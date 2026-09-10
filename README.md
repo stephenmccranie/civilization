@@ -10,7 +10,7 @@ A custom Minecraft civilization MMO where energy and real production support pow
 | [Implementation backlog](development_plan.md) | What exists, what remains and proposed dependency order |
 | [Open decisions](open_decisions.md) | Unresolved choices, simplification recommendations and cross-system conflicts |
 
-Each rule has one home. A decision being agreed does not mean it has been implemented. Current build: **0.10.0-dev**, adding everyday material rules and coal-fired household cooking. See the mod README for exact shipped behavior.
+Each rule has one home. A decision being agreed does not mean it has been implemented. Current build: **0.10.1-dev**, with everyday material rules, coal-fired household cooking and a Civilization creative tab. See the mod README for exact shipped behavior.
 
 ## Implementation and references
 

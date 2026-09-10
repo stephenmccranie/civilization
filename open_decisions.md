@@ -12,7 +12,7 @@ Resolved using the conversation's latest decisions:
 - Physical coal/oil/uranium are currencies; abstract-money issuance is no longer the plan.
 - Trusted members have full shared-asset access; custom member roles are unnecessary.
 - River freight and its coal boat are selected; transport mode is not an open-ended choice.
-- Current implementation baseline is 0.10.0-dev; implementation status is tracked in the backlog and mod README.
+- Current implementation baseline is 0.10.1-dev; implementation status is tracked in the backlog and mod README.
 
 ## Simplification recommendations
 

@@ -1,4 +1,5 @@
 {
+  "itemGroup.civilization": "Civilization",
   "command.civilization.status": "Civilization %s is loaded. Calorie food system active. Use /civilization calories.",
   "tooltip.civilization.calories": "+%s kcal",
   "item.civilization.foraged_morsel": "Foraged Morsel",

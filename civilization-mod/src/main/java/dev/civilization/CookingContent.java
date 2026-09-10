@@ -51,11 +51,5 @@ public final class CookingContent {
     public static void register(IEventBus bus) {
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus);
         MENUS.register(bus); RECIPES.register(bus); SERIALIZERS.register(bus);
-        bus.addListener((net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) -> {
-            if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) event.accept(STATION_ITEM);
-            if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
-                event.accept(BREAD_DOUGH); event.accept(COOKIE_DOUGH); event.accept(UNBAKED_PIE); event.accept(CAKE_BATTER);
-            }
-        });
     }
 }

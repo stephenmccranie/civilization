@@ -1,8 +1,10 @@
 # Civilization — implemented build
 
-**0.10.0-dev · Minecraft 1.21.1 · NeoForge 21.1.250 · JDK 21**
+**0.10.1-dev · Minecraft 1.21.1 · NeoForge 21.1.250 · JDK 21**
 
 This file describes the working mod. [Game rules](../design_direction.md) describe the intended game; [development plan](../development_plan.md) separates shipped work from future features.
+
+All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace are included automatically. They also remain discoverable through creative search.
 
 ## Development
 

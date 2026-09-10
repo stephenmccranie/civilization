@@ -1,10 +1,8 @@
 package dev.civilization;
 
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -16,9 +14,5 @@ public final class RecoveryItems {
     private RecoveryItems() {}
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
-        bus.addListener(RecoveryItems::creativeTab);
-    }
-    private static void creativeTab(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey().equals(CreativeModeTabs.FOOD_AND_DRINKS)) event.accept(MORSEL);
     }
 }

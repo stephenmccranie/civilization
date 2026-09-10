@@ -45,9 +45,5 @@ public final class KilnContent {
     public static void register(IEventBus bus) {
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus);
         MENUS.register(bus); RECIPES.register(bus); SERIALIZERS.register(bus);
-        bus.addListener((net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent event) -> {
-            if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) { event.accept(KILN_ITEM); event.accept(RETORT_ITEM); }
-            if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) event.accept(MINERAL_COAL);
-        });
     }
 }

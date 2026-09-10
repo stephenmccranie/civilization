@@ -23,6 +23,7 @@ public final class Civilization {
         FarmingContent.register(modBus);
         KilnContent.register(modBus);
         CookingContent.register(modBus);
+        CivilizationCreativeTab.register(modBus);
         modBus.addListener(net.neoforged.bus.api.EventPriority.LOWEST, MaterialRules::components);
         new CalorieSystem();
         new EnergyLog();

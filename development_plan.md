@@ -1,6 +1,6 @@
 # Civilization — implementation backlog
 
-Current build: **0.10.0-dev**, Minecraft **1.21.1**, NeoForge **21.1.250**, JDK **21**. Version in [gradle.properties](civilization-mod/gradle.properties). Coding resumed for everyday materials and household cooking.
+Current build: **0.10.1-dev**, Minecraft **1.21.1**, NeoForge **21.1.250**, JDK **21**. Version in [gradle.properties](civilization-mod/gradle.properties). Everyday materials and household cooking are implemented; all custom items now have a Civilization creative tab.
 
 Read [game rules](design_direction.md) for agreed behavior and [open decisions](open_decisions.md) for unsettled choices. This file owns work order and implementation status. Original checklist IDs are retained for traceability.
 
