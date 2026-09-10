@@ -1,0 +1,12 @@
+{
+  "type": "civilization:cooking",
+  "category": "food",
+  "cookingtime": 200,
+  "experience": 0.0,
+  "ingredient": {
+    "item": "minecraft:kelp"
+  },
+  "result": {
+    "id": "minecraft:dried_kelp"
+  }
+}

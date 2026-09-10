@@ -17,9 +17,26 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity {
     private MachineStructure.Result structure = new MachineStructure.Result(MachineStructure.INCOMPLETE, null, "");
     public int structureStatus() { return structure.status(); }
     public boolean isFertilizerWorks() { return this instanceof FertilizerRetortBlockEntity; }
+    public boolean requiresStructure() { return true; }
     public MachineStructure.Result checkStructure() {
-        structure = MachineStructure.check(level, worldPosition, getBlockState().getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING), isFertilizerWorks());
+        structure = requiresStructure()
+                ? MachineStructure.check(level, worldPosition, getBlockState().getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING), isFertilizerWorks())
+                : new MachineStructure.Result(MachineStructure.COMPLETE, null, "");
         return structure;
+    }
+    /** Small, synchronized state vocabulary shared by all three menus. */
+    public int operatingStatus() {
+        if (requiresStructure() && structureStatus() != MachineStructure.COMPLETE) return 0;
+        if (getBlockState().getValue(MachineFeedback.WORKING)) return 1;
+        if (!getItem(0).isEmpty() && !canPlaceItem(0, getItem(0))) return 5;
+        if (getItem(0).isEmpty()) return getItem(2).isEmpty() ? 2 : 6;
+        var recipe = level.getRecipeManager().getRecipeFor(processType,
+                new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)), level).orElseThrow().value();
+        var result = recipe.assemble(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)), level.registryAccess());
+        var output = getItem(2);
+        if (!output.isEmpty() && (!ItemStack.isSameItemSameComponents(output, result)
+                || output.getCount() + result.getCount() > output.getMaxStackSize())) return 3;
+        return dataAccess.get(0) > 0 ? 2 : 4;
     }
     private final net.minecraft.world.item.crafting.RecipeType<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe> processType;
     public KilnBlockEntity(BlockPos pos, BlockState state) { this(KilnContent.ENTITY.get(), pos, state, KilnContent.RECIPE_TYPE.get()); }
@@ -52,8 +69,9 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity {
                 kiln.setChanged();
                 EnergyLog.machine(level, pos, kiln.auditPrefix() + "_structure_broken", null, 0, null, 0);
             }
-            if (state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT))
-                level.setBlock(pos, state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, false), 3);
+            if (state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT) || state.getValue(MachineFeedback.WORKING))
+                level.setBlock(pos, state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, false)
+                        .setValue(MachineFeedback.WORKING, false), 3);
             return;
         }
         // Resume saved heat after a neighboring chunk reloads.
@@ -68,11 +86,21 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity {
         int progress = kiln.dataAccess.get(2);
         int heat = kiln.dataAccess.get(0);
         serverTick(level, pos, state, kiln);
-        if (kiln.getItem(1).getCount() < fuel)
+        boolean completed = kiln.getItem(0).getCount() < inputCount;
+        boolean working = completed || kiln.dataAccess.get(2) > progress;
+        var current = kiln.getBlockState();
+        if (current.getValue(MachineFeedback.WORKING) != working)
+            level.setBlock(pos, current.setValue(MachineFeedback.WORKING, working), 3);
+        if (kiln.getItem(1).getCount() < fuel) {
             EnergyLog.machine(level, pos, kiln.auditPrefix() + "_fuel", "civilization:mineral_coal", 1, null, 0);
-        if (kiln.getItem(0).getCount() < inputCount) {
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.2f, 0.9f);
+        }
+        if (completed) {
             EnergyLog.machine(level, pos, kiln.auditPrefix() + "_batch", net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(inputItem).toString(),
                     1, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(kiln.getItem(2).getItem()).toString(), kiln.getItem(2).getCount() - outputCount);
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.DECORATED_POT_PLACE,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.15f, 1.2f);
         }
         // Mark work in progress dirty too, so a normal chunk save preserves elapsed fuel/work.
         if (heat != kiln.dataAccess.get(0) || progress != kiln.dataAccess.get(2)) kiln.setChanged();

@@ -143,14 +143,14 @@ public class KilnGameTests {
         h.getLevel().setBlockEntity(restored);
         ticks(h, restored, 310);
         h.assertTrue(restored.getItem(2).is(FarmingContent.FERTILIZER.get()) && restored.getItem(2).getCount() == 4, "Retort preserves partial work on load");
-        restored.setItem(2, FarmingContent.FERTILIZER.toStack(61));
+        restored.setItem(2, FarmingContent.FERTILIZER.toStack(29));
         ticks(h, restored, 400);
-        h.assertTrue(restored.getItem(0).getCount() == 1 && restored.getItem(2).getCount() == 61, "Retort cannot overflow output");
+        h.assertTrue(restored.getItem(0).getCount() == 1 && restored.getItem(2).getCount() == 29, "Retort cannot overflow output");
         var pos = restored.getBlockPos();
         h.getLevel().destroyBlock(pos, true);
         var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(0.5));
         h.assertTrue(drops.stream().filter(e -> e.getItem().is(KilnContent.RETORT_ITEM.get())).mapToInt(e -> e.getItem().getCount()).sum() == 1, "Retort drops its own item");
-        h.assertTrue(drops.stream().filter(e -> e.getItem().is(FarmingContent.FERTILIZER.get())).mapToInt(e -> e.getItem().getCount()).sum() == 61, "Retort drops exact stored fertilizer");
+        h.assertTrue(drops.stream().filter(e -> e.getItem().is(FarmingContent.FERTILIZER.get())).mapToInt(e -> e.getItem().getCount()).sum() == 29, "Retort drops exact stored fertilizer");
         h.succeed();
     }
     @GameTest(template = "industrial")
@@ -184,14 +184,14 @@ public class KilnGameTests {
         var kiln = kiln(h);
         kiln.setItem(0, new ItemStack(Items.CLAY, 2));
         kiln.setItem(1, KilnContent.MINERAL_COAL.toStack(2));
-        kiln.setItem(2, new ItemStack(Items.BRICK, 61));
+        kiln.setItem(2, new ItemStack(Items.BRICK, 29));
         ticks(h, kiln, 250);
         h.assertTrue(kiln.getItem(1).getCount() == 2 && kiln.getItem(0).getCount() == 2, "No ignition without room for whole batch");
-        kiln.setItem(2, new ItemStack(Items.BRICK, 60));
+        kiln.setItem(2, new ItemStack(Items.BRICK, 28));
         ticks(h, kiln, 200);
-        h.assertTrue(kiln.getItem(2).getCount() == 64 && kiln.getItem(0).getCount() == 1, "Exactly fill the output slot");
+        h.assertTrue(kiln.getItem(2).getCount() == 32 && kiln.getItem(0).getCount() == 1, "Exactly fill the output slot");
         ticks(h, kiln, 1800);
-        h.assertTrue(kiln.getItem(1).getCount() == 1 && kiln.getItem(2).getCount() == 64, "Burn lit fuel but never ignite next fuel while blocked");
+        h.assertTrue(kiln.getItem(1).getCount() == 1 && kiln.getItem(2).getCount() == 32, "Burn lit fuel but never ignite next fuel while blocked");
         h.succeed();
     }
     @GameTest(template = "industrial")

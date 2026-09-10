@@ -72,7 +72,7 @@ Machines have physical multiblock construction where specified. Controllers expl
 
 ## 6. Carrying and transport
 
-Standard inventory slots represent carrying capacity. Ordinary 64-stacks become **32**, including building blocks. Bulky industrial goods stack lower, making large Tier 2 shipments impractical to carry personally. Existing 16-stack items still need a decision; unstackable items remain unstackable.
+Standard inventory slots represent carrying capacity. Ordinary 64-stacks become **32**, including building blocks. Bulky industrial goods stack lower, making large Tier 2 shipments impractical to carry personally. Existing 16-stack items stay unchanged in the first implementation; unstackable items remain unstackable.
 
 Warehouses and vehicles gain capacity through more slots. Ordinary chests can serve early warehouses. Containers must be empty to become portable inventory items; filled-container nesting cannot bypass capacity. Disable shared remote ender storage. An assembled cargo vehicle can physically move its inventory.
 

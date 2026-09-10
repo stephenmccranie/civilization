@@ -12,7 +12,7 @@ Resolved using the conversation's latest decisions:
 - Physical coal/oil/uranium are currencies; abstract-money issuance is no longer the plan.
 - Trusted members have full shared-asset access; custom member roles are unnecessary.
 - River freight and its coal boat are selected; transport mode is not an open-ended choice.
-- Current implementation baseline is 0.9.2-dev; agreed new systems are not shipped.
+- Current implementation baseline is 0.10.0-dev; implementation status is tracked in the backlog and mod README.
 
 ## Simplification recommendations
 
@@ -36,10 +36,10 @@ Keep short, direct controls: supply fuel, inspect requirements, load goods, set 
 | ID | Decision | Why it matters / simplest candidate to evaluate |
 | --- | --- | --- |
 | D01 | Spawn, starting items and accessible subsistence | A fresh solo player must reach food, tools and claim inputs without existing buyers. No starter kit or no-kit policy is approved |
-| D02 | Remaining vanilla boundary | Classify cooking, fire-cooked drops, renewable metals/fuels, recipes, enchanting/repair, XP, mobs, redstone and automation. Retain or replace deliberately; do not disable everything by inference |
+| D02 | Remaining vanilla boundary | Household cooking is implemented: food heat recipes use the stove; fire-cooked drops and villager baked/cooked supply are gated; cold assembly and finite loot remain. Renewable metals/fuels, other recipes, enchanting/repair, XP, mobs, redstone and automation still need review |
 | D03 | Passenger travel and dimensions | Decide portals, personal boats/mounts, elytra and teleport commands before final distances. Keep-inventory is already superseded by local recovery |
 | D04 | Region representation and generation | River width/depth/continuity, floodplain width/height, crop coverage, species conditions, stable forestry suitability, prospecting and migration. Candidate: a few overlapping geographic properties, not a biome per activity |
-| D05 | Fuel forms, packages and conservation | Select oil/uranium payment forms and physical quantities. Energy density, price and cargo volume are distinct; compressed blocks/tanks must not bypass freight. Existing 16-stack treatment remains open |
+| D05 | Fuel forms, packages and conservation | Select oil/uranium payment forms and physical quantities. Energy density, price and cargo volume are distinct; compressed blocks/tanks must not bypass freight. Existing 16-stack items stay unchanged in 0.10.0; later per-item tuning remains open |
 | D06 | Claim shape, power and denomination | Define billed area/volume, vertical reach, power clock across logout/unload/downtime, accepted fuel and takeover valuation. Candidate: one accepted denomination per controller avoids comparing market-priced mixed fuels; not approved |
 | D07 | Takeover scheduling and failure | Define monthly eligibility, simultaneous buyers, top-ups, resizing, cancellation and reserve exhaustion during the locked one-week handover. No grace and no fixed multi-fuel exchange rate may be silently invented |
 | D08 | Claim loss and movable asset rights | Who may use a shop/vehicle on unclaimed land, how reacquisition works, and treatment of left-behind goods. Prevent individually protected containers from making paid land protection irrelevant; preserve agreed owner-only death recovery |
@@ -94,7 +94,7 @@ The goal of immersion across every activity is agreed. The following is a cohesi
 
 **Investment changes the experience, not just a number.** Larger facilities, organized stores, loading areas and extraordinary craft visibly change a site. Advanced equipment expands reach and throughput while smaller work remains satisfying. No mandatory prestige stat, roleplay script or work minigame is implied.
 
-**First treatment to test later:** improve the existing crop, kiln and Fertilizer Works interactions with coherent sounds, restrained effects and clear state feedback. Reuse this treatment for the cooking station and river boat when implemented. Preserve current action responsiveness and recipes unless a separate gameplay change is chosen.
+**First treatment implemented in 0.10.0:** the stove, kiln and Fertilizer Works have state-driven heat/processing effects, quiet sounds and menu feedback. Crop-specific treatment and future boat effects remain proposals. Normal play and dense-site audiovisual tuning remain to be evaluated.
 
 Acceptance: nearby players can distinguish working, stopped and complete states without opening every menu; exact state remains accessible; repeated actions stay responsive; sound does not become unbearable in a dense factory; visual effects are bounded and scalable, with independent sound/motion settings. Compare a short ordinary work session and a crowded site, not only an isolated showcase. Audio/effect assets, licensing and technical rendering/audio support need investigation when implementation begins.
 
@@ -122,4 +122,4 @@ Natural-water-only fishing, stable forestry after clearing, empty boat portabili
 
 ## Recommended next move after this review
 
-Review the consolidated four-system model as a whole. When coding resumes, take a coherent package from the backlog rather than another isolated design question. The strongest unresolved boundary is protection/custody: it joins groups, land, shops, vehicles and recovery. Resolve its few core rules together before implementing any one of them.
+Everyday material rules and household cooking are now implemented. Next is the regional foundation: settle the minimum natural river/floodplain representation and forestry suitability, then implement consistent geographic queries and useful player feedback. Protection/custody decisions can wait until groups, land, shops and recovery become the active package. Siege brainstorming is deferred and has not become a mechanic specification.

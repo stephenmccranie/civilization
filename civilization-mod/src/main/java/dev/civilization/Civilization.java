@@ -22,6 +22,8 @@ public final class Civilization {
         RecoveryItems.register(modBus);
         FarmingContent.register(modBus);
         KilnContent.register(modBus);
+        CookingContent.register(modBus);
+        modBus.addListener(net.neoforged.bus.api.EventPriority.LOWEST, MaterialRules::components);
         new CalorieSystem();
         new EnergyLog();
         new Foraging();

@@ -1,7 +1,8 @@
 {
   "values": [
     "civilization:brick_kiln",
-    "civilization:fertilizer_retort"
+    "civilization:fertilizer_retort",
+    "civilization:cooking_station"
   ],
   "replace": false
 }

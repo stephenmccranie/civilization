@@ -24,8 +24,10 @@ public final class KilnScreen extends AbstractContainerScreen<KilnMenu> {
     }
     @Override public void render(GuiGraphics graphics, int x, int y, float delta) {
         super.render(graphics, x, y, delta);
-        graphics.drawString(font, Component.translatable("gui.civilization.structure_" + menu.structureStatus()), leftPos, topPos - 12,
-                menu.structureStatus() == 1 ? 0xFF99DD88 : 0xFFFFBB77, true);
+        boolean incomplete = menu.requiresStructure() && menu.structureStatus() != 1;
+        graphics.drawString(font, Component.translatable(incomplete ? "gui.civilization.structure_" + menu.structureStatus()
+                        : "gui.civilization.operating_" + menu.operatingStatus()), leftPos, topPos - 12,
+                !incomplete && (menu.operatingStatus() == 1 || menu.operatingStatus() == 6) ? 0xFF99DD88 : 0xFFFFBB77, true);
         renderTooltip(graphics, x, y);
         if (menu.getSlot(0).getItem().isEmpty() && isHovering(56, 17, 16, 16, x, y))
             graphics.renderTooltip(font, Component.translatable("tooltip.civilization." + menu.tooltipPrefix() + "_input"), x, y);

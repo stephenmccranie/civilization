@@ -13,6 +13,7 @@ public abstract class AbstractVillagerMixin {
     // Filter on access so both newly generated and saved villagers obey the production gate.
     @Inject(method = "getOffers", at = @At("RETURN"))
     private void civilization$kilnGate(CallbackInfoReturnable<MerchantOffers> callback) {
-        callback.getReturnValue().removeIf(offer -> offer.getResult().is(Items.BRICK));
+        callback.getReturnValue().removeIf(offer -> offer.getResult().is(Items.BRICK)
+                || dev.civilization.CookingContent.requiresCooking(offer.getResult()));
     }
 }

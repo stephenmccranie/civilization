@@ -1,0 +1,12 @@
+{
+  "type": "civilization:cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "civilization:bread_dough"
+  },
+  "result": {
+    "id": "minecraft:bread"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

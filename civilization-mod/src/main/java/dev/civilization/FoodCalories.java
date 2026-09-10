@@ -29,6 +29,9 @@ public final class FoodCalories {
         var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         double defaultValue = id.getNamespace().equals("minecraft") && FoodCatalog.KCAL.containsKey(id.getPath())
                 ? FoodCatalog.KCAL.get(id.getPath()) : properties.nutrition() * CalorieConfig.FOOD_FALLBACK.get();
+        if (stack.is(CookingContent.BREAD_DOUGH.get())) defaultValue = 300;
+        if (stack.is(CookingContent.COOKIE_DOUGH.get())) defaultValue = 25;
+        if (stack.is(CookingContent.UNBAKED_PIE.get())) defaultValue = 200;
         return values.getOrDefault(id.toString(), defaultValue);
     }
 

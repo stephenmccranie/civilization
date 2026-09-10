@@ -10,7 +10,17 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class KilnBlock extends AbstractFurnaceBlock {
     public static final MapCodec<KilnBlock> CODEC = simpleCodec(KilnBlock::new);
-    public KilnBlock(Properties properties) { super(properties); }
+    public KilnBlock(Properties properties) {
+        super(properties);
+        registerDefaultState(defaultBlockState().setValue(MachineFeedback.WORKING, false));
+    }
+    @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(MachineFeedback.WORKING);
+    }
+    @Override public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        MachineFeedback.animate(state, level, pos, random, false);
+    }
     @Override protected MapCodec<? extends KilnBlock> codec() { return CODEC; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new KilnBlockEntity(pos, state); }
     @Override protected void openContainer(Level level, BlockPos pos, Player player) {

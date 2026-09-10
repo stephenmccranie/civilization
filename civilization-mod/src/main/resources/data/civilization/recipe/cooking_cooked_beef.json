@@ -1,0 +1,12 @@
+{
+  "type": "civilization:cooking",
+  "category": "food",
+  "cookingtime": 200,
+  "experience": 0.0,
+  "ingredient": {
+    "item": "minecraft:beef"
+  },
+  "result": {
+    "id": "minecraft:cooked_beef"
+  }
+}

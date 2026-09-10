@@ -33,10 +33,12 @@ neoForge {
         }
         server {
             server()
+            gameDirectory = project.file('runs/server')
             programArgument '--nogui'
         }
         gameTestServer {
             type = 'gameTestServer'
+            gameDirectory = project.file('runs/gametest')
             systemProperty 'neoforge.enabledGameTestNamespaces', 'civilization'
         }
         configureEach {
@@ -50,6 +52,11 @@ neoForge {
             sourceSet(sourceSets.gameTest)
         }
     }
+}
+
+// JavaExec otherwise closes stdin, making the dedicated server's stop command unusable.
+tasks.named('runServer', JavaExec) {
+    standardInput = System.in
 }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {

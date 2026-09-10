@@ -30,6 +30,16 @@ try {
         default { 'build' }
     }
 
+    if ($Task -eq 'Server') {
+        $serverDirectory = Join-Path $PSScriptRoot 'runs/server'
+        New-Item -ItemType Directory -Path $serverDirectory -Force | Out-Null
+        $serverProperties = Join-Path $serverDirectory 'server.properties'
+        if (-not (Test-Path -LiteralPath $serverProperties)) {
+            Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'server.local.example.properties') -Destination $serverProperties
+        }
+        Write-Host 'Dedicated development server: localhost:25566; saves in runs/server. Type stop to shut down.'
+    }
+
     if ($Task -eq 'Deploy') {
         $instancePath = (Resolve-Path -LiteralPath $devConfig.prismInstance).Path
         $pack = Get-Content -LiteralPath (Join-Path $instancePath 'mmc-pack.json') -Raw | ConvertFrom-Json

@@ -1,0 +1,12 @@
+{
+  "type": "civilization:cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "civilization:cake_batter"
+  },
+  "result": {
+    "id": "minecraft:cake"
+  },
+  "experience": 0.0,
+  "cookingtime": 200
+}

@@ -22,6 +22,7 @@ public final class CalorieHud {
     public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         event.register(dev.civilization.KilnContent.MENU.get(), KilnScreen::new);
         event.register(dev.civilization.KilnContent.RETORT_MENU.get(), KilnScreen::new);
+        event.register(dev.civilization.CookingContent.MENU.get(), KilnScreen::new);
     }
 
     @SubscribeEvent
@@ -91,6 +92,17 @@ public final class CalorieHud {
         @SubscribeEvent
         public static void tooltip(ItemTooltipEvent event) {
             if (event.getEntity() == null) return;
+            if (event.getItemStack().is(net.minecraft.world.item.Items.BONE_MEAL))
+                event.getToolTip().add(Component.translatable("message.civilization.bone_meal_disabled").withStyle(ChatFormatting.GRAY));
+            if (event.getItemStack().is(dev.civilization.CookingContent.STATION_ITEM.get())) {
+                event.getToolTip().add(Component.translatable("tooltip.civilization.cooking_input").withStyle(ChatFormatting.GRAY));
+                event.getToolTip().add(Component.translatable("tooltip.civilization.cooking_fuel").withStyle(ChatFormatting.GRAY));
+            }
+            if (event.getItemStack().is(dev.civilization.CookingContent.BREAD_DOUGH.get())
+                    || event.getItemStack().is(dev.civilization.CookingContent.COOKIE_DOUGH.get())
+                    || event.getItemStack().is(dev.civilization.CookingContent.UNBAKED_PIE.get())
+                    || event.getItemStack().is(dev.civilization.CookingContent.CAKE_BATTER.get()))
+                event.getToolTip().add(Component.translatable("tooltip.civilization.bake").withStyle(ChatFormatting.GRAY));
             if (event.getItemStack().is(dev.civilization.KilnContent.RETORT_ITEM.get())) {
                 event.getToolTip().add(Component.translatable("tooltip.civilization.works_blocks").withStyle(ChatFormatting.GOLD));
                 event.getToolTip().add(Component.translatable("tooltip.civilization.preview").withStyle(ChatFormatting.GRAY));

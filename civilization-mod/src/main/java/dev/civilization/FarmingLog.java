@@ -34,7 +34,8 @@ public final class FarmingLog {
             for (var drop : harvest.getDrops()) {
                 var stack = drop.getItem();
                 if (stack.isEmpty()) continue;
-                double potential = stack.is(Items.WHEAT) ? FoodCalories.breadCalories() / 3
+                var dough = CookingContent.BREAD_DOUGH.toStack();
+                double potential = stack.is(Items.WHEAT) ? FoodCalories.of(dough, dough.getFoodProperties(player)) / 3
                         : FoodCalories.of(stack, stack.getFoodProperties(player));
                 EnergyLog.production(player, "crop_output", detail, BuiltInRegistries.ITEM.getKey(stack.getItem()).toString(),
                         0, stack.getCount(), potential * stack.getCount());
@@ -46,7 +47,8 @@ public final class FarmingLog {
 
     public static void crafted(Player player, ItemStack stack, int amount) {
         if (!(player instanceof ServerPlayer) || amount <= 0 || stack.getFoodProperties(player) == null) return;
-        String input = stack.is(FarmingContent.RATION.get()) ? "minecraft:bread" : stack.is(Items.BREAD) ? "minecraft:wheat" : null;
+        String input = stack.is(FarmingContent.RATION.get()) ? "minecraft:bread"
+                : stack.is(CookingContent.BREAD_DOUGH.get()) ? "minecraft:wheat" : null;
         EnergyLog.production(player, "food_produced", "manual_craft_or_processing",
                 new EnergyLog.Production(input, input == null ? 0 : amount * 3,
                         BuiltInRegistries.ITEM.getKey(stack.getItem()).toString(), amount,
