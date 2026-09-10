@@ -1,0 +1,15 @@
+{
+  "result": {
+    "count": 1,
+    "id": "civilization:mineral_blend"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "item": "minecraft:gravel"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless"
+}

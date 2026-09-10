@@ -1,0 +1,137 @@
+[
+  {
+    "path": "transport.md",
+    "sha256": "645D8971AAB8EA7D4F006B4AC60161F3F36D2D692E566C9C20650FAB4CEE1B87",
+    "words": 1312
+  },
+  {
+    "path": "tier_matrix.md",
+    "sha256": "ECE20F813A03F2772F8FD367754CD745A3A26B6C32107A67BEA022FC3265C9AD",
+    "words": 1829
+  },
+  {
+    "path": "tier_framework.md",
+    "sha256": "6CAFA603E0D89AEE38EDD39E5E9EF6D1CFA8DF4C450593E22EDCCE496C3717AB",
+    "words": 1203
+  },
+  {
+    "path": "systems_blueprint.md",
+    "sha256": "1812D838FFDE9594CA78CA7F3BAA8BB569EA8D601867C00DE73488BCB8A8DCCC",
+    "words": 2358
+  },
+  {
+    "path": "status_power_civilization_game_design.md",
+    "sha256": "9E3115A2652267BBC726D28EC62D0947153C763803BD5381B44807237A1FCE2B",
+    "words": 2452
+  },
+  {
+    "path": "region_system.md",
+    "sha256": "099D5FF471F76B6329283BAF530D2A391A703CFFCB7AE09F0B0FE3B84F56DE14",
+    "words": 1696
+  },
+  {
+    "path": "regional_geography.md",
+    "sha256": "13662930697DD85D20FF8597B684D2C90AFE4AE2EEB152CE1AB32CEDB797930C",
+    "words": 1125
+  },
+  {
+    "path": "property_and_authority.md",
+    "sha256": "6AB4C1E7ACF455C6B990F0641AF7B79DDF2531CFFB30108E229205C31F135B0C",
+    "words": 2058
+  },
+  {
+    "path": "modpack_server_design_workshop.md",
+    "sha256": "ACAFD41B88482579AF46A1668ED18FDC73CCBDEF1D76FEE9509644B068494741",
+    "words": 2577
+  },
+  {
+    "path": "map_and_discovery.md",
+    "sha256": "B2AB8C37E93BF2C24E6BD4183EEAE9EA4081B908BB3679EE1B504C6CDC254948",
+    "words": 676
+  },
+  {
+    "path": "land_controller.md",
+    "sha256": "348566543AF0D0B94F239CA7B76EAA32CF9103B7483D164338164BEAB50FB0DE",
+    "words": 1251
+  },
+  {
+    "path": "groups.md",
+    "sha256": "CDD259763BCEF4DF3F75EBDDA2418CB20A1EA79EDFD7A509B569AE150D3D2B78",
+    "words": 505
+  },
+  {
+    "path": "first_playable_economy.md",
+    "sha256": "B8C0065A5D3FCAC380AB5F2BA1968DCED08871C2F195B51D1D3125402D2A60B7",
+    "words": 1567
+  },
+  {
+    "path": "first_hour.md",
+    "sha256": "FAB4E51A5854A986E02966C4BA11B54DB368F20572404C5B96BDDD89C52A530E",
+    "words": 748
+  },
+  {
+    "path": "everyday_play.md",
+    "sha256": "802E22C6044745CB997FE57B862220EAEED076CA30DDBE2A67EE5B3A47578586",
+    "words": 2997
+  },
+  {
+    "path": "development_plan.md",
+    "sha256": "B27C0C99A4EA0399DD3ECAA4C63B6094FDB29362E8721D9076B6703A9874918B",
+    "words": 3430
+  },
+  {
+    "path": "design_direction.md",
+    "sha256": "D2FBB883D241F7C3749C7D2D062940863989CDB56D04768F6B4298111260125D",
+    "words": 4518
+  },
+  {
+    "path": "currency_and_exchange.md",
+    "sha256": "21EBE1BF1CC5712FB35DDEEF5561149C4D828099D53899D02BEDFFA307452F59",
+    "words": 2314
+  },
+  {
+    "path": "concept_art\\prompts.md",
+    "sha256": "BA1DA58E836C51E996251731AF4E2B3537C331F6DDAC598EAFF49A3F99F9BAED",
+    "words": 1615
+  },
+  {
+    "path": "civilization-mod\\kiln-prototype.md",
+    "sha256": "D50FA787556682D3CF87D62E5A4A295A8EF61955964D960C0FF33960D8976E9F",
+    "words": 826
+  },
+  {
+    "path": "bedrock_feasibility_research.md",
+    "sha256": "C457E6182E38A2C91114F04CA2F0AACF6EFE33EA7D8AC60C57D2294618FE82D5",
+    "words": 1443
+  },
+  {
+    "path": "civilization-mod\\industry-progression.md",
+    "sha256": "CA21147F98CF2FB0EFF0FE501AD20621689A3A79D6A5F505BAE4321D5C34FC9F",
+    "words": 816
+  },
+  {
+    "path": "civilization-mod\\farming-prototype.md",
+    "sha256": "B5E7CAB8BFC40514B11E163948EBEF45DD58DF24DD7D6928EDE97AEBCFC6EC4D",
+    "words": 1162
+  },
+  {
+    "path": "civilization-mod\\README.md",
+    "sha256": "C83A781EA003AF78907D588D52BB7BA0FB4D7C91F10BB4ED6015A349D6AFF7F3",
+    "words": 2677
+  },
+  {
+    "path": "civilization-mod\\multiblock-builds.md",
+    "sha256": "1DDD6864DD5ED73A5846097635FDE53FAF41487F679AE0B912BD4C5779AD5436",
+    "words": 1002
+  },
+  {
+    "path": "analysis\\session-review-2026-09-10.md",
+    "sha256": "D656253A9C0AE8D141E8F1F1451B82B6DFE4B62DB4501B1FC85F3555F16A450D",
+    "words": 599
+  },
+  {
+    "path": "analysis\\kiln-session-review-2026-09-10.md",
+    "sha256": "133AA80077B47873DFD6E3ECBE6B6CCDB1229677117CDF5B3CED49BE5628B645",
+    "words": 341
+  }
+]

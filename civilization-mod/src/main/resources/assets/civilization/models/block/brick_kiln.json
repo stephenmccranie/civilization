@@ -1,0 +1,8 @@
+{
+  "textures": {
+    "top": "minecraft:block/bricks",
+    "side": "minecraft:block/bricks",
+    "front": "minecraft:block/furnace_front"
+  },
+  "parent": "minecraft:block/orientable"
+}

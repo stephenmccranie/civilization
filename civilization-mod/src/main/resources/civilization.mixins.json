@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.civilization.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["PlayerMixin", "ServerPlayerMixin", "CakeMixin", "ItemStackMixin", "AbstractVillagerMixin"],
+  "client": ["LocalPlayerMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=west,lit=true": {
+      "y": 270,
+      "model": "civilization:block/brick_kiln_on"
+    },
+    "facing=west,lit=false": {
+      "y": 270,
+      "model": "civilization:block/brick_kiln"
+    },
+    "facing=north,lit=false": {
+      "y": 0,
+      "model": "civilization:block/brick_kiln"
+    },
+    "facing=east,lit=true": {
+      "y": 90,
+      "model": "civilization:block/brick_kiln_on"
+    },
+    "facing=north,lit=true": {
+      "y": 0,
+      "model": "civilization:block/brick_kiln_on"
+    },
+    "facing=south,lit=false": {
+      "y": 180,
+      "model": "civilization:block/brick_kiln"
+    },
+    "facing=south,lit=true": {
+      "y": 180,
+      "model": "civilization:block/brick_kiln_on"
+    },
+    "facing=east,lit=false": {
+      "y": 90,
+      "model": "civilization:block/brick_kiln"
+    }
+  }
+}

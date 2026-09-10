@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "food",
+  "ingredients": [ { "item": "minecraft:bread" }, { "item": "minecraft:bread" }, { "item": "minecraft:bread" } ],
+  "result": { "id": "civilization:field_ration", "count": 1 }
+}

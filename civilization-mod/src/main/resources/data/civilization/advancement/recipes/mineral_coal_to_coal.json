@@ -1,0 +1,25 @@
+{
+  "rewards": {
+    "recipes": [
+      "civilization:mineral_coal_to_coal"
+    ]
+  },
+  "criteria": {
+    "fuel": {
+      "conditions": {
+        "items": [
+          {
+            "items": "civilization:mineral_coal"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "parent": "minecraft:recipes/root",
+  "requirements": [
+    [
+      "fuel"
+    ]
+  ]
+}

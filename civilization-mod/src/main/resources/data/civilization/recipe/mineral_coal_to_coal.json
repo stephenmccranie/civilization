@@ -1,0 +1,12 @@
+{
+  "ingredients": [
+    {
+      "item": "civilization:mineral_coal"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "result": {
+    "id": "minecraft:coal",
+    "count": 1
+  }
+}

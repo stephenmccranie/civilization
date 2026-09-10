@@ -1,0 +1,8 @@
+{
+  "textures": {
+    "side": "minecraft:block/cut_copper",
+    "front": "minecraft:block/blast_furnace_front",
+    "top": "minecraft:block/copper_block"
+  },
+  "parent": "minecraft:block/orientable"
+}
