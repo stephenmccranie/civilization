@@ -12,6 +12,15 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 
 **Next:** try the physical oven in an ordinary kitchen, then choose its first baking batch. Continue ordinary stove play to assess sensory timing, carryover, warmth and rewards. Preparation remains deferred; there is no cooking XP or chopping mechanic.
 
+### Builder's Line — planning package
+
+The requested offhand, two-point, straight-line construction/demolition tool is in planning. [Design](design_direction.md#straight-line-hand-tool--planned) records agreed intent; the [proposal](open_decisions.md#builders-line--proposed-hand-tool) owns the visual brief, recommended controls, constraints and unresolved choices. No runtime behavior, recipe or asset is implemented, and this planning entry does not reorder the existing cooking/coal priorities.
+
+1. Settle demolition speed and selection/work controls, initial length/reach and block coverage. Choose name/appearance and acquisition before claiming a Survival-ready item.
+2. Build the smallest Creative-granted functional prototype: offhand detection, authoritative endpoint selection, inclusive axis-only line enumeration, preview/cancel, paced full-block placement and sequential held-tool demolition. Reuse protection, labor and ordinary item/break behavior; verify cancellation and conservation before expanding coverage.
+3. Create the reel sprite through Define → Build and refine → Verify and publish; review actual inventory/offhand readability and cached previews under Photon/Faithful. Play one short construction/demolition loop and tune only from observed behavior.
+4. Add the chosen Survival recipe and acquisition gating, update shipped controls/limits in the focused construction reference, validate under [testing](civilization-mod/testing.md), and deploy/update status when a runtime build exists. Cut-piece support follows only if selected, through the existing half-grid placement path.
+
 ## 1. Implemented foundation
 
 | IDs | Completed scope |

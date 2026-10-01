@@ -19,6 +19,45 @@ Reuse storage and accounting without forcing all consumers to behave identically
 
 Keep short, direct controls: supply fuel, inspect requirements, load goods, set an offer. Persistent implementation work is justified where it enforces an agreed rule, especially claims and transactions. Do not build a general framework before concrete consumers need it.
 
+## Builder's Line — proposed hand tool
+
+The [agreed brief](design_direction.md#straight-line-hand-tool--planned) is an offhand instrument for two-endpoint, axis-aligned building and demolition with the working block/tool in the main hand. Everything below is a recommendation for discussion, not shipped or approved mechanics.
+
+### Identity and appearance
+
+Recommend **Builder's Line**, a mason's line reel: a palm-sized flattened wooden spool in a dark iron frame, a small brass crank and a short ivory cord ending in an iron hook. The spool opening, off-center crank and dangling hook should read at inventory size. Worn wood, dark cord recesses and restrained brass fit the frontier/town tool family. Avoid a wand silhouette or decorative electrical hardware. One original 64x64 sprite should serve inventory and held views initially; no animated model is needed. Follow the [art skill](.agents/skills/civilization-art/SKILL.md) and [asset workflow](tools/modeling/README.md#complete-asset-pipeline) when creating actual art. This text is the planning brief; no concept or runtime asset exists yet.
+
+Show a thin taut cord between endpoint markers with restrained block outlines. Placement also shows translucent copies of the held block. Demolition uses amber outlines and ordinary cracking on the current block. Invalid targets use red plus a short reason; color is not the only cue. A compact action-bar message reports mode, length, material requirement or mining progress. No menu or permanent HUD panel.
+
+### Recommended interaction
+
+1. Equip the line reel in the offhand and a building block or mining tool in the main hand. Mode follows that main-hand item; unsupported items show a hint and perform no line action.
+2. Press a rebindable **Mark line** key (candidate default: G, after checking existing bindings) while aiming to mark A. Placement marks the cell ordinary placement would fill on the clicked face; demolition marks the actual block hit. Marking consumes the input without placing, mining, opening a container or using the main-hand tool.
+3. Aim at B and press the same key again to lock the preview. Both endpoints are included. Exactly two coordinates must match; a single-cell line is also valid. A diagonal candidate stays red with “Align the endpoints”; do not silently project it onto another axis. With the first point set, show a live candidate preview before locking B.
+4. Review, then hold **right-click to build** or **left-click to demolish**. Work proceeds from A toward B. Selection alone never changes the world. Releasing the button pauses immediately; holding again resumes after revalidation. Suppress ordinary held-item actions while a line selection is active. Crouch + Mark clears the selection; completion clears it too.
+5. Changing the working item/material or offhand reel cancels the selection. Death, logout, dimension change and leaving the working area cancel it; no queued offline work or saved job. Depletion follows existing labor rules rather than introducing a new calorie gate.
+
+Recommend a **16-cell maximum** for the first pass. Both marks use ordinary interaction reach and actual hit surfaces, so the player may walk between marking A and B. During work, each next cell must be within ordinary interaction reach with a valid unobstructed interaction; the player follows the line rather than operating remotely through walls. Out-of-reach work pauses with a hint. Recommend canceling when the player goes more than 16 blocks from the selected segment. Extended reach is an unresolved alternative if following a line proves cumbersome.
+
+### Work, costs and first-pass coverage
+
+- **Building:** propose up to four successful placements per second at 20 TPS. Consume only the selected main-hand stack, one item per successful full-block placement; no automatic inventory sourcing. Charge ordinary placement calories and comfort modifiers exactly once. A missing stack, obstruction, entity collision, denied access or canceled event stops at that cell with feedback; earlier work remains. Do not skip gaps, overwrite blocks or roll back an entire line. Counts shown before execution are estimates, rechecked as work proceeds.
+- **Demolition speed is unresolved:** recommend automatic sequential mining at the held tool's normal effective speed first, including hardness, enchantments, work bonuses and depletion. This saves repeated aiming/clicks while keeping powered extraction useful, but does not accelerate total mining labor. Alternatives are a bounded speed multiplier or immediate line destruction; these materially change construction/extraction balance and need an explicit decision before implementation.
+- Each successfully mined block follows ordinary harvest eligibility, tool durability, enchantments, drops, experience and calorie accounting. Revalidate tool identity and block state during progress; a tool breaking or a target changing stops/reset progress before another block can be affected. No free harvest, extra drops or separate reel wear in the recommended first pass. Break drops enter the world normally rather than teleporting into inventory.
+- Recommend ordinary inert full-cube building blocks first. Exclude block entities/containers, multiblock/native machine parts, fluids, falling blocks, TNT, plants, multi-block items and moving vessels. Apply the same conservative target coverage to demolition; ordinary harvestable full cubes, including ores, remain eligible under their existing rules. These exclusions are proposed scope, not changes to ordinary hand actions.
+- Cut slabs, beams and eighths should follow later through [CutPlacement](civilization-mod/cutting.md#placement-and-joining): repeat a captured half-grid orientation/anchor, consume the correct piece volume and preserve mixed-cell conservation. Do not treat them as generic full blocks. Functional/stateful blocks need separate placement semantics rather than an expanding set of special cases in the initial tool.
+- Recommend no additional fuel or XP system for the reel. Survival acquisition is unresolved: a modest Smithy recipe using iron, wood and cord is a candidate, with exact ingredients and workshop coverage still to choose. Grant the first prototype through Creative for testing; that does not settle the final recipe or tier.
+
+### Implementation approach and acceptance
+
+Use a small server-owned per-player selection/progress record, a line enumerator and one placement/mining executor. The client sends marking/work intent; the server validates hits, endpoints, axis, length, dimension, actual held stacks, reach, loaded chunks and current access. Never trust client previews or force-load chunks. Check permission again at each mutation, including mid-line whitelist revocation. Execute normal cancellable player placement/break paths with existing calorie hooks; raw set/remove-block loops would bypass protection, drops and durability. A denied action pays nothing. Preflight cannot replace per-block checks.
+
+Cache line geometry outside rendering. Reuse `GuidePerformance` refresh/key invalidation and visibility-bounded outlines under the [shared guide contract](civilization-mod/multiblock-builds.md#guide-performance-contract); no independent polling constants or per-frame geometry/collision unions. Only held, active selections render. One active job per player and paced work keep the first pass bounded without a generic job framework.
+
+Focused checks should prove all six directions and inclusive counts; diagonal/over-limit rejection; no accidental endpoint action; actual inventory/calorie/durability/drop conservation; protection and canceled-event behavior; entity/occupied-cell rejection; out-of-reach pause; changed targets/tools and broken tools; duplicate start requests; release/cancel/disconnect cleanup; unloaded chunks; and two players racing for one target. Inspect inventory, offhand, placement/demolition previews and input handling under Photon/Faithful. A single short wall/beam dismantling loop is the usability check. [The package](development_plan.md#builders-line--planning-package) owns the delivery order.
+
+Remaining choices: demolition speed, preferred controls, line length/reach, visual identity/name, Survival acquisition and whether shaped pieces belong in the first pass.
+
 ## Decisions that block coherent implementation
 
 | ID | Decision | Why it matters / simplest candidate to evaluate |

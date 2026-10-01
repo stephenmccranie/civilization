@@ -357,6 +357,10 @@ Future design direction: make architecture useful through shared physical relati
 
 Keep ordinary outdoor life viable. Prioritize useful spaces and new capabilities over constant temperature-meter maintenance. Exact room recipes, arbitrary population/proximity bonuses and an exhaustive simulation are not the organizing principle. Existing multiblocks remain until a specific replacement is designed. [Proposals and unresolved heat rules](open_decisions.md#emergent-architecture-and-heat).
 
+### Straight-line hand tool — planned
+
+Add an offhand tool for quickly building or destroying a straight line selected by two endpoints. Placement uses blocks held in the main hand; demolition uses a tool held in the main hand. Lines run along one world axis (X, Y or Z), never diagonally. This is agreed intent, not shipped behavior. The name, appearance, controls, speed, reach, acquisition and initial block coverage remain in the [Builder's Line proposal](open_decisions.md#builders-line--proposed-hand-tool); the [implementation package](development_plan.md#builders-line--planning-package) owns delivery.
+
 ## Shared heat and thermal comfort
 
 Present local temperature in a compact brass/glass thermometer between health and calories. Color and a subtle breathing highlight imply comfort and its benefits; an integrated brick accent indicates road speed. Keep exact bonus numbers in an inventory inspection tooltip, not a permanent status panel.
