@@ -77,6 +77,8 @@ public final class PreviewVisualCheck {
             prepared = true;
             PreviewConfig.MODE.set(PreviewConfig.Mode.TEXTURED);
             mc.options.pauseOnLostFocus = false;
+            mc.options.hideGui = false;
+            mc.options.fov().set(70);
             mc.options.guiScale().set(3);
             mc.options.renderDistance().set(8);
             mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
@@ -91,7 +93,7 @@ public final class PreviewVisualCheck {
                 level.setWeatherParameters(100000, 0, false, false);
                 for (int x = -8; x <= 8; x++) for (int z = -8; z <= 8; z++) {
                     level.setBlockAndUpdate(new BlockPos(x, 100, z), Blocks.STONE.defaultBlockState());
-                    for (int y = 101; y <= 107; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+                    for (int y = 101; y <= 129; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
                 }
                 level.setBlockAndUpdate(new BlockPos(0, 101, 0), KilnContent.KILN.get().defaultBlockState());
                 level.setBlockAndUpdate(new BlockPos(-1, 101, 1), Blocks.COBBLESTONE.defaultBlockState());
@@ -99,6 +101,7 @@ public final class PreviewVisualCheck {
                 for (int x = -3; x <= 3; x++) for (int y = 101; y <= 105; y++)
                     level.setBlockAndUpdate(new BlockPos(x, y, 5), ((x + y) % 2 == 0 ? Blocks.WHITE_CONCRETE : Blocks.RED_CONCRETE).defaultBlockState());
                 var player = server.getPlayerList().getPlayers().getFirst();
+                player.closeContainer();
                 player.setGameMode(GameType.CREATIVE);
                 if (CHECK.equals("textures") || CHECK.equals("machines")) {
                     player.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(KilnContent.MINERAL_COAL.get()));

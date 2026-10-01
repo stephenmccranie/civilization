@@ -2,6 +2,10 @@
 
 Start with [README.md](README.md), [current status](docs/status.md), and the active package in [development_plan.md](development_plan.md). Read the relevant implementation reference before changing behavior. The user's latest decisions take precedence over older documents.
 
+## Multiblock guide performance
+
+All current and future multiblock guides, including native model guides, must follow the [shared guide performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract). Use `GuidePerformance` for refresh cadence and bounded visible outlines; cache layout and construction geometry outside the frame loop. Do not introduce separate polling/budget constants or per-frame collision unions.
+
 ## Keep documentation current in the same change
 
 For asset creation/redesign, use the project [Civilization art skill](.agents/skills/civilization-art/SKILL.md) and [shared asset pipeline](tools/modeling/README.md#complete-asset-pipeline): brief → one generated direction → autonomous visual review/iteration → implementation → actual model/in-game review. Do not default to competing concepts or routine user approval gates. Concept selection does not approve generated mechanical errors.

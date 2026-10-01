@@ -19,7 +19,7 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 | F05 | Food catalog, calorie-neutral field rations, regional rain/soil storage and two-hour farmland cycles with shared fertilizer yields; [coverage and exceptions](civilization-mod/weather.md) |
 | F06 | Unified Coal from finite ore/salvage; vanilla coal conversion, charcoal and coal-block production retired |
 | F07–F08 | Kiln bricks, vanilla brick production gate and Fertilizer Furnace |
-| F09–F11 | Physical multiblocks, contextual textured build guides, [tier-appropriate machine storage](civilization-mod/README.md#machine-item-storage), hoppers and interruption/save behavior |
+| F09–F11 | Physical multiblocks, contextual textured build guides with a [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract), [tier-appropriate machine storage](civilization-mod/README.md#machine-item-storage), hoppers and interruption/save behavior |
 | F12 | Bounded asynchronous player/production and machine event logs |
 | F13 | Automated gameplay/unit tests and focused rendering checks; current results in project status |
 | F14 | User play evidence for gathering, building, calorie recovery, farming, fertilizer manufacture and multiblock assembly |
@@ -134,7 +134,7 @@ Entries remain open at their full scope unless explicitly marked complete. Parti
 | L02 | One sky asset's construction, access, energy clock and shortage behavior |
 | L03 | Later airship/distant-rendering integration, including extremely fast prestige airships, their energy demand and safe high-speed travel limits |
 | L04 | Optional organized PvP participation, stakes and protection boundary; implement the deferred [pickpocketing / wearable PvP flag](design_direction.md#pickpocketing-and-wearable-pvp-flag--planned) system after resolving its interaction rules |
-| L06 | The [Oil Derrick](civilization-mod/industry.md#build-and-supply-machines) has a tall guide-built timber frame, two walkable galleries, a small animated crosshead and a ground-level crude port, exported from the [isometric block plan](tools/modeling/README.md#isometric-block-plans). Every guided multiblock accepts held structural stacks and shows remaining material counts in its hint. Large-guide rendering now culls off-screen ghosts and bounds hard outlines; next overhaul the Coal Drill, review derrick construction cost and load, then resolve [machine-centered resource-site sieges](open_decisions.md#extraction-installation-sieges) |
+| L06 | The [Oil Derrick](civilization-mod/industry.md#build-and-supply-machines) is a complete native timber tower with progressive held-material construction, two walkable galleries, an animated crosshead and local section repair. Every guided multiblock accepts held structural stacks and shows remaining materials; all guides follow the [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract). Next overhaul the Coal Drill, review derrick construction cost and load, then resolve [machine-centered resource-site sieges](open_decisions.md#extraction-installation-sieges) |
 | L05 | Public access staged by operational and performance evidence |
 
 Keep the original distinction: a successful functional test does not prove an economy, and a small economy test does not prove 200-player capacity.

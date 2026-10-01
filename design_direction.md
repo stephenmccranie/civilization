@@ -120,7 +120,7 @@ Balance the initial refinery as **one oil extractor → one heater → one disti
 
 **Armor, tools and weapons beyond the stone stage must require an actual production pipeline.** Better equipment should depend on material processing and production infrastructure, rather than only direct crafting-table recipes. The first bridge is stone tools and Coal → kiln bricks → a brick-built, coal-fired Foundry → iron/copper/gold ingots → steel and shared Machine Parts → T2 machinery. The town-workshop direction below requires agricultural materials and dedicated workshops for the initial equipment catalog. The Foundry must be buildable without metal, and refinery construction must be possible before refined fuel exists. Later equipment tiers and alternate acquisition paths still need a broader pass.
 
-Machines have physical multiblock construction where specified. Controllers explain required materials with contextual textured ghost previews; guides disappear when complete or not being inspected. No separate build screen or hide key is needed. This does not require every future cooking station or vehicle to be a multiblock.
+Machines have physical multiblock construction where specified. Controllers explain required materials with contextual textured ghost previews; guides disappear when complete or not being inspected. No separate build screen or hide key is needed. Every multiblock guide follows the [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract), with cached construction geometry and bounded visible outlines. This does not require every future cooking station or vehicle to be a multiblock.
 
 ### Town workshops and the rural–urban production loop
 

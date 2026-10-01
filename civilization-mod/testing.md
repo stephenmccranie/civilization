@@ -14,6 +14,8 @@ Verification runs its Gradle tasks in one invocation. Gradle reuses unchanged co
 
 For a narrow change, inspect the owning code and focused reference, keep searches and command output bounded, make one coherent edit, run its check once, then deploy once if the user needs the build in Prism. Update only affected documents and use `tools/check_docs.py` after documentation changes. Profile slow tests before shortening any simulation or reducing coverage.
 
+Shared multiblock guide changes must preserve `GuidePerformanceTest` coverage for refresh cadence, key invalidation, visibility culling and retaining the aimed part inside the outline cap. Use `guide` for ordinary block guides and `derrick-guide` when native section geometry changes.
+
 ## Focused visual checks
 
 `models` is a development-only GeckoLib integration scene beside the Oil Engine. First create and publish the native editor fixture using the [model toolset](../tools/modeling/README.md). The fixture source and native exports are now included, with successful editor round-trip and Photon motion-frame review. The ordinary `engine` scene continues to test the production renderer; success there only verifies that the added dependency coexists with the current graphics setup.

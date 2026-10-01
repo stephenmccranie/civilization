@@ -18,11 +18,14 @@ public final class DerrickPreview {
     private static OilDerrickRenderer renderer;
     private static boolean visible;
     private static IndustrialBlockEntity cachedOwner;
-    private static int cachedMask=-1,pollTicks;
+    private static int cachedMask=-1;
+    private record UpdateKey(IndustrialBlockEntity owner,int mask,net.minecraft.core.Direction front) {}
+    private static final GuidePerformance.Refresh refresh=new GuidePerformance.Refresh();
     private static net.minecraft.core.Direction cachedFront;
     private static DerrickGuideGeometry geometry;
-    private static java.util.List<DerrickGuideGeometry.Cell> blocked=java.util.List.of();
-    private static void reset(){selected=null;cachedOwner=null;geometry=null;blocked=java.util.List.of();visible=false;focus.reset();}
+    private static java.util.List<DerrickGuideGeometry.Cell> blocked=java.util.List.of(),outlineCells=java.util.List.of();
+    private static DerrickGuideGeometry.Cell portCell;
+    private static void reset(){selected=null;cachedOwner=null;geometry=null;blocked=java.util.List.of();outlineCells=java.util.List.of();portCell=null;visible=false;focus.reset();refresh.reset();}
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();
         if(mc.level==null||mc.player==null){reset();return;}
@@ -34,11 +37,16 @@ public final class DerrickPreview {
         if(selected!=null&&(selected.getLevel()!=mc.level||selected.isRemoved()||selected.getBlockPos().distToCenterSqr(mc.player.position())>32*32)){reset();}
         if(selected==null)return;
         boolean changed=cachedOwner!=selected||cachedMask!=selected.derrickSections||cachedFront!=selected.front();
-        if(changed){cachedOwner=selected;cachedMask=selected.derrickSections;cachedFront=selected.front();geometry=DerrickGuideGeometry.build(selected.getBlockPos(),cachedFront,cachedMask);pollTicks=0;focus.reset();}
-        if(pollTicks++%10==0){
+        if(changed){
+            cachedOwner=selected;cachedMask=selected.derrickSections;cachedFront=selected.front();geometry=DerrickGuideGeometry.build(selected.getBlockPos(),cachedFront,cachedMask);focus.reset();
+            var port=MachineStructure.position(selected.getBlockPos(),cachedFront,ModeledDerrick.PORT);
+            portCell=ModeledDerrick.has(selected,24)?null:new DerrickGuideGeometry.Cell(-1,port,new AABB(port));
+            var cells=new java.util.ArrayList<>(geometry.cells());if(portCell!=null)cells.add(portCell);outlineCells=java.util.List.copyOf(cells);
+        }
+        if(refresh.due(new UpdateKey(selected,cachedMask,cachedFront))){
             var next=new java.util.ArrayList<DerrickGuideGeometry.Cell>();
             for(var cell:geometry.cells())if(mc.level.hasChunkAt(cell.pos())){var state=mc.level.getBlockState(cell.pos());if(!state.isAir()&&!state.equals(ModeledDerrick.state(cell.index(),cachedFront)))next.add(cell);}
-            blocked=java.util.List.copyOf(next);
+            if(portCell!=null)next.add(portCell);blocked=java.util.List.copyOf(next);
         }
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent event){
@@ -61,14 +69,10 @@ public final class DerrickPreview {
                 buffers.endBatch(PreviewRenderTypes.DERRICK);
             }
             pose.popPose();pose.pushPose();pose.translate(-eye.x,-eye.y,-eye.z);
-            // Reuse the earlier large-guide budget: only 64 nearby visible outlines.
+            // The port shares the same visible-outline budget as the frame.
             boolean textured=PreviewConfig.MODE.get()==PreviewConfig.Mode.TEXTURED;
-            var outlined=new java.util.ArrayList<DerrickGuideGeometry.Cell>();
-            for(var cell:textured?blocked:geometry.cells())if(event.getFrustum()==null||event.getFrustum().isVisible(cell.box()))outlined.add(cell);
-            if(outlined.size()>64){outlined.sort(java.util.Comparator.comparingDouble(c->c.box().getCenter().distanceToSqr(eye)));outlined.subList(64,outlined.size()).clear();}
-            for(var cell:outlined){boolean wrong=textured||blocked.contains(cell);net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),cell.box(),wrong?1:.5f,wrong?.2f:1,wrong?.2f:1,.5f);}
-            var port=MachineStructure.position(at,selected.front(),ModeledDerrick.PORT);
-            if(!ModeledDerrick.has(selected,24))net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),new AABB(port),.5f,1,1,.7f);
+            var outlined=GuidePerformance.outlines(textured?blocked:outlineCells,cell->event.getFrustum()==null||event.getFrustum().isVisible(cell.box()),cell->cell.box().getCenter().distanceToSqr(eye),null);
+            for(var cell:outlined){boolean wrong=cell.index()>=0&&(textured||blocked.contains(cell));net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),cell.box(),wrong?1:.5f,wrong?.2f:1,wrong?.2f:1,cell.index()<0?.7f:.5f);}
             buffers.endBatch(PreviewRenderTypes.OUTLINE);
         }finally{pose.popPose();matrix.popMatrix();com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();}
     }
