@@ -11,6 +11,8 @@ final class KitchenVisualCheck {
     private static int ticks;
     private static volatile boolean dialChecked,carryChecked,restServed;
     private static volatile String failure;
+    private static net.minecraft.nbt.CompoundTag heldData;
+    private static int heldUpdates;
     private static final BlockPos COUNTER=new BlockPos(1,100,0);
     private static final BlockPos POS=new BlockPos(0,100,0);
     static void tick(Minecraft mc){
@@ -56,16 +58,25 @@ final class KitchenVisualCheck {
         if(ticks==410)shot(mc,"resting");
         if(ticks==425)use(mc,COUNTER.above());
         if(ticks==435){shot(mc,"carried");mc.options.keyShift.setDown(false);}
-        if(ticks==440)use(mc,POS);
-        if(ticks==450)check(server,()->{var stove=(PrototypeStoveEntity)server.overworld().getBlockEntity(POS);if(!stove.hasSkillet()||!stove.batch()||stove.work()<=730||!server.overworld().getBlockState(COUNTER.above()).isAir())throw new IllegalStateException("Actual return or carryover failed");carryChecked=true;});
-        if(ticks==455)shot(mc,"returned");
-        if(ticks==460)mc.options.keyShift.setDown(true);
-        if(ticks==465)use(mc,POS);
-        if(ticks==475)use(mc,COUNTER);
-        if(ticks==480)mc.options.keyShift.setDown(false);
-        if(ticks==490)use(mc,COUNTER.above());
-        if(ticks==500){shot(mc,"rest-served");check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();var pan=(RestingSkilletEntity)server.overworld().getBlockEntity(COUNTER.above());if(pan.skillet().batch()||p.getInventory().countItem(PrototypeStoveContent.MEAL.get())!=8)throw new IllegalStateException("Actual resting serve failed");restServed=true;});}
-        if(ticks>510){if(failure!=null)throw new IllegalStateException(failure);if(!restServed)throw new IllegalStateException("Resting serve check did not complete");if(!carryChecked)throw new IllegalStateException("Carryover review did not complete");mc.options.keyShift.setDown(false);com.mojang.logging.LogUtils.getLogger().info("KITCHEN VISUAL VERIFIED: rotary input, working skillet, lift, rest, carried food, return and resting serve");mc.stop();}
+        if(ticks==445)heldData=mc.player.getMainHandItem().getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+        if(ticks>=446&&ticks<=505){
+            var stack=mc.player.getMainHandItem();
+            if(!stack.is(PrototypeStoveContent.SKILLET.get()))throw new IllegalStateException("Held skillet disappeared during cooling");
+            var data=stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+            if(!data.equals(heldData)){heldUpdates++;heldData=data;}
+            try{var f=net.minecraft.client.renderer.ItemInHandRenderer.class.getDeclaredField("mainHandHeight");f.setAccessible(true);if(f.getFloat(mc.gameRenderer.itemInHandRenderer)<.99f)throw new IllegalStateException("Cooling replayed the held skillet equip animation");}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+        }
+        if(ticks==506){if(heldUpdates<3)throw new IllegalStateException("Held cooling did not receive repeated server updates");shot(mc,"carried-steady");}
+        if(ticks==510)use(mc,POS);
+        if(ticks==520)check(server,()->{var stove=(PrototypeStoveEntity)server.overworld().getBlockEntity(POS);if(!stove.hasSkillet()||!stove.batch()||stove.work()<=730||!server.overworld().getBlockState(COUNTER.above()).isAir())throw new IllegalStateException("Actual return or carryover failed");carryChecked=true;});
+        if(ticks==525)shot(mc,"returned");
+        if(ticks==530)mc.options.keyShift.setDown(true);
+        if(ticks==535)use(mc,POS);
+        if(ticks==545)use(mc,COUNTER);
+        if(ticks==550)mc.options.keyShift.setDown(false);
+        if(ticks==560)use(mc,COUNTER.above());
+        if(ticks==570){shot(mc,"rest-served");check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();var pan=(RestingSkilletEntity)server.overworld().getBlockEntity(COUNTER.above());if(pan.skillet().batch()||p.getInventory().countItem(PrototypeStoveContent.MEAL.get())!=8)throw new IllegalStateException("Actual resting serve failed");restServed=true;});}
+        if(ticks>580){if(failure!=null)throw new IllegalStateException(failure);if(!restServed)throw new IllegalStateException("Resting serve check did not complete");if(!carryChecked)throw new IllegalStateException("Carryover review did not complete");mc.options.keyShift.setDown(false);com.mojang.logging.LogUtils.getLogger().info("KITCHEN VISUAL VERIFIED: rotary input, working skillet, lift, rest, carried food, steady cooling across server updates, return and resting serve");mc.stop();}
     }
     private static void check(net.minecraft.server.MinecraftServer server,Runnable action){server.execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
     private static void use(Minecraft mc,BlockPos pos){mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(pos.getCenter().add(0,.5,0),Direction.UP,pos,false));}

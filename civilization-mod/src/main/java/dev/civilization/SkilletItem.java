@@ -23,6 +23,10 @@ public final class SkilletItem extends Item {
     }
     public static void contents(ItemStack stack, SkilletContents s, Level l) { var tag=s.save();tag.putLong("warmthTick",l.getGameTime());stack.set(DataComponents.CUSTOM_DATA,CustomData.of(tag)); }
     public static ItemStack stack(SkilletContents s, Level l) { var stack=PrototypeStoveContent.SKILLET.toStack();contents(stack,s,l);return stack; }
+    /** Cooling changes components, not the vessel being held. */
+    @Override public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || !oldStack.is(newStack.getItem());
+    }
     @Override public InteractionResult useOn(UseOnContext c) {
         var l = c.getLevel(); var p = c.getPlayer(); var pos = c.getClickedPos();
         if (p == null || !CivicAccess.allowed(l, pos, p)) return InteractionResult.FAIL;
