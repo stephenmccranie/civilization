@@ -31,20 +31,21 @@ public final class StoveGameTests {
         var field=ThermalField.get(h.getLevel());long key=s.getBlockPos().asLong();double before=field.pending.get(key);
         for(int i=0;i<400;i++)s.tick();
         h.assertTrue(Math.abs(s.work()+s.skillet().warmth()-400)<.00001&&s.fireHeat()==0&&!s.fire.lit(),"Lower room heat preserves saved coal work and exhaustion");
-        h.assertTrue(Math.abs(field.pending.get(key)-before-325)<.001,"Already-loaded stove coal emits 2.5% of industrial waste heat");
+        h.assertTrue(Math.abs(field.pending.get(key)-before-650)<.001,"Already-loaded stove coal emits 5% of industrial waste heat");
         var p=s.getBlockPos();var l=h.getLevel();
         // Enclosed five-by-five kitchen, three air blocks below its roof.
         for(var q:BlockPos.betweenClosed(p.offset(-2,-1,-2),p.offset(2,4,2))){
             int dx=Math.abs(q.getX()-p.getX()),dz=Math.abs(q.getZ()-p.getZ()),dy=q.getY()-p.getY();
             if(!q.equals(p))l.setBlockAndUpdate(q,dy==-1||dy==4||dx==2||dz==2?net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultBlockState():net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
         }
-        var room=new ThermalField();var torso=p.north().above();
+        var room=new ThermalField();var previous=new ThermalField();var torso=p.north().above();
         for(int second=0;second<120;second++){
             room.pending.put(key,ThermalRules.COAL_WASTE_HEAT*s.coalWasteHeatFactor()*20/ProductionEnergy.HEAT_TICKS);room.step(l);
+            previous.pending.put(key,ThermalRules.COAL_WASTE_HEAT*.025*20/ProductionEnergy.HEAT_TICKS);previous.step(l);
         }
-        double rise=room.excess(l,torso)*1.8;
-        System.out.printf(java.util.Locale.ROOT,"STOVE_ADJACENT_ROOM_F after=120s rise=%.2f%n",rise);
-        h.assertTrue(rise>5&&rise<22,"Standing beside a working stove is warm without industrial overheating: +"+rise+" F");h.succeed();
+        double rise=room.excess(l,torso)*1.8,oldRise=previous.excess(l,torso)*1.8;
+        System.out.printf(java.util.Locale.ROOT,"STOVE_ADJACENT_ROOM_F after=120s previous=%.2f rise=%.2f%n",oldRise,rise);
+        h.assertTrue(rise>10&&rise<30&&rise>oldRise*1.8&&rise<oldRise*2.2,"Standing beside a working stove is warm without industrial overheating: +"+rise+" F");h.succeed();
     }
     private static double food(Item i){var s=i.getDefaultInstance();return FoodCalories.of(s,s.getFoodProperties(null));}
     @GameTest(template="industrial") public static void servingUsesPresentQualityAndDialValidation(GameTestHelper h){
