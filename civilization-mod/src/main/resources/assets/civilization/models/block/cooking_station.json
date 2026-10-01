@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "civilization:block/stove_front",
+    "side": "civilization:block/stove_side",
+    "top": "civilization:block/stove_top"
+  }
+}

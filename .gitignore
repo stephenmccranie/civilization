@@ -1,0 +1,25 @@
+.tools/
+.gradle/
+**/.gradle/
+**/build/
+**/runs/
+**/run/
+**/.idea/
+*.iml
+dev.local.json
+__pycache__/
+*.py[cod]
+
+**/.dev-libs/
+
+# Local authentication and runtime state
+.env
+.env.*
+!.env.example
+**/saves/
+**/logs/
+.codex/config.toml
+
+# Original art and visual review history stay local; runtime resources are versioned.
+/art/
+/concept_art/

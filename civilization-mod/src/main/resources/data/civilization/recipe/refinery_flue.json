@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "C C"
+  ],
+  "key": {
+    "C": {
+      "item": "civilization:industrial_casing"
+    }
+  },
+  "result": {
+    "id": "civilization:refinery_flue",
+    "count": 4
+  }
+}

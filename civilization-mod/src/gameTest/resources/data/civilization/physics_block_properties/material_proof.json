@@ -1,0 +1,6 @@
+{
+  "selector": "minecraft:iron_block",
+  "properties": {
+    "sable:mass": 7800
+  }
+}

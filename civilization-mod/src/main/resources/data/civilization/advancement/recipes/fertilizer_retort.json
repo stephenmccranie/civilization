@@ -1,0 +1,25 @@
+{
+  "criteria": {
+    "brick": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:brick"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "parent": "minecraft:recipes/root",
+  "requirements": [
+    [
+      "brick"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "civilization:fertilizer_retort"
+    ]
+  }
+}

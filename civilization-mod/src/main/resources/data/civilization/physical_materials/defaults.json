@@ -1,0 +1,69 @@
+{
+  "profiles": {
+    "air": {
+      "density_kg_m3": 1.2,
+      "specific_heat_j_kg_k": 1000,
+      "conductivity_w_m_k": 0.026,
+      "legacy_capacity": 1,
+      "legacy_conductance": 1
+    },
+    "water": {
+      "density_kg_m3": 1000,
+      "specific_heat_j_kg_k": 4180,
+      "conductivity_w_m_k": 0.6,
+      "legacy_capacity": 8,
+      "legacy_conductance": 0.7
+    },
+    "wood": {
+      "density_kg_m3": 600,
+      "specific_heat_j_kg_k": 1600,
+      "conductivity_w_m_k": 0.12,
+      "legacy_capacity": 3,
+      "legacy_conductance": 0.025
+    },
+    "masonry": {
+      "density_kg_m3": 2000,
+      "specific_heat_j_kg_k": 840,
+      "conductivity_w_m_k": 1.2,
+      "legacy_capacity": 10,
+      "legacy_conductance": 0.08
+    },
+    "glass": {
+      "density_kg_m3": 2500,
+      "specific_heat_j_kg_k": 800,
+      "conductivity_w_m_k": 1,
+      "legacy_capacity": 2,
+      "legacy_conductance": 0.3
+    },
+    "metal": {
+      "density_kg_m3": 7800,
+      "specific_heat_j_kg_k": 500,
+      "conductivity_w_m_k": 45,
+      "legacy_capacity": 10,
+      "legacy_conductance": 0.6
+    },
+    "door": {
+      "density_kg_m3": 600,
+      "specific_heat_j_kg_k": 1600,
+      "conductivity_w_m_k": 0.12,
+      "legacy_capacity": 2,
+      "legacy_conductance": 0.35
+    },
+    "partial": {
+      "density_kg_m3": 2000,
+      "specific_heat_j_kg_k": 840,
+      "conductivity_w_m_k": 1.2,
+      "legacy_capacity": 2,
+      "legacy_conductance": 0.55
+    }
+  },
+  "tags": {
+    "minecraft:planks": "wood",
+    "minecraft:logs": "wood"
+  },
+  "blocks": {
+    "minecraft:iron_block": "metal",
+    "minecraft:copper_block": "metal",
+    "civilization:industrial_casing": "metal"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "rewards": {
+    "recipes": [
+      "civilization:brick_kiln"
+    ]
+  },
+  "criteria": {
+    "furnace": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:furnace"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "parent": "minecraft:recipes/root",
+  "requirements": [
+    [
+      "furnace"
+    ]
+  ]
+}

@@ -1,0 +1,234 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = mod_id
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.blamejared.com'; content { includeGroup 'mezz.jei' } }
+    maven {
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content { includeGroup 'software.bernie.geckolib' }
+    }
+}
+dependencies {
+    // Optional client integration; never bundle JEI or require it on the server.
+    // The pinned local copy permits offline builds with the installed Prism artifact.
+    def jeiJar = file(".dev-libs/jei-${minecraft_version}-neoforge-${jei_version}.jar")
+    if (jeiJar.exists()) compileOnly files(jeiJar)
+    else compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    // Exact-version local artifact supports offline development; Maven remains the clean-checkout default.
+    def geckoJar = file(".dev-libs/geckolib-neoforge-${minecraft_version}-${geckolib_version}.jar")
+    if (geckoJar.exists()) implementation files(geckoJar)
+    else implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation files('.dev-libs/sable-neoforge-1.21.1-2.0.5.jar')
+    compileOnly fileTree(dir: '.dev-libs', include: ['sable-companion-*.jar', 'veil-*.jar'])
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'it.unimi.dsi:fastutil:8.5.12'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+tasks.named('test') { useJUnitPlatform() }
+
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations.gameTestImplementation.extendsFrom(configurations.implementation)
+configurations.gameTestCompileOnly.extendsFrom(configurations.compileOnly)
+
+neoForge {
+    version = project.neo_version
+    addModdingDependenciesTo(sourceSets.gameTest)
+
+    runs {
+        client {
+            client()
+        }
+        visualClient {
+            client()
+            gameDirectory = project.file('runs/visual')
+            systemProperty 'civilization.previewCheck', providers.gradleProperty('visualScene').getOrElse('machines')
+            systemProperty 'civilization.visualFull', providers.gradleProperty('visualFull').getOrElse('false')
+            systemProperty 'civilization.visualHeadless', 'true'
+            programArgument '--mixin'
+            programArgument 'civilization.visual.mixins.json'
+            programArgument '--width'
+            programArgument '1920'
+            programArgument '--height'
+            programArgument '1080'
+        }
+        weatherPeer {
+            client()
+            gameDirectory = project.file('runs/weather-peer')
+            systemProperty 'civilization.previewCheck', 'weather-peer'
+            systemProperty 'civilization.visualHeadless', 'true'
+            programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--width', '1920', '--height', '1080', '--username', 'WeatherPeer')
+        }
+        server {
+            server()
+            gameDirectory = project.file('runs/server')
+            programArgument '--nogui'
+        }
+        flightBenchmarkSeed {
+            server()
+            gameDirectory = project.file('runs/flight-benchmark/seed')
+            programArgument '--nogui'
+            systemProperty 'civilization.flightBenchmarkSeed', 'true'
+        }
+        flightBenchmark {
+            client()
+            gameDirectory = project.file('runs/flight-benchmark/client')
+            systemProperty 'civilization.previewCheck', 'flight-benchmark'
+            programArguments.addAll('--mixin','civilization.benchmark.mixins.json')
+            systemProperty 'civilization.previewWorld', providers.gradleProperty('benchWorld').getOrElse('benchmark-work')
+            systemProperty 'civilization.visualHeadless', 'true'
+            for (key in ['mode','speed','seconds','warmup','directional','output','obstacle','turn']) {
+                systemProperty "civilization.bench.${key}", providers.gradleProperty("bench${key.capitalize()}").getOrElse('')
+            }
+            programArguments.addAll('--mixin','civilization.visual.mixins.json','--width','1920','--height','1080')
+        }
+        campusClient {
+            client()
+            gameDirectory = project.file("runs/campus-preview")
+            systemProperty "civilization.previewCheck", "campus"
+            systemProperty "civilization.previewWorld", "compact-campus"
+            systemProperty "civilization.visualHeadless", "true"
+            programArguments.addAll("--mixin", "civilization.visual.mixins.json", "--width", "1920", "--height", "1080")
+        }
+        campusServer {
+            server()
+            gameDirectory = project.file("runs/test-campus")
+            programArgument "--nogui"
+            systemProperty "civilization.buildCampus", "true"
+            systemProperty "civilization.campusCompact", providers.gradleProperty("campusCompact").getOrElse("false")
+            systemProperty "civilization.campusTouchup", providers.gradleProperty("campusTouchup").getOrElse("false")
+        }
+        airshipServer {
+            server()
+            gameDirectory = project.file("runs/airship-server")
+            programArgument "--nogui"
+            systemProperty "civilization.airshipPhase", providers.gradleProperty("airshipPhase").getOrElse("manual")
+        }
+        boatServer {
+            server()
+            gameDirectory = project.file("runs/boat-server")
+            programArgument "--nogui"
+            systemProperty "civilization.boatPhase", providers.gradleProperty("boatPhase").getOrElse("manual")
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            gameDirectory = project.file('runs/gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'civilization'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gameTest)
+        }
+    }
+}
+
+// JavaExec otherwise closes stdin, making the dedicated server's stop command unusable.
+tasks.named('runServer', JavaExec) {
+    standardInput = System.in
+}
+
+tasks.named('runVisualClient', JavaExec) {
+    timeout = java.time.Duration.ofMinutes(3)
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def properties = [
+        mod_id: mod_id,
+        mod_name: mod_name,
+        mod_version: mod_version,
+        minecraft_version: minecraft_version,
+        neo_version: neo_version,
+        geckolib_version: geckolib_version
+    ]
+    inputs.properties properties
+    expand properties
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/modMetadata')
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+// Use Gradle's resolved artifact for Prism deployment rather than a second download path.
+tasks.register('prepareRuntimeMods', Copy) {
+    from(configurations.runtimeClasspath) { include 'geckolib-neoforge-*.jar' }
+    into layout.buildDirectory.dir('runtimeMods')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+tasks.withType(Jar).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    from('TEMPLATE_LICENSE.txt')
+}
+
+
+// Opt-in laboratory only: neither these classes nor Sable enter the production artifact.
+if (providers.gradleProperty('sableLab').getOrElse('false').toBoolean()) {
+    sourceSets {
+        sableLab {
+            compileClasspath += sourceSets.main.output + sourceSets.gameTest.output
+            runtimeClasspath += sourceSets.main.output + sourceSets.gameTest.output
+        }
+    }
+    dependencies {
+        sableLabImplementation files('.dev-libs/sable-neoforge-1.21.1-2.0.5.jar')
+        sableLabCompileOnly fileTree(dir: '.dev-libs', include: ['sable-companion-*.jar', 'veil-*.jar'])
+    }
+    neoForge {
+        addModdingDependenciesTo(sourceSets.sableLab)
+        mods { civilization { sourceSet(sourceSets.sableLab) } }
+        runs {
+            sableServer {
+                server()
+                sourceSet = sourceSets.sableLab
+                gameDirectory = project.file('runs/sable-server')
+                programArgument '--nogui'
+                systemProperty 'civilization.sablePhase', providers.gradleProperty('sablePhase').getOrElse('manual')
+            }
+            sableClient {
+                client()
+                sourceSet = sourceSets.sableLab
+                gameDirectory = project.file(providers.gradleProperty('sableVisualDir').getOrElse('runs/sable-visual'))
+                systemProperty 'civilization.sableVisual', 'true'
+                systemProperty 'civilization.visualHeadless', 'true'
+                programArguments.addAll('--mixin','civilization.visual.mixins.json','--width','1920','--height','1080')
+            }
+        }
+    }
+    tasks.named('runSableServer', JavaExec) { standardInput = System.in; timeout = java.time.Duration.ofMinutes(3) }
+    tasks.named('runSableClient', JavaExec) { timeout = java.time.Duration.ofMinutes(3) }
+}
+
+tasks.named("runBoatServer", JavaExec) { timeout = java.time.Duration.ofMinutes(3) }
+
+tasks.named("runCampusServer", JavaExec) { timeout = java.time.Duration.ofMinutes(5) }
+
+tasks.named("runCampusClient", JavaExec) { timeout = java.time.Duration.ofMinutes(3) }
+
+tasks.named('runWeatherPeer', JavaExec) { timeout = java.time.Duration.ofMinutes(3) }
+
+tasks.named('runFlightBenchmarkSeed', JavaExec) { timeout = java.time.Duration.ofMinutes(4) }
+tasks.named('runFlightBenchmark', JavaExec) { timeout = java.time.Duration.ofMinutes(8); maxHeapSize = providers.gradleProperty('benchHeap').getOrElse('6G') }

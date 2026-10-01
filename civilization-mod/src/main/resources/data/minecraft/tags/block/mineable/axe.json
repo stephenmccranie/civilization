@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "civilization:trade_counter",
+    "civilization:survey_table",
+    "civilization:survey_table_section",
+    "civilization:boat_helm"
+  ]
+}

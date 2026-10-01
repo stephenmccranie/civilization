@@ -1,0 +1,12 @@
+{
+  "type": "civilization:retort",
+  "ingredient": {
+    "item": "civilization:enriched_mineral_blend"
+  },
+  "result": {
+    "id": "civilization:fertilizer",
+    "count": 8
+  },
+  "cookingtime": 400,
+  "experience": 0.35
+}

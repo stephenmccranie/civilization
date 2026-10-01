@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "SPS",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "item": "civilization:steel_ingot"
+    },
+    "P": {
+      "item": "civilization:machine_parts"
+    }
+  },
+  "result": {
+    "id": "civilization:engine_flywheel",
+    "count": 1
+  }
+}

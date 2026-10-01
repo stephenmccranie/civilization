@@ -1,0 +1,1 @@
+{"required":true,"minVersion":"0.8","package":"dev.civilization.mixin.compat","plugin":"dev.civilization.mixin.compat.C2meFlightPlugin","compatibilityLevel":"JAVA_21","mixins":["C2meFlightLoaderMixin","C2meFlightIteratorMixin"]}

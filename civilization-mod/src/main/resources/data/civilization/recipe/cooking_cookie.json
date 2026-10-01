@@ -1,0 +1,12 @@
+{
+  "type": "civilization:cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "civilization:cookie_dough"
+  },
+  "result": {
+    "id": "minecraft:cookie"
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

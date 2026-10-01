@@ -1,0 +1,12 @@
+{
+  "cookingtime": 200,
+  "ingredient": {
+    "item": "minecraft:clay"
+  },
+  "experience": 1.2,
+  "type": "civilization:kiln",
+  "result": {
+    "id": "minecraft:brick",
+    "count": 4
+  }
+}

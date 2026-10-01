@@ -1,0 +1,6 @@
+{
+  "textures": {
+    "layer0": "civilization:item/mineral_coal"
+  },
+  "parent": "minecraft:item/generated"
+}

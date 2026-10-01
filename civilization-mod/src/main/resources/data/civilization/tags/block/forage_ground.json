@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:dirt", "#minecraft:sand", "#minecraft:terracotta", "#minecraft:base_stone_overworld",
+    "minecraft:gravel", "minecraft:snow_block", "minecraft:snow", "minecraft:moss_block", "minecraft:mud",
+    "minecraft:netherrack", "minecraft:soul_sand", "minecraft:soul_soil", "minecraft:end_stone"
+  ]
+}

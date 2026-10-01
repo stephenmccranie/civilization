@@ -1,0 +1,25 @@
+{
+  "rewards": {
+    "recipes": [
+      "civilization:mineral_blend"
+    ]
+  },
+  "criteria": {
+    "clay": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:clay_ball"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "clay"
+    ]
+  ],
+  "parent": "minecraft:recipes/root"
+}

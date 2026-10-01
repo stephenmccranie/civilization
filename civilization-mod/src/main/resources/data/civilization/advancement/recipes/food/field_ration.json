@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_bread": { "trigger": "minecraft:inventory_changed", "conditions": { "items": [{ "items": "minecraft:bread" }] } },
+    "has_recipe": { "trigger": "minecraft:recipe_unlocked", "conditions": { "recipe": "civilization:field_ration" } }
+  },
+  "requirements": [["has_bread", "has_recipe"]],
+  "rewards": { "recipes": ["civilization:field_ration"] }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "civilization:foundry",
+  "ingredient": {
+    "item": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "civilization:steel_ingot",
+    "count": 1
+  },
+  "cookingtime": 800,
+  "experience": 0.35
+}

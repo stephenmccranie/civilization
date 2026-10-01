@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "civilization:block/street_pavers_slab"
+    },
+    "type=double": {
+      "model": "civilization:block/street_pavers_mosaic"
+    },
+    "type=top": {
+      "model": "civilization:block/street_pavers_slab_top"
+    }
+  }
+}

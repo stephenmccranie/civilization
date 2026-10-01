@@ -1,0 +1,20 @@
+{
+  "result": {
+    "id": "civilization:brick_kiln",
+    "count": 1
+  },
+  "pattern": [
+    "CCC",
+    "CFC",
+    "CCC"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "F": {
+      "item": "minecraft:cobblestone"
+    },
+    "C": {
+      "item": "minecraft:cobblestone"
+    }
+  }
+}

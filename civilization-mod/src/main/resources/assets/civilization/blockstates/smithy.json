@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/smithy"
+    },
+    "facing=east": {
+      "model": "civilization:block/smithy",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/smithy",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/smithy",
+      "y": 270
+    }
+  }
+}

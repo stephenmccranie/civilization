@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/survey_table_section",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "civilization:block/survey_table_section",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/survey_table_section",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/survey_table_section",
+      "y": 270
+    }
+  }
+}

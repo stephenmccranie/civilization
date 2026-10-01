@@ -1,0 +1,47 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "body": "civilization:block/refinery_side",
+    "trim": "civilization:block/refinery_side",
+    "dark": "minecraft:block/gray_concrete",
+    "dial": "minecraft:block/white_concrete",
+    "needle": "minecraft:block/black_concrete",
+    "hot": "minecraft:block/orange_terracotta",
+    "brick": "minecraft:block/bricks",
+    "particle": "civilization:block/refinery_side"
+  },
+  "elements": [
+    {
+      "from": [
+        5.75,
+        5.75,
+        5.75
+      ],
+      "to": [
+        10.25,
+        10.25,
+        10.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hot"
+        },
+        "south": {
+          "texture": "#hot"
+        },
+        "east": {
+          "texture": "#hot"
+        },
+        "west": {
+          "texture": "#hot"
+        },
+        "up": {
+          "texture": "#hot"
+        },
+        "down": {
+          "texture": "#hot"
+        }
+      }
+    }
+  ]
+}

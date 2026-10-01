@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.civilization.mixin.compat",
+  "plugin": "dev.civilization.mixin.compat.DhTravelPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["DhTravelMixin", "DhWarpRenderMixin", "DhWarpClipMixin", "SodiumWarpTerrainMixin", "IrisWarpFadeMixin"]
+}
