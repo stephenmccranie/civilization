@@ -4,7 +4,7 @@ This is the only active register of unresolved design choices. Agreed rules live
 
 ## Guns — first Paterson model
 
-The user approved the playable Paterson prototype: left-click firing, R reload, slight recoil, projectiles and tunable damage. The user selected one complete .36 ammunition item per chamber, shown as a conical lead projectile with no cartridge case. These rules now live in [design](design_direction.md#setting-and-material-style); [firearms](civilization-mod/firearms.md) owns implementation and trial values. Acquisition/crafting progression, production combat balance, any later headshot/penetration rules and full historical loading fidelity remain unresolved. No crafting recipe is adopted.
+The user approved the playable Paterson prototype: left-click firing, tap R to cock each shot/empty reload and hold R for partial reload, slight recoil, projectiles and tunable damage. The user selected one complete .36 ammunition item per chamber, shown as a conical lead projectile with no cartridge case. These rules now live in [design](design_direction.md#setting-and-material-style); [firearms](civilization-mod/firearms.md) owns implementation and trial values. Acquisition/crafting progression, production combat balance, any later headshot/penetration rules and full historical loading fidelity remain unresolved. No crafting recipe is adopted.
 
 ## Simplification recommendations
 

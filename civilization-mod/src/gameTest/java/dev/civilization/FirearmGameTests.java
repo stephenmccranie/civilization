@@ -17,7 +17,13 @@ public final class FirearmGameTests {
         h.assertTrue(PatersonItem.reload(p),"Inventory ammo starts reload");((PatersonItem)s.getItem()).inventoryTick(s,h.getLevel(),p,0,false);h.assertTrue(!PatersonItem.reloading(s)&&PatersonItem.inventoryAmmo(p)==3,"Switch cancels without consuming ammunition");
         PatersonItem.reload(p);var t=PatersonItem.state(s);t.putLong("reloadEnd",h.getLevel().getGameTime());s.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.of(t));((PatersonItem)s.getItem()).inventoryTick(s,h.getLevel(),p,0,true);
         h.assertTrue(PatersonItem.rounds(s)==3&&PatersonItem.inventoryAmmo(p)==0,"Partial reload conserves three rounds");h.assertTrue(PatersonItem.rounds(s.copy())==3,"Loaded state survives stack copy");
-        h.assertTrue(PatersonItem.fire(p)&&PatersonItem.rounds(s)==2,"Successful shot consumes exactly one round");h.assertTrue(!PatersonItem.fire(p)&&PatersonItem.rounds(s)==2,"Packet repetition cannot bypass cadence");h.succeed();
+        h.assertTrue(!PatersonItem.fire(p),"Loaded gun requires manual cocking");
+        h.assertTrue(PatersonItem.cock(p)&&PatersonItem.armed(s),"R cocks loaded hammer");var armed=PatersonItem.state(s);armed.putLong("cockTick",h.getLevel().getGameTime()-6);s.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.of(armed));
+        h.assertTrue(PatersonItem.fire(p)&&PatersonItem.rounds(s)==2,"Successful shot consumes exactly one round");h.assertTrue(!PatersonItem.fire(p)&&PatersonItem.rounds(s)==2,"Packet repetition cannot bypass cadence");
+        p.getCooldowns().removeCooldown(s.getItem());h.assertTrue(!PatersonItem.fire(p)&&!PatersonItem.armed(s),"Every shot lowers hammer and requires cocking again");
+        p.getInventory().setItem(1,FirearmContent.AMMO.toStack(2));h.assertTrue(PatersonItem.cock(p)&&PatersonItem.reload(p)&&!PatersonItem.armed(s),"Partial reload lowers cocked hammer");
+        var partial=PatersonItem.state(s);partial.putLong("reloadEnd",h.getLevel().getGameTime());s.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.of(partial));((PatersonItem)s.getItem()).inventoryTick(s,h.getLevel(),p,0,true);
+        h.assertTrue(PatersonItem.rounds(s)==4&&PatersonItem.inventoryAmmo(p)==0&&!PatersonItem.armed(s),"Partial reload preserves existing chambers and leaves hammer down");h.succeed();
     }
     @GameTest(template="industrial") public static void sweptDamageAndWallStops(GameTestHelper h){
         var l=h.getLevel();var p=player(h);var start=h.absolutePos(new BlockPos(4,5,4)).getCenter();

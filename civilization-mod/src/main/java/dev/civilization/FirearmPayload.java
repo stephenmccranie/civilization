@@ -12,8 +12,8 @@ public record FirearmPayload(int action) implements CustomPacketPayload {
     public static void register(RegisterPayloadHandlersEvent e){
         var codec=new StreamCodec<RegistryFriendlyByteBuf,FirearmPayload>(){public FirearmPayload decode(RegistryFriendlyByteBuf b){return new FirearmPayload(b.readByte());}public void encode(RegistryFriendlyByteBuf b,FirearmPayload p){b.writeByte(p.action);}};
         e.registrar("1").playBidirectional(TYPE,codec,(p,c)->{
-            if(c.player().level().isClientSide){if(p.action==2)c.player().getPersistentData().putInt("patersonRecoil",4);}
-            else if(p.action==0)PatersonItem.fire(c.player());else if(p.action==1)PatersonItem.reload(c.player());
+            if(c.player().level().isClientSide){if(p.action==2){c.player().getPersistentData().putInt("patersonRecoil",4);dev.civilization.client.FirearmClient.shotSound();}}
+            else if(p.action==0)PatersonItem.fire(c.player());else if(p.action==1)PatersonItem.reload(c.player());else if(p.action==3)PatersonItem.cock(c.player());
         });
     }
 }

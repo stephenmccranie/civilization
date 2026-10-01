@@ -228,7 +228,7 @@
   "block.civilization.resting_skillet": "Resting Skillet",
   "item.civilization.colt_paterson": "Colt Paterson",
   "item.civilization.paterson_36_ammunition": ".36 Paterson Ammunition",
-  "key.civilization.reload": "Reload firearm",
+  "key.civilization.reload": "Cock / reload firearm",
   "key.categories.civilization": "Civilization",
   "subtitles.civilization.paterson_fire": "Colt Paterson fires"
 }
