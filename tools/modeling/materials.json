@@ -1,0 +1,11 @@
+{
+  "description": "Original, reviewed materials. Paths are local art sources, never copied Faithful pixels. Reuse native crops; place asset-specific seams, controls and wear separately.",
+  "materials": {
+    "cast_iron": {"source": "art/assets/prototype_stove/prototype_stove_iron.png", "crop": [0, 0, 64, 64], "texels_per_block": 64},
+    "seasoned_iron": {"source": "art/assets/prototype_stove/prototype_stove_iron.png", "crop": [64, 0, 128, 64], "texels_per_block": 64},
+    "steel": {"source": "art/assets/prototype_stove/prototype_stove_iron.png", "crop": [128, 0, 192, 64], "texels_per_block": 64},
+    "brass": {"source": "art/assets/prototype_stove/prototype_stove_brass.png", "crop": [0, 0, 64, 64], "texels_per_block": 64},
+    "timber": {"source": "art/assets/oil_derrick/studio/oil_derrick.png", "crop": [0, 0, 128, 128], "texels_per_block": 64}
+  },
+  "evidence": ["art/assets/prototype_stove/evidence/surface-materials.png", "art/assets/prototype_stove/evidence/surface-ingame-close.png", "art/assets/oil_derrick/review/progressive/partial-guide.png"]
+}

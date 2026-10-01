@@ -42,7 +42,7 @@ New artwork uses **four texture pixels per model unit** (64px per standard block
 
 Explicit `fit` regions are for authored decals such as a gauge, not an escape hatch for all materials. A gauge decal must contain just the gauge. Mapping an entire instrument panel onto a small gauge gives duplicate controls and an unreadably tiny face. Declare per-face overrides so the decal does not wrap around every side of the housing.
 
-Generate one coherent master, reduce through the existing texture pipeline, and reuse its materials. Verify material boundaries and tiling in the model. Quiet surfaces still need purposeful variation; there is no global noise pass. Reserve brighter steel for joints/rims and inspect it against the body at gameplay scale.
+Reuse inspected catalog materials where suitable; otherwise generate one coherent master and reduce it through the existing texture pipeline. Verify material boundaries and tiling in the model. Quiet surfaces still need purposeful variation; there is no global noise pass. Reserve brighter steel for joints/rims and inspect it against the body at gameplay scale.
 
 The engine study uses material reuse for unimportant faces and a dedicated instrument decal. Unique painted islands can be added for a specific visual need; do not automatically create a full custom unwrap for every cube.
 

@@ -44,10 +44,10 @@ The retired real-block Oil Derrick provides a small conversion example: [export_
 
 For shaped or animated assets, use the [native modeling practice](MODELING.md): whole-assembly blockouts, measured landmarks, fixed offscreen cameras, explicit UV density and functional detail. `studio.py` supplies reusable native construction/capture helpers; asset-specific geometry stays with its source files.
 
-This section covers native model export. The complete process for all asset types is below; do not begin implementation without its brief/mockup review.
+This section covers native model export. Use the shared workflow below and establish the visual target before authoring.
 
 1. Model a silhouette in the correct GeckoLib format with named groups/pivots. Preserve existing project tabs. Review front, side and isometric views before detailing.
-2. Use deliberate per-face UVs and approximately 32 texels per block-sized surface; whole machines may have larger atlases. Preserve the [reference-driven material workflow](../../art/textures/README.md#block-families-required-workflow).
+2. Use deliberate per-face UVs and 64 texels per block-sized surface for new assets (declared 32 for retained legacy art); whole machines may have larger atlases. Preserve the [reference-driven material workflow](../../art/textures/README.md#block-families-required-workflow).
 3. Author animation clips and explicit operating states. Bones are visual transforms, not physical constraints. Server code still owns production/fuel/collision.
 4. Save editable `.bbmodel`, native geometry/animation and PNG together in `art/models/<asset>/`. `export_model` codec `project` saves source; codec `bedrock` invokes the GeckoLib geometry hooks. Discover codecs rather than guessing. `Animator.buildFile(null, Animation.all.map(a => a.name))` supplies native animation export where no animation codec is exposed. Return content over MCP and save with local file tools if editor filesystem permission is unavailable.
 5. Add a manifest with `id`, `project`, `geometry`, `animation`, `texture`, `required_animations`; source paths are relative and cannot escape the asset directory. Run `python tools/modeling/assets.py art/models/<asset>/manifest.json`; use `--check` to detect stale runtime files/receipts without writing. The exporter validates native files and copies them without interpreting `.bbmodel`.
@@ -73,62 +73,45 @@ Fast checks: `python tools/modeling/test_assets.py` covers missing textures, bad
 
 ## Complete asset pipeline
 
-The [project skill](../../.agents/skills/civilization-art/SKILL.md) owns autonomous visual review behavior. `pipeline.py` supplies briefs, requests, immutable mockup iterations, evidence-linked review records and export validation/publishing. Image generation, visual judgment and gameplay implementation remain agent work using their real tools; this CLI does not call an image API or pretend to assess aesthetics. No routine user confirmation is required between stages.
+The [project art skill](../../.agents/skills/civilization-art/SKILL.md) follows **Define → Build and refine → Verify and publish**. The [design direction](../../design_direction.md#setting-and-material-style) owns visual style; this section owns the workflow. New assets use `art.py` and one compact schema-2 `asset.json`. Existing schema-1 records and `pipeline.py` remain supported unchanged; preserve their sources and history rather than migrating them routinely.
 
-Start from the [approved visual direction](../../design_direction.md#setting-and-material-style). New briefs name role, technological stage, material behavior, signature feature and neighboring assets. Declare subject/shape, material and style reference roles separately; acquire missing evidence where useful rather than making an unrelated style image define the substance.
+### Define
 
-Use one `art/assets/<name>/asset.json` per asset or coherent family. Existing texture/model manifests remain authoritative for their exports; do not migrate old art merely to fit this folder. The [Oil Engine brief](../../art/assets/oil_engine/asset.json) records the fresh design, generated iterations, critiques, native models and runtime outputs. The earlier A/B concepts are superseded.
+Fill three short brief fields: `purpose`, `target` (recognizable features and intended material treatment), and `constraints` (bounds, interfaces, motion/construction and gameplay invariants). Name inspected references by role: shape, material or project style. Choose one authoritative `source`: a hand-edited `project` or a Python `recipe`. Declare extra source dependencies, native `models`, output mappings and any GeckoLib manifests. A recipe owns generated models; a project owns its derived exports. Never silently overwrite manual edits with a recipe.
 
-### Routes
+Generate one coherent concept when the shape or direction needs exploration, using actual inspected image references and preserving the exact prompt. Routine repairs and established designs can use existing references directly. Competing concepts remain opt-in. Concepts are visual targets, not dimensioned engineering or finished textures.
 
-| Asset | Build route | Required review evidence |
-| --- | --- | --- |
-| Item sprite | High-resolution, native-size-designed master ([prompt rules](../../art/textures/sprite-design.md)) → alpha-safe exporter at the asset's declared size (existing 32×32 families remain until the 64×64 migration) → native generated-item JSON | Native-size and enlarged icon; background/edge clarity; inventory view |
-| Shaped item or single block | Blockbench Java Block/Item export, referenced material family; use GeckoLib only if animation needs it | Model front/side/back, UVs, inventory/held views as relevant, in-world scale |
-| Multiblock | One assembly brief plus named component sources/outputs; static pieces use Java models, animated pieces use GeckoLib | Full assembly and component map, build-guide match, ports/collision, consistent materials across parts |
-| Animated machine | Static shell plus named moving groups, native GeckoLib geometry/animation/atlas | Pivots, mechanical axes and clearances over the whole cycle; stopped/startup/running states |
-| UI assets | Existing cabinet/family and native Minecraft controls; reuse shared frame/slot parts | Actual supported GUI scales and interaction layout; use explicit output dimensions, not the world-texture resolution |
+### Build and refine
 
-Java 1.21.1 export checks cover cuboid bounds, supported single-axis rotation angles and UV ranges. GeckoLib checks reuse `assets.py` for hierarchy, animation references and atlas geometry. PNG checks enforce declared dimensions and alpha requirements. The validators do not prove Minecraft resource inheritance, gameplay integration, collision or artistic quality; verify those during model/in-game review.
+Block out the whole silhouette first. Finish a representative section containing the main material, a joint and a signature feature; inspect it on the actual model before extending it. For sprites, make the native-size export the proof. Use the small original [material catalog](materials.json) before generating new materials. It points to local reviewed source crops and evidence; include chosen source files in asset references so edits invalidate reviews. Copy crops into asset-owned textures through the existing reducers, retaining provenance. Keep object-specific seams, fittings and selective wear separate from base material. Extend the catalog only for a demonstrated need; do not copy Faithful pixels.
 
-### Commands and records
+New world art uses 64 texels per block. `art.py` checks actual native per-face UV spans, allowing one-pixel rounding; `decals` explicitly names fit exceptions as `model.bbmodel:element_name/face`. Legacy density and UI exceptions need `density_reason`. A larger image alone does not establish effective detail. Mechanical axes, clearances, joints and native export constraints live in [modeling practice](MODELING.md); small sprites use [native-size guidance](../../art/textures/sprite-design.md).
 
-Before detail work, put a few named visual landmarks/proportions in `brief.fidelity_targets` (for example barrel length/diameter, wheel/body ratio, support height and signature fittings). Compare the mockup against the **complete** native assembly at similar camera angles and object scale. Repeat after texturing; the model review's `matches_direction` finding should address those targets explicitly. Technical validity alone does not establish fidelity. Use actual existing block materials in assembly previews: a neutral placeholder can conceal an oversized bright copper part. If pack materials are unavailable, treat that appearance as unverified until Minecraft review.
+Keep one current comparison sheet: reference, actual asset and the useful close-up or gameplay view. Use matching angles/scales via `compare.py`. Correct the visible cause: shape, missing functional detail, UV placement or material treatment. Inspect native pixels, actual model and gameplay distance. Preserve history automatically instead of maintaining multiple parallel review files.
 
-`compare.py` creates a side-by-side evidence sheet with source hashes and explicit crop bounds, without modifying inputs. It does not infer cameras or score artwork:
+### Verify and publish
+
+A short review answers four questions: **character**, **materials**, **readability**, **function**. Record specific observed findings, blocking `defects` and optional `limits`. A pass requires no blocking defects. Build review covers the native proof; verify review covers the relevant real Minecraft views and checks. Review complexity follows the asset: sprites need inventory/held views as relevant; machines need motion, clearances, collision/guides and sampled performance where costly. Technical validation and image-generation success do not certify visual quality. Iterate autonomously, with no routine approval gates.
+
+`prepare` runs a declared Python recipe or exports the saved Blockbench project to `export/`, then checks the entire output bundle and UV density. `views` reuses native Blockbench capture; `compare --images` maintains the current reference/actual comparison sheet; `record` preserves optional generation prompts/references. `preview` requires a current build review and copies validated candidates to runtime for the focused test scene, preserving replaced files in local content-addressed history. `publish` requires a current verify review; `check --complete` checks fresh review hashes, exports and runtime receipt. Original source/export/evidence hashes are automatic. History is local and immutable; preview backups are recorded in `preview-backup.json`. Only publish completed code/runtime resources under the project Git workflow.
 
 ```powershell
-python tools/modeling/compare.py art/assets/example/comparison.png art/assets/example/mockup-01.png "art/assets/example/model-view.png|100,40,900,800" --labels Mockup Model
+python tools/modeling/art.py init art/assets/example --kind block
+# Fill asset.json; author the source and declare output paths.
+python tools/modeling/art.py materials
+python tools/modeling/art.py prepare art/assets/example
+python tools/modeling/art.py views art/assets/example --model model.bbmodel --target 8 8 8 --span 24
+# Inspect images; review.json has decision, criteria (four questions), defects and optional limits.
+python tools/modeling/art.py review art/assets/example --stage build --review art/assets/example/review.json --evidence review/views.png
+python tools/modeling/art.py preview art/assets/example
+# Run the relevant civilization-mod/dev.ps1 Visual scene; inspect real screenshots.
+python tools/modeling/art.py review art/assets/example --stage verify --review art/assets/example/review.json --evidence review/ingame.png
+python tools/modeling/art.py publish art/assets/example
+python tools/modeling/art.py check art/assets/example --complete
 ```
 
-Translate detail in three passes: large silhouette/masses, functional secondary shapes (flanges, lids, bearings, feet), then surface marks. Match meaningful detail placement instead of increasing random rivets or cube counts. Use geometry where it changes silhouette or depth; UV-map panels/bolts deliberately and keep noise off broad castings. A low-resolution texture cannot recover missing geometry.
+Output entries retain the existing `source`, `target`, `format`, PNG `size`/`alpha` and GeckoLib manifest validation. Existing item/family reducers and `assets.py` remain export backends. `prepare` for a saved project preserves its source and exports the explicitly selected project, never an arbitrary current tab. Native `views` opens review tabs; close only known generated tabs after saving authored work.
 
-```powershell
-python tools/modeling/pipeline.py init art/assets/example --kind block --description "Describe what this block should be"
-# Fill purpose, silhouette, bounds, materials, interfaces, states, construction, invariants and existing visual references in asset.json.
-python tools/modeling/pipeline.py request art/assets/example
-# Inspect reference images, call built-in image_gen, save the exact prompt actually used.
-python tools/modeling/pipeline.py record art/assets/example --image PATH_TO_GENERATED_PNG --prompt EXACT_PROMPT_FILE --references ACTUAL_REFERENCE_IMAGES
-# View the resulting image. Record specific findings for every criterion, then pass or revise.
-python tools/modeling/pipeline.py review art/assets/example --stage mockup --review FINDINGS_JSON --evidence mockup-01.png
-# If revise: edit the current image with fixed invariants, record the new generation, inspect again.
-python tools/modeling/export_project.py art/assets/example/model --name example
-# Add editable/master sources and runtime output mappings to asset.json. Review actual exported model/textures.
-python tools/modeling/pipeline.py review art/assets/example --stage model --review FINDINGS_JSON --evidence model-review.png
-python tools/modeling/pipeline.py publish art/assets/example
-# Implement/update registrations, models, ports, guides, renderer and recipes only where authorized; run the focused scene.
-python tools/modeling/pipeline.py review art/assets/example --stage ingame --review FINDINGS_JSON --evidence ingame-review.png
-python tools/modeling/pipeline.py check art/assets/example --complete
-```
-
-`export_project.py` supports Java Block/Item and GeckoLib projects through native codecs, preserves `.bbmodel`, exports textures, and refuses existing files unless `--replace` is explicit. Check native texture resource names before declaring outputs; it does not silently rewrite references or invent registrations. Use the existing item/family texture tools for downscaling instead of another reducer. Multi-face generation always references the inspected master and changes only needed surfaces. Reuse equivalent faces.
-
-`asset.json` output entries contain `source` (relative local file), `target` (relative to `assets/civilization`), and `format`: `png`, `java_model`, `json`, `gecko_geometry`, or `gecko_animation`. PNG entries also declare `size: [width,height]` and optionally `alpha: opaque|transparent`. `sources` lists editable projects/masters; `gecko_manifests` lists existing-format manifests checked by `assets.py`. A multiblock lists all component outputs together so they are validated before publishing. Use `json` for blockstates/metadata, not a way to bypass model validation.
-
-For simple items, use one `review.json` containing `mockup`, `model` and `ingame` entries, each in the following format; the CLI selects the entry matching `--stage`. Separate legacy review files remain supported. Keep provenance and hash checks, but scale written evidence to complexity. Compare the asset with its named neighbors in a contact sheet or in-game lineup and explicitly judge material identity, family fit, visual distinction, scale, contrast, saturation and detail density. Machines still require mechanical and assembly evidence.
-
-Review JSON contains `decision: pass|revise`, `criteria` (specific findings keyed by the stage's names), and `remaining_issues` (blocking defects; must be empty to pass). Explain non-applicable checks instead of omitting them. Stage criteria are exposed in `pipeline.py`; generation requests return mockup criteria. Evidence paths are relative to the asset directory. Review records bind to the brief, references, source/export hashes and screenshots. Changing inputs invalidates affected reviews; a later revision invalidates a prior passing mockup. Publishing requires current mockup and model reviews; `check --complete` additionally requires in-game evidence. These are self-review records, not claims that code or a second reviewer independently judged the image.
-
-Finish only when the asset is readable at its actual use scale, mechanically/buildably coherent, fits the Tesla-era family, and has no blocking visual defects. Iterate autonomously; a fixed number of generations is not a quality target. Preserve failed iterations and targeted findings without making another roadmap. Update only affected art/design/runtime documentation and follow the focused testing policy.
+Fast tool checks: `python -m unittest discover -s tools/modeling -p "test_art.py"` and the existing `test_pipeline.py`, `test_assets.py`, `test_studio.py`. No Minecraft launch is required for workflow/documentation changes. The next new cooking station will pilot the workflow; compare time to acceptable in-game art, rework and defects the user still has to identify. That art pilot remains pending.
 
 GeckoLib runtime is pinned to 4.9.3 in `civilization-mod/gradle.properties`. For offline development, the build accepts the exact-version JAR at `civilization-mod/.dev-libs/geckolib-neoforge-1.21.1-4.9.3.jar`; otherwise it resolves the normal Maven dependency. Deployment copies the resolved artifact and verifies its hash. This runtime update does not change the Blockbench editor plugin pin.

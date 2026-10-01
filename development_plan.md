@@ -25,7 +25,7 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 | F14 | User play evidence for gathering, building, calorie recovery, farming, fertilizer manufacture and multiblock assembly |
 | F15 | Everyday material rules, cooking gates, machine feedback and dedicated Street Paver movement bonus |
 | F16 | Unified half-grid cutting, mixed-cell placement, volume-based calorie charge and crafting recombination; vanilla and Street Pavers slab crafting plus vanilla slab stonecutting retired in favor of the saw |
-| F17 | Original texture pipeline, now adding 64×64 road paving alongside existing 32×32 families; resource-pack-aware materials and renderer synchronization |
+| F17 | Original texture pipeline and compact [asset workflow](tools/modeling/README.md#complete-asset-pipeline), with reusable materials, declared density, visual proofs and retained legacy families |
 | F18 | Native 60-minute day/night default with saved admin overrides |
 | F19 | Shared biome geography, river crop eligibility, woodland growth and hoe inspection |
 | F20 | Three-tier powered claims, chest-style coal storage, per-claim whitelists, held takeovers/refunds and local trade counters |
