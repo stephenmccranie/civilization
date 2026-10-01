@@ -6,6 +6,11 @@ import dev.civilization.StoveCooking;
 final class StoveSoundMix {
     private StoveSoundMix() {}
 
+    /** Preserve the former 16-block linear reach without OpenAL point-source panning. */
+    static double distanceGain(double distance) {
+        return Math.clamp(1 - distance / 16, 0, 1);
+    }
+
     static double gain(double work, int layer) {
         double scorched = smooth((work - StoveCooking.PLATEAU_END) / 400);
         double golden = .9 * smooth((work - (StoveCooking.OPTIMUM - 200)) / 200) * (1 - scorched);

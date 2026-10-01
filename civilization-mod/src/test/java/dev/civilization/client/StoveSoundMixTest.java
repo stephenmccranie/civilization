@@ -4,6 +4,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StoveSoundMixTest {
+    @Test void centeredSoundStillFadesWithDistanceAndStopsAtItsRange() {
+        assertEquals(1, StoveSoundMix.distanceGain(0));
+        assertEquals(.5, StoveSoundMix.distanceGain(8));
+        assertEquals(0, StoveSoundMix.distanceGain(16));
+        assertEquals(0, StoveSoundMix.distanceGain(32));
+        for (int distance=1;distance<=16;distance++)
+            assertTrue(StoveSoundMix.distanceGain(distance)<StoveSoundMix.distanceGain(distance-1));
+    }
+
     @Test void fryingRemainsAudibleWithoutAnEnergyDipAcrossCooking() {
         for (int work = 0; work <= 1800; work++) {
             double energy = 0;
