@@ -13,11 +13,13 @@ final class KitchenVisualCheck {
     private static volatile String failure;
     private static net.minecraft.nbt.CompoundTag heldData;
     private static int heldUpdates;
+    private static java.util.List<net.minecraft.client.resources.sounds.SoundInstance> heldLoops;
+    private static double heldSoundEnergy;
     private static final BlockPos COUNTER=new BlockPos(1,100,0);
     private static final BlockPos POS=new BlockPos(0,100,0);
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException(failure);
-        if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.guiScale().set(3);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
+        if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.guiScale().set(3);mc.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER).set(.3);mc.options.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.BLOCKS).set(1.0);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
             check(server,()->{var l=server.overworld();l.setDayTime(6000);var weather=RegionalWeather.get(l);var district=weather.district(l,RegionalWeather.key(0,0));district.rain=false;district.end=weather.clock+72000;weather.setDirty();
                 for(int x=-4;x<=7;x++)for(int z=-6;z<=3;z++){l.setBlockAndUpdate(new BlockPos(x,99,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=100;y<=105;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
                 for(var e:l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(-5,98,-7,8,107,4)))e.discard();
@@ -53,30 +55,49 @@ final class KitchenVisualCheck {
         if(ticks==370)mc.options.keyShift.setDown(true);
         if(ticks==375)use(mc,POS);
         if(ticks==380)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(((PrototypeStoveEntity)server.overworld().getBlockEntity(POS)).hasSkillet()||!p.getMainHandItem().is(PrototypeStoveContent.SKILLET.get()))throw new IllegalStateException("Actual stove lift failed");});
+        if(ticks==382)carriedSoundEnergy(mc,carriedLoops(mc));
         if(ticks==385)use(mc,COUNTER);
         if(ticks==400)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!(server.overworld().getBlockEntity(COUNTER.above()) instanceof RestingSkilletEntity pan)||!pan.skillet().batch()||!p.getMainHandItem().isEmpty())throw new IllegalStateException("Actual resting placement failed");});
         if(ticks==410)shot(mc,"resting");
         if(ticks==425)use(mc,COUNTER.above());
         if(ticks==435){shot(mc,"carried");mc.options.keyShift.setDown(false);}
-        if(ticks==445)heldData=mc.player.getMainHandItem().getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+        if(ticks==445){heldData=mc.player.getMainHandItem().getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();heldLoops=carriedLoops(mc);heldSoundEnergy=carriedSoundEnergy(mc,heldLoops);}
         if(ticks>=446&&ticks<=505){
             var stack=mc.player.getMainHandItem();
             if(!stack.is(PrototypeStoveContent.SKILLET.get()))throw new IllegalStateException("Held skillet disappeared during cooling");
+            if(!heldLoops.equals(carriedLoops(mc)))throw new IllegalStateException("Cooling restarted the carried sound loops");
+            carriedSoundEnergy(mc,heldLoops);
             var data=stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
             if(!data.equals(heldData)){heldUpdates++;heldData=data;}
             try{var f=net.minecraft.client.renderer.ItemInHandRenderer.class.getDeclaredField("mainHandHeight");f.setAccessible(true);if(f.getFloat(mc.gameRenderer.itemInHandRenderer)<.99f)throw new IllegalStateException("Cooling replayed the held skillet equip animation");}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
         }
-        if(ticks==506){if(heldUpdates<3)throw new IllegalStateException("Held cooling did not receive repeated server updates");shot(mc,"carried-steady");}
+        if(ticks==506){if(heldUpdates<3)throw new IllegalStateException("Held cooling did not receive repeated server updates");if(carriedSoundEnergy(mc,heldLoops)>=heldSoundEnergy*.8)throw new IllegalStateException("Held pan sound did not fade with paid heat");shot(mc,"carried-steady");}
         if(ticks==510)use(mc,POS);
         if(ticks==520)check(server,()->{var stove=(PrototypeStoveEntity)server.overworld().getBlockEntity(POS);if(!stove.hasSkillet()||!stove.batch()||stove.work()<=730||!server.overworld().getBlockState(COUNTER.above()).isAir())throw new IllegalStateException("Actual return or carryover failed");carryChecked=true;});
         if(ticks==525)shot(mc,"returned");
+        if(ticks==526){if(!carriedLoops(mc).isEmpty())throw new IllegalStateException("Held sound remained after returning the pan");for(var loop:heldLoops)if(mc.getSoundManager().isActive(loop))throw new IllegalStateException("Returned pan has duplicate carried sound");}
         if(ticks==530)mc.options.keyShift.setDown(true);
         if(ticks==535)use(mc,POS);
         if(ticks==545)use(mc,COUNTER);
         if(ticks==550)mc.options.keyShift.setDown(false);
         if(ticks==560)use(mc,COUNTER.above());
         if(ticks==570){shot(mc,"rest-served");check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();var pan=(RestingSkilletEntity)server.overworld().getBlockEntity(COUNTER.above());if(pan.skillet().batch()||p.getInventory().countItem(PrototypeStoveContent.MEAL.get())!=8)throw new IllegalStateException("Actual resting serve failed");restServed=true;});}
-        if(ticks>580){if(failure!=null)throw new IllegalStateException(failure);if(!restServed)throw new IllegalStateException("Resting serve check did not complete");if(!carryChecked)throw new IllegalStateException("Carryover review did not complete");mc.options.keyShift.setDown(false);com.mojang.logging.LogUtils.getLogger().info("KITCHEN VISUAL VERIFIED: rotary input, working skillet, lift, rest, carried food, steady cooling across server updates, return and resting serve");mc.stop();}
+        if(ticks>580){if(failure!=null)throw new IllegalStateException(failure);if(!restServed)throw new IllegalStateException("Resting serve check did not complete");if(!carryChecked)throw new IllegalStateException("Carryover review did not complete");mc.options.keyShift.setDown(false);com.mojang.logging.LogUtils.getLogger().info("KITCHEN VISUAL VERIFIED: rotary input, working skillet, lift, rest, carried food and audio, uninterrupted loops across server cooling updates, heat-driven audio fade, return without duplicate held sound and resting serve");mc.stop();}
+    }
+    @SuppressWarnings("unchecked")
+    private static java.util.List<net.minecraft.client.resources.sounds.SoundInstance> carriedLoops(Minecraft mc){
+        try{
+            var field=dev.civilization.client.CarriedSkilletSounds.class.getDeclaredField("SOUNDS");field.setAccessible(true);
+            var hands=(java.util.Map<?,?>)((java.util.Map<?,?>)field.get(null)).get(mc.player);
+            if(hands==null)return java.util.List.of();
+            var loops=hands.get(net.minecraft.world.InteractionHand.MAIN_HAND);
+            return loops==null?java.util.List.of():(java.util.List<net.minecraft.client.resources.sounds.SoundInstance>)loops;
+        }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+    }
+    private static double carriedSoundEnergy(Minecraft mc,java.util.List<net.minecraft.client.resources.sounds.SoundInstance> loops){
+        if(loops.size()!=3)throw new IllegalStateException("Hot held pan needs all three sound layers");
+        double energy=0;for(var loop:loops){if(!mc.getSoundManager().isActive(loop))throw new IllegalStateException("Carried pan sound stopped during cooling");energy+=loop.getVolume()*loop.getVolume();}
+        if(energy<=0)throw new IllegalStateException("Hot held pan is silent");return energy;
     }
     private static void check(net.minecraft.server.MinecraftServer server,Runnable action){server.execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
     private static void use(Minecraft mc,BlockPos pos){mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(pos.getCenter().add(0,.5,0),Direction.UP,pos,false));}
