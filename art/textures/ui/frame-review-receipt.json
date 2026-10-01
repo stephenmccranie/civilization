@@ -1,0 +1,14 @@
+{
+  "build": "0.32.8-dev",
+  "evidence": {
+    "art/assets/recipe_browser/ingame.png": "8a2b20056d5587455b4ba88258882d557131a4e4f434231d94202bb0df9ab1e4",
+    "art/assets/recipe_browser/ingame-scale-4.png": "fcd7f07949b1f0d8b4639e8c01ed51e10ff9fb14b9f208118e7e6ba275610790",
+    "art/textures/ui/review/chest-frame.png": "c6300d6599a25a7f3f7b24fbf7877e9679886fd3fcee5495cb741da795e7f2c0",
+    "civilization-mod/src/main/java/dev/civilization/client/MachineUi.java": "829a8c24b2d47777ac712b93f157e9ba69c9dbb6a7e71dd96ed503cf8e91a85e",
+    "civilization-mod/src/main/java/dev/civilization/client/RecipeWidget.java": "16a5feda0ee3d31bca3387bf49e097521f8356360869a3bcc377de910cebacd8",
+    "civilization-mod/src/main/java/dev/civilization/client/MachineScreen.java": "e2e80d2e988243f1dd5fc0808c909e62d0971a03733dd018316d9786bf064bd2",
+    "art/textures/ui/export.py": "e294fd44908c0c8d5eeee917a289b8880becc30e1c326de6ec427021a01caf6b"
+  },
+  "review": "Pass: enlarged rivets and heavier frame clear slots; adjoining drawer frames no longer occlude each other. Dark category tabs, brass selected state, raised beveled/fastened nameplate and magnifying-glass search with darker hint follow mockup-02. Existing master reused, native geometry for controls.",
+  "validation": "Build/unit + Photon workshops 44.0s; chest interaction/visual check 34.8s. GUI scales 3 and 4 captured. No server-suite repeat."
+}

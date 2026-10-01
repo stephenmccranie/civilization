@@ -1,0 +1,18 @@
+{
+  "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+    "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+    "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+    "F:\\minecraft project\\art\\assets\\tannery\\controller-front-master.png": "669d946a43e4771e6517652dfc134a75ac841e21ebe762a811384d778c884057",
+    "F:\\minecraft project\\art\\assets\\tannery\\controller-front-prompt.txt": "c3f66710c99f92372b8880e0c1fb4b28f48cdbd4b6bb13432cb67961aaa60436",
+    "F:\\minecraft project\\art\\assets\\tannery\\layout.md": "9242edc5616fbbcc45a7f4a51d02be942682c313fed20af6d9332ca01e5293a1",
+    "F:\\minecraft project\\art\\assets\\tannery\\export.py": "5aab131c666d7e6dbc21ea0b96af7569772f92e246a86b31ae2b0b01774c0755",
+    "F:\\minecraft project\\art\\assets\\tannery\\tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+    "F:\\minecraft project\\art\\assets\\tannery\\tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+  },
+  "outputs": {
+    "textures/block/tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+    "models/block/tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+  }
+}

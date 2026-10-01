@@ -1,0 +1,1477 @@
+{
+  "schema": 1,
+  "kind": "animated_machine",
+  "brief": {
+    "description": "Reference-led continuous cast bed: remove separated feet, integrate control pedestal with solid engine base, extend crankcase toward controller and lower working assembly slightly.",
+    "purpose": "A grounded late nineteenth-century hot-bulb oil engine: refined fuel and lubricant become visible mechanical work. Compact workshop and future marine equipment.",
+    "silhouette": "One low stepped cast-iron bed beneath crankcase and long cylinder; open four-spoke flywheel beside it. No separate stands or isolated controller cabinet.",
+    "bounds": "Existing complete 3x3 slab bed and component anchors unchanged. Continuous cast bed included in controller/cylinder models; same guide air clearances.",
+    "materials": "Cast iron supports and cabinet sides with restrained material variation; steel caps and actual mounting hardware describe construction. Keep access-cover accents and barrel stripe only where meaningful.",
+    "interfaces": "Low front-center pedestal, fuel pipe at front and lubricant pipe underneath. Dial and lever remain decorative controls.",
+    "states": "Stopped/neutral; startup local flame only; working whole wheel turns; shortage/off stops. Preserve casing colors and server-owned state.",
+    "construction": "Native cuboids and bevels; continuous stepped cast bed split between existing controller and cylinder anchors, perpendicular shaft, enclosed crankcase, single rotating wheel.",
+    "invariants": "Preserve fuel rates, capacities, recipes and standalone consumer. Construction adds two slabs; ports relocate to front/bottom to keep full base accessible.",
+    "fidelity_targets": [
+      "Continuous cast bed meets cylinder/crankcase and incorporates controller front; no open void above a separate pedestal.",
+      "Maintain 24-unit cylinder and 3x3 casing footprint; extend crankcase forward over controls.",
+      "Lower shaft/cylinder/wheel together one unit, with verified rotating wheel clearance.",
+      "Preserve quiet cast iron, steel collars and small brass fittings; real photo guides structure, not literal dual-wheel replication."
+    ],
+    "role": "Town industry mechanical drive",
+    "technological_stage": "Early hot-bulb oil engine",
+    "material_behavior": "Cast iron with restrained edge wear, machined steel rings, brass only for fittings.",
+    "signature_feature": "Open flywheel and elongated horizontal cylinder on short grounded iron saddles.",
+    "neighboring_assets": [
+      "Oil Engine current version",
+      "Industrial steel refinery controllers",
+      "Canisters"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/mockup-05.png",
+      "role": "Identity and functional layout only; refine proportions and native-model detail."
+    },
+    {
+      "path": "art/assets/industrial_steel/texture-review.png",
+      "role": "Material family reference only."
+    },
+    {
+      "path": "art/assets/oil_engine/studio/real-engine-reference.png",
+      "role": "User structural reference: solid grounded bed and compact integrated crankcase; retain single existing wheel and material family."
+    }
+  ],
+  "sources": [
+    "studio/build.py",
+    "studio/material-master.png",
+    "studio/material-prompt.txt",
+    "studio/model/assembly.bbmodel",
+    "studio/model/oil_engine.bbmodel",
+    "studio/model/engine_cylinder.bbmodel",
+    "studio/model/engine_flywheel.bbmodel",
+    "studio/model/engine_flywheel_linked.bbmodel",
+    "studio/model/oil_engine_wheel.bbmodel",
+    "studio/surface_textures.py",
+    "studio/surface-master.png",
+    "studio/surface-prompt.txt",
+    "studio/model/surface-map.json"
+  ],
+  "outputs": [
+    {
+      "source": "studio/model/oil_engine.json",
+      "target": "models/block/oil_engine.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_cylinder.json",
+      "target": "models/block/engine_cylinder.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_flywheel.json",
+      "target": "models/block/engine_flywheel.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_flywheel_linked.json",
+      "target": "models/block/engine_flywheel_linked.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_atlas.png",
+      "target": "textures/block/engine_atlas.png",
+      "format": "png",
+      "size": [
+        512,
+        512
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "studio/model/engine_atlas.png",
+      "target": "textures/entity/oil_engine_wheel.png",
+      "format": "png",
+      "size": [
+        512,
+        512
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "studio/model/oil_engine_wheel.geo.json",
+      "target": "geo/oil_engine_wheel.geo.json",
+      "format": "gecko_geometry"
+    },
+    {
+      "source": "studio/model/oil_engine_wheel.animation.json",
+      "target": "animations/oil_engine_wheel.animation.json",
+      "format": "gecko_animation"
+    },
+    {
+      "source": "studio/model/engine_flywheel.blockstate.json",
+      "target": "blockstates/engine_flywheel.json",
+      "format": "json"
+    },
+    {
+      "source": "studio/model/oil_engine.item.json",
+      "target": "models/item/oil_engine.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_cylinder.item.json",
+      "target": "models/item/engine_cylinder.json",
+      "format": "java_model"
+    },
+    {
+      "source": "studio/model/engine_flywheel.item.json",
+      "target": "models/item/engine_flywheel.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [
+    "studio/model/manifest.json"
+  ],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-ef6c48e1-689b-43bd-a9d9-162a27c04692.png",
+      "sha256": "5162d5d2cd9c768e9bf1551699fa04287dba8834d1903a8ce3a3c23c4dcdaf8b",
+      "prompt": "Use case: stylized-concept.\nCreate one fresh Minecraft-implementable hot-bulb oil engine mockup for Civilization, set around 1890-1910. One large three-quarter view on a warm light neutral background, no text or alternate designs. Image reference is our refinery texture palette ONLY, not geometry.\nA squat 3-block-wide by 3-block-deep steel foundation of half-height slabs. At front center is a low compact instrument/controller pedestal, leaving both front corners clear for pipe connections. Behind it, a horizontal medium-gray cast-iron engine cylinder and supported crankcase occupy the middle, with a large exposed four-spoke octagonal flywheel on the LEFT. Copper utility block at rear, short plain exhaust. All machinery stands on substantial feet meeting the half-height bed. Cylinder points fore-aft; flywheel axle runs left-right, physically into a bearing and closed crankcase. Keep connecting rod enclosed inside that crankcase, eliminating exposed linkage crossing the wheel. Wheel is a single coherent rotating unit with four thick spokes and clear empty openings; its bottom clears the foundation. Mechanically plausible and solid, not ornate.\nRender as an actual Blockbench Minecraft asset: only cuboids and limited 45-degree bevels, deliberately chunky 32-texel-per-block pixel textures, no tiny geometric bolts, no smooth high-poly curves. Medium graphite iron, muted blue-gray steel, restrained warm brass fittings and one small cream-faced instrument. Match reference material tone but use clean readable planes and subtle wear, not noisy texture. Rivets and panel lines painted into textures. Soft neutral daylight, honest shadows, no bloom, no cinematic smoke, no schematic floating parts. The assembly must look buildable from a handful of Minecraft pieces, handsome yet simple.",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "references": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-e326846b-cf29-43f0-ac95-e66c4724d098.png",
+      "sha256": "1088e5f44fb16479b4c5795951a9c0a40fd9b69e618ef792ccdd0526a5e4fd8f",
+      "prompt": "Edit this exact engine mockup, preserving its handsome cast-iron/steel/brass palette, chunky Minecraft cuboid style, large four-spoke octagonal left flywheel, low front-center dial controller, lighting and camera. Fix three construction issues. 1: The engine cylinder must run FRONT TO BACK, perpendicular to the flywheel axle which runs LEFT TO RIGHT. Put a compact CLOSED rectangular crankcase beside the flywheel hub, then the cylinder extending rearward from that crankcase. The cylinder axis must be perpendicular to the flywheel shaft, not an extension of it. No exposed connecting rod. 2: Remove the front-left and front-right foundation blocks, leaving a T-shaped footprint: two full rows of three half-height foundation slabs behind the lone front-center controller. Leave both controller sides accessible to pipes. The wheel is supported at its HUB by bearing pedestals, its rim clears the bed completely, no foot touching rim. 3: Remove the big elevated copper tank; replace with a low copper slab at the BACK under utility fittings. Keep one modest plain exhaust and a small brass oiler on the cylinder, no extra machinery. One view, no labels. This is a targeted correction, not a new art direction.",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-01.png": "5162d5d2cd9c768e9bf1551699fa04287dba8834d1903a8ce3a3c23c4dcdaf8b"
+      }
+    },
+    {
+      "file": "mockup-03.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-4b9b2dce-4fd5-4afe-91f6-c3467b8067f2.png",
+      "sha256": "0c3b8c130d1fc9aadcb4281537b027845ebcce3f39856afca7f141d08fc500f8",
+      "prompt": "Edit ONLY the flywheel supports in this exact Minecraft engine mockup. Preserve every other part, geometry, camera, colors and textures. Remove both little feet that touch the bottom edge of the flywheel. The flywheel RIM must float free around its AXLE with a clearly visible empty gap underneath, at least the thickness of its rim. Add ONE strong vertical bearing pedestal BEHIND the wheel, extending from foundation up to the AXLE HUB height, hidden partly by the spokes. This stationary pedestal must sit behind the plane of the rotating wheel and support its axle, never touch the rim. Wheel stays same size and height. No other edits. Maintain open gaps between spokes so bearing and shaft can be understood.",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-02.png": "1088e5f44fb16479b4c5795951a9c0a40fd9b69e618ef792ccdd0526a5e4fd8f"
+      }
+    },
+    {
+      "file": "mockup-04.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-e6f28875-4a8b-4927-a09a-aa6bf0ee3a23.png",
+      "sha256": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434",
+      "prompt": "Simplify this exact engine drawing. REMOVE THE ENTIRE PEDESTAL UNDER AND BEHIND THE LEFT FLYWHEEL, including its brass base and foot. The wheel must be supported ONLY by its SHORT HORIZONTAL AXLE going from the wheel center INTO the adjacent large gray crankcase on the RIGHT. The existing crankcase has its own strong foundation foot and acts as the bearing. Leave a large unmistakably EMPTY AIR GAP beneath the entire rotating wheel: no supports under the wheel at all. Keep the wheel, hub, axle, crankcase, cylinder, controller, bed and every other part exactly unchanged. Do not add other parts. This is a physically credible overhung flywheel with its bearing inside the crankcase, not a rim sitting on a stand. Same Minecraft pixel-textured style and camera.",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-03.png": "0c3b8c130d1fc9aadcb4281537b027845ebcce3f39856afca7f141d08fc500f8"
+      }
+    },
+    {
+      "file": "mockup-05.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-cebff123-2c24-4931-bf9c-a52001f2e583.png",
+      "sha256": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+      "prompt": "Use case: precise-object-edit. Edit the referenced selected Minecraft hot-bulb oil engine mockup, preserving its coherent Tesla-era style and all attractive structural detail. One design, one large three-quarter product view on neutral warm beige. Remove the copper strip/panel behind the cylinder entirely: no copper slab or copper structural plate anywhere. Use two short broad integrated cast-iron feet with restrained brass ankle bands supporting the crankcase and rear cylinder. Preserve the octagonal four-spoke flywheel, enclosed compact beveled crankcase, horizontal faceted cylindrical barrel with two raised end flanges, separate hot bulb, small brass oil cup, short exhaust with collar, low steel T-shaped bed and small front-center analog control pedestal. Barrel length should be about 1.5 times its diameter and its horizontal form must be obvious. Shaft must enter side of crankcase and be perpendicular to barrel axis. No moving part intersects a foot. Keep details achievable with Minecraft Java cuboids and 45 degree bevels, textures for rivets and seams, simple meaningful small fittings, no realistic thin tubing or smooth high-poly curves. Medium blue-gray cast iron with muted steel edge bands, small warm brass accents, crisp painted pixel-art materials. Preserve the reference's layered craftsmanship, readable mechanical mass and proportions; do not simplify it into tall rectangular boxes. No labels or text.",
+      "brief_hash": "0cbd55d421dd1973b59f51e8875a96d8c18ace3030c462ba9625ca3fb76475d8",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-04.png": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+      }
+    },
+    {
+      "file": "mockup-06.png",
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\concept.png",
+      "sha256": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254",
+      "prompt": "Use case: stylized-concept. Create one refined Minecraft/Blockbench-implementable hot-bulb oil engine concept, not competing designs. Reference image 1 supplies identity/layout, image 2 supplies restrained iron/steel/enamel material family only. Render one complete engine in clear rear three-quarter view, wheel on left and cylinder extending right. Quiet warm gray background, no text.\nPreserve the perpendicular crankshaft and horizontal cylinder axes, four open spokes and octagonal flywheel, elongated cylinder with end flanges, short substantial iron supports, low bed of steel half slabs and small front control cabinet. Improve craftsmanship: a thinner layered wheel rim with machined outer band and deep open quadrants, substantial central hub, a stepped crankcase with readable access hatch, discrete fasteners, two narrower cylinder flanges, a small brass hot bulb and burner, small top oil cup, short hollow exhaust stack. Raised brass-rimmed cream dial and physical lever on control cabinet. No giant copper slab. No decorative gears. Do not add pipes that cross the wheel sweep.\nGeometry must look like an ACTUAL native Minecraft cuboid model using axis-aligned cubes and modest 45-degree bevels, no smooth meshes, no tiny machined ridges, no fantasy curves. Clean broad surfaces, restrained pixel clusters, roughly 32 texels per block. Gray-blue cast iron body, slightly lighter steel edge strips, warm brass only fittings. No excessive brass, no black unreadable mechanism, no baked dramatic glow. Carefully supported feet contact the bed, wheel clears bed and body at every angle. Target readable large shapes and secondary fittings rather than illustration detail. Keep silhouette close to the reference but make it refined and functional.\n",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      }
+    },
+    {
+      "file": "mockup-07.png",
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png",
+      "sha256": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+      "prompt": "Use case: stylized-concept. Texture master for Civilization's Tesla-era cast iron oil engine. Reference 1 defines cast iron, steel and brass palette. Reference 2 is the native engine model to understand parts only. Create ONE flat orthographic high-resolution pixel-art texture sheet, four equal square quadrants, no gutters no text labels. Top left: a dark iron ACCESS PANEL with a narrow recessed seam inside perimeter, short silver worn L-shaped corner brackets, small steel corner rivets, a restrained thin warm brass double-line inlay on the inner border, quieter textured iron center. Top right: a STEEL EDGE TRIM panel, broad silver steel face with dark perimeter seam, narrow polished outer edge and four darker fasteners; controlled longitudinal machining strokes, no noisy scratches. Bottom left: dark cast iron BODY PANEL, broad dark iron field with thin stepped steel edges and sparse clustered wear at corners; inset muted blue-green enamel narrow horizontal stripe across middle, not glowing, no symbols. Bottom right: a dark iron FOOT/SUPPORT PANEL with inset rectangular cast recess, subtle vertical casting ribs near left/right sides, steel corner accents, one small plain aged brass identification plate centered near top, no lettering. Keep each panel aligned to its square boundaries and all patterns large enough for a native game texture. Strong deliberate pixel clusters and readable corner treatment. High-resolution pixel-art master, no tiny output request, no subpixel scratches, no gradients, no photorealism. Fully opaque edge-to-edge. These panels should look crafted and maintained, not ruined, not ornate steampunk. Preserve dark iron body with restrained steel/brass accents.\n",
+      "brief_hash": "d00a4fd281c064b8b2e46481bde74e509b8eccdc75198eeb327f17d0dc360949",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\plain-textures-rear.png": "4929c3917c44dc4cc10ef0696519cb70c341c75370cd868a7e17cc91db7e62ad"
+      }
+    },
+    {
+      "file": "mockup-08.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-78453702-af2c-482c-8730-d12c5ed6e722.png",
+      "sha256": "74b9afa2174c997ac2d3ca40666cdf24ed475c7e275cd0b2ad9f5e1f6d4eeb2b",
+      "prompt": "Refine this exact Minecraft Blockbench oil engine design, not a new design. Preserve cast iron, steel corner accents, brass fittings, teal stripe, octagonal four-spoke flywheel and readable low control box. Make the bed a complete square 3 by 3 grid of half-height steel casing blocks (front-center occupied by the control pedestal), no missing front corners. Engine should read longer and less stubby: move crankcase and flywheel forward and extend the straight horizontal cylinder by one third, keeping the heated brass bulb at the back end and two grounded feet. Maintain a clear gap between wheel and bed throughout rotation. Support posts should end at the underside of their steel top plates with no overlapping exposed faces. Everything economical Minecraft cuboids and 45-degree bevels, native-looking pixel materials. Three-quarter rear view like the reference on a neutral background. No labels, no extra machinery, no copper slab.\n",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\short-engine-rear.png": "b233ba6ddb585ef52ecabf507dd4a89151aead1bc4402eaa428d9158ed21dc31"
+      }
+    },
+    {
+      "file": "mockup-09.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-a032283a-654b-4a83-9987-17866f4bab95.png",
+      "sha256": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5",
+      "prompt": "Correct this exact Minecraft engine reference: REMOVE the disconnected third support pedestal in the foreground middle of the base. Keep exactly two supports, both touching the engine: one under crankcase and one under the rear end cap. Keep the extended cylinder and complete square 3x3 bed. No extra pedestal. Maintain all materials, corner details, silhouette, camera and other proportions.\n",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-08.png": "74b9afa2174c997ac2d3ca40666cdf24ed475c7e275cd0b2ad9f5e1f6d4eeb2b"
+      }
+    },
+    {
+      "file": "mockup-10.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-6cd55eb9-3e16-4624-8ef5-690eeeb065e4.png",
+      "sha256": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703",
+      "prompt": "Edit this exact Minecraft engine image only by simplifying the two cast-iron support feet and control box side surfaces. Remove ornamental panel outlines, brass squares and corner fittings from these supports. They should be solid cast iron with quiet material mottling. Preserve steel top and bottom mounting plates, real anchor bolts, all geometry, elongated body, wheel, barrel stripe, actual access covers and other materials. No new parts.\n",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\short-engine-rear.png": "b233ba6ddb585ef52ecabf507dd4a89151aead1bc4402eaa428d9158ed21dc31"
+      }
+    },
+    {
+      "file": "mockup-11.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-307feb9f-82cf-4d69-b022-234b94b7543e.png",
+      "sha256": "008594f402fabaec328b12c91324e5a0627b811bd38080eadf78295c79df2264",
+      "prompt": "Redesign this Minecraft hot-bulb engine using the real engine photo as structural reference. One continuous low stepped CAST IRON BED under the crankcase and long cylinder, not two separate support stands. Integrate the small front controller into the end of that bed with its brass dial on the front. The crankcase extends toward that control face, filling the empty area above the old isolated controller. Engine sits slightly lower and grounded like real photo. Preserve existing Minecraft single octagonal FOUR SPOKE flywheel, complete 3x3 steel slab footprint, long cylinder, steel collars, brass heated end bulb and dark quiet cast iron material; do not copy the real photo's second flywheel or elaborate plumbing. Entirely implementable Minecraft cuboids and 45-degree bevels, original 32px-style pixel textures, no noisy fake panels. Three-quarter view on neutral backdrop, show entire machine. Wheel must turn beside the narrower cast bed, never intersect it.\n",
+      "brief_hash": "8ea7361f8eba238857f9024fc115849d3fd9e604cc526f88f70771609ff2f21e",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\real-engine-reference.png": "6148a5af2896066ebf28fae2626f4a9d15e00db93e64a282b27a501cfa62fe0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\before-solid-bed.png": "9006d44cb359e55036ba144f9ada02a4311770303b58d2fbdcc62e2d81aa45f3"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "revise",
+      "criteria": {
+        "silhouette_scale": "Strong large open four-spoke wheel and low bed; copper upper box overstates rear copper slab.",
+        "implementable_geometry": "Cuboids and beveled forms practical; filled front corners conflict with existing layout.",
+        "mechanics_clearance": "Cylinder appears coaxial with wheel shaft; must point fore-aft perpendicular to axle. Wheel-bottom support risks contact.",
+        "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+        "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+        "controls_readability": "Dial pedestal readable, but front corners need clear pipe access.",
+        "gameplay_scope": "No new controls; remove invented elevated copper tank to retain rear slab construction."
+      },
+      "remaining_issues": [
+        "Turn cylinder fore-aft perpendicular to left-right flywheel shaft.",
+        "Clear front corners and wheel bottom.",
+        "Reduce copper rear box to slab/utility support."
+      ],
+      "stage": "mockup",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      },
+      "evidence": {
+        "mockup-01.png": "5162d5d2cd9c768e9bf1551699fa04287dba8834d1903a8ce3a3c23c4dcdaf8b"
+      },
+      "generation": "5162d5d2cd9c768e9bf1551699fa04287dba8834d1903a8ce3a3c23c4dcdaf8b"
+    },
+    {
+      "decision": "revise",
+      "criteria": {
+        "silhouette_scale": "Lower rear copper utility area and T-shaped foundation improved.",
+        "implementable_geometry": "Cuboid crankcase and cylinder with 45 degree bands can be modeled.",
+        "mechanics_clearance": "Shaft and cylinder now read as separate axes through crankcase, but two feet visibly meet bottom rim rather than hub. Need single pedestal behind wheel hub and visible gap below rim.",
+        "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+        "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+        "controls_readability": "Open controller sides and simple dial clear.",
+        "gameplay_scope": "No additional gameplay interfaces; rear utility support can map to existing copper slab."
+      },
+      "remaining_issues": [
+        "Remove supports touching wheel rim; support axle behind wheel and leave visible air gap."
+      ],
+      "stage": "mockup",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      },
+      "evidence": {
+        "mockup-02.png": "1088e5f44fb16479b4c5795951a9c0a40fd9b69e618ef792ccdd0526a5e4fd8f"
+      },
+      "generation": "1088e5f44fb16479b4c5795951a9c0a40fd9b69e618ef792ccdd0526a5e4fd8f"
+    },
+    {
+      "decision": "revise",
+      "criteria": {
+        "silhouette_scale": "Lower rear copper utility area and T-shaped foundation improved.",
+        "implementable_geometry": "Cuboid crankcase and cylinder with 45 degree bands can be modeled.",
+        "mechanics_clearance": "Behind-wheel pedestal is improved, but still visually meets lower rim. Simplify to short axle cantilever from adjacent supported crankcase; remove wheel pedestal completely.",
+        "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+        "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+        "controls_readability": "Open controller sides and simple dial clear.",
+        "gameplay_scope": "No additional gameplay interfaces; rear utility support can map to existing copper slab."
+      },
+      "remaining_issues": [
+        "Wheel rim still visually meets pedestal foot. Remove pedestal instead of another ambiguous small shift."
+      ],
+      "stage": "mockup",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      },
+      "evidence": {
+        "mockup-03.png": "0c3b8c130d1fc9aadcb4281537b027845ebcce3f39856afca7f141d08fc500f8"
+      },
+      "generation": "0c3b8c130d1fc9aadcb4281537b027845ebcce3f39856afca7f141d08fc500f8"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Large four-spoke octagon balances compact horizontal engine and low T-shaped foundation. Normalize scale to actual structure coordinates in blockout.",
+        "implementable_geometry": "Cuboids, four 45-degree rim corners, cylinder bands and a short exhaust are native-model feasible. Copper utility area reduces to existing rear slab.",
+        "mechanics_clearance": "Overhung wheel now has visible air below rim. Short axle into supported crankcase is buildable; model must set perpendicular cylinder/shaft axes explicitly and measure swept wheel gap.",
+        "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+        "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+        "controls_readability": "Open controller sides and simple dial clear.",
+        "gameplay_scope": "Existing controller/ports/component count retained; crankcase is visual cylinder subgeometry, not another required block."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      },
+      "evidence": {
+        "mockup-04.png": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Fresh exposed four-spoke wheel, enclosed supported crankcase, rear horizontal cylinder and low control cabinet. Exact existing component coordinates determine arrangement rather than perspective proportions.",
+        "geometry_uvs": "Native Java cuboids/45-degree corners and Gecko wheel exported. One 128 atlas composed of native 32 tiles; explicit per-face UVs. Wheel swept radius under 15 units at height30 clears bed top8 by over7 units; shaft and cylinder axes perpendicular.",
+        "material_consistency": "All engine-specific pieces share generated master iron, steel and brass. Actual casing and copper slabs retain their active resource-pack materials; assembly-only placeholders are not bundled replacements.",
+        "assembly_interfaces": "Separate controller, cylinder and flywheel models correspond to current recipe pieces; fuel/oil flanges meet both side block boundaries and front corners stay empty. Static/full wheel is available for guides/items.",
+        "animation_states": "Native 1.5-second whole-wheel loop; reviewed 0/22.5/45-degree poses. No external rod crossing the wheel. Server work only controls animation rate. Startup flame remains localized and is checked in-game.",
+        "native_size_readability": "Large open rim, light dial and distinct brass service ports survive distance. Inventory scale and Photon lighting require the next runtime review."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "3545fdbc46786f609aada16a16ae81ad46d7fd39c99afbe5b2db6801d4e9a12a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "c847887c222bf2a9326fd27100906d333a68f1be8ec1b97dedce73e9db2651ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "6c23999b2e747a496a1f6b24af3f0f6fe3802898cd91a8c67448c953ae6010ce",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "f89a61660f55831fe68005c400e03af822e8c12866e605995b46829fcf7a1da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "494fdb535b003bafd28873630bc5b322b129f00b8bec7b97c580290303d81da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "bb129142f83e1875837df5cfaad990ed9de4d52f106cc584a57fa773f3331933",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "024a98ba667c5188d5c51eb986607641eb03e10d772ca34a7dbf9ab76471cfc9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "8fcc1f6dbbc17c1f3fc4f1ec0b55e69fafe2dd1298a7af6473092009902cf90d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "b734ee2b32994666686e11196c57a945f9fa547ab1080cdfff3bf6c4f7af7b3a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "5a32f25109eaa9885403a293482dcfb39dae41c2c4d28e9ee3b5e225de699ff7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "ccfc57c1ceb38d448ba7be561c41f1b8da66f7c10d6d3d88a9c21a9e7e0818b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "a71b547fe0d09b4e605f7d754ecc35a7a73a0fac6c289af72c21b4e0b6f5530d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "55324ad03da550cea08be1d5b3cb7d11f6f2d31b47cdb364011cf61593e59938",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "5865f1fb1ae248ae0e4b230cb881abc1face6169ff4179da6cb67be7b6ce5e4d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "5706e894bc6e43f769a482e12ed3863c602d561cbb3a223ae6bdd6dfde882523",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4"
+      },
+      "evidence": {
+        "model/pose-0.png": "1bc553acf137a6ce682dcdfda83f30642176ef6b395595561d6323fbbad3c6f6",
+        "model/pose-22.5.png": "77269f893be8877159e02c3763672e09f2038995b346126564cdc89bbcefd9cf",
+        "model/pose-45.png": "0083e4c43164e6855d8605bf845bdbe3b2429bc83e284b6ac9cff42638c466b0",
+        "model/assembly-back.png": "e08ac0be41e8fd7420fabd6c0f40f2ab250369aa51df8785b2134b637e7d8d77",
+        "texture-review.png": "07a14ef480d6b9ae662baabbbedffb0b9c0e52ed5fc7846ae1ca4aaefc682e02"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "revise",
+      "criteria": {
+        "photon_materials": "Materials coherent but first scene was rainy and shadowed by old test blocks; check clear daylight.",
+        "scale_readability": "World engine coherent; cylinder inventory icon too large.",
+        "states_motion": "Running/motion frames show whole wheel, shaft aligned with casing. Exhaust located at new stack.",
+        "interaction_guides": "Full wheel ghost appears, but heading erroneously says Kiln.",
+        "inventory_appearance": "Cylinder extends outside slot; shrink its GUI transform, wheel also reduced slightly.",
+        "integration_limits": "Land engine only; no claim of moving-vessel support."
+      },
+      "remaining_issues": [
+        "Fix icon scale and engine guide title; daylight review."
+      ],
+      "stage": "ingame",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "3545fdbc46786f609aada16a16ae81ad46d7fd39c99afbe5b2db6801d4e9a12a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "c847887c222bf2a9326fd27100906d333a68f1be8ec1b97dedce73e9db2651ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "6c23999b2e747a496a1f6b24af3f0f6fe3802898cd91a8c67448c953ae6010ce",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "f89a61660f55831fe68005c400e03af822e8c12866e605995b46829fcf7a1da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "494fdb535b003bafd28873630bc5b322b129f00b8bec7b97c580290303d81da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "bb129142f83e1875837df5cfaad990ed9de4d52f106cc584a57fa773f3331933",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "024a98ba667c5188d5c51eb986607641eb03e10d772ca34a7dbf9ab76471cfc9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "8fcc1f6dbbc17c1f3fc4f1ec0b55e69fafe2dd1298a7af6473092009902cf90d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "b734ee2b32994666686e11196c57a945f9fa547ab1080cdfff3bf6c4f7af7b3a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "5a32f25109eaa9885403a293482dcfb39dae41c2c4d28e9ee3b5e225de699ff7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "ccfc57c1ceb38d448ba7be561c41f1b8da66f7c10d6d3d88a9c21a9e7e0818b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "a71b547fe0d09b4e605f7d754ecc35a7a73a0fac6c289af72c21b4e0b6f5530d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "55324ad03da550cea08be1d5b3cb7d11f6f2d31b47cdb364011cf61593e59938",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "5865f1fb1ae248ae0e4b230cb881abc1face6169ff4179da6cb67be7b6ce5e4d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "5706e894bc6e43f769a482e12ed3863c602d561cbb3a223ae6bdd6dfde882523",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4"
+      },
+      "evidence": {
+        "first-running.png": "feb4e753a7d575b5fde8aba5d02efdb6eecfcefd44916f15140579526bd499ef",
+        "first-menu.png": "36254cb518ecf6ed0f95e77a5e2baea986573f53bf2a26ba76b87ab48b9a8e36",
+        "first-guide-items.png": "639921e8eb89b595bb3a7735a8ebab5d3e4d57f9d16056db37f91250f9f45e91"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Fresh exposed four-spoke wheel, enclosed supported crankcase, rear horizontal cylinder and low control cabinet. Exact existing component coordinates determine arrangement rather than perspective proportions.",
+        "geometry_uvs": "Native Java cuboids/45-degree corners and Gecko wheel exported. One 128 atlas composed of native 32 tiles; explicit per-face UVs. Wheel swept radius under 15 units at height30 clears bed top8 by over7 units; shaft and cylinder axes perpendicular.",
+        "material_consistency": "All engine-specific pieces share generated master iron, steel and brass. Actual casing and copper slabs retain their active resource-pack materials; assembly-only placeholders are not bundled replacements.",
+        "assembly_interfaces": "Separate controller, cylinder and flywheel models correspond to current recipe pieces; fuel/oil flanges meet both side block boundaries and front corners stay empty. Static/full wheel is available for guides/items.",
+        "animation_states": "Native 1.5-second whole-wheel loop; reviewed 0/22.5/45-degree poses. No external rod crossing the wheel. Server work only controls animation rate. Startup flame remains localized and is checked in-game.",
+        "native_size_readability": "Large open rim, light dial and distinct brass service ports survive distance. Inventory scale and Photon lighting require the next runtime review."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "3545fdbc46786f609aada16a16ae81ad46d7fd39c99afbe5b2db6801d4e9a12a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "c847887c222bf2a9326fd27100906d333a68f1be8ec1b97dedce73e9db2651ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "6c23999b2e747a496a1f6b24af3f0f6fe3802898cd91a8c67448c953ae6010ce",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "f89a61660f55831fe68005c400e03af822e8c12866e605995b46829fcf7a1da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "494fdb535b003bafd28873630bc5b322b129f00b8bec7b97c580290303d81da8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "bb129142f83e1875837df5cfaad990ed9de4d52f106cc584a57fa773f3331933",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "024a98ba667c5188d5c51eb986607641eb03e10d772ca34a7dbf9ab76471cfc9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "8fcc1f6dbbc17c1f3fc4f1ec0b55e69fafe2dd1298a7af6473092009902cf90d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "b734ee2b32994666686e11196c57a945f9fa547ab1080cdfff3bf6c4f7af7b3a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "5a32f25109eaa9885403a293482dcfb39dae41c2c4d28e9ee3b5e225de699ff7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "ccfc57c1ceb38d448ba7be561c41f1b8da66f7c10d6d3d88a9c21a9e7e0818b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "a71b547fe0d09b4e605f7d754ecc35a7a73a0fac6c289af72c21b4e0b6f5530d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "55324ad03da550cea08be1d5b3cb7d11f6f2d31b47cdb364011cf61593e59938",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "5865f1fb1ae248ae0e4b230cb881abc1face6169ff4179da6cb67be7b6ce5e4d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "5706e894bc6e43f769a482e12ed3863c602d561cbb3a223ae6bdd6dfde882523",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "model/pose-0.png": "1bc553acf137a6ce682dcdfda83f30642176ef6b395595561d6323fbbad3c6f6",
+        "model/pose-22.5.png": "77269f893be8877159e02c3763672e09f2038995b346126564cdc89bbcefd9cf",
+        "model/pose-45.png": "0083e4c43164e6855d8605bf845bdbe3b2429bc83e284b6ac9cff42638c466b0",
+        "model/assembly-back.png": "e08ac0be41e8fd7420fabd6c0f40f2ab250369aa51df8785b2134b637e7d8d77",
+        "texture-review.png": "07a14ef480d6b9ae662baabbbedffb0b9c0e52ed5fc7846ae1ca4aaefc682e02"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Fresh exposed four-spoke wheel, enclosed supported crankcase, rear horizontal cylinder and low control cabinet. Exact existing component coordinates determine arrangement rather than perspective proportions.",
+        "geometry_uvs": "Native Java cuboids/45-degree corners and Gecko wheel exported. One 128 atlas composed of native 32 tiles; explicit per-face UVs. Wheel swept radius under 15 units at height30 clears bed top8 by over7 units; shaft and cylinder axes perpendicular.",
+        "material_consistency": "Shared master lightened for Photon after first runtime review, reduced speckle contrast. Brass/dial composition preserved. Existing casing/copper slabs retain active pack materials.",
+        "assembly_interfaces": "Separate controller, cylinder and flywheel models correspond to current recipe pieces; fuel/oil flanges meet both side block boundaries and front corners stay empty. Static/full wheel is available for guides/items.",
+        "animation_states": "Native 1.5-second whole-wheel loop; reviewed 0/22.5/45-degree poses. No external rod crossing the wheel. Server work only controls animation rate. Startup flame remains localized and is checked in-game.",
+        "native_size_readability": "Large open rim, light dial and distinct brass service ports survive distance. Inventory scale and Photon lighting require the next runtime review."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "3545fdbc46786f609aada16a16ae81ad46d7fd39c99afbe5b2db6801d4e9a12a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "4729f8a2d96243e15e17d3c6e58021d7aa7785aa1286b70d670841b46b2e4eeb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "e6a789f3c7bb219c880e4348cf9350dbd869e6cf59b55783809fe21aac09252f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "717ae9141db8ef710f573a4b8c9f4dccf45c54ec8cdd1955b017d5c968e90f6e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "4882c03a50c92accba208d6c3b1639cedf983e166486a3bce4dca360d32b3b9d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "3c72875b8f1c9a76c369414b22e9f86dce2ac41ce13185a9d2c07959b1dfe2dc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "5f23a21210970faa59a673c34fcb348d40acd7b358a6a4a45bc8b759567c2fef",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "7a661039a84d244ab848408bcb6a7c55c907c005cbf5a070f94e11948370d020",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "0a95783e13f048894cc9d4fcf722641f22c15c9a53f57604b73e16b97a46d062",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "5a32f25109eaa9885403a293482dcfb39dae41c2c4d28e9ee3b5e225de699ff7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "ccfc57c1ceb38d448ba7be561c41f1b8da66f7c10d6d3d88a9c21a9e7e0818b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "a71b547fe0d09b4e605f7d754ecc35a7a73a0fac6c289af72c21b4e0b6f5530d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "55324ad03da550cea08be1d5b3cb7d11f6f2d31b47cdb364011cf61593e59938",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "46bad6c82ed52ba29c7ee0b2f9d00e5b31925409d09bf877321c1e0f794cf2fd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "5164c363b71ae2b6a6c33486b6eed91db00b5e75b46801d6851d2c7c86eaf22e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "model/pose-0.png": "6a0131ae1e89149d6ed2db47d3c6e0de511005dc2fbd2aefd7fbddea29e88f24",
+        "model/pose-22.5.png": "6f14d214afd12336fa00788e093421b2e6f75cd77f1dd5579911ff895d383a7c",
+        "model/pose-45.png": "009a78b2b7e53c9642d53f5e0fef57f41d4c3e8443fdce6be55278537be09a4e",
+        "model/assembly-back.png": "324d675edfc41b146d1e774a6959b764e0d2b39ebb6681a9efaa389e7f2f1386",
+        "texture-review.png": "2c6f46b42ed53514f7c0d71e4acdc44f3eaab6e81040818ad66c13d49eafbe7b"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Lighter shared iron now reads on sunlit and shaded faces under Photon/Faithful. Original casing and copper slab contrast intentionally as foundation/support materials. No whole-block emissive casing.",
+        "scale_readability": "Large open octagonal wheel and horizontal rear cylinder read clearly; case/front dial and copper utility support distinguish the working sides. Bed clearance and aligned shaft visible in opposite views.",
+        "states_motion": "Stopped/starting wheel at rest; running and motion frames show rim and spokes rotating as one unit. Rear startup flame appears below hot bulb and vanishes after warmup; working exhaust uses stack location.",
+        "interaction_guides": "Missing wheel has matching transparent full geometry, clear original component requirement and corrected Oil Engine heading; completed build has no guide text. Ports remain accessible.",
+        "inventory_appearance": "Controller, cylinder and wheel now fit individual slots, distinct silhouettes and matching materials. Held controller renders with same front/side geometry.",
+        "integration_limits": "This review covers the land multiblock in the hidden 1920x1080 Photon/Faithful scene. Server checks cover four-direction linking/removal. No new boat integration or moving-vessel animation claim; no capacity/load claim."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "bfe325a32c7eba35bd78134c610cba157a3876db9c63156bce22905f60d54824",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "3545fdbc46786f609aada16a16ae81ad46d7fd39c99afbe5b2db6801d4e9a12a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "4729f8a2d96243e15e17d3c6e58021d7aa7785aa1286b70d670841b46b2e4eeb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "e6a789f3c7bb219c880e4348cf9350dbd869e6cf59b55783809fe21aac09252f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "717ae9141db8ef710f573a4b8c9f4dccf45c54ec8cdd1955b017d5c968e90f6e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "4882c03a50c92accba208d6c3b1639cedf983e166486a3bce4dca360d32b3b9d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "3c72875b8f1c9a76c369414b22e9f86dce2ac41ce13185a9d2c07959b1dfe2dc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "5f23a21210970faa59a673c34fcb348d40acd7b358a6a4a45bc8b759567c2fef",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "7a661039a84d244ab848408bcb6a7c55c907c005cbf5a070f94e11948370d020",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "0a95783e13f048894cc9d4fcf722641f22c15c9a53f57604b73e16b97a46d062",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "5a32f25109eaa9885403a293482dcfb39dae41c2c4d28e9ee3b5e225de699ff7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "ccfc57c1ceb38d448ba7be561c41f1b8da66f7c10d6d3d88a9c21a9e7e0818b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "a71b547fe0d09b4e605f7d754ecc35a7a73a0fac6c289af72c21b4e0b6f5530d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "55324ad03da550cea08be1d5b3cb7d11f6f2d31b47cdb364011cf61593e59938",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "46bad6c82ed52ba29c7ee0b2f9d00e5b31925409d09bf877321c1e0f794cf2fd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "5164c363b71ae2b6a6c33486b6eed91db00b5e75b46801d6851d2c7c86eaf22e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "minecraft-stopped.png": "776d70389333f9ecd6dd5a99105100a008b19423bb3924d1285a69c3b7eceeee",
+        "minecraft-starting-back.png": "1cae22921abbe0065cc3d976bc0140d45e9edd04b908a6b0c5179da87220285c",
+        "minecraft-running.png": "3a078dab8c4899d276e0b5db90203c7dbb74aadcd6ec5226260bf4c0255ad586",
+        "minecraft-motion.png": "72f91e565c7fb0c19a533a8d92b4bd4d554d7d207fe37b1cdad90a64873efebe",
+        "minecraft-back.png": "bd17518e51f2629e733d03a8b3e933fd677591237f43f25c0b47dd446905fd01",
+        "minecraft-menu.png": "770258f7d6cf5d528999b20bdfac26a7fd06bbff2dfce1787ad88faa51b93986",
+        "minecraft-guide-items.png": "dd7737e803b07742f5ed8af9c683a4f575909e52b16ccc8c55e0f16686f3e448"
+      },
+      "generation": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Selected refinement keeps wheel, compact crankcase and horizontal flanged barrel; low feet replace copper plate. Proportion targets are explicit in the brief.",
+        "implementable_geometry": "Faceted castings and flanges translate to cuboids and 45-degree bevel strips; rivets belong in panel UVs.",
+        "mechanics_clearance": "Use perpendicular X shaft and Z cylinder in native model; generated perspective is not an orthographic mechanical drawing. Short feet stay outside wheel sweep.",
+        "period_materials": "Iron/steel with restrained brass cups/collars; no large copper panel.",
+        "family_consistency": "Retains selected engine and refinery palette, original casing bed.",
+        "controls_readability": "Small front-center dial/lever panel and accessible side ports.",
+        "gameplay_scope": "Only rear copper construction slab removed; fuel/work/crafting remain unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "0cbd55d421dd1973b59f51e8875a96d8c18ace3030c462ba9625ca3fb76475d8",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345"
+      },
+      "evidence": {
+        "mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078"
+      },
+      "generation": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Comparison sheet: open octagonal wheel about 1.75x crankcase height, barrel 18/12=1.5 length/diameter, distinct end flanges, compact chamfered case, layered feet, oil cup and collared stack. No broad copper piece. Opposite service-side view shows barrel; front view separately shows control panel. Minecraft casing bed remains wider and panel fasteners smaller than the illustration.",
+        "geometry_uvs": "Native cuboid/45-degree bevel exports; continuous rim corner joins. Dedicated plain steel tile replaces accidental panel-corner sampling, and panel artwork is mapped only onto front faces.",
+        "material_consistency": "One referenced material master, coherent iron/steel/brass atlas; assembly casing uses actual refinery-side texture. No copper material placeholder.",
+        "assembly_interfaces": "Cylinder owns integral front/rear feet; rear space now requires air. Existing full-block component selection/collision remains coarse; this pass does not add a multipart collision engine. Ports and construction positions retained.",
+        "animation_states": "Whole wheel poses 0/22.5/45 reviewed; swept radius about 15.2 model units leaves 1.8 units above casing bed. Shaft is stationary, inside crankcase bearing; no support intrudes into wheel sweep.",
+        "native_size_readability": "Dial and lever retained; fitted component item transforms retained. Final shader/icon appearance checked next in focused Minecraft scene."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "0cbd55d421dd1973b59f51e8875a96d8c18ace3030c462ba9625ca3fb76475d8",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "4800a89a1ab8a5f1e9af74997d39fc679743f73ef7bb793d61bc2391a3ea267f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "19d54e2bdd8bb5da7a9367bdc5867bf4fba51302db569f34a98e49b1f935e35d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "bfbba2efe1fc9e1e0739a62956a572e5d397aa17313df7ad8f0e480cf5b3e7fd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "ff9cf5e83e8cc9db8fc6b5d8e3272d366363380cfd49039ad211767ba7805333",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "0d9462a361523a0d435ce8712a7b2ff40d5592189ddfbc9aa15fa9e4e10578d8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "6db8bbf3a4e22bb80c4ad570fe508ac5ba3ed6cbe1be739192af2f2835e1c44f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "e9e3e4a99c70484f2ff74c5637460a74c643413d5c54bd96c6dbe776f1896a06",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "8251178c097e440ecaedf1543b3f163e86bbf726f4cf7dcb0890bace75ff1d58",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "780f9eed25cad6568d2953cf5336775e1c73da93182fb67885868fea6645478b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "856b015d8c3098536a78c3cf8820f3f8c48a2b303255e1eac659dc6c37076c08",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "c96df9fc828cdde7c5f7bb621c28874cb8317aa09864d5c33d4abc5ae1b0ea9c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "1f90e720762138ec2ebfa594f6a781964d8fdf9abdd32000c527d71b245bddce",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "5e9267b05f701b5991ffb4508f01c31dedb386684facbe82b820db1c01d0cd8b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "59cacfa871319ff3ea0a42c10e34196f7c198a0fbe44b21f8d10b77e62959ae3",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "fidelity-comparison.png": "129a99abf45fea7df2c3d9b4cd8e62a21867d1e854867f31499cd0122b6f75a5",
+        "model/assembly-isometric.png": "2cf3c00cd0561f5c2517605b03804f2c80e13ab57cded04e5fe7d12c4614c0a6",
+        "model/pose-22.5.png": "c979d7a78d94a2a37c48725698b8c3c6b1d65e0f3d3ccc6da71266d2dbd73c13",
+        "model/pose-45.png": "3a2d6a831904af1405cf6821a12f3888d3507817051ddb60234a8b1645d971cb"
+      },
+      "generation": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon/Faithful scene inspected: consistent blue-gray iron with brass fittings, normal darker shaded front, clear flanges on lit rear; no copper panel or unintended panel UV patches.",
+        "scale_readability": "Shorter overall silhouette and horizontal barrel/end flanges visible; paired support feet and collared stack remain readable at ordinary distance.",
+        "states_motion": "Stopped/startup/running and two working frames show coherent whole-wheel rotation. Rear flame reaches bulb and smoke originates at stack; feet stay clear.",
+        "interaction_guides": "Oil Engine guide title and full revised loose-wheel preview match model; air requirement replaces old copper support. Existing coarse block-cell collision retained.",
+        "inventory_appearance": "Controller, cylinder and wheel fit hotbar slots; held controller and instrument panel retain recognizable appearance.",
+        "integration_limits": "Standalone commissioning scene with Sable loaded; this does not verify engine aboard a vessel. No user-world edits made."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "0cbd55d421dd1973b59f51e8875a96d8c18ace3030c462ba9625ca3fb76475d8",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\families\\refinery\\review.png": "bc97c0486ee78fece86afe3f56042f43d82e0f2baa0ac5f69c42dbf80c8bd345",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\build_model.py": "4800a89a1ab8a5f1e9af74997d39fc679743f73ef7bb793d61bc2391a3ea267f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\prepare_textures.py": "19d54e2bdd8bb5da7a9367bdc5867bf4fba51302db569f34a98e49b1f935e35d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly.bbmodel": "bfbba2efe1fc9e1e0739a62956a572e5d397aa17313df7ad8f0e480cf5b3e7fd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.bbmodel": "ff9cf5e83e8cc9db8fc6b5d8e3272d366363380cfd49039ad211767ba7805333",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.bbmodel": "0d9462a361523a0d435ce8712a7b2ff40d5592189ddfbc9aa15fa9e4e10578d8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.bbmodel": "6db8bbf3a4e22bb80c4ad570fe508ac5ba3ed6cbe1be739192af2f2835e1c44f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.bbmodel": "e9e3e4a99c70484f2ff74c5637460a74c643413d5c54bd96c6dbe776f1896a06",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.bbmodel": "8251178c097e440ecaedf1543b3f163e86bbf726f4cf7dcb0890bace75ff1d58",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.json": "780f9eed25cad6568d2953cf5336775e1c73da93182fb67885868fea6645478b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.json": "856b015d8c3098536a78c3cf8820f3f8c48a2b303255e1eac659dc6c37076c08",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.json": "c96df9fc828cdde7c5f7bb621c28874cb8317aa09864d5c33d4abc5ae1b0ea9c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel_linked.json": "1f90e720762138ec2ebfa594f6a781964d8fdf9abdd32000c527d71b245bddce",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_atlas.png": "5e9267b05f701b5991ffb4508f01c31dedb386684facbe82b820db1c01d0cd8b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.geo.json": "59cacfa871319ff3ea0a42c10e34196f7c198a0fbe44b21f8d10b77e62959ae3",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "minecraft-back.png": "5df01f68f9cf4b8ff29199e5877b47be4ddae767a995c5a0341cacaa3e93838b",
+        "minecraft-stopped.png": "deabfc4959a2da8d54235c1d0374829410abf9ef529b52d1661203cf8ce436a9",
+        "minecraft-starting-back.png": "e4a1beb5a9e55978c5a9899bf44cb61d754383e26c10b1694117fe59ac0edcd9",
+        "minecraft-running.png": "91efb167defd3d569876786977b5373c141786fd24d5b71c3bd34749c4b5b572",
+        "minecraft-motion.png": "6d2efd04417c9ae754568f2681078b6ca6b56a0910bd6c036b64d9d64c374f68",
+        "minecraft-guide-items.png": "080ea4be2af8022c82216a34fb2cb6c1fd7598e4d35c028ed133ff9ccdfa0971"
+      },
+      "generation": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Open four-spoke wheel, horizontal cylinder, two supports and separate front cabinet preserve engine identity. Native geometry will establish exact proportions rather than trusting illustration perspective.",
+        "implementable_geometry": "Box castings, 45-degree bevels and stepped fittings are implementable in the current Java/GeckoLib split. Tiny bevel highlights are texture treatment, not additional cubes.",
+        "mechanics_clearance": "Wheel shaft is transverse to the cylinder; clear space exists below the rim. Native review must verify the illustrated wheel-to-case separation and full rotation.",
+        "period_materials": "Cast iron and machined steel dominate, with brass oil cup, bearing and gauge. Avoid carrying the illustration's ornamental brass foot trim into the model.",
+        "family_consistency": "Gray castings and readable cream instrument match the refinery family. Material marks must remain quieter than the silhouette.",
+        "controls_readability": "Separate gauge and lever communicate monitoring and control; do not copy the image's extra duplicated oil cup behind the wheel.",
+        "gameplay_scope": "Same footprint, components, supplies and runtime behavior. This study improves modeling and evidence, not engine power or flight mechanics."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-06.png": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Whole assembly retains octagonal open four-spoke wheel, elongated cylinder, stepped case, two grounded feet and separate control cabinet. Narrow steel face rim and flanges replace broad indistinct surfaces. Intentional simplifications: no extra oil cup or decorative foot brass from the illustration.",
+        "geometry_uvs": "146 assembly cuboids including construction bed. Native Java and GeckoLib validation passed. Material UV spans use two pixels/model unit, rejecting overflow rather than clamping. Decals explicitly fit. Five-decimal coordinate normalization fixes actual save/reopen bevel drift; native geometry and animations now round-trip identically. Tiny separated casting caps avoid coplanar faces.",
+        "material_consistency": "One generated four-quadrant master: iron, steel, brass and isolated gauge. Existing shared casing texture retained. Compared six views; steel is visibly distinct from iron, and restrained brass identifies fittings. First old-atlas trial rejected for duplicate controls and weak value separation.",
+        "assembly_interfaces": "Unchanged controller/cylinder/wheel offsets and construction footprint. Two iron saddles meet bed, control-side mouths accessible, modeled exhaust opening recessed. Head bolts and side access cover finish rear/opposite views.",
+        "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+        "native_size_readability": "Fixed 1000px captures and reduced contact sheets show readable main shapes, separate gauge and physical lever. World-distance, icons and Photon materials are the next in-game check, not inferred from editor views."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "0af79852a31a23255888c8b1953b06ab94e41aca3a7684ff5a4a34372e0301f2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "7b1f45a937133c74b22f5d5363cad70f2b3dd095229bc8860576299d1528a7ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "93047fa0e57a54c084c24bca49d174b8ce42a1ed1bff138bbfa7cb44323218d5",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "ccbba742a8e1df30a33698af328590f9c1ca35a3926c008bf2a99b866953ced6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "4ed41b9873f3eb018916464f4713108c0f17a7f820177bd282ab9e8246b64a9d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "e4a7ecf6d3f2842920f55683d480565ce7baf07ff189ef2dfaa48b9645b49023",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "24d5cd43ef4995b2a3d038936356e343e1e0697d14a562408e65fdd505dab78b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "8a7e64c56de8cc7d82a5dd764ce7bbe189c3519ec47f9bc7662885d6d335a774",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "5ea852be83a2a46e734fc01c58b443830029af2aa424d962174e99dcbdfb1448",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "6d27fd9d865b9cffb9000e10b44e3b99681cb7dc3a567b21e63ae5534a1ac7de",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "5504b5163ce2b23001f019edbf5b984859062721d7fc1cbb7d0791be5fd42646",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "79651df588aca7455e8106b109a30bf05afc4ac9d902b54a224cbec46f406fe6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "178e2751c2e07efe5ae27c097b8dc6b2c96ab228dc6e778486d9b680cf65398b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "e11fef5ebc4083926394981fba5ecb89ecc103974eef9648d4345b28708d6b4d",
+        "studio/model/motion.png": "4295779a0da2bdd0faa5c6b9e3cf3b613a871e1b86103a4658b3dc1a1b39d4d8",
+        "studio/model/geometry-check.json": "5def24b7b33ee43d5c5cb0304582461b90dbae7ba068f09fe38885989fa1938c"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual hidden 1920x1080 Photon/Faithful scene inspected. Neutral iron is darker than steel bands, brass remains localized, and the bed uses the current shared casing. No missing textures visible.",
+        "scale_readability": "Front and rear views show distinct body/flanges, thinner wheel, grounded saddles, head bolts and recessed exhaust. Gauge is substantially more legible than the old tiny whole-panel decal. Nearby masonry and refinery structures provide scale/context.",
+        "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Build/unit and focused engine visual checks passed. Server behavior was not changed; no full gameplay rerun. Moving Sable vessel rendering is not claimed or tested by this stationary-engine study. Source/export validation and native geometry/animation save-reopen passed separately."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "0af79852a31a23255888c8b1953b06ab94e41aca3a7684ff5a4a34372e0301f2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "7b1f45a937133c74b22f5d5363cad70f2b3dd095229bc8860576299d1528a7ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "93047fa0e57a54c084c24bca49d174b8ce42a1ed1bff138bbfa7cb44323218d5",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "ccbba742a8e1df30a33698af328590f9c1ca35a3926c008bf2a99b866953ced6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "4ed41b9873f3eb018916464f4713108c0f17a7f820177bd282ab9e8246b64a9d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "e4a7ecf6d3f2842920f55683d480565ce7baf07ff189ef2dfaa48b9645b49023",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "24d5cd43ef4995b2a3d038936356e343e1e0697d14a562408e65fdd505dab78b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "8a7e64c56de8cc7d82a5dd764ce7bbe189c3519ec47f9bc7662885d6d335a774",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "5ea852be83a2a46e734fc01c58b443830029af2aa424d962174e99dcbdfb1448",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "6d27fd9d865b9cffb9000e10b44e3b99681cb7dc3a567b21e63ae5534a1ac7de",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "5504b5163ce2b23001f019edbf5b984859062721d7fc1cbb7d0791be5fd42646",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "79651df588aca7455e8106b109a30bf05afc4ac9d902b54a224cbec46f406fe6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "178e2751c2e07efe5ae27c097b8dc6b2c96ab228dc6e778486d9b680cf65398b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/stopped.png": "5a260912dccaa3f19997dd3979eb7df40bf4cde326a0077e7b601f64e3c3bf7b",
+        "studio/ingame/back.png": "c9fb3e81e0876de9b625d30115d52b1bdcb6c47bbedbba71c78a7ff7512968b2",
+        "studio/ingame/running.png": "aa80e6aaa4c01530039ee4673466aa4d89d73dce50ddc8b2608acd55807bfb21",
+        "studio/ingame/motion.png": "b0be112f78129742fac5a43bb2d3cd4299f93f276a58bb7ca1c041ee7eb83d0c",
+        "studio/ingame/guide-wheel-held.png": "52c164b7cff2392063a8d444c52f92a90e0f524b54dfb021d7bb9d091c12ad95"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Whole assembly retains octagonal open four-spoke wheel, elongated cylinder, stepped case, two grounded feet and separate control cabinet. Narrow steel face rim and flanges replace broad indistinct surfaces. Intentional simplifications: no extra oil cup or decorative foot brass from the illustration.",
+        "geometry_uvs": "146 assembly cuboids including construction bed. Native Java and GeckoLib validation passed. Material UV spans use two pixels/model unit, rejecting overflow rather than clamping. Decals explicitly fit. Five-decimal coordinate normalization fixes actual save/reopen bevel drift; native geometry and animations now round-trip identically. Tiny separated casting caps avoid coplanar faces.",
+        "material_consistency": "One generated four-quadrant master: iron, steel, brass and isolated gauge. Existing shared casing texture retained. Compared six views; steel is visibly distinct from iron, and restrained brass identifies fittings. First old-atlas trial rejected for duplicate controls and weak value separation.",
+        "assembly_interfaces": "Unchanged controller/cylinder/wheel offsets and construction footprint. Two iron saddles meet bed, control-side mouths accessible, modeled exhaust opening recessed. Head bolts and side access cover finish rear/opposite views. User refinement: tall protruding black burner removed; compact iron burner and brass nozzle recessed beneath end cap. Rear native view inspected.",
+        "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+        "native_size_readability": "Fixed 1000px captures and reduced contact sheets show readable main shapes, separate gauge and physical lever. World-distance, icons and Photon materials are the next in-game check, not inferred from editor views."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "e5607ddac6964dc5cc86c150a6da78a72730f748eb55a94ba7e49559f9d531da",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "4fbca95c269722a29f25e240c78d46486af19df9a383afced0df25c299cc61f6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "f2faab55c7f68c1d436e41a5e1d9842a7c850a70c0632bc42f6652765a9d6bc4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "5a02f3ac0279dbe1f01cd58c54aa6b85ca777f8b5a66459d311c0a25634073c2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "9c29c042c4b27e7f63e8aa323f8a1a27ac96e917de5ce2649b0ad685bc0f804c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "28ea5ba37bec687604d30ec9c95437ab6ed5a8a0b2dfe137d37015914b41151a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "62590fd4f56d1cb09ef9809f09ffdb9055ce9c8249d8d5880354d279b54c773d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "8a7e64c56de8cc7d82a5dd764ce7bbe189c3519ec47f9bc7662885d6d335a774",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "13349ec98171c28faf83d84d23c6f290feb5b2a36f991a52e2c3d3c95367582a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "6d27fd9d865b9cffb9000e10b44e3b99681cb7dc3a567b21e63ae5534a1ac7de",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "5504b5163ce2b23001f019edbf5b984859062721d7fc1cbb7d0791be5fd42646",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "79651df588aca7455e8106b109a30bf05afc4ac9d902b54a224cbec46f406fe6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "178e2751c2e07efe5ae27c097b8dc6b2c96ab228dc6e778486d9b680cf65398b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "e71c1d859d40edf51d7eb8ea308eca963058acdfbde07a21eb73ec6277d744aa",
+        "studio/model/motion.png": "b51b681602d47c9dbb5e52b1274dd1387302522bd5ce684949767b3b60cdb0c4",
+        "studio/model/geometry-check.json": "5def24b7b33ee43d5c5cb0304582461b90dbae7ba068f09fe38885989fa1938c"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual hidden 1920x1080 Photon/Faithful scene inspected. Neutral iron is darker than steel bands, brass remains localized, and the bed uses the current shared casing. No missing textures visible.",
+        "scale_readability": "Front and rear views show distinct body/flanges, thinner wheel, grounded saddles, head bolts and recessed exhaust. Gauge is substantially more legible than the old tiny whole-panel decal. Nearby masonry and refinery structures provide scale/context. Latest rear Photon screenshot confirms projecting black lip is gone; compact burner sits beneath end cap.",
+        "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Build/unit and focused engine visual checks passed. Server behavior was not changed; no full gameplay rerun. Moving Sable vessel rendering is not claimed or tested by this stationary-engine study. Source/export validation and native geometry/animation save-reopen passed separately."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "e5607ddac6964dc5cc86c150a6da78a72730f748eb55a94ba7e49559f9d531da",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "4fbca95c269722a29f25e240c78d46486af19df9a383afced0df25c299cc61f6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "f2faab55c7f68c1d436e41a5e1d9842a7c850a70c0632bc42f6652765a9d6bc4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "5a02f3ac0279dbe1f01cd58c54aa6b85ca777f8b5a66459d311c0a25634073c2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "9c29c042c4b27e7f63e8aa323f8a1a27ac96e917de5ce2649b0ad685bc0f804c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "28ea5ba37bec687604d30ec9c95437ab6ed5a8a0b2dfe137d37015914b41151a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "62590fd4f56d1cb09ef9809f09ffdb9055ce9c8249d8d5880354d279b54c773d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "8a7e64c56de8cc7d82a5dd764ce7bbe189c3519ec47f9bc7662885d6d335a774",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "13349ec98171c28faf83d84d23c6f290feb5b2a36f991a52e2c3d3c95367582a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "6d27fd9d865b9cffb9000e10b44e3b99681cb7dc3a567b21e63ae5534a1ac7de",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "5504b5163ce2b23001f019edbf5b984859062721d7fc1cbb7d0791be5fd42646",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "79651df588aca7455e8106b109a30bf05afc4ac9d902b54a224cbec46f406fe6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "178e2751c2e07efe5ae27c097b8dc6b2c96ab228dc6e778486d9b680cf65398b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/end-cap-cleanup.png": "625ffdf2801d5dc76a77b351faf656d5b1d279db40222d9b5bdd951ee83fd533"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Texture-only refinement of the existing inspected engine; no geometry changes. Generated four-panel sheet supplies surface treatment, not new geometry.",
+        "implementable_geometry": "Surface master reduces to pixel-art panels; nine-slice fitting preserves corner size on named native faces. Small rim/spoke edge accents are authored pixel strips, not additional cubes.",
+        "mechanics_clearance": "All existing geometry, pivots, supports and rotation clearances retained. No new mechanical forms implied by this sheet.",
+        "period_materials": "Steel corner protectors, recessed cast panels, restrained brass pinstriping and small identification plaques fit maintained Tesla-era machinery. Muted enamel band adds restrained color.",
+        "family_consistency": "Referenced current material master and actual model; common iron/steel/brass remain. Body accents are muted, no gold-covered casing or arbitrary gears.",
+        "controls_readability": "Existing isolated gauge and physical lever retained. New panel art adds no fake controls or lettering.",
+        "gameplay_scope": "Textures and UV layout only. Shared casing, removed black lip, recipes and controls retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "d00a4fd281c064b8b2e46481bde74e509b8eccdc75198eeb327f17d0dc360949",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-07.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372"
+      },
+      "generation": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Whole assembly retains octagonal open four-spoke wheel, elongated cylinder, stepped case, two grounded feet and separate control cabinet. Narrow steel face rim and flanges replace broad indistinct surfaces. Intentional simplifications: no extra oil cup or decorative foot brass from the illustration.",
+        "geometry_uvs": "Same 146 cuboids and pivots. Native Java/GeckoLib validation passed with 512x512 atlas. Named face islands keep two pixels per model unit; nine-slice panels retain corner scale. Base material tiles and gauge remain separate.",
+        "material_consistency": "Generated reference-driven surface sheet supplies steel corner protectors, brass pinstriped covers, inset support panels and muted enamel body bands. Explicit edge pixels articulate wheel/spokes. Front/rear native views inspected after modest panel brightening; shared casing and isolated gauge retained.",
+        "assembly_interfaces": "Unchanged controller/cylinder/wheel offsets and construction footprint. Two iron saddles meet bed, control-side mouths accessible, modeled exhaust opening recessed. Head bolts and side access cover finish rear/opposite views. User refinement: tall protruding black burner removed; compact iron burner and brass nozzle recessed beneath end cap. Rear native view inspected.",
+        "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+        "native_size_readability": "At native contact-sheet scale, panel borders, corners and wheel edges remain distinct; geometry is unchanged. Full in-game shader review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d00a4fd281c064b8b2e46481bde74e509b8eccdc75198eeb327f17d0dc360949",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "1623a5de26be0c6fb60c1f9d890e52ac947252eac9248d022ec95f3e43d0d2d9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "acb63f8493f07cc9a7637daaf35d08aa0e8bacf903ae34ad97711940360dd65e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "ab87839d8d0dc2f6e6eb8af369010c9f915a36407c0cf2c984a4733e952f7bff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "fdcab03776d2ec38a485ca632ae80d67b1a165d3bb7b57a8774276e8c950f302",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "abc9676645a11196363dedcc20f1cdb60f54f25d71f63137bc008c8c89ecd37d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "c2b19224bdcdb6db3f47541d0f0dd5b3a331d150bd394c04bfee0017912c74d7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "69e76df636969eea429c2454f0177a58840f6293da928de7bc837eb5c8c49dc9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "99f72916037bf07af23cc5c06fbdbbc95c081ec226ab79d56bfd8dd57bfc7926",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "3a63fa78065c18f998956964995ea642ba0729ba3015bb311bfc26c4626d7dc4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "906c04a3d59619c81135dccae4d615e2b723aeefa27c35aadf0cdbf51fe946ae",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "786b99cfc56b4760a01ebe61c1406b6b468ad4529300dc23add411ebd3f78f41",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "b145596bbec8bc7d70dce55c416fd26011ab381d5d38ed353b6e3540794723bd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "6fb04e935a6ed0212e0464ca60792d38101ea15d75ddc5367cd1c5a0066c7343",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "076262dc6fe12952734a0324c21da5e6b3c39fa6eaa9a81b0d6322a0359010f6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "ec1fb1c41ff97d102d588f54bf74229390a577d3f807bf4a9328e7eb31a9ff26",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "3cb6184bc5bafe1b697e04a8cd0c1996e4db621849b9ca982c17a9c64149bdd6",
+        "studio/model/motion.png": "b9c8d1776b2fbace445a51a914facfa0d8504a89b0b0cff227a96ad10ecd4822",
+        "studio/model/surface-map.json": "3a63fa78065c18f998956964995ea642ba0729ba3015bb311bfc26c4626d7dc4"
+      },
+      "generation": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Inspected current Photon/Faithful front and rear screenshots: steel corner fittings, brass pinstripes, dark recessed panels and restrained teal stripe render consistently; no missing textures. Cast iron remains darker than edge steel.",
+        "scale_readability": "Mapped corners stay at actual part corners; wheel edges and support fittings read at machine scale. Broad metal areas retain quieter texture. Geometry unchanged and burner remains recessed.",
+        "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Focused engine visual verifier passed. Texture-only change; no new moving-vessel or gameplay claims. Existing optional-mod and offline authentication log warnings remain outside this asset change."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "d00a4fd281c064b8b2e46481bde74e509b8eccdc75198eeb327f17d0dc360949",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "1623a5de26be0c6fb60c1f9d890e52ac947252eac9248d022ec95f3e43d0d2d9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "acb63f8493f07cc9a7637daaf35d08aa0e8bacf903ae34ad97711940360dd65e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "ab87839d8d0dc2f6e6eb8af369010c9f915a36407c0cf2c984a4733e952f7bff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "fdcab03776d2ec38a485ca632ae80d67b1a165d3bb7b57a8774276e8c950f302",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "abc9676645a11196363dedcc20f1cdb60f54f25d71f63137bc008c8c89ecd37d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "c2b19224bdcdb6db3f47541d0f0dd5b3a331d150bd394c04bfee0017912c74d7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "69e76df636969eea429c2454f0177a58840f6293da928de7bc837eb5c8c49dc9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "99f72916037bf07af23cc5c06fbdbbc95c081ec226ab79d56bfd8dd57bfc7926",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "3a63fa78065c18f998956964995ea642ba0729ba3015bb311bfc26c4626d7dc4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "906c04a3d59619c81135dccae4d615e2b723aeefa27c35aadf0cdbf51fe946ae",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "786b99cfc56b4760a01ebe61c1406b6b468ad4529300dc23add411ebd3f78f41",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "b145596bbec8bc7d70dce55c416fd26011ab381d5d38ed353b6e3540794723bd",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "6fb04e935a6ed0212e0464ca60792d38101ea15d75ddc5367cd1c5a0066c7343",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "076262dc6fe12952734a0324c21da5e6b3c39fa6eaa9a81b0d6322a0359010f6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "ec1fb1c41ff97d102d588f54bf74229390a577d3f807bf4a9328e7eb31a9ff26",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/surface-back.png": "e20b5c1ce79d0fcf7ca832df908ee9c7ba1e5aa296afb4895358e374400befaa",
+        "studio/ingame/surface-stopped.png": "b771d15c161d8369a1ee6e4e0903b1c4fd4328a566a443f203bef2593c56832c",
+        "studio/ingame/surface-motion.png": "00f454346afc13a228b18b980b88e86bc0429c6d7b208ab64b628301d0dcd78f",
+        "studio/ingame/surface-guide-wheel-held.png": "e4e44070613cb7b94ba028de5f5702e3f1f984041de2ca324aa4f4f8fe94e18e"
+      },
+      "generation": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Full square bed and clearly longer barrel preserve open wheel and period engine identity. First generated edit invented a third disconnected support; corrected in mockup-09.",
+        "implementable_geometry": "Surface master reduces to pixel-art panels; nine-slice fitting preserves corner size on named native faces. Small rim/spoke edge accents are authored pixel strips, not additional cubes.",
+        "mechanics_clearance": "Corrected reference has two connected supports only. Native implementation retains steel saddle caps and verifies rotating wheel clearance rather than copying generated seam inaccuracies.",
+        "period_materials": "Steel corner protectors, recessed cast panels, restrained brass pinstriping and small identification plaques fit maintained Tesla-era machinery. Muted enamel band adds restrained color.",
+        "family_consistency": "Referenced current material master and actual model; common iron/steel/brass remain. Body accents are muted, no gold-covered casing or arbitrary gears.",
+        "controls_readability": "Existing isolated gauge and physical lever retained. New panel art adds no fake controls or lettering.",
+        "gameplay_scope": "Textures and UV layout only. Shared casing, removed black lip, recipes and controls retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-09.png": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5"
+      },
+      "generation": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Barrel increases from 18 to 24 model units, crankcase/wheel move six forward. Complete square bed has eight casing slabs plus controller. Two supports retained; no invented middle pedestal.",
+        "geometry_uvs": "Saddle posts terminate at y17, matching cap underside; top surfaces no longer coincide at y19. Rotating wheel stays above bed and inside footprint. Native exports validated; dedicated texture islands regenerate at native density.",
+        "material_consistency": "Generated reference-driven surface sheet supplies steel corner protectors, brass pinstriped covers, inset support panels and muted enamel body bands. Explicit edge pixels articulate wheel/spokes. Front/rear native views inspected after modest panel brightening; shared casing and isolated gauge retained.",
+        "assembly_interfaces": "Cylinder/flywheel anchors unchanged. Fuel moves front and lubricant underside, allowing filled front corners; native controller pedestal matches slab height. Front machinery row requires clearance.",
+        "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+        "native_size_readability": "At native contact-sheet scale, panel borders, corners and wheel edges remain distinct; geometry is unchanged. Full in-game shader review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "8d6167903d2b803e49bf0cec631ec54cb1e8b5a9bad781ce7166b3ba4aa4afef",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "3eb066b60b076312f568e8d3ebc48d06ab8cb6f1fcf2bd39da5aa10da11c86f7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "09ab0e599b23b0379b0ea5847d5915286dd5bcd4d47e77965e3d8356565f0331",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "174aba6aa447f150a63649bd5ef46d77de1cc975aa4a53c5436da77067e839a3",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "18208d7b469d248694b3bd21d4b97cf13aa545e0af424094669207a40f2cc431",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "bc4eb58a5ebaf1cc62c1be16895433d703649b479b41fbc0e098d42fc5f7553d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "99f72916037bf07af23cc5c06fbdbbc95c081ec226ab79d56bfd8dd57bfc7926",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "d667fd0d1c6c801b05814060e95afb5f510b0627ade9f4748814305c0bf09df2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "86d6cda2f599c592d820306b0bfb098703102cfb267638d0dd0f1ff62a5643d6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "5e538ee5935f83f438847edcc9438e381a0ec2a8be43913e2bc01b28fd25c45a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "d3634f7a8ac43dd782b419002983e67c5e795294d13109df615f6cc8d789c282",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "c10fcd40c7079b7569f022f920b5f40576a6b0192f64d0d648e2863af1dc3c94",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "01d74ee4fd1d1aaf7cd7738a05a24a5524f6233f60fe8976241026396fd83404",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "01e94cd245b4605b2e9d364c847e0fe030005acbbc989de218a9953e79cdb191",
+        "studio/model/motion.png": "97fa0c3c458cd4d391ddffff57df31d0aadaed2797ea5062b5af8989da0da0d9",
+        "studio/model/geometry-check.json": "4545dab6bae55078278d167b25ce9b0a9249d33a0be82daa300c2f1a2d9dc3da"
+      },
+      "generation": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Barrel increases from 18 to 24 model units, crankcase/wheel move six forward. Complete square bed has eight casing slabs plus controller. Two supports retained; no invented middle pedestal.",
+        "geometry_uvs": "Saddle posts terminate at y17, matching cap underside; top surfaces no longer coincide at y19. Rotating wheel stays above bed and inside footprint. Native exports validated; dedicated texture islands regenerate at native density.",
+        "material_consistency": "Generated reference-driven surface sheet supplies steel corner protectors, brass pinstriped covers, inset support panels and muted enamel body bands. Explicit edge pixels articulate wheel/spokes. Front/rear native views inspected after modest panel brightening; shared casing and isolated gauge retained.",
+        "assembly_interfaces": "Cylinder/flywheel anchors unchanged. Fuel moves front and lubricant underside, allowing filled front corners; native controller pedestal matches slab height. Front machinery row requires clearance.",
+        "animation_states": "Native pose sheet and in-game motion show the complete wheel rotating about the translated pivot. Worst sweep clears bed by over 1.8 model units; wheel stays outside bearing housing. No new save/reopen regression claim.",
+        "native_size_readability": "Panel details remain legible in native views and the actual Photon scene. Longer proportions retain the previous material density."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "8d6167903d2b803e49bf0cec631ec54cb1e8b5a9bad781ce7166b3ba4aa4afef",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "3eb066b60b076312f568e8d3ebc48d06ab8cb6f1fcf2bd39da5aa10da11c86f7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "09ab0e599b23b0379b0ea5847d5915286dd5bcd4d47e77965e3d8356565f0331",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "174aba6aa447f150a63649bd5ef46d77de1cc975aa4a53c5436da77067e839a3",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "18208d7b469d248694b3bd21d4b97cf13aa545e0af424094669207a40f2cc431",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "bc4eb58a5ebaf1cc62c1be16895433d703649b479b41fbc0e098d42fc5f7553d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "99f72916037bf07af23cc5c06fbdbbc95c081ec226ab79d56bfd8dd57bfc7926",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "d667fd0d1c6c801b05814060e95afb5f510b0627ade9f4748814305c0bf09df2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "86d6cda2f599c592d820306b0bfb098703102cfb267638d0dd0f1ff62a5643d6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "5e538ee5935f83f438847edcc9438e381a0ec2a8be43913e2bc01b28fd25c45a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "d3634f7a8ac43dd782b419002983e67c5e795294d13109df615f6cc8d789c282",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "c10fcd40c7079b7569f022f920b5f40576a6b0192f64d0d648e2863af1dc3c94",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "01d74ee4fd1d1aaf7cd7738a05a24a5524f6233f60fe8976241026396fd83404",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "01e94cd245b4605b2e9d364c847e0fe030005acbbc989de218a9953e79cdb191",
+        "studio/model/motion.png": "97fa0c3c458cd4d391ddffff57df31d0aadaed2797ea5062b5af8989da0da0d9",
+        "studio/model/geometry-check.json": "4545dab6bae55078278d167b25ce9b0a9249d33a0be82daa300c2f1a2d9dc3da"
+      },
+      "generation": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Inspected current Photon/Faithful front and rear screenshots: steel corner fittings, brass pinstripes, dark recessed panels and restrained teal stripe render consistently; no missing textures. Cast iron remains darker than edge steel.",
+        "scale_readability": "Actual front/rear Photon views show complete square bed, longer barrel and clean saddle caps. The earlier exposed coplanar support top is removed.",
+        "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Build/unit checks, all 182 server tests and focused Photon engine visual check passed. First expanded pipe test retained tank stock between rotations; reset its fixture stock and reran successfully. No moving-vessel claim."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "619bc79431b27a67ed9032312160aff76c661f647c5021925804216daa8919ed",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "8d6167903d2b803e49bf0cec631ec54cb1e8b5a9bad781ce7166b3ba4aa4afef",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "3eb066b60b076312f568e8d3ebc48d06ab8cb6f1fcf2bd39da5aa10da11c86f7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "09ab0e599b23b0379b0ea5847d5915286dd5bcd4d47e77965e3d8356565f0331",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "174aba6aa447f150a63649bd5ef46d77de1cc975aa4a53c5436da77067e839a3",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "18208d7b469d248694b3bd21d4b97cf13aa545e0af424094669207a40f2cc431",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "bc4eb58a5ebaf1cc62c1be16895433d703649b479b41fbc0e098d42fc5f7553d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "99f72916037bf07af23cc5c06fbdbbc95c081ec226ab79d56bfd8dd57bfc7926",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "d667fd0d1c6c801b05814060e95afb5f510b0627ade9f4748814305c0bf09df2",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "86d6cda2f599c592d820306b0bfb098703102cfb267638d0dd0f1ff62a5643d6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "5e538ee5935f83f438847edcc9438e381a0ec2a8be43913e2bc01b28fd25c45a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "d3634f7a8ac43dd782b419002983e67c5e795294d13109df615f6cc8d789c282",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "c10fcd40c7079b7569f022f920b5f40576a6b0192f64d0d648e2863af1dc3c94",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "01d74ee4fd1d1aaf7cd7738a05a24a5524f6233f60fe8976241026396fd83404",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/length-back.png": "72be97cc317e81c628d6087bf54213df211d8406c8d062253e6a7908cfa1703d",
+        "studio/ingame/length-stopped.png": "1c22dd630f589787a281a52c355f7f87e48a49eebd273af22543ad9b4b3b9968",
+        "studio/ingame/length-motion.png": "a47ad4a224430367b0c70a5771a1aa9c0c0533ff4ca806f3f57ab1eea3060e4f",
+        "studio/ingame/length-guide-wheel-held.png": "423ae1fe1ca96f55d446ad13c3daf951b5102e227570b6420e8a1980f6847a3f"
+      },
+      "generation": "f2402b91ba6723133982591311085490e794d3e0472b2f67afebb4920c259be5"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Full square bed and clearly longer barrel preserve open wheel and period engine identity. First generated edit invented a third disconnected support; corrected in mockup-09.",
+        "implementable_geometry": "Surface master reduces to pixel-art panels; nine-slice fitting preserves corner size on named native faces. Small rim/spoke edge accents are authored pixel strips, not additional cubes.",
+        "mechanics_clearance": "Corrected reference has two connected supports only. Native implementation retains steel saddle caps and verifies rotating wheel clearance rather than copying generated seam inaccuracies.",
+        "period_materials": "User correction supersedes decorative support panels in earlier generated references. Reuse the original generated cast-iron material on both saddles and cabinet sides; native rear view confirms solid structural feet, steel caps and actual anchors. No new geometry or material generation needed for this targeted subtraction.",
+        "family_consistency": "Referenced current material master and actual model; common iron/steel/brass remain. Body accents are muted, no gold-covered casing or arbitrary gears.",
+        "controls_readability": "Existing isolated gauge and physical lever retained. New panel art adds no fake controls or lettering.",
+        "gameplay_scope": "Textures and UV layout only. Shared casing, removed black lip, recipes and controls retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-10.png": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703",
+        "studio/model/rear.png": "9006d44cb359e55036ba144f9ada02a4311770303b58d2fbdcc62e2d81aa45f3"
+      },
+      "generation": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Barrel increases from 18 to 24 model units, crankcase/wheel move six forward. Complete square bed has eight casing slabs plus controller. Two supports retained; no invented middle pedestal.",
+        "geometry_uvs": "Saddle posts terminate at y17, matching cap underside; top surfaces no longer coincide at y19. Rotating wheel stays above bed and inside footprint. Native exports validated; dedicated texture islands regenerate at native density.",
+        "material_consistency": "User correction supersedes decorative support panels in earlier generated references. Reuse the original generated cast-iron material on both saddles and cabinet sides; native rear view confirms solid structural feet, steel caps and actual anchors. No new geometry or material generation needed for this targeted subtraction.",
+        "assembly_interfaces": "Cylinder/flywheel anchors unchanged. Fuel moves front and lubricant underside, allowing filled front corners; native controller pedestal matches slab height. Front machinery row requires clearance.",
+        "animation_states": "Native pose sheet and in-game motion show the complete wheel rotating about the translated pivot. Worst sweep clears bed by over 1.8 model units; wheel stays outside bearing housing. No new save/reopen regression claim.",
+        "native_size_readability": "Panel details remain legible in native views and the actual Photon scene. Longer proportions retain the previous material density."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "967600e793cf230cb87f37786e5df033271c33283e9c90dbc498f6d29b262425",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "8a5d5d34dea49ee3b505e5097dfb53751f32fe2ba4a513474993886ea4927e88",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "c83a3b4d77e92d2e260a1e0a470638b3370a585aa837d561a43150c135eedf0e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "bca5b0cf48be03a077ed7dceb8654a98537c75982b08f9c0ab152605b7458d5b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "94261d76b7757943ed1063d59ce2898bcf78e093d1309e25917a4a29c30e8b56",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "ff2b8234dc31ab14a089c2719c95ae8ef5d7785fb86bc8e97d6cea505fbe0e0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "39afe5b4688c6cd404cc3c2154c7b4f243865cbbdc881be88bba526588bed61f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "8169110220cdf4b4332ddacc15591e59726159a831af539abf0d34409cb63576",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "f2dd8b610e39683957193ee4222eea75822d0738fdf3ec431fc96980957630a5",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "ba9577cbc4bc18a1c2a4ed364b09fd6b9b16b2238bcb888fa6d9229564505d37",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "f74843a199e8b7a8c7b084ae9ffcc2ba2dcc4409895a7cd38ef15f861364080d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "e4d59afc2d7eef7c0dd69d3203eab8ea0cf25eb80f988a1eecef0204fa3dcb22",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "fd8061a62722b2c370431e06d496df5ee50b0ff0ade52b9822fb3f8c4b7b808e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "394c1fbbc0d8f490496d564f518a161ea4b279401dd3b2a6463cdef4571f4ee5"
+      },
+      "generation": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Full square bed and clearly longer barrel preserve open wheel and period engine identity. First generated edit invented a third disconnected support; corrected in mockup-09.",
+        "implementable_geometry": "Surface master reduces to pixel-art panels; nine-slice fitting preserves corner size on named native faces. Small rim/spoke edge accents are authored pixel strips, not additional cubes.",
+        "mechanics_clearance": "Corrected reference has two connected supports only. Native implementation retains steel saddle caps and verifies rotating wheel clearance rather than copying generated seam inaccuracies.",
+        "period_materials": "Targeted generated material study confirms plain cast supports. Its older body proportions and removed head bolts are not adopted: current 3x3 geometry remains. Reuse original cast-iron material on saddles/cabinet sides, retaining steel caps and actual anchors.",
+        "family_consistency": "Referenced current material master and actual model; common iron/steel/brass remain. Body accents are muted, no gold-covered casing or arbitrary gears.",
+        "controls_readability": "Existing isolated gauge and physical lever retained. New panel art adds no fake controls or lettering.",
+        "gameplay_scope": "Textures and UV layout only. Shared casing, removed black lip, recipes and controls retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-10.png": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703",
+        "studio/model/rear.png": "9006d44cb359e55036ba144f9ada02a4311770303b58d2fbdcc62e2d81aa45f3"
+      },
+      "generation": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Barrel increases from 18 to 24 model units, crankcase/wheel move six forward. Complete square bed has eight casing slabs plus controller. Two supports retained; no invented middle pedestal.",
+        "geometry_uvs": "Saddle posts terminate at y17, matching cap underside; top surfaces no longer coincide at y19. Rotating wheel stays above bed and inside footprint. Native exports validated; dedicated texture islands regenerate at native density.",
+        "material_consistency": "Targeted generated material study confirms plain cast supports. Its older body proportions and removed head bolts are not adopted: current 3x3 geometry remains. Reuse original cast-iron material on saddles/cabinet sides, retaining steel caps and actual anchors.",
+        "assembly_interfaces": "Cylinder/flywheel anchors unchanged. Fuel moves front and lubricant underside, allowing filled front corners; native controller pedestal matches slab height. Front machinery row requires clearance.",
+        "animation_states": "Native pose sheet and in-game motion show the complete wheel rotating about the translated pivot. Worst sweep clears bed by over 1.8 model units; wheel stays outside bearing housing. No new save/reopen regression claim.",
+        "native_size_readability": "Panel details remain legible in native views and the actual Photon scene. Longer proportions retain the previous material density."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "967600e793cf230cb87f37786e5df033271c33283e9c90dbc498f6d29b262425",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "8a5d5d34dea49ee3b505e5097dfb53751f32fe2ba4a513474993886ea4927e88",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "c83a3b4d77e92d2e260a1e0a470638b3370a585aa837d561a43150c135eedf0e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "bca5b0cf48be03a077ed7dceb8654a98537c75982b08f9c0ab152605b7458d5b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "94261d76b7757943ed1063d59ce2898bcf78e093d1309e25917a4a29c30e8b56",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "ff2b8234dc31ab14a089c2719c95ae8ef5d7785fb86bc8e97d6cea505fbe0e0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "39afe5b4688c6cd404cc3c2154c7b4f243865cbbdc881be88bba526588bed61f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "8169110220cdf4b4332ddacc15591e59726159a831af539abf0d34409cb63576",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "f2dd8b610e39683957193ee4222eea75822d0738fdf3ec431fc96980957630a5",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "ba9577cbc4bc18a1c2a4ed364b09fd6b9b16b2238bcb888fa6d9229564505d37",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "f74843a199e8b7a8c7b084ae9ffcc2ba2dcc4409895a7cd38ef15f861364080d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "e4d59afc2d7eef7c0dd69d3203eab8ea0cf25eb80f988a1eecef0204fa3dcb22",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "fd8061a62722b2c370431e06d496df5ee50b0ff0ade52b9822fb3f8c4b7b808e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "394c1fbbc0d8f490496d564f518a161ea4b279401dd3b2a6463cdef4571f4ee5"
+      },
+      "generation": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Current Photon rear screenshot shows plain iron supports, quiet mottling, steel top/bottom mounting plates; decorative plaques and corner panels are gone. Existing barrel and wheel retain material identity.",
+        "scale_readability": "Actual front/rear Photon views show complete square bed, longer barrel and clean saddle caps. The earlier exposed coplanar support top is removed.",
+        "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Focused texture-only build/unit and engine visual verification passed; no gameplay rerun or moving-vessel claim."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "4c5e2030d83ebff09ae3afcaf215b5430ec27c3b0d6ccfa58d462dfd9684042c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "89ca70d811de96c523ba30168c33287a5bceaa17589927aa4b06580068f0ebfc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "967600e793cf230cb87f37786e5df033271c33283e9c90dbc498f6d29b262425",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "8a5d5d34dea49ee3b505e5097dfb53751f32fe2ba4a513474993886ea4927e88",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "c83a3b4d77e92d2e260a1e0a470638b3370a585aa837d561a43150c135eedf0e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "bca5b0cf48be03a077ed7dceb8654a98537c75982b08f9c0ab152605b7458d5b",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "94261d76b7757943ed1063d59ce2898bcf78e093d1309e25917a4a29c30e8b56",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "ff2b8234dc31ab14a089c2719c95ae8ef5d7785fb86bc8e97d6cea505fbe0e0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "39afe5b4688c6cd404cc3c2154c7b4f243865cbbdc881be88bba526588bed61f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "8169110220cdf4b4332ddacc15591e59726159a831af539abf0d34409cb63576",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "f2dd8b610e39683957193ee4222eea75822d0738fdf3ec431fc96980957630a5",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "ba9577cbc4bc18a1c2a4ed364b09fd6b9b16b2238bcb888fa6d9229564505d37",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "f74843a199e8b7a8c7b084ae9ffcc2ba2dcc4409895a7cd38ef15f861364080d",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "db09dfa44e694531037f59d744271e7805897509ac0857bb89ff531985f64e31",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "e4d59afc2d7eef7c0dd69d3203eab8ea0cf25eb80f988a1eecef0204fa3dcb22",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "fd8061a62722b2c370431e06d496df5ee50b0ff0ade52b9822fb3f8c4b7b808e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/simple-back.png": "ed2c911a08bbbaa68e5434c0acbc9a038ae125cf385612a0f326b8b1199716b5"
+      },
+      "generation": "e40b897e79cc8ae6532706fc0fca86169844ed95fed477d038060eb587ad1703"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Photo and generated study establish continuous stepped cast bed and compact grounded body. Preserve current single wheel and 3x3 footprint.",
+        "implementable_geometry": "Surface master reduces to pixel-art panels; nine-slice fitting preserves corner size on named native faces. Small rim/spoke edge accents are authored pixel strips, not additional cubes.",
+        "mechanics_clearance": "Use continuous base and integrated controls; generated extra tank/piping and stray front exhaust are not adopted. Actual reference and native clearance checks govern mechanics.",
+        "period_materials": "Retain quiet cast iron, real mounting bolts, steel collars and small brass fittings; no decorative support panels.",
+        "family_consistency": "Referenced current material master and actual model; common iron/steel/brass remain. Body accents are muted, no gold-covered casing or arbitrary gears.",
+        "controls_readability": "Existing isolated gauge and physical lever retained. New panel art adds no fake controls or lettering.",
+        "gameplay_scope": "Textures and UV layout only. Shared casing, removed black lip, recipes and controls retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "8ea7361f8eba238857f9024fc115849d3fd9e604cc526f88f70771609ff2f21e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\real-engine-reference.png": "6148a5af2896066ebf28fae2626f4a9d15e00db93e64a282b27a501cfa62fe0a"
+      },
+      "evidence": {
+        "mockup-11.png": "008594f402fabaec328b12c91324e5a0627b811bd38080eadf78295c79df2264",
+        "studio/real-engine-reference.png": "6148a5af2896066ebf28fae2626f4a9d15e00db93e64a282b27a501cfa62fe0a"
+      },
+      "generation": "008594f402fabaec328b12c91324e5a0627b811bd38080eadf78295c79df2264"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Removed two stands; continuous stepped cast bed now joins controller and cylinder, crankcase extends six units toward control face, whole working assembly lowered one unit. Native front/rear views match key structural reference landmarks.",
+        "geometry_uvs": "144 native cuboids; UVs within atlas at established density. Support posts removed. Bed joins at anchor boundary, no coincident exposed top caps.",
+        "material_consistency": "Current quiet cast iron reused on continuous bed; access accents retained on covers only. No new random noise or decorative feet.",
+        "assembly_interfaces": "Same 3x3 bed, eight casing slabs and component anchors. Controller front integrated into casting. Fuel front/lubricant underneath unchanged.",
+        "animation_states": "Wheel, shaft and cylinder axis all lowered one unit to y24; pivot matches. Worst swept wheel clears slab bed by about 0.845 model units; narrow cast bed lies beside wheel, not under it.",
+        "native_size_readability": "Viewed actual native front/rear model: continuous grounded silhouette and no empty shelf above controller. Shader review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "8ea7361f8eba238857f9024fc115849d3fd9e604cc526f88f70771609ff2f21e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\real-engine-reference.png": "6148a5af2896066ebf28fae2626f4a9d15e00db93e64a282b27a501cfa62fe0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "e363c27c375383c440767035fc3cd9b58aae93b6fd7128a18f9a077c21e459ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "b6e97fa1110f52d0850aef7e8e8ee940a2f3e04c1c73777cdc92ddc9df531f54",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "bc63d46751583bcc7d4ed16e971cb5416895f9c93b6dbbc745ad8aafa07e9ba9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "220dc88c27787d3b16a5682fcf9476309ff844eb51678e0d36e6a26ec4bb197a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "f4473589a32c3a1346e88fe308b83296fc8c16d338397f5412952fca8b6c867c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "ec019272690325f6d3e24fb8e8c94af13d61122f0857eb94876c7129665c53f8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "57c3edcf6c10a7b0c4267388ae7e83696ac6756419077481c27a6333fdac37c4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "39afe5b4688c6cd404cc3c2154c7b4f243865cbbdc881be88bba526588bed61f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "c5ccfa1c3d698f7250036a1e73877ee3c98ebb8265f2409579caf6cf296c9619",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "b220bf43e2a1fdfdb7b497ecdfe6c80f1845735a807c950e2cf77ad538f5506e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "e1251a442cc356d9d3c1bbae534b5cda4794013616d89485343275ce2b012f78",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "1a44648d2ea792efbe25f5585425d954b8c0e461fbd4165935de6b36d5916c96",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "6be1a337de179d67fa2c2af00d4ee7850da2b15039ea020559d1fd99a21a41cc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "123373c301e89aaa370599f909fa7a64eaf16226ccb6ec601ab288dea382d457",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "851cba8a8a396b970700759f463cd89fe1a7209a1a35218e5fd56aac94af9b7c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/model/views.png": "3cf990d2900e109bf7d67f28f70cbdde46dfd041cb94b607872cf4dbe2c27314",
+        "studio/model/motion.png": "5b2c4a0105176595280aee9ff25ba74f0b8746456fbb96357720d8defc519fcc",
+        "studio/model/geometry-check.json": "3915f40af0ac4539f8ef57603fddafa2288ec41b2476b7c6e49d817310fb045f"
+      },
+      "generation": "008594f402fabaec328b12c91324e5a0627b811bd38080eadf78295c79df2264"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon front/rear captures show continuous quiet cast bed, clear steel collars, restrained brass; no missing textures.",
+        "scale_readability": "Controller now part of continuous body; empty shelf above it gone. Two separate stands removed; cylinder appears seated into bed.",
+        "states_motion": "Working wheel and stopped geometry share lowered axis; focused visual verifier passed with startup, running and motion captures. Bed remains outside wheel sweep.",
+        "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+        "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+        "integration_limits": "Focused texture-only build/unit and engine visual verification passed; no gameplay rerun or moving-vessel claim."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "8ea7361f8eba238857f9024fc115849d3fd9e604cc526f88f70771609ff2f21e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\real-engine-reference.png": "6148a5af2896066ebf28fae2626f4a9d15e00db93e64a282b27a501cfa62fe0a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\build.py": "e363c27c375383c440767035fc3cd9b58aae93b6fd7128a18f9a077c21e459ff",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-master.png": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\material-prompt.txt": "16847a881a6f4cd438af14508de606f244bd41616ab0e47634eacb34b126c9fb",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\assembly.bbmodel": "b6e97fa1110f52d0850aef7e8e8ee940a2f3e04c1c73777cdc92ddc9df531f54",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.bbmodel": "bc63d46751583bcc7d4ed16e971cb5416895f9c93b6dbbc745ad8aafa07e9ba9",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.bbmodel": "220dc88c27787d3b16a5682fcf9476309ff844eb51678e0d36e6a26ec4bb197a",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.bbmodel": "f4473589a32c3a1346e88fe308b83296fc8c16d338397f5412952fca8b6c867c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.bbmodel": "ec019272690325f6d3e24fb8e8c94af13d61122f0857eb94876c7129665c53f8",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.bbmodel": "57c3edcf6c10a7b0c4267388ae7e83696ac6756419077481c27a6333fdac37c4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface_textures.py": "39afe5b4688c6cd404cc3c2154c7b4f243865cbbdc881be88bba526588bed61f",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-master.png": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\surface-prompt.txt": "6229f950d10637912da55ff1082d2f6833eabd8b3543ebf436099bf913c9e845",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\surface-map.json": "c5ccfa1c3d698f7250036a1e73877ee3c98ebb8265f2409579caf6cf296c9619",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.json": "b220bf43e2a1fdfdb7b497ecdfe6c80f1845735a807c950e2cf77ad538f5506e",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.json": "e1251a442cc356d9d3c1bbae534b5cda4794013616d89485343275ce2b012f78",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.json": "1a44648d2ea792efbe25f5585425d954b8c0e461fbd4165935de6b36d5916c96",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel_linked.json": "6be1a337de179d67fa2c2af00d4ee7850da2b15039ea020559d1fd99a21a41cc",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_atlas.png": "123373c301e89aaa370599f909fa7a64eaf16226ccb6ec601ab288dea382d457",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.geo.json": "851cba8a8a396b970700759f463cd89fe1a7209a1a35218e5fd56aac94af9b7c",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine_wheel.animation.json": "cc971e2a8b1322ccb44665d2b685cd2c65f3802baa1501edbf414f9351557510",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.blockstate.json": "4c51057103d1346dfef3bd76a91675dadbf90c7880ee602b103ad2aacde256b4",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\oil_engine.item.json": "da009ef5950771d32ea48227bc0173c009fb34d080e87674571bd3160b9631c6",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_cylinder.item.json": "2900d86b455d0541415d35ac245061136c417110302ac2a55e299a7589e3f7b0",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\model\\engine_flywheel.item.json": "088f6ffbffddd9779daac5e6409b5b0695e100c39f4a924d4df1fa0dfdfef93a"
+      },
+      "evidence": {
+        "studio/ingame/solid-back.png": "2e168ccb9ee440f6cd15c763f6e4de2656a6ed6e536f1ded2cbaf10321888986",
+        "studio/ingame/solid-stopped.png": "3c3a7cfdd2ab4f383ca0a78150fb3350f94010f08292b8d88f74601acb963cdf",
+        "studio/ingame/solid-motion.png": "ebd9eab89a065019cdb7f296e30a7994cf4a22e458aa54d6612b379577a3a17d",
+        "studio/ingame/solid-guide-wheel-held.png": "39541b63ccd6e46ad8c5f7df6b4aaf6612467b9413046e92935224159fded2a9"
+      },
+      "generation": "008594f402fabaec328b12c91324e5a0627b811bd38080eadf78295c79df2264"
+    }
+  ]
+}

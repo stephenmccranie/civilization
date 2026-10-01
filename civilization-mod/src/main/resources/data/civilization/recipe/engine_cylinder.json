@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "P P",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "civilization:machine_parts"
+    }
+  },
+  "result": {
+    "id": "civilization:engine_cylinder",
+    "count": 1
+  }
+}

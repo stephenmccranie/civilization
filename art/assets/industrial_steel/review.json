@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Concept retains compact stepped cabinet and lower rear mass. Its base is slightly exaggerated; actual stone feet and exact half-grid dimensions remain the implementation authority.",
+      "implementable_geometry": "All visible landmarks translate to existing cube/cut-block faces. No new modeled fittings needed; dial and hatch are painted.",
+      "mechanics_clearance": "No motion or new mechanical connections; existing ports remain accessible.",
+      "period_materials": "Medium steel plates and iron fasteners; brass appears only at the enamel dial. No ornamental copper slab or gears.",
+      "family_consistency": "Steel values and ivory/brass controls agree with Oil Engine. Broader quiet patches deliberately reduce the earlier streaks and fine noise.",
+      "controls_readability": "Referenced four-face atlases give heater, column, condenser, tank and drill distinct large fittings. Cold heater is an explicit edit. Protected outer borders enforce exact casing continuity despite generator drift.",
+      "gameplay_scope": "Texture refresh only; all six industrial controller faces are new original artwork. Gauges/sight glasses remain decorative, not live telemetry. Previous geometry, production and interactions remain unchanged."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Native 32-pixel plate has the broad quiet steel face, iron corner fixings and restrained dark seam from the concept. Pump dial/hatch remain separate landmarks.",
+      "geometry_uvs": "Texture-only native orientable cube, same front direction as existing blockstates. Existing cut-block geometry and UV sampling retained; complete assembly checked next in Photon.",
+      "material_consistency": "Ten faces share one bounded palette and one Photon brightness curve. Protected borders/corners are identical. Every fitting is newly generated from the same master/reference chain; no legacy device insert remains.",
+      "assembly_interfaces": "No structure, support, port, collision or guide geometry changes. Existing refinery-side resource keeps every industrial body using the same material.",
+      "animation_states": "New heater cold face replaces only the 10x5 inspection-window region from a referenced extinguished edit; entire remaining face is identical. Shared heat palette keeps small orange flame pixels from being lost in reduction.",
+      "native_size_readability": "Native previews show distinct silhouettes for pump dial/hatch, heater octagonal door, column instrument pair, condenser louvers/dial, tank vertical level and drill semicircular gauge. Photon-adjusted steel midtone remains quiet."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Reviewed final Photon/Faithful controller lineup, refinery assembly and pump front/rear. Shared brighter steel reads as plates in shade and daylight; iron fittings remain darker and ivory/brass instrumentation stays distinct.",
+      "scale_readability": "All six distinct controller designs read in world and native inventory hotbar. Broad surface patches remain subordinate to plate edges. Condenser louvers are readable across its full assembled face.",
+      "states_motion": "Working heater shows orange inspection slits in the assembly; stopped lineup heater is dark. No new motion. Build and connected refinery fixture passed after updating its Foundry/heater setup for manual ignition.",
+      "interaction_guides": "Column missing-block screenshot shows the same new plate material in its translucent contextual guide. Pump complete front/rear show unchanged cut-piece fit and supports; attempted separate pump guide capture did not show the guide and is not claimed as evidence.",
+      "inventory_appearance": "Six controller icons appear correctly textured in the creative inventory hotbar. Casing held appearance also reviewed beside the column.",
+      "integration_limits": "Art and native static model changes only; no gameplay changes or new gauge telemetry. No moving-vessel or additional shader testing. Existing engine/canister dedicated artwork retained; engine bed shares the new casing but was not separately launched."
+    },
+    "remaining_issues": []
+  }
+}

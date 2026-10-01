@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "The complete assembly retains the mockup's broad low bench, four short feet, two narrow uprights, open loom center, top beam and single copper roller.",
+    "geometry_uvs": "All structure pieces use the existing slab, quarter-beam and eighth-cell geometry. The custom controller face exports as an opaque 32x32, 20-color texture with broad oak, ivory cloth, indigo, copper and iron regions.",
+    "material_consistency": "Faithful oak remains authoritative on construction blocks; the controller's woven insert directly matches the established Cloth material identity.",
+    "assembly_interfaces": "The controller remains front-center, the roller is supported between posts, the center stays open and all required pieces use the existing saw-cut placement and guide system.",
+    "animation_states": "The structure is static; existing controller active/fire state and ambient light behavior are unchanged.",
+    "native_size_readability": "The pale swatch and blue selvage remain the dominant textile landmark at 32x; dark framing and the copper bearing remain subordinate."
+  },
+  "remaining_issues": []
+}

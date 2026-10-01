@@ -1,0 +1,575 @@
+{
+  "schema": 1,
+  "kind": "block",
+  "brief": {
+    "description": "Dedicated single-pan cast-iron cooking hob on an open iron stand, with continuous front heat dial and original 64px-per-block materials",
+    "purpose": "Sensory timing and heat tradeoff prototype; player serves a reserved batch",
+    "silhouette": "Shallow upper coal burner housing, four slender iron legs and low bracing; exposed skillet; no oven cavity or oven door",
+    "bounds": "16x16 footprint; burner housing y=9..14, cooktop y=14..14.5; pan rim y=17.1; open lower stand",
+    "materials": "Quiet charcoal cast iron with face-specific cover seams and steel fasteners; dark seasoned skillet with a worn lip and clean cooking well; subdued directional steel supports; brass dial only",
+    "interfaces": "Ingredient menu; continuous rotary drag and arrow fine adjustment; crouch-scroll heat and crouch-use serving",
+    "states": "Empty, pale through golden through browned/charred food; continuous pointer rotation; lit fire",
+    "construction": "Native legal static Java cuboids; dynamic food and pointer rendered by block entity",
+    "invariants": "One visible skillet and one continuous dial at existing coordinates, one batch and existing coal use; no oven door, no baking function; cooking cues, timing and reduced room heat retained",
+    "technological_stage": "Experimental Tier 2 cookware and manual coal-fired regulation",
+    "material_behavior": "Quiet large iron planes with subtle 64px clusters; purposeful sharp seams and edge wear, no granite-like pits or brown rusty cookware. Ordered construction detail dominates random-looking texture.",
+    "signature_feature": "Exposed pan food colors with continuous front dial",
+    "neighboring_assets": "T1 Cooking Stove, dedicated Baking Oven in T2 kitchen concept, prepared Vegetable Skillet portion",
+    "fidelity_targets": {
+      "burner": "16-wide upper housing, 5 units high, above an open lower stand; top remains y=14.5",
+      "stand": "Four 1.5-unit square iron legs with low braces; large visible negative space under heating head",
+      "pan": "11-wide square skillet, firmly supported, rim y=17.1 and short handle to cook right",
+      "controls": "One upper-right brass-rimmed dial at existing pivot; four narrow air/ember slots at left, no oven-like door or handle",
+      "density": "Four pixels per model unit on ordinary faces; fresh 64x64 tiles in declared atlas",
+      "surfaces": "Main heating-head faces have fitted edge seams and corner steel fasteners; vent surround and continuous dial markings occupy explicit measured positions. Supports have restrained longitudinal wear and connection hardware, not miniature framed panels. Pan lip and cooking well have distinct islands."
+    }
+  },
+  "references": [
+    {
+      "path": "art/assets/prototype_stove/mockup-02.png",
+      "role": "Selected geometry and compact dedicated-stovetop silhouette to preserve"
+    },
+    {
+      "path": "art/assets/prototype_stove/evidence/redesign-ingame-cooking.png",
+      "role": "Rejected implemented surface appearance: mottled stone-like iron and unplaced generic material tiles"
+    },
+    {
+      "path": "art/assets/t2_kitchen/mockup-03.png",
+      "role": "Period kitchen iron construction details and separate oven identity; no oven door or brick shell on stove"
+    }
+  ],
+  "sources": [
+    "prepare.py",
+    "build.py",
+    "textures.py",
+    "surfaces.py",
+    "surface-spec.json",
+    "surface-map.json",
+    "texture-spec.json",
+    "material-master-03.png",
+    "material-generations.json",
+    "material-prompt.txt",
+    "material-detail-prompt.txt",
+    "material-quiet-prompt.txt",
+    "surface-prompt.txt",
+    "model/prototype_stove.bbmodel",
+    "prototype_stove_iron.png",
+    "stove_wet.wav",
+    "stove_sizzle.wav",
+    "stove_char.wav"
+  ],
+  "outputs": [
+    {
+      "source": "prototype_stove.json",
+      "target": "models/block/prototype_stove.json",
+      "format": "java_model"
+    },
+    {
+      "source": "blockstates.json",
+      "target": "blockstates/prototype_stove.json",
+      "format": "json"
+    },
+    {
+      "source": "item.json",
+      "target": "models/item/prototype_stove.json",
+      "format": "java_model"
+    },
+    {
+      "source": "prototype_stove_iron.png",
+      "target": "textures/block/prototype_stove_iron.png",
+      "format": "png",
+      "size": [
+        512,
+        256
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "prototype_stove_brass.png",
+      "target": "textures/block/prototype_stove_brass.png",
+      "format": "png",
+      "size": [
+        64,
+        64
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "prototype_stove_ember.png",
+      "target": "textures/block/prototype_stove_ember.png",
+      "format": "png",
+      "size": [
+        64,
+        64
+      ],
+      "alpha": "opaque"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-d6c9381e-5c3f-4b54-a71e-f06fb6f6a4c1.png",
+      "sha256": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121",
+      "prompt": "Create a single Minecraft/Blockbench Java-cuboid style stove prototype, front three-quarter view, neutral grey background. Reference 1 gives Civilization kitchen materials and cookware, reference 2 gives the existing dark cast-iron stove body. Keep one compact one-block cast-iron body, short feet, small front coal fire door and ONE clearly accessible round heat dial at upper right. One shallow square cast-iron skillet sits firmly on top with thick raised rim and one short handle to the right; diced potato and carrot visibly fill the pan. No oven window, no extra instruments, no chimney or surrounding brickwork. Stove body 16 units wide, 14 units high, pan spans 11 units at height 16. Iron is charcoal grey with restrained seams and steel highlights; small brass dial pointer only. Native legal cuboid geometry, economical pixel material clusters. This is a playable continuous-heat control and exposed-food timing prototype; no glowing copper, no floating pieces, no logos or text. Show the whole object with pan contents visible from normal standing height.\n",
+      "brief_hash": "b69d20fbf9c1bb8c833d83b05940507ae992ab53fc4cfb8fccbb7d400b73ca71",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-cfcdc862-4f67-4394-86de-0cdd75849336.png",
+      "sha256": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+      "prompt": "Use case: precise-object-edit. Produce one coherent Minecraft/Blockbench concept render for the Civilization cooking stove redesign, neutral gray backdrop, whole object front three-quarter view. Reference 1 is the previous in-game stove: preserve its compact one-block footprint, square open skillet with visible diced potato and carrot, short pan handle to the cook right, and one accessible brass-rimmed rotary heat dial on the upper-right front. Replace the entire oven-like lower cabinet with a dedicated stovetop burner: a shallow charcoal cast-iron heating head, 16 units wide by 5 units tall, held at working height on four slim square iron legs with a low simple horizontal brace. Leave a large open negative space beneath the heating head. No oven cavity, oven door, broad hinged front panel, door handle, baking window, decorative instrument or shelf contents. On the upper heating head's front left place just three short narrow horizontal ventilation slots with subtle ember light, not a window or door. Pan height and existing dial pivot are preserved. Reference 2 supplies period Civilization kitchen material language and the SEPARATE baking oven; do not copy its brick shell or door onto this stove. The stove must visibly serve only pan cooking. Native legal Java cuboid geometry, small beveled octagonal dial, economical forms. Authored 64px-per-block pixel-art material density: dark graphite cast iron with quiet tonal clusters, narrow cool steel highlights and small worn edges; brass only on dial rim/pointer. Clean readable silhouette, physically connected pan, head, supports and braces. No text, logos, copper glow, modern gas pipes, giant glowing window or extra controls. Show enough front and right side to judge open stand and pan contents. This is a single selected design, not multiple alternatives.\n",
+      "brief_hash": "d9740a73e98e1cadd9669c7536256e7a344363d27f87ba71feed23184c5d86be",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\ingame-close.png": "228b4a594d7c29428ff303e2659e14d34f4df8aeb38e27a369c68715efe4d830",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc"
+      }
+    },
+    {
+      "file": "mockup-03.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-c25669c6-4540-49d2-8bb7-67e4ae27c2bf.png",
+      "sha256": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557",
+      "prompt": "Use case: precise-object-edit. Refine the surface art of ONE Civilization Minecraft stovetop. Reference 1 gives the selected compact stove shape; preserve shallow cast-iron heating head, open lower stand with four slender legs and low braces, one shallow square skillet at the same working height, short right pan handle, one brass-rimmed upper-right heat dial and four short ventilation slots at front left. Reference 2 shows the bad current in-game materials: overly mottled gray iron reads like stone and the generic grain repeats on every piece. Correct those defects. Reference 3 supplies Civilization kitchen construction language; do not add its separate oven door or brickwork. Render one whole stove front three-quarter view on neutral gray background. Use QUIET charcoal cast iron: broad coherent flat metal tones and sparse fine marks, not speckled granite, rust or gritty camouflage. Apply stove-specific art deliberately: a thin fitted casting seam and worn steel line around the upper heating head, four small steel corner fasteners on each broad housing face; a recessed slim steel surround for the existing four slots; a restrained arc of engraved ticks immediately around the existing single dial, without numbers; thin worn gray iron rim on the skillet, clean near-black cooking well, subtle longitudinal scuffs along straight supporting legs and hardware where braces join. Brass belongs only to the dial, not seams or bolt heads. Existing potato/carrot food remains visible. Detail hierarchy: recognizable masses first, sharp purposeful assembly accents second, very restrained fine 64px-per-block material detail last. One/two-texel fine marks should occupy selected edges and joints, not fill every face with noise. Native cuboid Minecraft model style, exact same bounds and existing functions. No oven cavity, door, handle on the housing, decorative logo, new controls, pressure gauge, gears, added burners, copper glow or extra action. Show all parts joined physically.\n",
+      "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Compact iron cabinet supports one shallow pan, matching the existing stove and kitchen range. Model will fit 16-wide body and short feet.",
+        "implementable_geometry": "Legal cuboids for shell and pan; octagonal dial approximation and procedural pointer. Food is separate rendered cubes.",
+        "mechanics_clearance": "Pan base contacts cooktop; short handle and front dial are accessible. No linkage or moving cookware.",
+        "period_materials": "Charcoal cast iron, restrained brass fittings and warm vegetables match the thermal-controller family.",
+        "family_consistency": "Same quiet dark metal and functional cooking surface as the inspected T1 stove; removes oven detail for this prototype.",
+        "controls_readability": "One contrasting upper-right dial with brass pointer, separate lower-left coal window.",
+        "gameplay_scope": "Only stove and skillet; no prep table, oven, chimney, extra cooking actions or tools."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "b69d20fbf9c1bb8c833d83b05940507ae992ab53fc4cfb8fccbb7d400b73ca71",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_side.png": "4d30ea6e955a54c571fcf8294e680ff0580c12f70c437f7ccb333be97fd08a89",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front.png": "a79fd29d18a778cb6ba6725c6cedb732edb94f7ce00d953867c28917aff8f931"
+      },
+      "evidence": {
+        "mockup-01.png": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121"
+      },
+      "generation": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Six actual native views preserve four short feet, shallow 11-unit pan, short right handle, separate coal door and upper-right dial. Simplified shell retains the selected large masses.",
+        "geometry_uvs": "Legal native Java cuboids and casting rotations, deliberate 2px/unit regions. Fire-window decal uses an explicit fit region. No floating pan or intersections with rim.",
+        "material_consistency": "Original accepted stove iron source throughout; quieter pan interior distinguishes cookware. Brass accents confined to door handle and thin dial rim.",
+        "assembly_interfaces": "Single experimental block; top food and front pointer share measured coordinates with renderer. No construction guide or multiblock claimed.",
+        "animation_states": "Static shell accepted here; pointer and food are dynamic client geometry and require in-game inspection. No mechanical transmission.",
+        "native_size_readability": "Native sheet shows a clear pan opening, front dial ring and fire recess. Small fittings are restrained, not excessive."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "b69d20fbf9c1bb8c833d83b05940507ae992ab53fc4cfb8fccbb7d400b73ca71",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_side.png": "4d30ea6e955a54c571fcf8294e680ff0580c12f70c437f7ccb333be97fd08a89",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front.png": "a79fd29d18a778cb6ba6725c6cedb732edb94f7ce00d953867c28917aff8f931",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "5049c094a0e436aa0c2c525d1cf196efaae533843029856749fe3c66ef0d3d04",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "1be8824a16e5404ed3902ce43dc743e60185cce3c66a6ad6bbfc662ad5ec029d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "316eb8141fe397d14f92f89e6fcb1ab85ccbe443a38ed77fa247c6cdaf377fa8",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "37aba7377f4fad90a69ed22f061454a546eeddfaa359c495076239ccbd16b422",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e"
+      },
+      "evidence": {
+        "evidence/model-sheet.png": "1b205ee1f34fafc651410a5262c7266ae258a1a280de1a35858438d6f85f67ca"
+      },
+      "generation": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon/Faithful display matches the existing T1 Cooking Stove: dark iron with restrained warm fittings. Food is visibly pale, golden or charred; fire emission remains local to its window.",
+        "scale_readability": "Single-block cabinet and short feet read beside the original stove. Shallow pan opening remains visible at standing height; varied-height diced food replaces the rejected flat-grid presentation. Brass rim separates the dial from the iron face.",
+        "states_motion": "Inspected pale/golden/charred states and fueled cooking. Physical pointer follows continuous settings; actual drag changes the server demand to 83%. Pointer direction matches the menu rotary control. No timer or perfect-state flash.",
+        "interaction_guides": "Actual shared cabinet menu shows fixed ingredient quantities, rotary dial, coal/ignition and Load/Serve controls, without clipped status text. Serving locks the batch exactly once. Experimental block has no multiblock guide.",
+        "inventory_appearance": "Native inventory shot shows distinct stove shell and warm prepared-meal icon; scale/detail fits the existing item family. No moving-vessel appearance is claimed.",
+        "integration_limits": "Hidden guarded client verified rotary input and serving; 254 server tests passed. Sound assets load without missing-event errors and blend from code, but human cue recognition, enjoyment, sound-only mastery and dense-kitchen tuning remain unverified. No Survival recipe or full kitchen construction claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "b69d20fbf9c1bb8c833d83b05940507ae992ab53fc4cfb8fccbb7d400b73ca71",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_side.png": "4d30ea6e955a54c571fcf8294e680ff0580c12f70c437f7ccb333be97fd08a89",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front.png": "a79fd29d18a778cb6ba6725c6cedb732edb94f7ce00d953867c28917aff8f931",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "5049c094a0e436aa0c2c525d1cf196efaae533843029856749fe3c66ef0d3d04",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "1be8824a16e5404ed3902ce43dc743e60185cce3c66a6ad6bbfc662ad5ec029d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "316eb8141fe397d14f92f89e6fcb1ab85ccbe443a38ed77fa247c6cdaf377fa8",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "37aba7377f4fad90a69ed22f061454a546eeddfaa359c495076239ccbd16b422",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e"
+      },
+      "evidence": {
+        "evidence/ingame-lineup.png": "560565a0ad185d8d02fcdfdc5cab697e7d14c144735541527e9b070838fced14",
+        "evidence/ingame-cooking.png": "9e70b53eb9de11c28705579d0ae48a4809b9a284eb7d1be031caafd19a419ffa",
+        "evidence/ingame-menu.png": "e40ffc230ceb2ca7482e81114d9707639235f49406fc2f921643b1d21893fee5",
+        "evidence/ingame-dial.png": "ff9e0d0c4aa6230d1da06e2daee100fc4442122517a45e5e55a0bed6f4e3d566",
+        "evidence/ingame-inventory.png": "551e459c0b0530d681c1b02e53aee65a2bf695249e4e9a27ac4a001ec1934501"
+      },
+      "generation": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Selected redesign has a shallow full-width heating head with four slim legs and low open bracing. Negative space removes the oven cabinet; exposed square pan remains at working height.",
+        "implementable_geometry": "Stand, head, pan, handle and four narrow front slots translate directly to legal Java cuboids. Octagonal dial uses existing supported casting geometry.",
+        "mechanics_clearance": "All four legs meet the head; low braces join legs without closing the stand. Pan sits on the cooktop and its short handle clears the housing.",
+        "period_materials": "Quiet graphite iron, steel edge wear and restrained brass control match Civilization kitchen metalwork. Ember light is confined to ventilation slots.",
+        "family_consistency": "Inspected beside the prior in-game stove and T2 kitchen concept. Open stand distinguishes pan cooking from the separate broad-door baking oven; original iron family and compact scale remain readable.",
+        "controls_readability": "One accessible contrasting dial at upper cook-right. Four narrow vents communicate fire without becoming an oven window or door.",
+        "gameplay_scope": "Only the stove appearance changes. One pan, same dial and serving; no baking, new ingredient, assembly recipe or gameplay process."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "d9740a73e98e1cadd9669c7536256e7a344363d27f87ba71feed23184c5d86be",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\ingame-close.png": "228b4a594d7c29428ff303e2659e14d34f4df8aeb38e27a369c68715efe4d830",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc"
+      },
+      "evidence": {
+        "mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595"
+      },
+      "generation": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Complete six-view neutral blockout and textured assembly preserve the selected shallow head, four slender legs and low braces with a large open lower volume. The 11-unit pan and right handle remain firmly on the cooktop; existing front dial pivot is preserved. Four narrow vents replace the former door and handle.",
+        "geometry_uvs": "Legal native Java cuboids and limited rotations; model authored through Blockbench. Ordinary faces use four pixels per model unit and the 320x64 atlas contains five 64px regions; only the authored slot decal uses explicit fit UVs. Shared UV density/rejection regressions pass.",
+        "material_consistency": "User-rejected coarse master retained as provenance. Revised original master supplies fine casting pits and wear, quieter seasoned iron, narrow steel machining marks and muted brass. Native 64px exports inspected beside zooms; no 32px enlargement. Bright warm color is confined to the dial and small lit slot decals.",
+        "assembly_interfaces": "One block at the same cooktop, food and dial coordinates. Four legs contact the head and low braces terminate at the legs. No oven cavity, hinged panel or storage/baking mechanism. Existing menu and reduced room-heat rules remain intact.",
+        "animation_states": "Static shell and four cold vent slots verified in native views. Pointer, food color and lit ember overlays are runtime geometry and need the focused Minecraft scene. Audio unchanged; no mechanical transmission or moving vessel appearance claimed.",
+        "native_size_readability": "Six native views show open space from every side, distinct smooth/seasoned cookware and steel support, and a clear brass dial ring. 64px material sheet inspected at native and enlarged size; fine surface variation is present without strong white plate highlights."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d9740a73e98e1cadd9669c7536256e7a344363d27f87ba71feed23184c5d86be",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\ingame-close.png": "228b4a594d7c29428ff303e2659e14d34f4df8aeb38e27a369c68715efe4d830",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "e055c89e150435d1d736dad873489c91bdf3ba67a1b9d80aaa26316ba0ad5586",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "1d3da66e42b75fea3de070ed309bfbf73349db24b708348cede712d08498b4f0",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master.png": "a6bd90e312eeaa8a44ba97f2a763d126cc781792b8528db00f1f01cd9bfc60c4",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "26ed25420638fa3af151d92489f3d22970e250e7660ffe2cba9147d358aeea5d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "9d913d6644744db5357029babde5cd7f5271bafe0e1f2b21c84bcc06fb7bd056",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "c67f44b4ff25441cf4c9500d8b3927b74dcdbf0f7db6986ea44ff6289d7643f3",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "63ff17c0a5a2ca48b917ad3e523d54d8cbc23daceda28bb3f41ab13762e0be06",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "7b8675973f90dcfb7440055ae049aa5cefb4f96af4dccd15eebfdb887802cc29",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/redesign-blockout-sheet.png": "b4d59bd84ac6d955b98197dba51b9f797c6ad86f1f57ff1781c2452bd15754dd",
+        "evidence/redesign-model-sheet.png": "e1d48163b92eeb2f7fddf1e9ab2a11eaba4352f36f02b360e57b44d653bad097",
+        "evidence/redesign-materials.png": "d41d1acd85a0c19cb68e3ff3de27a2d6edfa43d1c1f6f89e1d156f34d6c249af",
+        "evidence/redesign-concept-model.png": "f66b46f8b26ec9d1fc6f3fa91d8c71aeba94901f17e720767911c7d4beb842b1"
+      },
+      "generation": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Complete six-view neutral blockout and textured assembly preserve the selected shallow head, four slender legs and low braces with a large open lower volume. The 11-unit pan and right handle remain firmly on the cooktop; existing front dial pivot is preserved. Four narrow vents replace the former door and handle.",
+        "geometry_uvs": "Legal native Java cuboids and limited rotations; model authored through Blockbench. Ordinary faces use four pixels per model unit and the 320x64 atlas contains five 64px regions; only the authored slot decal uses explicit fit UVs. Shared UV density/rejection regressions pass.",
+        "material_consistency": "User-rejected coarse master retained as provenance. Revised original master supplies fine casting pits and wear, quieter seasoned iron, narrow steel machining marks and muted brass. Native 64px exports inspected beside zooms; no 32px enlargement. Bright warm color is confined to the dial and small lit slot decals.",
+        "assembly_interfaces": "One block at the same cooktop, food and dial coordinates. Four legs contact the head and low braces terminate at the legs. No oven cavity, hinged panel or storage/baking mechanism. Existing menu and reduced room-heat rules remain intact.",
+        "animation_states": "Static shell and four cold vent slots verified in native views. Pointer, food color and lit ember overlays are runtime geometry and need the focused Minecraft scene. Audio unchanged; no mechanical transmission or moving vessel appearance claimed.",
+        "native_size_readability": "Six native views show open space from every side, distinct smooth/seasoned cookware and steel support, and a clear brass dial ring. 64px material sheet inspected at native and enlarged size; fine surface variation is present without strong white plate highlights."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d9740a73e98e1cadd9669c7536256e7a344363d27f87ba71feed23184c5d86be",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\ingame-close.png": "228b4a594d7c29428ff303e2659e14d34f4df8aeb38e27a369c68715efe4d830",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "4647f1f9c45dfc5c6788283a9edcb41cfa30eebbbc93c2cda1669b851c15a8c2",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "e055c89e150435d1d736dad873489c91bdf3ba67a1b9d80aaa26316ba0ad5586",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "1d3da66e42b75fea3de070ed309bfbf73349db24b708348cede712d08498b4f0",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master.png": "a6bd90e312eeaa8a44ba97f2a763d126cc781792b8528db00f1f01cd9bfc60c4",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "26ed25420638fa3af151d92489f3d22970e250e7660ffe2cba9147d358aeea5d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "9d913d6644744db5357029babde5cd7f5271bafe0e1f2b21c84bcc06fb7bd056",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "c67f44b4ff25441cf4c9500d8b3927b74dcdbf0f7db6986ea44ff6289d7643f3",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "63ff17c0a5a2ca48b917ad3e523d54d8cbc23daceda28bb3f41ab13762e0be06",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "7b8675973f90dcfb7440055ae049aa5cefb4f96af4dccd15eebfdb887802cc29",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/redesign-blockout-sheet.png": "b4d59bd84ac6d955b98197dba51b9f797c6ad86f1f57ff1781c2452bd15754dd",
+        "evidence/redesign-model-sheet.png": "e1d48163b92eeb2f7fddf1e9ab2a11eaba4352f36f02b360e57b44d653bad097",
+        "evidence/redesign-materials.png": "d41d1acd85a0c19cb68e3ff3de27a2d6edfa43d1c1f6f89e1d156f34d6c249af",
+        "evidence/redesign-concept-model.png": "d48adb1e3de1a2551e2170ac4449be9242e8c20c92b7f2b188d8344985ad38d7"
+      },
+      "generation": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon/Faithful screenshots show fine cast-iron variation, quieter dark seasoned skillet and horizontal steel marks. Brass is confined to the dial; four small ember slots glow locally during cooking. Coarse first master was rejected and superseded.",
+        "scale_readability": "At normal standing view, the large open lower stand and shallow burner head identify a dedicated stovetop, distinct from the adjacent T1 cabinet. Front, rear and side captures show connected legs and bracing without an oven cavity or door.",
+        "states_motion": "Pale, golden and charred food states remain legible against the dark skillet. Real rotary drag reached the server; the physical pointer moved to the new setting. Serving succeeded and emptied the pan. Narrow lit overlays align with the four static vents.",
+        "interaction_guides": "Existing shared menu, ingredient ghosts, dial and Load/Serve controls remain readable and unobstructed. One-block experimental scope has no construction guide. No cooking timing or input process changed.",
+        "inventory_appearance": "Actual inventory/menu icon shows the open stand silhouette and pan in one slot; inspected beside the served vegetable portion and Faithful items. Fine texture detail is quieter at icon size while material contrast and leg spacing remain clear.",
+        "integration_limits": "Focused hidden kitchen scene and build/unit checks passed. Rendering/textures only; most recent 255 server GameTests are from the preceding heat correction and were not repeated. Sounds and sensory-learning balance are unchanged; full multiblocks, Survival recipe and moving-vessel appearance remain unverified."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "d9740a73e98e1cadd9669c7536256e7a344363d27f87ba71feed23184c5d86be",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\ingame-close.png": "228b4a594d7c29428ff303e2659e14d34f4df8aeb38e27a369c68715efe4d830",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "4647f1f9c45dfc5c6788283a9edcb41cfa30eebbbc93c2cda1669b851c15a8c2",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "e055c89e150435d1d736dad873489c91bdf3ba67a1b9d80aaa26316ba0ad5586",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "1d3da66e42b75fea3de070ed309bfbf73349db24b708348cede712d08498b4f0",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master.png": "a6bd90e312eeaa8a44ba97f2a763d126cc781792b8528db00f1f01cd9bfc60c4",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "26ed25420638fa3af151d92489f3d22970e250e7660ffe2cba9147d358aeea5d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "9d913d6644744db5357029babde5cd7f5271bafe0e1f2b21c84bcc06fb7bd056",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "c67f44b4ff25441cf4c9500d8b3927b74dcdbf0f7db6986ea44ff6289d7643f3",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "63ff17c0a5a2ca48b917ad3e523d54d8cbc23daceda28bb3f41ab13762e0be06",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "7b8675973f90dcfb7440055ae049aa5cefb4f96af4dccd15eebfdb887802cc29",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/redesign-ingame-lineup.png": "d084f9d2e148b874ef90c0f2547b947a504da9c1ec570d15e08e2fe4ed6d99e9",
+        "evidence/redesign-ingame-close.png": "780701ed6ae9cbc59f31a994ae0d8accaf99d3198b4d25f331fd7839e4694a55",
+        "evidence/redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "evidence/redesign-ingame-menu.png": "190fbaf2688d10c6fa7cc96a2ce1b01405a5c86d98d057e04b62d70d59cc00a5",
+        "evidence/redesign-ingame-dial.png": "c8df76ad4a61bff9312fbb8035954425d1be49d969667de8b9c1e60d4158e275",
+        "evidence/redesign-ingame-inventory.png": "bb16b21bd7d72d6694c15988069a5a33e88fec5b7f4d278babce16ecae8bdebf",
+        "evidence/redesign-ingame-rear.png": "1a5acf97084b550806f4f863642addaebc1cc11efedd724bea50ad8e93c2d1a8",
+        "evidence/redesign-ingame-side.png": "fe3d01e58aab12ffd7189bb66766c2a889bc049ad1188388be8649cf4d74daff"
+      },
+      "generation": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Selected refinement retains the shallow head, open braced four-leg stand, square skillet and single dial. No oven door or cavity reintroduced.",
+        "implementable_geometry": "Existing cuboids are sufficient. Main housing seams, small bolts, vent surround, dial ticks and pan lip can be placed with face-specific UV islands at 64px density instead of excess detail cubes.",
+        "mechanics_clearance": "No changes to pan support, food volume, head/leg contacts, dial pivot or short handle; all interfaces remain accessible.",
+        "period_materials": "Quieter charcoal cast iron now reads as metal; narrow rubbed edges and steel fastening accents explain construction. Brass remains confined to the existing dial.",
+        "family_consistency": "Inspected beside rejected implemented stove and kitchen concept. Same period iron structure, with the separate oven identity preserved. Broad panels and purposeful fastening accents replace the stone-like mottling.",
+        "controls_readability": "Four slots receive a restrained fitted surround. Existing rotary control gains engraved calibration ticks around its face, without new gameplay meters or extra instruments.",
+        "gameplay_scope": "Surface refinement only; unchanged bounds, burner count, coal use, cooking timings, food, continuous control and serving."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc"
+      },
+      "evidence": {
+        "mockup-03.png": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557"
+      },
+      "generation": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "New concept and complete neutral/textured six-view assembly retain the existing head, open stand and pan proportions. Housing joints, four-corner fastening, vent surround, dial calibration and worn skillet lip now occupy their actual component faces; excess repeated pan-edge bands were removed during review.",
+        "geometry_uvs": "Native Java cuboids are unchanged. A 512x256 atlas holds ordinary four-pixels-per-unit material and component islands. Housing faces use measured 64x20 regions; matching support faces share size-specific islands. The 12px control face is consistently cropped across the overlapping main dial castings. Only the existing slot decal uses explicit fit UVs.",
+        "material_consistency": "Prior gritty detailed master was rejected after user review. New generated metal has quieter coherent tones and clean dark cookware without rusty speckles. Native 64px exports and atlas inspected; metal identity comes from subtle fill, sharp purposeful joints and restrained rubbed edges. Brass stays on the dial.",
+        "assembly_interfaces": "No geometry, block bounds, pan/food coordinates, control pivot, fuel behavior or interactions changed. Small steel fastening marks and fitted seams explain the existing housing; supports have longitudinal edges and attachment marks rather than framed miniature panels.",
+        "animation_states": "Static shell, cold slots and control ticks reviewed in native views. Runtime ember overlays, food and pointer remain the same; actual alignment/readability still requires the focused Photon scene. No new moving mechanism or vessel claim.",
+        "native_size_readability": "Six-view and full-size model show a quiet readable pan and housing, strong open lower space, fitted vent group and distinct single dial. Sparse accents remain visible at ordinary scale; broad faces no longer look like mottled stone. Native material/atlas evidence preserves the exact placed pixels and face mapping."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "b12b2c7800e8cc1e93afc6556caab17b7717b93f72e88ea1a92fe8bec9f0799c",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "686fe9468c3d50fd9dff2f51cc171d262a279c22c4bf6c5fd14145fb4c08abfa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "7755daa10556a1bfed8e0af94ad40fb6979a2f815b2e09673051a0b8c8af4210",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surfaces.py": "c1c7a3cf8a3482e58e6444d662d70e0f6f43f41f52e3c53c6985c906904d8bfd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-spec.json": "2ba3d4ef522c1be74574eeadf1a6e34fe5d95244238c42f4ec3a68ca7918bfed",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-map.json": "3eb83849053ff8376c4fe1ce18fecbc0318f25c6dbfd2f55c6c96f8b5009cb79",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master-03.png": "c773eb4eeff650bc986079bf45fa998d65aaf6e396f5d79849d61336d0283ade",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "dee3510c896120f44903575e3eadddf73a3425abe6e5e118282f50fdc36a4ff5",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-quiet-prompt.txt": "7d9c0f045ad80a1041f6c345f9a4972962e4ca854519018c31355fecc61d633f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-prompt.txt": "b0c0f80982cfbe713b15f05df9235f8683e5fe92bfd89e621a3ef64eb8f59d18",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "958142d13140659059607d8c96631bad2361fb836a629c0548b24be7568163a6",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "acc99ffbefee6d4ed3ac6aca61285f27c3db017e62f71ef67a213d7eae47b68f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/surface-blockout-sheet.png": "392c0324700ef5df87d47a7320785e70999bbbe3511d8bb4c5df2cc9180a568b",
+        "evidence/surface-model-sheet.png": "b97c90968bb9e62a2d65eac3b897152286a139281ce1f1913b5c3011b766ea5a",
+        "evidence/surface-materials.png": "35a943b0943ba527b27a1684b2cf8563b6c98b33089826754c5fbd690e778ef3",
+        "evidence/surface-atlas.png": "9d32000b1f24414d586fee31bd06ad063dae63a15261e147d2424a1aea8b3014",
+        "evidence/surface-concept-model.png": "abe995c5297ce1d83259a4724bbb09131c036c286c09d62bf5eff1d54f52312a"
+      },
+      "generation": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "New concept and complete neutral/textured six-view assembly retain the existing head, open stand and pan proportions. Housing joints, four-corner fastening, vent surround, dial calibration and worn skillet lip now occupy their actual component faces; excess repeated pan-edge bands were removed during review.",
+        "geometry_uvs": "Native Java cuboids are unchanged. A 512x256 atlas holds ordinary four-pixels-per-unit material and component islands. Housing faces use measured 64x20 regions; matching support faces share size-specific islands. The 12px control face is consistently cropped across the overlapping main dial castings. Only the existing slot decal uses explicit fit UVs.",
+        "material_consistency": "Prior gritty detailed master was rejected after user review. New generated metal has quieter coherent tones and clean dark cookware without rusty speckles. Native 64px exports and atlas inspected; metal identity comes from subtle fill, sharp purposeful joints and restrained rubbed edges. Brass stays on the dial.",
+        "assembly_interfaces": "No geometry, block bounds, pan/food coordinates, control pivot, fuel behavior or interactions changed. Small steel fastening marks and fitted seams explain the existing housing; supports have longitudinal edges and attachment marks rather than framed miniature panels.",
+        "animation_states": "Static shell, cold slots and control ticks reviewed in native views. Runtime ember overlays, food and pointer remain the same; actual alignment/readability still requires the focused Photon scene. No new moving mechanism or vessel claim.",
+        "native_size_readability": "Six-view and full-size model show a quiet readable pan and housing, strong open lower space, fitted vent group and distinct single dial. Sparse accents remain visible at ordinary scale; broad faces no longer look like mottled stone. Native material/atlas evidence preserves the exact placed pixels and face mapping."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "b12b2c7800e8cc1e93afc6556caab17b7717b93f72e88ea1a92fe8bec9f0799c",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "686fe9468c3d50fd9dff2f51cc171d262a279c22c4bf6c5fd14145fb4c08abfa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "7755daa10556a1bfed8e0af94ad40fb6979a2f815b2e09673051a0b8c8af4210",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surfaces.py": "c1c7a3cf8a3482e58e6444d662d70e0f6f43f41f52e3c53c6985c906904d8bfd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-spec.json": "2ba3d4ef522c1be74574eeadf1a6e34fe5d95244238c42f4ec3a68ca7918bfed",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-map.json": "3eb83849053ff8376c4fe1ce18fecbc0318f25c6dbfd2f55c6c96f8b5009cb79",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master-03.png": "c773eb4eeff650bc986079bf45fa998d65aaf6e396f5d79849d61336d0283ade",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "7e0977a014d4708f5a16ad0c1b51cacf87eb63398f513f5049f82255b87c3b01",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-quiet-prompt.txt": "7d9c0f045ad80a1041f6c345f9a4972962e4ca854519018c31355fecc61d633f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-prompt.txt": "b0c0f80982cfbe713b15f05df9235f8683e5fe92bfd89e621a3ef64eb8f59d18",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "958142d13140659059607d8c96631bad2361fb836a629c0548b24be7568163a6",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "acc99ffbefee6d4ed3ac6aca61285f27c3db017e62f71ef67a213d7eae47b68f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/surface-blockout-sheet.png": "392c0324700ef5df87d47a7320785e70999bbbe3511d8bb4c5df2cc9180a568b",
+        "evidence/surface-model-sheet.png": "b97c90968bb9e62a2d65eac3b897152286a139281ce1f1913b5c3011b766ea5a",
+        "evidence/surface-materials.png": "35a943b0943ba527b27a1684b2cf8563b6c98b33089826754c5fbd690e778ef3",
+        "evidence/surface-atlas.png": "9d32000b1f24414d586fee31bd06ad063dae63a15261e147d2424a1aea8b3014",
+        "evidence/surface-concept-model.png": "abe995c5297ce1d83259a4724bbb09131c036c286c09d62bf5eff1d54f52312a"
+      },
+      "generation": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon/Faithful front, rear and side views show quiet cast iron rather than gritty stone-like mottling. Clean dark pan keeps food readable. Fitted cover seams, small steel fastening, vent surround and rubbed lips are visible at their actual joints; brass stays at the control.",
+        "scale_readability": "Dedicated shallow head/open stand still distinct from the neighboring T1 cabinet. Main casting panels are calm at gameplay distance; restrained high-contrast seam and hardware marks carry construction. No oven door/cavity, excess surface noise or decorative machinery.",
+        "states_motion": "Actual pale/golden/charred food and empty served pan inspected. Continuous pointer moves over the new static calibration marks; rotary input reaches the server. Four lit ember overlays fit inside the new vent surround without spreading over the casing.",
+        "interaction_guides": "Existing menu, ingredients, ignition, continuous rotary input and serving passed the focused scene. No changed interaction, timing, calorie benefit, fuel or room-heat behavior. Prototype retains one-block Creative/admin scope, with no multiblock guide.",
+        "inventory_appearance": "Actual inventory icon retains the open legs, square pan and single brass control beside the vegetable portion and Faithful vanilla items. Small surface marks reduce cleanly at slot scale; material tones and silhouette remain readable.",
+        "integration_limits": "Build/unit, complete asset validation and guarded hidden kitchen scene passed. Latest 255 server tests were in the earlier heat build and not repeated for this resource-only change. Sensory enjoyment, dense-kitchen balance and moving-vessel rendering are not newly verified."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "b12b2c7800e8cc1e93afc6556caab17b7717b93f72e88ea1a92fe8bec9f0799c",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "686fe9468c3d50fd9dff2f51cc171d262a279c22c4bf6c5fd14145fb4c08abfa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "7755daa10556a1bfed8e0af94ad40fb6979a2f815b2e09673051a0b8c8af4210",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surfaces.py": "c1c7a3cf8a3482e58e6444d662d70e0f6f43f41f52e3c53c6985c906904d8bfd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-spec.json": "2ba3d4ef522c1be74574eeadf1a6e34fe5d95244238c42f4ec3a68ca7918bfed",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-map.json": "3eb83849053ff8376c4fe1ce18fecbc0318f25c6dbfd2f55c6c96f8b5009cb79",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master-03.png": "c773eb4eeff650bc986079bf45fa998d65aaf6e396f5d79849d61336d0283ade",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "7e0977a014d4708f5a16ad0c1b51cacf87eb63398f513f5049f82255b87c3b01",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\material-quiet-prompt.txt": "7d9c0f045ad80a1041f6c345f9a4972962e4ca854519018c31355fecc61d633f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-prompt.txt": "b0c0f80982cfbe713b15f05df9235f8683e5fe92bfd89e621a3ef64eb8f59d18",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "958142d13140659059607d8c96631bad2361fb836a629c0548b24be7568163a6",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "acc99ffbefee6d4ed3ac6aca61285f27c3db017e62f71ef67a213d7eae47b68f",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+        "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+      },
+      "evidence": {
+        "evidence/surface-ingame-lineup.png": "6dd62a19ddffb6cb0627be01868aea1fc678165e0537b465e4d24ad2fcbf5531",
+        "evidence/surface-ingame-close.png": "76e86ee1d8b4d67f98153178415c2443d9ec992354667738310b36d48e96f740",
+        "evidence/surface-ingame-cooking.png": "56c75332eaef1f54adfa11a94beb08f244dcfac8fdcbbb398ad330dfa324d7a3",
+        "evidence/surface-ingame-menu.png": "b16879dc6424a042912ccafd030a42e034c452e792951321acab4010dbbfba18",
+        "evidence/surface-ingame-dial.png": "9951e3ee33b30421794d146018d9477b6ea7ce865068a81f8090793df01b52aa",
+        "evidence/surface-ingame-inventory.png": "d4be41c7030b3c696e4d8efc001168b32731adc3b1773f2b4b172cb56fb4537c",
+        "evidence/surface-ingame-rear.png": "ee17e6ec50601bde4bd5aa1c5783617cb817d8e077625c8cd0a252e3b01e58bf",
+        "evidence/surface-ingame-side.png": "7be59aecaeecafe81e91601c2ec2efb1163f57e835645ffbd9b5a484d869f3ca",
+        "evidence/surface-before-after.png": "e1a2ec98a20b4720bdd7b72f507e36d20c90ca34f9ae12e57252189f22b6fcdc"
+      },
+      "generation": "60e84e013bc8fb0b8ac7440bf8609041cb2e1e49a6823ad94b33bcbfbf820557"
+    }
+  ]
+}

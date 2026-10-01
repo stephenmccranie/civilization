@@ -15,19 +15,23 @@ public final class FertilizerItem extends Item {
     @Override public InteractionResult useOn(UseOnContext context) {
         var player = context.getPlayer();
         var level = context.getLevel();
-        var pos = context.getClickedPos();
+        var pos = SoilSystem.cropBase(level,context.getClickedPos());
         var state = level.getBlockState(pos);
         if (player == null || !player.mayBuild() || !level.mayInteract(player, pos)) return InteractionResult.FAIL;
-        if (state.is(FarmingContent.FERTILIZED_WHEAT.get())) {
+        if (state.is(FarmingContent.FERTILIZED_WHEAT.get()) || level instanceof ServerLevel s && SoilSystem.fertilized(s,pos)) {
             if (!level.isClientSide) player.displayClientMessage(Component.translatable("message.civilization.already_fertilized"), true);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
-        if (!state.is(Blocks.WHEAT) || ((CropBlock) Blocks.WHEAT).isMaxAge(state)) {
+        if (!SoilSystem.crop(state) || SoilSystem.mature(state) || state.getBlock() instanceof net.minecraft.world.level.block.AttachedStemBlock) {
             if (!level.isClientSide) player.displayClientMessage(Component.translatable("message.civilization.fertilizer_requires_growing_wheat"), true);
             return InteractionResult.PASS;
         }
-        if (!level.isClientSide && level.setBlock(pos,
-                FarmingContent.FERTILIZED_WHEAT.get().defaultBlockState().setValue(CropBlock.AGE, state.getValue(CropBlock.AGE)), 3)) {
+        if (level instanceof ServerLevel server && !Geography.canFarm(server, pos.below())) {
+            player.displayClientMessage(Component.translatable("message.civilization.geography.fertilizer_blocked"), true);
+            return InteractionResult.FAIL;
+        }
+        if (level instanceof ServerLevel server && SoilSystem.fertilize(server,pos)) {
+            if(state.is(Blocks.WHEAT))level.setBlock(pos,FarmingContent.FERTILIZED_WHEAT.get().defaultBlockState().setValue(CropBlock.AGE,state.getValue(CropBlock.AGE)),3);
             if (!player.isCreative()) context.getItemInHand().shrink(1);
             CalorieFoodData.of(player).spendOther(player, CalorieConfig.FERTILIZE.get(), "fertilizer_labor");
             EnergyLog.production(player, "fertilizer_apply", pos.toShortString(), "civilization:fertilizer",

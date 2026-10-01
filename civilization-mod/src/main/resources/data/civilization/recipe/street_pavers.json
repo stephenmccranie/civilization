@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    { "item": "minecraft:bricks" },
+    { "item": "minecraft:stone_bricks" }
+  ],
+  "result": { "id": "civilization:street_pavers", "count": 2 }
+}

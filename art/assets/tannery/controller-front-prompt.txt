@@ -1,0 +1,8 @@
+Use case: production texture master
+Asset type: one square Minecraft controller-block front texture for the Civilization Tannery
+Primary request: Create one straight-on, perfectly orthographic, edge-to-edge block face that integrates into a red-brick tanning vat.
+Subject: Rough red brick casing around a centered dark cast-iron rectangular service door. The door has three broad vertical ventilation slots, four restrained corner rivets, and one small warm copper drain fitting above it. Add a narrow dark tan leather-colored inset strip as the craft identifier. The composition must remain readable after reduction to 32 by 32 pixels.
+Style: Civilization's late-nineteenth-century practical industry; Faithful-32-adjacent Minecraft pixel material language; deliberate broad shapes with a 32-pixel information budget.
+Lighting: flat top-left Minecraft texture lighting, no dramatic scene lighting.
+Constraints: square, front orthographic, seamless edge alignment, opaque edge-to-edge texture, large connected color regions, about 20 colors, hard material boundaries, brick joints broad enough to survive downscaling, slots at least three final pixels wide, no perspective, no cast shadow, no background, no text, no logo, no separate object, no tiny gears, no gradients, no antialiasing in the intended pixel design.
+Output: a high-resolution nearest-neighbor-style pixel-art master representing exactly one block face; do not present it on a cube or in a UI.

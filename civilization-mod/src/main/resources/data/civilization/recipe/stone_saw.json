@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "MM ",
+    " SM",
+    "S  "
+  ],
+  "key": {
+    "M": {
+      "item": "minecraft:cobblestone"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "civilization:stone_saw",
+    "count": 1
+  }
+}

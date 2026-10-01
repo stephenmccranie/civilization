@@ -32,6 +32,19 @@ public final class KilnContent {
             RECIPES.register("retort", () -> new RecipeType<>() { @Override public String toString() { return "civilization:retort"; } });
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCookingSerializer<RetortRecipe>> RETORT_SERIALIZER =
             SERIALIZERS.register("retort", () -> new SimpleCookingSerializer<>(RetortRecipe::new, 400));
+    public static final DeferredBlock<FoundryBlock> FOUNDRY = BLOCKS.register("foundry",
+            () -> new FoundryBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE)));
+    public static final DeferredItem<BlockItem> FOUNDRY_ITEM = ITEMS.registerSimpleBlockItem(FOUNDRY);
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FoundryBlockEntity>> FOUNDRY_ENTITY =
+            ENTITIES.register("foundry", () -> BlockEntityType.Builder.of(FoundryBlockEntity::new, FOUNDRY.get()).build(null));
+    public static final DeferredHolder<MenuType<?>, MenuType<KilnMenu>> FOUNDRY_MENU =
+            MENUS.register("foundry", () -> new MenuType<>(KilnMenu::foundry, FeatureFlags.DEFAULT_FLAGS));
+    public static final DeferredHolder<RecipeType<?>, RecipeType<FoundryRecipe>> FOUNDRY_RECIPE_TYPE =
+            RECIPES.register("foundry", () -> new RecipeType<>() { @Override public String toString() { return "civilization:foundry"; } });
+    public static final DeferredHolder<RecipeSerializer<?>, SimpleCookingSerializer<FoundryRecipe>> FOUNDRY_SERIALIZER =
+            SERIALIZERS.register("foundry", () -> new SimpleCookingSerializer<>(FoundryRecipe::new, 400));
+    public static final DeferredItem<Item> STEEL = ITEMS.registerSimpleItem("steel_ingot");
+    public static final DeferredItem<Item> MACHINE_PARTS = ITEMS.registerSimpleItem("machine_parts");
     public static final DeferredItem<Item> MINERAL_COAL = ITEMS.registerSimpleItem("mineral_coal");
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<KilnBlockEntity>> ENTITY =
             ENTITIES.register("brick_kiln", () -> BlockEntityType.Builder.of(KilnBlockEntity::new, KILN.get()).build(null));

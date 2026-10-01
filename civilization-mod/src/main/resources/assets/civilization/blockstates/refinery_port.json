@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/refinery_port"
+    },
+    "facing=east": {
+      "model": "civilization:block/refinery_port",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/refinery_port",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/refinery_port",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "civilization:block/refinery_port",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "civilization:block/refinery_port",
+      "x": 90
+    }
+  }
+}

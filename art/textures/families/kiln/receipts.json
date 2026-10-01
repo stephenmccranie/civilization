@@ -1,0 +1,18 @@
+{
+  "side": {
+    "prompt": "EDIT this exact grey cobblestone kiln image; it is the material and style authority. Remove the inspection slit and all lower firebox metalwork and opening. Fill only those removed areas with continuous matching GREY COBBLESTONE masonry. Preserve the rest of the stonework, its irregular chunky stones, dark joints, color, size and shading. Do not add red bricks or a new stone pattern. Same high-resolution detailed pixel art. Fully opaque square edge-to-edge orthographic texture, no scene, no perspective, no text or margins.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\kiln_front-stone-v1.png"
+    ],
+    "reference_sha256": "9bfbc76a779b2b22e13eee2596df7c257c923dcb1055de74b9d8306aca733651",
+    "output_sha256": "6bc0b1fa099d240b2a4c25052febe403e47e02d962ee302fc2f3c99175d6c58c"
+  },
+  "front_on": {
+    "prompt": "EDIT this exact grey cobblestone kiln image; it is the material and style authority. Add orange coals and modest yellow-orange flames only inside the large lower chamber. Preserve all stonework, frame, handle, slit and bolts unchanged, no glow spilling over the casing. Keep the exact chamber geometry. Same high-resolution detailed pixel art. Fully opaque square edge-to-edge orthographic texture, no scene, no perspective, no text or margins.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\kiln_front-stone-v1.png"
+    ],
+    "reference_sha256": "9bfbc76a779b2b22e13eee2596df7c257c923dcb1055de74b9d8306aca733651",
+    "output_sha256": "5e66f6523a2da4c53dd5a6e04cae4da68857bef0f1fd70813c0445f3872f86d3"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "brief_hash": "92b015b7e7e460b62db2fb1151cf4b55c842c9ee7acd1fcca0095f410ea7c274",
+  "inputs": {
+    "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\cloth\\export.py": "8ad374b6cc04da0b06ac5f00918cfdc41887167192fc07827e4492094498624e",
+    "F:\\minecraft project\\art\\assets\\cloth\\cloth.png": "6b523119f913fad9148c1603c3e8ea97e2c993a9d6e6e0d4ae131b9552608929",
+    "F:\\minecraft project\\art\\assets\\cloth\\cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+  },
+  "outputs": {
+    "textures/item/cloth.png": "6b523119f913fad9148c1603c3e8ea97e2c993a9d6e6e0d4ae131b9552608929",
+    "models/item/cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+  }
+}

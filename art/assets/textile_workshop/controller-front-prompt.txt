@@ -1,0 +1,8 @@
+Use case: production texture master
+Asset type: one square Minecraft controller-block front texture for the Civilization Textile Workshop
+Primary request: Create one straight-on, perfectly orthographic, edge-to-edge oak cabinet face that clearly identifies textile work.
+Subject: Warm oak-plank casing with a centered pale ivory woven swatch held inside a dark iron rectangular frame. The swatch has one narrow muted indigo selvage stripe, broad visible weave clusters, and a small restrained copper bearing below it. Keep the cloth insert and frame large enough to read after reduction to 32 by 32 pixels.
+Style: Civilization's late-nineteenth-century artisan industry; Faithful-32-adjacent Minecraft pixel material language; deliberate broad shapes with a 32-pixel information budget.
+Lighting: flat top-left Minecraft texture lighting, no dramatic scene lighting.
+Constraints: square, front orthographic, seamless edge alignment, opaque edge-to-edge texture, large connected color regions, about 20 colors, hard material boundaries, wood grain and weave clusters broad enough to survive downscaling, no perspective, no cast shadow, no background, no text, no logo, no separate object, no tiny gears, no gradients, no antialiasing in the intended pixel design.
+Output: a high-resolution nearest-neighbor-style pixel-art master representing exactly one block face; do not present it on a cube or in a UI.

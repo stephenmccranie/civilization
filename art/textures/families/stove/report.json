@@ -1,0 +1,26 @@
+{
+  "sources": {
+    "front": {
+      "path": "sources\\stove_front-v1.png",
+      "sha256": "c011ba469b9d6e16421614191566785d9be9c2e64ab2d146d66b69e69111e77b"
+    },
+    "side": {
+      "path": "sources\\stove_side-v1.png",
+      "sha256": "29e4fc4a45996ec630213a733851b062da486661c751e4718100624b385dba0f"
+    },
+    "top": {
+      "path": "sources\\stove_top-v1.png",
+      "sha256": "6bf64f5c4e54c317c3ce914642848019271033e09cac77497b39098aa79de774"
+    },
+    "front_on": {
+      "path": "sources\\stove_front_on-v1.png",
+      "sha256": "045cc654cdbfb22b51da15ba0d8068bcb58f58abbd2cba57f0f545aa8f4d3bdf"
+    }
+  },
+  "faces": {
+    "front": "fb479fc2425081c75f1a1f301a9e78aa922ce70cd96017fb69b4784afacae3b5",
+    "side": "43940c7c60c16ed35cd0230a4be0bcfd01f52ab481f9efa7753d17848b2f2017",
+    "top": "c018e0153b1b2e3bcbe4f868e20eae162d531318264c0706c68279c01daef39f",
+    "front_on": "b552b9685a492c7393c4e64a5e6d16c68b1649f44597cb60924c24920c27c108"
+  }
+}

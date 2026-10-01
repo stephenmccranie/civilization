@@ -1,0 +1,20 @@
+{
+  "method": "Seeded original noise, frequency shaping and sparse decaying crackles; four-second mono Vorbis loops. Exact waveform sources and generator retained. No external audio copied.",
+  "files": {
+    "wet": {
+      "source_ogg": "649c2c55e7e7df51e51771219ed197b919a71cf7550660b926cba83220ce7bd0",
+      "source_wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+      "runtime_ogg": "649c2c55e7e7df51e51771219ed197b919a71cf7550660b926cba83220ce7bd0"
+    },
+    "sizzle": {
+      "source_ogg": "773363b9be3d223de433fc4e849cc0a3afc028d1786a6b95ec58f827f5d78b0e",
+      "source_wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+      "runtime_ogg": "773363b9be3d223de433fc4e849cc0a3afc028d1786a6b95ec58f827f5d78b0e"
+    },
+    "char": {
+      "source_ogg": "55e38050224585e48cd75f363026fe386d7b929b8e3692c6ca4751a1c7018844",
+      "source_wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+      "runtime_ogg": "55e38050224585e48cd75f363026fe386d7b929b8e3692c6ca4751a1c7018844"
+    }
+  }
+}

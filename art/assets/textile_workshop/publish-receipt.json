@@ -1,0 +1,19 @@
+{
+  "brief_hash": "5797163ad6fcb312150d0cc550bb1cd72e129f5f09d086065625872d4bd7de7c",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+    "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\mockup-01.png": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-master.png": "4e6127e9dc999cd44d36f27df1ecc36eb799830107410ac2d93f24497097118c",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-prompt.txt": "86e720fdee4e03f82c1d3e96abc1e9e05d62fc2face92983c58225a468cf3023",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\layout.md": "febad1e5f879c3596d68a4af7bd320af29edd74f0a6625190385f2a11bb3f720",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\export.py": "04f0e2f6d1255cd1d0b683e367d3aa8ab59e8b9a2b1372b1f6b52fe931bb9c26",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop_front.png": "f4fce3fb10f3b2abf2941871d2332857db7a4ae65e2bbd1d0eaf5c3e3fe240fa",
+    "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop.json": "8ec95eaba86a8161f835118bb1a4750a04473253b1a1e4118f14f90e782991de"
+  },
+  "outputs": {
+    "textures/block/textile_workshop_front.png": "f4fce3fb10f3b2abf2941871d2332857db7a4ae65e2bbd1d0eaf5c3e3fe240fa",
+    "models/block/textile_workshop.json": "8ec95eaba86a8161f835118bb1a4750a04473253b1a1e4118f14f90e782991de"
+  }
+}

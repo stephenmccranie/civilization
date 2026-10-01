@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png",
+      "sha256": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+      "crop": [
+        760,
+        410,
+        1170,
+        840
+      ],
+      "label": "Previous"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\surface-ingame-cooking.png",
+      "sha256": "56c75332eaef1f54adfa11a94beb08f244dcfac8fdcbbb398ad330dfa324d7a3",
+      "crop": [
+        760,
+        410,
+        1170,
+        840
+      ],
+      "label": "Refined"
+    }
+  ]
+}

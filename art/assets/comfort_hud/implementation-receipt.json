@@ -1,0 +1,49 @@
+{
+  "stage": "implemented",
+  "route": "shared native GuiGraphics pixel geometry; no generated runtime texture",
+  "approved_direction": {
+    "path": "art/assets/comfort_hud/mockup-04.png",
+    "sha256": "d53c11bc36401019a18d97805cd0f321ec734ff33517c9a159ec381bcb5e02c2"
+  },
+  "sources": [
+    {
+      "path": "civilization-mod/src/main/java/dev/civilization/client/ComfortHud.java",
+      "sha256": "218e56bc345ac2e379d5db82a93ff66f1119d1018bd6536cca49e81d8b958921"
+    },
+    {
+      "path": "civilization-mod/src/main/java/dev/civilization/client/CalorieHud.java",
+      "sha256": "e6c7a081b7cbe51a9ee0fa698f47b1cf04dbd44b4a78821daca6c210ad12666a"
+    },
+    {
+      "path": "civilization-mod/src/main/java/dev/civilization/client/ThermalVision.java",
+      "sha256": "5f1323131111aad7a3a5571dc56080f6ee00668b8b4479c06958e83a3a7b4b80"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "art/assets/comfort_hud/comfort-hud.png",
+      "sha256": "2fcd24e024223cef4666ae59e1bf17fd8b8f5c47cce07c4cda5b715bf7547d16"
+    },
+    {
+      "path": "art/assets/comfort_hud/comfort-inventory.png",
+      "sha256": "e440fb8ebcf501b0f326f4c7c0a322b9605e93b4ede2a48b5a9d5c1c7fd4e0e6"
+    },
+    {
+      "path": "art/assets/comfort_hud/comfort-cold.png",
+      "sha256": "599f81ad15d1e12d553f212ba8c08883be75ea46208b3db64e06ccfd875bbd8d"
+    }
+  ],
+  "review": {
+    "result": "pass",
+    "findings": [
+      "Centered instrument clears hearts, calories and XP bar at GUI scale 3.",
+      "Warm comfort tint/road foot and cold non-road state inspected under Photon.",
+      "Inventory tooltip rendered through the shared hover renderer with fixture coordinates and all six lines readable.",
+      "Four-second low-amplitude highlight is code-driven; screenshots alone do not demonstrate the complete animation cycle."
+    ],
+    "limits": [
+      "Other GUI scales, extra-health/armor layouts and color-accessibility alternatives not visually verified."
+    ]
+  },
+  "validation": "build/unit and focused Photon thermal scene passed in 39.1 seconds; gameplay rules unchanged"
+}

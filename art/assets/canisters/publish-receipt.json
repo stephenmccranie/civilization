@@ -1,0 +1,27 @@
+{
+  "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+    "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+    "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "881de9093255d47cdd1f66cd2e3ff25cf6f11647d6958d1d2172fe085aacfc36",
+    "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+    "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+    "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "be52f00e3ba54c1313e520f7939352f5f6d121c3e75d7f4af580523552e32300",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "83daa30cd85dee3b8d59f0b25bc6ad9b4b8b5cc9342f41ef90836d8828d5e0c9",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "24f28b83f8b3b82147af5d2df31dc1da753e2c2842dd0b35c8604290b47ea237",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "f4e07cc9d056a80181db0619f5d44e97e59a5ff16994457315ac1e8a06829677",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "16b0dc1c1081eec2cabf6ebdd3d9ac63f8d5b99fda5b67849bd9a89ae837254d",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "54d041e11c5bb604878f8de6bdb4b04fd207d377ccd61c74771cd59cfcb06b79",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "f44c53442bb364a2fb7460809a93b41e4b40dfad886b2f7cd0508dc29a0b3459",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "1d3411f8ec05b5ea3f0c97d0cb4a64df8229c213cdff06f402b2cff1229ffe0f",
+    "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+  },
+  "outputs": {
+    "models/item/empty_canister.json": "16b0dc1c1081eec2cabf6ebdd3d9ac63f8d5b99fda5b67849bd9a89ae837254d",
+    "models/item/crude_canister.json": "54d041e11c5bb604878f8de6bdb4b04fd207d377ccd61c74771cd59cfcb06b79",
+    "models/item/fuel_canister.json": "f44c53442bb364a2fb7460809a93b41e4b40dfad886b2f7cd0508dc29a0b3459",
+    "models/item/lubricant_canister.json": "1d3411f8ec05b5ea3f0c97d0cb4a64df8229c213cdff06f402b2cff1229ffe0f",
+    "textures/item/canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+  }
+}

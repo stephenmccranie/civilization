@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Reviewed actual Photon/Faithful screenshots: blue-gray steel, brass cap and enamel badges remain coherent and readable.",
+    "scale_readability": "All four inventory icons fit their slots; corrected first-person scale keeps handle, cap and badge readable in the lower right with a natural bottom-edge crop.",
+    "states_motion": "Four static variants display matching geometry with distinct empty ring, crude drop, fuel flame and lubricant oil-can labels.",
+    "interaction_guides": "No guide applies. Corrected fixed transform now shows the front label in every item frame.",
+    "inventory_appearance": "Reviewed inventory, player preview and held fuel/lubricant. Labels face the viewer and cap/handle remain distinct.",
+    "integration_limits": "Art-only focused scene passed in 35.2 seconds. Fluid behavior unchanged; full server suite not repeated. Left-hand and dropped-item views were not separately captured."
+  },
+  "remaining_issues": []
+}

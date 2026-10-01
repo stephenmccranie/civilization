@@ -1,0 +1,14 @@
+{
+  "brief_hash": "2bbec2c0c55e76b72819b47636a648ae901b5aff907800b835bf6e4bdc9c4e9d",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+    "F:\\minecraft project\\art\\assets\\sulfur\\export.py": "229f4bacb4445b64e09212fa5cbbf92b86315eeffe0c9f2c88fa9de049720dce",
+    "F:\\minecraft project\\art\\assets\\sulfur\\sulfur.png": "25c1ca12d18477e252bea9a2f24e960c707a54ef3997024e7dcc171f50026647",
+    "F:\\minecraft project\\art\\assets\\sulfur\\sulfur.json": "22151eb6c6298c47aeaab36806d8942714d160b97a1ba2f10e77f59201af8c8a"
+  },
+  "outputs": {
+    "textures/item/sulfur.png": "25c1ca12d18477e252bea9a2f24e960c707a54ef3997024e7dcc171f50026647",
+    "models/item/sulfur.json": "22151eb6c6298c47aeaab36806d8942714d160b97a1ba2f10e77f59201af8c8a"
+  }
+}

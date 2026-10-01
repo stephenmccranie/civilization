@@ -3,7 +3,46 @@
   "minVersion": "0.8",
   "package": "dev.civilization.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["PlayerMixin", "ServerPlayerMixin", "CakeMixin", "ItemStackMixin", "AbstractVillagerMixin", "BoneMealItemMixin", "WorkAtComposterMixin"],
-  "client": ["LocalPlayerMixin"],
-  "injectors": { "defaultRequire": 1 }
+  "mixins": [
+    "PlayerMixin",
+    "InventoryMenuMixin",
+    "ServerPlayerMixin",
+    "CakeMixin",
+    "ItemStackMixin",
+    "AbstractVillagerMixin",
+    "BoneMealItemMixin",
+    "WorkAtComposterMixin",
+    "RegionalGrowthMixin",
+    "CompoundContainerAccess",
+    "ProtectedMenuMixin",
+    "ProtectedHopperMixin",
+    "ProtectedLevelMixin",
+    "ProtectedFluidMixin",
+    "ProtectedFireMixin",
+    "ProtectedItemUseMixin",
+    "ProtectedDispenserMixin",
+    "WeatherLevelMixin",
+    "WeatherServerMixin",
+    "WeatherCommandMixin",
+    "SoilChangeMixin",
+    "WeatherFireMixin",
+    "PlayerMovementMixin",
+    "WorkshopRepairMixin",
+    "WorkshopMobMixin",
+    "RetiredFurnaceMixin",
+    "RetiredMinecartMixin"
+  ],
+  "client": [
+    "LocalPlayerMixin",
+    "WeatherClientMixin",
+    "WeatherRenderMixin",
+    "InventoryScreenMixin",
+    "CreativeInventoryAccessoriesMixin",
+    "InventoryRecipeBookMixin",
+    "ContainerScreenMixin",
+    "CraftingScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

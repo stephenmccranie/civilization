@@ -1,0 +1,22 @@
+{
+  "source": "art\\textures\\ui\\cabinet-master.png",
+  "source_sha256": "993e264796cc38cf5a96e76339c063f03a65ea8c0d508b7e336bc0b6b3b0c0b4",
+  "reference_sha256": "decd3db95c6dd5ff68a473b1cafb785b28d03f99868a3d37f4094acc8ab64be6",
+  "prompt_sha256": "1e6ddf53e7ba33d4358a4797888fc96b9e7d9cbc52344102593dfe717bbcf316",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "output": "civilization-mod\\src\\main\\resources\\assets\\civilization\\textures\\gui\\cabinet.png",
+  "output_sha256": "d1c682153d16eb9c4a1c47efa95009c12dad572bb3cc64791e9b81fe8939e8b0",
+  "size": [
+    512,
+    512
+  ],
+  "slice_border_source": 48,
+  "slice_border_gui": 18,
+  "outset_gui": 3,
+  "filter": "BOX",
+  "colors": "RGB, no palette reduction",
+  "texels_per_gui_pixel": 2.6666666666666665
+}

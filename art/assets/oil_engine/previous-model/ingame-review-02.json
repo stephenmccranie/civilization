@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Lighter shared iron now reads on sunlit and shaded faces under Photon/Faithful. Original casing and copper slab contrast intentionally as foundation/support materials. No whole-block emissive casing.",
+    "scale_readability": "Large open octagonal wheel and horizontal rear cylinder read clearly; case/front dial and copper utility support distinguish the working sides. Bed clearance and aligned shaft visible in opposite views.",
+    "states_motion": "Stopped/starting wheel at rest; running and motion frames show rim and spokes rotating as one unit. Rear startup flame appears below hot bulb and vanishes after warmup; working exhaust uses stack location.",
+    "interaction_guides": "Missing wheel has matching transparent full geometry, clear original component requirement and corrected Oil Engine heading; completed build has no guide text. Ports remain accessible.",
+    "inventory_appearance": "Controller, cylinder and wheel now fit individual slots, distinct silhouettes and matching materials. Held controller renders with same front/side geometry.",
+    "integration_limits": "This review covers the land multiblock in the hidden 1920x1080 Photon/Faithful scene. Server checks cover four-direction linking/removal. No new boat integration or moving-vessel animation claim; no capacity/load claim."
+  },
+  "remaining_issues": []
+}

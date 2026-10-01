@@ -1,0 +1,27 @@
+{
+  "brief_hash": "896487f8be93486db0b18e6dc1d99e1bde75378cc2f78e3d73b93fb6d147d104",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\build.py": "050cd583c9c558d7e52fcb38c0b121a4ec3201b981a364475648b06791cef729",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\bulk_steel.png": "60611c3d83fe24d149aa009b52bedf36193f70b90171aec0ea1c6c3c98e537ba",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.bbmodel": "ea2c652f5010726cb6c168ecf5d960bfaefd6822fdea0299e78e052342218b0f",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker_assembly.bbmodel": "d4b8cc28d8d3fece93dda05d81495be8311eabf45434092ca4ce1a274381d844",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.bbmodel": "23c016e9749c6b509f8feb09f4917f5d90072aff47d3461ad49284582887b7c0",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank_assembly.bbmodel": "806925ce62b436efe71041dd4287fd6d12d9a58d1b4e39da38781da56f99927e",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.json": "aecfe3dcc2f0776175482d0e899ddf549529d20d4ef5e270f099be3bd9f82f7c",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-state.json": "d612ab0d455411ae97922fe95c34c729874e762c5543306c0201d9c6cd7c1098",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-item.json": "588efbd3a31db4cd4b6d755d0492034177dab6e25cf6dea9347facb5d5fb187c",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.json": "18b391c927059ca325a657540abbd13d06c57a67bbcbf4d45df7a490bcdb1234",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-state.json": "41f9130ffa76fccceb428efbbf7000f7e2c28e59426bb852e3cf9485d9989a0e",
+    "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-item.json": "21a9092898ed0e7048521e599c0ed2faa280b8c76178d73348569232a9c6566b"
+  },
+  "outputs": {
+    "models/block/coal_bunker.json": "aecfe3dcc2f0776175482d0e899ddf549529d20d4ef5e270f099be3bd9f82f7c",
+    "blockstates/coal_bunker.json": "d612ab0d455411ae97922fe95c34c729874e762c5543306c0201d9c6cd7c1098",
+    "models/item/coal_bunker.json": "588efbd3a31db4cd4b6d755d0492034177dab6e25cf6dea9347facb5d5fb187c",
+    "models/block/cargo_tank.json": "18b391c927059ca325a657540abbd13d06c57a67bbcbf4d45df7a490bcdb1234",
+    "blockstates/cargo_tank.json": "41f9130ffa76fccceb428efbbf7000f7e2c28e59426bb852e3cf9485d9989a0e",
+    "models/item/cargo_tank.json": "21a9092898ed0e7048521e599c0ed2faa280b8c76178d73348569232a9c6566b",
+    "textures/block/bulk_steel.png": "60611c3d83fe24d149aa009b52bedf36193f70b90171aec0ea1c6c3c98e537ba"
+  }
+}

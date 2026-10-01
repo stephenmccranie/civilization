@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "An untreated brown cow hide with a folded corner",
+    "purpose": "Distinct readable frontier supply in the shared resource family.",
+    "silhouette": "A broad irregular flat animal hide, four short irregular side lobes, one folded-over corner showing pale suede underside. Muted warm umber/tawny brown hair-side with a few broad directional tufts and mottled patches, no face, head, horns, blood or gore; not a neat cloth rectangle and not finished leather. Slight three-quarter top view.",
+    "bounds": "32x32 transparent item, 28px longest silhouette extent.",
+    "materials": "A broad irregular flat animal hide, four short irregular side lobes, one folded-over corner showing pale suede underside. Muted warm umber/tawny brown hair-side with a few broad directional tufts and mottled patches, no face, head, horns, blood or gore; not a neat cloth rectangle and not finished leather. Slight three-quarter top view.",
+    "interfaces": "Existing item identity, recipe and stack behavior unchanged.",
+    "states": "Static inventory and held item.",
+    "construction": "Generated high-resolution master reduced by shared alpha-safe sprite pipeline.",
+    "invariants": "Art only; no container cost or new gameplay mechanics.",
+    "technological_stage": "Frontier supplies feeding town workshops.",
+    "material_behavior": "Broad material-specific clusters, subordinate marks, restrained saturation.",
+    "signature_feature": "An untreated brown cow hide with a folded corner",
+    "neighboring_assets": "Cloth, sulfur, Machine Parts and the other frontier supplies.",
+    "fidelity_targets": [
+      "An untreated brown cow hide with a folded corner",
+      "Distinct native-size silhouette",
+      "Readable material variation"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/cloth/mockup-04.png",
+      "role": "Style only; coarse readable project pixel clusters, not subject or material."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "raw_hide.png",
+      "target": "textures/item/raw_hide.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "raw_hide.json",
+      "target": "models/item/raw_hide.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-571e342d-a10f-4bd0-93d4-7f24aecc6c23.png",
+      "sha256": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11",
+      "prompt": "Create one item: A broad irregular flat animal hide, four short irregular side lobes, one folded-over corner showing pale suede underside. Muted warm umber/tawny brown hair-side with a few broad directional tufts and mottled patches, no face, head, horns, blood or gore; not a neat cloth rectangle and not finished leather. Slight three-quarter top view. High-resolution pixel-art master for a tiny Minecraft inventory icon, not a tiny output image. Clear broad silhouette, few major forms, crisp stepped edges and deliberately large color clusters. Material marks should occupy roughly 1-3 final pixels and stay lower contrast than structural edges. About sixteen purposeful colors, upper-left light, no gradients, microscopic detail, random noise, ground shadow, lettering, border or glow. Centered isolated item with generous margins on true transparent background. Reference image is STYLE ONLY: match the broad pixel clusters and readable material variation, not its subject, material or shape. Practical frontier craftsmanship in an alternate late nineteenth-century world; no ornamental brass or steampunk decoration.",
+      "brief_hash": "c7bbac0bde3f85d5d1799185c8d29d4e4f94db2b0f85d3531a9ff59a7d8b673c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Irregular lobes, mottled brown upper surface and pale folded underside remain readable.",
+        "implementable_geometry": "One static inventory sprite with no physical assembly required.",
+        "mechanics_clearance": "No moving or interacting components; depicted material rests as one coherent item.",
+        "period_materials": "Warm umber hide uses broad patches and directional tufts, distinct from pale woven Cloth.",
+        "family_consistency": "Broad stepped edges and restrained upper-left lighting follow inspected Cloth/sulfur references. Material identity is retained.",
+        "controls_readability": "No controls; silhouette and characteristic material identify the resource.",
+        "gameplay_scope": "Only appearance changes; item IDs, recipes and inventories unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "c7bbac0bde3f85d5d1799185c8d29d4e4f94db2b0f85d3531a9ff59a7d8b673c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "sprite-review.png": "61f52a1bc4e1f41797eca7dfd9503372f3a5f98d5c0c84370f740919f1ef2991",
+        "mockup-01.png": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11"
+      },
+      "generation": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Irregular lobes, mottled brown upper surface and pale folded underside remain readable.",
+        "geometry_uvs": "Generated-item model, 32x32 texture, 16 opaque colors and binary alpha; padded silhouette.",
+        "material_consistency": "Warm umber hide uses broad patches and directional tufts, distinct from pale woven Cloth.",
+        "assembly_interfaces": "Existing registered item model and texture path; no block interfaces.",
+        "animation_states": "Static material item, no animation needed.",
+        "native_size_readability": "Inspected native dark/light backgrounds and enlarged grid; characteristic forms remain legible without stray edge pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "c7bbac0bde3f85d5d1799185c8d29d4e4f94db2b0f85d3531a9ff59a7d8b673c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\mockup-01.png": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\export.py": "7cecad23c5ee6dba45444c80876d9d15d48cc9be217133451a91241bf04c927e",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.png": "c8b192376846e9b873e0d9db8135da37513bf4e4abb25f2e4b330acee1e1c761",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.json": "f091e89c2b9787201d25332daf04de0488f6f508f712a9b30576a0e064e2f403"
+      },
+      "evidence": {
+        "sprite-review.png": "61f52a1bc4e1f41797eca7dfd9503372f3a5f98d5c0c84370f740919f1ef2991",
+        "mockup-01.png": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11"
+      },
+      "generation": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon frame lighting darkens materials naturally; native inventory retains chosen palette. No opaque background or missing texture.",
+        "scale_readability": "Irregular warm pelt silhouette and cream underside are clear; darker mottling distinguishes it from pale folded Cloth.",
+        "states_motion": "Static generated item; no animation states or moving machinery.",
+        "interaction_guides": "Inventory resource, no build guide or placement interaction.",
+        "inventory_appearance": "Inspected seven-item family beside Cloth, sulfur and Machine Parts. Consistent padded scale and broad clusters; earthy low-saturation supplies contrast brighter sulfur and cool metal. Irregular warm pelt silhouette and cream underside are clear; darker mottling distinguishes it from pale folded Cloth.",
+        "integration_limits": "Build/unit and focused supplies scene passed. Reviewed inventory and framed appearances; no gameplay changes or multiplayer validation claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "c7bbac0bde3f85d5d1799185c8d29d4e4f94db2b0f85d3531a9ff59a7d8b673c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\mockup-01.png": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\export.py": "7cecad23c5ee6dba45444c80876d9d15d48cc9be217133451a91241bf04c927e",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.png": "c8b192376846e9b873e0d9db8135da37513bf4e4abb25f2e4b330acee1e1c761",
+        "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.json": "f091e89c2b9787201d25332daf04de0488f6f508f712a9b30576a0e064e2f403"
+      },
+      "evidence": {
+        "evidence/supplies-inventory.png": "a7fc3cb22a870257125e3cecd076d50d2548995ecf102f504e90d27f15bc3c46",
+        "evidence/supplies-frames.png": "d2b625053e700cd14e0f779d95a2a255a66a64e45cbbd5d102ac2c6172e6ae85"
+      },
+      "generation": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11"
+    }
+  ]
+}

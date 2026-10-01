@@ -22,13 +22,14 @@ public class MultiblockGameTests {
         return (KilnBlockEntity) h.getLevel().getBlockEntity(pos);
     }
     private static void ticks(GameTestHelper h, KilnBlockEntity machine, int count) {
+        CoalFireFixture.light(machine);
         for (int i = 0; i < count; i++) KilnBlockEntity.tick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
     }
     @GameTest(template = "industrial")
     public static void standaloneControllersCannotOperate(GameTestHelper h) {
         for (boolean works : new boolean[]{false, true}) {
             var machine = controller(h, works, Direction.NORTH);
-            machine.setItem(0, works ? FarmingContent.MINERAL_BLEND.toStack() : new ItemStack(Items.CLAY));
+            machine.setItem(0, works ? IndustrialContent.ENRICHED_BLEND.toStack() : new ItemStack(Items.CLAY));
             machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
             ticks(h, machine, 500);
             h.assertTrue(machine.getItem(0).getCount() == 1 && machine.getItem(1).getCount() == 1 && machine.getItem(2).isEmpty(), "Bare controller cannot burn fuel or process items");
@@ -44,12 +45,14 @@ public class MultiblockGameTests {
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack(2));
         ticks(h, machine, 199);
         var wall = machine.getBlockPos().above(2);
+        var wallState = h.getLevel().getBlockState(wall);
         h.getLevel().setBlockAndUpdate(wall, Blocks.AIR.defaultBlockState());
         ticks(h, machine, 1);
         h.assertTrue(machine.getItem(2).isEmpty() && machine.getItem(0).getCount() == 1 && machine.getItem(1).getCount() == 1, "No completion or new fuel consumption after breach");
         h.assertTrue(!machine.getBlockState().getValue(AbstractFurnaceBlock.LIT), "Breach extinguishes the controller");
         h.assertTrue(machine.checkStructure().problem().equals(wall), "Feedback identifies the missing block exactly");
-        h.getLevel().setBlockAndUpdate(wall, Blocks.COBBLESTONE.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(wall, wallState);
+        ((CutBlockEntity) h.getLevel().getBlockEntity(wall)).material(Blocks.COBBLESTONE.defaultBlockState());
         ticks(h, machine, 199);
         h.assertTrue(machine.getItem(2).isEmpty(), "Repair cannot reuse old partial progress");
         ticks(h, machine, 1);
@@ -61,8 +64,10 @@ public class MultiblockGameTests {
         var machine = controller(h, true, Direction.NORTH);
         var pos = machine.getBlockPos();
         KilnGameTests.buildShell(h, pos, Direction.NORTH, true);
-        for (var part : MachineStructure.parts(true)) if (part.material().equals("copper"))
-            h.getLevel().setBlockAndUpdate(MachineStructure.position(pos, Direction.NORTH, part), Blocks.WAXED_OXIDIZED_COPPER.defaultBlockState());
+        for (var part : MachineStructure.parts(true)) if (part.material().equals("copper")) {
+            var cut = (CutBlockEntity) h.getLevel().getBlockEntity(MachineStructure.position(pos, Direction.NORTH, part));
+            cut.material(Blocks.WAXED_OXIDIZED_COPPER.defaultBlockState());
+        }
         h.getLevel().setBlockAndUpdate(pos.above(), Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.DOWN));
         h.assertTrue(machine.checkStructure().status() == MachineStructure.COMPLETE, "Aged/waxed copper and downward input hatch form correctly");
         h.getLevel().setBlockAndUpdate(pos.above(), Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.NORTH));
@@ -90,7 +95,7 @@ public class MultiblockGameTests {
     public static void saveCannotPreserveAFalseFormedState(GameTestHelper h) {
         var machine = controller(h, true, Direction.NORTH);
         KilnGameTests.buildShell(h, machine.getBlockPos(), Direction.NORTH, true);
-        machine.setItem(0, FarmingContent.MINERAL_BLEND.toStack());
+        machine.setItem(0, IndustrialContent.ENRICHED_BLEND.toStack());
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
         ticks(h, machine, 100);
         var saved = machine.saveWithFullMetadata(h.getLevel().registryAccess());

@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "item-and-block-family",
+  "brief": {
+    "purpose": "A hand-mined rare frontier ore and a wearable audible survey instrument.",
+    "setting": "Practical late-nineteenth-century cast steel and brass, natural muted mineral colors.",
+    "silhouettes": "Rectangular dial plus probe; angular mineral fragment; opaque stone ore face.",
+    "neighbors": ["prospecting_rod", "machine_parts", "sulfur"],
+    "invariants": "No neon glow, radiation warning mark, invented processing machinery or fuel capability."
+  },
+  "prompt_file": "prompts.md",
+  "generated_sources": [
+    { "file": "instrument-and-ore-master.png", "sha256": "1af294d953e7b2a6b658faaed1b2dab4c4fbcf9b3fca5d78c5f22e987dfc5e10" },
+    { "file": "raw-uranium-master.png", "sha256": "07e36838af6fe2741f8eccc8c1bacd24e0aad74e39d11ba4a1af9bd94d09b986" }
+  ],
+  "exporter": "export.py",
+  "outputs": [
+    { "source": "geiger_counter.png", "target": "textures/item/geiger_counter.png", "size": [32, 32], "sha256": "05c5dd82a3660bb721d807d83834197e2d327e119e987f0fbb13a85515793c16" },
+    { "source": "raw_uranium.png", "target": "textures/item/raw_uranium.png", "size": [32, 32], "sha256": "807e90ff824a481095391724d643f939e10da6b2347d74b66da16c38b5bec8c3" },
+    { "source": "uranium_ore.png", "target": "textures/block/uranium_ore.png", "size": [32, 32], "sha256": "3a8a79f36e3a3eaaa5a428f8857bfebcc8df403e01734928ae4556451846c24f" }
+  ],
+  "reviews": [
+    { "stage": "native", "decision": "pass", "evidence": "sprite-review.png", "finding": "Legible dial/probe and mineral facets at 32px, clean alpha and subdued colors." },
+    { "stage": "ingame", "decision": "pass-with-limit", "evidence": "evidence/inventory-closed.png", "sha256": "f94277b1732272f2eb9ce309a9d40904b2334277e185e7a87e7f65d7f93930cd", "finding": "Faithful inventory and item lineup pass without shaders; Photon check stalled before world render." }
+  ]
+}

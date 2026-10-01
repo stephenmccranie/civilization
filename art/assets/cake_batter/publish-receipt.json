@@ -1,0 +1,14 @@
+{
+  "brief_hash": "7fc5b48c95a91302f89f66fdbc6bd629ec6029783f867a2eb04ee9427a9251ce",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\cake_batter\\mockup-01.png": "9a5547277eeb431b1ffbbca7414bb09b2bc59df3dd5d1f671b37139075fa1f92",
+    "F:\\minecraft project\\art\\assets\\cake_batter\\export.py": "df786e747a63d32017cb91894595d20eb91837d4be96de3fd51731c50e478719",
+    "F:\\minecraft project\\art\\assets\\cake_batter\\cake_batter.png": "4c5ec91dec2e1f3663785c3883b2e30d0c58667508870ebc8eb42b737ba0cd2b",
+    "F:\\minecraft project\\art\\assets\\cake_batter\\cake_batter.json": "55e6f392ac275c82c382695e19d03be513fd980dc4c89dc3549052809a447cbf"
+  },
+  "outputs": {
+    "textures/item/cake_batter.png": "4c5ec91dec2e1f3663785c3883b2e30d0c58667508870ebc8eb42b737ba0cd2b",
+    "models/item/cake_batter.json": "55e6f392ac275c82c382695e19d03be513fd980dc4c89dc3549052809a447cbf"
+  }
+}

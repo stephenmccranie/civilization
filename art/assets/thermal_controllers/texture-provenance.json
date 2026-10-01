@@ -1,0 +1,53 @@
+[
+  {
+    "tool": "built-in image_gen",
+    "file": "plates-master.png",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-ab86a2b7-d504-42b9-b14c-0a6dbd9ef106.png",
+    "sha256": "b3408b66f84e8ed98616a7429ff27d151b51f2085318938e33c0f5e2ddd2b30f",
+    "prompt": "plates-prompt.txt",
+    "references": {
+      "concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    }
+  },
+  {
+    "tool": "built-in image_gen",
+    "file": "plates-hot-master.png",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-e0191750-6748-4c0a-8a47-27efb839792f.png",
+    "sha256": "6a4624aa94b1af31a7b1c58779698ac26217bdfc958c589e909e3afeda62a78a",
+    "prompt": "plates-hot-prompt.txt",
+    "references": {
+      "plates-master.png": "b3408b66f84e8ed98616a7429ff27d151b51f2085318938e33c0f5e2ddd2b30f"
+    }
+  },
+  {
+    "tool": "built-in image_gen",
+    "file": "surfaces-master.png",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-046050fd-04ab-4b5b-ac96-86a85286a8a1.png",
+    "sha256": "8ccf3aaf8069f5da732dff7a39571869e89f3c4861a4345f05fed0d077ac0e2e",
+    "prompt": "surfaces-prompt.txt",
+    "references": {
+      "plates-master.png": "b3408b66f84e8ed98616a7429ff27d151b51f2085318938e33c0f5e2ddd2b30f",
+      "concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    }
+  },
+  {
+    "tool": "built-in image_gen",
+    "file": "surfaces-hot-master.png",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-57e3fc04-e968-4b5a-a029-7de7c54bddca.png",
+    "sha256": "80f29f4ea619998e4b091e545a2fea7fb2a1a25eb807de08f10d8562b8940397",
+    "prompt": "surfaces-hot-prompt.txt",
+    "references": {
+      "surfaces-master.png": "8ccf3aaf8069f5da732dff7a39571869e89f3c4861a4345f05fed0d077ac0e2e"
+    }
+  },
+  {
+    "tool": "built-in image_gen",
+    "file": "stove-top-fixed-master.png",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-d9d496e8-dd9b-4dc2-8a99-8aea40ff4ead.png",
+    "sha256": "95b048df325ef0883d132345b2adfdf542e6d51f65c7e5656bbf221684fab634",
+    "prompt": "stove-top-fix-prompt.txt",
+    "references": {
+      "surfaces-master.png": "8ccf3aaf8069f5da732dff7a39571869e89f3c4861a4345f05fed0d077ac0e2e"
+    }
+  }
+]

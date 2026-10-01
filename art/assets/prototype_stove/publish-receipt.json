@@ -1,0 +1,39 @@
+{
+  "brief_hash": "de9aba02d4a96404e5bdca68b587a781f478951f86a63bcf40cdea923753013e",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-ingame-cooking.png": "cb7c478f090e9fca1691f9975287c5835ee4ada3420478cefc2b2f40893cc015",
+    "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\prepare.py": "b12b2c7800e8cc1e93afc6556caab17b7717b93f72e88ea1a92fe8bec9f0799c",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\build.py": "686fe9468c3d50fd9dff2f51cc171d262a279c22c4bf6c5fd14145fb4c08abfa",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\textures.py": "7755daa10556a1bfed8e0af94ad40fb6979a2f815b2e09673051a0b8c8af4210",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\surfaces.py": "c1c7a3cf8a3482e58e6444d662d70e0f6f43f41f52e3c53c6985c906904d8bfd",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-spec.json": "2ba3d4ef522c1be74574eeadf1a6e34fe5d95244238c42f4ec3a68ca7918bfed",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-map.json": "3eb83849053ff8376c4fe1ce18fecbc0318f25c6dbfd2f55c6c96f8b5009cb79",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\texture-spec.json": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\material-master-03.png": "c773eb4eeff650bc986079bf45fa998d65aaf6e396f5d79849d61336d0283ade",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\material-generations.json": "7e0977a014d4708f5a16ad0c1b51cacf87eb63398f513f5049f82255b87c3b01",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\material-prompt.txt": "9222ef848d86e0f362f6e093b95589a5e18d5e70a075fe301a610b1c154716aa",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\material-detail-prompt.txt": "5ee1ec2c40cb87c03ece01a5ee5152f63477b593950c30ade26ab900d1193ecd",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\material-quiet-prompt.txt": "7d9c0f045ad80a1041f6c345f9a4972962e4ca854519018c31355fecc61d633f",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\surface-prompt.txt": "b0c0f80982cfbe713b15f05df9235f8683e5fe92bfd89e621a3ef64eb8f59d18",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\model\\prototype_stove.bbmodel": "958142d13140659059607d8c96631bad2361fb836a629c0548b24be7568163a6",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_wet.wav": "113e6d5aa8b80bb884d3c50c2c18f70ad6969a1fd8c781bb16331aa37c766e87",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_sizzle.wav": "5b5391524105f70e78bae9b8df18779533a3b262ec702f1f3b0fcfc76562ad8f",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\stove_char.wav": "96b329b83acc759439d20714fdafc69a5a343befabbd1f2d319b77e7cccfc82d",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove.json": "acc99ffbefee6d4ed3ac6aca61285f27c3db017e62f71ef67a213d7eae47b68f",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\blockstates.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\item.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+    "F:\\minecraft project\\art\\assets\\prototype_stove\\prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+  },
+  "outputs": {
+    "models/block/prototype_stove.json": "acc99ffbefee6d4ed3ac6aca61285f27c3db017e62f71ef67a213d7eae47b68f",
+    "blockstates/prototype_stove.json": "ea876d919811d3d9817991830096890309c172c357307e04eee31478c6f1c381",
+    "models/item/prototype_stove.json": "6c00870a144edb83ce8d65e6cfae396b8e55de5bff0c69744c058af7b290a58e",
+    "textures/block/prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+    "textures/block/prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+    "textures/block/prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+  }
+}

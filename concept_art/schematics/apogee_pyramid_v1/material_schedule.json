@@ -1,0 +1,28 @@
+{
+  "dimensions": {
+    "width": 37,
+    "height": 23,
+    "depth": 37
+  },
+  "orientation": "entrance and stair face south (+Z)",
+  "total_blocks": 4423,
+  "materials": {
+    "minecraft:copper_grate": 24,
+    "minecraft:cut_copper": 117,
+    "minecraft:cut_copper_stairs": 17,
+    "minecraft:deepslate_tiles": 240,
+    "minecraft:oxidized_cut_copper": 40,
+    "minecraft:polished_deepslate": 1364,
+    "minecraft:quartz_pillar": 16,
+    "minecraft:sea_lantern": 1,
+    "minecraft:smooth_stone": 1792,
+    "minecraft:stone_brick_stairs": 68,
+    "minecraft:stone_bricks": 744
+  },
+  "design_notes": [
+    "Exactly three main masonry levels; summit machinery is not a fourth architectural level.",
+    "All three level interiors are hollow and intentionally unresolved for later functional rooms.",
+    "The crown is an open 7x7 dais with four ceramic supports and one compact octagonal ring.",
+    "Palette and exact multiblock validation are candidates for review, not approved gameplay rules."
+  ]
+}

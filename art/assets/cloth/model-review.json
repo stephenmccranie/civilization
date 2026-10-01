@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Referenced weave edit preserves prior silhouette, blue band and fold shadows with visible center variation.",
+    "geometry_uvs": "Native item/generated extrusion with transparent 32x32 RGBA sprite, extent28 and binary alpha; no custom mesh UV seams.",
+    "material_consistency": "Sixteen-color export keeps oatmeal and cream woven clusters; no procedural noise or copied pack pixels.",
+    "assembly_interfaces": "Existing cloth item model reference only; no multiblock interfaces.",
+    "animation_states": "Static item; no moving parts.",
+    "native_size_readability": "Compared old/new at 12/16/24 colors and via64; direct16 retains restrained surface variation without hiding folds."
+  },
+  "remaining_issues": []
+}

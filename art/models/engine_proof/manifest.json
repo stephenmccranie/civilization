@@ -1,0 +1,12 @@
+{
+  "id": "engine_proof",
+  "project": "engine_proof.bbmodel",
+  "geometry": "engine_proof.geo.json",
+  "animation": "engine_proof.animation.json",
+  "texture": "engine_proof.png",
+  "required_animations": [
+    "animation.engine_proof.cycle"
+  ],
+  "purpose": "Diagnostic toolchain fixture; not approved engine art",
+  "texels_per_block": 32
+}

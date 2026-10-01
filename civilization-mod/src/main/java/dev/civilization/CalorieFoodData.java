@@ -1,5 +1,6 @@
 package dev.civilization;
 
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -7,7 +8,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /** Replaces FoodData itself: vanilla has no second food, saturation, or exhaustion store. */
@@ -17,8 +20,15 @@ public final class CalorieFoodData extends FoodData {
     private double lastSent = -1, lastCapacity = -1, lastSprintMinimum = -1;
     private boolean depleted, lastDepleted;
     private double lastRecovery = -1;
+    private UUID lastRowBoat;
+    private Vec3 lastRowPosition;
+    private int mealTicks;
+    private double mealQuality;
+    public void workMeal(double quality){mealQuality=Double.isFinite(quality)?Math.clamp(quality,0,1):0;mealTicks=36000;}
+    public int mealTicks(){return mealTicks;}
+    public double workFactor(){return mealTicks>0?1-StoveCooking.discount(mealQuality):1;}
     public long broken, placed;
-    public double walkDistance, sprintDistance, laborSpent, travelSpent, otherSpent, eaten;
+    public double walkDistance, sprintDistance, rowDistance, laborSpent, travelSpent, otherSpent, eaten;
 
     public CalorieFoodData() {
         double capacity = CalorieConfig.SPEC.isLoaded() ? CalorieConfig.CAPACITY.get() : 2400;
@@ -44,6 +54,7 @@ public final class CalorieFoodData extends FoodData {
     }
 
     public void spendLabor(Player player, double kcal, boolean mining, String block) {
+        kcal *= ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
         double before = reserve.calories();
         laborSpent += reserve.spend(kcal);
         if (mining) broken++; else placed++;
@@ -56,21 +67,59 @@ public final class CalorieFoodData extends FoodData {
         if (!active(player) || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying) return;
         double distance = MovementCost.distance(dx, dy, dz, player.isInWater(), player.onClimbable());
         boolean sprint = player.isSprinting();
-        if (distance <= 0) return;
+        double ascent = MovementCost.ascent(dx, dy, dz);
+        if (distance <= 0 && ascent <= 0) return;
         if (sprint) sprintDistance += distance; else walkDistance += distance;
-        double cost = MovementCost.calories(distance, sprint, CalorieConfig.WALK.get(), CalorieConfig.SPRINT_MULTIPLIER.get());
+        double cost = MovementCost.calories(distance, sprint, CalorieConfig.WALK.get(), CalorieConfig.SPRINT_MULTIPLIER.get()) * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
         double before = reserve.calories();
         travelSpent += reserve.spend(cost);
         EnergyLog.record(player, sprint ? "sprint" : "walk", player.isInWater() ? "swimming" : player.onClimbable() ? "climbing" : "ground_or_air",
                 -cost, before, reserve.calories(), distance, true);
+        if (ascent > 0) {
+            double ascentCost = ascent * CalorieConfig.ASCENT.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
+            before = reserve.calories();
+            travelSpent += reserve.spend(ascentCost);
+            EnergyLog.record(player, "ascent", "upward_distance", -ascentCost,
+                    before, reserve.calories(), ascent, true);
+        }
         updateRecovery(player);
     }
 
+    /** Sample the vehicle, not the rider: passenger position updates can lag the actual boat. */
+    public void row(Player player) {
+        if (!(player.getVehicle() instanceof Boat boat) || boat.getControllingPassenger() != player || !active(player)) {
+            lastRowBoat = null;
+            lastRowPosition = null;
+            return;
+        }
+        Vec3 position = boat.position();
+        UUID id = boat.getUUID();
+        if (id.equals(lastRowBoat) && lastRowPosition != null
+                && (boat.getPaddleState(Boat.PADDLE_LEFT) || boat.getPaddleState(Boat.PADDLE_RIGHT))) {
+            double distance = MovementCost.distance(position.x - lastRowPosition.x, 0, position.z - lastRowPosition.z, false, false);
+            if (distance > 0) {
+                double cost = distance * CalorieConfig.ROW.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
+                double before = reserve.calories();
+                rowDistance += distance;
+                travelSpent += reserve.spend(cost);
+                EnergyLog.record(player, "row", "boat", -cost, before, reserve.calories(), distance, true);
+                updateRecovery(player);
+            }
+        }
+        lastRowBoat = id;
+        lastRowPosition = position;
+    }
+
     public void spendOther(Player player, double kcal, String action) {
+        spendOther(player,kcal,action,"");
+    }
+    public void spendOther(Player player, double kcal, String action, String detail) {
         if (active(player) && kcal > 0) {
+            if (action.equals("jump") || action.equals("melee_hit") || action.equals("swim") || action.equals("machine_ignite")) kcal *= ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
+            if(action.equals("fertilizer_labor"))kcal*=workFactor();
             double before = reserve.calories();
             otherSpent += reserve.spend(kcal);
-            EnergyLog.record(player, action, "", -kcal, before, reserve.calories(), 1, action.equals("hunger_effect"));
+            EnergyLog.record(player, action, detail, -kcal, before, reserve.calories(), 1, action.equals("hunger_effect")||action.equals("cold_exposure"));
             updateRecovery(player);
         }
     }
@@ -86,7 +135,7 @@ public final class CalorieFoodData extends FoodData {
 
     public void resetCounters() {
         broken = placed = 0;
-        walkDistance = sprintDistance = laborSpent = travelSpent = otherSpent = eaten = 0;
+        walkDistance = sprintDistance = rowDistance = laborSpent = travelSpent = otherSpent = eaten = 0;
     }
 
     public void resizeForConfig(Player player) {
@@ -98,7 +147,9 @@ public final class CalorieFoodData extends FoodData {
     }
 
     @Override public void tick(Player player) {
+        if(!player.level().isClientSide&&mealTicks>0)mealTicks--;
         resizeForConfig(player);
+        if (!player.level().isClientSide) row(player);
         if (active(player)) {
             if (isDepleted() || reserve.calories() < CalorieConfig.SPRINT_MINIMUM.get()) player.setSprinting(false);
             var hunger = player.getEffect(MobEffects.HUNGER);
@@ -161,8 +212,10 @@ public final class CalorieFoodData extends FoodData {
         reserve.set(tag.contains("civilizationKcal", 99) ? tag.getDouble("civilizationKcal") : reserve.capacity());
         depleted = RecoveryRules.depleted(tag.getBoolean("civilizationDepleted"), reserve.calories(), recoveryThreshold());
         var stats = tag.getCompound("civilizationCalorieStats");
+        mealTicks=Math.clamp(tag.getInt("civilizationMealTicks"),0,36000);
+        double q=tag.getDouble("civilizationMealQuality");mealQuality=Double.isFinite(q)?Math.clamp(q,0,1):0;
         broken = stats.getLong("broken"); placed = stats.getLong("placed");
-        walkDistance = stats.getDouble("walk"); sprintDistance = stats.getDouble("sprint");
+        walkDistance = stats.getDouble("walk"); sprintDistance = stats.getDouble("sprint"); rowDistance = stats.getDouble("row");
         laborSpent = stats.getDouble("labor"); travelSpent = stats.getDouble("travel");
         otherSpent = stats.getDouble("other"); eaten = stats.getDouble("eaten");
         lastSent = -1;
@@ -170,10 +223,11 @@ public final class CalorieFoodData extends FoodData {
 
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         tag.putDouble("civilizationKcal", reserve.calories());
+        tag.putInt("civilizationMealTicks",mealTicks);tag.putDouble("civilizationMealQuality",mealQuality);
         tag.putBoolean("civilizationDepleted", isDepleted());
         var stats = new CompoundTag();
         stats.putLong("broken", broken); stats.putLong("placed", placed);
-        stats.putDouble("walk", walkDistance); stats.putDouble("sprint", sprintDistance);
+        stats.putDouble("walk", walkDistance); stats.putDouble("sprint", sprintDistance); stats.putDouble("row", rowDistance);
         stats.putDouble("labor", laborSpent); stats.putDouble("travel", travelSpent);
         stats.putDouble("other", otherSpent); stats.putDouble("eaten", eaten);
         tag.put("civilizationCalorieStats", stats);

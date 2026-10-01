@@ -9,21 +9,8 @@
           "functions": [
             {
               "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
-              },
+              "count": 1,
               "function": "minecraft:set_count"
-            },
-            {
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 1.0,
-                "min": 0.0
-              },
-              "enchantment": "minecraft:looting",
-              "function": "minecraft:enchanted_count_increase"
             }
           ],
           "name": "minecraft:porkchop"

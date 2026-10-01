@@ -1,0 +1,24 @@
+{
+  "tool": "built-in image_gen",
+  "concept": {
+    "file": "../../../concept_art/16_oil_engine.png",
+    "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-d10f4a8d-7473-447a-a02a-9650e7443efb.png",
+    "prompt": "Minecraft mod multiblock engine concept design sheet. A handsome compact HOT BULB OIL ENGINE circa 1890-1910, heavy dark iron castings on low riveted steel bed, one large horizontal cylinder, copper pipes and brass lubricator. Overall engine fits 3 blocks wide by 3 blocks long by 3 high; all geometry explicitly voxel full/half blocks, simplified feasible shapes, NOT photoreal complex machinery. Large exposed vertical eight-sided flywheel on LEFT SIDE with open center and four thick spokes, axle horizontal side-to-side; right side cylinder and protected bulb head with small warm orange startup burner. Front bottom accessible controller small brass plate, distinct fuel and oil ports. No boiler, no steam fittings, no scaffolding, no screen electronics. Large three-quarter hero, smaller opposite-side view and front view. Show STOPPED vs STARTING vs RUNNING in three little state views: burner glow only startup, wheel movement and restrained exhaust running; nothing glows across casing. Good clear moderately bright iron textures, warm gray aged steel and copper consistent across every view. Neutral background with one Minecraft player for scale. This is a buildable compact standalone land engine later suitable on a small freight boat. No cabin. Title OIL ENGINE. Emphasize visual clarity and same machine in all views.",
+    "sha256": "a5e6d59ca43afc14555c210aa876ee458c6521a91025369cb8cc9cd24f877971"
+  },
+  "material": {
+    "file": "iron-master-dark.png",
+    "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-67fbbbcc-fd06-41c9-b2e8-3aedd3e30e83.png",
+    "prompt": "Using the attached Oil Engine concept ONLY as material/style reference, create a square orthographic seamless material texture for its dark warm-gray CAST IRON engine cylinder and flywheel. Detailed high resolution pixel art, rich crisp pixel clusters, subtle forged/cast grain, softly worn medium-gray metal, legible rather than nearly black. Completely flat evenly lit edge-to-edge opaque surface. No engine depiction, no perspective, no lighting gradient, no shadow, no borders, no rivets, no labels, no copper, no panels. One reusable cast iron material; mechanical form will come from actual model geometry. This is a texture master for a Minecraft mod, not a concept sheet.",
+    "reference": "concept",
+    "sha256": "eebd3d06cfe045ed352998340ffcf9fd2839ebd2d18e5fa11796f8596adc09c4"
+  },
+  "revision": {
+    "file": "iron-master.png",
+    "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-2a0ce4c6-78e9-4fe1-9e73-6c1b2d9c0a65.png",
+    "prompt": "Edit this exact square cast iron texture master. Preserve its seamless uniform grain and high resolution pixel-art clusters, but make the iron significantly lighter: medium warm silver-gray cast iron, average brightness around 130 rather than dark charcoal. Reduce mottling contrast slightly for a cohesive industrial surface. No highlights or directional lighting, no borders, no panels, no text, no perspective, fully opaque. This will be darkened naturally by Minecraft ambient lighting; must remain clearly visible under shaders.",
+    "reference": "iron-master-dark.png",
+    "sha256": "9c1097064ce01387703015955585e0e114841ad2117ff69630eae7ee21c9189c"
+  },
+  "review": "Mockup retained; startup flame extinguishes after warmup, separate side ports. First runtime review required supports down to slab base and brighter iron. Same generated material reused on all cast-iron faces; no independent face styles."
+}

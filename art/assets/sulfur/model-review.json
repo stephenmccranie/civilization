@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Native sprite retains three yellow lobes, shadow creases and broad mineral texture.",
+    "geometry_uvs": "32x32 RGBA,28px extent,binary alpha,16 colors; standard item/generated model.",
+    "material_consistency": "Lemon/cream highlights and ochre fractures; no unrelated material sampling.",
+    "assembly_interfaces": "Existing sulfur item model target only; no assembly or ports.",
+    "animation_states": "Static mineral item, no animation.",
+    "native_size_readability": "Reviewed native light/dark and enlarged grid; fractures visible without random grain or blank planes."
+  },
+  "remaining_issues": []
+}

@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "One cast STEEL INGOT: a stout elongated trapezoidal bar with gently sloping sides, chamfered corners, broad flat upper face and a subtle shallow casting depression. Cool medium blue-gray steel with dark graphite side plane and a narrow silver machined edge. Two or three broad restrained scuff clusters on the top, no letters, symbol, rivets, gold, copper or rust. Three-quarter view, long axis diagonal lower-left to upper-right. Clearly heavier and darker than bright silver iron ingots, but not black.",
+    "purpose": "Clear manufactured material/tool identity in town industry.",
+    "silhouette": "One cast STEEL INGOT: a stout elongated trapezoidal bar with gently sloping sides, chamfered corners, broad flat upper face and a subtle shallow casting depression. Cool medium blue-gray steel with dark graphite side plane and a narrow silver machined edge. Two or three broad restrained scuff clusters on the top, no letters, symbol, rivets, gold, copper or rust. Three-quarter view, long axis diagonal lower-left to upper-right. Clearly heavier and darker than bright silver iron ingots, but not black.",
+    "bounds": "32x32 transparent inventory icon, 28px maximum extent.",
+    "materials": "One cast STEEL INGOT: a stout elongated trapezoidal bar with gently sloping sides, chamfered corners, broad flat upper face and a subtle shallow casting depression. Cool medium blue-gray steel with dark graphite side plane and a narrow silver machined edge. Two or three broad restrained scuff clusters on the top, no letters, symbol, rivets, gold, copper or rust. Three-quarter view, long axis diagonal lower-left to upper-right. Clearly heavier and darker than bright silver iron ingots, but not black.",
+    "interfaces": "Existing item IDs and interactions.",
+    "states": "Static item.",
+    "construction": "Generated master through shared alpha-safe sprite export.",
+    "invariants": "No recipe, prospecting, mass, durability or stack changes.",
+    "technological_stage": "Practical late nineteenth-century manufacture.",
+    "material_behavior": "Cool cast steel, restrained scuffs; rod wooden grain and iron socket.",
+    "signature_feature": "Cast bar profile",
+    "neighboring_assets": "Machine Parts, Oil Engine, steel, prospecting rod and vanilla iron/copper.",
+    "fidelity_targets": [
+      "Strong silhouette",
+      "Medium steel readable on dark backgrounds",
+      "No decorative mechanisms"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/texture-master.png",
+      "role": "Material palette only."
+    },
+    {
+      "path": "art/assets/machine_parts/mockup-01.png",
+      "role": "Sprite style only; broad clusters and material separation."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "steel_ingot.png",
+      "target": "textures/item/steel_ingot.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "steel_ingot.json",
+      "target": "models/item/steel_ingot.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-4bbe203e-78b3-422e-8822-a59947fc06af.png",
+      "sha256": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+      "prompt": "Create one Minecraft item: One cast STEEL INGOT: a stout elongated trapezoidal bar with gently sloping sides, chamfered corners, broad flat upper face and a subtle shallow casting depression. Cool medium blue-gray steel with dark graphite side plane and a narrow silver machined edge. Two or three broad restrained scuff clusters on the top, no letters, symbol, rivets, gold, copper or rust. Three-quarter view, long axis diagonal lower-left to upper-right. Clearly heavier and darker than bright silver iron ingots, but not black. High-resolution pixel-art master designed to survive tiny Minecraft inventory use, not a tiny generated file. Reference 1 is MATERIAL PALETTE ONLY (cool steel and practical construction), reference 2 is SPRITE STYLE ONLY (broad readable clusters), not a shape to copy. About sixteen deliberate colors, two or three main tones per material, restrained upper-left lighting, crisp stepped edges. Features and sparse scuffs/grain should survive as 1-3 final pixels; no microtexture, gradients, blurry highlights or random noise. Strong silhouette centered with generous margins on a true transparent background, no shadow, floor, border or text.",
+      "brief_hash": "88f595362b9366a3e2b25c639365f16725b85b84b793f22709b4d83e36ba9734",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Stout trapezoidal ingot, lighter top, graphite side and narrow silver edges survive export; broad scuffs retain steel character.",
+        "implementable_geometry": "Single static generated-item sprite, transparent padded silhouette.",
+        "mechanics_clearance": "Ingot is solid cast metal; rod shaft and center socket visibly meet its wooden crossbar. No moving mechanism.",
+        "period_materials": "Cool steel and plain wood/iron suit practical period manufacture without decorative brass.",
+        "family_consistency": "References inspected: engine metal palette and Machine Parts pixel clusters; functional material treatment retained.",
+        "controls_readability": "No UI; cast bar and probing tool have distinct silhouettes.",
+        "gameplay_scope": "Appearance only, preserving recipes and all prospecting behavior."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "88f595362b9366a3e2b25c639365f16725b85b84b793f22709b4d83e36ba9734",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+      },
+      "evidence": {
+        "mockup-01.png": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+        "sprite-review.png": "516337b3ae2ed244bcc0471305f7635e67b0469dd6bde1075e48f10c4906057e"
+      },
+      "generation": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Stout trapezoidal ingot, lighter top, graphite side and narrow silver edges survive export; broad scuffs retain steel character.",
+        "geometry_uvs": "32x32 native sprite, binary alpha, at most 16 opaque colors and transparent padding; native generated-item JSON.",
+        "material_consistency": "Blue-gray steel planes have restrained wear; rod wood remains warm and distinct from cool metal.",
+        "assembly_interfaces": "Existing item IDs retained; no block interface or placement change.",
+        "animation_states": "Static item with native transforms.",
+        "native_size_readability": "Inspected dark/light native views and grid: ingot edges clear; slender rod shaft remains connected and T-grip recognizable."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "88f595362b9366a3e2b25c639365f16725b85b84b793f22709b4d83e36ba9734",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\mockup-01.png": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\export.py": "ff57ce29d1e973fda595e9a4423d6e152e5a7161bcb47720d2c25e4cd83c7d9f",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.png": "c617eb16e367bf528c578f23a9c68a115d1e41fa3393931b83f7a58b9c36ca1f",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.json": "f292a6c023074c0a22de527a5b7aeabf70cd03c2e121af3531bb620da57149d9"
+      },
+      "evidence": {
+        "mockup-01.png": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+        "sprite-review.png": "516337b3ae2ed244bcc0471305f7635e67b0469dd6bde1075e48f10c4906057e"
+      },
+      "generation": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon world lighting darkens steel naturally; inventory highlights remain clear without alpha artifacts.",
+        "scale_readability": "Steel has comparable ingot footprint to vanilla iron/copper with a distinct cooler darker hue. Rod shaft remains visible in slots and frames.",
+        "states_motion": "Static sprites; held rod inspected with the native transform, grip and shaft remain coherent.",
+        "interaction_guides": "Existing prospecting interaction unchanged; no placement guide.",
+        "inventory_appearance": "Compared beside Machine Parts, iron and copper: cool metal family consistent, warm wooden grip distinct, similar edge contrast and restrained wear. Rod intentionally has less filled area than solid ingots.",
+        "integration_limits": "Build/unit and focused manufactured Photon scene passed. Inventory, frames visible in held view and held rod reviewed. No recipe or prospecting behavior changes."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "88f595362b9366a3e2b25c639365f16725b85b84b793f22709b4d83e36ba9734",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\mockup-01.png": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\export.py": "ff57ce29d1e973fda595e9a4423d6e152e5a7161bcb47720d2c25e4cd83c7d9f",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.png": "c617eb16e367bf528c578f23a9c68a115d1e41fa3393931b83f7a58b9c36ca1f",
+        "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.json": "f292a6c023074c0a22de527a5b7aeabf70cd03c2e121af3531bb620da57149d9"
+      },
+      "evidence": {
+        "evidence/manufactured-inventory.png": "d9554f87dac677de356250912c3410e6e7ea2664bd15733ce27e9287ea5ee146",
+        "evidence/manufactured-held.png": "51bdb8aa386a7142d2dd2a183643d78cb9cc18f17f5d16d8a9c606994985663d"
+      },
+      "generation": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0"
+    }
+  ]
+}

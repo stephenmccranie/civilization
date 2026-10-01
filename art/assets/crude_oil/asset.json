@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "kind": "block",
+  "brief": {
+    "description": "Thick crude petroleum surface for natural oil seeps and finite underground reservoirs",
+    "purpose": "Make the natural oil seep and underground crude reservoir read as thick liquid from above and beside the pool.",
+    "silhouette": "A flat Minecraft fluid face with no container or separate geometry.",
+    "bounds": "One 64x64-pixel face, exported as eight stacked animation frames.",
+    "materials": "Near-black charcoal and black-brown petroleum with subtle umber depth and sparse broken cool gray-blue glints; no steel or ornamental detail.",
+    "interfaces": "Shared by surface flowing oil and finite reservoir oil; no buckets or canister acquisition from world fluid.",
+    "states": "A slow looping eddy animation, with fluid height and directional flow determined by Minecraft.",
+    "construction": "Generated high-resolution master, periodic edge blending, 64x64 downsample and eight looping warped frames.",
+    "invariants": "The surface clue must not replenish or count toward the finite reservoir; underground oil remains stationary and physically drained.",
+    "technological_stage": "Natural frontier crude before refinery processing.",
+    "material_behavior": "Viscous, dark, slow to traverse and slower to spread than water.",
+    "signature_feature": "A quiet near-black liquid body with subtle heavy movement and scattered small cool reflections.",
+    "neighboring_assets": "Oil Derrick timber frame, deepslate reservoir cavity, bare stone and dirt terrain."
+  },
+  "references": [
+    {
+      "path": "art/construction/compact-campus-refinery.png",
+      "role": "Existing Photon industrial-scene scale and contrast only; not a model for oil shape."
+    },
+    {
+      "path": "art/assets/crude_oil/material-reference.png",
+      "role": "User-supplied oil photograph for darkness, viscous material and sparse cool specular highlights only; do not copy composition or watermark."
+    }
+  ],
+  "sources": [
+    "master.png",
+    "export.py",
+    "prompt.md",
+    "material-reference.png"
+  ],
+  "outputs": [
+    {
+      "source": "atlas.png",
+      "target": "textures/block/crude_oil.png",
+      "format": "png",
+      "size": [
+        64,
+        512
+      ]
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "F:\\minecraft project\\art\\assets\\crude_oil\\master.png",
+      "sha256": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632",
+      "prompt": "Create a single square, seamless tileable material texture master for the surface of crude petroleum in a Minecraft-like 64-pixel texture pack. Image fills the entire square edge-to-edge, viewed straight down, with no border, no container, no objects, no text. High-resolution deliberate pixel art with broad coherent clusters designed to survive reducing to 64×64: near-black umber base, dark warm brown transparent-looking eddies, a few restrained amber-copper reflective ribbons and broken tiny highlights. Oil should read as a thick viscous liquid, not solid stone, asphalt, dirt, water, lava, or a glossy mirror. Use organically flowing, slow-moving swirl forms; there must be a recognizable repeated flow direction that can plausibly animate by scrolling/cycling frames. Keep no single highlight larger than about one eighth of the tile, avoid high-frequency pixel noise and stark white streaks. Restrained late-19th-century industrial visual family, readable under Photon shaders and against deepslate/soil. Exact seamless edges so the texture tiles without a grid. Output one texture only.",
+      "brief_hash": "7891687f7e79bc89ad408e9b7d4e385f7c0fcc5a1ccd1852100bb52aded744ad",
+      "references": {}
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "F:\\minecraft project\\art\\assets\\crude_oil\\master.png",
+      "sha256": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1",
+      "prompt": "Edit the first supplied image, a square high-resolution pixel-art texture master for crude oil. Use the second supplied oil photograph ONLY as a material/color reference, not as a composition: do not copy its watermark, bubble placement, photographic lighting, or text. The current first image has conspicuous broad luminous orange/amber swirling ribbons; remove those. Create a continuous nearly black, heavy petroleum liquid surface viewed directly from above. About 85-90% of the surface should be dark charcoal and black-brown, with very subtle muted umber movement and low contrast soft folds. Add a few sparse, small, broken cool slate-blue/gray-silver specular glints across the surface, perhaps a few tiny warm-brown hints beneath, but NO broad copper/orange ribbons, NO bright white patches, NO large bubbles, NO yellow glow, NO terrain, NO border, NO objects, NO text. Should feel deep, viscous, reflective only in a few places, quiet and menacing. Purposeful high-resolution pixel art clusters and crisp shapes designed to remain legible when later reduced to a 64-pixel Minecraft fluid tile, but do not render this master at 64 pixels. Keep the entire square filled edge-to-edge with broadly seamless periodic visual character; no obvious central focal point. Maintain one coherent material across the tile.\n",
+      "brief_hash": "3f6a5f81dd2e74797afff9a3fb08fe80a8e7a9395e549d193e56b59539d0bb45",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master-v1.png": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\material-reference.png": "7c0976a51807e3ae3b469107f8e969c8ad20798dc1fe2a6acae3b446d3fefe2f"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "A full face of broad, winding liquid eddies; enough structure remains after reduction to 64 pixels.",
+        "implementable_geometry": "Uses the existing Minecraft fluid surface and side geometry, so no custom mesh is required.",
+        "mechanics_clearance": "No mesh or mechanical parts; fluid heights remain controlled by block states.",
+        "period_materials": "Natural dark crude has restrained warm reflections and no decorative metal or magical glow.",
+        "family_consistency": "The near-black oil contrasts with the existing iron refinery and timber derrick without borrowing their ornamental marks.",
+        "controls_readability": "There are no controls on this material texture.",
+        "gameplay_scope": "The graphic adds no acquisition or resource simulation rules."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "7891687f7e79bc89ad408e9b7d4e385f7c0fcc5a1ccd1852100bb52aded744ad",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9"
+      },
+      "evidence": {
+        "mockup-01.png": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632"
+      },
+      "generation": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The native reduction retains broad amber eddies on a dark oil body from the selected generated master.",
+        "geometry_uvs": "One periodic 64-pixel fluid face with eight 64-pixel animation frames; built-in fluid geometry supplies levels and edges.",
+        "material_consistency": "The same atlas is used by surface and reservoir crude fluid states.",
+        "assembly_interfaces": "Liquid renderer uses the registered still and flowing atlas; no separate model interfaces.",
+        "animation_states": "A looping eight-frame subpixel warp changes the eddies slowly without a hard cycle reset.",
+        "native_size_readability": "Large continuous dark areas and broad warm eddies remain legible at 64 pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "7891687f7e79bc89ad408e9b7d4e385f7c0fcc5a1ccd1852100bb52aded744ad",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "8a63def57e81881f9ff856f1f273a175ead7d5ebf448206a08219a52fa791b70",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "46517633f7ba969230226fed379287000cd812cf3daa7e10cf10dc0a30eefca6",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "d01843520b895db4ea4d6fd4ef85463b6ad13672d28d4a11b055547120c6320d"
+      },
+      "evidence": {
+        "native-review.png": "8568e34a661697eeda5241c2a2c64592808a9fdb167ece32171d5b4384b31dc8",
+        "atlas.png": "d01843520b895db4ea4d6fd4ef85463b6ad13672d28d4a11b055547120c6320d"
+      },
+      "generation": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The native reduction retains broad amber eddies on a dark oil body from the selected generated master.",
+        "geometry_uvs": "One periodic 64-pixel fluid face with eight 64-pixel animation frames; built-in fluid geometry supplies levels and edges.",
+        "material_consistency": "The same atlas is used by surface and reservoir crude fluid states.",
+        "assembly_interfaces": "Liquid renderer uses the registered still and flowing atlas; no separate model interfaces.",
+        "animation_states": "A looping eight-frame subpixel warp changes the eddies slowly without a hard cycle reset.",
+        "native_size_readability": "Large continuous dark areas and broad warm eddies remain legible at 64 pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "7891687f7e79bc89ad408e9b7d4e385f7c0fcc5a1ccd1852100bb52aded744ad",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "719c728546ff8667ae1685b923d14803b79ece479b1c949723511ba94fa530e2",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "46517633f7ba969230226fed379287000cd812cf3daa7e10cf10dc0a30eefca6",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "853ee1ce93a4c8c248449c245e5b7497991eeecd48b6568067fc87d18c32fdbe"
+      },
+      "evidence": {
+        "native-review.png": "8568e34a661697eeda5241c2a2c64592808a9fdb167ece32171d5b4384b31dc8",
+        "atlas.png": "853ee1ce93a4c8c248449c245e5b7497991eeecd48b6568067fc87d18c32fdbe",
+        "evidence/frame-contact.png": "c2ccf62f5d008cefc94eaccffb30edb430923c52118d4fd0d57832fc493eb813"
+      },
+      "generation": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "The surface seep and broad underground reservoir both render as near-black viscous oil with restrained warm swirls under Photon/Faithful.",
+        "scale_readability": "The 64-pixel marks remain visible on individual flowing blocks and across the large reservoir without becoming a bright tiled grid.",
+        "states_motion": "A natural generated source was asserted, a controlled surface source flowed, and reservoir oil stayed finite during extraction. The eight atlas poses form a smooth loop in the frame contact sheet; live animation cadence was not captured on video.",
+        "interaction_guides": "The visual fixture verified the natural center source and the derrick's physical depletion; no new interaction guide is attached to oil.",
+        "inventory_appearance": "Crude has no placeable inventory item, so there is no item icon to review.",
+        "integration_limits": "The controlled surface pool is a visual fixture; its small directional spill follows the nearby drop and does not predict every natural terrain shape."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "7891687f7e79bc89ad408e9b7d4e385f7c0fcc5a1ccd1852100bb52aded744ad",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "719c728546ff8667ae1685b923d14803b79ece479b1c949723511ba94fa530e2",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "46517633f7ba969230226fed379287000cd812cf3daa7e10cf10dc0a30eefca6",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "853ee1ce93a4c8c248449c245e5b7497991eeecd48b6568067fc87d18c32fdbe"
+      },
+      "evidence": {
+        "evidence/photon-surface.png": "eb7350711f68ecb03e1babe2e9906286adb3a1fb32f35815563f0a20bfd421ff",
+        "evidence/photon-reservoir.png": "807c3961b853c4f931b71970a617fb3bce283bf6466b0e69000cc53414a98c49",
+        "evidence/frame-contact.png": "c2ccf62f5d008cefc94eaccffb30edb430923c52118d4fd0d57832fc493eb813"
+      },
+      "generation": "869b11bb084453a4d0fc7a15cdf2ed5036a4d0468e3aaf3e75752d4282036632"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "A continuous liquid material with low-contrast folds and sparse glints that survive the 64-pixel reduction.",
+        "implementable_geometry": "Uses the existing Minecraft fluid surface and side geometry, so no custom mesh is required.",
+        "mechanics_clearance": "No mesh or mechanical parts; fluid heights remain controlled by block states.",
+        "period_materials": "Crude reads as near-black petroleum; the photographic material reference guides color and reflections only, with no copied watermark.",
+        "family_consistency": "The quiet dark oil contrasts with the timber Oil Derrick and iron refinery without amber glow or ornament.",
+        "controls_readability": "There are no controls on this material texture.",
+        "gameplay_scope": "The graphic adds no acquisition or resource simulation rules."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "3f6a5f81dd2e74797afff9a3fb08fe80a8e7a9395e549d193e56b59539d0bb45",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\material-reference.png": "7c0976a51807e3ae3b469107f8e969c8ad20798dc1fe2a6acae3b446d3fefe2f"
+      },
+      "evidence": {
+        "mockup-02.png": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1"
+      },
+      "generation": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The 64-pixel reduction preserves a near-black body, subtle umber depth and broken cool highlights without luminous ribbons.",
+        "geometry_uvs": "One periodic 64-pixel fluid face with eight 64-pixel animation frames; built-in fluid geometry supplies levels and edges.",
+        "material_consistency": "The same atlas is used by surface and reservoir crude fluid states.",
+        "assembly_interfaces": "Liquid renderer uses the registered still and flowing atlas; no separate model interfaces.",
+        "animation_states": "A looping eight-frame subpixel warp changes the eddies slowly without a hard cycle reset.",
+        "native_size_readability": "Quiet forms remain legible in the four-tile preview at native resolution, with much lower overall brightness than the prior atlas."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "3f6a5f81dd2e74797afff9a3fb08fe80a8e7a9395e549d193e56b59539d0bb45",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\material-reference.png": "7c0976a51807e3ae3b469107f8e969c8ad20798dc1fe2a6acae3b446d3fefe2f",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "719c728546ff8667ae1685b923d14803b79ece479b1c949723511ba94fa530e2",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "647bb5272f195399ad56f2b902e44b84b24d41dc1ae6d108fa0b5d3edf88a313",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "957a149305036ba5c2079d10e4ecbe8de0372cb1b43b30dfd2f15b9243b9cc36"
+      },
+      "evidence": {
+        "native-review.png": "4ec065d86ea602ac0224ebcc091387b11fa20f9f4c396134139999452bf96eb8",
+        "atlas.png": "957a149305036ba5c2079d10e4ecbe8de0372cb1b43b30dfd2f15b9243b9cc36",
+        "evidence/frame-contact.png": "0e6a4b8a5ac71223117fa5715c86d78f77b09ccd5c2123aaef5742fc6b8ccae2",
+        "evidence/tile-review.png": "3eb815f1267882f492e137d1f937c74b178f1c165115684e961d71e5e40a08b8"
+      },
+      "generation": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Daylit seep renders as near-black viscous oil with restrained brown depth; low-light reservoir appears almost black, consistent with the supplied material reference.",
+        "scale_readability": "At scene scale the surface has subtle movement but no luminous amber ribbons or bright tiled grid; underground pool edge remains distinct against stone.",
+        "states_motion": "A natural generated source was asserted, a controlled surface source flowed, and reservoir oil stayed finite during extraction. The eight atlas poses form a smooth loop in the frame contact sheet; live animation cadence was not captured on video.",
+        "interaction_guides": "The visual fixture verified the natural center source and the derrick's physical depletion; no new interaction guide is attached to oil.",
+        "inventory_appearance": "Crude has no placeable inventory item, so there is no item icon to review.",
+        "integration_limits": "The controlled surface pool and exposed reservoir are visual fixtures; this review does not cover every terrain slope or live motion cadence."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "3f6a5f81dd2e74797afff9a3fb08fe80a8e7a9395e549d193e56b59539d0bb45",
+      "inputs": {
+        "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\material-reference.png": "7c0976a51807e3ae3b469107f8e969c8ad20798dc1fe2a6acae3b446d3fefe2f",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "719c728546ff8667ae1685b923d14803b79ece479b1c949723511ba94fa530e2",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "647bb5272f195399ad56f2b902e44b84b24d41dc1ae6d108fa0b5d3edf88a313",
+        "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "957a149305036ba5c2079d10e4ecbe8de0372cb1b43b30dfd2f15b9243b9cc36"
+      },
+      "evidence": {
+        "evidence/photon-surface.png": "a8364e1d7373686f3e8875bacafd9ce9e81e70b60bc3ee7cb2cebbe6c98e63ac",
+        "evidence/photon-reservoir.png": "fb549fcc73271cb3f625712024adef3223a4229fc6705e197d726f9d36a3a669",
+        "evidence/frame-contact.png": "0e6a4b8a5ac71223117fa5715c86d78f77b09ccd5c2123aaef5742fc6b8ccae2"
+      },
+      "generation": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1"
+    }
+  ]
+}

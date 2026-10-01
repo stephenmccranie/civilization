@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "A practical open sack of finished mineral fertilizer",
+    "purpose": "Distinct readable frontier supply in the shared resource family.",
+    "silhouette": "One squat open coarse flax-brown burlap sack of finished fertilizer with a broad rolled mouth showing pale gray-beige granules in four or five chunky patches. On the sack front a large simple desaturated dark green sprout stencil with two broad leaves, no letters. One side fold and short coarse woven marks across the cloth; not tiny mesh. Broad open mouth and green plant mark must remain unmistakable at inventory scale. Three-quarter view. No brass, no metal fittings, no second bag.",
+    "bounds": "32x32 transparent item, 28px longest silhouette extent.",
+    "materials": "One squat open coarse flax-brown burlap sack of finished fertilizer with a broad rolled mouth showing pale gray-beige granules in four or five chunky patches. On the sack front a large simple desaturated dark green sprout stencil with two broad leaves, no letters. One side fold and short coarse woven marks across the cloth; not tiny mesh. Broad open mouth and green plant mark must remain unmistakable at inventory scale. Three-quarter view. No brass, no metal fittings, no second bag.",
+    "interfaces": "Existing item identity, recipe and stack behavior unchanged.",
+    "states": "Static inventory and held item.",
+    "construction": "Generated high-resolution master reduced by shared alpha-safe sprite pipeline.",
+    "invariants": "Art only; no container cost or new gameplay mechanics.",
+    "technological_stage": "Frontier supplies feeding town workshops.",
+    "material_behavior": "Broad material-specific clusters, subordinate marks, restrained saturation.",
+    "signature_feature": "A practical open sack of finished mineral fertilizer",
+    "neighboring_assets": "Cloth, sulfur, Machine Parts and the other frontier supplies.",
+    "fidelity_targets": [
+      "A practical open sack of finished mineral fertilizer",
+      "Distinct native-size silhouette",
+      "Readable material variation"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/cloth/mockup-04.png",
+      "role": "Style only; coarse readable project pixel clusters, not subject or material."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "fertilizer.png",
+      "target": "textures/item/fertilizer.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "fertilizer.json",
+      "target": "models/item/fertilizer.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-bef51bcb-70af-47ad-8d84-e176673b381e.png",
+      "sha256": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4",
+      "prompt": "Create one item: One squat open coarse flax-brown burlap sack of finished fertilizer with a broad rolled mouth showing pale gray-beige granules in four or five chunky patches. On the sack front a large simple desaturated dark green sprout stencil with two broad leaves, no letters. One side fold and short coarse woven marks across the cloth; not tiny mesh. Broad open mouth and green plant mark must remain unmistakable at inventory scale. Three-quarter view. No brass, no metal fittings, no second bag. High-resolution pixel-art master for a tiny Minecraft inventory icon, not a tiny output image. Clear broad silhouette, few major forms, crisp stepped edges and deliberately large color clusters. Material marks should occupy roughly 1-3 final pixels and stay lower contrast than structural edges. About sixteen purposeful colors, upper-left light, no gradients, microscopic detail, random noise, ground shadow, lettering, border or glow. Centered isolated item with generous margins on true transparent background. Reference image is STYLE ONLY: match the broad pixel clusters and readable material variation, not its subject, material or shape. Practical frontier craftsmanship in an alternate late nineteenth-century world; no ornamental brass or steampunk decoration.",
+      "brief_hash": "d6b84ab69e6d44027b476dc102337f3b54e46b0d818c9eacb6ee5a4d8e00c3e1",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Wide rolled mouth, pale contents and green two-leaf mark survive reduction.",
+        "implementable_geometry": "One static inventory sprite with no physical assembly required.",
+        "mechanics_clearance": "No moving or interacting components; depicted material rests as one coherent item.",
+        "period_materials": "Coarse brown sack and pale mineral contents fit practical frontier supplies; woven variation remains visible.",
+        "family_consistency": "Broad stepped edges and restrained upper-left lighting follow inspected Cloth/sulfur references. Material identity is retained.",
+        "controls_readability": "No controls; silhouette and characteristic material identify the resource.",
+        "gameplay_scope": "Only appearance changes; item IDs, recipes and inventories unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "d6b84ab69e6d44027b476dc102337f3b54e46b0d818c9eacb6ee5a4d8e00c3e1",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "sprite-review.png": "16c26b08fb096d1e9f63822f69c21116d84fcf062984619575fdef6eb168d067",
+        "mockup-01.png": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4"
+      },
+      "generation": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Wide rolled mouth, pale contents and green two-leaf mark survive reduction.",
+        "geometry_uvs": "Generated-item model, 32x32 texture, 16 opaque colors and binary alpha; padded silhouette.",
+        "material_consistency": "Coarse brown sack and pale mineral contents fit practical frontier supplies; woven variation remains visible.",
+        "assembly_interfaces": "Existing registered item model and texture path; no block interfaces.",
+        "animation_states": "Static material item, no animation needed.",
+        "native_size_readability": "Inspected native dark/light backgrounds and enlarged grid; characteristic forms remain legible without stray edge pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d6b84ab69e6d44027b476dc102337f3b54e46b0d818c9eacb6ee5a4d8e00c3e1",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\mockup-01.png": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\export.py": "b05620a56c825816fe149a9f93ca2da7e256968f9a131531dc8446835b872adb",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.png": "dd96643fd02b527e9bd40c5ad4de18ee9bf4a32514d0a7fa568237f66a5fb2fa",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.json": "9423ddcb8a1f372db26bcad38457ce60125b998f599b4d857f6dc3acdadee02a"
+      },
+      "evidence": {
+        "sprite-review.png": "16c26b08fb096d1e9f63822f69c21116d84fcf062984619575fdef6eb168d067",
+        "mockup-01.png": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4"
+      },
+      "generation": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon frame lighting darkens materials naturally; native inventory retains chosen palette. No opaque background or missing texture.",
+        "scale_readability": "Open sack, pale granules and green sprout stay visible at native inventory scale; broader silhouette distinguishes finished supply from blends.",
+        "states_motion": "Static generated item; no animation states or moving machinery.",
+        "interaction_guides": "Inventory resource, no build guide or placement interaction.",
+        "inventory_appearance": "Inspected seven-item family beside Cloth, sulfur and Machine Parts. Consistent padded scale and broad clusters; earthy low-saturation supplies contrast brighter sulfur and cool metal. Open sack, pale granules and green sprout stay visible at native inventory scale; broader silhouette distinguishes finished supply from blends.",
+        "integration_limits": "Build/unit and focused supplies scene passed. Reviewed inventory and framed appearances; no gameplay changes or multiplayer validation claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "d6b84ab69e6d44027b476dc102337f3b54e46b0d818c9eacb6ee5a4d8e00c3e1",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\mockup-01.png": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\export.py": "b05620a56c825816fe149a9f93ca2da7e256968f9a131531dc8446835b872adb",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.png": "dd96643fd02b527e9bd40c5ad4de18ee9bf4a32514d0a7fa568237f66a5fb2fa",
+        "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.json": "9423ddcb8a1f372db26bcad38457ce60125b998f599b4d857f6dc3acdadee02a"
+      },
+      "evidence": {
+        "evidence/supplies-inventory.png": "a7fc3cb22a870257125e3cecd076d50d2548995ecf102f504e90d27f15bc3c46",
+        "evidence/supplies-frames.png": "d2b625053e700cd14e0f779d95a2a255a66a64e45cbbd5d102ac2c6172e6ae85"
+      },
+      "generation": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "silhouette_scale": "Strong large open four-spoke wheel and low bed; copper upper box overstates rear copper slab.",
+    "implementable_geometry": "Cuboids and beveled forms practical; filled front corners conflict with existing layout.",
+    "mechanics_clearance": "Cylinder appears coaxial with wheel shaft; must point fore-aft perpendicular to axle. Wheel-bottom support risks contact.",
+    "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+    "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+    "controls_readability": "Dial pedestal readable, but front corners need clear pipe access.",
+    "gameplay_scope": "No new controls; remove invented elevated copper tank to retain rear slab construction."
+  },
+  "remaining_issues": [
+    "Turn cylinder fore-aft perpendicular to left-right flywheel shaft.",
+    "Clear front corners and wheel bottom.",
+    "Reduce copper rear box to slab/utility support."
+  ]
+}

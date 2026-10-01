@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.civilization.visual",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "FlightBenchmarkHintsMixin",
+    "FlightBenchmarkSafetyMixin",
+    "FlightBenchmarkTerrainMixin",
+    "FlightBenchmarkReadMixin",
+    "FlightBenchmarkDecodeMixin",
+    "FlightBenchmarkStepMixin",
+    "FlightBenchmarkAccessibleMixin",
+    "FlightBenchmarkLightQueueMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

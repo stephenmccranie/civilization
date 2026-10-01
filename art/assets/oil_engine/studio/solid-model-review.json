@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Removed two stands; continuous stepped cast bed now joins controller and cylinder, crankcase extends six units toward control face, whole working assembly lowered one unit. Native front/rear views match key structural reference landmarks.",
+    "geometry_uvs": "144 native cuboids; UVs within atlas at established density. Support posts removed. Bed joins at anchor boundary, no coincident exposed top caps.",
+    "material_consistency": "Current quiet cast iron reused on continuous bed; access accents retained on covers only. No new random noise or decorative feet.",
+    "assembly_interfaces": "Same 3x3 bed, eight casing slabs and component anchors. Controller front integrated into casting. Fuel front/lubricant underneath unchanged.",
+    "animation_states": "Wheel, shaft and cylinder axis all lowered one unit to y24; pivot matches. Worst swept wheel clears slab bed by about 0.845 model units; narrow cast bed lies beside wheel, not under it.",
+    "native_size_readability": "Viewed actual native front/rear model: continuous grounded silhouette and no empty shelf above controller. Shader review follows."
+  },
+  "remaining_issues": []
+}

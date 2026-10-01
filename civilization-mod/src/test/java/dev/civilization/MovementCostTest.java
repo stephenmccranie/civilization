@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MovementCostTest {
-    @Test void sprintCostsThreeTimesForIdenticalDistance() {
+    @Test void gaitRatesStayConstantAcrossMovementStepSizes() {
         assertEquals(10, MovementCost.calories(100, false, 0.1, 3), 1e-9);
+        assertEquals(10, 10 * MovementCost.calories(10, false, 0.1, 3), 1e-9);
         assertEquals(30, MovementCost.calories(100, true, 0.1, 3), 1e-9);
+        assertEquals(30, 10 * MovementCost.calories(10, true, 0.1, 3), 1e-9);
     }
     @Test void diagonalMovementUsesActualDistance() {
         assertEquals(5, MovementCost.distance(3, 0, 4, false, false));
@@ -23,8 +25,16 @@ class MovementCostTest {
     }
     @Test void swimmingAndClimbingIncludeVerticalEffort() {
         assertEquals(5, MovementCost.distance(0, 3, 4, true, false));
-        assertEquals(3, MovementCost.distance(0, 3, 0, false, true));
+        assertEquals(0, MovementCost.distance(0, 3, 0, false, true));
+        assertEquals(3, MovementCost.ascent(0, 3, 0));
         assertEquals(0, MovementCost.distance(0, -3, 0, false, true));
+    }
+    @Test void ascentChargesOnlyGainAndIsIndependentOfPacketSize() {
+        assertEquals(1, MovementCost.ascent(1, 1, 0));
+        assertEquals(1, 2 * MovementCost.ascent(.5, .5, 0));
+        assertEquals(0, MovementCost.ascent(0, -1, 0));
+        assertEquals(0, MovementCost.ascent(0, 1000, 0));
+        assertEquals(0, MovementCost.ascent(Double.NaN, 1, 0));
     }
     @Test void displacementsAndNonFiniteValuesDoNotBecomeHugeBills() {
         assertEquals(0, MovementCost.distance(1000, 0, 0, false, false));

@@ -1,0 +1,14 @@
+{
+  "brief_hash": "a46c8ee119917480f26d61aaaf3afe03e71aeb2189da9780de7d92327124b26c",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\unbaked_pie\\mockup-01.png": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+    "F:\\minecraft project\\art\\assets\\unbaked_pie\\export.py": "a13e453e67e812c53e20e0f061d06850dba3ebeb9a2e02ea58d7f44baa62758e",
+    "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.png": "d6016924b837c7f8a8c312b515adbf4da70353f566631612f0803474e002cc34",
+    "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.json": "3c3f2934a2e5732d38a20e73f010bf90c1999aa4447306c74d74229e2d9c732d"
+  },
+  "outputs": {
+    "textures/item/unbaked_pie.png": "d6016924b837c7f8a8c312b515adbf4da70353f566631612f0803474e002cc34",
+    "models/item/unbaked_pie.json": "3c3f2934a2e5732d38a20e73f010bf90c1999aa4447306c74d74229e2d9c732d"
+  }
+}

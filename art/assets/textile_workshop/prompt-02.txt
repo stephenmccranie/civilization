@@ -1,0 +1,9 @@
+Use case: stylized-concept refinement
+Asset type: implementable Minecraft multiblock design reference
+Primary request: Preserve the selected Civilization Textile Workshop direction from Image 1, but redraw it as a mechanically exact, feasible 3x3 Minecraft assembly informed by the actual blockout in Image 2.
+Reference roles: Image 1 is the selected design and owns silhouette/material hierarchy. Image 2 is the actual current implementation and owns exact scale, footprint, cut-block geometry and controller placement. Image 3 is partial-block presentation language only. Image 4 is woven material identity only.
+Subject: A low two-block-deep oak workbench with a thin half-block top and four short eighth-block feet, controller at bottom front center, two narrow rear oak posts, one three-block-wide half-grid top crossbar, and one short horizontal copper roller spanning only the clear center cell. The center remains open. The controller has an integrated pale woven swatch with muted indigo edge; no separate cloth block.
+Style: polished Minecraft build mockup, Faithful 32x material density, practical late-nineteenth-century artisan industry.
+Composition: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on neutral stone.
+Constraints: exact 3x3 footprint, maximum four blocks high; only full blocks, slabs, quarter beams and eighth cubes; all parts visibly supported; same asset in both views.
+Avoid: solid plank cube, full-width posts, long unsupported roller, floating thread, people, text, modern equipment, decorative gears or belts.

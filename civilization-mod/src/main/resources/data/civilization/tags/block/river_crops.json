@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wheat",
+    "civilization:fertilized_wheat",
+    "minecraft:carrots",
+    "minecraft:potatoes",
+    "minecraft:beetroots",
+    "minecraft:pumpkin_stem",
+    "minecraft:melon_stem",
+    "minecraft:torchflower_crop",
+    "minecraft:pitcher_crop",
+    "minecraft:sweet_berry_bush",
+    "minecraft:sugar_cane",
+    "minecraft:cocoa"
+  ]
+}

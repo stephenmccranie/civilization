@@ -1,0 +1,15 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+    "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+    "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+    "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+    "family_consistency": "Warm upper-left light and woven detail match the inspected ration master without copying its food subject.",
+    "controls_readability": "Native export preserves folds but narrow blue edging averages into grey. Widen the accent in a referenced edit before final approval.",
+    "gameplay_scope": "Only artwork for existing wool-derived cloth."
+  },
+  "remaining_issues": [
+    "Indigo landmark lacks contrast at native size."
+  ]
+}

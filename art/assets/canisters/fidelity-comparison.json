@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\canisters\\mockup-01.png",
+      "sha256": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9",
+      "crop": [
+        20,
+        170,
+        520,
+        1080
+      ],
+      "label": "Selected mockup"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister-isometric.png",
+      "sha256": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+      "crop": [
+        620,
+        270,
+        1160,
+        1010
+      ],
+      "label": "Native Minecraft item model"
+    }
+  ]
+}

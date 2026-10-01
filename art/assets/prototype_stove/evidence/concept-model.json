@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-01.png",
+      "sha256": "cc561c54feb82c91e4c1218b186271ac73820980e4ec559a2243880a5258b121",
+      "crop": [
+        0,
+        0,
+        1312,
+        1199
+      ],
+      "label": "Concept"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\model-front_threequarter.png",
+      "sha256": "49d523e67856d7b533bf8a84ca16557a01acf7cdc9e01a103d0018443332a3aa",
+      "crop": [
+        0,
+        0,
+        600,
+        600
+      ],
+      "label": "Native shell"
+    }
+  ]
+}

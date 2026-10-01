@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Single squat bearing assembly; feet, collar and shaft remain distinct at native size.",
+      "implementable_geometry": "Static inventory sprite fits the generated-item route.",
+      "mechanics_clearance": "Shaft enters the central copper collar; housing and mounting feet form one supported assembly.",
+      "period_materials": "Cool cast housing, machined steel shaft and functional copper bearing fit town industry.",
+      "family_consistency": "Uses engine cool metal and warm fittings, with coarse resource-sprite clusters.",
+      "controls_readability": "No controls; copper collar distinguishes this manufactured intermediate.",
+      "gameplay_scope": "Existing item and steel/copper recipe retained."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Housing arch, copper collar, shaft and mounting feet survive the 28-pixel silhouette.",
+      "geometry_uvs": "Native generated item uses one 32x32 RGBA texture, binary alpha and 16 opaque colors.",
+      "material_consistency": "Cool steel has broad varied planes; copper remains a functional accent.",
+      "assembly_interfaces": "Existing machine_parts resource identity retained. No block interfaces.",
+      "animation_states": "Static item; no animation required.",
+      "native_size_readability": "Native dark/light views retain separated collar and shaft with clean padded silhouette."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Photon shades framed/held steel darker than inventory, with collar and shaft still distinct.",
+      "scale_readability": "Bearing silhouette and warm collar read in hotbar, creative slots and frames.",
+      "states_motion": "Static generated item, ordinary held transform; no animated states.",
+      "interaction_guides": "Material item has no placement guide or controls.",
+      "inventory_appearance": "Compared beside steel, sulfur and Cloth: cool low-saturation housing contrasts yellow mineral and pale fabric; comparable icon scale, restrained highlights and deliberate clusters fit the family. Existing steel uses a thinner 3D model.",
+      "integration_limits": "Build/unit and parts visual scene passed; inspected inventory, held and frame screenshots. No gameplay changes or multiplayer claims."
+    },
+    "remaining_issues": []
+  }
+}

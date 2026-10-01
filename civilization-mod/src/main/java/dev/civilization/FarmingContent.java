@@ -15,6 +15,7 @@ public final class FarmingContent {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks("civilization");
     public static final DeferredBlock<CropBlock> FERTILIZED_WHEAT = BLOCKS.register("fertilized_wheat",
             () -> new CropBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT)));
+    public static final DeferredItem<RainCaller> RAIN_CALLER=ITEMS.registerItem("rain_caller",RainCaller::new,new Item.Properties().stacksTo(1));
     public static final DeferredItem<FertilizerItem> FERTILIZER = ITEMS.registerItem("fertilizer", FertilizerItem::new);
     public static final DeferredItem<Item> MINERAL_BLEND = ITEMS.registerSimpleItem("mineral_blend");
     public static final DeferredItem<Item> RATION = ITEMS.registerSimpleItem("field_ration",

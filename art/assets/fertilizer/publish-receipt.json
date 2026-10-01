@@ -1,0 +1,14 @@
+{
+  "brief_hash": "d6b84ab69e6d44027b476dc102337f3b54e46b0d818c9eacb6ee5a4d8e00c3e1",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\fertilizer\\mockup-01.png": "d2e855d115ea1ec88e5cacbb126b81245f4c3473553c0af0767cd749d96fbab4",
+    "F:\\minecraft project\\art\\assets\\fertilizer\\export.py": "b05620a56c825816fe149a9f93ca2da7e256968f9a131531dc8446835b872adb",
+    "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.png": "dd96643fd02b527e9bd40c5ad4de18ee9bf4a32514d0a7fa568237f66a5fb2fa",
+    "F:\\minecraft project\\art\\assets\\fertilizer\\fertilizer.json": "9423ddcb8a1f372db26bcad38457ce60125b998f599b4d857f6dc3acdadee02a"
+  },
+  "outputs": {
+    "textures/item/fertilizer.png": "dd96643fd02b527e9bd40c5ad4de18ee9bf4a32514d0a7fa568237f66a5fb2fa",
+    "models/item/fertilizer.json": "9423ddcb8a1f372db26bcad38457ce60125b998f599b4d857f6dc3acdadee02a"
+  }
+}

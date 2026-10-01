@@ -1,0 +1,16 @@
+{
+  "position": [
+    8,
+    24,
+    -90
+  ],
+  "target": [
+    5,
+    20,
+    24
+  ],
+  "span": 75,
+  "size": 1000,
+  "renderer": "Blockbench offscreen Preview",
+  "sha256": "96e123bcf1e3838423d294c4162920b2100812e8f69011a377f97b7637eb7449"
+}

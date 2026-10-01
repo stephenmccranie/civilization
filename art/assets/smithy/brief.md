@@ -1,0 +1,16 @@
+# Smithy redesign
+
+Create a compact, recognizable coal forge and metalworking bench for the Tesla-era town workshops. Current recipes, two coal slots, four interchangeable material inputs, one output, repair and upgrade behavior remain invariants. The user approved implementation with the refinement below; initial concept details are retained as visual provenance, not the final construction plan.
+
+One direction: approximately 4 blocks wide, 3 deep and 4 high. A brick hearth on the left has an open working mouth, a supported stepped smoke hood and a narrow chimney. A dark timber bench on the right carries an anvil and small vise. A brick cheek separates timber from the fire. Keep the front approachable and the underside of the bench visibly open. Integrate the controller as a small iron access face in the masonry beneath the hearth, not a separate generic cube. Modest worn iron and brass accents; no giant copper plate, railings or exposed decorative gears.
+
+Use full blocks for the hearth body/back and chimney; half slabs for the hearth lip, stepped hood shoulders and bench top; quarter beams (1 × 0.5 × 0.5) for timber legs/stretchers; eighth cubes (0.5 cubed) only for sensible feet or masonry corbels. Structural cuts must align to the half-block grid. Do not turn quarter beams into thin plates. Anvil, vise, controller face and fire can be native/custom models or effects; their smaller geometry must not be presented as saw-cut building pieces.
+
+Fidelity landmarks: asymmetric high brick forge/low timber bench, clear dark hearth opening with localized ember light, stepped supported chimney silhouette, visible air beneath the bench, anvil recognizable at gameplay distance. Existing workshop screenshot supplies material/world-scale context, not a shape to preserve. Screenshot and exact generation prompt are recorded in the concept receipt. No new fuels, water consumption, controls, automation or production stages are implied by decoration.
+
+## Approved implementation refinement
+
+Simplify to the existing half-grid. Ground-level native anvil on a stone footing beside the bench replaces the tabletop modeled anvil; accept all anvil wear states. Omit the vise and tiny ornamental trim. Final envelope is six blocks wide, three deep and 4.5 high above ground, plus one buried anvil footing. A 2×2 clear hearth sits beneath the stepped hood; a recessed slab rear wall has quarter-beam corner piers and eighth-cube shoulders. The table is exactly 2 blocks wide, 1.5 deep and 1 high: two upper slabs and two upper quarter beams on four lower eighth-cube feet. Width, a finished rear and stepped half-grid detailing remain fidelity targets. Native pack coal/fire textures render a visual hearth bed only, with fire tied to the lit coal fire; it supplies no free items or heat.
+
+## Finished rear and deeper chamber refinement
+Keep the six-block width and 4.5-block height. Expand to three blocks deep for a true 2x2 clear hearth, recessed vertical-slab rear masonry framed by quarter-beam corner piers and a stepped slab/corbel cap. Use a 2x1.5 top on four eighth-cube feet, one block tall; retain the ground anvil in front. Use existing pack materials and controller. Preserve all processing rules. Review front and rear silhouettes, chamber clearance, four supported table corners and guide construction.

@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "One-block cabinets remain clear and distinct; shallow tray stays within existing bounds.",
+      "implementable_geometry": "Land full cube; trade base and shallow rim/divider use native cuboids. Labels outside objects are presentation only and excluded from textures.",
+      "mechanics_clearance": "Static emblems; no invented moving mechanisms. Tray remains shallow and supported.",
+      "period_materials": "Stone survey plaque and oak merchant counter fit period craft; brass belongs to the exchange emblem.",
+      "family_consistency": "Material contrast and modest fittings match industrial and textile neighbors without copying industrial steel everywhere.",
+      "controls_readability": "Parcel boundary, house/flag and balance scales communicate ownership and exchange far more clearly than rejected dial/drawers.",
+      "gameplay_scope": "Existing controls, inventory and collision retained; emblems imply no new live telemetry."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Parcel/house/red flag and balance-scale motifs replace the rejected generic dial/drawers; front landmarks match concept at native size.",
+      "geometry_uvs": "Land uses native cube; trade uses full-height rim and center divider above 15/16-block base. Auto-derived native UVs stay within bounds. No change to facing.",
+      "material_consistency": "Each atlas shares its 24-color palette with protected perimeter/corners. Reserved iron colors prevent bronze-colored iron; land reserves red/green so its flag survives. Side stone mottling and oak grain remain distinct.",
+      "assembly_interfaces": "Existing single-block interactions and collision retained; shallow tray is visual. Back and bottom intentionally reuse side.",
+      "animation_states": "Static emblems and materials; no false animated gauge or live map telemetry.",
+      "native_size_readability": "32x32 exports reviewed on dark background: land house/flag and trade scale silhouette legible; quiet side panels retain material texture without competing with emblems."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Photon/Faithful scene shows distinct warm oak and pale stone, with readable ivory emblems and subdued iron fittings beside industrial steel and the Survey Table.",
+      "scale_readability": "At one-block world scale, scale pans and land house/flag distinguish exchange from ownership; same-height cabinets keep common family proportions.",
+      "states_motion": "Static textures; shallow two-bay tray renders correctly with divider supported by base. No motion or invented indicator states.",
+      "interaction_guides": "Existing menus synchronize in civic fixture, including typed trade quantity and ghost selection. No new multiblock guide required.",
+      "inventory_appearance": "Both native icons visible in land menu hotbar, using new textures and tray geometry without missing faces. Side texture doubles as back; geometry bounded and full collision retained.",
+      "integration_limits": "Verified recommended Photon/Faithful only, not other shaders or moving vessels. Generated mockup labels excluded. Gameplay unchanged."
+    },
+    "remaining_issues": []
+  }
+}

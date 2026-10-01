@@ -1,0 +1,43 @@
+{
+  "master": "texture-master.png",
+  "sha256": "6c23999b2e747a496a1f6b24af3f0f6fe3802898cd91a8c67448c953ae6010ce",
+  "prompt": "Create a high-resolution pixel-art texture material sheet for this exact Minecraft oil engine. Reference image establishes materials only. Orthographic flat texture art, NOT a rendered machine. Four equal square cells in a seamless 2 by 2 grid covering the entire image, NO gutters, NO labels, NO perspective. Top left: plain medium blue-gray cast iron with quiet broad tonal clusters and subtle fine wear, NO framing or rivets, suitable for many small mechanical surfaces. Top right: slightly lighter blue-gray steel cabinet panel with narrow raised edge seams on all four sides and modest corner fasteners painted flat. Bottom left: muted warm brass metal, low contrast soft brushed pixel clusters, no border, no fittings. Bottom right: matching steel instrument panel with ONE small cream circular analog dial left of center, a restrained brass vertical lever on the right, thin steel border. Entire sheet opaque, straight-on, uniformly lit; detailed high-resolution pixel art with crisp clusters; no lighting gradients, shadows cast outside objects, bloom, scratches overload, text, checkerboard or white padding. All cells form ONE coherent material family matching reference colors. Do not make a low-resolution enlarged sprite: deliver detailed high-resolution texture masters for later downscaling.",
+  "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-78b72218-8402-4c1f-a75c-38b38f3cf735.png",
+  "references": {
+    "mockup-04.png": "fd50be79f9ce8c3b7d6cf308ad1b19b0c62eca7cdd3016a5d19a88b995989434"
+  },
+  "source_size": [
+    1254,
+    1254
+  ],
+  "crops": [
+    [
+      0,
+      0,
+      627,
+      627
+    ],
+    [
+      627,
+      0,
+      1254,
+      627
+    ],
+    [
+      0,
+      627,
+      627,
+      1254
+    ],
+    [
+      627,
+      627,
+      1254,
+      1254
+    ]
+  ],
+  "export": "model/engine_atlas.png",
+  "export_sha256": "5865f1fb1ae248ae0e4b230cb881abc1face6169ff4179da6cb67be7b6ce5e4d",
+  "tile_size": 32,
+  "review": "Four coherent opaque cells; quiet downscaled iron and readable dial. Copper slot is an assembly placeholder; actual rear slab uses the active pack."
+}

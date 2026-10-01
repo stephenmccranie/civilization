@@ -1,0 +1,32 @@
+{
+  "brief_hash": "47f6d81ec27a0e2ca6ad1555503d3896530d4efcb37ec1fcf17df514c2b1e802",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "6ebdf1c39d164927b167f7059e72ef8e246230d102f9e502513f44127f086869",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "4b58535cd21658ae686299ecdf9c48224b6546c777aeb2ebd1ac6aecd724ff95",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-source.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-shell-prompt.txt": "fa8de52000e23d309fc38b112ca88c95744b5d731e01024c5d777fd7e3e9c2f9",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "154774ac37daff38cc6a385bca59c92d52842515b1877bb9229def0c99bb9e78",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+    "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+  },
+  "outputs": {
+    "models/block/fluid_pipe_arm.json": "154774ac37daff38cc6a385bca59c92d52842515b1877bb9229def0c99bb9e78",
+    "models/block/fluid_pipe_open.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+    "models/block/fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+    "models/block/fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+    "models/block/fluid_pipe_item.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+    "textures/block/pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+    "textures/block/pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+    "blockstates/fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+    "models/item/fluid_pipe.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+  }
+}

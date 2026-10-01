@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/trade_counter"
+    },
+    "facing=east": {
+      "model": "civilization:block/trade_counter",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/trade_counter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/trade_counter",
+      "y": 270
+    }
+  }
+}

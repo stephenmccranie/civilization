@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "front": {
+      "path": "sources\\land_controller_front-v1.png",
+      "sha256": "ca6e8d0c889a89315066f9bed5fb7ca2314558abf7f39487c229f291831a34f8"
+    },
+    "side": {
+      "path": "sources\\land_controller_side-v1.png",
+      "sha256": "eb6cfb4e4efb0a4ab91653621b745eb2decf09271c05d36b7c0c35ccddea8074"
+    },
+    "top": {
+      "path": "sources\\land_controller_top-v1.png",
+      "sha256": "289c4e9d0b91666b5ec18f59d3757632c455ad7c3a060bf352bc34ef77c3e201"
+    }
+  },
+  "faces": {
+    "front": "7f72b696d164b1cea305c9492061e0ef258d2fafd99e60ec737d938e28cf8dc8",
+    "side": "af0d459bec6b176f36884ec18c4c454ecb31e35fd0becd4265f14ab4c040d35b",
+    "top": "c0db57e8bef049e44efce12baef7aa65b28557b334911fb5b831a65db00dd8ed"
+  }
+}

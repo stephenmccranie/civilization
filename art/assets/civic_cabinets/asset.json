@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "kind": "block",
+  "brief": {
+    "description": "Readable civic cabinets: territorial parcel map and merchant exchange scales.",
+    "purpose": "Make ownership and commerce readable beside updated town industry.",
+    "silhouette": "Two one-block cabinets; shallow inset fittings remain within cube bounds.",
+    "bounds": "Each is exactly one Minecraft cube.",
+    "materials": "Warm stone and iron land cabinet with ivory cadastral map; oak and iron exchange counter with functional brass scales emblem.",
+    "interfaces": "Existing facing, full cube collision, inventories and claim/trade menus unchanged.",
+    "states": "Static, no new indicators or animated mechanics.",
+    "construction": "Existing full-cube models with three unique 32x32 faces each.",
+    "invariants": "No recipes, capacities, rules, structure changes or lettering.",
+    "technological_stage": "Late nineteenth-century town civic craft, not elite sky ornament.",
+    "material_behavior": "Directional oak grain; broad restrained limestone mottling; iron edges; brass reserved for functional fittings.",
+    "signature_feature": "Land: bold bounded parcel diagram with corner markers. Trade: clear two-pan balance emblem and open shallow transaction tray.",
+    "neighboring_assets": "Industrial steel controllers, Textile Workshop, shared cabinet UI.",
+    "fidelity_targets": [
+      "Land map dominates front with bold rectangular boundary and four corner markers; no pressure gauge.",
+      "Trade front has large recognizable balance scales; top has open counting tray; no chest-like drawer stack.",
+      "Broad simple native-size landmarks, practical timber/stone materials and restrained metal fittings."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/industrial_steel/texture-review.png",
+      "role": "Style: native material contrast and restrained brass/ivory instrumentation, not land/trade body material."
+    }
+  ],
+  "sources": [
+    "export.py",
+    "mockup-02.png",
+    "land-master.png",
+    "trade-master.png",
+    "land-final-prompt.txt",
+    "trade-final-prompt.txt",
+    "texture-provenance.json"
+  ],
+  "outputs": [
+    {
+      "source": "land_controller_front.png",
+      "target": "textures/block/land_controller_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "land_controller_side.png",
+      "target": "textures/block/land_controller_side.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "land_controller_top.png",
+      "target": "textures/block/land_controller_top.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "land_controller.json",
+      "target": "models/block/land_controller.json",
+      "format": "java_model"
+    },
+    {
+      "source": "trade_counter_front.png",
+      "target": "textures/block/trade_counter_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "trade_counter_side.png",
+      "target": "textures/block/trade_counter_side.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "trade_counter_top.png",
+      "target": "textures/block/trade_counter_top.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "trade_counter.json",
+      "target": "models/block/trade_counter.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "F:\\minecraft project\\art\\assets\\civic_cabinets\\concept.png",
+      "sha256": "ea9fff68b86fd188f23ec8fec03447b74f73b93fee5ade31974e2fcca6d61542",
+      "prompt": "Create one coherent Minecraft-implementable concept sheet for two single-cube civic cabinets in Civilization, late nineteenth-century Nikola Tesla lifetime town industry. Image reference is STYLE ONLY: readable ivory instruments, restrained functional brass, sturdy iron framing and broad pixel material patches. LEFT Land Controller: one cube of warm pale limestone inset within dark cast iron edge framing; large ivory round brass-rimmed survey dial on upper front, broad dark iron coal hatch with short brass handle on lower front; top has a simple inset surveying cross; side quiet mottled stone panels. RIGHT Trade Counter: one cube warm oak merchant cabinet with dark iron corner straps; two broad shallow drawer faces with simple brass pulls and tiny blank ivory label plates; top is wood with shallow rectangular counting tray outline, sides directional oak boards. Show front/top/right three-quarter views together on neutral background. These are texture-driven full cubes, no protrusions, legs, electronics, pipes, ornamental gears, fantasy glow or lettering. Feasible Minecraft pixel texture look, broad structural landmarks, calm surfaces with visible wood grain/stone mottling; no tiny scratches or subpixel filigree. Closely related craftsmanship but keep wood versus stone distinct. No grids, labels or surrounding props.\n",
+      "brief_hash": "a963c70627a772cc90c5d45fa17322cd3aaf905d8ff165b63e78ef7a6eefa6c3",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "F:\\minecraft project\\art\\assets\\civic_cabinets\\concept-revised.png",
+      "sha256": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+      "prompt": "Create one Minecraft-implementable concept sheet for TWO civic blocks whose PURPOSE IS IMMEDIATELY READABLE. Image 1 is material/pixel contrast reference ONLY, not device shape. Nikola Tesla lifetime late nineteenth-century town craftsmanship, practical iron/wood/pale stone and small functional brass. LEFT LAND OWNERSHIP CONTROLLER: single cube survey marker cabinet of pale stone with dark iron corner fittings. FRONT dominated by a large ivory cadastral parcel-map plaque: simple bold square land boundary, four substantial corner marker dots, green land patch and small central house/flag symbol. It must immediately read as claiming a piece of land, not a pressure gauge, compass, clock or furnace. A small lower coal-access slit secondary to the map. TOP repeats a very simple territory boundary diagram. RIGHT TRADE COUNTER: single cube warm oak merchant exchange pedestal, FRONT a large iconic TWO-PAN BALANCE SCALE in restrained brass on an ivory inset plaque, equal pans on either side of a stout central upright and clearly connected crossbar; below it a single shallow transaction opening, not drawers or chest lid. TOP is an open shallow wood counting tray split into two broad bays, visual exchange space with no loose objects. Each fits one block; no tall apparatus or detached pieces. Show one front/top/side three-quarter view for each on neutral background at equal scale, and a small straight-front view underneath to check icon recognition. Chunky Minecraft pixel texture language with large simple shapes and modest material variation; prioritize instantly readable land-versus-trade symbols over ornamental detail. No text, letters, numbers, pressure gauges, decorative gears, glow, overly tiny map details, modern screens or extra props.\n",
+      "brief_hash": "062d20ca22930bd48e7e20e58568e23d68ccc5bd19eab961c92bde5aee75076f",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "One-block cabinets remain clear and distinct; shallow tray stays within existing bounds.",
+        "implementable_geometry": "Land full cube; trade base and shallow rim/divider use native cuboids. Labels outside objects are presentation only and excluded from textures.",
+        "mechanics_clearance": "Static emblems; no invented moving mechanisms. Tray remains shallow and supported.",
+        "period_materials": "Stone survey plaque and oak merchant counter fit period craft; brass belongs to the exchange emblem.",
+        "family_consistency": "Material contrast and modest fittings match industrial and textile neighbors without copying industrial steel everywhere.",
+        "controls_readability": "Parcel boundary, house/flag and balance scales communicate ownership and exchange far more clearly than rejected dial/drawers.",
+        "gameplay_scope": "Existing controls, inventory and collision retained; emblems imply no new live telemetry."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "062d20ca22930bd48e7e20e58568e23d68ccc5bd19eab961c92bde5aee75076f",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-02.png": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77"
+      },
+      "generation": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Parcel/house/red flag and balance-scale motifs replace the rejected generic dial/drawers; front landmarks match concept at native size.",
+        "geometry_uvs": "Land uses native cube; trade uses full-height rim and center divider above 15/16-block base. Auto-derived native UVs stay within bounds. No change to facing.",
+        "material_consistency": "Each atlas shares its 24-color palette with protected perimeter/corners. Reserved iron colors prevent bronze-colored iron; land reserves red/green so its flag survives. Side stone mottling and oak grain remain distinct.",
+        "assembly_interfaces": "Existing single-block interactions and collision retained; shallow tray is visual. Back and bottom intentionally reuse side.",
+        "animation_states": "Static emblems and materials; no false animated gauge or live map telemetry.",
+        "native_size_readability": "32x32 exports reviewed on dark background: land house/flag and trade scale silhouette legible; quiet side panels retain material texture without competing with emblems."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "062d20ca22930bd48e7e20e58568e23d68ccc5bd19eab961c92bde5aee75076f",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\export.py": "fcf56b87909ecef95d5931d1d1c0e01d23ee7021a5dc1ae96f0e4e94d9f66305",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\mockup-02.png": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-master.png": "ed3dff10f21d01d6a438a84550b231363c5b4db016afde49e7477d59d3a96630",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-master.png": "7717444dc704ccf9dd32ad6ce0a9bb2cbabec267e8aa5d1f38e742f5c6f300e2",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-final-prompt.txt": "ae6e1dab542306cf7fdd1ced9e64ef73c71f786de495aa80057fc7a46d5dc4c1",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-final-prompt.txt": "4af6a3a3089dc6e963a0364dd2ff6c8cee8de3d0acaccbe273c4495d2439adf3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\texture-provenance.json": "f26dd25b69889b574476cabb8351bc17785f51d12c07afa94fab25739e284bc3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_front.png": "be5012b2e024994fafddd94cd82498064cdb752dd2dbb898ceba2172a631dcf7",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_side.png": "fe50d853b85f73c0a0349451f721c867639e8627b1d58aedf51cec088254abf2",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_top.png": "25c90f1082bd90b1e2d500de1ea22f572989fc2286ee0269ed65cc3efe3558f3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller.json": "49f74886c54c3580878c82b133b7e70a45aaa2ce5d84e19b997a50571bb67f03",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_front.png": "d86775a0b71b710fa4cf9ea88e65e20e6b7965c66c447d20d2f9036d2fb9bc95",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_side.png": "1ac92ea04b5e4f12397a29be9a0a6d5843131f8d24ee28d7015857625a4ca660",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_top.png": "776e487676b3815967cbc40ee4469df86223fa99f78d5afa0622e3656c669d73",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter.json": "7a4e8140e3f313c0e7f8cdd34af1c1d7f9e0fa942358185025e8a13d9694e870"
+      },
+      "evidence": {
+        "texture-review.png": "0551efd277ba399c09f7adfe607825fdc8a23d9eeeea0aab3d54eccb4cbcbe00",
+        "land_controller.json": "49f74886c54c3580878c82b133b7e70a45aaa2ce5d84e19b997a50571bb67f03",
+        "trade_counter.json": "7a4e8140e3f313c0e7f8cdd34af1c1d7f9e0fa942358185025e8a13d9694e870"
+      },
+      "generation": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon/Faithful scene shows distinct warm oak and pale stone, with readable ivory emblems and subdued iron fittings beside industrial steel and the Survey Table.",
+        "scale_readability": "At one-block world scale, scale pans and land house/flag distinguish exchange from ownership; same-height cabinets keep common family proportions.",
+        "states_motion": "Static textures; shallow two-bay tray renders correctly with divider supported by base. No motion or invented indicator states.",
+        "interaction_guides": "Existing menus synchronize in civic fixture, including typed trade quantity and ghost selection. No new multiblock guide required.",
+        "inventory_appearance": "Both native icons visible in land menu hotbar, using new textures and tray geometry without missing faces. Side texture doubles as back; geometry bounded and full collision retained.",
+        "integration_limits": "Verified recommended Photon/Faithful only, not other shaders or moving vessels. Generated mockup labels excluded. Gameplay unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "062d20ca22930bd48e7e20e58568e23d68ccc5bd19eab961c92bde5aee75076f",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\export.py": "fcf56b87909ecef95d5931d1d1c0e01d23ee7021a5dc1ae96f0e4e94d9f66305",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\mockup-02.png": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-master.png": "ed3dff10f21d01d6a438a84550b231363c5b4db016afde49e7477d59d3a96630",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-master.png": "7717444dc704ccf9dd32ad6ce0a9bb2cbabec267e8aa5d1f38e742f5c6f300e2",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-final-prompt.txt": "ae6e1dab542306cf7fdd1ced9e64ef73c71f786de495aa80057fc7a46d5dc4c1",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-final-prompt.txt": "4af6a3a3089dc6e963a0364dd2ff6c8cee8de3d0acaccbe273c4495d2439adf3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\texture-provenance.json": "f26dd25b69889b574476cabb8351bc17785f51d12c07afa94fab25739e284bc3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_front.png": "be5012b2e024994fafddd94cd82498064cdb752dd2dbb898ceba2172a631dcf7",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_side.png": "fe50d853b85f73c0a0349451f721c867639e8627b1d58aedf51cec088254abf2",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_top.png": "25c90f1082bd90b1e2d500de1ea22f572989fc2286ee0269ed65cc3efe3558f3",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller.json": "49f74886c54c3580878c82b133b7e70a45aaa2ce5d84e19b997a50571bb67f03",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_front.png": "d86775a0b71b710fa4cf9ea88e65e20e6b7965c66c447d20d2f9036d2fb9bc95",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_side.png": "1ac92ea04b5e4f12397a29be9a0a6d5843131f8d24ee28d7015857625a4ca660",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_top.png": "776e487676b3815967cbc40ee4469df86223fa99f78d5afa0622e3656c669d73",
+        "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter.json": "7a4e8140e3f313c0e7f8cdd34af1c1d7f9e0fa942358185025e8a13d9694e870"
+      },
+      "evidence": {
+        "evidence/civic-blocks.png": "1fb0f755583cbaa4453eb25f313229bc38bfd32d25a8248d1828b90598c96f89",
+        "evidence/civic-land.png": "8095c39d26e351f033ed6b1d222c22327754763fd6fca598b5147f0fe4f57763",
+        "evidence/civic-shop.png": "cd5efe793f1cc3c42ca19ffb31d1f835288c65561b15b61612228c3fe8fa7c35"
+      },
+      "generation": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77"
+    }
+  ]
+}

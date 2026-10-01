@@ -1,0 +1,18 @@
+{
+  "side": {
+    "prompt": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Remove the pressure gauge and the entire lower door/firebox assembly. Replace them with continuous copper casing matching the surrounding material. Keep the outer iron border, rivets, copper coloration, sparse edge patina and scale exactly unchanged. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\works_front-v1.png"
+    ],
+    "reference_sha256": "ea2d599c3a0a785ae75bb7c72df39f3fb225b451c63685a56e2218d0cbb0db2c",
+    "output_sha256": "fcc0a8167d94e444aa9381198361a523b37a40e6c1fa7f5902b0fb373eef2037"
+  },
+  "front_on": {
+    "prompt": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Show the hot state: add subdued bright orange coals and flame visible BEHIND the vertical iron grate in the lower chamber. Keep the grate bars themselves dark and exactly unchanged. Change only the dark gaps between the bars. Preserve all casing, border, gauge, doorframe, handle and fasteners exactly. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\works_front-v1.png"
+    ],
+    "reference_sha256": "ea2d599c3a0a785ae75bb7c72df39f3fb225b451c63685a56e2218d0cbb0db2c",
+    "output_sha256": "f5bf114dde24a72a364fe38942d1e95ad914ce6f64eb40d8ae2474618b5b1e99"
+  }
+}

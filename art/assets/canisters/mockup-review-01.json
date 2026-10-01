@@ -1,0 +1,13 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "silhouette_scale": "Compact folded-metal oil tin, open handle, offset filler and broad readable label; proportions extracted into fidelity targets.",
+    "implementable_geometry": "Cuboid body/handle, 45-degree shoulder strips and small faceted cap; tiny edge wear stays in texture.",
+    "mechanics_clearance": "Both handle legs supported by shoulder; cap sits beside handle and remains accessible. Static sealed item, no animation needed.",
+    "period_materials": "Blue-gray metal, thin steel seams and brass closure match engine family; enamel marking avoids modern plastic/military jerrycan look.",
+    "family_consistency": "Same tin/hardware on all four variants, differentiated only by matching enamel badge.",
+    "controls_readability": "Gray ring, dark drop, amber flame and green oil-can symbols distinguish empty/crude/fuel/lube without tiny text.",
+    "gameplay_scope": "Only appearance; original item IDs/capacity/stack sizes unchanged."
+  },
+  "remaining_issues": []
+}

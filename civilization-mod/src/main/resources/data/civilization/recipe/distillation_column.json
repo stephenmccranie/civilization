@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "CHC",
+    "ICI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "H": {
+      "item": "civilization:machine_parts"
+    }
+  },
+  "result": {
+    "id": "civilization:distillation_column",
+    "count": 1
+  }
+}

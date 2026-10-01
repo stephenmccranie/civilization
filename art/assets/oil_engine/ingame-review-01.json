@@ -1,0 +1,14 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "photon_materials": "Materials coherent but first scene was rainy and shadowed by old test blocks; check clear daylight.",
+    "scale_readability": "World engine coherent; cylinder inventory icon too large.",
+    "states_motion": "Running/motion frames show whole wheel, shaft aligned with casing. Exhaust located at new stack.",
+    "interaction_guides": "Full wheel ghost appears, but heading erroneously says Kiln.",
+    "inventory_appearance": "Cylinder extends outside slot; shrink its GUI transform, wheel also reduced slightly.",
+    "integration_limits": "Land engine only; no claim of moving-vessel support."
+  },
+  "remaining_issues": [
+    "Fix icon scale and engine guide title; daylight review."
+  ]
+}

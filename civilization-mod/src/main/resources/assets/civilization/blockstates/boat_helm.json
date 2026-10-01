@@ -1,0 +1,132 @@
+{
+  "variants": {
+    "facing=north,panel=false,gear=0": {
+      "model": "civilization:block/boat_helm",
+      "y": 0
+    },
+    "facing=north,panel=false,gear=1": {
+      "model": "civilization:block/boat_helm",
+      "y": 0
+    },
+    "facing=north,panel=false,gear=2": {
+      "model": "civilization:block/boat_helm",
+      "y": 0
+    },
+    "facing=north,panel=false,gear=3": {
+      "model": "civilization:block/boat_helm",
+      "y": 0
+    },
+    "facing=north,panel=true,gear=0": {
+      "model": "civilization:block/boat_panel_0",
+      "y": 0
+    },
+    "facing=north,panel=true,gear=1": {
+      "model": "civilization:block/boat_panel_1",
+      "y": 0
+    },
+    "facing=north,panel=true,gear=2": {
+      "model": "civilization:block/boat_panel_2",
+      "y": 0
+    },
+    "facing=north,panel=true,gear=3": {
+      "model": "civilization:block/boat_panel_3",
+      "y": 0
+    },
+    "facing=east,panel=false,gear=0": {
+      "model": "civilization:block/boat_helm",
+      "y": 90
+    },
+    "facing=east,panel=false,gear=1": {
+      "model": "civilization:block/boat_helm",
+      "y": 90
+    },
+    "facing=east,panel=false,gear=2": {
+      "model": "civilization:block/boat_helm",
+      "y": 90
+    },
+    "facing=east,panel=false,gear=3": {
+      "model": "civilization:block/boat_helm",
+      "y": 90
+    },
+    "facing=east,panel=true,gear=0": {
+      "model": "civilization:block/boat_panel_0",
+      "y": 90
+    },
+    "facing=east,panel=true,gear=1": {
+      "model": "civilization:block/boat_panel_1",
+      "y": 90
+    },
+    "facing=east,panel=true,gear=2": {
+      "model": "civilization:block/boat_panel_2",
+      "y": 90
+    },
+    "facing=east,panel=true,gear=3": {
+      "model": "civilization:block/boat_panel_3",
+      "y": 90
+    },
+    "facing=south,panel=false,gear=0": {
+      "model": "civilization:block/boat_helm",
+      "y": 180
+    },
+    "facing=south,panel=false,gear=1": {
+      "model": "civilization:block/boat_helm",
+      "y": 180
+    },
+    "facing=south,panel=false,gear=2": {
+      "model": "civilization:block/boat_helm",
+      "y": 180
+    },
+    "facing=south,panel=false,gear=3": {
+      "model": "civilization:block/boat_helm",
+      "y": 180
+    },
+    "facing=south,panel=true,gear=0": {
+      "model": "civilization:block/boat_panel_0",
+      "y": 180
+    },
+    "facing=south,panel=true,gear=1": {
+      "model": "civilization:block/boat_panel_1",
+      "y": 180
+    },
+    "facing=south,panel=true,gear=2": {
+      "model": "civilization:block/boat_panel_2",
+      "y": 180
+    },
+    "facing=south,panel=true,gear=3": {
+      "model": "civilization:block/boat_panel_3",
+      "y": 180
+    },
+    "facing=west,panel=false,gear=0": {
+      "model": "civilization:block/boat_helm",
+      "y": 270
+    },
+    "facing=west,panel=false,gear=1": {
+      "model": "civilization:block/boat_helm",
+      "y": 270
+    },
+    "facing=west,panel=false,gear=2": {
+      "model": "civilization:block/boat_helm",
+      "y": 270
+    },
+    "facing=west,panel=false,gear=3": {
+      "model": "civilization:block/boat_helm",
+      "y": 270
+    },
+    "facing=west,panel=true,gear=0": {
+      "model": "civilization:block/boat_panel_0",
+      "y": 270
+    },
+    "facing=west,panel=true,gear=1": {
+      "model": "civilization:block/boat_panel_1",
+      "y": 270
+    },
+    "facing=west,panel=true,gear=2": {
+      "model": "civilization:block/boat_panel_2",
+      "y": 270
+    },
+    "facing=west,panel=true,gear=3": {
+      "model": "civilization:block/boat_panel_3",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/tannery"
+    },
+    "facing=east": {
+      "model": "civilization:block/tannery",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/tannery",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/tannery",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+    "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+    "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+    "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+    "family_consistency": "Keeps established ivory/indigo silhouette and folds, restoring subordinate oatmeal/cream material variation.",
+    "controls_readability": "Sparse staggered weave clusters interrupt the blank center; lower contrast than fold seams and band. Native comparison preserves broad form.",
+    "gameplay_scope": "Only artwork for existing wool-derived cloth."
+  },
+  "remaining_issues": []
+}

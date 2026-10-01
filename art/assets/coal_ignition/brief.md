@@ -1,0 +1,3 @@
+Shared manual coal-fire ignition control: compact native button embedded inside the cabinet, to the right of a centered fire window, with both coal slots on the left, flint and steel at rest / contact with sparks. Two aligned raster frames, one coherent palette matching the shared cabinet. One-second server cooldown, random ignition success, brief click pose, native strike and fire sounds. Actual flame window continues using Minecraft fire textures. No new inventory item or recipe.
+
+A native-style vertical remaining-coal bar sits between the centered fire and striker. It uses actual server energy rather than an independent animation timer.

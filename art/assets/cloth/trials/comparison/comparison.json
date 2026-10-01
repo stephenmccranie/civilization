@@ -1,0 +1,200 @@
+[
+  {
+    "source": "art\\assets\\cloth\\mockup-02.png",
+    "sha256": "afb5c84ed4607b1de871f1f125d405a5d0c93bd6871ac84ee6be4085255fb9f2",
+    "variants": {
+      "direct-12": {
+        "file": "0-direct-12.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          5,
+          30,
+          27
+        ],
+        "opaque_colors": 12,
+        "partial_alpha_pixels": 0
+      },
+      "direct-16": {
+        "file": "0-direct-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          5,
+          30,
+          27
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "direct-24": {
+        "file": "0-direct-24.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          5,
+          30,
+          27
+        ],
+        "opaque_colors": 24,
+        "partial_alpha_pixels": 0
+      },
+      "via64-16": {
+        "file": "0-via64-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          5,
+          30,
+          27
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      }
+    }
+  },
+  {
+    "source": "art\\assets\\cloth\\trials\\b-macro.png",
+    "sha256": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+    "variants": {
+      "direct-12": {
+        "file": "1-direct-12.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 12,
+        "partial_alpha_pixels": 0
+      },
+      "direct-16": {
+        "file": "1-direct-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "direct-24": {
+        "file": "1-direct-24.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 22,
+        "partial_alpha_pixels": 0
+      },
+      "via64-16": {
+        "file": "1-via64-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      }
+    }
+  },
+  {
+    "source": "art\\assets\\cloth\\trials\\c-coarse64.png",
+    "sha256": "f8abf4c6f2c28b1ca0eebed64edbf6b4d84d274dd8426237bf4062b77e393360",
+    "variants": {
+      "direct-12": {
+        "file": "2-direct-12.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 11,
+        "partial_alpha_pixels": 0
+      },
+      "direct-16": {
+        "file": "2-direct-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 14,
+        "partial_alpha_pixels": 0
+      },
+      "direct-24": {
+        "file": "2-direct-24.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 22,
+        "partial_alpha_pixels": 0
+      },
+      "via64-16": {
+        "file": "2-via64-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      }
+    }
+  }
+]

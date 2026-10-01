@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,linked=false": {
+      "model": "civilization:block/engine_flywheel",
+      "y": 0
+    },
+    "facing=north,linked=true": {
+      "model": "civilization:block/engine_flywheel_linked",
+      "y": 0
+    },
+    "facing=east,linked=false": {
+      "model": "civilization:block/engine_flywheel",
+      "y": 90
+    },
+    "facing=east,linked=true": {
+      "model": "civilization:block/engine_flywheel_linked",
+      "y": 90
+    },
+    "facing=south,linked=false": {
+      "model": "civilization:block/engine_flywheel",
+      "y": 180
+    },
+    "facing=south,linked=true": {
+      "model": "civilization:block/engine_flywheel_linked",
+      "y": 180
+    },
+    "facing=west,linked=false": {
+      "model": "civilization:block/engine_flywheel",
+      "y": 270
+    },
+    "facing=west,linked=true": {
+      "model": "civilization:block/engine_flywheel_linked",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "kind": "multiblock",
+  "brief": {
+    "description": "Two related land freight stores: open coal bunker and rounded horizontal liquid tank.",
+    "purpose": "Accumulate industrial cargo with visible quantities, for later vessel integration.",
+    "silhouette": "Long open steel box with visible coal pile; horizontal half-grid tank with clipped corners, grounded saddles and front inspection window.",
+    "bounds": "Both 3x5x3, controller at bottom/front center. Existing casing and cut forms build the shell.",
+    "materials": "Current original refinery steel, restrained brass functional fittings, black coal. Quiet structural surfaces, no ornamental fake panels.",
+    "interfaces": "Front controller manual access/UI, local hopper coal access, fluid pipe front/below, visible fill.",
+    "states": "Empty/partial/full; incomplete shell retains stock and pauses access.",
+    "construction": "Pack-aware actual casing/slabs/beams with native small controller models; deterministic rendered contents, no loose-item physics.",
+    "invariants": "8192 coal or 64000 mB crude/fuel/lubricant. Land-only initial acceptance. No new recipes beyond controllers or transfer network.",
+    "fidelity_targets": [
+      "Open top and long horizontal silhouette",
+      "Rounded half-grid tank ends supported to ground",
+      "Controller faces clearly distinguish coal hatch and fluid fitting"
+    ],
+    "role": "Ground industry freight storage",
+    "technological_stage": "Steel and oil era",
+    "material_behavior": "Structural steel shell with subtle surface variation",
+    "signature_feature": "Actual contents visible",
+    "neighboring_assets": [
+      "Refinery steel family",
+      "Hot-Bulb Engine",
+      "Canisters"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/industrial_steel/texture-review.png",
+      "role": "Existing steel material family; preserve current pack-aware casing."
+    }
+  ],
+  "sources": [
+    "build.py",
+    "bulk_steel.png",
+    "coal_bunker.bbmodel",
+    "coal_bunker_assembly.bbmodel",
+    "cargo_tank.bbmodel",
+    "cargo_tank_assembly.bbmodel"
+  ],
+  "outputs": [
+    {
+      "source": "coal_bunker.json",
+      "target": "models/block/coal_bunker.json",
+      "format": "java_model"
+    },
+    {
+      "source": "coal_bunker-state.json",
+      "target": "blockstates/coal_bunker.json",
+      "format": "json"
+    },
+    {
+      "source": "coal_bunker-item.json",
+      "target": "models/item/coal_bunker.json",
+      "format": "json"
+    },
+    {
+      "source": "cargo_tank.json",
+      "target": "models/block/cargo_tank.json",
+      "format": "java_model"
+    },
+    {
+      "source": "cargo_tank-state.json",
+      "target": "blockstates/cargo_tank.json",
+      "format": "json"
+    },
+    {
+      "source": "cargo_tank-item.json",
+      "target": "models/item/cargo_tank.json",
+      "format": "json"
+    },
+    {
+      "source": "bulk_steel.png",
+      "target": "textures/block/bulk_steel.png",
+      "format": "png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": "opaque"
+    }
+  ],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-e26b3c46-3816-4ee5-8919-2b932d9e64b8.png",
+      "sha256": "b3e6ec409c5ac05c1c112398e602db19562e02289f17aa2078766d3ea6e224b6",
+      "prompt": "Minecraft implementable pair of industrial freight storage multiblocks in Civilization's Tesla-era style, side by side on stone dock neutral daytime. LEFT open top long coal bunker, 3 blocks wide 5 blocks long and under 3 blocks tall, built from substantial steel half-block wall sections, thin stepped rim, coal visibly piled inside, small coal loading hatch controller at bottom front center. RIGHT horizontal long liquid cargo tank same 3x5x3 envelope, visibly rounded using half-block/quarter-beam clipped corners (no smooth curves), two grounded structural saddles, a narrow vertical glass fill window in front end and small brass fluid fitting controller below it. Muted gray steel from supplied texture family, subtle broad mottling, restrained structural seams, no gratuitous panels or decorative brass squares. Basic Minecraft pixel textures, simple cuboid geometry. No wheels, no floating supports, no ladders or catwalks, no giant gauges or text labels. Show entire both structures from front three-quarter view so length and open pile are clear. This is one coherent paired design, not alternatives.\n",
+      "brief_hash": "896487f8be93486db0b18e6dc1d99e1bde75378cc2f78e3d73b93fb6d147d104",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Long open bunker and horizontal clipped tank clearly distinguish solid and liquid freight within the selected 3x5x3 envelope.",
+        "implementable_geometry": "Translate angled tank shoulders to half-grid steps. Thin bunker rim uses quarter beams and eighth corners; no arbitrary mesh required.",
+        "mechanics_clearance": "Static stores only; grounded saddles, open bunker top and reachable front fittings. No moving mechanical interfaces.",
+        "period_materials": "Muted structural steel and functional brass fitting suit the oil-era freight role.",
+        "family_consistency": "Refinery steel is the supplied material reference; retain original casing textures rather than inventing a new metal family.",
+        "controls_readability": "Coal hatch and brass liquid socket distinguish the controller purposes. Native glass window replaces the generated custom gauge strip.",
+        "gameplay_scope": "No crane, harbor scenery or background buildings become required mechanics. Land storage only in this package."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "896487f8be93486db0b18e6dc1d99e1bde75378cc2f78e3d73b93fb6d147d104",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-01.png": "b3e6ec409c5ac05c1c112398e602db19562e02289f17aa2078766d3ea6e224b6"
+      },
+      "generation": "b3e6ec409c5ac05c1c112398e602db19562e02289f17aa2078766d3ea6e224b6"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Preserved 5-block length, open bunker, narrow rim and stepped tank shoulders. Half-grid construction simplifies the concept's bevels; tank window uses existing glass. Corrected floating bunker walls and edge-only tank joins found in first native review.",
+        "geometry_uvs": "Editable native Java controller models and whole assembly projects. Shared 128px atlas uses repeated original 32px steel at two texels per model unit; fittings occupy discrete depths without coplanar faces.",
+        "material_consistency": "Actual original refinery steel covers shell and fittings; dark recesses and small brass socket/latch are functional accents. Quiet, low-saturation storage is distinct from the engine's exposed mechanics.",
+        "assembly_interfaces": "Front hatch/socket sits on controller at floor level; grounded full-block saddles and contiguous casing support shell. Guides use the same real cut-block geometry.",
+        "animation_states": "No mechanical animation. Coal fill and fluid window are runtime quantities to inspect in the game stage.",
+        "native_size_readability": "Native front/rear assembly views show both silhouettes, rim opening and clear controller distinction. Faithful glass remains an in-game check."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "896487f8be93486db0b18e6dc1d99e1bde75378cc2f78e3d73b93fb6d147d104",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\build.py": "050cd583c9c558d7e52fcb38c0b121a4ec3201b981a364475648b06791cef729",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\bulk_steel.png": "60611c3d83fe24d149aa009b52bedf36193f70b90171aec0ea1c6c3c98e537ba",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.bbmodel": "ea2c652f5010726cb6c168ecf5d960bfaefd6822fdea0299e78e052342218b0f",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker_assembly.bbmodel": "d4b8cc28d8d3fece93dda05d81495be8311eabf45434092ca4ce1a274381d844",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.bbmodel": "23c016e9749c6b509f8feb09f4917f5d90072aff47d3461ad49284582887b7c0",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank_assembly.bbmodel": "806925ce62b436efe71041dd4287fd6d12d9a58d1b4e39da38781da56f99927e",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.json": "aecfe3dcc2f0776175482d0e899ddf549529d20d4ef5e270f099be3bd9f82f7c",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-state.json": "d612ab0d455411ae97922fe95c34c729874e762c5543306c0201d9c6cd7c1098",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-item.json": "588efbd3a31db4cd4b6d755d0492034177dab6e25cf6dea9347facb5d5fb187c",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.json": "18b391c927059ca325a657540abbd13d06c57a67bbcbf4d45df7a490bcdb1234",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-state.json": "41f9130ffa76fccceb428efbbf7000f7e2c28e59426bb852e3cf9485d9989a0e",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-item.json": "21a9092898ed0e7048521e599c0ed2faa280b8c76178d73348569232a9c6566b"
+      },
+      "evidence": {
+        "model-review.png": "a281171d9995aab3db2939513a3ed6095c1ce47100cfc05533dbcc80f13bb3bd"
+      },
+      "generation": "b3e6ec409c5ac05c1c112398e602db19562e02289f17aa2078766d3ea6e224b6"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Reviewed actual Photon/Faithful daylight assemblies. Shell and controller steel are coherent with the adjacent refinery. Glass exposes fluid without emissive casing; brass is reserved for the fitting.",
+        "scale_readability": "Both 3x5x3 builds are grounded and distinguishable. Bunker has open rim and dark raised coal; tank has stepped shoulders, saddles and a clear window. Construction-grid simplification is intentional.",
+        "states_motion": "Client snapshot asserts 6144 coal and a formed shell; filled versus empty bunker and full/half liquid levels were inspected. No mechanical motion is required.",
+        "interaction_guides": "Actual contextual guide identifies the missing casing half at the correct position. Real menu withdrawal changes stock by 32. Tank screen synchronizes the entire 64000mB value, product name and capacity.",
+        "inventory_appearance": "Both controller icons render correctly in native inventory slots with distinct hatch/socket faces. Shared cabinet spacing and controls are legible at GUI scale 3.",
+        "integration_limits": "Land-only acceptance. Vessel transforms/docking are not claimed. The fixture uses a disposable world and hidden uncaptured cursor. Renderer uses deterministic bounded contents rather than loose entities."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "896487f8be93486db0b18e6dc1d99e1bde75378cc2f78e3d73b93fb6d147d104",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\build.py": "050cd583c9c558d7e52fcb38c0b121a4ec3201b981a364475648b06791cef729",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\bulk_steel.png": "60611c3d83fe24d149aa009b52bedf36193f70b90171aec0ea1c6c3c98e537ba",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.bbmodel": "ea2c652f5010726cb6c168ecf5d960bfaefd6822fdea0299e78e052342218b0f",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker_assembly.bbmodel": "d4b8cc28d8d3fece93dda05d81495be8311eabf45434092ca4ce1a274381d844",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.bbmodel": "23c016e9749c6b509f8feb09f4917f5d90072aff47d3461ad49284582887b7c0",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank_assembly.bbmodel": "806925ce62b436efe71041dd4287fd6d12d9a58d1b4e39da38781da56f99927e",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker.json": "aecfe3dcc2f0776175482d0e899ddf549529d20d4ef5e270f099be3bd9f82f7c",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-state.json": "d612ab0d455411ae97922fe95c34c729874e762c5543306c0201d9c6cd7c1098",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\coal_bunker-item.json": "588efbd3a31db4cd4b6d755d0492034177dab6e25cf6dea9347facb5d5fb187c",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank.json": "18b391c927059ca325a657540abbd13d06c57a67bbcbf4d45df7a490bcdb1234",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-state.json": "41f9130ffa76fccceb428efbbf7000f7e2c28e59426bb852e3cf9485d9989a0e",
+        "F:\\minecraft project\\art\\assets\\bulk_storage\\cargo_tank-item.json": "21a9092898ed0e7048521e599c0ed2faa280b8c76178d73348569232a9c6566b"
+      },
+      "evidence": {
+        "evidence/bulk-assemblies.png": "1a23dcecb7027827b4422724319420012dd4c35a1997cf6deb0f5203dce32ac8",
+        "evidence/bulk-empty-and-half.png": "a368a2cc0fe1738b8c1905f70ca2ffb138f7d7261f0ca20a4593fb0eeb58d5aa",
+        "evidence/bulk-tank-menu.png": "950efc53646e4d0cccff308c88f8aef55681cce35e781f4aa41ce2e6b55a4ad7",
+        "evidence/bulk-bunker-menu.png": "e65858429b70cd4ffd34b0040796455bf6773471b3b9d58abb0b71c1e9019958",
+        "evidence/bulk-guide.png": "ecd0ac80a678530e25c00c629d5af548ee3c66c1cd203f0532a25e33ed6af9d4"
+      },
+      "generation": "b3e6ec409c5ac05c1c112398e602db19562e02289f17aa2078766d3ea6e224b6"
+    }
+  ],
+  "gecko_manifests": []
+}

@@ -1,0 +1,14 @@
+{
+  "brief_hash": "3f6a5f81dd2e74797afff9a3fb08fe80a8e7a9395e549d193e56b59539d0bb45",
+  "inputs": {
+    "F:\\minecraft project\\art\\construction\\compact-campus-refinery.png": "ff22c94709929de7ff1603b7ce54e4b4f10bda8d45445bd275a864315740eef9",
+    "F:\\minecraft project\\art\\assets\\crude_oil\\material-reference.png": "7c0976a51807e3ae3b469107f8e969c8ad20798dc1fe2a6acae3b446d3fefe2f",
+    "F:\\minecraft project\\art\\assets\\crude_oil\\master.png": "58e7b98956194ad7ed726f68bf578e97c061f81e18776a9703a84eaaaf73cfa1",
+    "F:\\minecraft project\\art\\assets\\crude_oil\\export.py": "719c728546ff8667ae1685b923d14803b79ece479b1c949723511ba94fa530e2",
+    "F:\\minecraft project\\art\\assets\\crude_oil\\prompt.md": "647bb5272f195399ad56f2b902e44b84b24d41dc1ae6d108fa0b5d3edf88a313",
+    "F:\\minecraft project\\art\\assets\\crude_oil\\atlas.png": "957a149305036ba5c2079d10e4ecbe8de0372cb1b43b30dfd2f15b9243b9cc36"
+  },
+  "outputs": {
+    "textures/block/crude_oil.png": "957a149305036ba5c2079d10e4ecbe8de0372cb1b43b30dfd2f15b9243b9cc36"
+  }
+}

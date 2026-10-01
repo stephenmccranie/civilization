@@ -1,7 +1,12 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Build', 'Deploy', 'Client', 'Server', 'GameTest')]
-    [string]$Task = 'Build'
+    [ValidateSet('Build', 'Deploy', 'Client', 'Server', 'GameTest', 'Visual', 'Verify')]
+    [string]$Task = 'Build',
+    [ValidateSet('Quick', 'Gameplay', 'Visual', 'Full')]
+    [string]$Scope = 'Quick',
+    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','thermal','road','uranium','derrick-guide','kitchen')]
+    [string]$Scene = 'machines',
+    [switch]$FullVisual
 )
 
 $ErrorActionPreference = 'Stop'
@@ -23,11 +28,60 @@ $previousJavaHome = $env:JAVA_HOME
 Push-Location $PSScriptRoot
 try {
     $env:JAVA_HOME = $devConfig.javaHome
-    $gradleTask = switch ($Task) {
+    & ./sable.ps1 Prepare
+    $gradleTasks = @(switch ($Task) {
         'Client' { 'runClient' }
         'Server' { 'runServer' }
         'GameTest' { 'runGameTestServer' }
+        'Visual' { 'runVisualClient' }
+        'Verify' {
+            'build'
+            if ($Scope -in @('Gameplay', 'Full')) { 'runGameTestServer' }
+            if ($Scope -in @('Visual', 'Full')) { 'runVisualClient' }
+        }
         default { 'build' }
+    })
+    $needsVisual = $gradleTasks -contains 'runVisualClient'
+    if ($Task -eq 'Deploy') { $gradleTasks += 'prepareRuntimeMods' }
+    $gradleArguments = @('--console=plain')
+    if ($needsVisual) {
+        $gradleArguments += "-PvisualScene=$Scene"
+        $gradleArguments += "-PvisualFull=$($FullVisual.IsPresent.ToString().ToLowerInvariant())"
+    }
+
+    if ($needsVisual) {
+        $visualPath = Join-Path $PSScriptRoot 'runs/visual'
+        foreach ($subdir in @('config', 'mods', 'shaderpacks', 'resourcepacks', 'saves')) {
+            New-Item -ItemType Directory -Force (Join-Path $visualPath $subdir) | Out-Null
+        }
+        $visualWorld = Join-Path $visualPath 'saves/preview-compatibility'
+        if (-not (Test-Path -LiteralPath $visualWorld)) {
+            $sourceWorld = Join-Path $PSScriptRoot 'run/saves/preview-compatibility'
+            if (-not (Test-Path -LiteralPath $sourceWorld)) { $sourceWorld = Join-Path $PSScriptRoot 'runs/server/development-world' }
+            if (-not (Test-Path -LiteralPath $sourceWorld)) { throw 'Visual tests need a disposable development world first.' }
+            Copy-Item -LiteralPath $sourceWorld -Destination $visualWorld -Recurse
+        }
+        # Copy development-only graphics inputs; never edit the user's Prism instance.
+        foreach ($subdir in @('mods', 'shaderpacks', 'resourcepacks')) {
+            $sourceDir = Join-Path $PSScriptRoot "run/$subdir"
+            if (Test-Path -LiteralPath $sourceDir) {
+                Get-ChildItem -LiteralPath $sourceDir -File | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $visualPath $subdir) }
+            }
+        }
+        $optionsSource = Join-Path $PSScriptRoot 'run/options.txt'
+        if (Test-Path -LiteralPath $optionsSource) {
+            $options = @(Get-Content -LiteralPath $optionsSource | Where-Object { $_ -notmatch '^(fullscreen|overrideWidth|overrideHeight|pauseOnLostFocus):' })
+            $options += @('fullscreen:false', 'overrideWidth:1920', 'overrideHeight:1080', 'pauseOnLostFocus:false')
+            [IO.File]::WriteAllLines((Join-Path $visualPath 'options.txt'), $options)
+        }
+        $irisSource = Join-Path $PSScriptRoot 'run/config/iris.properties'
+        if (Test-Path -LiteralPath $irisSource) { Copy-Item -LiteralPath $irisSource -Destination (Join-Path $visualPath 'config/iris.properties') }
+        # The disposable client has no one to dismiss a Distant Horizons update prompt.
+        # Its default auto-updater was blocking the title screen and looked like a Photon stall.
+        [IO.File]::WriteAllText((Join-Path $visualPath 'config/DistantHorizons.toml'), "[client.advanced.autoUpdater]`nenableAutoUpdater = false`n")
+        # Disable NeoForge's separate early splash window before any native window is created.
+        [IO.File]::WriteAllText((Join-Path $visualPath 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 1920`nearlyWindowHeight = 1080`n")
+        Write-Host "Hidden 1920x1080 visual check: $Scene (extended tour: $($FullVisual.IsPresent)). Mouse capture disabled. Output: runs/visual/screenshots."
     }
 
     if ($Task -eq 'Server') {
@@ -63,8 +117,10 @@ try {
         }
     }
 
-    & (Join-Path $PSScriptRoot 'gradlew.bat') $gradleTask --console=plain
-    if ($LASTEXITCODE -ne 0) { throw "Gradle $gradleTask failed ($LASTEXITCODE)." }
+    $verificationTimer = [Diagnostics.Stopwatch]::StartNew()
+    & (Join-Path $PSScriptRoot 'gradlew.bat') @gradleTasks @gradleArguments
+    if ($LASTEXITCODE -ne 0) { throw "Gradle $($gradleTasks -join ', ') failed ($LASTEXITCODE)." }
+    Write-Host ("Completed {0} in {1:N1}s." -f ($gradleTasks -join ', '), $verificationTimer.Elapsed.TotalSeconds)
 
     if ($Task -eq 'Deploy') {
         $jarName = "$($properties.mod_id)-$($properties.mod_version).jar"
@@ -72,6 +128,18 @@ try {
         if (-not (Test-Path -LiteralPath $artifact)) { throw "Missing artifact: $artifact" }
         $modsPath = Join-Path $gamePath 'mods'
         New-Item -ItemType Directory -Path $modsPath -Force | Out-Null
+        $geckoName = "geckolib-neoforge-$($properties.minecraft_version)-$($properties.geckolib_version).jar"
+        $geckoSource = Join-Path $PSScriptRoot "build/runtimeMods/$geckoName"
+        if (-not (Test-Path -LiteralPath $geckoSource)) { throw "Missing resolved GeckoLib artifact: $geckoSource" }
+        $otherGecko = @(Get-ChildItem -LiteralPath $modsPath -Filter 'geckolib-*.jar' -File | Where-Object Name -ne $geckoName)
+        if ($otherGecko.Count) { throw 'A different GeckoLib version is installed; resolve the duplicate before deployment.' }
+        $geckoDestination = Join-Path $modsPath $geckoName
+        Copy-Item -LiteralPath $geckoSource -Destination $geckoDestination -Force
+        if ((Get-FileHash -LiteralPath $geckoSource).Hash -ne (Get-FileHash -LiteralPath $geckoDestination).Hash) { throw 'GeckoLib deployment hash mismatch' }
+        $sableJar = Join-Path $PSScriptRoot ".dev-libs/sable-neoforge-1.21.1-2.0.5.jar"
+        $sableDestination = Join-Path $modsPath "sable-neoforge-1.21.1-2.0.5.jar"
+        Copy-Item -LiteralPath $sableJar -Destination $sableDestination -Force
+        if ((Get-FileHash -LiteralPath $sableJar -Algorithm SHA512).Hash -ne (Get-FileHash -LiteralPath $sableDestination -Algorithm SHA512).Hash) { throw "Sable deployment hash mismatch" }
         # Only replace our own artifacts; archive previous builds outside the loaded mods folder.
         $existing = @(Get-ChildItem -LiteralPath $modsPath -Filter "$($properties.mod_id)-*.jar" -File)
         if ($existing.Count -gt 0) {

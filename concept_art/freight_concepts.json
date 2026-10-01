@@ -1,0 +1,27 @@
+{
+  "purpose": "Concept inspiration, not implemented geometry or runtime textures.",
+  "tool": "built-in image_gen",
+  "concepts": [
+    {
+      "id": "boat",
+      "prompt": "Minecraft mod concept art, detailed voxel build rendered with warm realistic shaders, all shapes visibly made of Minecraft full blocks slabs and half-block pieces, restrained late 1800s early 1900s industrial river shipping aesthetic from Nikola Tesla's lifetime. Landscape design presentation of a realistically proportioned SMALL COASTAL/RIVER FREIGHT BOAT, about 7 blocks wide and 17 blocks long, 1 block approximately 1 meter. Main large three-quarter overhead view floating at a timber river wharf; modest aft wheelhouse with a wooden wheel and brass throttle console, low freeboard sturdy dark riveted iron hull with timber deck, broad unobstructed forward working deck. The deck holds two modular cargo units: one open rectangular riveted iron coal bunker with visibly heaped black coal, one horizontal faceted cylindrical iron liquid tank on two saddles with brass sight glass. Both units compact about 3 blocks wide 5 long and 3 high, positioned fore and aft with an accessible side walkway. One Minecraft player for scale. Working vessel, not yacht or gigantic ship, no sails, no fantasy gears, no smokestack forest, no cranes required. Attractive silhouette stepped bow and stern, subtle cream/ochre identification accents and dark weathered iron, readable construction and empty deck space for player customization. Small inset overhead layout sketch in lower right matching main boat. Clear daylight, very crisp material detail. Title 'RIVER FREIGHTER'. This is concept art, not a texture atlas.",
+      "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-61db3dbd-6c51-4185-87dd-c22f2d0cf1e1.png",
+      "file": "13_river_freighter.png",
+      "sha256": "c37688f91a8e10fe2b6bcbae762c372a166382fba516ecfd58269b16f1a639ff"
+    },
+    {
+      "id": "coal",
+      "prompt": "Minecraft mod multiblock concept design sheet in high detail voxel rendering, shapes feasible with full blocks slabs and half-block geometry, cohesive late 1800s early 1900s industrial palette dark riveted iron, weathered timber accents, restrained brass. Design an OPEN TOP COAL BUNKER for boat cargo and land bulk storage, rectangular box approximately 3 blocks wide 5 long 3 high, low sturdy base, chamfered top rim, inset iron wall panels with readable vertical ribs, no roof, no complicated scaffolding or giant hopper funnel. Coal is visibly physical: angular black chunks form a mound inside and rise as storage fills. One clearly marked square transfer port low on a short end, modest brass-framed controller beside it. Large hero three-quarter overhead view on stone dock showing half-full bunker and one Minecraft player for scale. Bottom row three smaller matching views of EXACT SAME structure: empty showing inner bottom, half-full with low coal mound, full with high coal mound within rim. Labels 'EMPTY', 'HALF', 'FULL'. Include a small context inset of same bunker on timber vessel deck to show identical land/boat usage. Industrial practical and handsome, economical repeated panels, not a modern dumpster, no wheels, no conveyor system or crane required. Light parchment background and soft daylight shading; title 'COAL BUNKER'. Concept inspiration only not texture atlas.",
+      "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-6ac6be25-49df-41b2-9289-5f7c3e19c4c9.png",
+      "file": "14_coal_bunker.png",
+      "sha256": "496dbd4290f8a21ea142f22cfcd22f011702c1bc2e5e9323657800c2239d6d7f"
+    },
+    {
+      "id": "tank",
+      "prompt": "Minecraft mod multiblock concept design sheet in high detail voxel rendering, realistic shader lighting on visibly block-built forms with half-block steps and slabs, cohesive late 1800s early 1900s industrial palette of dark weathered riveted iron, muted cream identification stripe, restrained brass. Design a HORIZONTAL LIQUID CARGO TANK approximately 3 blocks wide 5 long 3 high, faceted octagonal barrel cross section feasible with Minecraft cut blocks, two stout saddle supports directly meeting the ground, capped ends with clearly repeated iron bands, beautiful compact practical silhouette. Front end has tall narrow protected brass framed glass sight strip showing amber liquid level, one large lower flanged pipe transfer port and small brass controller. No pressure simulation controls, no forests of valves, no roof platform or ladders. Main large three-quarter view on stone quay, one Minecraft player for scale. Secondary inset rear view and small end-on view showing the polygonal cross section and glass indicator at low vs high fill. Small context inset same tank secured on timber river freight vessel deck, identical structure on land and afloat. Simple robust modular cargo storage for crude oil fuel or lubricant, one liquid at a time. Clear readable accessible fittings, believable scale, not a tiny magic block and not a huge oil refinery. Title 'LIQUID CARGO TANK'. Warm neutral parchment background, crisp detail, no texture atlas.",
+      "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-616c3353-4f57-44ff-800e-0965e317d4f5.png",
+      "file": "15_liquid_cargo_tank.png",
+      "sha256": "45c4100bb875aa9e03ddd74856399fa8cf3c7f6b613b0e471f568526943eaeaf"
+    }
+  ]
+}

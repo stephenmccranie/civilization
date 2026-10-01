@@ -1,0 +1,22 @@
+{
+  "sources": {
+    "front": {
+      "path": "sources\\works_front-v1.png",
+      "sha256": "ea2d599c3a0a785ae75bb7c72df39f3fb225b451c63685a56e2218d0cbb0db2c"
+    },
+    "side": {
+      "path": "sources\\works_side-v1.png",
+      "sha256": "fcc0a8167d94e444aa9381198361a523b37a40e6c1fa7f5902b0fb373eef2037"
+    },
+    "front_on": {
+      "path": "sources\\works_front_on-v1.png",
+      "sha256": "f5bf114dde24a72a364fe38942d1e95ad914ce6f64eb40d8ae2474618b5b1e99"
+    }
+  },
+  "faces": {
+    "front": "22b4a623f73f28132f560f8430e42f171bf5c07f95d577b6bbe05cf9ae8f3b38",
+    "side": "b230812be63a782b7ffc747736bc573ff253f070adbfa7dd2f2462e5526bfd5f",
+    "top": "b230812be63a782b7ffc747736bc573ff253f070adbfa7dd2f2462e5526bfd5f",
+    "front_on": "c545b740bad065edb0047b3aae949deaadc3aad1323b1d79aeda41fb703f6e4e"
+  }
+}

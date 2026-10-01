@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "civilization:item/grade_wear/minecraft_netherite_axe_v08"
+  }
+}

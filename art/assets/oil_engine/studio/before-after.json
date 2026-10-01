@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\before\\rear.png",
+      "sha256": "d800d53869b1af64ad049aa49fe54d4f7d217dc95248a7353a0660c8060bd69a",
+      "crop": [
+        0,
+        0,
+        1000,
+        1000
+      ],
+      "label": "Previous"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\studio\\after\\rear.png",
+      "sha256": "3163daab017782affb12d8927f84dce697449cd9e8c59b2799b938767b98870c",
+      "crop": [
+        0,
+        0,
+        1000,
+        1000
+      ],
+      "label": "Revised"
+    }
+  ]
+}

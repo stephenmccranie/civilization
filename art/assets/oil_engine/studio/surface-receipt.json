@@ -1,0 +1,12 @@
+{
+  "master": "surface-master.png",
+  "prompt": "surface-prompt.txt",
+  "tool": "built-in image_gen",
+  "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-4d741158-ffe8-4259-8278-61590a98803a.png",
+  "sha256": "dbaa353d240dd26c272e86856a8c58018afe79fbe40d3ce85d6592a676d54372",
+  "references": [
+    "material-master.png",
+    "plain-textures-rear.png"
+  ],
+  "preparation": "Generated alpha range 238..250 normalized opaque retaining RGB; actual cutouts rejected. Shared BOX reduction, 24-color tiles, nine-slice native face layout, +15% panel brightness. Explicit authored rim/spoke edge pixels. No random noise or geometry change."
+}

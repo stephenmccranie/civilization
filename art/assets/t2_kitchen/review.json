@@ -1,0 +1,21 @@
+{
+  "iteration_findings": {
+    "mockup-01.png": "Room layout and four major equipment silhouettes are readable. Range carries a small unrelated forge-style door mark and the copper kettle has excessive orange glow; refine those two details.",
+    "mockup-02.png": "Station sheet exposes full supports and two kettle handles, but the range's right door clearly inherited an anvil symbol. Copper vessel also appears incandescent; revise both without changing geometry.",
+    "mockup-03.png": "Corrected station sheet: unrelated emblem removed, copper body now shows brown/tarnished metal and a normal small warm highlight. Four stations remain distinct and supported.",
+    "mockup-04.png": "Corrected room: matches station-sheet fixes while preserving layout, circulation and equipment identities. Both final views reviewed together."
+  },
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Room mockup-04 shows a central preparation island, rear range and separate baking oven, and entrance-side portioning counter. Worker provides indicative scale. Mockup-03 isolates the same four principal stations. Bench leg count/details are illustrative rather than exact construction plans.",
+      "implementable_geometry": "Broad brick cuboids, stepped chimneys and thick timber counters/posts fit full and half-block construction. Bowls, handles, kettle and hardware require modest custom cuboid/faceted models. This passes concept readability only; exact half-grid coordinates and piece counts await engineering plans.",
+      "mechanics_clearance": "Range kettle sits on the cooktop, its two handles are visible in the sheet, hood is supported by side/rear masonry, oven flue rests on oven body, bench shelves are borne by timber posts. The main room aisles and station fronts are clear. No moving linkage exists to validate.",
+      "period_materials": "Brick, oak, matte iron and warm copper fit town food production. Ivory cloth/ceramics distinguish serving surfaces. Corrected kettle is non-incandescent and anvil mark is removed. Fire glow is confined to apertures and oven inspection view.",
+      "family_consistency": "Brick chimney vocabulary and supported oak benches relate to the existing Smithy; iron hardware relates to the Cooking Stove. Copper cookware, mixing bowl and meal tray give the kitchen its own identity. Brick red, timber ochre and low-contrast dark iron are coherent across both final views; detail remains subordinate to shape.",
+      "controls_readability": "Large accessible iron doors and handles distinguish heating stations. Work surfaces identify preparation and portioning. No fake gauge or UI is introduced. Caption text in the station sheet is correct; exact controller placement is still a design task.",
+      "gameplay_scope": "Mockups explore the requested kitchen room composed of several multiblocks. Four named stations, recipes, fuel, meal effects, bounds and transfer rules remain proposals. No runtime art, machine behavior, room detection or in-game validation is claimed."
+    },
+    "remaining_issues": []
+  }
+}

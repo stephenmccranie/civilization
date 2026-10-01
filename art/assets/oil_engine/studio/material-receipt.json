@@ -1,0 +1,8 @@
+{
+  "tool": "built-in image_gen",
+  "master": "material-master.png",
+  "sha256": "d74fbdf141b73f1715cd29fac242e3e11e1518c6c208098dbfdeffeb71b34797",
+  "prompt": "material-prompt.txt",
+  "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-5ab402c6-1419-4230-8850-c9a2b938e65b.png",
+  "review": "Four coherent material/decal quadrants. Gauge intentionally contains only one instrument. Native exports use shared BOX/no-dither reducer, iron/steel/brass 16 colors, dial 24."
+}

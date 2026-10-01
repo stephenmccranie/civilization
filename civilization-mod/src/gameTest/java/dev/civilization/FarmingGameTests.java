@@ -88,14 +88,16 @@ public class FarmingGameTests {
 
     @GameTest(template = "empty")
     public static void fertilizerIsSingleUseAndStatePersists(GameTestHelper helper) {
-        var player = farmer(helper);
-        BlockPos pos = helper.absolutePos(new BlockPos(1, 1, 1));
-        helper.getLevel().setBlockAndUpdate(pos.below(), Blocks.FARMLAND.defaultBlockState());
-        helper.getLevel().setBlockAndUpdate(pos, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 3));
+        var level = GeographyGameTests.region(helper, "river");
+        var player = new FakePlayer(level, new GameProfile(UUID.randomUUID(), "fertilizer-test"));
+        player.setGameMode(GameType.SURVIVAL);
+        BlockPos pos = new BlockPos(16, 64, 16);
+        level.setBlockAndUpdate(pos.below(), Blocks.FARMLAND.defaultBlockState());
+        level.setBlockAndUpdate(pos, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 3));
         player.setItemInHand(InteractionHand.MAIN_HAND, FarmingContent.FERTILIZER.toStack(2));
         player.setPos(Vec3.atCenterOf(pos.above()));
         FarmingContent.FERTILIZER.get().useOn(context(player, pos));
-        var fertilized = helper.getLevel().getBlockState(pos);
+        var fertilized = level.getBlockState(pos);
         helper.assertTrue(fertilized.is(FarmingContent.FERTILIZED_WHEAT.get()) && fertilized.getValue(CropBlock.AGE) == 3,
                 "Fertilizer must change crop identity, preserving age");
         helper.assertTrue(player.getMainHandItem().getCount() == 1, "Consume exactly one fertilizer");
@@ -103,13 +105,13 @@ public class FarmingGameTests {
         FarmingContent.FERTILIZER.get().useOn(context(player, pos));
         helper.assertTrue(player.getMainHandItem().getCount() == 1, "Cannot apply twice");
         var saved = NbtUtils.writeBlockState(fertilized);
-        var restored = NbtUtils.readBlockState(helper.getLevel().holderLookup(Registries.BLOCK), saved);
+        var restored = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), saved);
         helper.assertTrue(restored.equals(fertilized), "Fertilizer state must survive block-state save/load");
         for (int i = 0; i < 3; i++) FarmingContent.FERTILIZED_WHEAT.get().performBonemeal(
-                helper.getLevel(), helper.getLevel().random, pos, helper.getLevel().getBlockState(pos));
-        helper.assertTrue(helper.getLevel().getBlockState(pos).is(FarmingContent.FERTILIZED_WHEAT.get())
-                && helper.getLevel().getBlockState(pos).getValue(CropBlock.AGE) == 7, "Growing must preserve fertilizer until maturity");
-        helper.getLevel().setBlockAndUpdate(pos, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7));
+                level, level.random, pos, level.getBlockState(pos));
+        helper.assertTrue(level.getBlockState(pos).is(FarmingContent.FERTILIZED_WHEAT.get())
+                && level.getBlockState(pos).getValue(CropBlock.AGE) == 7, "Growing must preserve fertilizer until maturity");
+        level.setBlockAndUpdate(pos, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7));
         FarmingContent.FERTILIZER.get().useOn(context(player, pos));
         helper.assertTrue(player.getMainHandItem().getCount() == 1, "Mature wheat cannot be fertilized at harvest time");
         helper.succeed();

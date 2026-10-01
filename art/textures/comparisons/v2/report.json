@@ -1,0 +1,69 @@
+{
+  "pillow": "12.3.0",
+  "assets": {
+    "mineral_coal": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          157,
+          157,
+          1137,
+          1097
+        ],
+        "opaque_colors": 106,
+        "partial_alpha_pixels": 622108
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 15,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "969cbc6a3cd03ce2423b2fd62fbd1247353d7735d7c399952b3bc2a555894fd5",
+      "output_sha256": "73acb033f0a4a7658ecba6e6e71fb9aebe773ec26d7e3168bc8959fbe98c2944"
+    },
+    "fertilizer": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          111,
+          162,
+          1143,
+          1170
+        ],
+        "opaque_colors": 557,
+        "partial_alpha_pixels": 787138
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "755d9518b953a5ec8916fb8cd591bb4fdd89b25019c26b4dece7b7a5569553cd",
+      "output_sha256": "06673c5d1174cd50688b4149d89b84832daaeae3813833d86770757280ac9cee"
+    }
+  }
+}

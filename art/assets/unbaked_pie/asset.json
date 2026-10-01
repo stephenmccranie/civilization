@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "One shallow round unbaked pumpkin pie with pale raw ivory pastry rim and muted ochre-orange filling. Six broad pinched pastry folds around rim, plain dark gray baking tin barely visible below; no handles. Unbaked dough must look pale, not golden or toasted. Broad quiet color variations in filling, not tiny grains. Three-quarter view.",
+    "purpose": "Readable food/preparation item in Civilization kitchen family.",
+    "silhouette": "One shallow round unbaked pumpkin pie with pale raw ivory pastry rim and muted ochre-orange filling. Six broad pinched pastry folds around rim, plain dark gray baking tin barely visible below; no handles. Unbaked dough must look pale, not golden or toasted. Broad quiet color variations in filling, not tiny grains. Three-quarter view.",
+    "bounds": "32x32 generated item with 28px silhouette extent and transparent margin.",
+    "materials": "One shallow round unbaked pumpkin pie with pale raw ivory pastry rim and muted ochre-orange filling. Six broad pinched pastry folds around rim, plain dark gray baking tin barely visible below; no handles. Unbaked dough must look pale, not golden or toasted. Broad quiet color variations in filling, not tiny grains. Three-quarter view.",
+    "interfaces": "Existing item registration and normal generated-item model.",
+    "states": "Static inventory resource.",
+    "construction": "High-resolution generated master to shared alpha-safe sprite exporter.",
+    "invariants": "No recipe, calorie, stack, container-return or gameplay changes.",
+    "technological_stage": "Practical frontier and town kitchens in the late nineteenth-century material tradition.",
+    "material_behavior": "Broad natural material planes and sparse lower-contrast marks; uncooked dough stays pale.",
+    "signature_feature": "One shallow round unbaked pumpkin pie with pale raw ivory pastry rim and muted ochre-orange filling. Six broad pinched pastry folds around rim, plain dark gray baking tin barely visible below; no handles. Unbaked dough must look pale, not golden or toasted. Broad quiet color variations in filling, not tiny grains. Three-quarter view.",
+    "neighboring_assets": "Other five kitchen items, Cloth and Mineral Fertilizer.",
+    "fidelity_targets": [
+      "Distinct silhouette at inventory size",
+      "Food state readable",
+      "Broad material-specific variation"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/cloth/mockup-04.png",
+      "role": "Style only: established pixel cluster scale, restrained lighting and readable silhouette."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "unbaked_pie.png",
+      "target": "textures/item/unbaked_pie.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "unbaked_pie.json",
+      "target": "models/item/unbaked_pie.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-aefcba0d-573a-4e50-9b13-b8becef519ae.png",
+      "sha256": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+      "prompt": "Create one Minecraft item: One shallow round unbaked pumpkin pie with pale raw ivory pastry rim and muted ochre-orange filling. Six broad pinched pastry folds around rim, plain dark gray baking tin barely visible below; no handles. Unbaked dough must look pale, not golden or toasted. Broad quiet color variations in filling, not tiny grains. Three-quarter view. High-resolution pixel-art master composed for a tiny Minecraft inventory icon; do not output a tiny image. Reference image is STYLE ONLY: broad purposeful connected pixel clusters, modest material marks and readable silhouette, not its cloth subject or blue stripe. Match Civilization frontier supplies: practical natural materials, muted earth colors, restrained upper-left light. About sixteen deliberate colors, two or three main tones per material; hard stepped boundaries, sparse 1-3-final-pixel material marks quieter than structural edges. Clear major forms, no fine noise, gradients, shiny plastic, microscopic detail, lettering, floor, cast shadow, border or glow. Centered isolated single inventory item, generous margins, true transparent background.",
+      "brief_hash": "a46c8ee119917480f26d61aaaf3afe03e71aeb2189da9780de7d92327124b26c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+        "implementable_geometry": "One static generated-item sprite; shape is complete within transparent margins.",
+        "mechanics_clearance": "No moving mechanics; food and depicted container/wrapping form a coherent supported object.",
+        "period_materials": "Natural food, earthenware, plain tin and cloth fit practical frontier/town kitchens; no decorative machinery.",
+        "family_consistency": "Inspected against Cloth and fertilizer; broad pixel clusters, upper-left light and earthy palette are consistent.",
+        "controls_readability": "No controls; ingredient state and silhouette identify this food.",
+        "gameplay_scope": "No recipe, calorie, stack or container-return changes."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "a46c8ee119917480f26d61aaaf3afe03e71aeb2189da9780de7d92327124b26c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "mockup-01.png": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+        "sprite-review.png": "e61849d7bda99ae688e71ce8495cf93c91600d16480f000f2bf2ce959be53133"
+      },
+      "generation": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+        "geometry_uvs": "Native generated-item JSON with 32x32 texture, 16 opaque colors, binary alpha and padded silhouette.",
+        "material_consistency": "Food variation stays subordinate to shape; dough pale, baked bread warm, clay muted reddish brown.",
+        "assembly_interfaces": "Existing registered item resource retained; no physical block interfaces.",
+        "animation_states": "Static item with native held transform; no animation needed.",
+        "native_size_readability": "Inspected family sheet at native size on dark/light backgrounds and enlarged. Comparable footprint and detail density; shapes remain distinct beside Cloth/fertilizer."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "a46c8ee119917480f26d61aaaf3afe03e71aeb2189da9780de7d92327124b26c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\mockup-01.png": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\export.py": "a13e453e67e812c53e20e0f061d06850dba3ebeb9a2e02ea58d7f44baa62758e",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.png": "d6016924b837c7f8a8c312b515adbf4da70353f566631612f0803474e002cc34",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.json": "3c3f2934a2e5732d38a20e73f010bf90c1999aa4447306c74d74229e2d9c732d"
+      },
+      "evidence": {
+        "mockup-01.png": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+        "sprite-review.png": "e61849d7bda99ae688e71ce8495cf93c91600d16480f000f2bf2ce959be53133"
+      },
+      "generation": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Inventory retains original natural palette; Photon framed views shade it consistently without missing textures or alpha boxes.",
+        "scale_readability": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+        "states_motion": "Static generated item. No animated or processing states apply.",
+        "interaction_guides": "Food inventory item, no multiblock guide or placement interfaces.",
+        "inventory_appearance": "Reviewed eight-item lineup: six kitchen items plus Cloth/fertilizer. Comparable scale, warm restrained palette, broad clusters and distinct silhouettes; pale uncooked preparations contrast golden ration bread. Bowl and pie have distinct depths and colors.",
+        "integration_limits": "Build/unit and focused foods scene passed; inventory and frames inspected. Recipes/calories untouched; no gameplay or multiplayer coverage claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "a46c8ee119917480f26d61aaaf3afe03e71aeb2189da9780de7d92327124b26c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\mockup-01.png": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\export.py": "a13e453e67e812c53e20e0f061d06850dba3ebeb9a2e02ea58d7f44baa62758e",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.png": "d6016924b837c7f8a8c312b515adbf4da70353f566631612f0803474e002cc34",
+        "F:\\minecraft project\\art\\assets\\unbaked_pie\\unbaked_pie.json": "3c3f2934a2e5732d38a20e73f010bf90c1999aa4447306c74d74229e2d9c732d"
+      },
+      "evidence": {
+        "evidence/foods-inventory.png": "86eb70753cc3bfc88e107d5b68e2f79487f68a74d38b1b93668b03f681960f0a",
+        "evidence/foods-frames.png": "d15100422c3538a8b47f04f2284bddb514b8555b668bd42604713b0079f448cc"
+      },
+      "generation": "285fbd657d74cad96ce3d852f07d505a1f1979fd1265df4560af7e4818155fef"
+    }
+  ]
+}

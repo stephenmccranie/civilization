@@ -1,0 +1,25 @@
+{
+  "id": "engine_proof",
+  "sources": {
+    "project": "9af3de8942c75f08632e83c70d114632f3a3ec16ada39d638befc807a2819a16",
+    "geometry": "2c7515fd88d387c44538c1db870146d1fa2a0cc399f75a8215b6ed1e006ccb1f",
+    "animation": "9f0595ecaca82ee2e811d6772d5e44c7303da0a94825f7038ef88d86997bf0f8",
+    "texture": "b689c6d030c0e7c278c42780d78b2681e1292b13b9819adac53e1ac748c3f922"
+  },
+  "outputs": {
+    "geometry": "civilization-mod/src/main/resources/assets/civilization/geo/engine_proof.geo.json",
+    "animation": "civilization-mod/src/main/resources/assets/civilization/animations/engine_proof.animation.json",
+    "texture": "civilization-mod/src/main/resources/assets/civilization/textures/entity/engine_proof.png"
+  },
+  "validation": {
+    "bones": 3,
+    "cubes": 17,
+    "atlas": [
+      128,
+      128
+    ],
+    "animations": [
+      "animation.engine_proof.cycle"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Whole assembly retains octagonal open four-spoke wheel, elongated cylinder, stepped case, two grounded feet and separate control cabinet. Narrow steel face rim and flanges replace broad indistinct surfaces. Intentional simplifications: no extra oil cup or decorative foot brass from the illustration.",
+    "geometry_uvs": "Same 146 cuboids and pivots. Native Java/GeckoLib validation passed with 512x512 atlas. Named face islands keep two pixels per model unit; nine-slice panels retain corner scale. Base material tiles and gauge remain separate.",
+    "material_consistency": "Generated reference-driven surface sheet supplies steel corner protectors, brass pinstriped covers, inset support panels and muted enamel body bands. Explicit edge pixels articulate wheel/spokes. Front/rear native views inspected after modest panel brightening; shared casing and isolated gauge retained.",
+    "assembly_interfaces": "Unchanged controller/cylinder/wheel offsets and construction footprint. Two iron saddles meet bed, control-side mouths accessible, modeled exhaust opening recessed. Head bolts and side access cover finish rear/opposite views. User refinement: tall protruding black burner removed; compact iron burner and brass nozzle recessed beneath end cap. Rear native view inspected.",
+    "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+    "native_size_readability": "At native contact-sheet scale, panel borders, corners and wheel edges remain distinct; geometry is unchanged. Full in-game shader review follows."
+  },
+  "remaining_issues": []
+}

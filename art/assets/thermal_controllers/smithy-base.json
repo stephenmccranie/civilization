@@ -1,0 +1,113 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/bricks",
+    "brick": "minecraft:block/bricks",
+    "iron": "minecraft:block/anvil",
+    "door": "minecraft:block/blast_furnace_front"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brick"
+        },
+        "south": {
+          "texture": "#brick"
+        },
+        "east": {
+          "texture": "#brick"
+        },
+        "west": {
+          "texture": "#brick"
+        },
+        "up": {
+          "texture": "#brick"
+        },
+        "down": {
+          "texture": "#brick"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        2,
+        -0.1
+      ],
+      "to": [
+        13,
+        13,
+        1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#iron"
+        },
+        "south": {
+          "texture": "#iron"
+        },
+        "east": {
+          "texture": "#iron"
+        },
+        "west": {
+          "texture": "#iron"
+        },
+        "up": {
+          "texture": "#iron"
+        },
+        "down": {
+          "texture": "#iron"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        3,
+        -0.2
+      ],
+      "to": [
+        12,
+        12,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#door",
+          "uv": [
+            3,
+            3,
+            13,
+            14
+          ]
+        },
+        "south": {
+          "texture": "#door"
+        },
+        "east": {
+          "texture": "#door"
+        },
+        "west": {
+          "texture": "#door"
+        },
+        "up": {
+          "texture": "#door"
+        },
+        "down": {
+          "texture": "#door"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["P  ", "PP ", "PPP"],
+  "key": { "P": { "item": "civilization:street_pavers" } },
+  "result": { "id": "civilization:street_pavers_stairs", "count": 4 }
+}

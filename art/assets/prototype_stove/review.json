@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Selected refinement retains the shallow head, open braced four-leg stand, square skillet and single dial. No oven door or cavity reintroduced.",
+      "implementable_geometry": "Existing cuboids are sufficient. Main housing seams, small bolts, vent surround, dial ticks and pan lip can be placed with face-specific UV islands at 64px density instead of excess detail cubes.",
+      "mechanics_clearance": "No changes to pan support, food volume, head/leg contacts, dial pivot or short handle; all interfaces remain accessible.",
+      "period_materials": "Quieter charcoal cast iron now reads as metal; narrow rubbed edges and steel fastening accents explain construction. Brass remains confined to the existing dial.",
+      "family_consistency": "Inspected beside rejected implemented stove and kitchen concept. Same period iron structure, with the separate oven identity preserved. Broad panels and purposeful fastening accents replace the stone-like mottling.",
+      "controls_readability": "Four slots receive a restrained fitted surround. Existing rotary control gains engraved calibration ticks around its face, without new gameplay meters or extra instruments.",
+      "gameplay_scope": "Surface refinement only; unchanged bounds, burner count, coal use, cooking timings, food, continuous control and serving."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "New concept and complete neutral/textured six-view assembly retain the existing head, open stand and pan proportions. Housing joints, four-corner fastening, vent surround, dial calibration and worn skillet lip now occupy their actual component faces; excess repeated pan-edge bands were removed during review.",
+      "geometry_uvs": "Native Java cuboids are unchanged. A 512x256 atlas holds ordinary four-pixels-per-unit material and component islands. Housing faces use measured 64x20 regions; matching support faces share size-specific islands. The 12px control face is consistently cropped across the overlapping main dial castings. Only the existing slot decal uses explicit fit UVs.",
+      "material_consistency": "Prior gritty detailed master was rejected after user review. New generated metal has quieter coherent tones and clean dark cookware without rusty speckles. Native 64px exports and atlas inspected; metal identity comes from subtle fill, sharp purposeful joints and restrained rubbed edges. Brass stays on the dial.",
+      "assembly_interfaces": "No geometry, block bounds, pan/food coordinates, control pivot, fuel behavior or interactions changed. Small steel fastening marks and fitted seams explain the existing housing; supports have longitudinal edges and attachment marks rather than framed miniature panels.",
+      "animation_states": "Static shell, cold slots and control ticks reviewed in native views. Runtime ember overlays, food and pointer remain the same; actual alignment/readability still requires the focused Photon scene. No new moving mechanism or vessel claim.",
+      "native_size_readability": "Six-view and full-size model show a quiet readable pan and housing, strong open lower space, fitted vent group and distinct single dial. Sparse accents remain visible at ordinary scale; broad faces no longer look like mottled stone. Native material/atlas evidence preserves the exact placed pixels and face mapping."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Actual Photon/Faithful front, rear and side views show quiet cast iron rather than gritty stone-like mottling. Clean dark pan keeps food readable. Fitted cover seams, small steel fastening, vent surround and rubbed lips are visible at their actual joints; brass stays at the control.",
+      "scale_readability": "Dedicated shallow head/open stand still distinct from the neighboring T1 cabinet. Main casting panels are calm at gameplay distance; restrained high-contrast seam and hardware marks carry construction. No oven door/cavity, excess surface noise or decorative machinery.",
+      "states_motion": "Actual pale/golden/charred food and empty served pan inspected. Continuous pointer moves over the new static calibration marks; rotary input reaches the server. Four lit ember overlays fit inside the new vent surround without spreading over the casing.",
+      "interaction_guides": "Existing menu, ingredients, ignition, continuous rotary input and serving passed the focused scene. No changed interaction, timing, calorie benefit, fuel or room-heat behavior. Prototype retains one-block Creative/admin scope, with no multiblock guide.",
+      "inventory_appearance": "Actual inventory icon retains the open legs, square pan and single brass control beside the vegetable portion and Faithful vanilla items. Small surface marks reduce cleanly at slot scale; material tones and silhouette remain readable.",
+      "integration_limits": "Build/unit, complete asset validation and guarded hidden kitchen scene passed. Latest 255 server tests were in the earlier heat build and not repeated for this resource-only change. Sensory enjoyment, dense-kitchen balance and moving-vessel rendering are not newly verified."
+    },
+    "remaining_issues": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "photon_materials": "Engine-family metal consistent and symbols readable in inventory.",
+    "scale_readability": "Inventory size good; first-person canister too large/cut off.",
+    "states_motion": "Static variants correct in hotbar; no animation needed.",
+    "interaction_guides": "No multiblock guide applies. Item frame shows unmarked rear, needs fixed transform correction.",
+    "inventory_appearance": "All four symbols/colors visible at inventory scale; hand points wrong face toward player.",
+    "integration_limits": "Art-only scene; no gameplay changes."
+  },
+  "remaining_issues": [
+    "Rotate fixed display to show front badge.",
+    "Rotate hand display toward front and reduce/raise it so full tin is visible."
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,working=false": {
+      "model": "civilization:block/oil_refinery",
+      "y": 0
+    },
+    "facing=north,working=true": {
+      "model": "civilization:block/oil_refinery_on",
+      "y": 0
+    },
+    "facing=east,working=false": {
+      "model": "civilization:block/oil_refinery",
+      "y": 90
+    },
+    "facing=east,working=true": {
+      "model": "civilization:block/oil_refinery_on",
+      "y": 90
+    },
+    "facing=south,working=false": {
+      "model": "civilization:block/oil_refinery",
+      "y": 180
+    },
+    "facing=south,working=true": {
+      "model": "civilization:block/oil_refinery_on",
+      "y": 180
+    },
+    "facing=west,working=false": {
+      "model": "civilization:block/oil_refinery",
+      "y": 270
+    },
+    "facing=west,working=true": {
+      "model": "civilization:block/oil_refinery_on",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "blockbench": {
+    "version": "5.1.6",
+    "url": "https://github.com/JannisX11/blockbench/releases/download/v5.1.6/Blockbench_5.1.6_portable.exe",
+    "file": "Blockbench_5.1.6_portable.exe",
+    "sha256": "6dfc65fd8360974a52383ce801cb31e253e655b39ccbb2e8f560db4bf99ae93b"
+  },
+  "mcp": {
+    "version": "1.7.0",
+    "source_commit": "b187b4b056f0efafcc573335400ecbb21ad26ecc",
+    "url": "https://raw.githubusercontent.com/jasonjgardner/blockbench-mcp-plugin/2deae460d4bdf542660753cb8eb71cfc6a7bbf9b/mcp.js",
+    "file": "mcp.upstream.js",
+    "sha256": "ff265bebbadd779374d69edb380041267f2d9a60cbdc9465a94005da2e1068fa"
+  },
+  "geckolib_editor": {
+    "source_commit": "b712fec18fdc63badaff1a7cb309dcceff1656eb",
+    "url": "https://raw.githubusercontent.com/JannisX11/blockbench-plugins/b712fec18fdc63badaff1a7cb309dcceff1656eb/plugins/geckolib/geckolib.js",
+    "file": "geckolib.js",
+    "sha256": "55d29fb29a888bcc60a8f1250c945e2835883add69f1aa4007ff7c7bf994b30f"
+  },
+  "geckolib_runtime": "4.9.3"
+}

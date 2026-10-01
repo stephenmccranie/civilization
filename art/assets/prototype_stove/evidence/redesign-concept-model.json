@@ -1,0 +1,37 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\mockup-02.png",
+      "sha256": "af2d077b21b1cda50568ac865e0be3146c0052359178e767bf7fe4873f29b595",
+      "crop": [
+        165,
+        130,
+        1150,
+        1150
+      ],
+      "label": "Concept"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-blockout-front_threequarter.png",
+      "sha256": "934223b25f53647895c51262f5beb61d22551f15688c8f2615560530f5779c13",
+      "crop": [
+        0,
+        0,
+        600,
+        600
+      ],
+      "label": "Blockout"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\prototype_stove\\evidence\\redesign-model-front_threequarter.png",
+      "sha256": "9dc745d85e3d7389b4eeb71a62afc96dcc94713a963614573319ed41ef09758b",
+      "crop": [
+        0,
+        0,
+        600,
+        600
+      ],
+      "label": "Textured"
+    }
+  ]
+}

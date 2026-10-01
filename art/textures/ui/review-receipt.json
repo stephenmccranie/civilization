@@ -1,0 +1,45 @@
+{
+  "result": "pass",
+  "change": "512x512 RGB master export; 48 source pixels map to 12 GUI pixels",
+  "source": {
+    "path": "art/textures/ui/cabinet-master.png",
+    "sha256": "993e264796cc38cf5a96e76339c063f03a65ea8c0d508b7e336bc0b6b3b0c0b4"
+  },
+  "runtime": {
+    "path": "civilization-mod/src/main/resources/assets/civilization/textures/gui/cabinet.png",
+    "sha256": "d1c682153d16eb9c4a1c47efa95009c12dad572bb3cc64791e9b81fe8939e8b0"
+  },
+  "renderer": {
+    "path": "civilization-mod/src/main/java/dev/civilization/client/MachineUi.java",
+    "sha256": "f8853a6256f3a4b6fb4c67caadef40a9f5dec35731bd38e7995a16df6fe8acba"
+  },
+  "evidence": [
+    {
+      "path": "art/textures/ui/review/chest-double.png",
+      "sha256": "2734ff03f76a98d0404f9dd85e06729a728ddb271180c4556473be96cf557d31"
+    },
+    {
+      "path": "art/textures/ui/review/inventory-closed.png",
+      "sha256": "5fc1c35981fd1ead6ff162ea7f028941ff759c8a4acbf0c71f0c5da9ee2b2c4e"
+    },
+    {
+      "path": "art/textures/ui/review/workshop-menu-2.png",
+      "sha256": "47e29091ca590127da6b5f37b5035d04174b79b14600ed703e0e48128c05fdd7"
+    }
+  ],
+  "findings": [
+    "Rounded brass heads retain highlights and dark lower rims.",
+    "Layered metal bevel visible without increasing frame size.",
+    "Player, double chest and multiblock controller frames remain aligned with native slots."
+  ],
+  "validation": [
+    "Build/unit checks passed",
+    "Photon inventory scene 43.3s",
+    "Photon chests scene 35.0s",
+    "Photon workshops scene 41.4s"
+  ],
+  "limits": [
+    "GUI scale 3 reviewed; smaller scales necessarily discard source detail.",
+    "No new image generation: original approved generated master reused without modification."
+  ]
+}

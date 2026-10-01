@@ -1,0 +1,12 @@
+{
+  "master": "iron-master.png",
+  "master_sha256": "9c1097064ce01387703015955585e0e114841ad2117ff69630eae7ee21c9189c",
+  "output": "F:\\minecraft project\\civilization-mod\\src\\main\\resources\\assets\\civilization\\textures\\block\\engine_iron.png",
+  "sha256": "a1e8faac0e5aca811503044f58276f93c4ffb32471cd3ce5a4887b02f74580fc",
+  "size": [
+    32,
+    32
+  ],
+  "palette": 24,
+  "reuse": "Same master on every iron face; copper/steel reference active resource-pack materials."
+}

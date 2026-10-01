@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+    "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+    "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+    "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+    "animation_states": "No animation required; all four static variants reviewed.",
+    "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+  },
+  "remaining_issues": []
+}

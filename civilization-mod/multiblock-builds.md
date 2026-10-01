@@ -1,49 +1,41 @@
-# Multiblock machines — 0.9.2
+# Multiblock machines
 
-Craft and place a controller, then build the machine around it. The controller's furnace-like front faces outwards at the bottom-center of the structure's front wall. The body extends two blocks behind it, one left and one right, and two blocks above it. The Fertilizer Works adds a fourth-height chimney.
+Craft and place a controller, then build the machine around it. This page covers the Kiln and Fertilizer Furnace; [oil industry](industry.md) owns the newer pump/refinery/drill layouts, which use the same contextual guides. For the machines below, the controller's furnace-like front faces outwards at the bottom-center of the structure's front wall. The body extends two blocks behind it, one left and one right, and two blocks above it. The Fertilizer Furnace adds a fourth-height chimney.
 
 ## In-world building flow
 
 1. Craft the controller using its existing recipe. Its tooltip lists the **additional structural blocks**, excluding the controller's own crafting ingredients.
 2. Place it where the machine's bottom/front-center should be. The model's front faces you.
 3. Transparent boxes show missing positions. If the preview is not selected, look directly at the controller. Only one nearby controller is selected at a time.
-4. Ghost blocks use the actual baked block models and resource-pack textures at 30% opacity. Cobblestone, bricks and copper appear as themselves. Holding an accepted alternative (stone bricks, aged/waxed copper, or a downward hopper for the hatch) previews that variant. A red outline means an existing block must be replaced or the chamber must be emptied; an air requirement has no textured block. Aim at a guide to see the required material in the HUD. Correctly filled positions disappear.
-5. The HUD and guides appear only while looking at the selected unfinished build area within eight blocks. Looking away or completing the structure hides both automatically. Walking more than 32 blocks away clears selection. No toggle key is needed. These guides are client-only and never place blocks or load distant terrain.
-6. Right-click the controller to open its inventory. Missing-block feedback includes a coordinate and material; the status becomes complete when assembled. The extra Build button and layer-plan screen were removed; the diagrams below are reference documentation only.
+4. Ghost blocks use the actual baked block models and resource-pack textures at the configured guide opacity (32% default). Cobblestone, bricks and copper appear as themselves. Holding an accepted alternative (stone bricks, aged/waxed copper, or a downward hopper for the hatch) previews that variant. Holding the required block preserves the guide's orientation and connections; it never substitutes the item's default facing. A red outline means an existing block must be replaced or the chamber must be emptied. Incorrectly occupied positions show the real block with a correction outline, without a full-bright ghost layered over it; the current world state suppresses that texture immediately on placement, before the next guide scan. An air requirement has no textured block. The guide sets its own neutral shader color and restores the previous color afterward. Textures remain translucent to suggest the whole build, but hard outlines are shown only where they are not hidden by nearer guide surfaces or real blocks. Large guides keep all on-screen ghost textures but draw hard outlines for the nearest 64 on-screen pieces and the directly aimed piece. The nearest directly aimed guide gets a cyan outline and its material in the HUD; already-placed blocks stop target selection. Correctly filled requirements disappear. Declared shared-cell pieces (such as Smithy table feet and tops) may occupy the same block space: each missing piece keeps its own guide, while excess cells or wrong materials are marked for correction.
+5. The HUD and guides appear while looking at the selected unfinished build area within eight blocks. The top-left hint lists remaining quantities by material and piece size, including pieces behind obstructions; air spaces count as obstructions but need no item. Visibility uses the rendered camera for both aiming and obstruction, with a 0.1-block retention margin and a 150 ms release delay to avoid flicker when walking along block edges. Looking away hides the guide after that brief delay; completing the build, opening a menu or hiding the HUD hides it immediately. The 3D guide and HUD share one visibility decision per frame. Walking more than 32 blocks away clears selection. No toggle key is needed. The guide is client-only and never loads distant terrain.
+6. Right-click the controller with a matching stack to place its missing blueprint pieces, or place them yourself. One click uses as many of the held items as safely fit, with exact cut shapes and functional-block facing. Shared workshop cells accept their separate pieces without charging twice. Full blocks need full items; halves, quarter beams and eighth cubes need the corresponding saw-cut items or native slabs. **You must make the cuts yourself with a saw; the controller neither cuts full blocks nor recuts the wrong-sized pieces.** Already-correct pieces cost nothing. Existing blocks, liquids and inaccessible or unloaded spaces are never replaced; clear obstructions yourself. Empty-hand right-click opens the controller's inventory. The extra Build button and layer-plan screen remain unnecessary; the diagrams below are reference documentation only.
 
-The retort is now named **Fertilizer Works**. Existing controller items/blocks retain their registry IDs (`civilization:brick_kiln` and `civilization:fertilizer_retort`) to preserve saves. No recrafting or item replacement is required. Existing single-block machines retain inventory but need their shells built before they can work.
+The retort is now named **Fertilizer Furnace**. Existing controller items/blocks retain their registry IDs (`civilization:brick_kiln` and `civilization:fertilizer_retort`) to preserve saves. No recrafting or item replacement is required. Existing single-block machines retain inventory but need their shells built before they can work.
 
 ## Kiln
 
-Additional materials: **25 cobblestone and/or stone bricks**. They may be mixed. One wall position may instead be a downward-facing hopper, reducing the stone requirement to 24 plus that hopper.
+Additional materials: **13 cobblestone/stone brick blocks, 4 slabs, 4 quarter beams, 4 eighth cubes**. Stone variants may be mixed. A downward input hopper may replace one full wall block.
 
-Top-down layers, bottom to top; the front is the **bottom row** of every plan:
+From bottom to top: the full 3×3 plinth contains the controller at front-center; the next layer has four inset vertical quarter-beam corners, full side/hatch walls, and the empty center; the roof has four eighth-cube corners, four half-slab edge centers, and one full central crown. The vertical supports occupy the inward corner along both horizontal axes. Roof pieces attach to the bottom of their cells. The in-world guide shows exact shapes and orientations.
 
-```text
-Layer 1       Layer 2       Layer 3
-S S S         S S S         S S S
-S S S         S . S         S S S
-S C S         S H S         S S S
-```
+The shell uses no bricks, avoiding a progression deadlock. Its controller is crafted from cobblestone only. Clay blocks produce four bricks per 200 ticks, with two uninterrupted batches per Coal.
 
-S = cobblestone or stone bricks. C = controller. `.` = empty chamber. H = same stone wall, or a downward-facing hopper pointing into the controller.
+## Fertilizer Furnace
 
-The shell uses no bricks, avoiding a progression deadlock. Its controller crafting recipe remains a furnace surrounded by eight cobblestone. Clay blocks and Mineral Coal retain their 0.8 rates: four bricks per 200 ticks, eight uninterrupted batches per fuel.
+Additional materials: **13 brick blocks, 4 brick slabs, 4 brick beams, 1 copper slab, 4 copper eighth cubes**. A downward input hopper may replace one full brick wall block. Copper may be fresh, aged or waxed.
 
-## Fertilizer Works
+The furnace follows the same plinth, inset supports and stepped roof as the kiln. Its roof corners are copper eighth cubes; a copper half slab forms the chimney cap above the full central crown. The hollow chamber and input hatch remain in their original positions. Vanilla slabs are accepted wherever their shape matches; all pieces must have the correct material and orientation.
 
-Additional materials: **21 brick blocks + 5 full copper blocks**. One brick wall may instead be the input hopper, reducing bricks to 20. Copper blocks may be fresh, exposed, weathered, oxidized, or waxed; cut copper, slabs and stairs are not full copper blocks for this pattern.
+The controller's recipe remains four brick blocks, four copper ingots and a furnace in the documented alternating pattern. These are in addition to the shell materials. Production remains one Raw Mineral Blend → four fertilizer per 400 ticks, four uninterrupted batches per Coal. The works cannot fire bricks; the kiln cannot make fertilizer.
 
-```text
-Layer 1       Layer 2       Layer 3       Layer 4
-B B B         B B B         P B P
-B B B         B . B         B B B           P
-B C B         B H B         P B P
-```
+## Survey Table
 
-B = brick block. P = full copper block. C = controller. `.` = air. H = brick wall or downward input hopper. Blank spaces in layer 4 are unrestricted; only the central chimney block is required.
+A separate **2×2, one-block-high** assembly: one Survey Table Controller and three Survey Table Sections. Its contextual guide uses the same transparent models and visible-surface outlines as the machines. The controller sits at a corner; follow its guide for the other three positions. Completing the structure enables a continuous tabletop map and right-click inspection. Removing any section disables both. See [Survey Table recipes and behavior](ownership-trade.md#survey-table).
 
-The controller's recipe remains four brick blocks, four copper ingots and a furnace in the documented alternating pattern. These are in addition to the shell materials. Production remains one Raw Mineral Blend → four fertilizer per 400 ticks, four uninterrupted batches per Mineral Coal. The works cannot fire bricks; the kiln cannot make fertilizer.
+## Town workshops
+
+The Tannery, Textile Workshop and Smithy use the same partial-block guide system. The Tannery is a low brick vat with an open center and narrow oak rack; the Textile Workshop is a thin oak bench on shared-cell feet with an open loom frame and central copper roller; the Smithy combines a broad hearth, chimney, bench and real anvil. Exact material counts, recipes and migration behavior live in [Town workshops](industry.md#town-workshops).
 
 ## Hopper connections
 
@@ -53,7 +45,7 @@ No special casing inventories or hidden item transfers are introduced. Inventori
 
 ## Runtime behavior
 
-Active machines validate 26 required positions for the kiln or 27 for the works on every processing tick. Idle empty controllers stagger checks once per second; opening a menu checks immediately. Validation only reads nearby loaded chunks, uses no global structure scan, and never force-loads chunks.
+Active machines validate 26 required positions for the kiln or 27 for the Fertilizer Furnace on every processing tick. Idle empty controllers stagger checks once per second; opening a menu checks immediately. Validation only reads nearby loaded chunks, uses no global structure scan, and never force-loads chunks.
 
 Removing/replacing a required block or obstructing the chamber stops processing before the next batch can complete. It extinguishes remaining fuel heat and resets unfinished work without consuming another stored fuel or deleting unprocessed materials. Repairing allows operation with new fuel. Breaking a running structure emits `kiln_structure_broken` or `retort_structure_broken` in the machine journal. The latter prefix remains stable for existing audit tools despite the display-name change.
 
@@ -61,4 +53,4 @@ If a required neighboring chunk is unavailable, the machine waits and preserves 
 
 ## Verification
 
-36 Minecraft GameTests and 19 unit tests cover existing production/calorie behavior plus standalone controller rejection, immediate interruption and repair at a batch boundary, exact missing-block feedback, aged/waxed copper, hopper orientation, air chamber, all horizontal facings, and structure revalidation after save/load. Earlier machine tests now construct full shells and run in larger test templates. Client startup checks registrations and assets; in-world preview appearance has not yet been visually verified on this host.
+The server and unit suites cover existing production/calorie behavior plus standalone controller rejection, immediate interruption and repair at a batch boundary, exact missing-block feedback, aged/waxed copper, hopper orientation, air chamber, all horizontal facings, and structure revalidation after save/load. Earlier machine tests now construct full shells and run in larger test templates. Client startup checks registrations and assets; the new shapes and placement previews are visually checked with Photon and Faithful in the hidden 1920×1080 test client.

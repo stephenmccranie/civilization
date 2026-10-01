@@ -1,0 +1,43 @@
+{
+  "master": "texture-master.png",
+  "sha256": "e6a789f3c7bb219c880e4348cf9350dbd869e6cf59b55783809fe21aac09252f",
+  "prompt": "Edit this exact four-cell 2-by-2 engine texture master. Keep the cell boundaries, panel borders, fasteners, dial shape and markings, lever, brass cell, and all layout EXACTLY unchanged. Lighten the blue-gray iron in top-left, top-right and bottom-right to a soft medium-light neutral blue-gray, about 30 percent brighter, and reduce its speckled contrast by half so it reads as quiet cast metal at game scale. The brass and cream instrument face must retain their current colors. Do not add detail. No perspective, no text, no gutters, fully opaque. Preserve high-resolution pixel-art texture clusters; this is a high-resolution source for later downscaling, not a low-resolution sprite.\n",
+  "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-4cff96fb-4e42-40f6-9df9-40446d04b522.png",
+  "references": {
+    "texture-master-01.png": "6c23999b2e747a496a1f6b24af3f0f6fe3802898cd91a8c67448c953ae6010ce"
+  },
+  "source_size": [
+    1254,
+    1254
+  ],
+  "crops": [
+    [
+      0,
+      0,
+      627,
+      627
+    ],
+    [
+      627,
+      0,
+      1254,
+      627
+    ],
+    [
+      0,
+      627,
+      627,
+      1254
+    ],
+    [
+      627,
+      627,
+      1254,
+      1254
+    ]
+  ],
+  "export": "model/engine_atlas.png",
+  "export_sha256": "46bad6c82ed52ba29c7ee0b2f9d00e5b31925409d09bf877321c1e0f794cf2fd",
+  "tile_size": 32,
+  "review": "Second master lightens iron for Photon readability and reduces speckle contrast; brass/dial layout retained. Copper slot is an assembly placeholder; actual rear slab uses the active pack."
+}

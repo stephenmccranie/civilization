@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "asset": "apogee_pyramid_review_schematic_v3",
+  "generator": "tools/schematics/generate_apogee_pyramid.py",
+  "image_generation_used": false,
+  "status": "candidate_for_user_review",
+  "files_sha256": {
+    "apogee_pyramid_v3.nbt": "62fc4295556a021e7dcb34cc1d35cb210e5c0abcc3edf168f28e9760f8ee4139",
+    "blocks.csv": "7a40f5e086b6534b12e3a5dfb542ee65d2ec36b10551e182535658420569609c",
+    "blocks.json": "3533ba9270e06e3d5a95ce34ba475cc635012f2382ec6157f3b96fda2d620313",
+    "elevations.png": "40fc59958f7cbecafb69e68b3e673d35db0ec691f6faeadcd2c34fd6c28f1017",
+    "isometric_review.png": "9d22be831c227d5c183d7d5def2c511c7a0717fdef21c6d88afeca050a914f3f",
+    "material_schedule.json": "f6c0499e319132b8af31bc53c8ab9036f4fb40d64d3b193c97a5f7fc837a1474",
+    "plan_views.png": "2ff2e1d70123dc9ea168aa31bcfeaa3fccd5b0c83d19f51c17f87bdf4a10f923",
+    "README.md": "f020ece6f9adf4a1107c276286c2ea3cef551aee7a681ee738d5f0e78eb682a0"
+  }
+}

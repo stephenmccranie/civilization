@@ -1,0 +1,22 @@
+[
+  {
+    "tool": "built-in image_gen",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-bb87d9b9-bff5-41a9-921b-322a63a76617.png",
+    "master": "land-master.png",
+    "sha256": "ed3dff10f21d01d6a438a84550b231363c5b4db016afde49e7477d59d3a96630",
+    "prompt": "land-final-prompt.txt",
+    "reference": "concept-revised.png",
+    "reference_sha256": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+    "layout": "2x2: front, side, top, unused back; side reused for back and bottom"
+  },
+  {
+    "tool": "built-in image_gen",
+    "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-7fca71ec-1df7-4ec5-aa78-64a743d469f0.png",
+    "master": "trade-master.png",
+    "sha256": "7717444dc704ccf9dd32ad6ce0a9bb2cbabec267e8aa5d1f38e742f5c6f300e2",
+    "prompt": "trade-final-prompt.txt",
+    "reference": "concept-revised.png",
+    "reference_sha256": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+    "layout": "2x2: front, side, top, unused back; side reused for back and bottom"
+  }
+]

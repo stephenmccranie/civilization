@@ -1,0 +1,22 @@
+{
+  "sources": {
+    "front": {
+      "path": "sources\\kiln_front-stone-v1.png",
+      "sha256": "9bfbc76a779b2b22e13eee2596df7c257c923dcb1055de74b9d8306aca733651"
+    },
+    "side": {
+      "path": "sources\\kiln_side-stone-v1.png",
+      "sha256": "6bc0b1fa099d240b2a4c25052febe403e47e02d962ee302fc2f3c99175d6c58c"
+    },
+    "front_on": {
+      "path": "sources\\kiln_front_on-stone-v1.png",
+      "sha256": "5e66f6523a2da4c53dd5a6e04cae4da68857bef0f1fd70813c0445f3872f86d3"
+    }
+  },
+  "faces": {
+    "front": "98e8f8d5bd2c8eadf9e3a66d13d7f60edd49ff8cee6cf7c4137497b5583e0958",
+    "side": "ed7804644263af750ee40ca46da0e74705e101d58c3b7526b7efaab673a29e95",
+    "top": "ed7804644263af750ee40ca46da0e74705e101d58c3b7526b7efaab673a29e95",
+    "front_on": "fd7d1ee9056c4e7788da46e3c04a9517712c92fb87ed4f8f792f6091854b4488"
+  }
+}

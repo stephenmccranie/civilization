@@ -39,6 +39,7 @@ public class EverydayGameTests {
         return (CookingStationBlockEntity) h.getLevel().getBlockEntity(pos);
     }
     private static void ticks(GameTestHelper h, KilnBlockEntity machine, int count) {
+        CoalFireFixture.light(machine);
         for (int i = 0; i < count; i++) KilnBlockEntity.tick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
     }
     private static ItemStack craft(GameTestHelper h, CraftingInput input) {
@@ -127,7 +128,7 @@ public class EverydayGameTests {
                 h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(type, input, h.getLevel()).isEmpty(), "No vanilla heat bypass for " + item);
         }
         h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING,
-                new SingleRecipeInput(new ItemStack(Items.RAW_IRON)), h.getLevel()).isPresent(), "Unrelated smelting remains");
+                new SingleRecipeInput(new ItemStack(Items.SAND)), h.getLevel()).isEmpty(), "Glass moves to the kiln");
         var machine = stove(h);
         var p = player(h);
         var menu = (KilnMenu) machine.createMenu(0, p.getInventory(), p);
@@ -146,16 +147,16 @@ public class EverydayGameTests {
     public static void stoveCraftsAndCooksWithoutShell(GameTestHelper h) {
         var copper = new ItemStack(Items.COPPER_INGOT);
         var stone = new ItemStack(Items.COBBLESTONE);
-        var result = craft(h, CraftingInput.of(3, 3, List.of(copper, copper, copper, stone, new ItemStack(Items.FURNACE), stone, stone, stone, stone)));
-        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Copper top, five cobble, furnace make stove");
+        var result = craft(h, CraftingInput.of(3, 3, List.of(copper, copper, copper, stone, new ItemStack(Items.COBBLESTONE), stone, stone, stone, stone)));
+        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Copper top, six cobble make stove");
         var machine = stove(h);
         machine.setItem(0, new ItemStack(Items.BEEF, 9));
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
         ticks(h, machine, 1);
         h.assertTrue(machine.getBlockState().getValue(MachineFeedback.WORKING) && machine.operatingStatus() == 1, "Working state set on ignition");
         ticks(h, machine, 1799);
-        h.assertTrue(machine.getItem(2).is(Items.COOKED_BEEF) && machine.getItem(2).getCount() == 8, "Exactly eight meals per uninterrupted coal");
-        h.assertTrue(machine.getItem(0).getCount() == 1 && machine.getItem(1).isEmpty(), "No free ninth meal");
+        h.assertTrue(machine.getItem(2).is(Items.COOKED_BEEF) && machine.getItem(2).getCount() == 2, "Exactly two meals per uninterrupted coal");
+        h.assertTrue(machine.getItem(0).getCount() == 7 && machine.getItem(1).isEmpty(), "No free third meal");
         h.assertTrue(!machine.getBlockState().getValue(MachineFeedback.WORKING) && machine.operatingStatus() == 4, "Stopped machine requests fuel");
         h.succeed();
     }
@@ -189,6 +190,7 @@ public class EverydayGameTests {
         h.assertTrue(cakeRecipe.value().getRemainingItems(cakeInput).stream().filter(s -> s.is(Items.BUCKET)).count() == 3, "Preparing cake returns all milk buckets");
         for (var entry : List.of(CookingContent.COOKIE_DOUGH, CookingContent.UNBAKED_PIE, CookingContent.CAKE_BATTER)) {
             machine.setItem(0, entry.toStack());
+            machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
             ticks(h, machine, 200);
             h.assertTrue(CookingContent.requiresCooking(machine.getItem(2)), "Prepared food bakes");
             machine.removeItem(2, 32);
@@ -201,9 +203,9 @@ public class EverydayGameTests {
         var machine = stove(h);
         machine.setItem(0, new ItemStack(Items.POTATO, 2));
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack(2));
-        machine.setItem(2, new ItemStack(Items.BAKED_POTATO, 32));
+        machine.setItem(2, new ItemStack(Items.BAKED_POTATO, 32)); machine.setItem(5,new ItemStack(Items.STONE,32));
         ticks(h, machine, 200);
-        h.assertTrue(machine.getItem(1).getCount() == 2 && machine.operatingStatus() == 3, "Full output prevents ignition");
+        h.assertTrue(machine.getItem(1).getCount() == 1 && machine.operatingStatus() == 3, "Full output preserves recipe while fire idles");
         machine.removeItem(2, 1);
         ticks(h, machine, 75);
         var saved = machine.saveWithFullMetadata(h.getLevel().registryAccess());
@@ -214,7 +216,7 @@ public class EverydayGameTests {
         ticks(h, restored, 125);
         h.assertTrue(restored.getItem(2).getCount() == 32 && restored.getItem(0).getCount() == 1, "Saved partial meal completes exactly once");
         ticks(h, restored, 1800);
-        h.assertTrue(restored.getItem(1).getCount() == 1 && restored.getItem(0).getCount() == 1, "Blocked stove burns only already-lit fuel");
+        h.assertTrue(restored.getItem(1).getCount() == 1 && restored.getItem(0).getCount() == 1, "Blocked stove continues low idle burn");
         var pos = restored.getBlockPos();
         h.getLevel().destroyBlock(pos, true);
         var drops = h.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(0.6));
@@ -232,7 +234,7 @@ public class EverydayGameTests {
         var top = (HopperBlockEntity) h.getLevel().getBlockEntity(pos.above());
         var bottom = (HopperBlockEntity) h.getLevel().getBlockEntity(pos.below());
         top.setItem(0, new ItemStack(Items.BEEF));
-        machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
+        machine.setItem(1, KilnContent.MINERAL_COAL.toStack());CoalFireFixture.light(machine);
         h.runAfterDelay(250, () -> {
             h.assertTrue(top.isEmpty() && machine.getItem(0).isEmpty() && machine.getItem(2).isEmpty(), "Hopper pipeline moves actual stock");
             h.assertTrue(bottom.getItem(0).is(Items.COOKED_BEEF) && bottom.getItem(0).getCount() == 1, "Bottom hopper collects cooked output");
@@ -249,6 +251,25 @@ public class EverydayGameTests {
                 .withParameter(LootContextParams.DAMAGE_SOURCE, h.getLevel().damageSources().onFire()).create(LootContextParamSets.ENTITY);
         var drops = h.getLevel().getServer().reloadableRegistries().getLootTable(cow.getLootTable()).getRandomItems(params);
         h.assertTrue(drops.stream().anyMatch(s -> s.is(Items.BEEF)) && drops.stream().noneMatch(s -> s.is(Items.COOKED_BEEF)), "Fire is not free cooking");
+        h.succeed();
+    }
+
+    @GameTest(template = "industrial")
+    public static void livestockDropOneMeatEach(GameTestHelper h) {
+        var types=List.of(EntityType.COW,EntityType.MOOSHROOM,EntityType.PIG,EntityType.HOGLIN,
+                EntityType.SHEEP,EntityType.CHICKEN,EntityType.RABBIT);
+        var meats=List.of(Items.BEEF,Items.BEEF,Items.PORKCHOP,Items.PORKCHOP,Items.MUTTON,Items.CHICKEN,Items.RABBIT);
+        for(int i=0;i<types.size();i++) {
+            var animal=types.get(i).create(h.getLevel());
+            var params=new LootParams.Builder(h.getLevel()).withParameter(LootContextParams.THIS_ENTITY,animal)
+                    .withParameter(LootContextParams.ORIGIN,Vec3.atCenterOf(h.absolutePos(new BlockPos(2,2,2))))
+                    .withParameter(LootContextParams.DAMAGE_SOURCE,h.getLevel().damageSources().generic())
+                    .create(LootContextParamSets.ENTITY);
+            var drops=h.getLevel().getServer().reloadableRegistries().getLootTable(animal.getLootTable()).getRandomItems(params);
+            var meat=meats.get(i);
+            h.assertTrue(drops.stream().filter(s->s.is(meat)).mapToInt(ItemStack::getCount).sum()==1,
+                    "Exactly one raw meat from "+types.get(i));
+        }
         h.succeed();
     }
 

@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "Folded wool cloth with layered woven edges and restrained blue selvage for the Textile Workshop",
+    "purpose": "Recognizable wool textile intermediate, readable in inventory and recipes.",
+    "silhouette": "Three-quarter view of a squat folded bolt, broad ivory top with stepped layered front edge.",
+    "bounds": "Native generated item sprite; square transparent master downscaled to 32x32 with 28px silhouette extent.",
+    "materials": "Warm ivory woven wool, restrained indigo-blue selvage; no metal, paper or leather.",
+    "interfaces": "Existing cloth item, inventory/recipe/held use only.",
+    "states": "Static, no animation.",
+    "construction": "High-resolution generated sprite master reduced by existing alpha-safe item pipeline; native item/generated extrusion.",
+    "invariants": "Keep registry, recipes, wool-only sourcing and stack sizes unchanged.",
+    "fidelity_targets": [
+      "Broad folded ivory textile silhouette",
+      "Two visible layered folds",
+      "One restrained indigo selvage accent",
+      "Woven cloth, not white wool blocks",
+      "Visible sparse woven material clusters across the ivory top at native size; no blank center or fine noisy weave"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/textures/sources/field_ration-v1.png",
+      "role": "Existing high-resolution pixel-art family; textile weave and warm top-left lighting only, not food silhouette."
+    }
+  ],
+  "sources": [
+    "mockup-04.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "cloth.png",
+      "target": "textures/item/cloth.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "cloth.json",
+      "target": "models/item/cloth.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-72e85946-42a8-4305-9fd8-f4d3f0af6314.png",
+      "sha256": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d",
+      "prompt": "Create one isolated Minecraft inventory item artwork, high-resolution detailed pixel art on a genuinely transparent background. A neatly folded thick bolt of woven WOOL CLOTH from a late-1800s textile workshop: warm ivory oatmeal fabric, broad rectangular top, two or three clearly layered folded edges visible along the front, subtle woolen weave, ONE narrow muted indigo-blue woven selvage stripe following one edge. Three-quarter inventory view, top and front/right edge visible, squat compact silhouette, slightly uneven soft folded corners, clearly fabric not a stack of blocks or paper. Use the reference only for the pixel-art material richness, woven-fabric treatment and warm upper-left lighting; no food, no sack, no cord, no bow. Bold readable fold shadows and restrained surface detail, crisp stepped contours, visually substantial textile. Single object centered with generous transparent padding, no text, labels, border, floor, cast shadow, scenery or UI. This is the high-resolution source artwork, not a tiny pixel grid.",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "references": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-6917cff4-6bbf-41f9-82bf-42a894e9abd6.png",
+      "sha256": "afb5c84ed4607b1de871f1f125d405a5d0c93bd6871ac84ee6be4085255fb9f2",
+      "prompt": "Edit this exact folded wool cloth inventory artwork. Preserve the silhouette, layered folds, warm ivory wool weave, perspective, lighting, true transparent background and padding. Change ONLY the blue selvage: make it a single bold muted indigo band about THREE TIMES as wide as the current blue stripes combined, following exactly the same path along the top right edge and over the folded front edge. This blue woven band must survive downscaling as a readable color accent. No other additions, no text, no labels. High-resolution pixel art source.",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-01.png": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d"
+      }
+    },
+    {
+      "file": "mockup-03.png",
+      "source": "F:\\minecraft project\\art\\assets\\cloth\\trials\\b-macro.png",
+      "sha256": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+      "prompt": "Redesign this same folded ivory wool cloth with a single indigo selvage band as production Minecraft item art. Preserve subject, three-quarter view, broad top, two visible fold layers, ivory/brown/indigo palette. True transparent background, single centered object, 15% clear margin, no text or scenery. High-resolution pixel-art MASTER designed for a tiny final inventory icon, not a detailed illustration. Make only LARGE deliberate pixel clusters: ivory top as two broad tones, thick dark fold seams, broad blue band approximately one eighth of the object's width. Each important seam and band must be several percent of the silhouette width. Three light levels per material, maximum about twelve deliberate colors, hard color boundaries, no gradients, no smooth shading, no woven microtexture, no individual threads, no tiny highlights, no dithering, no noisy speckling. Communicate wool with a few large stepped edge notches rather than texture. Bold geometry and a clean readable silhouette. Do not add a pixel grid.\n",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-02.png": "afb5c84ed4607b1de871f1f125d405a5d0c93bd6871ac84ee6be4085255fb9f2"
+      }
+    },
+    {
+      "file": "mockup-04.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-e84fa5cc-dd9a-4e94-8ef4-7e510060a964.png",
+      "sha256": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+      "prompt": "Edit this exact Minecraft folded ivory wool cloth item artwork. Keep silhouette, camera, two fold layers, dark seams, broad blue band, lighting and transparent background unchanged. Add readable MATERIAL TEXTURE to the empty ivory top: about 15 to 20 deliberately placed short chunky staggered diagonal weave dashes, alternating muted oatmeal shadow and cream highlight. Each dash must be a broad connected pixel cluster, about 5 to 8 percent of the cloth width, following the plane's perspective, with plenty of unmarked ivory between them. Texture contrast moderate and clearly visible, but weaker than fold seams and blue band. Also a few matching broad fiber marks on the folded edges. It should feel woven wool, not dirty, polka dots, checkerboard, or a printed decorative pattern. High-resolution pixel-art master with coarse purposeful marks that survive reduction; no individual threads, fine grain, speckling, gradients or photographic microtexture. Do not leave the center blank. Single object only, real transparent background.\n",
+      "brief_hash": "92b015b7e7e460b62db2fb1151cf4b55c842c9ee7acd1fcca0095f410ea7c274",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-03.png": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+        "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+        "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+        "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+        "family_consistency": "Warm upper-left light and woven detail match the inspected ration master without copying its food subject.",
+        "controls_readability": "No controls; dark fold lines and blue edging identify the item.",
+        "gameplay_scope": "Only artwork for existing wool-derived cloth."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      },
+      "evidence": {
+        "mockup-01.png": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d"
+      },
+      "generation": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d"
+    },
+    {
+      "decision": "revise",
+      "criteria": {
+        "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+        "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+        "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+        "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+        "family_consistency": "Warm upper-left light and woven detail match the inspected ration master without copying its food subject.",
+        "controls_readability": "Native export preserves folds but narrow blue edging averages into grey. Widen the accent in a referenced edit before final approval.",
+        "gameplay_scope": "Only artwork for existing wool-derived cloth."
+      },
+      "remaining_issues": [
+        "Indigo landmark lacks contrast at native size."
+      ],
+      "stage": "mockup",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      },
+      "evidence": {
+        "mockup-01.png": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d",
+        "sprite-review.png": "6a7e871da5494ea124eb3ea37b44ac21ebdc53e68fca485bed4cc92989cebe46"
+      },
+      "generation": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+        "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+        "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+        "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+        "family_consistency": "Warm upper-left light and woven detail match the inspected ration master without copying its food subject.",
+        "controls_readability": "Wider indigo woven band is a clear secondary landmark; folds and silhouette retained by referenced edit.",
+        "gameplay_scope": "Only artwork for existing wool-derived cloth."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      },
+      "evidence": {
+        "mockup-02.png": "afb5c84ed4607b1de871f1f125d405a5d0c93bd6871ac84ee6be4085255fb9f2"
+      },
+      "generation": "afb5c84ed4607b1de871f1f125d405a5d0c93bd6871ac84ee6be4085255fb9f2"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+        "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+        "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+        "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+        "family_consistency": "Preserves warm ivory/blue textile identity; deliberately simplifies weave into broad clusters for native inventory scale.",
+        "controls_readability": "Macro design wins controlled 32px comparison: broad blue band and thick separated fold shadows survive without weave noise.",
+        "gameplay_scope": "Only artwork for existing wool-derived cloth."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      },
+      "evidence": {
+        "mockup-03.png": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+        "trials/comparison/comparison.png": "77b8546646d96d62f65bef3b28454dfac358d4095452ba0f1a4fccd9aec53fa0"
+      },
+      "generation": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Selected macro master preserves broad top, two fold seams and indigo edge in the direct 12-color comparison.",
+        "geometry_uvs": "Native item/generated extrusion with transparent 32x32 RGBA sprite, extent28 and binary alpha; no custom mesh UV seams.",
+        "material_consistency": "Ivory highlight, warm fold shadows and indigo accent use twelve colors with no weave noise.",
+        "assembly_interfaces": "Existing cloth item model reference only; no multiblock interfaces.",
+        "animation_states": "Static item; no moving parts.",
+        "native_size_readability": "Inspected native light/dark and enlarged comparison: blue band and separated folds remain readable."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-03.png": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+        "F:\\minecraft project\\art\\assets\\cloth\\export.py": "64a89a0a66c66f85f512d4ccf783011b938711e2c11f60fa3322a9e750dcc30d",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.png": "11e087b48241665d304e29e70869d8a67879f9236038091ef20cfa616c9bd8e2",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+      },
+      "evidence": {
+        "sprite-review.png": "21e7f38bcf2143fc52d83f4d68fbcaa03ea4cd7cfadda7172fe100e2e3858452",
+        "trials/comparison/comparison.png": "77b8546646d96d62f65bef3b28454dfac358d4095452ba0f1a4fccd9aec53fa0"
+      },
+      "generation": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Ivory cloth and indigo accent remain distinct under Photon; no missing texture or alpha fringe.",
+        "scale_readability": "Folds and blue edge identify cloth in actual hotbar, creative inventory and frame next to wool/leather/coal.",
+        "states_motion": "Static generated item; held view reviewed, no animated state required.",
+        "interaction_guides": "Existing item has no custom interactions or build guide; standard item rendering.",
+        "inventory_appearance": "Native inventory icon reviewed beside existing resources; visibly folded textile rather than placeholder wool slabs.",
+        "integration_limits": "Art-only; no recipe or gameplay changes. Uses flat generated-item extrusion, not a sculpted cloth mesh."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "602b9956be181ed20b210c093712a599365fcea653c4dbdc96bec0391cd5f3f6",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-03.png": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+        "F:\\minecraft project\\art\\assets\\cloth\\export.py": "64a89a0a66c66f85f512d4ccf783011b938711e2c11f60fa3322a9e750dcc30d",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.png": "11e087b48241665d304e29e70869d8a67879f9236038091ef20cfa616c9bd8e2",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+      },
+      "evidence": {
+        "evidence/inventory.png": "7744c3de0d56e7dc8b2b7bd4c693c49f22c96732652dbca77681d4629bab1bc8",
+        "evidence/held.png": "b79ef445d874c0e12ac428296af9119a8793378a3676adacc9033954cc0355af",
+        "evidence/frames.png": "ff3e3df28a0336b822dd7f106703b10e85e0658f67acd99dbe19efc1a843a79d"
+      },
+      "generation": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Squat layered fold silhouette with broad top; appropriate inventory material rather than a world block.",
+        "implementable_geometry": "Single transparent sprite supported by native generated-item extrusion.",
+        "mechanics_clearance": "Static textile; no mechanisms or moving clearance.",
+        "period_materials": "Ivory woven wool and blue selvage suit a nineteenth-century textile workshop.",
+        "family_consistency": "Keeps established ivory/indigo silhouette and folds, restoring subordinate oatmeal/cream material variation.",
+        "controls_readability": "Sparse staggered weave clusters interrupt the blank center; lower contrast than fold seams and band. Native comparison preserves broad form.",
+        "gameplay_scope": "Only artwork for existing wool-derived cloth."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "92b015b7e7e460b62db2fb1151cf4b55c842c9ee7acd1fcca0095f410ea7c274",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242"
+      },
+      "evidence": {
+        "mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "trials/weave-comparison/comparison.png": "a27b73a5d034f865595ae0162eea6044e6661ffa1b184a5395e397055f7390f7"
+      },
+      "generation": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Referenced weave edit preserves prior silhouette, blue band and fold shadows with visible center variation.",
+        "geometry_uvs": "Native item/generated extrusion with transparent 32x32 RGBA sprite, extent28 and binary alpha; no custom mesh UV seams.",
+        "material_consistency": "Sixteen-color export keeps oatmeal and cream woven clusters; no procedural noise or copied pack pixels.",
+        "assembly_interfaces": "Existing cloth item model reference only; no multiblock interfaces.",
+        "animation_states": "Static item; no moving parts.",
+        "native_size_readability": "Compared old/new at 12/16/24 colors and via64; direct16 retains restrained surface variation without hiding folds."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "92b015b7e7e460b62db2fb1151cf4b55c842c9ee7acd1fcca0095f410ea7c274",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\cloth\\export.py": "8ad374b6cc04da0b06ac5f00918cfdc41887167192fc07827e4492094498624e",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.png": "6b523119f913fad9148c1603c3e8ea97e2c993a9d6e6e0d4ae131b9552608929",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+      },
+      "evidence": {
+        "sprite-review.png": "7dc436dbd52ec7b5243204712835bbe3928b62af4a27c55531d784a077518dd0",
+        "trials/weave-comparison/comparison.png": "a27b73a5d034f865595ae0162eea6044e6661ffa1b184a5395e397055f7390f7"
+      },
+      "generation": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Oatmeal/cream woven clusters remain visible across the held face under Photon, with clear blue edging and no alpha fringe.",
+        "scale_readability": "Folds and blue edge identify cloth in actual hotbar, creative inventory and frame next to wool/leather/coal.",
+        "states_motion": "Static generated item; held view reviewed, no animated state required.",
+        "interaction_guides": "Existing item has no custom interactions or build guide; standard item rendering.",
+        "inventory_appearance": "Native inventory shows restrained surface variation while preserving folds and blue band; reviewed alongside wool/leather/coal.",
+        "integration_limits": "Art-only; no recipe or gameplay changes. Uses flat generated-item extrusion, not a sculpted cloth mesh."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "92b015b7e7e460b62db2fb1151cf4b55c842c9ee7acd1fcca0095f410ea7c274",
+      "inputs": {
+        "F:\\minecraft project\\art\\textures\\sources\\field_ration-v1.png": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\cloth\\export.py": "8ad374b6cc04da0b06ac5f00918cfdc41887167192fc07827e4492094498624e",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.png": "6b523119f913fad9148c1603c3e8ea97e2c993a9d6e6e0d4ae131b9552608929",
+        "F:\\minecraft project\\art\\assets\\cloth\\cloth.json": "2d59145109d029ac79c423fd19289c401c4c8b7a103f06b886abb6971e5cec20"
+      },
+      "evidence": {
+        "evidence/weave-inventory.png": "b85c203285ed4d78655b94821bc43faefcafef6ed90ec71910668f4e886e56ae",
+        "evidence/weave-held.png": "db58464df4b098f647d3235ef5c34853ff52da2af2f8148e74184c01bc28fce6",
+        "evidence/weave-frames.png": "11e1143ec02012f7266c99f7900b67e58cb8e3663ebc929e5ff0373c5d54b3a9"
+      },
+      "generation": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+    }
+  ]
+}

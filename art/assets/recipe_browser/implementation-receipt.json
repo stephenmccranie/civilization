@@ -1,0 +1,21 @@
+{
+  "build": "0.32.8-dev",
+  "implementation": "Native controls and existing cabinet/item art; no new raster generation required.",
+  "evidence": {
+    "art/assets/recipe_browser/mockup-02.png": "90ba99db5856111f7a855df6e5794f8cce9a30e9ae9ffaeddafb6c07cb8d308b",
+    "art/assets/recipe_browser/ingame.png": "8a2b20056d5587455b4ba88258882d557131a4e4f434231d94202bb0df9ab1e4",
+    "art/assets/recipe_browser/ingame-scale-4.png": "fcd7f07949b1f0d8b4639e8c01ed51e10ff9fb14b9f208118e7e6ba275610790",
+    "art/assets/recipe_browser/comparison.png": "90fb852aaf34ad9c945d08d96581412a1b78323e00df03e411c34a40e2dc942f",
+    "civilization-mod/src/main/java/dev/civilization/client/MachineScreen.java": "e2e80d2e988243f1dd5fc0808c909e62d0971a03733dd018316d9786bf064bd2",
+    "civilization-mod/src/main/java/dev/civilization/client/RecipeWidget.java": "16a5feda0ee3d31bca3387bf49e097521f8356360869a3bcc377de910cebacd8",
+    "civilization-mod/src/main/java/dev/civilization/client/WorkshopScreen.java": "a05eb8ff7243082582e7fa7d2d3e952773fa1f0b7ba28b59f68f3005b1a522e8",
+    "civilization-mod/src/main/java/dev/civilization/client/KilnScreen.java": "d0491fe349e33191b91565682bb61a868d53e756fbca15b8a882a4a5e6f0c66f"
+  },
+  "review": {
+    "matches_direction": "Pass: outer category tabs, material row, compact six-row named results, brass highlight, tan cabinet and bottom action icons match the approved arrangement. Actual drawer is proportionally wider to preserve native text readability. Machine panel retains native slots and existing fire animation; empty fixture does not burn.",
+    "legibility": "Pass at GUI scales 3 and 4 with Photon/Faithful. Long names truncate with full hover labels.",
+    "interaction": "Build/unit + Photon workshops 44.0s; chest interaction/visual check 34.8s. GUI scales 3 and 4 captured. No server-suite repeat.",
+    "limits": "No server gameplay rules changed. No full server suite repeated. Scrollbar is a position indicator; wheel and Page Up/Down navigate.",
+    "cabinet_refinement": "Pass: enlarged rivets and heavier frame clear slots; adjoining drawer frames no longer occlude each other. Dark category tabs, brass selected state, raised beveled/fastened nameplate and magnifying-glass search with darker hint follow mockup-02. Existing master reused, native geometry for controls."
+  }
+}

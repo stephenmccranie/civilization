@@ -19,8 +19,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerMixin {
     @Shadow protected FoodData foodData;
 
+    @Inject(method = "getFlyingSpeed", at = @At("HEAD"), cancellable = true)
+    private void civilization$airControl(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Float> ci) {
+        var player = (Player) (Object) this;
+        if (!player.getAbilities().flying && !player.isPassenger()) {
+            ci.setReturnValue((float) (player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)
+                    * dev.civilization.PlayerMovement.AIR_CONTROL_RATIO));
+        }
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void civilization$food(CallbackInfo ci) { foodData = new CalorieFoodData(); }
+    private void civilization$food(CallbackInfo ci) {
+        foodData = new CalorieFoodData();
+        dev.civilization.PlayerMovement.apply((Player) (Object) this);
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
+    private void civilization$walkingSpeed(CallbackInfo ci) {
+        dev.civilization.PlayerMovement.apply((Player) (Object) this);
+    }
 
     @Redirect(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;eat(Lnet/minecraft/world/food/FoodProperties;)V"))
     private void civilization$eat(FoodData data, FoodProperties properties, Level level, ItemStack stack, FoodProperties original) {

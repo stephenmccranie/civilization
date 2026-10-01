@@ -1,0 +1,288 @@
+[
+  {
+    "part": "plinth",
+    "face": "up",
+    "style": "steel",
+    "rect": [
+      0,
+      130,
+      32,
+      32
+    ]
+  },
+  {
+    "part": "case_lid",
+    "face": "up",
+    "style": "steel",
+    "rect": [
+      34,
+      130,
+      24,
+      16
+    ]
+  },
+  {
+    "part": "front_cover",
+    "face": "north",
+    "style": "access",
+    "rect": [
+      60,
+      130,
+      20,
+      19
+    ]
+  },
+  {
+    "part": "side_cover",
+    "face": "east",
+    "style": "access",
+    "rect": [
+      82,
+      130,
+      10,
+      14
+    ]
+  },
+  {
+    "part": "barrel_wide",
+    "face": "east",
+    "style": "enamel",
+    "rect": [
+      94,
+      130,
+      48,
+      16
+    ]
+  },
+  {
+    "part": "barrel_wide",
+    "face": "west",
+    "style": "enamel",
+    "rect": [
+      144,
+      130,
+      48,
+      16
+    ]
+  },
+  {
+    "part": "spoke_vertical",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      194,
+      130,
+      5,
+      52
+    ]
+  },
+  {
+    "part": "spoke_vertical",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      201,
+      130,
+      5,
+      52
+    ]
+  },
+  {
+    "part": "spoke_horizontal",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      208,
+      130,
+      52,
+      5
+    ]
+  },
+  {
+    "part": "spoke_horizontal",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      262,
+      130,
+      52,
+      5
+    ]
+  },
+  {
+    "part": "rim_face_0",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      316,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_0",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      342,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_1",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      368,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_1",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      394,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_2",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      420,
+      130,
+      4,
+      24
+    ]
+  },
+  {
+    "part": "rim_face_2",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      426,
+      130,
+      4,
+      24
+    ]
+  },
+  {
+    "part": "rim_face_3",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      432,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_3",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      458,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_4",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      484,
+      130,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_4",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      0,
+      184,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_5",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      26,
+      184,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_5",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      52,
+      184,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_6",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      78,
+      184,
+      4,
+      24
+    ]
+  },
+  {
+    "part": "rim_face_6",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      84,
+      184,
+      4,
+      24
+    ]
+  },
+  {
+    "part": "rim_face_7",
+    "face": "west",
+    "style": "authored_edge",
+    "rect": [
+      90,
+      184,
+      24,
+      4
+    ]
+  },
+  {
+    "part": "rim_face_7",
+    "face": "east",
+    "style": "authored_edge",
+    "rect": [
+      116,
+      184,
+      24,
+      4
+    ]
+  }
+]

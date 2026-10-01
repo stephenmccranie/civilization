@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Comparison sheet: open octagonal wheel about 1.75x crankcase height, barrel 18/12=1.5 length/diameter, distinct end flanges, compact chamfered case, layered feet, oil cup and collared stack. No broad copper piece. Opposite service-side view shows barrel; front view separately shows control panel. Minecraft casing bed remains wider and panel fasteners smaller than the illustration.",
+    "geometry_uvs": "Native cuboid/45-degree bevel exports; continuous rim corner joins. Dedicated plain steel tile replaces accidental panel-corner sampling, and panel artwork is mapped only onto front faces.",
+    "material_consistency": "One referenced material master, coherent iron/steel/brass atlas; assembly casing uses actual refinery-side texture. No copper material placeholder.",
+    "assembly_interfaces": "Cylinder owns integral front/rear feet; rear space now requires air. Existing full-block component selection/collision remains coarse; this pass does not add a multipart collision engine. Ports and construction positions retained.",
+    "animation_states": "Whole wheel poses 0/22.5/45 reviewed; swept radius about 15.2 model units leaves 1.8 units above casing bed. Shaft is stationary, inside crankcase bearing; no support intrudes into wheel sweep.",
+    "native_size_readability": "Dial and lever retained; fitted component item transforms retained. Final shader/icon appearance checked next in focused Minecraft scene."
+  },
+  "remaining_issues": []
+}

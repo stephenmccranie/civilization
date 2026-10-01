@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SPS",
+    "PWP",
+    "S S"
+  ],
+  "key": {
+    "S": {
+      "item": "civilization:steel_ingot"
+    },
+    "P": {
+      "item": "civilization:machine_parts"
+    },
+    "W": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "id": "civilization:boat_helm",
+    "count": 1
+  }
+}

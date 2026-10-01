@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "block-family",
+  "brief": {
+    "purpose": "A dedicated kiln-dependent road surface with a visible movement advantage, distinct from structural red bricks.",
+    "setting": "Weathered late-nineteenth-century fired-clay street pavers, mainly charcoal-gray with muted oxide red and occasional tan.",
+    "shape": "Full cube, integrated native slab and stairs, and saw-cut pieces.",
+    "fidelity_targets": "A readable Minecraft-scale interpretation of late-19th-century vitrified-clay street paving: long, narrow and individually worn running-bond bricks in charcoal, gray, muted oxide red and umber. One 8-by-8-block painting supplies the world-aligned top face at 64 pixels per block; its own 64-pixel crop supplies sides and items.",
+    "neighbors": ["minecraft:bricks", "minecraft:stone_bricks", "civilization:brick_kiln"],
+    "invariants": "No road bonus on ordinary red brick or stone brick; no copied photo or Faithful pixels; no duplicate slab ecosystem."
+  },
+  "prompt_file": "prompts.md",
+  "generated_source": { "file": "generated-road-large.png", "sha256": "35f205960ab885709494094975bfc2883bf88717303a25c5ad5421efad3741b0" },
+  "material_references": [
+    { "file": "reference-1.png", "sha256": "9b3b3c423d7f31a53e2c09c441f4c35bde9eacdef2a499479ea7d64312e3f9cb" },
+    { "file": "reference-2.png", "sha256": "e04a2ae75751aafa0528be85d6536a6fef0f1bb0637850fbc51825439766fdf0" },
+    { "file": "reference-3.png", "sha256": "08dabdfd83b1c808995858c75deac19eb297a103cf3cb0b4adc243f52e17244a" }
+  ],
+  "exporter": "export.py",
+  "outputs": ["textures/block/street_pavers_mosaic.png", "textures/block/street_pavers_0.png"],
+  "reviews": [
+    { "stage": "native-first-pass", "decision": "revise", "finding": "The seam-safe courses and color mix worked, but flat programmed fills made each paver bland." },
+    { "stage": "native-32", "decision": "revise", "finding": "Even with source swatches, 32 pixels forced too few pavers or too little individual surface detail, and the tan examples drew too much attention." },
+    { "stage": "native-64-small", "decision": "revise", "finding": "Ten courses carried the master's wear but made the pavers appear undersized in a one-meter Minecraft block." },
+    { "stage": "native-64-swatches", "decision": "revise", "finding": "Seven courses improved scale, but arbitrary brick-center crops lost the source's fired rims, mortar and surface wear. User play review found the pavers plain and stretched despite the earlier isolated visual pass." },
+    { "stage": "native-64-full-courses", "decision": "pass", "evidence": "road-review.png", "finding": "Seven complete source courses retain worn rims, mottling and mortar at native size. Circular row offsets align at block boundaries; interior whole-face substitutions vary the broad road." },
+    { "stage": "64-pixel block mosaic", "decision": "revise", "finding": "The first 8-by-8-block world-aligned mosaic removed per-block repetition but stamped the same source paver faces throughout the larger texture." },
+    { "stage": "unique programmed 16-by-16-block mosaic", "decision": "revise", "finding": "Every face was different, but the mechanically straight mortar still made the road feel like a grid." },
+    { "stage": "first whole-road image generation", "decision": "revise", "finding": "Brick scale was much too large and a dark vignette made the image unsuitable for tiling." },
+    { "stage": "second whole-road image generation and material edit", "decision": "pass", "evidence": [
+      { "file": "evidence/wide.png", "sha256": "dbee4538c79ec05d65f40b57606fd4c72c8ba29ac598664fd6d42b61c63e7fbe" },
+      { "file": "evidence/close.png", "sha256": "cd4b1f7ab62924f59d054d4c8345b565afdfbfdff3ec47888cca4b0c448b086f" },
+      { "file": "evidence/inventory.png", "sha256": "00fea03c24a067ff7d23130ec66b404c88419a19b25ac5ccf3f3334c3c55a528" }
+    ], "finding": "The one-image 8-by-8-block top is darker and has larger, more irregular pavers and richer individual wear. Photon/Faithful street-wide, close, and item views passed; a matching crop supplies sides and item faces. The image generator did not produce mathematically exact edge tiling, so long uninterrupted roads can still reveal the 8-block repeat." }
+  ]
+}

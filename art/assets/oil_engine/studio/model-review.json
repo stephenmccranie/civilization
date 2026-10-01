@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Whole assembly retains octagonal open four-spoke wheel, elongated cylinder, stepped case, two grounded feet and separate control cabinet. Narrow steel face rim and flanges replace broad indistinct surfaces. Intentional simplifications: no extra oil cup or decorative foot brass from the illustration.",
+    "geometry_uvs": "146 assembly cuboids including construction bed. Native Java and GeckoLib validation passed. Material UV spans use two pixels/model unit, rejecting overflow rather than clamping. Decals explicitly fit. Five-decimal coordinate normalization fixes actual save/reopen bevel drift; native geometry and animations now round-trip identically. Tiny separated casting caps avoid coplanar faces.",
+    "material_consistency": "One generated four-quadrant master: iron, steel, brass and isolated gauge. Existing shared casing texture retained. Compared six views; steel is visibly distinct from iron, and restrained brass identifies fittings. First old-atlas trial rejected for duplicate controls and weak value separation.",
+    "assembly_interfaces": "Unchanged controller/cylinder/wheel offsets and construction footprint. Two iron saddles meet bed, control-side mouths accessible, modeled exhaust opening recessed. Head bolts and side access cover finish rear/opposite views. User refinement: tall protruding black burner removed; compact iron burner and brass nozzle recessed beneath end cap. Rear native view inspected.",
+    "animation_states": "Four spokes, rim and hub rotate together around the named X-axis pivot. Three native pose captures inspected. Worst octagon sweep clears bed by over 1.8 model units; wheel's X interval stays outside bearing housing. Shaft contact intentional. Native animation export/reopen checked.",
+    "native_size_readability": "Fixed 1000px captures and reduced contact sheets show readable main shapes, separate gauge and physical lever. World-distance, icons and Photon materials are the next in-game check, not inferred from editor views."
+  },
+  "remaining_issues": []
+}

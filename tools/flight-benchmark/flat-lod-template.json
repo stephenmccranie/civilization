@@ -1,0 +1,115 @@
+{
+  "source": "Minecraft-generated flat seed 192506; DH 3.3.1 row (-3,-3), away from ship; 2026-09-20",
+  "row": {
+    "DetailLevel": 0,
+    "PosX": -3,
+    "PosZ": -3,
+    "MinY": 0,
+    "DataChecksum": 34082564,
+    "Data": {
+      "hex": "28b52ffd6030b3150100600303061081027f0182060f0f0500030e7a3ce0b91e27f01d4f0c9a8ec700f70116"
+    },
+    "ColumnGenerationStep": {
+      "hex": "28b52ffd60000f4d00001009090100fbf70116"
+    },
+    "ColumnWorldCompressionMode": {
+      "hex": "28b52ffd60000f4d00001001010100fbf70116"
+    },
+    "Mapping": {
+      "hex": "28b52ffd20f58d03004205141a704b1d10d7152b0581c56657789bcd4234f425ff4be5aac7b829ce5809b861fc404677ac6484ff6d330f07ec8768219d8474b1e053fabfae3889381c4da0413110f4dbed6b98d8d617b7630032c9cc0b0021b31170772a42a5024127c45f39da8161c412c429f83b613000aa27"
+    },
+    "DataFormatVersion": 2,
+    "CompressionMode": 4,
+    "ApplyToParent": 0,
+    "LastModifiedUnixDateTime": 1789947889134,
+    "CreatedUnixDateTime": 1789947889134,
+    "ApplyToChildren": 0,
+    "NorthAdjData": {
+      "hex": "28b52ffd6000031d01008805050306080c10810201027c0182060f0f05001ba478e7527c97a2161c14554f0258"
+    },
+    "SouthAdjData": {
+      "hex": "28b52ffd6000031d01008805050306080c10810201027c0182060f0f05001ba478e7527c97a2161c14554f0258"
+    },
+    "EastAdjData": {
+      "hex": "28b52ffd6000031d01008805050306080c10810201027c0182060f0f05001ba478e7527c97a2161c14554f0258"
+    },
+    "WestAdjData": {
+      "hex": "28b52ffd6000031d01008805050306080c10810201027c0182060f0f05001ba478e7527c97a2161c14554f0258"
+    },
+    "Regenerate": 0
+  },
+  "schema": [
+    "CREATE TABLE Schema ( \n    SchemaVersionId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \n    ScriptName TEXT NOT NULL UNIQUE, \n    AppliedDateTime DATETIME NOT NULL default CURRENT_TIMESTAMP \n)",
+    "CREATE TABLE \"Legacy_FullData_V1\"(\r\n\t DhSectionPos TEXT NOT NULL PRIMARY KEY\r\n\t\r\n\t-- meta data\r\n\t,DataDetailLevel TINYINT NULL\r\n\t,Checksum INT NULL\r\n\t,DataVersion BIGINT NULL\r\n\t,WorldGenStep NVARCHAR(32) NULL\r\n\t,DataType NVARCHAR(48) NULL\r\n\t,BinaryDataFormatVersion TINYINT NULL\r\n\t \r\n    ,Data BLOB NULL\r\n    \r\n    ,CreatedDateTime DATETIME NOT NULL default CURRENT_TIMESTAMP -- in UTC\r\n    ,LastModifiedDateTime DATETIME NOT NULL default CURRENT_TIMESTAMP -- in UTC\r\n, MigrationFailed BIT NOT NULL DEFAULT 0)",
+    "CREATE TABLE FullData ( \r\n    -- compound primary key\r\n     DetailLevel TINYINT NOT NULL -- LOD detail level, not section detail level IE 0, 1, 2 not 6, 7, 8\r\n    ,PosX INT NOT NULL\r\n    ,PosZ INT NOT NULL\r\n    \r\n    ,MinY INT NOT NULL\r\n    ,DataChecksum INT NOT NULL\r\n    \r\n    ,Data BLOB NULL\r\n    ,ColumnGenerationStep BLOB NULL\r\n    ,ColumnWorldCompressionMode BLOB NULL\r\n    ,Mapping BLOB NULL\r\n    \r\n    ,DataFormatVersion TINYINT NULL\r\n    ,CompressionMode TINYINT NULL\r\n    \r\n    ,ApplyToParent BIT NULL\r\n    \r\n    ,LastModifiedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    ,CreatedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    \r\n    , ApplyToChildren BIT NULL, NorthAdjData BLOB NULL, SouthAdjData BLOB NULL, EastAdjData BLOB NULL, WestAdjData BLOB NULL, Regenerate bit null,PRIMARY KEY (DetailLevel, PosX, PosZ)\r\n)",
+    "CREATE TABLE ChunkHash(\r\n    -- compound primary key\r\n     ChunkPosX INT NOT NULL\r\n    ,ChunkPosZ INT NOT NULL\r\n    \r\n    ,ChunkHash INT NOT NULL\r\n    \r\n    ,LastModifiedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    ,CreatedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    \r\n    ,PRIMARY KEY (ChunkPosX, ChunkPosZ)\r\n)",
+    "CREATE TABLE BeaconBeam(\r\n    -- compound primary key\r\n     BlockPosX INT NOT NULL\r\n    ,BlockPosY INT NOT NULL\r\n    ,BlockPosZ INT NOT NULL\r\n    \r\n    ,ColorR INT NOT NULL\r\n    ,ColorG INT NOT NULL\r\n    ,ColorB INT NOT NULL\r\n    \r\n    ,LastModifiedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    ,CreatedUnixDateTime BIGINT NOT NULL -- in GMT 0\r\n    \r\n    ,PRIMARY KEY (BlockPosX, BlockPosY, BlockPosZ)\r\n)",
+    "CREATE INDEX FullDataApplyToChildrenIndex on FullData (ApplyToChildren) where ApplyToChildren = 1",
+    "CREATE INDEX FullDataUpdatedIndex on FullData (ApplyToParent) where ApplyToParent = 1",
+    "CREATE INDEX FullDataRegenerateIndex on FullData (Regenerate) where Regenerate = 1"
+  ],
+  "schema_rows": [
+    [
+      1,
+      "sqlScripts/0010-sqlite-createInitialDataTables.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      2,
+      "sqlScripts/0020-sqlite-createFullDataSourceV2Tables.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      3,
+      "sqlScripts/0030-sqlite-changeTableJournaling.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      4,
+      "sqlScripts/0031-sqlite-useSqliteWalJournaling.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      5,
+      "sqlScripts/0040-sqlite-removeRenderCache.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      6,
+      "sqlScripts/0050-sqlite-addApplyToParentIndex.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      7,
+      "sqlScripts/0060-sqlite-createChunkHashTable.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      8,
+      "sqlScripts/0070-sqlite-createBeaconBeamTable.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      9,
+      "sqlScripts/0080-sqlite-addApplyToChildrenColumn.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      10,
+      "sqlScripts/0090-sqlite-addAdjacentFullDataColumns.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      11,
+      "sqlScripts/0100-sqlite-deleteLowDetailDataForRegen.sql",
+      "2026-09-20 23:44:43"
+    ],
+    [
+      12,
+      "sqlScripts/0110-sqlite-addApplyToParentIndex.sql",
+      "2026-09-20 23:44:43"
+    ]
+  ],
+  "dh_sha256": "b12931cc0c680914e461b478f6a361285870a489bedd3985dee52cd3ce3590c0",
+  "chunk_template_sha256": "bfc52f6bbd58fe95e741cf835e52225c15f7a488bc0ab43058f902224637a2eb"
+}

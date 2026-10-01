@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "A coarse clay and gravel fertilizer feedstock",
+    "purpose": "Distinct readable frontier supply in the shared resource family.",
+    "silhouette": "One compact low mound of coarse mineral blend: four or five large irregular dull gray gravel chunks embedded in muted clay-brown crumbs. Angular stones, earthy binder, a few subordinate lighter mineral chips. Readable broad clumps, not dozens of tiny grains. No container or bag, no yellow sulfur, no metallic shine. Slight three-quarter top view.",
+    "bounds": "32x32 transparent item, 28px longest silhouette extent.",
+    "materials": "One compact low mound of coarse mineral blend: four or five large irregular dull gray gravel chunks embedded in muted clay-brown crumbs. Angular stones, earthy binder, a few subordinate lighter mineral chips. Readable broad clumps, not dozens of tiny grains. No container or bag, no yellow sulfur, no metallic shine. Slight three-quarter top view.",
+    "interfaces": "Existing item identity, recipe and stack behavior unchanged.",
+    "states": "Static inventory and held item.",
+    "construction": "Generated high-resolution master reduced by shared alpha-safe sprite pipeline.",
+    "invariants": "Art only; no container cost or new gameplay mechanics.",
+    "technological_stage": "Frontier supplies feeding town workshops.",
+    "material_behavior": "Broad material-specific clusters, subordinate marks, restrained saturation.",
+    "signature_feature": "A coarse clay and gravel fertilizer feedstock",
+    "neighboring_assets": "Cloth, sulfur, Machine Parts and the other frontier supplies.",
+    "fidelity_targets": [
+      "A coarse clay and gravel fertilizer feedstock",
+      "Distinct native-size silhouette",
+      "Readable material variation"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/sulfur/mockup-01.png",
+      "role": "Style only; coarse readable project pixel clusters, not subject or material."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "mineral_blend.png",
+      "target": "textures/item/mineral_blend.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "mineral_blend.json",
+      "target": "models/item/mineral_blend.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-ffdaea62-4cac-4609-b47f-03252e449cb0.png",
+      "sha256": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+      "prompt": "Create one item: One compact low mound of coarse mineral blend: four or five large irregular dull gray gravel chunks embedded in muted clay-brown crumbs. Angular stones, earthy binder, a few subordinate lighter mineral chips. Readable broad clumps, not dozens of tiny grains. No container or bag, no yellow sulfur, no metallic shine. Slight three-quarter top view. High-resolution pixel-art master for a tiny Minecraft inventory icon, not a tiny output image. Clear broad silhouette, few major forms, crisp stepped edges and deliberately large color clusters. Material marks should occupy roughly 1-3 final pixels and stay lower contrast than structural edges. About sixteen purposeful colors, upper-left light, no gradients, microscopic detail, random noise, ground shadow, lettering, border or glow. Centered isolated item with generous margins on true transparent background. Reference image is STYLE ONLY: match the broad pixel clusters and readable material variation, not its subject, material or shape. Practical frontier craftsmanship in an alternate late nineteenth-century world; no ornamental brass or steampunk decoration.",
+      "brief_hash": "a718498ba9fb7d478f773e11e10cd3f8bb043cef565d2014694bddb202429d0a",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Four gray stones remain separated by clay-brown binder; pale chips stay subordinate.",
+        "implementable_geometry": "One static inventory sprite with no physical assembly required.",
+        "mechanics_clearance": "No moving or interacting components; depicted material rests as one coherent item.",
+        "period_materials": "Dull angular gravel and earthy clay read as raw feedstock, distinct from yellow sulfur.",
+        "family_consistency": "Broad stepped edges and restrained upper-left lighting follow inspected Cloth/sulfur references. Material identity is retained.",
+        "controls_readability": "No controls; silhouette and characteristic material identify the resource.",
+        "gameplay_scope": "Only appearance changes; item IDs, recipes and inventories unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "a718498ba9fb7d478f773e11e10cd3f8bb043cef565d2014694bddb202429d0a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      },
+      "evidence": {
+        "sprite-review.png": "73504d121471db49d38c6e4aca01816039c3d3a293a5d29569e00b35863cfe18",
+        "mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc"
+      },
+      "generation": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Four gray stones remain separated by clay-brown binder; pale chips stay subordinate.",
+        "geometry_uvs": "Generated-item model, 32x32 texture, 16 opaque colors and binary alpha; padded silhouette.",
+        "material_consistency": "Dull angular gravel and earthy clay read as raw feedstock, distinct from yellow sulfur.",
+        "assembly_interfaces": "Existing registered item model and texture path; no block interfaces.",
+        "animation_states": "Static material item, no animation needed.",
+        "native_size_readability": "Inspected native dark/light backgrounds and enlarged grid; characteristic forms remain legible without stray edge pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "a718498ba9fb7d478f773e11e10cd3f8bb043cef565d2014694bddb202429d0a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\export.py": "448fa891d0f1e158bdfbceae2f9940078dcefc57d56485fcd05eb98549318c83",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.png": "213fa8a332e64c642dc312cc39965d60111f2e043d0d82a23b30d4c01edbd0ca",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.json": "ff8a72bf811de05ceb79aa12331323fce4f3214994fe56360a349b9329fe3ce7"
+      },
+      "evidence": {
+        "sprite-review.png": "73504d121471db49d38c6e4aca01816039c3d3a293a5d29569e00b35863cfe18",
+        "mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc"
+      },
+      "generation": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon frame lighting darkens materials naturally; native inventory retains chosen palette. No opaque background or missing texture.",
+        "scale_readability": "Gray stone faces and brown binder read as a coarse raw mixture; silhouette is shared with enrichment but without yellow chips.",
+        "states_motion": "Static generated item; no animation states or moving machinery.",
+        "interaction_guides": "Inventory resource, no build guide or placement interaction.",
+        "inventory_appearance": "Inspected seven-item family beside Cloth, sulfur and Machine Parts. Consistent padded scale and broad clusters; earthy low-saturation supplies contrast brighter sulfur and cool metal. Gray stone faces and brown binder read as a coarse raw mixture; silhouette is shared with enrichment but without yellow chips.",
+        "integration_limits": "Build/unit and focused supplies scene passed. Reviewed inventory and framed appearances; no gameplay changes or multiplayer validation claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "a718498ba9fb7d478f773e11e10cd3f8bb043cef565d2014694bddb202429d0a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\export.py": "448fa891d0f1e158bdfbceae2f9940078dcefc57d56485fcd05eb98549318c83",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.png": "213fa8a332e64c642dc312cc39965d60111f2e043d0d82a23b30d4c01edbd0ca",
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.json": "ff8a72bf811de05ceb79aa12331323fce4f3214994fe56360a349b9329fe3ce7"
+      },
+      "evidence": {
+        "evidence/supplies-inventory.png": "a7fc3cb22a870257125e3cecd076d50d2548995ecf102f504e90d27f15bc3c46",
+        "evidence/supplies-frames.png": "d2b625053e700cd14e0f779d95a2a255a66a64e45cbbd5d102ac2c6172e6ae85"
+      },
+      "generation": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc"
+    }
+  ]
+}

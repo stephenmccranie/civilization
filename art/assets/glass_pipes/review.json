@@ -1,0 +1,27 @@
+{
+  "mockup": {"decision":"pass", "criteria": {
+    "silhouette_scale":"Revised concept has dominant steel shoulders and narrow lengthwise slits within the same thick octagonal envelope. Its background vertical section retains excess glass; implementation applies the corrected shell to every orientation.",
+    "implementable_geometry":"Solid 45-degree steel bevels and split cardinal plates frame real narrow glass apertures. No curved mesh needed.",
+    "mechanics_clearance":"Pipe reaches a square machine flange; elbow uses a compact connector. No moving hardware or floating support claimed.",
+    "period_materials":"Steel and laboratory-style clear sight glass fit the nineteenth-century industrial family without ornamental brass.",
+    "family_consistency":"Existing industrial steel remains the material authority; isolated glass glints are code-native optical details.",
+    "controls_readability":"Empty scenery-visible tube contrasts clearly with amber flowing interior. No new controls.",
+    "gameplay_scope":"Same transfer telemetry and routing; image's partly filled liquid is a visual suggestion, not a new stored-fluid mechanic. Native implementation uses a narrow internal stream."
+  }, "remaining_issues":[]},
+  "model": {"decision":"pass", "criteria": {
+    "matches_direction":"Revised Blockbench view matches the steel-heavy concept: solid diagonal facets, thick cardinal shoulders and four 1.25-pixel slits. Glass occupies 18.9 percent of the perimeter before solid rings, with unchanged eight-pixel diameter.",
+    "geometry_uvs":"Native 45-degree cuboids and two-sided thin glass planes, all within block bounds. Eight-pixel width and arms to block edge. Retained editable bbmodel and deterministic generation.",
+    "material_consistency":"Steel sampled from the current shared steel plate center; no independently invented palette. Glass has ten deliberate pale glint pixels and otherwise zero alpha.",
+    "assembly_interfaces":"Multipart opposing arms join at center and block boundaries; compact eight-pixel junction only when axes differ. Flange remains wider than tube. Collision envelope updated for the new size.",
+    "animation_states":"Idle renderer emits no fluid or opaque backing. Active octagonal internal stream stays inside glass and uses existing flow colors/time/direction.",
+    "native_size_readability":"Static Blockbench preview retains recognizable octagon and open view. In-game closeups and inventory will check Photon and long runs."
+  }, "remaining_issues":[]},
+  "ingame": {"decision":"pass", "criteria": {
+    "photon_materials":"Revised Photon captures show a dominant solid steel shell and small clear slits; patterned wall remains visible through aligned empty windows. Steel bevels read clearly at oblique angles.",
+    "scale_readability":"Eight-pixel envelope is twice the previous width. Octagonal end rim and rings read in the oblique corner capture. Flush joints do not swell into repeating bulbs.",
+    "states_motion":"Flow/motion captures show directional amber bands inside horizontal and vertical arms. Expiry assertion and empty capture verify that colored geometry vanishes after transfer events expire. Idle branch remains clear.",
+    "interaction_guides":"Six-direction multipart connections fit around corners and meet the existing flange with no visible gap. No machine guide behavior changed. Larger selection/collision follows connected arms; existing server suite passed.",
+    "inventory_appearance":"Creative hotbar shows the new hollow tube model; a naturally fine silhouette at inventory scale. Native editor views retain its octagonal section and transparent windows.",
+    "integration_limits":"Steel-shell revision passed build/unit and focused Photon checks. Only native model geometry changed; server suite was not repeated. Previous routing, collision and transfer behavior retained. Other shader packs and moving vessels were not individually tested."
+  }, "remaining_issues":[]}
+}

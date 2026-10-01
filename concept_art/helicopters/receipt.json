@@ -1,0 +1,31 @@
+{
+  "scope": "Two competing helicopter concepts, explicitly requested. No implementation or gameplay approval implied.",
+  "tool": "built-in image_gen, reference-guided generation",
+  "images": [
+    {
+      "name": "kestrel",
+      "image": "kestrel.png",
+      "original_source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-9f08ffdb-4632-43cd-9a9b-806094653c8d.png",
+      "sha256": "ca84264b95c2940bd380438de0533ebf8a6c7de7ea82741a97a6f3375aac972f",
+      "prompt": "kestrel-prompt.txt",
+      "reference": "art\\assets\\industrial_steel\\texture-review.png",
+      "reference_sha256": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+      "reference_role": "Industrial metal/material style only; not vehicle geometry"
+    },
+    {
+      "name": "meridian",
+      "image": "meridian.png",
+      "original_source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-34d279a3-7620-4a46-b4ac-c18e07efe51e.png",
+      "sha256": "73e21f95c9a318305d5ba53a35104d32de08542699243614a1fe49b9a9610628",
+      "prompt": "meridian-prompt.txt",
+      "reference": "art\\assets\\industrial_steel\\texture-review.png",
+      "reference_sha256": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+      "reference_role": "Industrial metal/material style only; not vehicle geometry"
+    }
+  ],
+  "review": {
+    "kestrel": "Strong town-workshop identity, open negative space, two distinct separated rotor masts, visible triangular supports and landing skids. Readable construction with timber blades and functional brass. Native blockout must validate full rotating rotor envelopes and pilot access; transmission and lightweight aero engine are proposals, not reused stationary engine geometry.",
+    "meridian": "Distinct sky-carriage identity, ivory/turquoise, glazed cabin, restrained copper/porcelain and vertically separated coaxial hubs. Whole craft and skids legible. Generated rotor roots contain extra small fittings; native blockout must resolve exactly two opposite blades per stage and full clearance. Paint weathering should be simplified at native texture size.",
+    "decision": "Both suitable for comparing visual directions; neither is a mechanically approved or implemented model."
+  }
+}

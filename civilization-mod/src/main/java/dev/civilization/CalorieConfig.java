@@ -5,9 +5,10 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class CalorieConfig {
     public static final ModConfigSpec SPEC;
-    public static final ModConfigSpec.DoubleValue CAPACITY, WALK, SPRINT_MULTIPLIER, BREAK, PLACE,
-            JUMP, ATTACK, HEAL, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
-            RECOVERY, DEPLETED_SPEED, STARVATION_FLOOR, FORAGE_KCAL, LIGHT_BREAK, HARVEST, PLANT, FERTILIZE;
+    public static final ModConfigSpec.DoubleValue CAPACITY, WALK, ROW, ASCENT, SPRINT_MULTIPLIER, BREAK, PLACE,
+            JUMP, ATTACK, IGNITE, HEAL, SLEEP, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
+            RECOVERY, DEPLETED_SPEED, STARVATION_FLOOR, FORAGE_KCAL, LIGHT_BREAK, HARVEST, PLANT, FERTILIZE,
+            COLD_EXPOSURE;
     public static final ModConfigSpec.IntValue FORAGE_TICKS;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> FOODS;
 
@@ -15,23 +16,33 @@ public final class CalorieConfig {
         var b = new ModConfigSpec.Builder();
         b.comment("Single calorie reserve. Vanilla saturation and exhaustion are disabled. Values are tunable game kcal.");
         CAPACITY = b.defineInRange("capacityKcal", 2400.0, 100.0, 100000.0);
-        WALK = b.comment("kcal per horizontal block; swimming includes vertical distance and climbing includes ascent.")
+        WALK = b.comment("Walking kcal per horizontal block, independent of speed; swimming includes vertical distance. Ascent is charged separately.")
                 .defineInRange("walkKcalPerBlock", 0.1, 0.001, 100.0);
-        SPRINT_MULTIPLIER = b.comment("Per-distance multiplier, in addition to covering distance faster.")
-                .defineInRange("sprintMultiplier", 3.0, 1.01, 20.0);
+        ROW = b.comment("Controlling a paddled vanilla boat or chest boat costs this many kcal per horizontal block traveled; drifting and passengers cost nothing.")
+                .defineInRange("rowKcalPerBlock", 0.05, 0.0, 100.0);
+        ASCENT = b.comment("Additional kcal per block gained vertically, independent of gait; jumps still pay their separate charge.")
+                .defineInRange("ascentKcalPerBlock", 1.0, 0.0, 100.0);
+        SPRINT_MULTIPLIER = b.comment("Sprinting costs this many times the walking rate per block; road/effect speed does not change that rate.")
+                .defineInRange("sprintMultiplier", 3.0, 1.0, 20.0);
         BREAK = b.defineInRange("breakKcal", 4.0, 0.0, 1000.0);
         LIGHT_BREAK = b.defineInRange("lightVegetationBreakKcal", 0.25, 0.0, 1000.0);
         HARVEST = b.defineInRange("cropHarvestKcal", 1.0, 0.0, 1000.0);
         PLANT = b.defineInRange("cropPlantKcal", 1.0, 0.0, 1000.0);
         FERTILIZE = b.defineInRange("fertilizerApplicationKcal", 1.0, 0.0, 1000.0);
         PLACE = b.defineInRange("placeKcal", 2.0, 0.0, 1000.0);
+        SLEEP = b.comment("Calories per in-game hour actually slept, including hours skipped when the night advances.")
+                .defineInRange("sleepKcalPerGameHour", 50.0, 0.0, 1000.0);
         JUMP = b.defineInRange("jumpKcal", 2.0, 0.0, 1000.0);
         ATTACK = b.defineInRange("successfulAttackKcal", 3.0, 0.0, 1000.0);
+        IGNITE = b.comment("Calories spent for each accepted strike of a coal-fired machine, whether or not it lights.")
+                .defineInRange("machineIgnitionKcal", 1.0, 0.0, 1000.0);
         HEAL = b.comment("kcal per health point (half heart), every 4 seconds while hurt; respects naturalRegeneration.")
                 .defineInRange("healKcalPerHealthPoint", 40.0, 1.0, 1000.0);
         SPRINT_MINIMUM = b.defineInRange("minimumSprintKcal", 100.0, 1.0, 100000.0);
         HUNGER = b.comment("Hunger status effect drain per second per effect level.")
                 .defineInRange("hungerEffectKcalPerSecond", 2.0, 0.0, 1000.0);
+        COLD_EXPOSURE = b.comment("Maximum passive kcal per second at or below 35.6 F player temperature. The player follows local air over several seconds. Drain begins below 64.4 F, rising quadratically; only while heat simulation is enabled and the player is online in Survival.")
+                .defineInRange("coldExposureMaxKcalPerSecond", 0.2, 0.0, 10.0);
         FOOD_FALLBACK = b.comment("Foods absent from the vanilla catalog and overrides use nutrition times this value; ignores saturation.")
                 .defineInRange("fallbackKcalPerNutrition", 100.0, 0.0, 10000.0);
         CAKE = b.defineInRange("cakeSliceKcal", 200.0, 0.0, 10000.0);

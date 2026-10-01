@@ -1,0 +1,18 @@
+{
+  "stage": "mockup-only",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: ui-mockup. Create ONE polished Minecraft HUD concept sheet, landscape, for the Civilization mod. This is a minimal always-visible local temperature and comfort widget, NOT a full menu. Reference image is ONLY palette/material inspiration: muted warm tan enamel, charcoal iron edge and restrained brass fittings. Do not reproduce the inventory menu.\nMain composition: large Minecraft first-person scene of a brick-paved lane beside a warm timber-and-brick workshop, Tesla-era industrial riverside settlement, vanilla-shaped voxel architecture, calm daytime, no modern electronics. Lower center has a familiar small Minecraft hotbar and hearts, understated. Place the NEW compact HUD immediately above and slightly to the left of the hotbar, keeping most of the world unobstructed. In the upper right of the image, provide ONE enlarged sharp detail of exactly the same widget for legibility, on a neutral dark backing; no arrows or paragraphs, no competing designs.\nWidget design: very slim horizontal rectangular instrument plate, roughly 230 by 44 logical Minecraft GUI pixels. Pixel-art construction with crisp stepped outlines, only two tiny brass fasteners, dark iron narrow border, softly darker tan face. No gears, tubing, elaborate scrollwork, giant circular dials or chunky frame. Readable Minecraft-like pixel lettering. Left area: recognizable small thermometer icon, prominent exact text \"72°F\", then a short horizontal temperature scale blue through muted green to amber with a tiny needle centered within green. Small text \"Comfortable\". Right area: three small distinct pictograms in a single tidy line with numeric values: food/loaf icon \"-20%\", pickaxe icon \"+15%\", walking boot icon \"+5%\". These mean comfort calorie saving, mining speed, and movement speed; do NOT add long labels. A subtly separated small brick-paving icon and \"+25%\" at the far right indicates the additional road speed bonus. Make the brick icon visibly reddish laid bricks, distinct from the walking boot. Percentages MUST remain separate, do not sum them. Four effects total. Legible and minimal, no comfort percentage, no heading such as thermal diagnostics, no kelvin/celsius, no extra gauges. Show full comfort and active road as one example state. The small strip should feel like a quiet late-1800s scientific instrument translated to native Minecraft pixel UI. Scene is illustrative, enlarged inset should be clean and implementation-ready in layout, not photoreal metal or smooth mobile UI.",
+  "reference": "concept_art/11_ui_coal_machine.png",
+  "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-c701514d-d806-4bce-8750-e0eba1d3a7d1.png",
+  "output": "mockup-01.png",
+  "review": {
+    "result": "pass as concept",
+    "findings": [
+      "Single compact instrument strip with matching enlarged detail; tan/iron/brass matches cabinet family.",
+      "Temperature, comfort and all four effect numbers read correctly; road badge separated from comfort speed.",
+      "Four small corner fasteners instead of the requested two are acceptable at concept stage.",
+      "Background vanilla hunger/XP HUD is illustrative: implementation must preserve Civilization's calorie HUD.",
+      "Bread-minus icon may require an inspection tooltip to distinguish calorie saving from food depletion. Exact layout and supported GUI scales require runtime review."
+    ]
+  }
+}

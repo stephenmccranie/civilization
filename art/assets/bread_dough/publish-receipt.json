@@ -1,0 +1,14 @@
+{
+  "brief_hash": "668259c5c1cea5a3b5ed942f465546563b748b73cbe7cd8c5ee6c0badd655f26",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\bread_dough\\mockup-01.png": "1f02d40cd23bd52df917dbbbec9a9ab26bace918440e80b0f2d595321bf62621",
+    "F:\\minecraft project\\art\\assets\\bread_dough\\export.py": "5394f06e9bf33220177e9710dbd5d43502911784afc794d32dbbf6b7b068a223",
+    "F:\\minecraft project\\art\\assets\\bread_dough\\bread_dough.png": "7fcce48755a6273a91aecb8aaa0a29ca6acdfb4a69e1e7c98092a1714d9365b0",
+    "F:\\minecraft project\\art\\assets\\bread_dough\\bread_dough.json": "a45f3e4792c60c843866099c68c37682ba9ca8a89f4143380a0a827b5d4879a8"
+  },
+  "outputs": {
+    "textures/item/bread_dough.png": "7fcce48755a6273a91aecb8aaa0a29ca6acdfb4a69e1e7c98092a1714d9365b0",
+    "models/item/bread_dough.json": "a45f3e4792c60c843866099c68c37682ba9ca8a89f4143380a0a827b5d4879a8"
+  }
+}

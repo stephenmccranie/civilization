@@ -1,0 +1,14 @@
+{
+  "brief_hash": "cc08ced5bee3e9d6622a0070473bed5340744ed9c083aadcd675a83cff3238dd",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\field_ration\\mockup-01.png": "b3f1683df745cf11913212bdb2d4d41e0f2c9aa5d3632f5889cfcfcd12f64f23",
+    "F:\\minecraft project\\art\\assets\\field_ration\\export.py": "965b76b0ea82ebc9c1c04850aa4c1706d2d7347940bbcc1e5d3791216280dba4",
+    "F:\\minecraft project\\art\\assets\\field_ration\\field_ration.png": "8ae39ec8825876f97c88a096196199900612ba6946fea5c991a9b831a3eb75d0",
+    "F:\\minecraft project\\art\\assets\\field_ration\\field_ration.json": "3b218c195979c90e833db5da465952be0cd32eb3f41fbbd6dc7681fe44cc451f"
+  },
+  "outputs": {
+    "textures/item/field_ration.png": "8ae39ec8825876f97c88a096196199900612ba6946fea5c991a9b831a3eb75d0",
+    "models/item/field_ration.json": "3b218c195979c90e833db5da465952be0cd32eb3f41fbbd6dc7681fe44cc451f"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "master": "texture-master.png",
+  "sha256": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+  "prompt": "Edit the provided 2 by 2 high-resolution pixel-art material master sheet for a Minecraft Tesla-era cast-iron oil engine. Preserve EXACT quadrant layout: top left plain blue-gray cast iron, top right riveted iron access panel, bottom left muted warm brass, bottom right iron instrument panel with cream analog dial and brass vertical lever. Improve surfaces: replace cloudy concrete-like mottling with quieter, broader consistent cast-iron color and sparse subtle pixel variation. Top left medium blue-gray iron, a little darker than current but clearly visible, neither black nor pale cement. The panel backgrounds must be exactly same iron family. Thin clean steel edge highlights, crisp small brass corner fasteners on panels. Brass less yellow-gold, more restrained warm aged brass. Preserve instrument legibility and panel proportions. High-resolution pixel art texture sheet, flat orthographic surface, no perspective, no rendered 3d objects, no labels, no borders between quadrants, full bleed. Do not specify a tiny pixel resolution: keep high-resolution art for later pipeline downscaling.\n",
+  "original": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-3519f699-b634-466a-9511-c1d3c108aa82.png",
+  "references": {
+    "texture-master-02.png": "e6a789f3c7bb219c880e4348cf9350dbd869e6cf59b55783809fe21aac09252f"
+  },
+  "source_size": [
+    1254,
+    1254
+  ],
+  "crops": [
+    [
+      0,
+      0,
+      627,
+      627
+    ],
+    [
+      627,
+      0,
+      1254,
+      627
+    ],
+    [
+      0,
+      627,
+      627,
+      1254
+    ],
+    [
+      627,
+      627,
+      1254,
+      1254
+    ]
+  ],
+  "export": "model/engine_atlas.png",
+  "export_sha256": "5e9267b05f701b5991ffb4508f01c31dedb386684facbe82b820db1c01d0cd8b",
+  "tile_size": 32,
+  "review": "Third referenced master gives quieter medium blue-gray iron; plain steel has a dedicated derived tile. Assembly bed uses actual refinery casing texture; copper slab removed."
+}

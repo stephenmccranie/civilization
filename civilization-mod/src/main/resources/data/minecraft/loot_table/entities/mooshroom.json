@@ -26,7 +26,7 @@
               "function": "minecraft:enchanted_count_increase"
             }
           ],
-          "name": "minecraft:leather"
+          "name": "civilization:raw_hide"
         }
       ],
       "rolls": 1.0
@@ -39,21 +39,44 @@
           "functions": [
             {
               "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
-              },
+              "count": 1,
               "function": "minecraft:set_count"
             },
             {
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 1.0,
-                "min": 0.0
-              },
-              "enchantment": "minecraft:looting",
-              "function": "minecraft:enchanted_count_increase"
+              "conditions": [
+                {
+                  "condition": "minecraft:any_of",
+                  "terms": [
+                    {
+                      "condition": "minecraft:entity_properties",
+                      "entity": "this",
+                      "predicate": {
+                        "flags": {
+                          "is_on_fire": true
+                        }
+                      }
+                    },
+                    {
+                      "condition": "minecraft:entity_properties",
+                      "entity": "direct_attacker",
+                      "predicate": {
+                        "equipment": {
+                          "mainhand": {
+                            "predicates": {
+                              "minecraft:enchantments": [
+                                {
+                                  "enchantments": "#minecraft:smelts_loot"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "function": "minecraft:furnace_smelt"
             }
           ],
           "name": "minecraft:beef"

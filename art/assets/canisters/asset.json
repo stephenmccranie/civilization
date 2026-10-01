@@ -1,0 +1,485 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "Tesla-era workshop canister family with shared native geometry and readable liquid labels",
+    "purpose": "Reusable hand-carried 1000 mB vessel for empty, crude oil, refined engine fuel and lubricating oil; distinguish contents in inventory and hand.",
+    "silhouette": "Compact rectangular metal oil tin with beveled shoulders, open bridge handle, off-center brass screw cap and reinforced foot rim. Broad readable front enamel badge.",
+    "bounds": "Handheld item around 8 model units wide, 6 deep and 13 tall including handle. Static Java item, no placed block, no animation library needed.",
+    "materials": "Reuse original engine blue-gray iron, steel trim and restrained brass. Original enamel badge family uses gray empty ring, dark crude drop, amber fuel flame and green lubricant oil-can symbol.",
+    "interfaces": "Inventory, first/third person held item, dropped item and item-frame display. Contents distinguished by color and symbol, names remain existing tooltips.",
+    "states": "Four item IDs sharing silhouette and metal, different contents badges. No partial amounts or moving lid.",
+    "construction": "Native Blockbench Java item with clear handle hole, thin folded rims, beveled shoulder and small cap. Texture badges/rivets; no tiny pipes or high-poly smooth metal.",
+    "invariants": "Appearance only. Preserve four IDs, recipes, stack size one, 1000 mB transfers, permissions and existing machine/boat interactions. Do not imply new pouring/placeable/partial-fill mechanics.",
+    "fidelity_targets": [
+      "Body about 9 units wide and 10 high; overall height about 14 including open handle.",
+      "Open handle spans left two-thirds of top; separate brass cap on right, supported by shoulder.",
+      "Thin steel base/shoulder rims and sloping shoulders, broad front badge covering roughly two-thirds of body height.",
+      "One geometry for all four states; colored enamel field AND cream symbol distinguish contents."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/mockup-05.png",
+      "role": "Established Tesla-era materials and mechanically legible beveled geometry"
+    },
+    {
+      "path": "art/assets/oil_engine/texture-master.png",
+      "role": "Existing generated iron/brass material master reused for canister body"
+    }
+  ],
+  "sources": [
+    "build_model.py",
+    "prepare_textures.py",
+    "metal-master.png",
+    "label-master.png",
+    "model/empty_canister.bbmodel",
+    "model/crude_canister.bbmodel",
+    "model/fuel_canister.bbmodel",
+    "model/lubricant_canister.bbmodel"
+  ],
+  "outputs": [
+    {
+      "source": "model/empty_canister.json",
+      "target": "models/item/empty_canister.json",
+      "format": "java_model"
+    },
+    {
+      "source": "model/crude_canister.json",
+      "target": "models/item/crude_canister.json",
+      "format": "java_model"
+    },
+    {
+      "source": "model/fuel_canister.json",
+      "target": "models/item/fuel_canister.json",
+      "format": "java_model"
+    },
+    {
+      "source": "model/lubricant_canister.json",
+      "target": "models/item/lubricant_canister.json",
+      "format": "java_model"
+    },
+    {
+      "source": "model/canisters.png",
+      "target": "textures/item/canisters.png",
+      "format": "png",
+      "size": [
+        128,
+        128
+      ],
+      "alpha": "opaque"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-150bcb14-ba4e-4c97-9f85-9bd03869a74e.png",
+      "sha256": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9",
+      "prompt": "Design one coherent Minecraft canister family inspired by the material/style of the reference engine, not an engine itself. A production-ready Blockbench-style mockup: four identical hand-carried late-1800s workshop oil tins in a row, labeled only through simple enamel symbols, no text. Main large three-quarter view of refined fuel tin, with three smaller matching empty/crude/lubricant variants beside it. The tin is compact, about 8 wide by 6 deep by 13 tall in Minecraft model proportions. Flat blue-gray cast/sheet-metal rectangular body, small 45-degree beveled shoulders, reinforced thin steel bottom and shoulder rims, a clearly open bridge handle with two attached uprights and space for a hand, and an offset brass screw filler cap beside the handle. Restrained brass, no copper slab, no military jerrycan X embossing, no modern plastic. Front broad enamel label: EMPTY gray with cream hollow circle, CRUDE charcoal with cream drop, FUEL amber with cream flame, LUBRICANT muted green with cream oil-can/spout symbol. All four share exactly the same body and hardware; only label changes. Meaningful layered folded-metal construction with clean edges and very subtle pixel wear. Static Minecraft Java cuboids/45-degree bevels, high-resolution pixel-painted textures intended for later native model mapping. Neutral warm beige background, soft lighting, clear physical proportions, no huge rivets or complicated hoses, no words, no invented functional mechanics. Match the reference iron/steel/brass workshop family. Display the entire can including base and open handle.",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Compact folded-metal oil tin, open handle, offset filler and broad readable label; proportions extracted into fidelity targets.",
+        "implementable_geometry": "Cuboid body/handle, 45-degree shoulder strips and small faceted cap; tiny edge wear stays in texture.",
+        "mechanics_clearance": "Both handle legs supported by shoulder; cap sits beside handle and remains accessible. Static sealed item, no animation needed.",
+        "period_materials": "Blue-gray metal, thin steel seams and brass closure match engine family; enamel marking avoids modern plastic/military jerrycan look.",
+        "family_consistency": "Same tin/hardware on all four variants, differentiated only by matching enamel badge.",
+        "controls_readability": "Gray ring, dark drop, amber flame and green oil-can symbols distinguish empty/crude/fuel/lube without tiny text.",
+        "gameplay_scope": "Only appearance; original item IDs/capacity/stack sizes unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27"
+      },
+      "evidence": {
+        "mockup-01.png": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "b93fa04b4e75d868d640ceb50e594b2563b13ca025f0960512dee15abb3cdc57",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "d36a9ba3c31b1a9bab88f0bacc504bd7636bd7d935e7c5e7b84ee9c1f1163500",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "35d38d26effd46ca5971ea9950d2bf4e1ae50dde1026f0e1120382db82d4ae9f",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "3009787cbc5c0e36fe5f7e46072a7894e8919cb5710eb6d1cbaf0f073c126425",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "ac7e143af22554c3649b2a629375bbc821458a076c3113a34a3a91bda4ac11ac",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "c416f219148515badcd1ee6b7690025e4980ff456f4b55fcd15d422c214d2f26",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "8ec03abcefa0300e326654972c307c693774debb62b385bcb29b2c42660e5b04",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "da13e2e6c8e558b02f9c22e11f621311d1db9d4aa1bc05d63380dbf84ea39b0d",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "8653123329ed20a99671540fa6b848114dd76871633f5918d48580471d746083",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "fidelity-comparison.png": "9d2523c97ab6fa95ecaa3f2f826204f235d15a254865c821c5590970a5f2c98b",
+        "model/lubricant_canister-front.png": "dd90d4ff22a8345f7630fb4da0a1eeb0cd3cbaea30957eeb23ba83b2ff807e6e",
+        "model/empty_canister-back.png": "d9d915e0d1b26db4f0fce30b2246ce6e2a571e3998883833c4ffe85fb29762f1",
+        "model/crude_canister-isometric.png": "56c4fa1af7145d1cc0eef5c8b5b916e6740963b3596642a2a171717b05eb0b61"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "revise",
+      "criteria": {
+        "photon_materials": "Engine-family metal consistent and symbols readable in inventory.",
+        "scale_readability": "Inventory size good; first-person canister too large/cut off.",
+        "states_motion": "Static variants correct in hotbar; no animation needed.",
+        "interaction_guides": "No multiblock guide applies. Item frame shows unmarked rear, needs fixed transform correction.",
+        "inventory_appearance": "All four symbols/colors visible at inventory scale; hand points wrong face toward player.",
+        "integration_limits": "Art-only scene; no gameplay changes."
+      },
+      "remaining_issues": [
+        "Rotate fixed display to show front badge.",
+        "Rotate hand display toward front and reduce/raise it so full tin is visible."
+      ],
+      "stage": "ingame",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "b93fa04b4e75d868d640ceb50e594b2563b13ca025f0960512dee15abb3cdc57",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "d36a9ba3c31b1a9bab88f0bacc504bd7636bd7d935e7c5e7b84ee9c1f1163500",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "35d38d26effd46ca5971ea9950d2bf4e1ae50dde1026f0e1120382db82d4ae9f",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "3009787cbc5c0e36fe5f7e46072a7894e8919cb5710eb6d1cbaf0f073c126425",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "ac7e143af22554c3649b2a629375bbc821458a076c3113a34a3a91bda4ac11ac",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "c416f219148515badcd1ee6b7690025e4980ff456f4b55fcd15d422c214d2f26",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "8ec03abcefa0300e326654972c307c693774debb62b385bcb29b2c42660e5b04",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "da13e2e6c8e558b02f9c22e11f621311d1db9d4aa1bc05d63380dbf84ea39b0d",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "8653123329ed20a99671540fa6b848114dd76871633f5918d48580471d746083",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "first-frames.png": "ae0ca316c87e568bebca2ffe5088c48a4f16caad9da68b088080dde3711368d1",
+        "first-fuel-held.png": "018188dc8718e6807b127ba0223d6144d8118897ca6532092b7a143f511c61a0",
+        "first-inventory.png": "a5ad1880dc9cf124df42426d52e6deaa2efe5f6278a9e5e21a5fa424dcb7e9c1"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "060842b17e2aad4173612f6fcedddf0088a7cef86016ec313a60b89abd81e887",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "c8c30b3a71098cca1bcfbdfd52a06316ed172bdec40c3467b99927c893617fcc",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "0bb27d7ad7a77f118514d763c24618db31c5958e2ef55fa1e224b5f8035bae17",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "20313a3e027994873933e70c7fa856705342224443de05c3939ca2b474036254",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "7bacfa45fbad0fabdd16c49b1c02fcae91898a595975ec67527fba75d4aa7ea4",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "ff0debbbb09fd3b2a8cf920759db3e8cf78689230d9ddb6bbd293f669f2f4524",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "f6d3bd79cbf17e549e6728e757e4eb038e85483b59cfc49fbbde5c3f90f48bd4",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "50bd15283c7f4a30ee635d92e93a19af2c87c99eaeaa212625c7e23a30ce3ba1",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "923d2d6d34a648a3c5a82ddd43f80a5d57023863da99e25a737f7567b7fb4469",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "model/fuel_canister-isometric.png": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+        "model/lubricant_canister-front.png": "dd90d4ff22a8345f7630fb4da0a1eeb0cd3cbaea30957eeb23ba83b2ff807e6e",
+        "model/empty_canister-back.png": "d9d915e0d1b26db4f0fce30b2246ce6e2a571e3998883833c4ffe85fb29762f1",
+        "model/crude_canister-isometric.png": "56c4fa1af7145d1cc0eef5c8b5b916e6740963b3596642a2a171717b05eb0b61"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Reviewed actual Photon/Faithful screenshots: blue-gray steel, brass cap and enamel badges remain coherent and readable.",
+        "scale_readability": "All four inventory icons fit their slots; corrected first-person scale keeps handle, cap and badge readable in the lower right with a natural bottom-edge crop.",
+        "states_motion": "Four static variants display matching geometry with distinct empty ring, crude drop, fuel flame and lubricant oil-can labels.",
+        "interaction_guides": "No guide applies. Corrected fixed transform now shows the front label in every item frame.",
+        "inventory_appearance": "Reviewed inventory, player preview and held fuel/lubricant. Labels face the viewer and cap/handle remain distinct.",
+        "integration_limits": "Art-only focused scene passed in 35.2 seconds. Fluid behavior unchanged; full server suite not repeated. Left-hand and dropped-item views were not separately captured."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "060842b17e2aad4173612f6fcedddf0088a7cef86016ec313a60b89abd81e887",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "c8c30b3a71098cca1bcfbdfd52a06316ed172bdec40c3467b99927c893617fcc",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "0bb27d7ad7a77f118514d763c24618db31c5958e2ef55fa1e224b5f8035bae17",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "20313a3e027994873933e70c7fa856705342224443de05c3939ca2b474036254",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "7bacfa45fbad0fabdd16c49b1c02fcae91898a595975ec67527fba75d4aa7ea4",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "ff0debbbb09fd3b2a8cf920759db3e8cf78689230d9ddb6bbd293f669f2f4524",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "f6d3bd79cbf17e549e6728e757e4eb038e85483b59cfc49fbbde5c3f90f48bd4",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "50bd15283c7f4a30ee635d92e93a19af2c87c99eaeaa212625c7e23a30ce3ba1",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "923d2d6d34a648a3c5a82ddd43f80a5d57023863da99e25a737f7567b7fb4469",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "minecraft-frames.png": "b6c64f2260d2470b785ded1f3b098cb32838326eac65ff374a5b5474500249e1",
+        "minecraft-inventory.png": "4abac0b3b6a8ffe1999cd293a46d2b44d5a6e954cd824c2fdba1b471275de47a",
+        "minecraft-fuel-held.png": "53da8f036494d6f393d5426722a6e91590dd0887725d86c48bfc2966639c0709",
+        "minecraft-lubricant-held.png": "8ffb6c700b481536bd7eddce818894af0f6864e14fe86dd058113a2ce233e0c9"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "a7bc5d8cf734a46b27a3a1020958bf10c795453b0821f8d14e56209c8cd80173",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "b217de266fd3884e40e7a13f30888104de9299da99211527392c696f41586365",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "5c62119898e360992ced1de83eaebaa14530ebd46e8866ffc1711371d7e653bf",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "787224155716233378eaaa7bda3c241421fe5a05abc20e7148e495bf4d37d38c",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "ad4ccfe798bad7c71f8c21f5b93bcc3c6b66548b592811368233d399e4d620fd",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "f09879e5d34078702e92065ba214291755618624a870f824e7d530da901b08a8",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "359b3f8a2a6afffca6e35b9abb0ae73d84fe3d3f7d2ce8ad73fdfeaf72bf1d43",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "7074567f55b36a31fa96bc250f4b0840795d8758aa31ff3247c0975adc52bfb0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "5447b640a914bf0a4ab3b0266686ea1fbd47a11f7636f0ca71566f5da695d8b0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "model/fuel_canister-isometric.png": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+        "model/fuel_canister.bbmodel": "787224155716233378eaaa7bda3c241421fe5a05abc20e7148e495bf4d37d38c"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Reviewed actual Photon/Faithful screenshots: blue-gray steel, brass cap and enamel badges remain coherent and readable.",
+        "scale_readability": "Reviewed held fuel view: upright tin lowered to the side, slightly turned with visible logo and handle; bottom deliberately continues below screen. More central view remains unobstructed.",
+        "states_motion": "Four static variants display matching geometry with distinct empty ring, crude drop, fuel flame and lubricant oil-can labels.",
+        "interaction_guides": "No guide applies. Corrected fixed transform now shows the front label in every item frame.",
+        "inventory_appearance": "Inventory/frame transforms and geometry unchanged; only first-person mirrored transforms adjusted.",
+        "integration_limits": "Focused Photon/Faithful scene passed in 35.5 seconds. No gameplay changes. Left-hand and dropped-item views not separately captured."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "a7bc5d8cf734a46b27a3a1020958bf10c795453b0821f8d14e56209c8cd80173",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "b217de266fd3884e40e7a13f30888104de9299da99211527392c696f41586365",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "5c62119898e360992ced1de83eaebaa14530ebd46e8866ffc1711371d7e653bf",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "787224155716233378eaaa7bda3c241421fe5a05abc20e7148e495bf4d37d38c",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "ad4ccfe798bad7c71f8c21f5b93bcc3c6b66548b592811368233d399e4d620fd",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "f09879e5d34078702e92065ba214291755618624a870f824e7d530da901b08a8",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "359b3f8a2a6afffca6e35b9abb0ae73d84fe3d3f7d2ce8ad73fdfeaf72bf1d43",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "7074567f55b36a31fa96bc250f4b0840795d8758aa31ff3247c0975adc52bfb0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "5447b640a914bf0a4ab3b0266686ea1fbd47a11f7636f0ca71566f5da695d8b0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "carry-fuel-held.png": "c98f500c2b38ee6f6d9a2456df6dcaec2e84e9387f42dd9f915b38ba6958e967",
+        "carry-lubricant-held.png": "812bed8cc6f89609159b7c6701ed7075c645b84ee241d24707424ef8f4dde2a4",
+        "carry-inventory.png": "d1036706cb11d2f54d947a7a06cb14ef4dcdf4ba1f4f2cbb0def06b07f5f145a",
+        "carry-frames.png": "90233fdda883715f6c6dadde46423e9d87947055512193da887817fb81c3426b"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "dbe6243612f2380b283278dda0ee61a042035d4e50da14ebff4021d51608b307",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "764ed72ac8a4fd532699ea5dae07fcd4e85d595663a9f68a161d1f6476b6c4f0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "ea9a380b076f19fc60bfc89dd5d90f5e5eb9f334fa61d2a772c3155a867079f0",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "334f7d81792781800c0376a9c576fe3dfe5d657d93fbf64c63ef0715171d2374",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "d750585cfa668d30fa6a35eb4adbe2868e6c6e3315cf7a2514375c3957d704a2",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "1db7d1aafe6c9c26721e0c39d51994256cce50e2435d032f6078b60d287f45cc",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "6e9cc40b1702d24f5e54e048df4a38c9d6e3f273de6414477f349c3da56e59d8",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "74973f12224e18a3237d7fadafd585c1cb909deaa871fc62ee25eb189be314c9",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "3287e117a568bdf3998c5682f50099d25f3d9031e4dcc20a6fe044cad60c6aba",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "model/fuel_canister-isometric.png": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+        "model/fuel_canister.bbmodel": "334f7d81792781800c0376a9c576fe3dfe5d657d93fbf64c63ef0715171d2374"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "be65aaf25fc3268feb22ef0b723fdc01968f59eab49263667d7689346237c3df",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "f42af37b2e9bcf07e410583838f8bfcea3fad241f05caac9ce73037b4316b248",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "9750d9a4b58d9c03fc480640f365e00b9beaf293fd90813e0a1b47bf40627317",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "141bd95bad76814bd2fd38aeac57365194feb88e5c73e465ddc06e18995b2610",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "2a9e85cd79a9f58514fcc8ebf498fdf93fd263f8825abc763decfa7c4594444a",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "5c8f8761a41bde1522228e9ec97a6578af60ace55041cc08345718bf7463cd05",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "d93e70241ec766ff969fd1df2d6518d408bb7ca0748023a91e0889a289a183ef",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "b90d0cda6d6cded337e6aca1919db1e910f9a2ac90c479afaf0137d96f5a65a1",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "9f2bf075e1652a73562db0f168c3fb63625276daba80640f0fb459c95392ed64",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "model/fuel_canister-isometric.png": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+        "model/fuel_canister.bbmodel": "141bd95bad76814bd2fd38aeac57365194feb88e5c73e465ddc06e18995b2610"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual native model retains all four targets: 9x10 body / 14 total height, open supported handle, offset brass cap, sloped shoulders and thin rim, broad enamel label. Mockup has finer edge wear; native version retains key layered forms without tiny decorative geometry.",
+        "geometry_uvs": "Sixteen native cuboids with legal X-axis 45-degree shoulder strips; identical recipe used for four items. Named material UV regions, label restricted to front face; native sources and Java exports retained.",
+        "material_consistency": "Copied original engine master preserves iron/brass provenance; one newly generated referenced label sheet reduced through shared pipeline. One atlas for all four items.",
+        "assembly_interfaces": "Standalone handheld items, no multiblock/ports/collision integration. Original item IDs and interactions untouched. Handle and cap are physically supported.",
+        "animation_states": "No animation required; all four static variants reviewed.",
+        "native_size_readability": "High-contrast cream symbols and gray/charcoal/amber/green fields survive 32px reduction. Inventory/hand transforms explicitly fitted; actual Photon review follows."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "881de9093255d47cdd1f66cd2e3ff25cf6f11647d6958d1d2172fe085aacfc36",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "be52f00e3ba54c1313e520f7939352f5f6d121c3e75d7f4af580523552e32300",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "83daa30cd85dee3b8d59f0b25bc6ad9b4b8b5cc9342f41ef90836d8828d5e0c9",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "24f28b83f8b3b82147af5d2df31dc1da753e2c2842dd0b35c8604290b47ea237",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "f4e07cc9d056a80181db0619f5d44e97e59a5ff16994457315ac1e8a06829677",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "16b0dc1c1081eec2cabf6ebdd3d9ac63f8d5b99fda5b67849bd9a89ae837254d",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "54d041e11c5bb604878f8de6bdb4b04fd207d377ccd61c74771cd59cfcb06b79",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "f44c53442bb364a2fb7460809a93b41e4b40dfad886b2f7cd0508dc29a0b3459",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "1d3411f8ec05b5ea3f0c97d0cb4a64df8229c213cdff06f402b2cff1229ffe0f",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "model/fuel_canister-isometric.png": "194f4b7e502e89540f17fa46c3594b54460f19e7e5b5fb5bc41fc80fbd62b3a0",
+        "model/fuel_canister.bbmodel": "24f28b83f8b3b82147af5d2df31dc1da753e2c2842dd0b35c8604290b47ea237"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Reviewed actual Photon/Faithful screenshots: blue-gray steel, brass cap and enamel badges remain coherent and readable.",
+        "scale_readability": "Reviewed final fuel view: low carry preserved; tin now points mostly forward, narrow end prominent and logo visible obliquely along the inward face. Small five-degree tilt. Bottom remains naturally offscreen.",
+        "states_motion": "Four static variants display matching geometry with distinct empty ring, crude drop, fuel flame and lubricant oil-can labels.",
+        "interaction_guides": "No guide applies. Corrected fixed transform now shows the front label in every item frame.",
+        "inventory_appearance": "Inventory/frame transforms and geometry unchanged; only first-person mirrored transforms adjusted.",
+        "integration_limits": "Final focused Photon/Faithful scene passed in 37.5 seconds. Only native first-person display transforms changed; no gameplay changes. Left-hand and dropped views not separately captured."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "9f5d58c5221fe43787b242d8e31a151b38a4ccda7613b5fea576c4cd430c510b",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\build_model.py": "881de9093255d47cdd1f66cd2e3ff25cf6f11647d6958d1d2172fe085aacfc36",
+        "F:\\minecraft project\\art\\assets\\canisters\\prepare_textures.py": "84853fb5463cbcc6c39e73294f07de5fb1d06b05008a87ad4efd703cd7d8c3d5",
+        "F:\\minecraft project\\art\\assets\\canisters\\metal-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\canisters\\label-master.png": "dbcffc45f157e87ff55026f6bc04b5e27f26575c664cb10846d3191820ee8b5b",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.bbmodel": "be52f00e3ba54c1313e520f7939352f5f6d121c3e75d7f4af580523552e32300",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.bbmodel": "83daa30cd85dee3b8d59f0b25bc6ad9b4b8b5cc9342f41ef90836d8828d5e0c9",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.bbmodel": "24f28b83f8b3b82147af5d2df31dc1da753e2c2842dd0b35c8604290b47ea237",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.bbmodel": "f4e07cc9d056a80181db0619f5d44e97e59a5ff16994457315ac1e8a06829677",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\empty_canister.json": "16b0dc1c1081eec2cabf6ebdd3d9ac63f8d5b99fda5b67849bd9a89ae837254d",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\crude_canister.json": "54d041e11c5bb604878f8de6bdb4b04fd207d377ccd61c74771cd59cfcb06b79",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\fuel_canister.json": "f44c53442bb364a2fb7460809a93b41e4b40dfad886b2f7cd0508dc29a0b3459",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\lubricant_canister.json": "1d3411f8ec05b5ea3f0c97d0cb4a64df8229c213cdff06f402b2cff1229ffe0f",
+        "F:\\minecraft project\\art\\assets\\canisters\\model\\canisters.png": "ab6121abe932a353ce7ba4f2af589ccfb15a150873e56f779f62613547941c37"
+      },
+      "evidence": {
+        "forward-fuel-held.png": "9c838b4fc23ba2143179f54bfd7232aa132cd2415fef7fc5645c0b5e1ce288f7",
+        "forward-lubricant-held.png": "20b3c9788fc5eabd3776db99a232fbc330999a7d61e1c57209d146a7c34a6443",
+        "forward-inventory.png": "7b982ae103f5df9bd2b930444f969b257fbea2fe29ba2beb7fbd67de679dce2c",
+        "forward-frames.png": "cdc28597ab08806c44cd3460da57c55d6100eb6cbffef2d2631a2bbe75d3be57"
+      },
+      "generation": "c36dc27f3e48c04cb3ad91c25a0fbe59e451634c07114421863f733087e11af9"
+    }
+  ]
+}

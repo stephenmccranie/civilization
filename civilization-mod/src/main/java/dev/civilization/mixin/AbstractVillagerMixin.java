@@ -14,6 +14,10 @@ public abstract class AbstractVillagerMixin {
     @Inject(method = "getOffers", at = @At("RETURN"))
     private void civilization$kilnGate(CallbackInfoReturnable<MerchantOffers> callback) {
         callback.getReturnValue().removeIf(offer -> offer.getResult().is(Items.BRICK)
+                || dev.civilization.VanillaRetirement.retired(offer.getResult())
+                || dev.civilization.VanillaRetirement.retired(offer.getBaseCostA())
+                || dev.civilization.VanillaRetirement.retired(offer.getCostB())
+                || dev.civilization.WorkshopGates.disabledTrade(offer.getResult())
                 || dev.civilization.CookingContent.requiresCooking(offer.getResult()));
     }
 }

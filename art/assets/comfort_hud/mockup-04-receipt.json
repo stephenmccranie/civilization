@@ -1,0 +1,16 @@
+{
+  "tool": "built-in image_gen",
+  "stage": "mockup-only",
+  "prompt": "Edit the supplied Minecraft HUD concept screenshot. Preserve the waterfront workshop world and native hotbar, hearts and amber calorie bar. Remove the current temperature widget above the left hearts entirely, including its underline and square badge.\nPlace the temperature display exactly at the HORIZONTAL CENTER of the hotbar, in the narrow gap BETWEEN the right end of the hearts and the left end of the calorie bar. Compact VERTICAL arrangement: one tiny slender brass-and-glass thermometer centered in that gap on the same baseline as hearts, with very small \"72°F\" centered directly ABOVE the thermometer. The number can rise one text row above the bars but must not overlap either bar. Total icon width no greater than two heart icons. Make it feel physically nestled in the middle of the native survival HUD. Do not shift or remove the hearts or calorie bar to fit a wide panel.\nComfort is conveyed ONLY through color and soft restrained luminous accents: thermometer glass is muted sage green at this comfortable temperature, white temperature text has a faint sage tint, tiny two-pixel green highlights around the bulb depict the brightest moment of a very gentle breathing glow. Crisp pixel-art shading, not a blurry big aura, no particle cloud, no radial rays. At the thermometer's base attach a minuscule reddish brick-pattern foot with ONE ivory up-chevron indicating the road boost. This is an integrated accent, not a separate square button. No underline, no comfort meter, no comfort word, no percentages, no additional status glyphs, no large backing panel, no inset or presentation labels. Tesla-era brass scientific instrument flavor only in the tiny thermometer frame. Actual world visibility and compact native-Minecraft integration are essential. This is a STATIC concept of one pulse frame, do not put motion lines in the image.",
+  "reference": "mockup-03.png",
+  "output": "mockup-04.png",
+  "review": {
+    "result": "center placement accepted as concept; animation not demonstrated",
+    "findings": [
+      "Compact vertical readout centered between health and calories; no comfort underline or explicit percentage.",
+      "Static image cannot validate a breathing animation; implementation should use a slow low-amplitude highlight proportional to actual comfort.",
+      "Road accent generated larger than requested and overlaps illustrative XP strip: native asset must reduce it to an integrated few-pixel foot without covering other HUD.",
+      "Color proposal: cool blue when cold, sage green when comfortable, amber/red when hot. Strongest gentle pulse at full comfort; fade with reduced benefits."
+    ]
+  }
+}

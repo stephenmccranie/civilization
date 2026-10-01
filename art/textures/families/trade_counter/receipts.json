@@ -1,0 +1,18 @@
+{
+  "side": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Remove the drawers, handles and central transaction emblem inside the border. Fill the interior with matching warm vertical oak boards with quiet grain and one narrow brass reinforcing strip across their middle. Preserve the complete outer frame and corner hardware exactly. Warm honey oak, restrained walnut grain and aged brass frame fittings. Match the master detailed high-resolution pixel art exactly. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\trade_counter_front-v1.png"
+    ],
+    "reference_sha256": "258fb97e06e424f0072a9520105f6838413f66d2373af5d9e3a80763381742b2",
+    "output_sha256": "e0927f4be0d75b2fda4b355a6647a430b3d9ef3f1aef9e6dacc1e764ee206ea2"
+  },
+  "top": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Make the top work surface of this exact oak counter. Replace all front drawers and hardware inside the perimeter with uninterrupted warm oak boards and a modest rectangular inset brass-edged counting tray outline in the center. The tray is empty and shallow, with oak interior. Keep the exact outer wooden frame and brass corner fasteners. Flat top-down texture, no objects on top. Warm honey oak, restrained walnut grain and aged brass frame fittings. Match the master detailed high-resolution pixel art exactly. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\trade_counter_front-v1.png"
+    ],
+    "reference_sha256": "258fb97e06e424f0072a9520105f6838413f66d2373af5d9e3a80763381742b2",
+    "output_sha256": "b1957dc37186d1d5f87587d17b655ba22b141fa164b47aa980d03525f37f008d"
+  }
+}

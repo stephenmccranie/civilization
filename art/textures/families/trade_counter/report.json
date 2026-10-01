@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "front": {
+      "path": "sources\\trade_counter_front-v1.png",
+      "sha256": "258fb97e06e424f0072a9520105f6838413f66d2373af5d9e3a80763381742b2"
+    },
+    "side": {
+      "path": "sources\\trade_counter_side-v1.png",
+      "sha256": "e0927f4be0d75b2fda4b355a6647a430b3d9ef3f1aef9e6dacc1e764ee206ea2"
+    },
+    "top": {
+      "path": "sources\\trade_counter_top-v1.png",
+      "sha256": "b1957dc37186d1d5f87587d17b655ba22b141fa164b47aa980d03525f37f008d"
+    }
+  },
+  "faces": {
+    "front": "1c4393e127e1f106f0728e47b1b005aaeea0883d6d82fe45d77124f62cdf958b",
+    "side": "f2624ed2151606624b062cd15e10669d2470e4bc1bf2a9150f48b4479badb672",
+    "top": "ee36de80c2094e0750bb3791f6786e4f5a976a9eab5efad038bf980ce0456cf9"
+  }
+}

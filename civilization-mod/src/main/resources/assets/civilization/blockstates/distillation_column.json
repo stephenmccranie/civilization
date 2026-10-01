@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/distillation_column",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "civilization:block/distillation_column",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/distillation_column",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/distillation_column",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,254 @@
+{
+  "schema": 1,
+  "kind": "multiblock",
+  "brief": {
+    "description": "A low brick-and-timber tannery with a real open vat, rear drying rack and integrated front controller.",
+    "purpose": "Make the hide-to-leather workshop recognizable as a practical wet craft beside the Textile Workshop and Smithy.",
+    "silhouette": "Three blocks wide and three deep: low rectangular vat and work rim in front, paired narrow timber posts and one rear crossbar above it; broad negative space through the rack.",
+    "bounds": "Controller at front-center; assembly stays within x=-1..1, depth=0..2 and no more than four blocks high.",
+    "materials": "Vanilla/resource-pack brick and oak construction, restrained copper only for vat lining or drain, dark iron and leather-colored controller details.",
+    "interfaces": "Existing front-center controller, contextual guide, coal processing and inventory behavior remain unchanged.",
+    "states": "Static structure; controller retains existing working/fire state behavior and shared UI.",
+    "construction": "Existing bricks, planks, copper and saw-cut slabs/beams/eighth cubes; no new decorative block or entity.",
+    "invariants": "No recipe, production, capacity, fuel or inventory changes. No required water, loose hide prop or invented mechanism.",
+    "technological_stage": "Frontier craft becoming organized town industry.",
+    "material_behavior": "Rough brick plinth, directional oak grain, darker wet-vat recess, restrained oxidizable copper detail.",
+    "signature_feature": "Low open tanning vat beneath a supported rear drying rack.",
+    "neighboring_assets": "Textile Workshop, Smithy, Raw Hide and Cloth.",
+    "fidelity_targets": [
+      "Vat occupies most of the low 3x2 working mass without becoming a solid box.",
+      "Two narrow rear posts and one top crossbar remain visibly supported and leave an open center.",
+      "Partial blocks create rim, posts and feet instead of full-block columns.",
+      "Front-center controller reads as part of the brick/timber assembly."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/tannery/model-context.png",
+      "role": "Frozen assembly and exact Minecraft material context; the revised tannery is at right."
+    },
+    {
+      "path": "art/assets/smithy/mockup-03.png",
+      "role": "Project multiblock presentation and partial-block construction language only."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "controller-front-master.png",
+    "controller-front-prompt.txt",
+    "layout.md",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "tannery_front.png",
+      "target": "textures/block/tannery_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "tannery.json",
+      "target": "models/block/tannery.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-73966490-153c-4891-a4a6-dc9834093e6e.png",
+      "sha256": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+      "prompt": "Use case: stylized-concept\nAsset type: implementable Minecraft multiblock design reference\nPrimary request: Redesign the Civilization Tannery as one coherent, attractive late-nineteenth-century workshop assembly.\nInput images: Image 1 is the current in-game workshop lineup and material/scale context; redesign only the tannery shown at right. Image 2 is presentation and partial-block construction language only, not a shape to copy.\nSubject: A three-block-wide, three-block-deep tannery with the controller at bottom front center. Build a low brick plinth and genuinely open rectangular tanning vat with a thin oak work rim, supported narrow oak posts at the rear, and one strong top drying-rack crossbar. Use a few restrained copper lining/drain details where physically useful. The rack center remains open and visibly supported.\nStyle/medium: polished Minecraft build mockup using feasible full blocks, slabs, quarter beams and eighth cubes; 32x resource-pack material density; late nineteenth-century practical craft.\nComposition/framing: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on a neutral stone floor, matching scale and orientation.\nMaterials/textures: red brick, warm oak, dark iron controller fittings, small functional copper details. Clear directional wood grain and masonry joints.\nConstraints: exact maximum footprint 3x3 blocks, maximum height 4 blocks, controller at front-center, major pieces aligned to Minecraft half-block geometry, broad negative space, buildable with existing brick/oak/copper cut pieces. No new gameplay component.\nAvoid: solid 3x3 blob, full-block timber pillars, railings, ladders, decorative gears, pipes, modern equipment, floating hides, water simulation, people, labels, impossible curves, tiny ornamental clutter.\n",
+      "brief_hash": "823cf7374522872bff87005983a1b21c90d89b89d5e60853241e7dc40f41e41e",
+      "references": {
+        "F:\\minecraft project\\civilization-mod\\runs\\visual\\screenshots\\workshop-structures.png": "9f0502ab09da83ca73724cea9c8001bd656568b12c52d394087f78f53173b734",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-bce4aa0d-6dc3-4cbd-b431-4962256f2e0d.png",
+      "sha256": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592",
+      "prompt": "Use case: stylized-concept refinement\nAsset type: implementable Minecraft multiblock design reference\nPrimary request: Preserve the selected Civilization Tannery direction from Image 1, but redraw it as a mechanically exact, feasible 3x3 Minecraft assembly informed by the actual blockout in Image 2.\nReference roles: Image 1 is the selected design and owns silhouette/material hierarchy. Image 2 is the actual current implementation and owns exact scale, footprint, cut-block geometry and controller placement. Image 3 is partial-block presentation language only.\nSubject: A low one-block red-brick 3x3 plinth, a half-height oak rim around a genuinely open vat center, two narrow rear oak posts, and one three-block-wide half-grid oak crossbar. Controller at bottom front center. Keep the existing custom controller identity but do not show liquids, loose hides, pipes, or extra machines.\nStyle: polished Minecraft build mockup, Faithful 32x material density, practical late-nineteenth-century frontier industry.\nComposition: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on neutral stone.\nConstraints: exact 3x3 footprint, maximum four blocks high; only full blocks, slabs, quarter beams and eighth cubes; all parts visibly supported; same asset in both views.\nAvoid: solid tall blob, full-width posts, floating fittings, copper vat lining, water, people, text, modern equipment, decorative gears.\n",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+        "F:\\minecraft project\\art\\assets\\tannery\\model-front.png": "bdf199682813e97c8be5695b83f90a31bbbd4217674ef59c59e35cc2077324ce",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "The low 3x3 brick vat and narrow rear timber rack produce a clear wet-workshop silhouette with broad open space above the basin.",
+        "implementable_geometry": "The brick base, half-height rim, quarter-beam posts and top crossbar translate directly to the existing saw-cut block system; the illustration's small metal drain becomes controller-face detail rather than a new component.",
+        "mechanics_clearance": "The vat center is open, both rack posts are grounded on the rim and the crossbar spans between supports without floating pieces.",
+        "period_materials": "Brick, oak and restrained dark metal fit a late-nineteenth-century frontier tannery and remain visually distinct from the timber textile bench.",
+        "family_consistency": "Its partial-block supports and readable construction share the Smithy's hand-built town-workshop language without copying its hearth form.",
+        "controls_readability": "The front-center controller remains exposed and visually integrated below the work rim.",
+        "gameplay_scope": "The design changes only structure geometry and artwork; water, loose hides and extra mechanisms shown or implied by the craft are not added to gameplay."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "823cf7374522872bff87005983a1b21c90d89b89d5e60853241e7dc40f41e41e",
+      "inputs": {
+        "F:\\minecraft project\\civilization-mod\\runs\\visual\\screenshots\\workshop-structures.png": "9f0502ab09da83ca73724cea9c8001bd656568b12c52d394087f78f53173b734",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      },
+      "evidence": {
+        "mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6"
+      },
+      "generation": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "The low 3x3 brick vat and narrow rear timber rack produce a clear wet-workshop silhouette with broad open space above the basin.",
+        "implementable_geometry": "The brick base, half-height rim, quarter-beam posts and top crossbar translate directly to the existing saw-cut block system; the illustration's small metal drain becomes controller-face detail rather than a new component.",
+        "mechanics_clearance": "The vat center is open, both rack posts are grounded on the rim and the crossbar spans between supports without floating pieces.",
+        "period_materials": "Brick, oak and restrained dark metal fit a late-nineteenth-century frontier tannery and remain visually distinct from the timber textile bench.",
+        "family_consistency": "Its partial-block supports and readable construction share the Smithy's hand-built town-workshop language without copying its hearth form.",
+        "controls_readability": "The front-center controller remains exposed and visually integrated below the work rim.",
+        "gameplay_scope": "The design changes only structure geometry and artwork; water, loose hides and extra mechanisms shown or implied by the craft are not added to gameplay."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      },
+      "evidence": {
+        "mockup-02.png": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592",
+        "controller-review.png": "d1ea18cc9a68c36cb31706f93f5ce1160481a084ffe3804b2531062d6b465e3e"
+      },
+      "generation": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The complete assembly retains the mockup's low brick vat, thin oak rim, two narrow rear posts, open center and broad top crossbar. The footprint is visibly lower and less monolithic than the previous structure.",
+        "geometry_uvs": "All structure pieces use the existing full-block, slab, quarter-beam and eighth-cell geometry. The custom controller face exports as an opaque 32x32, 20-color texture with broad readable brick, iron, copper and leather regions.",
+        "material_consistency": "Faithful brick and oak remain authoritative on construction blocks; the controller preserves the same warm masonry and dark functional metal balance.",
+        "assembly_interfaces": "The controller remains front-center, the vat center is empty, rack parts are grounded and every required part can be placed with the existing saw-cut system and guide.",
+        "animation_states": "The structure is static; existing controller active/fire state and ambient light behavior are unchanged.",
+        "native_size_readability": "The 32x controller review keeps three iron slots, the copper drain and tan craft strip legible without fine noise."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-master.png": "669d946a43e4771e6517652dfc134a75ac841e21ebe762a811384d778c884057",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-prompt.txt": "c3f66710c99f92372b8880e0c1fb4b28f48cdbd4b6bb13432cb67961aaa60436",
+        "F:\\minecraft project\\art\\assets\\tannery\\layout.md": "9242edc5616fbbcc45a7f4a51d02be942682c313fed20af6d9332ca01e5293a1",
+        "F:\\minecraft project\\art\\assets\\tannery\\export.py": "5aab131c666d7e6dbc21ea0b96af7569772f92e246a86b31ae2b0b01774c0755",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+      },
+      "evidence": {
+        "model-front.png": "bdf199682813e97c8be5695b83f90a31bbbd4217674ef59c59e35cc2077324ce",
+        "model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "controller-review.png": "d1ea18cc9a68c36cb31706f93f5ce1160481a084ffe3804b2531062d6b465e3e"
+      },
+      "generation": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon and Faithful preserve the brick/oak split; the controller brick blends with the plinth while copper, leather and iron details remain readable without emissive metal.",
+        "scale_readability": "At normal world distance the low vat is clearly distinct from the taller Smithy and lighter Textile Workshop; the drying rack remains legible against the sky.",
+        "states_motion": "The static assembly remains coherent while the existing controller fire/working state changes independently.",
+        "interaction_guides": "The focused workshop scene assembles the real Part list and verifies completion; all partial pieces use the existing contextual guide and placement system.",
+        "inventory_appearance": "The existing controller item model inherits the redesigned block model and front texture; no item-specific transform changed.",
+        "integration_limits": "Reviewed under the recommended Photon shader with Faithful 32x. The scene verifies the assembled front/side silhouette and controller UI; rear construction is represented by the same supported rack seen in the context view."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-master.png": "669d946a43e4771e6517652dfc134a75ac841e21ebe762a811384d778c884057",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-prompt.txt": "c3f66710c99f92372b8880e0c1fb4b28f48cdbd4b6bb13432cb67961aaa60436",
+        "F:\\minecraft project\\art\\assets\\tannery\\layout.md": "9242edc5616fbbcc45a7f4a51d02be942682c313fed20af6d9332ca01e5293a1",
+        "F:\\minecraft project\\art\\assets\\tannery\\export.py": "5aab131c666d7e6dbc21ea0b96af7569772f92e246a86b31ae2b0b01774c0755",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+      },
+      "evidence": {
+        "evidence/photon-front.png": "d8856646b85126145a0447e4e085d69824863739cb7f6b2fba16af400e90d2a4",
+        "evidence/photon-context.png": "7b10c4609a3637a32baa3e2732098104a024cd4ecc90b50730f89b373ea8b513"
+      },
+      "generation": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The complete assembly retains the mockup's low brick vat, thin oak rim, two narrow rear posts, open center and broad top crossbar. The footprint is visibly lower and less monolithic than the previous structure.",
+        "geometry_uvs": "All structure pieces use the existing full-block, slab, quarter-beam and eighth-cell geometry. The custom controller face exports as an opaque 32x32, 20-color texture with broad readable brick, iron, copper and leather regions.",
+        "material_consistency": "Faithful brick and oak remain authoritative on construction blocks; the controller preserves the same warm masonry and dark functional metal balance.",
+        "assembly_interfaces": "The controller remains front-center, the vat center is empty, rack parts are grounded and every required part can be placed with the existing saw-cut system and guide.",
+        "animation_states": "The structure is static; existing controller active/fire state and ambient light behavior are unchanged.",
+        "native_size_readability": "The 32x controller review keeps three iron slots, the copper drain and tan craft strip legible without fine noise."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-master.png": "669d946a43e4771e6517652dfc134a75ac841e21ebe762a811384d778c884057",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-prompt.txt": "c3f66710c99f92372b8880e0c1fb4b28f48cdbd4b6bb13432cb67961aaa60436",
+        "F:\\minecraft project\\art\\assets\\tannery\\layout.md": "067de28d0ce3675ed1f5fde8bc863df6b16c849cf4a0e4060ab46e3d437262d2",
+        "F:\\minecraft project\\art\\assets\\tannery\\export.py": "5aab131c666d7e6dbc21ea0b96af7569772f92e246a86b31ae2b0b01774c0755",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+      },
+      "evidence": {
+        "evidence/support-fix.png": "f89a1f3ba1b723ebcc0aa3a640982e1b71c63cc94d378e12fb3e76fad21f9e73",
+        "controller-review.png": "d1ea18cc9a68c36cb31706f93f5ce1160481a084ffe3804b2531062d6b465e3e"
+      },
+      "generation": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon and Faithful preserve the brick/oak split; the controller brick blends with the plinth while copper, leather and iron details remain readable without emissive metal.",
+        "scale_readability": "At normal world distance the low vat is clearly distinct from the taller Smithy and lighter Textile Workshop; the drying rack remains legible against the sky.",
+        "states_motion": "The static assembly remains coherent while the existing controller fire/working state changes independently.",
+        "interaction_guides": "The focused workshop scene assembles the real Part list and verifies completion; all partial pieces use the existing contextual guide and placement system.",
+        "inventory_appearance": "The existing controller item model inherits the redesigned block model and front texture; no item-specific transform changed.",
+        "integration_limits": "Reviewed under the recommended Photon shader with Faithful 32x. The scene verifies the assembled front/side silhouette and controller UI; rear construction is represented by the same supported rack seen in the context view."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "b6bb47c079e8c3985b452100f8b8dae6835fe771b7bcd12b10dfb517c04fc92d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\tannery\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\tannery\\mockup-01.png": "51fdd29bcd52ac6c2f3fab4035d4db7cedc06f01410a3990b73c7c2a4a5958b6",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-master.png": "669d946a43e4771e6517652dfc134a75ac841e21ebe762a811384d778c884057",
+        "F:\\minecraft project\\art\\assets\\tannery\\controller-front-prompt.txt": "c3f66710c99f92372b8880e0c1fb4b28f48cdbd4b6bb13432cb67961aaa60436",
+        "F:\\minecraft project\\art\\assets\\tannery\\layout.md": "067de28d0ce3675ed1f5fde8bc863df6b16c849cf4a0e4060ab46e3d437262d2",
+        "F:\\minecraft project\\art\\assets\\tannery\\export.py": "5aab131c666d7e6dbc21ea0b96af7569772f92e246a86b31ae2b0b01774c0755",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery_front.png": "d4eda294d15c9b2e27286cbc4cd370ef71aff83479209e00107d779311de24dd",
+        "F:\\minecraft project\\art\\assets\\tannery\\tannery.json": "a2d2db1adf9716860127c2a55a3cfa801129d763f44491f7ad7ce3e5187c7c44"
+      },
+      "evidence": {
+        "evidence/support-fix.png": "f89a1f3ba1b723ebcc0aa3a640982e1b71c63cc94d378e12fb3e76fad21f9e73"
+      },
+      "generation": "ecfec96289a586f908685db6dec728981351f575028c129054d82995ec027592"
+    }
+  ]
+}

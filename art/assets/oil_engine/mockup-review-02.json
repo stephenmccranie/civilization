@@ -1,0 +1,15 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "silhouette_scale": "Lower rear copper utility area and T-shaped foundation improved.",
+    "implementable_geometry": "Cuboid crankcase and cylinder with 45 degree bands can be modeled.",
+    "mechanics_clearance": "Shaft and cylinder now read as separate axes through crankcase, but two feet visibly meet bottom rim rather than hub. Need single pedestal behind wheel hub and visible gap below rim.",
+    "period_materials": "Readable medium iron and restrained brass fit late nineteenth-century machinery.",
+    "family_consistency": "Blue-gray planes and edge seams match refinery reference; noise should be quieter in final texture.",
+    "controls_readability": "Open controller sides and simple dial clear.",
+    "gameplay_scope": "No additional gameplay interfaces; rear utility support can map to existing copper slab."
+  },
+  "remaining_issues": [
+    "Remove supports touching wheel rim; support axle behind wheel and leave visible air gap."
+  ]
+}

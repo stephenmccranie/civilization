@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+      "implementable_geometry": "One static generated-item sprite; shape is complete within transparent margins.",
+      "mechanics_clearance": "No moving mechanics; food and depicted container/wrapping form a coherent supported object.",
+      "period_materials": "Natural food, earthenware, plain tin and cloth fit practical frontier/town kitchens; no decorative machinery.",
+      "family_consistency": "Inspected against Cloth and fertilizer; broad pixel clusters, upper-left light and earthy palette are consistent.",
+      "controls_readability": "No controls; ingredient state and silhouette identify this food.",
+      "gameplay_scope": "No recipe, calorie, stack or container-return changes."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+      "geometry_uvs": "Native generated-item JSON with 32x32 texture, 16 opaque colors, binary alpha and padded silhouette.",
+      "material_consistency": "Food variation stays subordinate to shape; dough pale, baked bread warm, clay muted reddish brown.",
+      "assembly_interfaces": "Existing registered item resource retained; no physical block interfaces.",
+      "animation_states": "Static item with native held transform; no animation needed.",
+      "native_size_readability": "Inspected family sheet at native size on dark/light backgrounds and enlarged. Comparable footprint and detail density; shapes remain distinct beside Cloth/fertilizer."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Inventory retains original natural palette; Photon framed views shade it consistently without missing textures or alpha boxes.",
+      "scale_readability": "Pale pinched pastry rim encloses orange pumpkin filling; thin gray tin and shallow profile remain readable.",
+      "states_motion": "Static generated item. No animated or processing states apply.",
+      "interaction_guides": "Food inventory item, no multiblock guide or placement interfaces.",
+      "inventory_appearance": "Reviewed eight-item lineup: six kitchen items plus Cloth/fertilizer. Comparable scale, warm restrained palette, broad clusters and distinct silhouettes; pale uncooked preparations contrast golden ration bread. Bowl and pie have distinct depths and colors.",
+      "integration_limits": "Build/unit and focused foods scene passed; inventory and frames inspected. Recipes/calories untouched; no gameplay or multiplayer coverage claimed."
+    },
+    "remaining_issues": []
+  }
+}

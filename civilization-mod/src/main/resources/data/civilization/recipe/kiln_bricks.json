@@ -3,7 +3,7 @@
   "ingredient": {
     "item": "minecraft:clay"
   },
-  "experience": 0.0,
+  "experience": 1.2,
   "type": "civilization:kiln",
   "result": {
     "id": "minecraft:brick",

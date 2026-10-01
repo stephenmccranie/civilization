@@ -1,0 +1,19 @@
+{
+  "version": "0.33.2-dev",
+  "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-777ae25f-3e20-4b30-a8b9-a5b6b20c33a8.png",
+  "reference": "art/textures/ui/cabinet-master.png",
+  "prompt": "prompt.txt",
+  "pipeline": "One generated direction, reviewed master, two BOX-downsampled 64px frames; shared 24 GUI-pixel button.",
+  "review": "Reviewed native Photon Tannery rest/contact/lit captures: matching brass frame, distinct sparks, clear fire window, no inventory overlap. Lit state disables button and uses amber marker.",
+  "validation": "169 server GameTests passed. Photon workshop check passed; initial random visual timeout replaced with real client click plus deterministic server menu follow-up for final lit art capture. Audio events implemented; not audited by listening.",
+  "sha256": {
+    "art/assets/coal_ignition/master.png": "39f2149fee1bf464eb9863662cd92f20c5f324dd1781a9f480c479a5b5369ba6",
+    "art/assets/coal_ignition/prompt.txt": "a765742da9fae8478b76adda8c9b621ee765ace98508c80dde40e7c7c5501b96",
+    "civilization-mod/src/main/resources/assets/civilization/textures/gui/ignition.png": "03f8952a8097c0508167a89ccb37ee191679fec867736a1fe6e71c94c608942b",
+    "art/assets/coal_ignition/evidence/lit.png": "b3e78a86424001c42f66859a49b288d20688555d050fda4e796ca624bc0b8a47",
+    "art/assets/coal_ignition/evidence/rest.png": "ecd9f236d4ed3c83b54f72c70c2e127c166fa9acf60ff3142f9c308d1b7b5e8c",
+    "art/assets/coal_ignition/evidence/strike.png": "6dd8891209335286c4c379595265681849a452ae369e380e6d6f1c9d60a560bc"
+  },
+  "layout_review": "Coal at x17/35, centered 44px fire at x66, embedded 24px striker at x132. Photon Tannery capture reviewed; no slot or label overlap. Build/unit and workshop visual check passed.",
+  "gauge_review": "Native-style 6x23 vertical remaining-coal bar at x116/y85, between fire and striker. Photon lit view inspected; no overlap. Actual reserve fraction, no independent countdown."
+}

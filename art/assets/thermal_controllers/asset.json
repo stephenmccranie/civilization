@@ -1,0 +1,408 @@
+{
+  "schema": 1,
+  "kind": "block",
+  "brief": {
+    "description": "Original readable T1 thermal controller family for Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy.",
+    "purpose": "Replace dated dark or borrowed vanilla fronts with distinct practical workshop hardware.",
+    "silhouette": "Existing one-block controllers within existing multiblock assemblies; broad accessible doors and restrained hardware.",
+    "bounds": "Existing controller bounds and assembly footprints unchanged.",
+    "materials": "Pack-owned cobblestone and brick bodies; original dark iron hardware; stove cast iron, fertilizer copper.",
+    "interfaces": "Existing faces, ports, inventories and guide behavior unchanged.",
+    "states": "Preserve current lit states; orange only inside fire apertures, never emissive casing. Smithy front static under its existing open hearth.",
+    "construction": "Native Java model overlays and opaque 32x32 faces, no structural changes.",
+    "invariants": "No recipes, fuel balance, machine requirements or physics changes. Do not bundle vanilla/Faithful pixels.",
+    "technological_stage": "Practical late nineteenth-century frontier and town heat-based craft.",
+    "material_behavior": "Broad cast iron variation, functional brass pulls, restrained warm copper; existing resource pack supplies masonry.",
+    "signature_feature": "Kiln firing door; Foundry crucible mark; stove oven/burners; fertilizer leaf-stamped sealed door; Smithy anvil-stamped ash gate.",
+    "neighboring_assets": "Industrial steel controllers, revised civic cabinets, Tannery and Textile Workshop.",
+    "fidelity_targets": [
+      "Large readable hardware and distinct purpose silhouettes, no universal pressure dial.",
+      "Masonry remains active resource-pack texture around hardware.",
+      "Hot/cold differ only in small fuel openings.",
+      "Stove retains actual cooktop identity, fertilizer copper body remains distinct."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/industrial_steel/texture-review.png",
+      "role": "Style and iron instrument contrast only."
+    },
+    {
+      "path": "art/assets/smithy/mockup-03.png",
+      "role": "Existing assembly context; no structure redesign."
+    }
+  ],
+  "sources": [
+    "export.py",
+    "mockup-01.png",
+    "plates-master.png",
+    "plates-hot-master.png",
+    "surfaces-master.png",
+    "surfaces-hot-master.png",
+    "stove-top-fixed-master.png",
+    "plates-prompt.txt",
+    "plates-hot-prompt.txt",
+    "surfaces-prompt.txt",
+    "surfaces-hot-prompt.txt",
+    "stove-top-fix-prompt.txt",
+    "texture-provenance.json"
+  ],
+  "outputs": [
+    {
+      "source": "kiln_front.png",
+      "target": "textures/block/kiln_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "foundry_front.png",
+      "target": "textures/block/foundry_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "smithy_front.png",
+      "target": "textures/block/smithy_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "works_front.png",
+      "target": "textures/block/works_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "stove_front.png",
+      "target": "textures/block/stove_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "stove_side.png",
+      "target": "textures/block/stove_side.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "stove_top.png",
+      "target": "textures/block/stove_top.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "works_side.png",
+      "target": "textures/block/works_side.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "works_top.png",
+      "target": "textures/block/works_top.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "kiln_front_on.png",
+      "target": "textures/block/kiln_front_on.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "foundry_front_on.png",
+      "target": "textures/block/foundry_front_on.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "works_front_on.png",
+      "target": "textures/block/works_front_on.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "stove_front_on.png",
+      "target": "textures/block/stove_front_on.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "brick_kiln.json",
+      "target": "models/block/brick_kiln.json",
+      "format": "java_model"
+    },
+    {
+      "source": "brick_kiln_on.json",
+      "target": "models/block/brick_kiln_on.json",
+      "format": "java_model"
+    },
+    {
+      "source": "foundry.json",
+      "target": "models/block/foundry.json",
+      "format": "java_model"
+    },
+    {
+      "source": "foundry_on.json",
+      "target": "models/block/foundry_on.json",
+      "format": "java_model"
+    },
+    {
+      "source": "cooking_station.json",
+      "target": "models/block/cooking_station.json",
+      "format": "java_model"
+    },
+    {
+      "source": "cooking_station_on.json",
+      "target": "models/block/cooking_station_on.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fertilizer_retort.json",
+      "target": "models/block/fertilizer_retort.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fertilizer_retort_on.json",
+      "target": "models/block/fertilizer_retort_on.json",
+      "format": "java_model"
+    },
+    {
+      "source": "smithy.json",
+      "target": "models/block/smithy.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png",
+      "sha256": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+      "prompt": "Design one coherent implementable Minecraft T1 thermal controller family concept sheet, five single-block controllers viewed slightly from above/front, all same block scale. Tesla lifetime late nineteenth-century practical industry. Image1 is material/style reference only: bold readable iron and restrained functional brass. Image2 is Smithy's EXISTING assembly context, not to redesign. Machines: 1 KILN: resource-pack gray cobblestone cube with large arched cast iron firing door, simple brick-shaped embossed mark and tiny lower ember slit. 2 FOUNDRY: red brick cube, sturdy square iron door with big simple pouring-crucible silhouette embossed on upper panel, lower ember inspection slot. 3 COOKING STOVE: dark cast iron cube with broad oven window/door, short brass horizontal handle, two large circular cooktop plates on top; compact loaf silhouette above door as secondary mark. 4 FERTILIZER FURNACE: warm copper cube with round sealed iron process door and simple readable two-leaf sprout stamp, small lower fire slit. 5 SMITHY CONTROLLER: red brick cube with compact iron ash/draft gate, big plain anvil emblem upper half and three broad horizontal lower vent slots; this controller sits underneath existing open forge, no extra burner. Existing 1-block footprints; no geometry changes to multiblocks, chimneys or machinery. Each purpose recognizable at Minecraft 32x block resolution from broad shapes, not microdetail. Restrained iron/copper wear, calm substantial surfaces, brass only handles/latches. One readable family, not five identical gauges. No pressure gauges, ornamental gears, text labels, loose items, futuristic screens, glossy plastic or fine filigree. Show hardware clearly, medium charcoal rather than black crush; neutral even lighting on plain background. Modest orange only inside lit fire slits, all outside surfaces normally shaded.\n",
+      "brief_hash": "0fe73cc8973d56740a3d7bd5095cc7d5f0451e2f32724aa380432347917ebf67",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "One-block controllers retain existing structure scale; recognizable broad doors stay within faces.",
+        "implementable_geometry": "Layered hardware and full cube stove/fertilizer faces are native static models; no new protruding apparatus required.",
+        "mechanics_clearance": "No moving parts, exposed mechanisms or new pipes. Illustrated Smithy embers will remain dark because its open hearth already supplies fire.",
+        "period_materials": "Iron doors, functional brass latches, copper processing cabinet and cast-iron range fit practical town industry.",
+        "family_consistency": "All share clear broad castings and quiet material patches, distinct from civic emblems and industrial gauges.",
+        "controls_readability": "Brick, pouring crucible, loaf, sprout and anvil marks complement door form; no identical instrument faces. Small rivets will be simplified at native size.",
+        "gameplay_scope": "Illustration captions are not game rules; no organic compost mechanic or live gauge is added. Existing inputs, recipes and structures unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "0fe73cc8973d56740a3d7bd5095cc7d5f0451e2f32724aa380432347917ebf67",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      },
+      "evidence": {
+        "mockup-01.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+      },
+      "generation": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "One-block controllers retain existing structure scale; recognizable broad doors stay within faces.",
+        "implementable_geometry": "Layered hardware and full cube stove/fertilizer faces are native static models; no new protruding apparatus required.",
+        "mechanics_clearance": "No moving parts, exposed mechanisms or new pipes. Illustrated Smithy embers will remain dark because its open hearth already supplies fire.",
+        "period_materials": "Iron doors, functional brass latches, copper processing cabinet and cast-iron range fit practical town industry.",
+        "family_consistency": "All share clear broad castings and quiet material patches, distinct from civic emblems and industrial gauges.",
+        "controls_readability": "Brick, pouring crucible, loaf, sprout and anvil marks complement door form. User rejected paired stove circles as eyes/breasts; referenced cooktop correction replaces them with one rectangular ridged cookplate.",
+        "gameplay_scope": "Illustration captions are not game rules; no organic compost mechanic or live gauge is added. Existing inputs, recipes and structures unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "0fe73cc8973d56740a3d7bd5095cc7d5f0451e2f32724aa380432347917ebf67",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      },
+      "evidence": {
+        "mockup-01.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "stove-top-fixed-master.png": "95b048df325ef0883d132345b2adfdf542e6d51f65c7e5656bbf221684fab634"
+      },
+      "generation": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Door forms and clear material/process marks retained. User correction applied: one rectangular griddle with straight ribs replaces twin circular stove plates.",
+        "geometry_uvs": "Pack-aware full masonry cubes with bounded north overlays; original stone/brick remains visible. Stove and copper furnace retain native orientable cubes.",
+        "material_consistency": "Shared bounded iron and copper palettes, common brightness lift; stove/copper faces have protected perimeter and corners. Body colors exactly identical between hot/cold variants.",
+        "assembly_interfaces": "Existing physical structures and controller directions retained. Smithy original borrowed blast-furnace patch replaced by a larger readable anvil draft gate on its same block.",
+        "animation_states": "Only inspection/window rectangles change for four lit textures; Smithy gate static beneath real hearth. No emissive body flags or new animation.",
+        "native_size_readability": "Native 32px sheet reviewed: distinct brick/crucible/anvil/sprout/loaf silhouettes, visible cast-metal variation and brass pulls. Rectangular stove top has no eye-like circles."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "0fe73cc8973d56740a3d7bd5095cc7d5f0451e2f32724aa380432347917ebf67",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\export.py": "c788d30b93c4a0bdc04876f759c2d4875b5e68db2b972fe3a9d0f68d651a553b",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\mockup-01.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-master.png": "b3408b66f84e8ed98616a7429ff27d151b51f2085318938e33c0f5e2ddd2b30f",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-hot-master.png": "6a4624aa94b1af31a7b1c58779698ac26217bdfc958c589e909e3afeda62a78a",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-master.png": "8ccf3aaf8069f5da732dff7a39571869e89f3c4861a4345f05fed0d077ac0e2e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-hot-master.png": "80f29f4ea619998e4b091e545a2fea7fb2a1a25eb807de08f10d8562b8940397",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove-top-fixed-master.png": "95b048df325ef0883d132345b2adfdf542e6d51f65c7e5656bbf221684fab634",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-prompt.txt": "d49d7e2cef4e45e6464c1dc0f3e2cb0089d3602cc4e099136c6ccd9f7b0c2f95",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-hot-prompt.txt": "6dbed52b87e93ce2346d804c730ad773c88fd7c0a0fa26f15663aed8e164fbd9",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-prompt.txt": "d137bdfb4828ee6907dc233900544efde1d35f543f9c62c5937115a6ea3764e3",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-hot-prompt.txt": "3d4958933cf2ccbd36b0df45d85e069f6185d3d69c45393fae6e72a042d658fd",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove-top-fix-prompt.txt": "856b2a52418e08b031229be11650728091a77237178305558ec62c2ab88acf1a",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\texture-provenance.json": "a7e01e5f94bf149a4a0e903f952001459b105091351ee6b625346d9a93c10888",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\kiln_front.png": "de51ed0a76b0008b1923b7e073819a6cae68e01a9c69317b48ee40e72f2027c1",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_front.png": "efc34a54f5f713b31f43b7fd245a8f12b2b67121022d3b46f448efb09c5682f8",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\smithy_front.png": "c9f84756fb106a3020a95a987bfe2f15bb643fb60cb0a958452def8a03c0bb1c",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_front.png": "9319c516910a515deb67c2319b46baf10457bc230e772d566e61eb07406caf65",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front.png": "a79fd29d18a778cb6ba6725c6cedb732edb94f7ce00d953867c28917aff8f931",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_side.png": "4d30ea6e955a54c571fcf8294e680ff0580c12f70c437f7ccb333be97fd08a89",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_top.png": "9c30f1068ac6ee256963d4706cdebdb0b85829233644104b8e6f4f45471da32e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_side.png": "c8115c5ba547aa0f7e09ff6b212332e6b8455cd55e8dcd5b60126e2b4dfdc05e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_top.png": "c8115c5ba547aa0f7e09ff6b212332e6b8455cd55e8dcd5b60126e2b4dfdc05e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\kiln_front_on.png": "b7f1b8199bf7f3145969ddfa076416318aeb6004c95a74e11d20d7acb72a11b2",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_front_on.png": "4a639efa8b8fdbf7f1908509fb0cfa97e9f9afdf9a2c1ee101a00f5d837d45b4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_front_on.png": "9dceb4606ff9dfd2411c554ad0462e004f4a98ed03d6db6448e9d7e6b52fd473",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front_on.png": "a997777c9773b53ea15a5433f26b16883ae1d22703662900094f6db44c52d186",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\brick_kiln.json": "76607f7bd7338064e61bdf44a3853c890d39748c15a975c958316ab2166d6dda",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\brick_kiln_on.json": "f31bc54732bbd46523da0e5689b2319b8d1926f12afb2801684d43c650aa1a20",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry.json": "ccaffad4f02b54c8429b58c2081f7c7cf381409d430bf72d77d0fb4d2ad10a1e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_on.json": "4586332172af06a1d26de7bea47efbef8313f4902a030bb27a5e113391e92551",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\cooking_station.json": "289017be5b70e17e59bf25b2e74790f7012390d06f05d25ce27c9af4affc573c",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\cooking_station_on.json": "6eba30f47576aeae1af720e21b4bb7225923c37889a50517381681af71717960",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\fertilizer_retort.json": "5cbe8bb163a32f8bc2f82165e481440b898258bc7674ebd0ddc4a6ecf8ac3aa7",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\fertilizer_retort_on.json": "269e454519878e40f0613abf1bcf74587a11e8b8e5025c27e76954504ed86f62",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\smithy.json": "21e7f826127ffc26fd1c2713943047ed616dccd3084eecd76861ed1d25570c08"
+      },
+      "evidence": {
+        "texture-review.png": "222991d8b9640393f75b330b142f5ba3e59d55c14b0fef71416cfcd4a16b8d8e"
+      },
+      "generation": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Actual Photon/Faithful cold/lit/rear views reviewed: pack masonry matches structures, cast iron stays distinct from copper and brick.",
+        "scale_readability": "Broad door silhouettes and process emblems remain visible; rectangular ridged stove top removes paired circular face-like pattern.",
+        "states_motion": "Lit windows show embers with unchanged casing; Smithy real hearth burns above static gate.",
+        "interaction_guides": "Existing structures assembled by fixture; geometry and directions retained. Guide interaction not retested for texture-only changes.",
+        "inventory_appearance": "All five native models visible in inventory hotbar, with matching materials and no missing textures.",
+        "integration_limits": "Recommended Photon/Faithful reviewed; other shaders and moving vessels not checked. Fixture has unrelated old display frames dropping during updates; no gameplay changes introduced."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "0fe73cc8973d56740a3d7bd5095cc7d5f0451e2f32724aa380432347917ebf67",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\export.py": "c788d30b93c4a0bdc04876f759c2d4875b5e68db2b972fe3a9d0f68d651a553b",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\mockup-01.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-master.png": "b3408b66f84e8ed98616a7429ff27d151b51f2085318938e33c0f5e2ddd2b30f",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-hot-master.png": "6a4624aa94b1af31a7b1c58779698ac26217bdfc958c589e909e3afeda62a78a",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-master.png": "8ccf3aaf8069f5da732dff7a39571869e89f3c4861a4345f05fed0d077ac0e2e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-hot-master.png": "80f29f4ea619998e4b091e545a2fea7fb2a1a25eb807de08f10d8562b8940397",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove-top-fixed-master.png": "95b048df325ef0883d132345b2adfdf542e6d51f65c7e5656bbf221684fab634",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-prompt.txt": "d49d7e2cef4e45e6464c1dc0f3e2cb0089d3602cc4e099136c6ccd9f7b0c2f95",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\plates-hot-prompt.txt": "6dbed52b87e93ce2346d804c730ad773c88fd7c0a0fa26f15663aed8e164fbd9",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-prompt.txt": "d137bdfb4828ee6907dc233900544efde1d35f543f9c62c5937115a6ea3764e3",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\surfaces-hot-prompt.txt": "3d4958933cf2ccbd36b0df45d85e069f6185d3d69c45393fae6e72a042d658fd",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove-top-fix-prompt.txt": "856b2a52418e08b031229be11650728091a77237178305558ec62c2ab88acf1a",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\texture-provenance.json": "a7e01e5f94bf149a4a0e903f952001459b105091351ee6b625346d9a93c10888",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\kiln_front.png": "de51ed0a76b0008b1923b7e073819a6cae68e01a9c69317b48ee40e72f2027c1",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_front.png": "efc34a54f5f713b31f43b7fd245a8f12b2b67121022d3b46f448efb09c5682f8",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\smithy_front.png": "c9f84756fb106a3020a95a987bfe2f15bb643fb60cb0a958452def8a03c0bb1c",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_front.png": "9319c516910a515deb67c2319b46baf10457bc230e772d566e61eb07406caf65",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front.png": "a79fd29d18a778cb6ba6725c6cedb732edb94f7ce00d953867c28917aff8f931",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_side.png": "4d30ea6e955a54c571fcf8294e680ff0580c12f70c437f7ccb333be97fd08a89",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_top.png": "9c30f1068ac6ee256963d4706cdebdb0b85829233644104b8e6f4f45471da32e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_side.png": "c8115c5ba547aa0f7e09ff6b212332e6b8455cd55e8dcd5b60126e2b4dfdc05e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_top.png": "c8115c5ba547aa0f7e09ff6b212332e6b8455cd55e8dcd5b60126e2b4dfdc05e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\kiln_front_on.png": "b7f1b8199bf7f3145969ddfa076416318aeb6004c95a74e11d20d7acb72a11b2",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_front_on.png": "4a639efa8b8fdbf7f1908509fb0cfa97e9f9afdf9a2c1ee101a00f5d837d45b4",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\works_front_on.png": "9dceb4606ff9dfd2411c554ad0462e004f4a98ed03d6db6448e9d7e6b52fd473",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\stove_front_on.png": "a997777c9773b53ea15a5433f26b16883ae1d22703662900094f6db44c52d186",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\brick_kiln.json": "76607f7bd7338064e61bdf44a3853c890d39748c15a975c958316ab2166d6dda",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\brick_kiln_on.json": "f31bc54732bbd46523da0e5689b2319b8d1926f12afb2801684d43c650aa1a20",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry.json": "ccaffad4f02b54c8429b58c2081f7c7cf381409d430bf72d77d0fb4d2ad10a1e",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\foundry_on.json": "4586332172af06a1d26de7bea47efbef8313f4902a030bb27a5e113391e92551",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\cooking_station.json": "289017be5b70e17e59bf25b2e74790f7012390d06f05d25ce27c9af4affc573c",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\cooking_station_on.json": "6eba30f47576aeae1af720e21b4bb7225923c37889a50517381681af71717960",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\fertilizer_retort.json": "5cbe8bb163a32f8bc2f82165e481440b898258bc7674ebd0ddc4a6ecf8ac3aa7",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\fertilizer_retort_on.json": "269e454519878e40f0613abf1bcf74587a11e8b8e5025c27e76954504ed86f62",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\smithy.json": "21e7f826127ffc26fd1c2713943047ed616dccd3084eecd76861ed1d25570c08"
+      },
+      "evidence": {
+        "evidence/thermal-art-cold.png": "f8520e0d9afc42046aea91da9b24ec08730a8f941f822eb72daf38d741471783",
+        "evidence/thermal-art-lit.png": "bbe113348e6b026225f16825da13c087aa1f6cb347a765b59fd077509f05addd",
+        "evidence/thermal-art-forge-fertilizer.png": "a397595d8f851806422cefc99729d2f29603b7d2371a42fabe24e99262efd9e4",
+        "evidence/thermal-art-rear.png": "8ade70a696fa66e42ec8b448c9fd5728ba402f31ddc713b555cfd15027cf71c5",
+        "evidence/thermal-art-inventory.png": "f9eb5a22229f58ba5753ad7b47e6b6068be80e7e79b7dde48c03cef014edfa4d"
+      },
+      "generation": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+    }
+  ]
+}

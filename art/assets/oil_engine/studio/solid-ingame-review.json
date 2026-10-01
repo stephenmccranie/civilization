@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Actual Photon front/rear captures show continuous quiet cast bed, clear steel collars, restrained brass; no missing textures.",
+    "scale_readability": "Controller now part of continuous body; empty shelf above it gone. Two separate stands removed; cylinder appears seated into bed.",
+    "states_motion": "Working wheel and stopped geometry share lowered axis; focused visual verifier passed with startup, running and motion captures. Bed remains outside wheel sweep.",
+    "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+    "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+    "integration_limits": "Focused texture-only build/unit and engine visual verification passed; no gameplay rerun or moving-vessel claim."
+  },
+  "remaining_issues": []
+}

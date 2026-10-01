@@ -1,0 +1,15 @@
+{
+  "brief_hash": "340ad9d6d39b9eadd245bbf28dfe80821c516977920b3d4fd464a7b73d64d8e9",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+    "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\export.py": "c7bbcb6667137488a4db9898b03d4ef95f594381f7b5d136a754b5b0a566e910",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.png": "e2a71a3ead2fa7263444b54b8bb9ad1c6eacc04dde6b04214b4538cab9dd6bce",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.json": "be36372683a5bc99781bea683db4976f3f34a024dfa61657ad70d2112a27707c"
+  },
+  "outputs": {
+    "textures/item/machine_parts.png": "e2a71a3ead2fa7263444b54b8bb9ad1c6eacc04dde6b04214b4538cab9dd6bce",
+    "models/item/machine_parts.json": "be36372683a5bc99781bea683db4976f3f34a024dfa61657ad70d2112a27707c"
+  }
+}

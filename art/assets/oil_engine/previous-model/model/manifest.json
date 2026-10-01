@@ -1,0 +1,11 @@
+{
+  "id": "oil_engine_wheel",
+  "project": "oil_engine_wheel.bbmodel",
+  "geometry": "oil_engine_wheel.geo.json",
+  "animation": "oil_engine_wheel.animation.json",
+  "texture": "engine_atlas.png",
+  "required_animations": [
+    "animation.oil_engine_wheel.cycle"
+  ],
+  "texels_per_block": 32
+}

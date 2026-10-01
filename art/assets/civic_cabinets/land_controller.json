@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "civilization:block/land_controller_side",
+    "down": "civilization:block/land_controller_side",
+    "up": "civilization:block/land_controller_top",
+    "north": "civilization:block/land_controller_front",
+    "south": "civilization:block/land_controller_side",
+    "east": "civilization:block/land_controller_side",
+    "west": "civilization:block/land_controller_side"
+  }
+}

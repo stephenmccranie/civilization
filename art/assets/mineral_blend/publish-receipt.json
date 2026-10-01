@@ -1,0 +1,14 @@
+{
+  "brief_hash": "a718498ba9fb7d478f773e11e10cd3f8bb043cef565d2014694bddb202429d0a",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+    "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+    "F:\\minecraft project\\art\\assets\\mineral_blend\\export.py": "448fa891d0f1e158bdfbceae2f9940078dcefc57d56485fcd05eb98549318c83",
+    "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.png": "213fa8a332e64c642dc312cc39965d60111f2e043d0d82a23b30d4c01edbd0ca",
+    "F:\\minecraft project\\art\\assets\\mineral_blend\\mineral_blend.json": "ff8a72bf811de05ceb79aa12331323fce4f3214994fe56360a349b9329fe3ce7"
+  },
+  "outputs": {
+    "textures/item/mineral_blend.png": "213fa8a332e64c642dc312cc39965d60111f2e043d0d82a23b30d4c01edbd0ca",
+    "models/item/mineral_blend.json": "ff8a72bf811de05ceb79aa12331323fce4f3214994fe56360a349b9329fe3ce7"
+  }
+}

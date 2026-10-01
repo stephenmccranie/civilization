@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "kind": "multiblock",
+  "brief": {
+    "description": "Tier 2 kitchen workshop concept family: preparation bench, cooking range, baking oven and portioning bench, shown as one room and an equipment sheet.",
+    "purpose": "Explore the user's requested whole-room kitchen composed of several distinct multiblocks before gameplay or model implementation.",
+    "silhouette": "A low central timber preparation island, substantial brick-and-iron range with a supported copper kettle, separate enclosed stepped brick baking oven, and timber portioning counter with raised shelves.",
+    "bounds": "Illustrative room about 12 by 10 blocks, generous working aisles; benches and range roughly 3 blocks wide, oven roughly 3 blocks wide/deep. These are visual proportions, not approved block counts or construction coordinates.",
+    "materials": "Red brick and stone masonry, dark cast iron, directional oak timber, warm functional copper cookware, ivory cloth and ceramics, restrained brass handles only.",
+    "interfaces": "Front-facing accessible doors/handles and work surfaces; range firebox below kettle; baking chamber above separate lower firebox; storage shelves accessible from aisles. No decorative gear network or invented power ports.",
+    "states": "Small orange fire apertures in working range/oven and faint steam rising from the kettle; static room with a few ingredient/meal props. No emission from whole casings.",
+    "construction": "Concept only. Minecraft full blocks and half-grid cuts for major structures, modest custom cuboid/faceted cookware and hardware. Player building surrounds freely arranged stations.",
+    "invariants": "User agreed multiple multiblocks across a whole kitchen workshop. Four proposed stations and layout are exploratory. Meal recipes, bonuses, duration, fuel rates, room detection, construction counts and runtime behavior are not approved or implemented by these mockups.",
+    "technological_stage": "Tier 2 town food workshop within Civilization's late nineteenth-century industrial foundation.",
+    "material_behavior": "Heavy load-bearing masonry, broad matte iron doors and stovetop, sturdy timber beams and grain, warm tarnished copper kettle. No glossy modern appliances or arbitrary gold ornament.",
+    "signature_feature": "Four visibly different station silhouettes organized around a usable central work aisle, with copper cooking vessel and enclosed baking oven on the hot wall.",
+    "neighboring_assets": "Existing Cooking Stove from thermal controllers and brick/timber Smithy workshop assembly.",
+    "fidelity_targets": [
+      "Exactly four principal equipment assemblies, with prep and portioning visibly distinct.",
+      "Large cooking kettle seated fully on range; handles have usable clearance.",
+      "Separate oven with enclosed baking chamber and lower combustion opening.",
+      "Supported chimneys, shelves and bench legs; accessible fronts and generous aisles.",
+      "Minecraft-scale block and half-block construction with readable 64-pixel material clusters."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/thermal_controllers/concept.png",
+      "role": "Project style and existing Cooking Stove material/hardware contrast only; do not copy unrelated controller symbols."
+    },
+    {
+      "path": "art/assets/smithy/mockup-03.png",
+      "role": "Project style and subject construction vocabulary for brick hearths, supported chimneys and timber benches; no anvil or forge equipment."
+    }
+  ],
+  "sources": [
+    "room-prompt.txt",
+    "stations-prompt.txt",
+    "stations-fix-prompt.txt",
+    "room-fix-prompt.txt",
+    "mockup-01.png",
+    "mockup-02.png",
+    "mockup-03.png",
+    "mockup-04.png",
+    "review.json"
+  ],
+  "outputs": [],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-da8e8dc4-0218-47fb-a51b-a89a55a53aef.png",
+      "sha256": "e80a69f4581d1e6cc0e5a809dee56fc5ee65a25c0d48cb9b86c1aa13834aa194",
+      "prompt": "Use case: stylized-concept.\nAsset type: Minecraft Civilization Tier 2 kitchen workshop room mockup, concept only.\nPrimary request: Create ONE coherent room-scale kitchen composed of exactly four distinct multiblock workstations. Render a large landscape architectural cutaway/isometric interior, removing roof and front walls so all equipment, supports and circulation are visible. This is a believable player-built Minecraft town workshop, about 12 by 10 blocks for visual scale, not an exact building specification.\nInput image 1: project style/material reference, especially the dark cast-iron Cooking Stove in the center; do not copy the other machines or their emblems. Input image 2: project style/construction reference for brick hearths, simple supported chimneys, oak slab counters and half-block construction; no anvil or blacksmith equipment.\nLayout and subjects: Exactly one central PREPARATION BENCH, one COOKING RANGE along the rear-left wall, one separate BAKING OVEN along the rear-right wall, and one PORTIONING BENCH beside the open entrance in the front-right. Ordinary pantry barrels, ingredient chests and shelves occupy the left wall, subordinate to equipment. Keep wide unobstructed working aisles and every station's working front visible. Preparation bench: broad 3-block oak worktop supported by four stout timber posts, under-shelf, a large ivory mixing bowl and a chopping board with a few vegetables. Cooking range: substantial 3-block brick plinth, dark cast-iron stovetop, ONE large faceted copper stock kettle fully seated on a burner with two symmetric reachable handles; small lower iron coal firebox, one adjacent spare burner, block-built brick hood and supported chimney continuous to the wall top. Baking oven: distinct enclosed stepped brick body roughly 3 blocks wide/deep, large upper dark iron rectangular baking door with horizontal handle and a separate small lower coal firebox, its own modest supported brick flue; no open forge. Portioning bench: 3-block timber serving/packing counter with ivory cloth patch, a shallow tray of several matching meal portions and a short shelf rack attached to two rear posts, packing parcels and stacked ceramic bowls. Make this bench clearly different from the preparation island. Minimal kitchen props, everything rests on a real surface. No pipes, no electrical gear, no extra stove or extra kiln.\nRoom architecture: red brick rear wall, stout oak beams, pale gray stone-slab floor, two tall simple daylight windows, ordinary pantry shelves. No dining room seating. The room should look like a working town food workshop with room for future expansion.\nStyle: high-quality Minecraft/Blockbench voxel game concept render, cuboids and slabs, modest faceted custom cookware, pixel-textured materials with 64-pixel-per-block visual clusters, visibly block-sized masonry not tiny realistic bricks. Follow Civilization late nineteenth-century town industry: matte dark cast iron, worn red brick, warm directional oak, tarnished copper where heat explains it, ivory ceramic/cloth, very restrained brass handles. Match the reference images' practical material hierarchy and readable detail density. No generic steampunk clutter or ornamental gears.\nComposition: single large elevated three-quarter cutaway, full room in frame, station fronts exposed, floorplan easy to read, useful daylight with small warm orange fire apertures and faint kettle steam. Add one unobtrusive blocky Minecraft worker in a clear central aisle for scale, not obscuring any equipment. Roof cutaway should reveal actual walls, not float a ceiling above the workstations. No labels, text, arrows, UI, watermark, multiple panels, photorealism, smooth mesh furniture, modern appliances, stainless commercial kitchen, floating shelves, unsupported pipes, duplicated equipment or oversized kettle.\n",
+      "brief_hash": "d253a285a846c024b8ffe812757c87133071e2403303a5c596ce0dddfd10202c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-1423d817-c966-41f4-a98b-91278479b1bc.png",
+      "sha256": "2457084f26ef7d15cac94c01c1941c256723f476bb1bdb611025325dde01863c",
+      "prompt": "Use case: stylized-concept.\nAsset type: close equipment study sheet for the same Civilization Minecraft Tier 2 kitchen shown in input image 1.\nPrimary request: Create a clean landscape four-panel concept sheet presenting the FOUR EXACT SAME principal kitchen workstations from the reference room, isolated individually in large three-quarter views on a plain warm gray background with a small pale stone floor patch beneath each. These are detailed views of one coherent direction, not competing alternatives. Remove room walls, architecture, pantry, worker and background village so the four station assemblies and their supports are completely readable. Preserve reference design proportions, material hierarchy and equipment identity.\nInput image 1: subject/shape and material reference, the kitchen room mockup. Input image 2: project style reference, the existing thermal controllers; only dark iron/copper hardware and pixel material contrast, no unrelated emblems.\nPanel order in a spacious two-by-two grid: top left PREPARATION BENCH; top right COOKING RANGE; bottom left BAKING OVEN; bottom right PORTIONING BENCH. Place a short clean printed caption centered below each panel with exactly those names. No other text, dimensions or arrows.\nPREPARATION BENCH: same broad oak timber island, four stout supported legs, open under-shelf with just a bowl and ingredient box, large ivory mixing bowl on the left and chopping board with a few carrots on the right, cloth draped over one near corner. Clearly expose the bench's complete support structure.\nCOOKING RANGE: preserve same brick-and-dark-iron range body, lower left iron firebox with narrow orange aperture, adjacent dark iron stove door/control front, flat cooktop with ONE large faceted tarnished copper stock kettle seated on its left burner and an unused round plate on the right. Show the kettle with TWO symmetrical functional loop handles and generous clearance around them. Retain a brick hood and supported chimney as part of this assembly; connect hood with thick rear and side brick supports, the chimney rests on the hood and continues straight up. No floating hood, no isolated unattached chimney, no hanging linkage. Keep chimney fully inside panel. Copper kettle is matte metal reflecting local warmth, not glowing/emissive metal. Small wisps of steam are enough.\nBAKING OVEN: same independent stepped red-brick enclosed baking oven, broad dark iron upper baking door with horizontal restrained brass handle and small amber inspection window, smaller lower coal firebox with tiny orange aperture, supported stepped brick chimney rising directly from the body. Keep upper baking chamber physically separate from lower firebox. No extra stovetop burners or cookware on this station.\nPORTIONING BENCH: same oak counter with enclosed timber cabinet base, attached low rear shelf rack borne by two timber posts, ivory cloth work surface, tray of four matching bowl meals, stacks of ceramic bowls, two wrapped meal parcels. Keep portions clearly seated in trays and shelves and leave enough unobstructed counter to work. Distinguish it clearly from open preparation bench.\nStyle: Minecraft voxel game asset concept, cuboids/half-block supports, large block masonry scale, pixel-textured surfaces at 64-pixel-per-block visual clusters and modest faceted cookware, readable shapes suitable for native Blockbench translation. Civilization late nineteenth-century practical town industry: red brick, dark matte cast iron, directional warm oak, restrained copper, ivory cloth/ceramic and brass handles only. Match the exact reference material palette and overall design. Warm neutral studio lighting that reveals form; small firebox glow only. Whole assemblies shown uncropped with generous panel separation. No modern appliances, smooth photoreal furniture, gratuitous rivets, decorative gears, water plumbing, electrical machinery, tiny brick mosaic, extra stations, worker, UI, watermark, workflow arrows or dimension labels.\n",
+      "brief_hash": "d253a285a846c024b8ffe812757c87133071e2403303a5c596ce0dddfd10202c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-01.png": "e80a69f4581d1e6cc0e5a809dee56fc5ee65a25c0d48cb9b86c1aa13834aa194",
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4"
+      }
+    },
+    {
+      "file": "mockup-03.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-898844da-ec3b-4ad0-92d7-348f81e5b3f8.png",
+      "sha256": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+      "prompt": "Edit this exact four-panel Minecraft kitchen station concept sheet with two targeted corrections only. Preserve all four panels, exact composition, captions, brick shapes, chimneys, timber furniture, bowls, props, supports, iron door positions, handles, lighting and pixel texture style. In the COOKING RANGE top-right panel, remove the anvil-shaped emblem from the right dark iron lower door and replace that emblem area with plain broad matte dark cast iron matching the same door, leaving its hinges, handle and edges unchanged. This is kitchen equipment, so no forge or anvil symbol. In that same panel, recolor the copper kettle's vivid glowing orange lower patches to subdued non-emissive tarnished copper and dark umber with a small normal warm metallic highlight; it must visibly remain copper, but the kettle wall must not look incandescent. Keep orange emission ONLY in the small lower firebox aperture. Keep the kettle fully seated, its two handles, open top, faint steam and all geometry unchanged. No other changes anywhere in the image.\n",
+      "brief_hash": "d253a285a846c024b8ffe812757c87133071e2403303a5c596ce0dddfd10202c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-02.png": "2457084f26ef7d15cac94c01c1941c256723f476bb1bdb611025325dde01863c"
+      }
+    },
+    {
+      "file": "mockup-04.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a0f19e-2de7-70d3-90f6-1459e257b9bb\\exec-4190d226-5510-4be9-a709-927d5a37f35d.png",
+      "sha256": "5b355dcd9b955c43ea701bf770f2033312fc782f50e704dac62846ad71800d5c",
+      "prompt": "Edit this exact Minecraft kitchen cutaway room mockup with two targeted corrections only. Preserve the entire room, exact layout, floor, walls, windows, pantry, four workstations, chimneys, worker, props, supports, composition, lighting and pixel texture style. On the rear-left COOKING RANGE, remove the small ambiguous anvil/forge-shaped emblem from the right dark iron lower door and make just that emblem area plain broad matte dark cast iron matching the same door; preserve the handle, hinges, door edges and other equipment. Recolor the copper kettle's vivid glowing orange lower patches to subdued non-emissive tarnished copper and dark umber with a small normal warm metallic highlight. The kettle wall must remain clearly copper without looking incandescent. Keep the small lower firebox glow orange, the kettle fully seated on the cooktop, its handles, open top, faint steam, all geometry and every other image detail unchanged. No other changes anywhere in the image.\n",
+      "brief_hash": "d253a285a846c024b8ffe812757c87133071e2403303a5c596ce0dddfd10202c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-01.png": "e80a69f4581d1e6cc0e5a809dee56fc5ee65a25c0d48cb9b86c1aa13834aa194"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Room mockup-04 shows a central preparation island, rear range and separate baking oven, and entrance-side portioning counter. Worker provides indicative scale. Mockup-03 isolates the same four principal stations. Bench leg count/details are illustrative rather than exact construction plans.",
+        "implementable_geometry": "Broad brick cuboids, stepped chimneys and thick timber counters/posts fit full and half-block construction. Bowls, handles, kettle and hardware require modest custom cuboid/faceted models. This passes concept readability only; exact half-grid coordinates and piece counts await engineering plans.",
+        "mechanics_clearance": "Range kettle sits on the cooktop, its two handles are visible in the sheet, hood is supported by side/rear masonry, oven flue rests on oven body, bench shelves are borne by timber posts. The main room aisles and station fronts are clear. No moving linkage exists to validate.",
+        "period_materials": "Brick, oak, matte iron and warm copper fit town food production. Ivory cloth/ceramics distinguish serving surfaces. Corrected kettle is non-incandescent and anvil mark is removed. Fire glow is confined to apertures and oven inspection view.",
+        "family_consistency": "Brick chimney vocabulary and supported oak benches relate to the existing Smithy; iron hardware relates to the Cooking Stove. Copper cookware, mixing bowl and meal tray give the kitchen its own identity. Brick red, timber ochre and low-contrast dark iron are coherent across both final views; detail remains subordinate to shape.",
+        "controls_readability": "Large accessible iron doors and handles distinguish heating stations. Work surfaces identify preparation and portioning. No fake gauge or UI is introduced. Caption text in the station sheet is correct; exact controller placement is still a design task.",
+        "gameplay_scope": "Mockups explore the requested kitchen room composed of several multiblocks. Four named stations, recipes, fuel, meal effects, bounds and transfer rules remain proposals. No runtime art, machine behavior, room detection or in-game validation is claimed."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "d253a285a846c024b8ffe812757c87133071e2403303a5c596ce0dddfd10202c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\thermal_controllers\\concept.png": "3321470d69c2003f47ad3209d83e74790685d402d88041f9ab45f679791f4fc4",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+      },
+      "evidence": {
+        "mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "mockup-04.png": "5b355dcd9b955c43ea701bf770f2033312fc782f50e704dac62846ad71800d5c"
+      },
+      "generation": "5b355dcd9b955c43ea701bf770f2033312fc782f50e704dac62846ad71800d5c"
+    }
+  ]
+}

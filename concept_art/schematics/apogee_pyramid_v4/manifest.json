@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "asset": "apogee_pyramid_review_schematic_v4",
+  "generator": "tools/schematics/generate_apogee_pyramid.py",
+  "image_generation_used": false,
+  "status": "candidate_for_user_review",
+  "files_sha256": {
+    "apogee_pyramid_v4.nbt": "415dbd096f5de5c95cc364cd328505fcaa8ad928117feadccd237b1280f5f68b",
+    "blocks.csv": "53567518c170f8536a7bc5160e800ae0012250fc349436c05a00c89be0f39a11",
+    "blocks.json": "89cc2532555e992a2e1102d149060b3021805bf9b81a32af089a6c0054305b41",
+    "elevations.png": "758d82a56b3f7db3d161c0f0cbdd045a17d969ac67f40c66c44ac9192665f5cd",
+    "isometric_review.png": "e8defd987fa2481703b233e76ec285b0b5b45f61630c278c5419781be713465a",
+    "material_schedule.json": "03d65773d8aba9c0f6d24ae836e597bacae12c75263f98dda4779f85757595b9",
+    "plan_views.png": "efae28f14cf34a3e1284414168933d355bfda4f07d858d5b76101ad39956aa5a",
+    "README.md": "04123d96af8da30a5099c67d24b15860aa7bde80c81dc2dc718d90d73bef11c6"
+  }
+}

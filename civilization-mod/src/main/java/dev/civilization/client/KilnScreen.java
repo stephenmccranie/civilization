@@ -1,37 +1,48 @@
 package dev.civilization.client;
-
-import dev.civilization.KilnMenu;
+import java.util.*;
+import dev.civilization.*;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-/** Native furnace layout without a recipe book advertising unrelated furnace recipes. */
-public final class KilnScreen extends AbstractContainerScreen<KilnMenu> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/furnace.png");
-    public KilnScreen(KilnMenu menu, Inventory inventory, Component title) { super(menu, inventory, title); }
-    @Override protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
-        graphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
-        if (menu.isLit()) {
-            int h = (int)Math.ceil(menu.getLitProgress() * 13) + 1;
-            graphics.blitSprite(ResourceLocation.withDefaultNamespace("container/furnace/lit_progress"),
-                    14, 14, 0, 14 - h, leftPos + 56, topPos + 50 - h, 14, h);
-        }
-        int w = (int)Math.ceil(menu.getBurnProgress() * 24);
-        if (w > 0) graphics.blitSprite(ResourceLocation.withDefaultNamespace("container/furnace/burn_progress"),
-                24, 16, 0, 0, leftPos + 79, topPos + 34, w, 16);
+public final class KilnScreen extends MachineScreen<KilnMenu> {
+    public KilnScreen(KilnMenu m,Inventory i,Component title){super(m,i,title);imageHeight=214;inventoryLabelY=120;}
+    @Override protected List<RecipeEntry> recipes(){
+        var list=new ArrayList<RecipeEntry>();for(int i=0;i<menu.recipes.size();i++){
+            var recipe=menu.recipes.get(i).value();var output=recipe.getResultItem(minecraft.level.registryAccess());
+            var input=recipe.getIngredients().getFirst().getItems()[0];
+            list.add(new RecipeEntry(i,output.getHoverName().copy().append(" — ").append(input.getHoverName()),output,"Components",net.minecraft.world.item.Items.AIR));
+        }return list;
     }
-    @Override public void render(GuiGraphics graphics, int x, int y, float delta) {
-        super.render(graphics, x, y, delta);
-        boolean incomplete = menu.requiresStructure() && menu.structureStatus() != 1;
-        graphics.drawString(font, Component.translatable(incomplete ? "gui.civilization.structure_" + menu.structureStatus()
-                        : "gui.civilization.operating_" + menu.operatingStatus()), leftPos, topPos - 12,
-                !incomplete && (menu.operatingStatus() == 1 || menu.operatingStatus() == 6) ? 0xFF99DD88 : 0xFFFFBB77, true);
-        renderTooltip(graphics, x, y);
-        if (menu.getSlot(0).getItem().isEmpty() && isHovering(56, 17, 16, 16, x, y))
-            graphics.renderTooltip(font, Component.translatable("tooltip.civilization." + menu.tooltipPrefix() + "_input"), x, y);
-        if (menu.getSlot(1).getItem().isEmpty() && isHovering(56, 53, 16, 16, x, y))
-            graphics.renderTooltip(font, Component.translatable("tooltip.civilization." + menu.tooltipPrefix() + "_fuel"), x, y);
+    @Override protected int chosen(){return menu.selection();}
+    @Override protected void choose(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
+    private net.minecraft.world.item.crafting.AbstractCookingRecipe recipe(){
+        int selected=menu.selection();
+        if(selected>=0&&selected<menu.recipes.size())return menu.recipes.get(selected).value();
+        var actual=menu.getSlot(0).hasItem()?menu.getSlot(0).getItem():menu.getSlot(4).getItem();
+        if(!actual.isEmpty())return menu.recipes.stream().filter(r->r.value().getIngredients().getFirst().test(actual)).map(r->r.value()).findFirst().orElse(null);
+        return null;
+    }
+    @Override protected void drawMachine(GuiGraphics g,float dt,int mx,int my){
+        var recipe=recipe();
+        g.drawString(font,"Materials",leftPos+17,topPos+29,MachineUi.INK,false);g.drawString(font,"Output",leftPos+130,topPos+29,MachineUi.INK,false);
+        if(recipe!=null){
+            for(int i:MachineInventory.KILN_INPUT)if(!menu.getSlot(i).hasItem())MachineUi.ghost(g,recipe.getIngredients().getFirst().getItems()[0],leftPos+menu.getSlot(i).x,topPos+43);
+            for(int i:MachineInventory.KILN_OUTPUT)if(!menu.getSlot(i).hasItem())MachineUi.ghost(g,recipe.getResultItem(minecraft.level.registryAccess()),leftPos+menu.getSlot(i).x,topPos+43);
+        }
+        MachineUi.progress(g,leftPos+73,topPos+49,43,menu.getBurnProgress());
+        g.drawString(font,"Coal",leftPos+17,topPos+76,MachineUi.INK,false);
+        for(int index:new int[]{1,3})if(menu.getSlot(index).getItem().isEmpty())MachineUi.ghost(g,KilnContent.MINERAL_COAL.toStack(),leftPos+menu.getSlot(index).x,topPos+88);
+        MachineUi.fire(g,leftPos+66,topPos+85,44,23,menu.isLit());
+        boolean incomplete=menu.requiresStructure()&&menu.structureStatus()!=1;
+        var state=!incomplete&&!menu.isLit()&&menu.operatingStatus()!=7?Component.literal("Add Coal and strike to light"):Component.translatable(incomplete?"gui.civilization.structure_"+menu.structureStatus():"gui.civilization.operating_"+menu.operatingStatus());
+        g.drawString(font,font.plainSubstrByWidth(state.getString(),158),leftPos+9,topPos+64,MachineUi.MUTED,false);
+    }
+    @Override public void render(GuiGraphics g,int x,int y,float dt){super.render(g,x,y,dt);
+        for(int index:new int[]{0,1,2,3,4,5}){var slot=menu.getSlot(index);if(!slot.hasItem()&&isHovering(slot.x,slot.y,16,16,x,y)){
+            var r=recipe();ItemStack ghost=index==1||index==3?KilnContent.MINERAL_COAL.toStack():r==null?ItemStack.EMPTY:(index==0||index==4)?r.getIngredients().getFirst().getItems()[0]:r.getResultItem(minecraft.level.registryAccess());
+            g.renderTooltip(font,ghost.isEmpty()?Component.literal((index==0||index==4)?"Materials — choose a recipe for a guide":"Output"):ghost.getHoverName(),x,y);
+        }}
     }
 }

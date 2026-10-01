@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "One portion of the prototype potato carrot and bread skillet",
+    "purpose": "Portioned, quality-dependent cooked food",
+    "silhouette": "Cream square bowl filled with large golden potato, orange carrot and brown bread clusters",
+    "bounds": "64x64 item sprite, 60px maximum extent and two-pixel margin",
+    "materials": "Cream ceramic and warm food palette",
+    "interfaces": "Edible item, calorie and work-benefit tooltip",
+    "states": "Fixed served sprite; quality/calorie data travel on item stack",
+    "construction": "Generated transparent master and alpha-safe shared palette exporter",
+    "invariants": "One portion; no utensils or decorations; stored recipe calorie budget",
+    "technological_stage": "Tier 2 prepared meal",
+    "material_behavior": "Matte ceramic, cooked vegetables and bread",
+    "signature_feature": "Readable three-ingredient clusters in a cream bowl",
+    "neighboring_assets": "Bread, T2 kitchen portioning concept and field ration"
+  },
+  "references": [
+    {
+      "path": "art/assets/t2_kitchen/mockup-03.png",
+      "role": "Named kitchen family comparison; not provided to sprite generation"
+    }
+  ],
+  "sources": [
+    "master.png",
+    "prompt.txt",
+    "export.json"
+  ],
+  "outputs": [
+    {
+      "source": "vegetable_skillet.png",
+      "target": "textures/item/vegetable_skillet.png",
+      "format": "png",
+      "size": [
+        64,
+        64
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "item.json",
+      "target": "models/item/vegetable_skillet.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "F:\\minecraft project\\art\\assets\\vegetable_skillet\\master.png",
+      "sha256": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0",
+      "prompt": "Create an original Minecraft Civilization inventory food sprite, centered single shallow cream ceramic square bowl containing golden diced potatoes, orange carrot chunks and a few brown bread pieces. Transparent background, no shadow outside the bowl, no utensils, no text, no surrounding scene. Top/front three-quarter view. Designed for a 64x64 pixel export: thick readable bowl rim, 6-10 distinct large food clusters, controlled stepped silhouette and limited warm palette, no tiny speckles. Late nineteenth-century practical meal. Render a large clean pixel-art master with hard color clusters; food is golden cooked rather than charred. The item represents one vegetable skillet portion, not a cooking pan.\n",
+      "brief_hash": "eb7a9177959ea59df516cc6eabfd3fbb9cd4142e249a129b877c67cee1583c39",
+      "references": {}
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "One shallow cream square bowl with large readable potato/carrot/bread clusters; whole silhouette fits the transparent master.",
+        "implementable_geometry": "Raster item only; exporter will reduce with hard alpha and shared palette.",
+        "mechanics_clearance": "No mechanism or moving parts; no floating utensils.",
+        "period_materials": "Matte cream ceramic and cooked vegetables suit the practical kitchen family.",
+        "family_consistency": "Warm prepared-food palette matches the inspected portioning concept; avoids mechanical ornament.",
+        "controls_readability": "Distinct food item, no controls or illegible text.",
+        "gameplay_scope": "One served portion; no tray, preparation tool, new ingredients or meter."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "eb7a9177959ea59df516cc6eabfd3fbb9cd4142e249a129b877c67cee1583c39",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc"
+      },
+      "evidence": {
+        "mockup-01.png": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0"
+      },
+      "generation": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native 64px export preserves cream rim and distinct three-ingredient clusters.",
+        "geometry_uvs": "Alpha-safe raster exporter; 60px extent in 64px image, hard alpha. Native generated-item JSON.",
+        "material_consistency": "24 warm colors; cream bowl separates orange carrots and golden potato from bread. No surface noise added.",
+        "assembly_interfaces": "Edible item, no assembly or ports; per-stack quality remains readable through tooltip.",
+        "animation_states": "Fixed served sprite; dynamic food state belongs to stove renderer.",
+        "native_size_readability": "Inspected actual native and 2x exports: clear bowl silhouette, recognizable large clusters and clean edge."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "eb7a9177959ea59df516cc6eabfd3fbb9cd4142e249a129b877c67cee1583c39",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\master.png": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\prompt.txt": "1233087d4db6a6e79bb6ff1ff788e40a666c7212ea1d1632d551733d78dbb796",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\export.json": "78730bb8facbb75a7c2d933d2b719e9793b88eaab8af2095df33f375856cc9b1",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\vegetable_skillet.png": "796d8b338d327266184802e272494b6bdc3a374fbee13116b19154ea450b9e34",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\item.json": "bf164af7438dcca03273aeaeb430895c44e6015947d03004059986d6269a8fdc"
+      },
+      "evidence": {
+        "native-review.png": "16a50187ce0997339eb8d76bcd440acfb93969d8cbc7668c39342e66d12445ed"
+      },
+      "generation": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Prepared portion has a cream ceramic rim and warm orange/golden ingredient clusters in the actual inventory. Original item sprite remains distinct from pack bread/potato inputs.",
+        "scale_readability": "Bowl silhouette and food clusters survive native inventory scaling; no extraneous utensil or decoration.",
+        "states_motion": "Fixed portion appearance is intentional. Cooking color progression is visible in the stove; finished quality and saved calorie values travel in components/tooltips.",
+        "interaction_guides": "Edible item displays quality, duration and benefit, with calorie tooltip supplied by the existing food inspector. Server consumption check grants the stored calories and nonstacking work benefit.",
+        "inventory_appearance": "Actual Photon/Faithful inventory and stove-menu item views inspected beside the stove. Clean silhouette, restrained detail density and warm food contrast.",
+        "integration_limits": "One recipe and fixed sprite. Sensory playtesting remains; full food-specialty family and moving-vessel handling are not claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "eb7a9177959ea59df516cc6eabfd3fbb9cd4142e249a129b877c67cee1583c39",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\master.png": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\prompt.txt": "1233087d4db6a6e79bb6ff1ff788e40a666c7212ea1d1632d551733d78dbb796",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\export.json": "78730bb8facbb75a7c2d933d2b719e9793b88eaab8af2095df33f375856cc9b1",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\vegetable_skillet.png": "796d8b338d327266184802e272494b6bdc3a374fbee13116b19154ea450b9e34",
+        "F:\\minecraft project\\art\\assets\\vegetable_skillet\\item.json": "bf164af7438dcca03273aeaeb430895c44e6015947d03004059986d6269a8fdc"
+      },
+      "evidence": {
+        "ingame-inventory.png": "551e459c0b0530d681c1b02e53aee65a2bf695249e4e9a27ac4a001ec1934501"
+      },
+      "generation": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0"
+    }
+  ]
+}

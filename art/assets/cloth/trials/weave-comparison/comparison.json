@@ -1,0 +1,134 @@
+[
+  {
+    "source": "art\\assets\\cloth\\mockup-03.png",
+    "sha256": "13bb3bbfbcb71272a0914a60586c53d744c3ae629182dff05269d9afa0acc66d",
+    "variants": {
+      "direct-12": {
+        "file": "0-direct-12.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 12,
+        "partial_alpha_pixels": 0
+      },
+      "direct-16": {
+        "file": "0-direct-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "direct-24": {
+        "file": "0-direct-24.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 22,
+        "partial_alpha_pixels": 0
+      },
+      "via64-16": {
+        "file": "0-via64-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      }
+    }
+  },
+  {
+    "source": "art\\assets\\cloth\\mockup-04.png",
+    "sha256": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "variants": {
+      "direct-12": {
+        "file": "1-direct-12.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 12,
+        "partial_alpha_pixels": 0
+      },
+      "direct-16": {
+        "file": "1-direct-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "direct-24": {
+        "file": "1-direct-24.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 24,
+        "partial_alpha_pixels": 0
+      },
+      "via64-16": {
+        "file": "1-via64-16.png",
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      }
+    }
+  }
+]

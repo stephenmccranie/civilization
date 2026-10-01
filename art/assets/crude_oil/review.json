@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "A continuous liquid material with low-contrast folds and sparse glints that survive the 64-pixel reduction.",
+      "implementable_geometry": "Uses the existing Minecraft fluid surface and side geometry, so no custom mesh is required.",
+      "mechanics_clearance": "No mesh or mechanical parts; fluid heights remain controlled by block states.",
+      "period_materials": "Crude reads as near-black petroleum; the photographic material reference guides color and reflections only, with no copied watermark.",
+      "family_consistency": "The quiet dark oil contrasts with the timber Oil Derrick and iron refinery without amber glow or ornament.",
+      "controls_readability": "There are no controls on this material texture.",
+      "gameplay_scope": "The graphic adds no acquisition or resource simulation rules."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "The 64-pixel reduction preserves a near-black body, subtle umber depth and broken cool highlights without luminous ribbons.",
+      "geometry_uvs": "One periodic 64-pixel fluid face with eight 64-pixel animation frames; built-in fluid geometry supplies levels and edges.",
+      "material_consistency": "The same atlas is used by surface and reservoir crude fluid states.",
+      "assembly_interfaces": "Liquid renderer uses the registered still and flowing atlas; no separate model interfaces.",
+      "animation_states": "A looping eight-frame subpixel warp changes the eddies slowly without a hard cycle reset.",
+      "native_size_readability": "Quiet forms remain legible in the four-tile preview at native resolution, with much lower overall brightness than the prior atlas."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Daylit seep renders as near-black viscous oil with restrained brown depth; low-light reservoir appears almost black, consistent with the supplied material reference.",
+      "scale_readability": "At scene scale the surface has subtle movement but no luminous amber ribbons or bright tiled grid; underground pool edge remains distinct against stone.",
+      "states_motion": "A natural generated source was asserted, a controlled surface source flowed, and reservoir oil stayed finite during extraction. The eight atlas poses form a smooth loop in the frame contact sheet; live animation cadence was not captured on video.",
+      "interaction_guides": "The visual fixture verified the natural center source and the derrick's physical depletion; no new interaction guide is attached to oil.",
+      "inventory_appearance": "Crude has no placeable inventory item, so there is no item icon to review.",
+      "integration_limits": "The controlled surface pool and exposed reservoir are visual fixtures; this review does not cover every terrain slope or live motion cadence."
+    },
+    "remaining_issues": []
+  }
+}

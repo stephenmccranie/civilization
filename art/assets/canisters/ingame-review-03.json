@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Reviewed actual Photon/Faithful screenshots: blue-gray steel, brass cap and enamel badges remain coherent and readable.",
+    "scale_readability": "Reviewed held fuel view: upright tin lowered to the side, slightly turned with visible logo and handle; bottom deliberately continues below screen. More central view remains unobstructed.",
+    "states_motion": "Four static variants display matching geometry with distinct empty ring, crude drop, fuel flame and lubricant oil-can labels.",
+    "interaction_guides": "No guide applies. Corrected fixed transform now shows the front label in every item frame.",
+    "inventory_appearance": "Inventory/frame transforms and geometry unchanged; only first-person mirrored transforms adjusted.",
+    "integration_limits": "Focused Photon/Faithful scene passed in 35.5 seconds. No gameplay changes. Left-hand and dropped-item views not separately captured."
+  },
+  "remaining_issues": []
+}

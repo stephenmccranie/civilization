@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\recipe_browser\\mockup-02.png",
+      "sha256": "90ba99db5856111f7a855df6e5794f8cce9a30e9ae9ffaeddafb6c07cb8d308b",
+      "crop": [
+        156,
+        80,
+        1380,
+        885
+      ],
+      "label": "Approved mockup"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\recipe_browser\\ingame.png",
+      "sha256": "8a2b20056d5587455b4ba88258882d557131a4e4f434231d94202bb0df9ab1e4",
+      "crop": [
+        191,
+        205,
+        1238,
+        875
+      ],
+      "label": "Implemented - refined cabinet"
+    }
+  ]
+}

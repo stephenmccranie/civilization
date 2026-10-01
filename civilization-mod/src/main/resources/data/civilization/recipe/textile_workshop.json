@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BBB",
+    "PCP",
+    "III"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bricks"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "id": "civilization:textile_workshop",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+# Comfort HUD
+
+Purpose: a minimal always-visible local air temperature/comfort readout with understandable labor benefits and a distinct active brick-road speed badge. Local temperature includes machine warmth, not just the biome baseline. Fahrenheit only.
+
+Current direction (mockup-04): a tiny vertical brass/glass thermometer centered between the health and calorie bars, with Fahrenheit directly above. Comfort is implied by color and a subtle slow breathing highlight, strongest at full comfort and fading with the bonuses. Blue cold, sage comfortable, amber/red hot is the proposed palette. No comfort underline, separate meter or explicit percentage. A tiny brick-pattern foot indicates the road boost; native layout must shrink the generated tab and avoid overlapping other HUD. Individual bonus details remain proposed for an inventory tooltip. Earlier mockups are superseded. Match the established cabinet family using `concept_art/11_ui_coal_machine.png` as an inspected palette reference. Keep the world unobstructed and use native Minecraft pixel typography.
+
+Example state: 72°F, Comfortable; calorie cost −20%, mining +15%, comfort movement +5%, road movement +25%. These numbers describe underlying effects, not permanent HUD text in the revised concept. Keep movement sources separate; do not invent an additive total. Exact bonuses should remain discoverable when implementing; generated icons and text are layout guidance, not runtime assets.
+
+Implementation approved after mockup-04. Native GUI drawing in ComfortHud reuses the accepted proportions and brass/glass palette, with procedural whole-pixel instrument parts and no new raster atlas. The existing survival and inventory render paths share the same component. Gameplay bonuses remain unchanged. Review receipt records actual in-game evidence.

@@ -1,0 +1,22 @@
+{
+  "parent": "civilization:block/engine_cylinder",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.34,
+        0.34,
+        0.34
+      ]
+    }
+  }
+}

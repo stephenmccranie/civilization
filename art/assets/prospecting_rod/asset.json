@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "One practical late nineteenth-century PROSPECTING ROD: straight slender iron probe with a pointed steel tip at lower left, one continuous visible cool gray metal shaft, and a short warm brown wooden T-grip at upper right perpendicular to shaft. The grip is a single solid wooden crossbar, attached at its center by a small iron socket; no brass. Sturdy simple hand tool, length about four times grip width. Broad wood grain marks, clear shaft edges. Entire tool on a diagonal from lower left to upper right. No wires, dial, glow, gears, brush bristles or shovel blade.",
+    "purpose": "Clear manufactured material/tool identity in town industry.",
+    "silhouette": "One practical late nineteenth-century PROSPECTING ROD: straight slender iron probe with a pointed steel tip at lower left, one continuous visible cool gray metal shaft, and a short warm brown wooden T-grip at upper right perpendicular to shaft. The grip is a single solid wooden crossbar, attached at its center by a small iron socket; no brass. Sturdy simple hand tool, length about four times grip width. Broad wood grain marks, clear shaft edges. Entire tool on a diagonal from lower left to upper right. No wires, dial, glow, gears, brush bristles or shovel blade.",
+    "bounds": "32x32 transparent inventory icon, 28px maximum extent.",
+    "materials": "One practical late nineteenth-century PROSPECTING ROD: straight slender iron probe with a pointed steel tip at lower left, one continuous visible cool gray metal shaft, and a short warm brown wooden T-grip at upper right perpendicular to shaft. The grip is a single solid wooden crossbar, attached at its center by a small iron socket; no brass. Sturdy simple hand tool, length about four times grip width. Broad wood grain marks, clear shaft edges. Entire tool on a diagonal from lower left to upper right. No wires, dial, glow, gears, brush bristles or shovel blade.",
+    "interfaces": "Existing item IDs and interactions.",
+    "states": "Static item.",
+    "construction": "Generated master through shared alpha-safe sprite export.",
+    "invariants": "No recipe, prospecting, mass, durability or stack changes.",
+    "technological_stage": "Practical late nineteenth-century manufacture.",
+    "material_behavior": "Cool cast steel, restrained scuffs; rod wooden grain and iron socket.",
+    "signature_feature": "Wooden T-grip, long straight iron shaft and pointed tip",
+    "neighboring_assets": "Machine Parts, Oil Engine, steel, prospecting rod and vanilla iron/copper.",
+    "fidelity_targets": [
+      "Strong silhouette",
+      "Medium steel readable on dark backgrounds",
+      "No decorative mechanisms"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/texture-master.png",
+      "role": "Material palette only."
+    },
+    {
+      "path": "art/assets/machine_parts/mockup-01.png",
+      "role": "Sprite style only; broad clusters and material separation."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "prospecting_rod.png",
+      "target": "textures/item/prospecting_rod.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "prospecting_rod.json",
+      "target": "models/item/prospecting_rod.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-6ff74317-dd06-41e0-938d-839186695957.png",
+      "sha256": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+      "prompt": "Create one Minecraft item: One practical late nineteenth-century PROSPECTING ROD: straight slender iron probe with a pointed steel tip at lower left, one continuous visible cool gray metal shaft, and a short warm brown wooden T-grip at upper right perpendicular to shaft. The grip is a single solid wooden crossbar, attached at its center by a small iron socket; no brass. Sturdy simple hand tool, length about four times grip width. Broad wood grain marks, clear shaft edges. Entire tool on a diagonal from lower left to upper right. No wires, dial, glow, gears, brush bristles or shovel blade. High-resolution pixel-art master designed to survive tiny Minecraft inventory use, not a tiny generated file. Reference 1 is MATERIAL PALETTE ONLY (cool steel and practical construction), reference 2 is SPRITE STYLE ONLY (broad readable clusters), not a shape to copy. About sixteen deliberate colors, two or three main tones per material, restrained upper-left lighting, crisp stepped edges. Features and sparse scuffs/grain should survive as 1-3 final pixels; no microtexture, gradients, blurry highlights or random noise. Strong silhouette centered with generous margins on a true transparent background, no shadow, floor, border or text.",
+      "brief_hash": "e7eb4e39809014176dc92ff4cc5dfa46581f28866fc0b979613b23f515ca416a",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Wooden T-grip attaches centrally to continuous iron shaft and pointed tip. Native silhouette is slim but unbroken and distinct from a brush.",
+        "implementable_geometry": "Single static generated-item sprite, transparent padded silhouette.",
+        "mechanics_clearance": "Ingot is solid cast metal; rod shaft and center socket visibly meet its wooden crossbar. No moving mechanism.",
+        "period_materials": "Cool steel and plain wood/iron suit practical period manufacture without decorative brass.",
+        "family_consistency": "References inspected: engine metal palette and Machine Parts pixel clusters; functional material treatment retained.",
+        "controls_readability": "No UI; cast bar and probing tool have distinct silhouettes.",
+        "gameplay_scope": "Appearance only, preserving recipes and all prospecting behavior."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "e7eb4e39809014176dc92ff4cc5dfa46581f28866fc0b979613b23f515ca416a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+      },
+      "evidence": {
+        "mockup-01.png": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+        "sprite-review.png": "08929efb2ee554176bf523d76cd4973a20cd9af9ae90e40968af1f7b00f98998"
+      },
+      "generation": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Wooden T-grip attaches centrally to continuous iron shaft and pointed tip. Native silhouette is slim but unbroken and distinct from a brush.",
+        "geometry_uvs": "32x32 native sprite, binary alpha, at most 16 opaque colors and transparent padding; native generated-item JSON.",
+        "material_consistency": "Blue-gray steel planes have restrained wear; rod wood remains warm and distinct from cool metal.",
+        "assembly_interfaces": "Existing item IDs retained; no block interface or placement change.",
+        "animation_states": "Static item with native transforms.",
+        "native_size_readability": "Inspected dark/light native views and grid: ingot edges clear; slender rod shaft remains connected and T-grip recognizable."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "e7eb4e39809014176dc92ff4cc5dfa46581f28866fc0b979613b23f515ca416a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\mockup-01.png": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\export.py": "db267101d385ef5c99858b586e09823adb1f81ff6cedd2e2f0286538fe499bb7",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.png": "1dbfccdd59b124c847f33d164f69adc26d67c6367690663871319f9b4970c3c4",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.json": "85e3d24366aa83946410e1abb92a709a638c1bfcefa2aba4196c1b8999f50c28"
+      },
+      "evidence": {
+        "mockup-01.png": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+        "sprite-review.png": "08929efb2ee554176bf523d76cd4973a20cd9af9ae90e40968af1f7b00f98998"
+      },
+      "generation": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon world lighting darkens steel naturally; inventory highlights remain clear without alpha artifacts.",
+        "scale_readability": "Steel has comparable ingot footprint to vanilla iron/copper with a distinct cooler darker hue. Rod shaft remains visible in slots and frames.",
+        "states_motion": "Static sprites; held rod inspected with the native transform, grip and shaft remain coherent.",
+        "interaction_guides": "Existing prospecting interaction unchanged; no placement guide.",
+        "inventory_appearance": "Compared beside Machine Parts, iron and copper: cool metal family consistent, warm wooden grip distinct, similar edge contrast and restrained wear. Rod intentionally has less filled area than solid ingots.",
+        "integration_limits": "Build/unit and focused manufactured Photon scene passed. Inventory, frames visible in held view and held rod reviewed. No recipe or prospecting behavior changes."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "e7eb4e39809014176dc92ff4cc5dfa46581f28866fc0b979613b23f515ca416a",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\mockup-01.png": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\export.py": "db267101d385ef5c99858b586e09823adb1f81ff6cedd2e2f0286538fe499bb7",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.png": "1dbfccdd59b124c847f33d164f69adc26d67c6367690663871319f9b4970c3c4",
+        "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.json": "85e3d24366aa83946410e1abb92a709a638c1bfcefa2aba4196c1b8999f50c28"
+      },
+      "evidence": {
+        "evidence/manufactured-inventory.png": "d9554f87dac677de356250912c3410e6e7ea2664bd15733ce27e9287ea5ee146",
+        "evidence/manufactured-held.png": "51bdb8aa386a7142d2dd2a183643d78cb9cc18f17f5d16d8a9c606994985663d"
+      },
+      "generation": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9"
+    }
+  ]
+}

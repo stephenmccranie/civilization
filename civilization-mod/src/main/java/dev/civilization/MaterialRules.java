@@ -10,5 +10,6 @@ public final class MaterialRules {
     public static void components(ModifyDefaultComponentsEvent event) {
         event.modifyMatching(item -> Integer.valueOf(64).equals(item.components().get(DataComponents.MAX_STACK_SIZE)),
                 patch -> patch.set(DataComponents.MAX_STACK_SIZE, 32));
+        GoldEquipment.modify(event);
     }
 }

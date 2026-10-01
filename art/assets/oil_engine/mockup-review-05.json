@@ -1,0 +1,13 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "silhouette_scale": "Selected refinement keeps wheel, compact crankcase and horizontal flanged barrel; low feet replace copper plate. Proportion targets are explicit in the brief.",
+    "implementable_geometry": "Faceted castings and flanges translate to cuboids and 45-degree bevel strips; rivets belong in panel UVs.",
+    "mechanics_clearance": "Use perpendicular X shaft and Z cylinder in native model; generated perspective is not an orthographic mechanical drawing. Short feet stay outside wheel sweep.",
+    "period_materials": "Iron/steel with restrained brass cups/collars; no large copper panel.",
+    "family_consistency": "Retains selected engine and refinery palette, original casing bed.",
+    "controls_readability": "Small front-center dial/lever panel and accessible side ports.",
+    "gameplay_scope": "Only rear copper construction slab removed; fuel/work/crafting remain unchanged."
+  },
+  "remaining_issues": []
+}

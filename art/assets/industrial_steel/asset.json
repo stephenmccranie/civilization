@@ -1,0 +1,533 @@
+{
+  "schema": 1,
+  "kind": "multiblock",
+  "brief": {
+    "description": "Replace streaky industrial casing with readable steel plates and regenerate all six industrial controller faces as one coherent family.",
+    "purpose": "Unify the first industrial extraction family with the Oil Engine and canisters.",
+    "silhouette": "Existing stepped Oil Pump: front controller cube, two stacked half/full casing pieces above, shorter rear casing, stone slab feet. Shared casing remains a full cuttable cube.",
+    "bounds": "Existing three-wide, two-deep construction envelope, two-and-a-half blocks high.",
+    "materials": "Medium cool-gray steel, dark cast iron, small functional brass dial rim and warm ivory enamel. Broad worked-metal patches; no ornamental brass edging.",
+    "interfaces": "Existing controller, inventories, coal ignition, ports and contextual guides unchanged.",
+    "states": "Static textures. Existing active-state light and fire behavior retained.",
+    "construction": "Native cube textures and original cut-block geometry; reuse identical body material across casing, machine surrounds and pipes.",
+    "invariants": "No new gameplay, moving mechanisms, recipes or structure changes. Generate new faces for Oil Pump, Fired Heater, Distillation Column, Condenser, Tank and Coal Drill. Heater lit/cold states change only inside the inspection window. Gauges are decorative artwork, not live telemetry.",
+    "technological_stage": "Town heavy industry, circa 1890–1920.",
+    "material_behavior": "Broad low-contrast hammered/rolled steel patches, short directional scuffs; sparse strong seams and iron fasteners, not fine vertical streaks.",
+    "signature_feature": "Quiet steel plates with readable iron seams; pump has an ivory pressure dial above a broad bolted service cover.",
+    "neighboring_assets": "Oil Engine, canisters, Fired Heater, Distillation Column, Condenser.",
+    "fidelity_targets": [
+      "Steel remains mid-value under Photon.",
+      "Large plates remain quiet when repeated across a column.",
+      "Pump dial and service cover remain legible at 32-pixel native texture size.",
+      "No new unsupported geometry or floating fittings."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/industrial_steel/references/industry-before.png",
+      "role": "Existing construction and refinery neighbors; replace material treatment, not geometry."
+    },
+    {
+      "path": "art/assets/industrial_steel/references/engine-master.png",
+      "role": "Steel/enamel/brass palette and family membership, not surface noise or shape."
+    }
+  ],
+  "sources": [
+    "export.py",
+    "steel-master.png",
+    "steel-prompt.txt",
+    "pump-master.png",
+    "pump-prompt.txt",
+    "controllers-master.png",
+    "controllers-prompt.txt",
+    "fittings-master.png",
+    "fittings-prompt.txt",
+    "references/legacy-front.png"
+  ],
+  "outputs": [
+    {
+      "source": "refinery_side.png",
+      "target": "textures/block/refinery_side.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "refinery_top.png",
+      "target": "textures/block/refinery_top.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "oil_pump_front.png",
+      "target": "textures/block/oil_pump_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "refinery_heater.png",
+      "target": "textures/block/refinery_heater.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "column_front.png",
+      "target": "textures/block/column_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "condenser_front.png",
+      "target": "textures/block/condenser_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "fuel_tank_front.png",
+      "target": "textures/block/fuel_tank_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "refinery_fins.png",
+      "target": "textures/block/refinery_fins.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "coal_drill_front.png",
+      "target": "textures/block/coal_drill_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "refinery_heater_cold.png",
+      "target": "textures/block/refinery_heater_cold.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "oil_pump.json",
+      "target": "models/block/oil_pump.json",
+      "format": "java_model"
+    },
+    {
+      "source": "oil_refinery.json",
+      "target": "models/block/oil_refinery.json",
+      "format": "java_model"
+    },
+    {
+      "source": "oil_refinery_on.json",
+      "target": "models/block/oil_refinery_on.json",
+      "format": "java_model"
+    },
+    {
+      "source": "distillation_column.json",
+      "target": "models/block/distillation_column.json",
+      "format": "java_model"
+    },
+    {
+      "source": "condenser.json",
+      "target": "models/block/condenser.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fuel_tank.json",
+      "target": "models/block/fuel_tank.json",
+      "format": "java_model"
+    },
+    {
+      "source": "coal_drill.json",
+      "target": "models/block/coal_drill.json",
+      "format": "java_model"
+    },
+    {
+      "source": "refinery_front.png",
+      "target": "textures/block/refinery_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-34c4e313-0d91-4f92-9b4d-2cc0ea4b9dde.png",
+      "sha256": "ae5486634dd71b6ed8123cff5735520a02520672111e78036669a4916659e38e",
+      "prompt": "Create one implementable Minecraft material-and-machine mockup for Civilization, late nineteenth-century heavy industry. Show a compact stepped oil pump plus one detached steel casing cube, and a small inset demonstrating that casing repeated on a tall industrial column. Preserve simple Minecraft full/half-block geometry: pump front controller cube at ground level, one full casing cube above it and a half-height casing cap above that, one rear casing cube with a half-height cap, stone slab feet left and right of controller. No pipes, wheel, beam, piston, motor or pumpjack invented on the model. Shape is intentionally a compact stationary extraction cabinet.\nReplace the dark streaky material of reference 1 with quiet medium cool-gray steel plates, dark cast-iron seams, sparse practical iron fasteners. Broad connected hard-edged pixel-art material patches and a few short scuffs; no fine vertical striping, generic noise, ornate trim, brass corners, photorealism or modern LEDs. Reference 2 provides palette/family only, not its dense small texture pattern. Pump front has one clear ivory enamel pressure dial with restrained brass rim above a wide dark-iron bolted service cover, physically legible and grounded. Show clean front-three-quarter and rear-three-quarter views of the SAME pump assembly on neutral stone, restrained Minecraft 32x material detail. Do not increase geometric detail beyond block/cut-block construction. Attractive craftsmanship through large readable masses and material contrast, not decorative gears. A concept sheet, not a texture atlas. No text or labels.\n",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png",
+      "sha256": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+      "prompt": "Create a production texture master derived from the attached approved Minecraft steel pump concept. One single square steel plate surface, perfectly front-on orthographic, filling the entire image edge to edge. High-resolution pixel art with a deliberately limited information budget and crisp large connected color clusters. No perspective, mockup, labels, scenery, cast shadow outside the surface, or transparency.\nMatch the concept's medium cool-gray steel and dark iron seams. Strong simple plate border approximately one-sixteenth of image width. Four sparse square iron fasteners inset near corners, each about one-twelfth of image width, with a single light top edge. The broad center uses a few overlapping large muted steel-gray patches and short purposeful scuffs, each several percent of the face width, contrast much lower than the border. Clear worked steel, not stone, cobblestone, camouflage, vertical streaks, checker noise, blank plastic or photographic grain. Two or three main steel values, shadowed iron seam, subdued pale edge highlights. No gold or brass. Details must survive severe reduction; no tiny scratches or dither. Uniform neutral illumination. This is the common material tile for large industrial buildings and their cut-block pieces, so keep the center quiet and readable when repeated. Follow the palette and broad material marks of the approved image, but do not include its dial or service hatch.\n",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\mockup-01.png": "ae5486634dd71b6ed8123cff5735520a02520672111e78036669a4916659e38e"
+      }
+    },
+    {
+      "file": "mockup-03.png",
+      "source": "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png",
+      "sha256": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+      "prompt": "Edit the attached square steel texture into the oil pump controller face shown in reference 2. Image 1 is the exact material authority: preserve its outer border, four corner iron fasteners, steel palette and worked-metal patch scale. Image 2 supplies ONLY placement of the pressure dial and service hatch, not perspective or geometry. Output one perfectly orthographic edge-to-edge square opaque high-resolution pixel-art texture, no scene or labels.\nInside the existing steel border add a clearly readable ivory enamel pressure dial with a restrained aged-brass rim in the UPPER CENTER, occupying about 36 percent of the total face width. Dark diagonal needle and four thick cardinal marks, no tiny numbers. Below it put a broad dark cast-iron rectangular service hatch, about 65 percent face width and 30 percent face height, with four simple iron corner bolts and a few muted large wear patches. All painted flat into the texture, subtle raised lip shading only. Keep clear steel space separating the dial and hatch. Coarse connected deliberate pixel-art clusters and strong iconic forms that survive reduction. No decorative gears, copper plate, gold corners, extra controls, liquid tubes, words, fine scratches, noise, gradients, blurred edges or realistic embossed render. Match first image's exact medium-value steel and outer face boundaries. Keep the lower hatch lighter than black so it remains readable in Minecraft shadows.\n",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\mockup-01.png": "ae5486634dd71b6ed8123cff5735520a02520672111e78036669a4916659e38e"
+      }
+    },
+    {
+      "file": "mockup-04.png",
+      "source": "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-master.png",
+      "sha256": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa",
+      "prompt": "Generate a unified production texture atlas for Civilization's late nineteenth-century industrial machines. Reference 1 is the EXACT steel plate material master; reference 2 is the already approved oil pump controller face, for shared enamel/brass/iron treatment. Produce a perfectly square image divided into exactly FOUR equally sized square quadrants, edge-to-edge with NO gutters, NO labels and NO perspective. Each quadrant is a complete square front-on block face with the same iron border and four iron corner fasteners as reference 1. Preserve medium cool-gray worked steel with quiet broad pixel-art patches. High-resolution crisp pixel art with simple robust landmarks, designed to survive substantial reduction; no tiny numbers, fine engraving or photographic noise.\nTOP LEFT: coal-fired heater. One LARGE octagonal dark cast-iron firebox door centered in steel, occupying two thirds of the face. Thick iron rim, simple latch on right, two hinges on left, small horizontal three-slot inspection window near lower center, showing WARM ORANGE fire. No other control, no gauge. Readable iron midtones, not black.\nTOP RIGHT: distillation column controller. One large circular IVORY ENAMEL pressure dial with a restrained brass rim in upper-left/center, plus one tall AMBER sight glass to its right. Below dial a short dark iron lever horizontally. A few broad strong marks on dial, no numbers. Functional and sparse.\nBOTTOM LEFT: air-cooled condenser controller. Three broad horizontal dark louver openings across the upper half, and ONE small ivory circular temperature gauge centered in the lower half. Iron grille structure and muted gray steel, sparse small brass rim on gauge only. No fan propeller, no LEDs.\nBOTTOM RIGHT: liquid storage tank controller. ONE large tall vertical amber sight-glass window occupying the central third of the face, dark iron frame and brass end caps, broad dark lower liquid fill area and light upper empty region; two or three thick level ticks to its left. No dial, no text, no valve wheel.\nAll four tiles must have IDENTICAL outer border/corner placement and steel tone. Actual outer pixels will be protected in our pipeline. Keep each fitting at least one-tenth face width away from outer edges and corner bolts. Broad two/three-value material regions with small purposeful wear patches. No extra tile, no alternate designs, no labels, no surrounding margin. An orthographic texture atlas, not a machine render.\n",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1"
+      }
+    },
+    {
+      "file": "mockup-05.png",
+      "source": "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-master.png",
+      "sha256": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49",
+      "prompt": "Edit this exact four-quadrant square orthographic industrial texture atlas, preserving its exact grid, outer edges, common iron fasteners, material style and scale. Three targeted changes only. TOP LEFT: retain exact octagonal heater door, hinges, latch and three-slot window, but extinguish the fire: all three window interiors become dark charcoal iron, no orange or yellow or red anywhere. TOP RIGHT: completely unchanged, retain pressure dial and sight glass. BOTTOM LEFT: replace the small gauge with additional matching wide horizontal louvers so this becomes a full-face cooling grille with FIVE broad louvers; keep surrounding steel and corner iron bolts. BOTTOM RIGHT: replace liquid sight glass with a COAL DRILL control face: one broad semicircular ivory enamel load gauge across upper half, dark needle pointing diagonally up-right, restrained brass frame; below a large horizontal iron selector lever with a simple square pivot left and rounded rectangular grip right. No words, gear teeth, numbers, icons, lamps, extra gauges or tiny details. Coherent late-nineteenth-century cast iron, medium-gray steel and sparse functional brass, high-resolution pixel-art master with large connected clusters. Square atlas, exactly four equal edge-to-edge square tiles without gutters or perspective. No other changes; same neutral illumination as original.\n",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-master.png": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Concept retains compact stepped cabinet and lower rear mass. Its base is slightly exaggerated; actual stone feet and exact half-grid dimensions remain the implementation authority.",
+        "implementable_geometry": "All visible landmarks translate to existing cube/cut-block faces. No new modeled fittings needed; dial and hatch are painted.",
+        "mechanics_clearance": "No motion or new mechanical connections; existing ports remain accessible.",
+        "period_materials": "Medium steel plates and iron fasteners; brass appears only at the enamel dial. No ornamental copper slab or gears.",
+        "family_consistency": "Steel values and ivory/brass controls agree with Oil Engine. Broader quiet patches deliberately reduce the earlier streaks and fine noise.",
+        "controls_readability": "Pump master has a large upper dial and separate lower hatch; protected outer borders enforce exact casing continuity despite generator drift.",
+        "gameplay_scope": "Texture refresh only; previous geometry, production and interactions remain unchanged. Existing refinery device inserts are retained for later dedicated machine art."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27"
+      },
+      "evidence": {
+        "mockup-01.png": "ae5486634dd71b6ed8123cff5735520a02520672111e78036669a4916659e38e",
+        "mockup-02.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "mockup-03.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1"
+      },
+      "generation": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native 32-pixel plate has the broad quiet steel face, iron corner fixings and restrained dark seam from the concept. Pump dial/hatch remain separate landmarks.",
+        "geometry_uvs": "Texture-only native orientable cube, same front direction as existing blockstates. Existing cut-block geometry and UV sampling retained; complete assembly checked next in Photon.",
+        "material_consistency": "All seven surfaces share one bounded palette. Protected outer pixels are exactly shared; heater/front/grille original fittings retained inside their edit rectangles.",
+        "assembly_interfaces": "No structure, support, port, collision or guide geometry changes. Existing refinery-side resource keeps every industrial body using the same material.",
+        "animation_states": "Retained heater lit/cold inserts; only original inspection window changes. Pump has no new animated part.",
+        "native_size_readability": "Native light/dark previews show a distinct ivory dial and dark hatch. Steel patches remain subtle and sparse; seams survive reduction. In-game review will judge cut-piece repetition."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\export.py": "10e738917400495c8afd07477123c4e5602f52bf369235258deb3d25b09623d0",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-prompt.txt": "64a21878b4b3c238641ca837d5e757005ae7a35b00283031070f8113b4174798",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-prompt.txt": "76dd45e714fa85ec55ad8270bf7d1e984feca8e96be67daa3490e636525c5521",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-heater.png": "ad22d1d0ec394e2849e9691224a0f0684a851ecea88b1a08a68fac0504c847e6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-heater-cold.png": "35397c9deceb71cf61056b1ad63875ace2a42fe60e70d5bdd1273b4f1751b038",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-fins.png": "dfe68c373cf690f3e4ad88dc9bf8ae53ead7f74ae49c7041a5547dabd932df41",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_side.png": "1e8abe0e7238e9aae17a4030ab0ed10cd687037908b44d5a95200d3ff4506aae",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_top.png": "1e8abe0e7238e9aae17a4030ab0ed10cd687037908b44d5a95200d3ff4506aae",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump_front.png": "8daa231d34759a5b35169102190268769af294fd471d4dc561483a5fc09af6ca",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_front.png": "99b8f9866c93f230fe712b6e782c8f0dd90e52ae0fbfbc682301d36f550bd84c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater.png": "1f232e385323441b1dce22608cadeac768cb584176ed0b63b4edc8c3e3713abb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater_cold.png": "cf0e30cd5e02734e04a5475a2837c1f17e30acad1e7758e1d73aec1088187333",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_fins.png": "b29a3cb2840e56702439afbd51364788d7de903a7b1f2b53e65fe4e0976d473f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump.json": "3ff8722653114dedf0996e16584736edbc3447dc6b73f1b6aabb4ba225e931aa"
+      },
+      "evidence": {
+        "texture-review.png": "dc484186518c9b3d7a19971bd2614a8c15c13f49dfb7c141e8ffe861ac7cc793"
+      },
+      "generation": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native 32-pixel plate has the broad quiet steel face, iron corner fixings and restrained dark seam from the concept. Pump dial/hatch remain separate landmarks.",
+        "geometry_uvs": "Texture-only native orientable cube, same front direction as existing blockstates. Existing cut-block geometry and UV sampling retained; complete assembly checked next in Photon.",
+        "material_consistency": "All seven surfaces share one bounded palette. Protected outer pixels are exactly shared; heater/front/grille original fittings retained inside their edit rectangles.",
+        "assembly_interfaces": "No structure, support, port, collision or guide geometry changes. Existing refinery-side resource keeps every industrial body using the same material.",
+        "animation_states": "Retained heater lit/cold inserts; only original inspection window changes. Pump has no new animated part.",
+        "native_size_readability": "Native light/dark previews show a distinct ivory dial and dark hatch. Steel patches remain subtle and sparse; seams survive reduction. In-game review will judge cut-piece repetition."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "0493406751e854fbd2746d9cca0aca67903484480535f04c164459406b87307c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\export.py": "37c5af7dc544e954e6fea76674e1a4540b3d55ab118601e3289dcb55fc055b0e",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-prompt.txt": "64a21878b4b3c238641ca837d5e757005ae7a35b00283031070f8113b4174798",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-prompt.txt": "76dd45e714fa85ec55ad8270bf7d1e984feca8e96be67daa3490e636525c5521",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-heater.png": "ad22d1d0ec394e2849e9691224a0f0684a851ecea88b1a08a68fac0504c847e6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-heater-cold.png": "35397c9deceb71cf61056b1ad63875ace2a42fe60e70d5bdd1273b4f1751b038",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-fins.png": "dfe68c373cf690f3e4ad88dc9bf8ae53ead7f74ae49c7041a5547dabd932df41",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_side.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_top.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump_front.png": "04fa63850d68aa0076c00e984215f9b0aaff0fe6c5de6a76fcf616f802bf56bb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_front.png": "4b93781c3c5b50a4b872f900705ebb1d592d22a6a3b68640527950a7a9ad5696",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater.png": "797860755a61a89f7ea0455129243c1721c9ae0938dcf7484ef0dfa25808227c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater_cold.png": "e1d38c4500cbc7356409b1952a764dfce7a4c9b2fa72eb96cfa96eea679e06b8",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_fins.png": "4f9bb5dfd87101fd207c0ef61b493d60b3f68590808e437de7123a07fbb939e9",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump.json": "3ff8722653114dedf0996e16584736edbc3447dc6b73f1b6aabb4ba225e931aa"
+      },
+      "evidence": {
+        "texture-review.png": "6bceba2b93a422059e044675422859437f9fcf3a6152719f885127f39f5a17e7"
+      },
+      "generation": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Concept retains compact stepped cabinet and lower rear mass. Its base is slightly exaggerated; actual stone feet and exact half-grid dimensions remain the implementation authority.",
+        "implementable_geometry": "All visible landmarks translate to existing cube/cut-block faces. No new modeled fittings needed; dial and hatch are painted.",
+        "mechanics_clearance": "No motion or new mechanical connections; existing ports remain accessible.",
+        "period_materials": "Medium steel plates and iron fasteners; brass appears only at the enamel dial. No ornamental copper slab or gears.",
+        "family_consistency": "Steel values and ivory/brass controls agree with Oil Engine. Broader quiet patches deliberately reduce the earlier streaks and fine noise.",
+        "controls_readability": "Referenced four-face atlases give heater, column, condenser, tank and drill distinct large fittings. Cold heater is an explicit edit. Protected outer borders enforce exact casing continuity despite generator drift.",
+        "gameplay_scope": "Texture refresh only; all six industrial controller faces are new original artwork. Gauges/sight glasses remain decorative, not live telemetry. Previous geometry, production and interactions remain unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27"
+      },
+      "evidence": {
+        "mockup-01.png": "ae5486634dd71b6ed8123cff5735520a02520672111e78036669a4916659e38e",
+        "mockup-04.png": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa",
+        "mockup-05.png": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49"
+      },
+      "generation": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native 32-pixel plate has the broad quiet steel face, iron corner fixings and restrained dark seam from the concept. Pump dial/hatch remain separate landmarks.",
+        "geometry_uvs": "Texture-only native orientable cube, same front direction as existing blockstates. Existing cut-block geometry and UV sampling retained; complete assembly checked next in Photon.",
+        "material_consistency": "Ten faces share one bounded palette and one Photon brightness curve. Protected borders/corners are identical. Every fitting is newly generated from the same master/reference chain; no legacy device insert remains.",
+        "assembly_interfaces": "No structure, support, port, collision or guide geometry changes. Existing refinery-side resource keeps every industrial body using the same material.",
+        "animation_states": "New heater cold face replaces only the 10x5 inspection-window region from a referenced extinguished edit; entire remaining face is identical. Shared heat palette keeps small orange flame pixels from being lost in reduction.",
+        "native_size_readability": "Native previews show distinct silhouettes for pump dial/hatch, heater octagonal door, column instrument pair, condenser louvers/dial, tank vertical level and drill semicircular gauge. Photon-adjusted steel midtone remains quiet."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\export.py": "bd6541864097391d2d6fc6f6ef70667bcef6c7e8d466629a32a219241f4eaf0b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-prompt.txt": "64a21878b4b3c238641ca837d5e757005ae7a35b00283031070f8113b4174798",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-prompt.txt": "76dd45e714fa85ec55ad8270bf7d1e984feca8e96be67daa3490e636525c5521",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-master.png": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-prompt.txt": "6e49e2780d86bdc534d4f60fd2281aee53660a23b0670ee13e97eb9ccd52fe8b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-master.png": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-prompt.txt": "ca812a235d4ba478ef277aa64c0e03b4cdf10053544dae761c4092018be87a3d",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_side.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_top.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump_front.png": "04fa63850d68aa0076c00e984215f9b0aaff0fe6c5de6a76fcf616f802bf56bb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater.png": "0d0da9e9a48c81ce2c111c3c6c17422108c1ea56835ddd3b6b13e23bcca8d415",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_front.png": "829d3bdedb2f9e622c625611dbbbb517d5003486d5f0272247537ea434e10918",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser_front.png": "82eaac410a3b464c68e7f264e9501614c4d183807082e94f320eb686058fb6b0",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank_front.png": "757a6eeaa214961597f93ac3b46b24417fd9488ba4896acf74a8434b6ec1ad57",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_fins.png": "e22597a909f8a9509f778dcb118b7ecb776d514e3ea5de56e56b1b5a8dd3d6cb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill_front.png": "7cb8358b322d60d50f310847cc1eac103eda676d09a368a9eac9be16685104e3",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater_cold.png": "0430802ead7c53dd636591f8a12836b8cad2bd6d935d394737787c8b8830c30f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump.json": "3ff8722653114dedf0996e16584736edbc3447dc6b73f1b6aabb4ba225e931aa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery.json": "325ec851cc7eb5d12092509011eb1c530bb9383641af6a679b23aa85e8330dad",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery_on.json": "8f88c92534d6be4841e4c58c25bf856dbe96a18a24c9fb57eb6a37f7b59591f5",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\distillation_column.json": "322c7d0611d2aa50fe9577b1067759636e120b9bf0ad1c56b9ab49d8b1e3ba8d",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser.json": "ffb8b46bcd4ea08eeee9032095572e5846710a89cf6b844ada63f074f9bb6d62",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank.json": "58227da18986435c5a5928f6ee6658731ac761bf9a578a73e8d39abd8baab235",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill.json": "9338b3f2baf767cf6eafeccdff11a73073a477079ccb4459f3aecc72a0d2d8ff"
+      },
+      "evidence": {
+        "texture-review.png": "04da1ea40c071f61f414841c502eac9587c8083cb3847cb21734da1a3e4b3fff"
+      },
+      "generation": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native 32-pixel plate has the broad quiet steel face, iron corner fixings and restrained dark seam from the concept. Pump dial/hatch remain separate landmarks.",
+        "geometry_uvs": "Texture-only native orientable cube, same front direction as existing blockstates. Existing cut-block geometry and UV sampling retained; complete assembly checked next in Photon.",
+        "material_consistency": "Ten faces share one bounded palette and one Photon brightness curve. Protected borders/corners are identical. Every fitting is newly generated from the same master/reference chain; no legacy device insert remains.",
+        "assembly_interfaces": "No structure, support, port, collision or guide geometry changes. Existing refinery-side resource keeps every industrial body using the same material.",
+        "animation_states": "New heater cold face replaces only the 10x5 inspection-window region from a referenced extinguished edit; entire remaining face is identical. Shared heat palette keeps small orange flame pixels from being lost in reduction.",
+        "native_size_readability": "Native previews show distinct silhouettes for pump dial/hatch, heater octagonal door, column instrument pair, condenser louvers/dial, tank vertical level and drill semicircular gauge. Photon-adjusted steel midtone remains quiet."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\export.py": "f3c059c4b80f344a8837ded5e8a322883fa2afbc3fa975982ce919e4f489d621",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-prompt.txt": "64a21878b4b3c238641ca837d5e757005ae7a35b00283031070f8113b4174798",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-prompt.txt": "76dd45e714fa85ec55ad8270bf7d1e984feca8e96be67daa3490e636525c5521",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-master.png": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-prompt.txt": "6e49e2780d86bdc534d4f60fd2281aee53660a23b0670ee13e97eb9ccd52fe8b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-master.png": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-prompt.txt": "ca812a235d4ba478ef277aa64c0e03b4cdf10053544dae761c4092018be87a3d",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_side.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_top.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump_front.png": "04fa63850d68aa0076c00e984215f9b0aaff0fe6c5de6a76fcf616f802bf56bb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater.png": "0d0da9e9a48c81ce2c111c3c6c17422108c1ea56835ddd3b6b13e23bcca8d415",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\column_front.png": "829d3bdedb2f9e622c625611dbbbb517d5003486d5f0272247537ea434e10918",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser_front.png": "82eaac410a3b464c68e7f264e9501614c4d183807082e94f320eb686058fb6b0",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank_front.png": "757a6eeaa214961597f93ac3b46b24417fd9488ba4896acf74a8434b6ec1ad57",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_fins.png": "e22597a909f8a9509f778dcb118b7ecb776d514e3ea5de56e56b1b5a8dd3d6cb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill_front.png": "7cb8358b322d60d50f310847cc1eac103eda676d09a368a9eac9be16685104e3",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater_cold.png": "0430802ead7c53dd636591f8a12836b8cad2bd6d935d394737787c8b8830c30f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump.json": "3ff8722653114dedf0996e16584736edbc3447dc6b73f1b6aabb4ba225e931aa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery.json": "325ec851cc7eb5d12092509011eb1c530bb9383641af6a679b23aa85e8330dad",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery_on.json": "8f88c92534d6be4841e4c58c25bf856dbe96a18a24c9fb57eb6a37f7b59591f5",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\distillation_column.json": "352d11cb11fc1d83a2d4481fe7f9f1f5fcf8f322f24a747babfa466c7e4a69a4",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser.json": "ffb8b46bcd4ea08eeee9032095572e5846710a89cf6b844ada63f074f9bb6d62",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank.json": "58227da18986435c5a5928f6ee6658731ac761bf9a578a73e8d39abd8baab235",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill.json": "9338b3f2baf767cf6eafeccdff11a73073a477079ccb4459f3aecc72a0d2d8ff",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f"
+      },
+      "evidence": {
+        "texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "generation": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Reviewed final Photon/Faithful controller lineup, refinery assembly and pump front/rear. Shared brighter steel reads as plates in shade and daylight; iron fittings remain darker and ivory/brass instrumentation stays distinct.",
+        "scale_readability": "All six distinct controller designs read in world and native inventory hotbar. Broad surface patches remain subordinate to plate edges. Condenser louvers are readable across its full assembled face.",
+        "states_motion": "Working heater shows orange inspection slits in the assembly; stopped lineup heater is dark. No new motion. Build and connected refinery fixture passed after updating its Foundry/heater setup for manual ignition.",
+        "interaction_guides": "Column missing-block screenshot shows the same new plate material in its translucent contextual guide. Pump complete front/rear show unchanged cut-piece fit and supports; attempted separate pump guide capture did not show the guide and is not claimed as evidence.",
+        "inventory_appearance": "Six controller icons appear correctly textured in the creative inventory hotbar. Casing held appearance also reviewed beside the column.",
+        "integration_limits": "Art and native static model changes only; no gameplay changes or new gauge telemetry. No moving-vessel or additional shader testing. Existing engine/canister dedicated artwork retained; engine bed shares the new casing but was not separately launched."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "7427ed387468367b74db5927e9382c40ac3f3db58e4299d564a411e338dfdea7",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\industry-before.png": "a18488d0513078fcf1698ef1d318e783c3ea0d4dafc819bbaa885f5d28421bd6",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\engine-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\export.py": "f3c059c4b80f344a8837ded5e8a322883fa2afbc3fa975982ce919e4f489d621",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-master.png": "72e63faba106ab72cfb421c791401983a2bde9c70133a0bec7a406bf307c557c",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\steel-prompt.txt": "64a21878b4b3c238641ca837d5e757005ae7a35b00283031070f8113b4174798",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-master.png": "571d0a41e1b2457f5aeb3794f16f28aae263742c395b4ba2de4afd5114a1cca1",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\pump-prompt.txt": "76dd45e714fa85ec55ad8270bf7d1e984feca8e96be67daa3490e636525c5521",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-master.png": "80816efdb70f1e13355dc8176bcbbf201e6c03644dc5ebf8e4a50c487d00a6fa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\controllers-prompt.txt": "6e49e2780d86bdc534d4f60fd2281aee53660a23b0670ee13e97eb9ccd52fe8b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-master.png": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fittings-prompt.txt": "ca812a235d4ba478ef277aa64c0e03b4cdf10053544dae761c4092018be87a3d",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\references\\legacy-front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_side.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_top.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump_front.png": "04fa63850d68aa0076c00e984215f9b0aaff0fe6c5de6a76fcf616f802bf56bb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater.png": "0d0da9e9a48c81ce2c111c3c6c17422108c1ea56835ddd3b6b13e23bcca8d415",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\column_front.png": "829d3bdedb2f9e622c625611dbbbb517d5003486d5f0272247537ea434e10918",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser_front.png": "82eaac410a3b464c68e7f264e9501614c4d183807082e94f320eb686058fb6b0",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank_front.png": "757a6eeaa214961597f93ac3b46b24417fd9488ba4896acf74a8434b6ec1ad57",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_fins.png": "e22597a909f8a9509f778dcb118b7ecb776d514e3ea5de56e56b1b5a8dd3d6cb",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill_front.png": "7cb8358b322d60d50f310847cc1eac103eda676d09a368a9eac9be16685104e3",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_heater_cold.png": "0430802ead7c53dd636591f8a12836b8cad2bd6d935d394737787c8b8830c30f",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_pump.json": "3ff8722653114dedf0996e16584736edbc3447dc6b73f1b6aabb4ba225e931aa",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery.json": "325ec851cc7eb5d12092509011eb1c530bb9383641af6a679b23aa85e8330dad",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\oil_refinery_on.json": "8f88c92534d6be4841e4c58c25bf856dbe96a18a24c9fb57eb6a37f7b59591f5",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\distillation_column.json": "352d11cb11fc1d83a2d4481fe7f9f1f5fcf8f322f24a747babfa466c7e4a69a4",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\condenser.json": "ffb8b46bcd4ea08eeee9032095572e5846710a89cf6b844ada63f074f9bb6d62",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\fuel_tank.json": "58227da18986435c5a5928f6ee6658731ac761bf9a578a73e8d39abd8baab235",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\coal_drill.json": "9338b3f2baf767cf6eafeccdff11a73073a477079ccb4459f3aecc72a0d2d8ff",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\refinery_front.png": "178af96bae077cd4d362343cd15cf55b2082ce1f511c82800378c914598f217f"
+      },
+      "evidence": {
+        "evidence/industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "evidence/industry-pump-front.png": "116d5747745d560e57f21961e40c968bb96bf32dbd0dd0efe9fffa85d9a92b9c",
+        "evidence/industry-pump-rear.png": "6e5b45faf49fd3c3cc49c69d061e0c39ea8a8505cfbb212a3f4fbab00d4c0350",
+        "evidence/industry-guide.png": "2ee9774b7ed2ca9ba59d31ee50d87bd9c78faf3313a273cdd8e31a755dfe4ca7",
+        "evidence/industry-controller-family.png": "128ca22ce9e6451e7b44edbf595930ceac03afd354b7d300dc572ee93deaf7f5",
+        "evidence/industry-controller-items.png": "64bde1d736b7780dbce69234659a2ae43dbc470235c5d8326e64590a1e9d5718"
+      },
+      "generation": "d68c18d99474584eae2c078d988b4809435a14125885f53f4538ff9e70138e49"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "Mineral blend visibly enriched with yellow sulfur",
+    "purpose": "Distinct readable frontier supply in the shared resource family.",
+    "silhouette": "Same four-stone clay mound as ordinary blend, with several large sulfur pieces among the clay",
+    "bounds": "32x32 transparent item, 28px longest silhouette extent.",
+    "materials": "One compact low mound of coarse mineral blend: four or five large irregular dull gray gravel chunks embedded in muted clay-brown crumbs. Angular stones, earthy binder, a few subordinate lighter mineral chips. Readable broad clumps, not dozens of tiny grains. No container or bag, no yellow sulfur, no metallic shine. Slight three-quarter top view.",
+    "interfaces": "Existing item identity, recipe and stack behavior unchanged.",
+    "states": "Static inventory and held item.",
+    "construction": "Generated high-resolution master reduced by shared alpha-safe sprite pipeline.",
+    "invariants": "Art only; no container cost or new gameplay mechanics.",
+    "technological_stage": "Frontier supplies feeding town workshops.",
+    "material_behavior": "Broad material-specific clusters, subordinate marks, restrained saturation.",
+    "signature_feature": "Broad ochre-yellow sulfur chips between gray stones",
+    "neighboring_assets": "Cloth, sulfur, Machine Parts and the other frontier supplies.",
+    "fidelity_targets": [
+      "Preserve ordinary blend mound and stone positions",
+      "Clearly visible yellow sulfur inclusions"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/mineral_blend/mockup-01.png",
+      "role": "Shape and material invariant; enrich this exact blend."
+    },
+    {
+      "path": "art/assets/sulfur/mockup-01.png",
+      "role": "Sulfur color and fracture reference only."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "enriched_mineral_blend.png",
+      "target": "textures/item/enriched_mineral_blend.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "enriched_mineral_blend.json",
+      "target": "models/item/enriched_mineral_blend.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-d7cf919a-50d7-49e1-b8a4-0e4ef2c805a3.png",
+      "sha256": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601",
+      "prompt": "Edit reference 1 into sulfur-enriched mineral blend. Preserve its overall silhouette, four gray stones, clay-brown binder, camera, coarse stepped pixel-art style and upper-left lighting. Add three or four broad angular yellow sulfur chips nestled visibly between the gray stones, replacing some clay regions and pale small chips; yellow should occupy roughly one fifth of the mound and remain clearly visible in a tiny inventory icon. Use reference 2 ONLY for sulfur yellow color and fractured material character. Keep the stones gray, do not recolor the entire mound. High-resolution master composed of broad connected pixel clusters, no subpixel grains, no new container, labels or glow. Same generous transparent margin and true transparent background.",
+      "brief_hash": "97def60f0c02e86a8b58909fa3a923a04eaa6980e6c6dd8209b23453042e4f3e",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Base mound and four gray stones preserved; several yellow sulfur inclusions clearly identify enrichment.",
+        "implementable_geometry": "One static inventory sprite with no physical assembly required.",
+        "mechanics_clearance": "No moving or interacting components; depicted material rests as one coherent item.",
+        "period_materials": "Gray gravel/clay remain natural; sulfur inclusions match inspected yellow sulfur reference.",
+        "family_consistency": "Broad stepped edges and restrained upper-left lighting follow inspected Cloth/sulfur references. Material identity is retained.",
+        "controls_readability": "No controls; silhouette and characteristic material identify the resource.",
+        "gameplay_scope": "Only appearance changes; item IDs, recipes and inventories unchanged."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "97def60f0c02e86a8b58909fa3a923a04eaa6980e6c6dd8209b23453042e4f3e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      },
+      "evidence": {
+        "sprite-review.png": "68e9d27ca3fabf3866e5e524650ebc21b400aef7543e6370f3e99079bd289246",
+        "mockup-01.png": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601"
+      },
+      "generation": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Native export retains same base mound and broad yellow chips without replacing gray stones.",
+        "geometry_uvs": "Generated-item model, 32x32 texture, 16 opaque colors and binary alpha; padded silhouette.",
+        "material_consistency": "Sulfur is a bright minority inclusion, not a yellow recolor of the blend; individual mineral tones remain.",
+        "assembly_interfaces": "Existing registered item model and texture path; no block interfaces.",
+        "animation_states": "Static material item, no animation needed.",
+        "native_size_readability": "Inspected native dark/light backgrounds and enlarged grid; characteristic forms remain legible without stray edge pixels."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "97def60f0c02e86a8b58909fa3a923a04eaa6980e6c6dd8209b23453042e4f3e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\mockup-01.png": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\export.py": "c6314ddbc53f118c40f945bf47f947b9cc8e67b9de495fa5aab5002130b758e4",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\enriched_mineral_blend.png": "cfacb02b211a93f9bb77467834cd9e8d4083749bd096e90aa49a6d77bb97bde2",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\enriched_mineral_blend.json": "edde1359740e4f8438ca36a77f204c11e2e39a9f21922a273001620c0d98f482"
+      },
+      "evidence": {
+        "sprite-review.png": "68e9d27ca3fabf3866e5e524650ebc21b400aef7543e6370f3e99079bd289246",
+        "mockup-01.png": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601"
+      },
+      "generation": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon frame lighting darkens materials naturally; native inventory retains chosen palette. No opaque background or missing texture.",
+        "scale_readability": "Same ordinary-blend stone arrangement with clearly visible yellow sulfur in native inventory slots.",
+        "states_motion": "Static generated item; no animation states or moving machinery.",
+        "interaction_guides": "Inventory resource, no build guide or placement interaction.",
+        "inventory_appearance": "Inspected seven-item family beside Cloth, sulfur and Machine Parts. Consistent padded scale and broad clusters; earthy low-saturation supplies contrast brighter sulfur and cool metal. Same ordinary-blend stone arrangement with clearly visible yellow sulfur in native inventory slots.",
+        "integration_limits": "Build/unit and focused supplies scene passed. Reviewed inventory and framed appearances; no gameplay changes or multiplayer validation claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "97def60f0c02e86a8b58909fa3a923a04eaa6980e6c6dd8209b23453042e4f3e",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\mineral_blend\\mockup-01.png": "8d367eef127d6b807bbe0ceee54635d5401d5125950695aa816b3b97e25219bc",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\mockup-01.png": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\export.py": "c6314ddbc53f118c40f945bf47f947b9cc8e67b9de495fa5aab5002130b758e4",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\enriched_mineral_blend.png": "cfacb02b211a93f9bb77467834cd9e8d4083749bd096e90aa49a6d77bb97bde2",
+        "F:\\minecraft project\\art\\assets\\enriched_mineral_blend\\enriched_mineral_blend.json": "edde1359740e4f8438ca36a77f204c11e2e39a9f21922a273001620c0d98f482"
+      },
+      "evidence": {
+        "evidence/supplies-inventory.png": "a7fc3cb22a870257125e3cecd076d50d2548995ecf102f504e90d27f15bc3c46",
+        "evidence/supplies-frames.png": "d2b625053e700cd14e0f779d95a2a255a66a64e45cbbd5d102ac2c6172e6ae85"
+      },
+      "generation": "e983e4c51c05663b55b7feb45083d9974226f952e6a08248cecb0f2c7e2b9601"
+    }
+  ]
+}

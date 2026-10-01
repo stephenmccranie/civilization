@@ -1,0 +1,10 @@
+Use case: stylized-concept
+Asset type: implementable Minecraft multiblock design reference
+Primary request: Redesign the Civilization Textile Workshop as one coherent, attractive late-nineteenth-century loom and workbench assembly.
+Input images: Image 1 is the current in-game workshop lineup and material/scale context; redesign only the middle Textile Workshop. Image 2 is presentation and partial-block construction language only. Image 3 is woven material identity only.
+Subject: A three-block-wide, three-block-deep textile workstation with the controller at bottom front center. Make a low broad oak workbench with a thin slab top and four short partial-block legs. At the rear, two narrow oak loom uprights support one top crossbar around a large open center. One horizontal copper roller spans the frame with visible bearings. Integrate a small pale woven swatch with restrained blue selvage into the controller face at the front; do not invent a separate cloth block.
+Style/medium: polished Minecraft build mockup using feasible full blocks, slabs, quarter beams and eighth cubes; 32x resource-pack material density; late nineteenth-century artisan workshop.
+Composition/framing: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on a neutral stone floor, matching scale and orientation.
+Materials/textures: warm oak, restrained copper roller/bearings, small dark iron controller fittings, pale wool swatch with one narrow blue edge.
+Constraints: exact maximum footprint 3x3 blocks, maximum height 4 blocks, controller at front-center, Minecraft half-block geometry, broad negative space, buildable with existing oak/copper cut pieces. No separate cloth panel in the structure.
+Avoid: solid plank cube, full-block fence-like posts, spinning-wheel complexity, decorative gears, belts, pipes, modern machinery, floating thread, people, labels, impossible curves, tiny clutter.

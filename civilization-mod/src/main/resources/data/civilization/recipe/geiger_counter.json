@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [ " G ", "CRC", " M " ],
+  "key": {
+    "G": { "item": "minecraft:glass_pane" },
+    "C": { "item": "minecraft:copper_ingot" },
+    "R": { "item": "minecraft:redstone" },
+    "M": { "item": "civilization:machine_parts" }
+  },
+  "result": { "id": "civilization:geiger_counter", "count": 1 }
+}

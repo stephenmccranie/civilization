@@ -1,0 +1,73 @@
+{
+  "density": 4,
+  "palette": {
+    "edge": [
+      100,
+      105,
+      109,
+      255
+    ],
+    "rub": [
+      137,
+      141,
+      144,
+      255
+    ],
+    "shade": [
+      27,
+      30,
+      32,
+      255
+    ],
+    "seam": [
+      40,
+      43,
+      45,
+      255
+    ],
+    "plate": [
+      67,
+      71,
+      74,
+      255
+    ],
+    "black": [
+      24,
+      27,
+      29,
+      255
+    ],
+    "stud": [
+      112,
+      117,
+      121,
+      255
+    ],
+    "stud_shadow": [
+      48,
+      52,
+      55,
+      255
+    ]
+  },
+  "housing_inset": 2,
+  "housing_fastener_offset": 4,
+  "vent_surround": [
+    6,
+    7,
+    33,
+    17
+  ],
+  "dial_radius_pixels": 6,
+  "dial_tick_degrees": [
+    -135,
+    -90,
+    -45,
+    0,
+    45,
+    90,
+    135
+  ],
+  "pan_well_inset": 3,
+  "support_detail": "Longitudinal edge wear on legs; small attachment marks at upper ends. No miniature cover panels on supports."
+}

@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Stout trapezoidal ingot, lighter top, graphite side and narrow silver edges survive export; broad scuffs retain steel character.",
+      "implementable_geometry": "Single static generated-item sprite, transparent padded silhouette.",
+      "mechanics_clearance": "Ingot is solid cast metal; rod shaft and center socket visibly meet its wooden crossbar. No moving mechanism.",
+      "period_materials": "Cool steel and plain wood/iron suit practical period manufacture without decorative brass.",
+      "family_consistency": "References inspected: engine metal palette and Machine Parts pixel clusters; functional material treatment retained.",
+      "controls_readability": "No UI; cast bar and probing tool have distinct silhouettes.",
+      "gameplay_scope": "Appearance only, preserving recipes and all prospecting behavior."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Stout trapezoidal ingot, lighter top, graphite side and narrow silver edges survive export; broad scuffs retain steel character.",
+      "geometry_uvs": "32x32 native sprite, binary alpha, at most 16 opaque colors and transparent padding; native generated-item JSON.",
+      "material_consistency": "Blue-gray steel planes have restrained wear; rod wood remains warm and distinct from cool metal.",
+      "assembly_interfaces": "Existing item IDs retained; no block interface or placement change.",
+      "animation_states": "Static item with native transforms.",
+      "native_size_readability": "Inspected dark/light native views and grid: ingot edges clear; slender rod shaft remains connected and T-grip recognizable."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Photon world lighting darkens steel naturally; inventory highlights remain clear without alpha artifacts.",
+      "scale_readability": "Steel has comparable ingot footprint to vanilla iron/copper with a distinct cooler darker hue. Rod shaft remains visible in slots and frames.",
+      "states_motion": "Static sprites; held rod inspected with the native transform, grip and shaft remain coherent.",
+      "interaction_guides": "Existing prospecting interaction unchanged; no placement guide.",
+      "inventory_appearance": "Compared beside Machine Parts, iron and copper: cool metal family consistent, warm wooden grip distinct, similar edge contrast and restrained wear. Rod intentionally has less filled area than solid ingots.",
+      "integration_limits": "Build/unit and focused manufactured Photon scene passed. Inventory, frames visible in held view and held rod reviewed. No recipe or prospecting behavior changes."
+    },
+    "remaining_issues": []
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "One irregular rounded mound of raw cookie dough with five or six broad dark cocoa pieces embedded in pale beige dough. A thick folded lip and one kneading crease show soft dough rather than a flat baked cookie. No baked edge or plate. Three-quarter view.",
+    "purpose": "Readable food/preparation item in Civilization kitchen family.",
+    "silhouette": "One irregular rounded mound of raw cookie dough with five or six broad dark cocoa pieces embedded in pale beige dough. A thick folded lip and one kneading crease show soft dough rather than a flat baked cookie. No baked edge or plate. Three-quarter view.",
+    "bounds": "32x32 generated item with 28px silhouette extent and transparent margin.",
+    "materials": "One irregular rounded mound of raw cookie dough with five or six broad dark cocoa pieces embedded in pale beige dough. A thick folded lip and one kneading crease show soft dough rather than a flat baked cookie. No baked edge or plate. Three-quarter view.",
+    "interfaces": "Existing item registration and normal generated-item model.",
+    "states": "Static inventory resource.",
+    "construction": "High-resolution generated master to shared alpha-safe sprite exporter.",
+    "invariants": "No recipe, calorie, stack, container-return or gameplay changes.",
+    "technological_stage": "Practical frontier and town kitchens in the late nineteenth-century material tradition.",
+    "material_behavior": "Broad natural material planes and sparse lower-contrast marks; uncooked dough stays pale.",
+    "signature_feature": "One irregular rounded mound of raw cookie dough with five or six broad dark cocoa pieces embedded in pale beige dough. A thick folded lip and one kneading crease show soft dough rather than a flat baked cookie. No baked edge or plate. Three-quarter view.",
+    "neighboring_assets": "Other five kitchen items, Cloth and Mineral Fertilizer.",
+    "fidelity_targets": [
+      "Distinct silhouette at inventory size",
+      "Food state readable",
+      "Broad material-specific variation"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/cloth/mockup-04.png",
+      "role": "Style only: established pixel cluster scale, restrained lighting and readable silhouette."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "cookie_dough.png",
+      "target": "textures/item/cookie_dough.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "cookie_dough.json",
+      "target": "models/item/cookie_dough.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-1808da8d-3b5f-4882-87cc-c0faae363334.png",
+      "sha256": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+      "prompt": "Create one Minecraft item: One irregular rounded mound of raw cookie dough with five or six broad dark cocoa pieces embedded in pale beige dough. A thick folded lip and one kneading crease show soft dough rather than a flat baked cookie. No baked edge or plate. Three-quarter view. High-resolution pixel-art master composed for a tiny Minecraft inventory icon; do not output a tiny image. Reference image is STYLE ONLY: broad purposeful connected pixel clusters, modest material marks and readable silhouette, not its cloth subject or blue stripe. Match Civilization frontier supplies: practical natural materials, muted earth colors, restrained upper-left light. About sixteen deliberate colors, two or three main tones per material; hard stepped boundaries, sparse 1-3-final-pixel material marks quieter than structural edges. Clear major forms, no fine noise, gradients, shiny plastic, microscopic detail, lettering, floor, cast shadow, border or glow. Centered isolated single inventory item, generous margins, true transparent background.",
+      "brief_hash": "3974dd7ee4d7840711262a5f88420043da816df5488efdb4ca29691f06cdea09",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Irregular thick dough mound with broad cocoa chunks and a fold; pale body contrasts dark chips without tiny speckle.",
+        "implementable_geometry": "One static generated-item sprite; shape is complete within transparent margins.",
+        "mechanics_clearance": "No moving mechanics; food and depicted container/wrapping form a coherent supported object.",
+        "period_materials": "Natural food, earthenware, plain tin and cloth fit practical frontier/town kitchens; no decorative machinery.",
+        "family_consistency": "Inspected against Cloth and fertilizer; broad pixel clusters, upper-left light and earthy palette are consistent.",
+        "controls_readability": "No controls; ingredient state and silhouette identify this food.",
+        "gameplay_scope": "No recipe, calorie, stack or container-return changes."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "3974dd7ee4d7840711262a5f88420043da816df5488efdb4ca29691f06cdea09",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "mockup-01.png": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+        "sprite-review.png": "0bfe6eef0b655476d0bd0f7c8b29a86def8ff8e7e1b27bc847cf7489e3154e1f"
+      },
+      "generation": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Irregular thick dough mound with broad cocoa chunks and a fold; pale body contrasts dark chips without tiny speckle.",
+        "geometry_uvs": "Native generated-item JSON with 32x32 texture, 16 opaque colors, binary alpha and padded silhouette.",
+        "material_consistency": "Food variation stays subordinate to shape; dough pale, baked bread warm, clay muted reddish brown.",
+        "assembly_interfaces": "Existing registered item resource retained; no physical block interfaces.",
+        "animation_states": "Static item with native held transform; no animation needed.",
+        "native_size_readability": "Inspected family sheet at native size on dark/light backgrounds and enlarged. Comparable footprint and detail density; shapes remain distinct beside Cloth/fertilizer."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "3974dd7ee4d7840711262a5f88420043da816df5488efdb4ca29691f06cdea09",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\mockup-01.png": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\export.py": "3f0ce26ce6efa3d8bd04e1013b0029e78961871855d7b7b38729658b66b3cbb6",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.png": "c54dcdb50ee062650e99ba4ccd262d0253b3d32d8682863aa904b0c4f9f2dade",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.json": "4052589240aad83464f823e83445caf2ca85379541f48eb9e479fbdb1b537f76"
+      },
+      "evidence": {
+        "mockup-01.png": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+        "sprite-review.png": "0bfe6eef0b655476d0bd0f7c8b29a86def8ff8e7e1b27bc847cf7489e3154e1f"
+      },
+      "generation": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Inventory retains original natural palette; Photon framed views shade it consistently without missing textures or alpha boxes.",
+        "scale_readability": "Irregular thick dough mound with broad cocoa chunks and a fold; pale body contrasts dark chips without tiny speckle.",
+        "states_motion": "Static generated item. No animated or processing states apply.",
+        "interaction_guides": "Food inventory item, no multiblock guide or placement interfaces.",
+        "inventory_appearance": "Reviewed eight-item lineup: six kitchen items plus Cloth/fertilizer. Comparable scale, warm restrained palette, broad clusters and distinct silhouettes; pale uncooked preparations contrast golden ration bread. Bowl and pie have distinct depths and colors.",
+        "integration_limits": "Build/unit and focused foods scene passed; inventory and frames inspected. Recipes/calories untouched; no gameplay or multiplayer coverage claimed."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "3974dd7ee4d7840711262a5f88420043da816df5488efdb4ca29691f06cdea09",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\mockup-01.png": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\export.py": "3f0ce26ce6efa3d8bd04e1013b0029e78961871855d7b7b38729658b66b3cbb6",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.png": "c54dcdb50ee062650e99ba4ccd262d0253b3d32d8682863aa904b0c4f9f2dade",
+        "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.json": "4052589240aad83464f823e83445caf2ca85379541f48eb9e479fbdb1b537f76"
+      },
+      "evidence": {
+        "evidence/foods-inventory.png": "86eb70753cc3bfc88e107d5b68e2f79487f68a74d38b1b93668b03f681960f0a",
+        "evidence/foods-frames.png": "d15100422c3538a8b47f04f2284bddb514b8555b668bd42604713b0079f448cc"
+      },
+      "generation": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e"
+    }
+  ]
+}

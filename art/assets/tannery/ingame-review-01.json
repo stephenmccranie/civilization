@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Photon and Faithful preserve the brick/oak split; the controller brick blends with the plinth while copper, leather and iron details remain readable without emissive metal.",
+    "scale_readability": "At normal world distance the low vat is clearly distinct from the taller Smithy and lighter Textile Workshop; the drying rack remains legible against the sky.",
+    "states_motion": "The static assembly remains coherent while the existing controller fire/working state changes independently.",
+    "interaction_guides": "The focused workshop scene assembles the real Part list and verifies completion; all partial pieces use the existing contextual guide and placement system.",
+    "inventory_appearance": "The existing controller item model inherits the redesigned block model and front texture; no item-specific transform changed.",
+    "integration_limits": "Reviewed under the recommended Photon shader with Faithful 32x. The scene verifies the assembled front/side silhouette and controller UI; rear construction is represented by the same supported rack seen in the context view."
+  },
+  "remaining_issues": []
+}

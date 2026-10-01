@@ -14,6 +14,7 @@ public final class FoodCalories {
 
     public static synchronized double of(ItemStack stack, FoodProperties properties) {
         if (properties == null) return 0;
+        if (stack.is(PrototypeStoveContent.MEAL.get())) return WorkMealItem.calories(stack);
         if (stack.is(RecoveryItems.MORSEL.get())) return CalorieConfig.FORAGE_KCAL.get();
         if (stack.is(FarmingContent.RATION.get())) return breadCalories() * 3;
         List<? extends String> configured = CalorieConfig.FOODS.get();

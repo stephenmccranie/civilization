@@ -1,0 +1,12 @@
+{
+  "method": "Built-in referenced material generation; equal-quarter crops; shared BOX/palette exporter at 64px, no dithering; explicit vent-state pixel recipe. Native model uses four pixels per unit. Face-specific fitted seams, fastening, vent, dial and cookware accents use measured native islands and explicit-pixels recipes.",
+  "master": "c773eb4eeff650bc986079bf45fa998d65aaf6e396f5d79849d61336d0283ade",
+  "spec": "4763f3655866bc50445e776aa45ed471e561ad326a519766fb3f06c1ca49bd3d",
+  "outputs": {
+    "prototype_stove_iron.png": "9e459e210502f3fedf34efc60fbd9b40c9846299a9d3cc20953bd4ee55d45c38",
+    "prototype_stove_brass.png": "818f6d8bcd56d1919750bcc78b7d2e0f5012b7d2712dfd0b6d3b2b8403b2da7e",
+    "prototype_stove_ember.png": "e5b31bec497295c4eaf2a504ae563e93cdbe854fd1cf541ebf73756337c9d05b"
+  },
+  "surface_map": "3eb83849053ff8376c4fe1ce18fecbc0318f25c6dbfd2f55c6c96f8b5009cb79",
+  "surface_spec": "2ba3d4ef522c1be74574eeadf1a6e34fe5d95244238c42f4ec3a68ca7918bfed"
+}

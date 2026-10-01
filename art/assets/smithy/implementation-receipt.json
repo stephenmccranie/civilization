@@ -1,0 +1,24 @@
+{
+  "build": "0.32.14-dev",
+  "sources_and_evidence": {
+    "art/assets/smithy/mockup-02.png": "204b40857ebf6dc02b403d06fd9cb0782ce5969efcb1ef92f4d4572ccdefda16",
+    "art/assets/smithy/ingame-working.png": "522219150dd0b93706574e2462320c82225f01f3090a2a93ee89892f382657aa",
+    "art/assets/smithy/ingame-rear.png": "c131b3d3cf34e2f9bcbcd2135b930ca8a6c06165d0785f249fb23d461ea135c2",
+    "art/assets/smithy/ingame-guide.png": "740ea4267795baef8cbe39902542f8a7a53edb0c8835df359bfd4df899b64c65",
+    "civilization-mod/src/main/java/dev/civilization/WorkshopStructure.java": "fb04e605fab1b3bb832d9c5ed4a6348334222a5e70cfc6958f1af29dd6ab960b",
+    "civilization-mod/src/main/java/dev/civilization/MachineStructure.java": "e2ff19661340c406bf026d804ab513d2ac376cebe028160a99e9415dd8836df8",
+    "civilization-mod/src/main/java/dev/civilization/WorkshopBlock.java": "f32b11a51367300d5441f35ca79da0bb10265cb7bfe0616c6df77dc288d26a62",
+    "civilization-mod/src/main/java/dev/civilization/client/SmithyRenderer.java": "0bb92337a88a30f4375930dc717966a2f1ab98e99afc9a309595b0b566d541ed",
+    "civilization-mod/src/main/resources/assets/civilization/models/block/smithy.json": "ebbac02d2a372d205932c1c23e25288cd1d41b81aa8ca205dd750d79cadf2b88",
+    "art/assets/smithy/mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1"
+  },
+  "materials": "Active-pack brick/plank blocks, anvil metal for controller frame, blast-furnace hatch face, pack coal and fire. No new generated raster; all cut structure geometry is native half-grid.",
+  "review": {
+    "silhouette": "Existing forge retained. User-directed dimensional refinement: table is exactly 2 wide, 1.5 deep and 1 high, using upper slabs/quarter beams and four lower eighth feet sharing block spaces. Reviewed front/back under Photon. Mockup-03 remains the earlier forge/rear direction; its tall table is superseded by the explicit dimension brief.",
+    "construction": "9 bricks, 14 brick halves, 8 brick beams, 4 brick eighths, 2 plank halves, 2 plank beams, 4 plank eighths, one stone footing and one anvil plus controller.",
+    "operation": "Animated fire/chimney smoke observed during work; extinguished when blocked. Decorative coal bed is not a real block/item. Controller frame darkened after initial review.",
+    "guide": "Missing anvil appears as native translucent anvil model with one missing-block HUD; rear masonry and open bench inspected.",
+    "validation": "Build/unit, 166 server GameTests and Photon workshop scene passed in 51.1s; exact table bounds, four feet, sibling-piece guide eligibility and existing all-facing checks.",
+    "limits": "Existing shells require manual reshaping. Renderer aboard moving Sable vessels not tested; no new moving-vessel support claimed."
+  }
+}

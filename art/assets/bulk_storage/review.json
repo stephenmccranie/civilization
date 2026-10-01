@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Long open bunker and horizontal clipped tank clearly distinguish solid and liquid freight within the selected 3x5x3 envelope.",
+      "implementable_geometry": "Translate angled tank shoulders to half-grid steps. Thin bunker rim uses quarter beams and reinforced half-block corners; no arbitrary mesh required.",
+      "mechanics_clearance": "Static stores only; grounded saddles, open bunker top and reachable front fittings. No moving mechanical interfaces.",
+      "period_materials": "Muted structural steel and functional brass fitting suit the oil-era freight role.",
+      "family_consistency": "Refinery steel is the supplied material reference; retain original casing textures rather than inventing a new metal family.",
+      "controls_readability": "Coal hatch and brass liquid socket distinguish the controller purposes. Native glass window replaces the generated custom gauge strip.",
+      "gameplay_scope": "No crane, harbor scenery or background buildings become required mechanics. Land storage only in this package."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Preserved 5-block length, open bunker, narrow rim and stepped tank shoulders. Half-grid construction simplifies the concept's bevels; tank window uses existing glass. Corrected floating bunker walls and edge-only tank joins found in first native review.",
+      "geometry_uvs": "Editable native Java controller models and whole assembly projects. Shared 128px atlas uses repeated original 32px steel at two texels per model unit; fittings occupy discrete depths without coplanar faces.",
+      "material_consistency": "Actual original refinery steel covers shell and fittings; dark recesses and small brass socket/latch are functional accents. Quiet, low-saturation storage is distinct from the engine's exposed mechanics.",
+      "assembly_interfaces": "Front hatch/socket sits on controller at floor level; grounded full-block saddles and contiguous casing support shell. Guides use the same real cut-block geometry.",
+      "animation_states": "No mechanical animation. Coal fill and fluid window are runtime quantities to inspect in the game stage.",
+      "native_size_readability": "Native front/rear assembly views show both silhouettes, rim opening and clear controller distinction. Faithful glass remains an in-game check."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Reviewed actual Photon/Faithful daylight assemblies. Shell and controller steel are coherent with the adjacent refinery. Glass exposes fluid without emissive casing; brass is reserved for the fitting.",
+      "scale_readability": "Both 3x5x3 builds are grounded and distinguishable. Bunker has open rim and dark raised coal; tank has stepped shoulders, saddles and a clear window. Construction-grid simplification is intentional.",
+      "states_motion": "Client snapshot asserts 6144 coal and a formed shell; filled versus empty bunker and full/half liquid levels were inspected. No mechanical motion is required.",
+      "interaction_guides": "Actual contextual guide identifies the missing casing half at the correct position. Real menu withdrawal changes stock by 32. Tank screen synchronizes the entire 64000mB value, product name and capacity.",
+      "inventory_appearance": "Both controller icons render correctly in native inventory slots with distinct hatch/socket faces. Shared cabinet spacing and controls are legible at GUI scale 3.",
+      "integration_limits": "Land-only acceptance. Vessel transforms/docking are not claimed. The fixture uses a disposable world and hidden uncaptured cursor. Renderer uses deterministic bounded contents rather than loose entities."
+    },
+    "remaining_issues": []
+  }
+}

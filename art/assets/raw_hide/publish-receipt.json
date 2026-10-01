@@ -1,0 +1,14 @@
+{
+  "brief_hash": "c7bbac0bde3f85d5d1799185c8d29d4e4f94db2b0f85d3531a9ff59a7d8b673c",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\raw_hide\\mockup-01.png": "78c118e468b67efb869352fd97852e07e81dff3b87fb2d23277a35493819cf11",
+    "F:\\minecraft project\\art\\assets\\raw_hide\\export.py": "7cecad23c5ee6dba45444c80876d9d15d48cc9be217133451a91241bf04c927e",
+    "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.png": "c8b192376846e9b873e0d9db8135da37513bf4e4abb25f2e4b330acee1e1c761",
+    "F:\\minecraft project\\art\\assets\\raw_hide\\raw_hide.json": "f091e89c2b9787201d25332daf04de0488f6f508f712a9b30576a0e064e2f403"
+  },
+  "outputs": {
+    "textures/item/raw_hide.png": "c8b192376846e9b873e0d9db8135da37513bf4e4abb25f2e4b330acee1e1c761",
+    "models/item/raw_hide.json": "f091e89c2b9787201d25332daf04de0488f6f508f712a9b30576a0e064e2f403"
+  }
+}

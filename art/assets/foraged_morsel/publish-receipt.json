@@ -1,0 +1,14 @@
+{
+  "brief_hash": "6c4622e3617157e02fb659d4d6847fa805e5eb0b7ee1d5e880e5f78b85e7c9fe",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\foraged_morsel\\mockup-01.png": "9bc86b257e1fa7f9639513e6ab6f53b889f88033ea263649f0988772163ef718",
+    "F:\\minecraft project\\art\\assets\\foraged_morsel\\export.py": "0e1f58c023468f984606bfab3bad548ff49df70232d1dad8e483706ef9580456",
+    "F:\\minecraft project\\art\\assets\\foraged_morsel\\foraged_morsel.png": "03adb8d3d54bab4aa71124b178abfd92bad035fbc58685d8220a255950e36e8e",
+    "F:\\minecraft project\\art\\assets\\foraged_morsel\\foraged_morsel.json": "3a8eb2d6ca39bfe0909e68748908cab4fcaf33dd1bf0ca4103d121f706c15e9d"
+  },
+  "outputs": {
+    "textures/item/foraged_morsel.png": "03adb8d3d54bab4aa71124b178abfd92bad035fbc58685d8220a255950e36e8e",
+    "models/item/foraged_morsel.json": "3a8eb2d6ca39bfe0909e68748908cab4fcaf33dd1bf0ca4103d121f706c15e9d"
+  }
+}

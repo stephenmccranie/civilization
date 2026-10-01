@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "matches_direction": "Barrel increases from 18 to 24 model units, crankcase/wheel move six forward. Complete square bed has eight casing slabs plus controller. Two supports retained; no invented middle pedestal.",
+    "geometry_uvs": "Saddle posts terminate at y17, matching cap underside; top surfaces no longer coincide at y19. Rotating wheel stays above bed and inside footprint. Native exports validated; dedicated texture islands regenerate at native density.",
+    "material_consistency": "Generated reference-driven surface sheet supplies steel corner protectors, brass pinstriped covers, inset support panels and muted enamel body bands. Explicit edge pixels articulate wheel/spokes. Front/rear native views inspected after modest panel brightening; shared casing and isolated gauge retained.",
+    "assembly_interfaces": "Cylinder/flywheel anchors unchanged. Fuel moves front and lubricant underside, allowing filled front corners; native controller pedestal matches slab height. Front machinery row requires clearance.",
+    "animation_states": "Native pose sheet and in-game motion show the complete wheel rotating about the translated pivot. Worst sweep clears bed by over 1.8 model units; wheel stays outside bearing housing. No new save/reopen regression claim.",
+    "native_size_readability": "Panel details remain legible in native views and the actual Photon scene. Longer proportions retain the previous material density."
+  },
+  "remaining_issues": []
+}

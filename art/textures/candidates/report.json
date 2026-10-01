@@ -1,0 +1,389 @@
+{
+  "pillow": "12.3.0",
+  "assets": {
+    "mineral_coal": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          105,
+          139,
+          1197,
+          1146
+        ],
+        "opaque_colors": 85,
+        "partial_alpha_pixels": 785322
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          3,
+          30,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "65227c2c466fc2502bbcf8cf9be40c78886b8fbe514bd7312bc9d4a5ed8a8f3f",
+      "output_sha256": "5e1132360775d31029b5673857af6664cb4162897e6c6afc4b72607b88c9333a"
+    },
+    "fertilizer": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          54,
+          126,
+          1211,
+          1170
+        ],
+        "opaque_colors": 570,
+        "partial_alpha_pixels": 947289
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          3,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "ea8f2d1f6a7eeb2b472d0dff7f83595d71358a22dbbf8b32444cc53c0b7e6281",
+      "output_sha256": "b26c49836e0f04f1213f47f4abcf9b0e6fe4ed255fa3c672e11d04977d5dfcee"
+    },
+    "mineral_blend": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          49,
+          115,
+          1205,
+          1176
+        ],
+        "opaque_colors": 545,
+        "partial_alpha_pixels": 824888
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          3,
+          30,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "7fb359621cdeb986f384a2cdfe91d321ef74f404ec5d660ba95e977131ce4efe",
+      "output_sha256": "b50f39ed1286a8c3b8613fad5111e05ec98c104fb63d1d98fcb24a752f674491"
+    },
+    "bread_dough": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          41,
+          278,
+          1229,
+          1051
+        ],
+        "opaque_colors": 638,
+        "partial_alpha_pixels": 625586
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          7,
+          30,
+          25
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "91d0410047eb8dfc32eaf3bd6c7d174a229431e4456cc9424bff353e994292b4",
+      "output_sha256": "f241c611a8b036d5e6cd419c08266ca0d1ad35e54e993d346cb9ae110c945e56"
+    },
+    "cookie_dough": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          109,
+          146,
+          1146,
+          1128
+        ],
+        "opaque_colors": 816,
+        "partial_alpha_pixels": 754100
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "a998d1083c7689afbf6edfffb995939c7c9e759ef191863c3fa33070f0b87e27",
+      "output_sha256": "69ece092dc8b95b1ca0aba09aeee8c61ebaad7ece4c24aaecb458967825fba0a"
+    },
+    "cake_batter": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          30,
+          134,
+          1224,
+          1166
+        ],
+        "opaque_colors": 905,
+        "partial_alpha_pixels": 937030
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          4,
+          30,
+          28
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "34ff0d623704c01d72818ce7256614d06e88a22075e2736a26540afa194ee208",
+      "output_sha256": "7f4f3bae2dd216cf2f5e3024e6fb5bd735f78f5836b912855dd5116325b3dfbd"
+    },
+    "unbaked_pie": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          24,
+          177,
+          1231,
+          1116
+        ],
+        "opaque_colors": 498,
+        "partial_alpha_pixels": 875798
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          5,
+          30,
+          27
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "abc860a36184af95a6eff1993921c31cba3d8fb0b43fd71a6428df81c65e285e",
+      "output_sha256": "e72d41d421e38b4ab68daebb2f97cc7ace4aca2f02cd80a4aee404e6c858c329"
+    },
+    "field_ration": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          267,
+          99,
+          1021,
+          1158
+        ],
+        "opaque_colors": 694,
+        "partial_alpha_pixels": 656278
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          6,
+          2,
+          26,
+          30
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "716329e5f1da56b4b2e9af0905e7299047eb5fa881eff1e9b42f7e0a93aa1242",
+      "output_sha256": "d68bae0e4daa9827bf29be457c92c1004b65e4030c70b3066da0ee292326b101"
+    },
+    "foraged_morsel": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          356,
+          327,
+          911,
+          964
+        ],
+        "opaque_colors": 930,
+        "partial_alpha_pixels": 236927
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          4,
+          2,
+          28,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "69089db83002e9832fb2d6aa3dd715c28b5f9d96cb9ae8f97f795505ea65ad60",
+      "output_sha256": "e2d9d7bbbebc2a10e6ba541b529545165dd1913a246f7c8393a8abb4db450118"
+    },
+    "stone_saw": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          20,
+          50,
+          1236,
+          1217
+        ],
+        "opaque_colors": 302,
+        "partial_alpha_pixels": 486036
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 16,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "a472e203d7588e4382b88e5afaa05d221e328584fa9434e2cdac69b8ced021c2",
+      "output_sha256": "de9bab8760dff31c08c2aacd951cc2cc7f7b39279e95bd41e647d8418193c1af"
+    },
+    "iron_saw": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          20,
+          50,
+          1236,
+          1217
+        ],
+        "opaque_colors": 555,
+        "partial_alpha_pixels": 486036
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 15,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "b1c731c416e9a18588def263aa5bccd78f2537561cf0fc5f9528a1f32b51d5b9",
+      "output_sha256": "14b57d93e4b9de5e4050b8620f4a7830bfed0f333674ff06eba86a0490187e37"
+    },
+    "diamond_saw": {
+      "source": {
+        "size": [
+          1254,
+          1254
+        ],
+        "bbox": [
+          20,
+          50,
+          1236,
+          1217
+        ],
+        "opaque_colors": 329,
+        "partial_alpha_pixels": 486036
+      },
+      "output": {
+        "size": [
+          32,
+          32
+        ],
+        "bbox": [
+          2,
+          2,
+          30,
+          29
+        ],
+        "opaque_colors": 15,
+        "partial_alpha_pixels": 0
+      },
+      "source_sha256": "994012e776d3a1fa6d2a86b628f9ae91c646af541b2ea98eef23ef989c34cee2",
+      "output_sha256": "e1891308fc172a28b2c1242570a29954f760162cfc71c561fa1deda403ac8e14"
+    }
+  }
+}

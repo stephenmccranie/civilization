@@ -1,0 +1,15 @@
+{
+  "brief_hash": "88f595362b9366a3e2b25c639365f16725b85b84b793f22709b4d83e36ba9734",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+    "F:\\minecraft project\\art\\assets\\steel_ingot\\mockup-01.png": "1fe585df4d91b75aac3e4502ba3ea4b501cf5c46a57fcf05f0e257405f3521b0",
+    "F:\\minecraft project\\art\\assets\\steel_ingot\\export.py": "ff57ce29d1e973fda595e9a4423d6e152e5a7161bcb47720d2c25e4cd83c7d9f",
+    "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.png": "c617eb16e367bf528c578f23a9c68a115d1e41fa3393931b83f7a58b9c36ca1f",
+    "F:\\minecraft project\\art\\assets\\steel_ingot\\steel_ingot.json": "f292a6c023074c0a22de527a5b7aeabf70cd03c2e121af3531bb620da57149d9"
+  },
+  "outputs": {
+    "textures/item/steel_ingot.png": "c617eb16e367bf528c578f23a9c68a115d1e41fa3393931b83f7a58b9c36ca1f",
+    "models/item/steel_ingot.json": "f292a6c023074c0a22de527a5b7aeabf70cd03c2e121af3531bb620da57149d9"
+  }
+}

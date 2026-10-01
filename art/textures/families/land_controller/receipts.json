@@ -1,0 +1,18 @@
+{
+  "side": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Remove the entire surveying dial, lower coal hatch and decorative front grooves. Replace the interior with a quiet slab of matching warm limestone and just two narrow vertical brass reinforcement strips at one quarter and three quarters of the width. Preserve the complete outer iron frame and four brass corner bolts exactly. Warm pale limestone, slate iron edges and aged brass, restrained Art Deco survey engineering. Match the master detailed high-resolution pixel art exactly. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\land_controller_front-v1.png"
+    ],
+    "reference_sha256": "ca6e8d0c889a89315066f9bed5fb7ca2314558abf7f39487c229f291831a34f8",
+    "output_sha256": "eb6cfb4e4efb0a4ab91653621b745eb2decf09271c05d36b7c0c35ccddea8074"
+  },
+  "top": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Make the top surface of this exact cabinet. Replace all front hardware and front grooves inside the border with a quiet warm limestone slab containing a centered modest flat brass surveying cross inset into the stone, with four simple pointed arms, no circular dial. Keep the outer iron frame and corner rivets exactly. Flat top-down texture. Warm pale limestone, slate iron edges and aged brass, restrained Art Deco survey engineering. Match the master detailed high-resolution pixel art exactly. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\land_controller_front-v1.png"
+    ],
+    "reference_sha256": "ca6e8d0c889a89315066f9bed5fb7ca2314558abf7f39487c229f291831a34f8",
+    "output_sha256": "289c4e9d0b91666b5ec18f59d3757632c455ad7c3a060bf352bc34ef77c3e201"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "tool": "built-in image_gen",
+  "stage": "mockup-only",
+  "prompt": "Edit this Minecraft gameplay mockup, preserving the waterfront workshop scene, hotbar, hearts and calorie display. Redesign ONLY the new temperature/status cluster above the left-hand hearts. Remove the entire existing row of thermometer, sun, food, pickaxe, boots, bricks and arrows.\nReplace that whole row with ONE tiny unified frameless readout: a miniature brass-edged thermometer glyph directly beside \"72°F\", with a thin sage-green underline directly under the number. At the right end of this underline incorporate a tiny terracotta brick-pattern tab with a single pale up-chevron, attached to the line, not a separate floating item. Temperature, comfort underline and road tab should read as ONE small symbol-plus-number unit about 44 logical GUI pixels wide and 12 pixels tall, less than HALF the width of the hearts row. White Minecraft pixel text with dark shadow, same text scale as the existing \"2400 kcal\". Center this compact unit above the hearts, aligned vertically with the calorie number. The sage line indicates comfort and the terracotta end-tab indicates road speed. Restrained late-1800s brass thermometer is the only period ornament. No backing panel or rectangle, no extra comfort word, no percentages, no sun, bread, tool, boot item icons, no floating chevrons beyond the ONE tiny integrated road tab. No large gauge or separate temperature scale. Keep exactly the same screenshot composition, no inset or enlarged detail. This is a minimal native Minecraft HUD concept, not a presentation board. World visibility is paramount. The entire new addition should occupy roughly the area of six Minecraft text characters, with only a few extra pixels of height for the underline. All other UI and scene remain unchanged.",
+  "reference": "mockup-02.png",
+  "output": "mockup-03.png",
+  "review": {
+    "result": "pass for compact unified concept",
+    "findings": [
+      "Single thermometer/readout with comfort underline replaces the row of effect icons.",
+      "Integrated reddish road tab conveys a distinct active modifier without percentages.",
+      "Readout fits under half the hearts width; generated positioning is left-aligned rather than requested centered and should be aligned with existing HUD in implementation.",
+      "Road brick pattern could be clearer at native scale; tooltip must name its source.",
+      "Individual benefit values move to proposed inventory inspection tooltip; not implemented."
+    ]
+  }
+}

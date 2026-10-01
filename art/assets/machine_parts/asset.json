@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "kind": "item",
+  "brief": {
+    "description": "A compact steel bearing-and-shaft assembly with a functional copper-colored bushing",
+    "purpose": "Recognizable common assembly intermediate for advanced machines.",
+    "silhouette": "Squat steel bearing housing, short projecting shaft and visible copper-colored bearing collar; no pile of tiny objects.",
+    "bounds": "32x32 native generated item, 28px extent and transparent padding.",
+    "materials": "Blue-gray steel, dark cast housing, warm copper bushing; sparse machined edge highlights and wear.",
+    "interfaces": "Existing machine_parts item, unchanged recipe and stack limits.",
+    "states": "Static material item.",
+    "construction": "High-resolution master to shared alpha-safe item export and native item/generated model.",
+    "invariants": "Preserve two steel plus two copper recipe; no new gear or alloy ingredients.",
+    "technological_stage": "Town metalworking, practical late nineteenth-century machine assembly.",
+    "material_behavior": "Broad cool steel planes, narrow machined edges, restrained wear; copper only at functional bearing surface.",
+    "signature_feature": "Short steel shaft visibly seated in a warm copper collar on a dark steel housing.",
+    "neighboring_assets": "Steel ingot, Coal, sulfur and Cloth; Oil Engine material family.",
+    "fidelity_targets": [
+      "One readable mechanical assembly",
+      "Separate cool housing and warm functional collar",
+      "Readable shaft and mounting feet",
+      "Sparse metal variation, no decorative gears"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/texture-master.png",
+      "role": "Material reference: cast iron/steel colors and restrained functional warm metal; do not copy machine layout."
+    },
+    {
+      "path": "art/assets/sulfur/mockup-01.png",
+      "role": "Project sprite style: purposeful coarse shapes and subordinate surface marks, not mineral material or silhouette."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "machine_parts.png",
+      "target": "textures/item/machine_parts.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "machine_parts.json",
+      "target": "models/item/machine_parts.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-e5cab448-bf35-41bf-bf2a-fb17ff8858da.png",
+      "sha256": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+      "prompt": "Create one Minecraft inventory item representing MACHINE PARTS: a compact late-nineteenth-century steel bearing assembly, one squat blue-gray steel pillow-block housing with two short mounting feet, a clearly visible warm COPPER bearing collar, and one short solid steel shaft seated through its center, projecting toward the lower right. Three-quarter view, the shaft and circular collar opening legible. This is a functional component for an industrial workshop, no decorative gears, no clocks, no wires, no cog pile. Reference 1 is MATERIAL ONLY: cool cast iron and steel with small warm functional fittings. Reference 2 is PIXEL-ART STYLE ONLY: broad connected clusters and readable material variation, not sulfur colors or crystal shapes. High-resolution master composed for a tiny inventory icon. Strong compact silhouette, three major readable forms: housing, copper collar, shaft. Dark housing still readable, medium steel-blue planes and light machined edges. Restrained broad scuff marks across steel surfaces, approximately 1–3 final-pixel clusters; quieter than structural boundaries. Copper used only in collar, no gold trim. Simple two or three tones per material, about sixteen deliberate colors, crisp stepped edges, upper-left lighting. No gradients, microscopic machining, fine noise, bolts too small to read, lettering, glow, floor, cast shadow or border. Centered isolated object on true transparent background with generous margin.\n",
+      "brief_hash": "340ad9d6d39b9eadd245bbf28dfe80821c516977920b3d4fd464a7b73d64d8e9",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Single squat bearing assembly; feet, collar and shaft remain distinct at native size.",
+        "implementable_geometry": "Static inventory sprite fits the generated-item route.",
+        "mechanics_clearance": "Shaft enters the central copper collar; housing and mounting feet form one supported assembly.",
+        "period_materials": "Cool cast housing, machined steel shaft and functional copper bearing fit town industry.",
+        "family_consistency": "Uses engine cool metal and warm fittings, with coarse resource-sprite clusters.",
+        "controls_readability": "No controls; copper collar distinguishes this manufactured intermediate.",
+        "gameplay_scope": "Existing item and steel/copper recipe retained."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "340ad9d6d39b9eadd245bbf28dfe80821c516977920b3d4fd464a7b73d64d8e9",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020"
+      },
+      "evidence": {
+        "mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "sprite-review.png": "19333d41d6f7e9c3b7703abb75d94feca010dba8f72ca258bffea482aa0d2f30"
+      },
+      "generation": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Housing arch, copper collar, shaft and mounting feet survive the 28-pixel silhouette.",
+        "geometry_uvs": "Native generated item uses one 32x32 RGBA texture, binary alpha and 16 opaque colors.",
+        "material_consistency": "Cool steel has broad varied planes; copper remains a functional accent.",
+        "assembly_interfaces": "Existing machine_parts resource identity retained. No block interfaces.",
+        "animation_states": "Static item; no animation required.",
+        "native_size_readability": "Native dark/light views retain separated collar and shaft with clean padded silhouette."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "340ad9d6d39b9eadd245bbf28dfe80821c516977920b3d4fd464a7b73d64d8e9",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\export.py": "c7bbcb6667137488a4db9898b03d4ef95f594381f7b5d136a754b5b0a566e910",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.png": "e2a71a3ead2fa7263444b54b8bb9ad1c6eacc04dde6b04214b4538cab9dd6bce",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.json": "be36372683a5bc99781bea683db4976f3f34a024dfa61657ad70d2112a27707c"
+      },
+      "evidence": {
+        "sprite-review.png": "19333d41d6f7e9c3b7703abb75d94feca010dba8f72ca258bffea482aa0d2f30"
+      },
+      "generation": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon shades framed/held steel darker than inventory, with collar and shaft still distinct.",
+        "scale_readability": "Bearing silhouette and warm collar read in hotbar, creative slots and frames.",
+        "states_motion": "Static generated item, ordinary held transform; no animated states.",
+        "interaction_guides": "Material item has no placement guide or controls.",
+        "inventory_appearance": "Compared beside steel, sulfur and Cloth: cool low-saturation housing contrasts yellow mineral and pale fabric; comparable icon scale, restrained highlights and deliberate clusters fit the family. Existing steel uses a thinner 3D model.",
+        "integration_limits": "Build/unit and parts visual scene passed; inspected inventory, held and frame screenshots. No gameplay changes or multiplayer claims."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "340ad9d6d39b9eadd245bbf28dfe80821c516977920b3d4fd464a7b73d64d8e9",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+        "F:\\minecraft project\\art\\assets\\sulfur\\mockup-01.png": "4388bf39079bde54ce6aebb2e6206854177f5b0645c26d71594049d661224020",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\export.py": "c7bbcb6667137488a4db9898b03d4ef95f594381f7b5d136a754b5b0a566e910",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.png": "e2a71a3ead2fa7263444b54b8bb9ad1c6eacc04dde6b04214b4538cab9dd6bce",
+        "F:\\minecraft project\\art\\assets\\machine_parts\\machine_parts.json": "be36372683a5bc99781bea683db4976f3f34a024dfa61657ad70d2112a27707c"
+      },
+      "evidence": {
+        "evidence/parts-inventory.png": "5d6cf6cf3124f9b7defe56893f3ce4d9eb067d1fca2613d6810b8bbc8a1d7e76",
+        "evidence/parts-held.png": "baacd281611c605dfb2a8a7a9afd7fc736e01fd9dc4d477270f69cd6da3638aa",
+        "evidence/parts-frames.png": "1df1cf5fad45e53ac491c301e7a918cde4e3cbcec68a853a75778200e9aed8e3"
+      },
+      "generation": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107"
+    }
+  ]
+}

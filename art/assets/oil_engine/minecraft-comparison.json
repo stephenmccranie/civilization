@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\previous-model\\minecraft-back.png",
+      "sha256": "bd17518e51f2629e733d03a8b3e933fd677591237f43f25c0b47dd446905fd01",
+      "crop": [
+        730,
+        0,
+        1430,
+        660
+      ],
+      "label": "Before - actual Minecraft"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\minecraft-back.png",
+      "sha256": "5df01f68f9cf4b8ff29199e5877b47be4ddae767a995c5a0341cacaa3e93838b",
+      "crop": [
+        730,
+        50,
+        1430,
+        650
+      ],
+      "label": "After - actual Minecraft"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "Irregular lobes, mottled brown upper surface and pale folded underside remain readable.",
+      "implementable_geometry": "One static inventory sprite with no physical assembly required.",
+      "mechanics_clearance": "No moving or interacting components; depicted material rests as one coherent item.",
+      "period_materials": "Warm umber hide uses broad patches and directional tufts, distinct from pale woven Cloth.",
+      "family_consistency": "Broad stepped edges and restrained upper-left lighting follow inspected Cloth/sulfur references. Material identity is retained.",
+      "controls_readability": "No controls; silhouette and characteristic material identify the resource.",
+      "gameplay_scope": "Only appearance changes; item IDs, recipes and inventories unchanged."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Irregular lobes, mottled brown upper surface and pale folded underside remain readable.",
+      "geometry_uvs": "Generated-item model, 32x32 texture, 16 opaque colors and binary alpha; padded silhouette.",
+      "material_consistency": "Warm umber hide uses broad patches and directional tufts, distinct from pale woven Cloth.",
+      "assembly_interfaces": "Existing registered item model and texture path; no block interfaces.",
+      "animation_states": "Static material item, no animation needed.",
+      "native_size_readability": "Inspected native dark/light backgrounds and enlarged grid; characteristic forms remain legible without stray edge pixels."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Photon frame lighting darkens materials naturally; native inventory retains chosen palette. No opaque background or missing texture.",
+      "scale_readability": "Irregular warm pelt silhouette and cream underside are clear; darker mottling distinguishes it from pale folded Cloth.",
+      "states_motion": "Static generated item; no animation states or moving machinery.",
+      "interaction_guides": "Inventory resource, no build guide or placement interaction.",
+      "inventory_appearance": "Inspected seven-item family beside Cloth, sulfur and Machine Parts. Consistent padded scale and broad clusters; earthy low-saturation supplies contrast brighter sulfur and cool metal. Irregular warm pelt silhouette and cream underside are clear; darker mottling distinguishes it from pale folded Cloth.",
+      "integration_limits": "Build/unit and focused supplies scene passed. Reviewed inventory and framed appearances; no gameplay changes or multiplayer validation claimed."
+    },
+    "remaining_issues": []
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "brief_hash": "3974dd7ee4d7840711262a5f88420043da816df5488efdb4ca29691f06cdea09",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+    "F:\\minecraft project\\art\\assets\\cookie_dough\\mockup-01.png": "02b849827cbdbc73faf958ac2722ca7c2d94c230b5a84f0965feac84ad388a2e",
+    "F:\\minecraft project\\art\\assets\\cookie_dough\\export.py": "3f0ce26ce6efa3d8bd04e1013b0029e78961871855d7b7b38729658b66b3cbb6",
+    "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.png": "c54dcdb50ee062650e99ba4ccd262d0253b3d32d8682863aa904b0c4f9f2dade",
+    "F:\\minecraft project\\art\\assets\\cookie_dough\\cookie_dough.json": "4052589240aad83464f823e83445caf2ca85379541f48eb9e479fbdb1b537f76"
+  },
+  "outputs": {
+    "textures/item/cookie_dough.png": "c54dcdb50ee062650e99ba4ccd262d0253b3d32d8682863aa904b0c4f9f2dade",
+    "models/item/cookie_dough.json": "4052589240aad83464f823e83445caf2ca85379541f48eb9e479fbdb1b537f76"
+  }
+}

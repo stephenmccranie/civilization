@@ -1,0 +1,351 @@
+{
+  "schema": 1,
+  "kind": "block",
+  "brief": {
+    "description": "Thicker faceted industrial sight-glass pipes with a truly open view through idle sections.",
+    "purpose": "Make fluid routing readable and physically substantial beside the new industrial machinery.",
+    "silhouette": "Eight-sided half-block-wide steel tube with thin flush rings, solid bevels and four narrow 1.25-pixel inspection slits. Glass occupies about 19 percent of the perimeter; steel dominates.",
+    "bounds": "Main tube eight model pixels across, compared with the old four. Arms reach block edges and meet current ten-pixel port flange.",
+    "materials": "Existing cool steel plates adapted to narrow plain fittings; clear glass with sparse pale edge glints. Fluid colors remain brown, amber, orange, pale vapor and olive.",
+    "interfaces": "Six-direction connections, original routing, automatic ports and item placement; no valve or new interaction.",
+    "states": "Idle glass has genuinely transparent holes with no colored interior. Confirmed transfer briefly shows colored moving fluid inside the tube, then clears.",
+    "construction": "Native Java multipart models, four flat glass faces and four bevel steel faces, thin ring ends. Cutout clear glass avoids stacked alpha sorting under shader packs. Existing nearby block-entity renderer draws only transient fluid.",
+    "invariants": "Keep recipes, throughput, fluid compatibility, chunk limits and event lifetime unchanged. Update shape bounds to match larger tube; no pressure or stored liquid simulation.",
+    "technological_stage": "Tesla-lifetime heavy industry and laboratory sight-glass hardware.",
+    "material_behavior": "Quiet steel ribs and discrete joints; glass is mostly empty transparent pixels, not a painted dark stripe. Fluid is visible inside rather than outside steel.",
+    "signature_feature": "Sturdy mostly solid octagonal steel pipe with small see-through inspection strips.",
+    "neighboring_assets": "Industrial Casing, Refinery Ports, Distillation Column, Oil Pump.",
+    "fidelity_targets": [
+      "Twice the old tube width.",
+      "See contrasting scenery through empty windows.",
+      "Eight-sided silhouette visible at ends and corners.",
+      "No repeating oversized bulb along straight runs.",
+      "Fluid fits inside the glass and stops at connected arms."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/industrial_steel/evidence/industry-machines.png",
+      "role": "Current industrial material/context; replace narrow pipe geometry only."
+    }
+  ],
+  "sources": [
+    "build.py",
+    "preview.py",
+    "pipe.bbmodel",
+    "steel-source.png",
+    "concept-prompt.txt",
+    "steel-shell-prompt.txt"
+  ],
+  "outputs": [
+    {
+      "source": "fluid_pipe_arm.json",
+      "target": "models/block/fluid_pipe_arm.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fluid_pipe_open.json",
+      "target": "models/block/fluid_pipe_open.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fluid_pipe_fitting.json",
+      "target": "models/block/fluid_pipe_fitting.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fluid_pipe_end.json",
+      "target": "models/block/fluid_pipe_end.json",
+      "format": "java_model"
+    },
+    {
+      "source": "fluid_pipe_item.json",
+      "target": "models/block/fluid_pipe_item.json",
+      "format": "java_model"
+    },
+    {
+      "source": "pipe_steel.png",
+      "target": "textures/block/pipe_steel.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "pipe_glass.png",
+      "target": "textures/block/pipe_glass.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "transparent"
+    },
+    {
+      "source": "fluid_pipe.json",
+      "target": "blockstates/fluid_pipe.json",
+      "format": "json"
+    },
+    {
+      "source": "item.json",
+      "target": "models/item/fluid_pipe.json",
+      "format": "json"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-9694db8f-37d7-4238-ba4d-b36d923379b0.png",
+      "sha256": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b",
+      "prompt": "Create ONE Minecraft-implementable design for thick industrial glass pipes in Civilization, Tesla lifetime circa 1890-1920. Reference image supplies steel material and neighboring machinery only. Main tube is half a Minecraft block wide, twice the existing skinny pipe. An octagonal eight-sided tube with four broad completely CLEAR glass windows on cardinal faces, four narrow steel diagonal bevel faces, and thin flush iron rings at block-length joints. No swollen bulb fittings, valves, brass decoration, fantasy coils or modern plastic. A compact steel connector only at elbow/tee junctions, with the same bore width and clear transition. Show one long EMPTY straight run with checker-pattern masonry clearly visible THROUGH both glass walls, one same-size run with amber moving liquid visible INSIDE, and one right-angle branch connecting to a square machine flange. One coherent design, not alternatives. Neutral workshop stone background, cool medium steel matching reference. Blockbench-feasible rectangles and 45-degree bevels, sparse purposeful pixel-art edge marks at Minecraft 32x density. Glass should be mostly visually absent, with sparse thin pale reflection streaks at its edges; do not draw it as opaque dark blue strips. No labels, dimensions, people or text. Useful front-three-quarter view with a small exposed end showing the octagonal cross-section. The main diagonal ribs supply structure; avoid a round photoreal cylinder or microgeometry.\n",
+      "brief_hash": "d9d1f509dad33a0417ecb7a8e42192724eeee1ef58c4f06cb39a5c6f1b09643d",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-83925dac-2cf9-4824-a8df-859130c27434.png",
+      "sha256": "26215e95a1ea000fc41586b50640bb9739310513b214a1fe10e1d27a69a92712",
+      "prompt": "Edit this existing Minecraft industrial pipe concept. Keep the same thick octagonal diameter, thin flush joints, machine flange, materials, composition and upper empty/lower flowing examples. Replace the glass-heavy cage construction with a STURDY MOSTLY SOLID STEEL PIPE. About 80–85 percent of the pipe surface must be opaque cool-gray steel. All four diagonal bevel faces are solid steel. Each cardinal flat face has only ONE very narrow lengthwise glass inspection slit at its center, about one sixth of the total pipe diameter in width. Thick steel shoulders surround each slit; no broad glass panels, no exposed cage ribs. The small upper slits remain genuinely see-through; lower slits show only a thin amber line of liquid through the steel shell. Real industrial pipe with a small inspection window, not a glass tube with metal frame. Preserve restrained late-nineteenth-century Minecraft pixel-art materials, no extra controls, labels, valves, ornaments or oversized collars. Octagonal open end should show substantial steel walls.\n",
+      "brief_hash": "47f6d81ec27a0e2ca6ad1555503d3896530d4efcb37ec1fcf17df514c2b1e802",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\mockup-01.png": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Octagonal tube is visibly wider than the old thin line, with flush restrained rings and open glass.",
+        "implementable_geometry": "Flat windows, 45-degree bevels and narrow steel ribs are native Java model geometry. No curved mesh needed.",
+        "mechanics_clearance": "Pipe reaches a square machine flange; elbow uses a compact connector. No moving hardware or floating support claimed.",
+        "period_materials": "Steel and laboratory-style clear sight glass fit the nineteenth-century industrial family without ornamental brass.",
+        "family_consistency": "Existing industrial steel remains the material authority; isolated glass glints are code-native optical details.",
+        "controls_readability": "Empty scenery-visible tube contrasts clearly with amber flowing interior. No new controls.",
+        "gameplay_scope": "Same transfer telemetry and routing; image's partly filled liquid is a visual suggestion, not a new stored-fluid mechanic. Native implementation uses a narrow internal stream."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "d9d1f509dad33a0417ecb7a8e42192724eeee1ef58c4f06cb39a5c6f1b09643d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a"
+      },
+      "evidence": {
+        "mockup-01.png": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+      },
+      "generation": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual Blockbench views show the hollow octagonal cross section, thin rings, clear windows and four narrow longitudinal ribs. First blockout had overly wide bevel panels; narrowed before approval.",
+        "geometry_uvs": "Native 45-degree cuboids and two-sided thin glass planes, all within block bounds. Eight-pixel width and arms to block edge. Retained editable bbmodel and deterministic generation.",
+        "material_consistency": "Steel sampled from the current shared steel plate center; no independently invented palette. Glass has ten deliberate pale glint pixels and otherwise zero alpha.",
+        "assembly_interfaces": "Multipart opposing arms join at center and block boundaries; compact eight-pixel junction only when axes differ. Flange remains wider than tube. Collision envelope updated for the new size.",
+        "animation_states": "Idle renderer emits no fluid or opaque backing. Active octagonal internal stream stays inside glass and uses existing flow colors/time/direction.",
+        "native_size_readability": "Static Blockbench preview retains recognizable octagon and open view. In-game closeups and inventory will check Photon and long runs."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d9d1f509dad33a0417ecb7a8e42192724eeee1ef58c4f06cb39a5c6f1b09643d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "a165e1c2e20b6d314f91281ebaa743186ec80c1895343f3d86ac1b47bc7cfa78",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "53cd715c8ba80aa03a9ed96b1198410d0179afe02b5b866e43b1b3464d5d6c1a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "ac3b13919539bb173587038ef63149718312343253e8e691bdcc4869f6fe8831",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "5c8e893c06ff403225ca3e7dc89fad5820baa65764f8cd72d37304bac04a7a66",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+      },
+      "evidence": {
+        "model-end.png": "1bebffca7d2e605d3be923bae63679f82dd80f717741128cef542be88820d295",
+        "model-side.png": "c76fdf6eeac59a7610cc795a1198959e9bd1b013c28e5223e525ed484a6e6963"
+      },
+      "generation": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Actual Blockbench views show the hollow octagonal cross section, thin rings, clear windows and four narrow longitudinal ribs. First blockout had overly wide bevel panels; narrowed before approval.",
+        "geometry_uvs": "Native 45-degree cuboids and two-sided thin glass planes, all within block bounds. Eight-pixel width and arms to block edge. Retained editable bbmodel and deterministic generation.",
+        "material_consistency": "Steel sampled from the current shared steel plate center; no independently invented palette. Glass has ten deliberate pale glint pixels and otherwise zero alpha.",
+        "assembly_interfaces": "Multipart opposing arms join at center and block boundaries; compact eight-pixel junction only when axes differ. Flange remains wider than tube. Collision envelope updated for the new size.",
+        "animation_states": "Idle renderer emits no fluid or opaque backing. Active octagonal internal stream stays inside glass and uses existing flow colors/time/direction.",
+        "native_size_readability": "Static Blockbench preview retains recognizable octagon and open view. In-game closeups and inventory will check Photon and long runs."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "d9d1f509dad33a0417ecb7a8e42192724eeee1ef58c4f06cb39a5c6f1b09643d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "a3dafa7860bd4f1913e1c9c1e380bceb6531a8ec5d05f029edf61bf1c847a466",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "53cd715c8ba80aa03a9ed96b1198410d0179afe02b5b866e43b1b3464d5d6c1a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-source.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "ac3b13919539bb173587038ef63149718312343253e8e691bdcc4869f6fe8831",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+      },
+      "evidence": {
+        "model-end.png": "1bebffca7d2e605d3be923bae63679f82dd80f717741128cef542be88820d295",
+        "model-side.png": "c76fdf6eeac59a7610cc795a1198959e9bd1b013c28e5223e525ed484a6e6963"
+      },
+      "generation": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Patterned wall remains clearly visible through empty horizontal/vertical tubes under Photon. Steel ribs match adjacent refinery casing; sparse glass glints have no opaque backing.",
+        "scale_readability": "Eight-pixel envelope is twice the previous width. Octagonal end rim and rings read in the oblique corner capture. Flush joints do not swell into repeating bulbs.",
+        "states_motion": "Flow/motion captures show directional amber bands inside horizontal and vertical arms. Expiry assertion and empty capture verify that colored geometry vanishes after transfer events expire. Idle branch remains clear.",
+        "interaction_guides": "Six-direction multipart connections fit around corners and meet the existing flange with no visible gap. No machine guide behavior changed. Larger selection/collision follows connected arms; existing server suite passed.",
+        "inventory_appearance": "Creative hotbar shows the new hollow tube model; a naturally fine silhouette at inventory scale. Native editor views retain its octagonal section and transparent windows.",
+        "integration_limits": "Build/unit tests and all 169 server tests passed, then final Photon art scene passed after exposed-end rim refinement. Synthetic visual telemetry tests rendering; existing routing tests verify transfer behavior. Other shader packs and moving vessels were not individually tested."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "d9d1f509dad33a0417ecb7a8e42192724eeee1ef58c4f06cb39a5c6f1b09643d",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "a3dafa7860bd4f1913e1c9c1e380bceb6531a8ec5d05f029edf61bf1c847a466",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "53cd715c8ba80aa03a9ed96b1198410d0179afe02b5b866e43b1b3464d5d6c1a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-source.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "ac3b13919539bb173587038ef63149718312343253e8e691bdcc4869f6fe8831",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "3b318533e2222964838012725c0fb515542e4a8e65bec3858fd854fa1a153f93",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+      },
+      "evidence": {
+        "evidence/pipes-flow.png": "045c2867ef245f689b954c36c910c96a2a9787732e63486466dc26d277878501",
+        "evidence/pipes-motion.png": "4f8fd47cd53f11c44398489e20f2b005334c006a148443665e1c8023f43856eb",
+        "evidence/pipes-empty.png": "0d0f233a707c959b0dce9ea9c412ec1f1280b417f269e121d482b94f7ff4ec5e",
+        "evidence/pipes-corners.png": "400002d9d899ff9da0bd2c90de0b199fc19165261fa36482c986178198fee37c",
+        "evidence/pipes-item.png": "b6a15ff9bc0f3b460823054639d574d9138e160be298b7d731dc5494486f4df1"
+      },
+      "generation": "1c40f8666b6649b7bc4503ee8200eaae9235131d212479246340db1ef79bac0b"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Revised concept has dominant steel shoulders and narrow lengthwise slits within the same thick octagonal envelope. Its background vertical section retains excess glass; implementation applies the corrected shell to every orientation.",
+        "implementable_geometry": "Solid 45-degree steel bevels and split cardinal plates frame real narrow glass apertures. No curved mesh needed.",
+        "mechanics_clearance": "Pipe reaches a square machine flange; elbow uses a compact connector. No moving hardware or floating support claimed.",
+        "period_materials": "Steel and laboratory-style clear sight glass fit the nineteenth-century industrial family without ornamental brass.",
+        "family_consistency": "Existing industrial steel remains the material authority; isolated glass glints are code-native optical details.",
+        "controls_readability": "Empty scenery-visible tube contrasts clearly with amber flowing interior. No new controls.",
+        "gameplay_scope": "Same transfer telemetry and routing; image's partly filled liquid is a visual suggestion, not a new stored-fluid mechanic. Native implementation uses a narrow internal stream."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "47f6d81ec27a0e2ca6ad1555503d3896530d4efcb37ec1fcf17df514c2b1e802",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a"
+      },
+      "evidence": {
+        "mockup-02.png": "26215e95a1ea000fc41586b50640bb9739310513b214a1fe10e1d27a69a92712"
+      },
+      "generation": "26215e95a1ea000fc41586b50640bb9739310513b214a1fe10e1d27a69a92712"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "Revised Blockbench view matches the steel-heavy concept: solid diagonal facets, thick cardinal shoulders and four 1.25-pixel slits. Glass occupies 18.9 percent of the perimeter before solid rings, with unchanged eight-pixel diameter.",
+        "geometry_uvs": "Native 45-degree cuboids and two-sided thin glass planes, all within block bounds. Eight-pixel width and arms to block edge. Retained editable bbmodel and deterministic generation.",
+        "material_consistency": "Steel sampled from the current shared steel plate center; no independently invented palette. Glass has ten deliberate pale glint pixels and otherwise zero alpha.",
+        "assembly_interfaces": "Multipart opposing arms join at center and block boundaries; compact eight-pixel junction only when axes differ. Flange remains wider than tube. Collision envelope updated for the new size.",
+        "animation_states": "Idle renderer emits no fluid or opaque backing. Active octagonal internal stream stays inside glass and uses existing flow colors/time/direction.",
+        "native_size_readability": "Static Blockbench preview retains recognizable octagon and open view. In-game closeups and inventory will check Photon and long runs."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "47f6d81ec27a0e2ca6ad1555503d3896530d4efcb37ec1fcf17df514c2b1e802",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "6ebdf1c39d164927b167f7059e72ef8e246230d102f9e502513f44127f086869",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "4b58535cd21658ae686299ecdf9c48224b6546c777aeb2ebd1ac6aecd724ff95",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-source.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-shell-prompt.txt": "fa8de52000e23d309fc38b112ca88c95744b5d731e01024c5d777fd7e3e9c2f9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "154774ac37daff38cc6a385bca59c92d52842515b1877bb9229def0c99bb9e78",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+      },
+      "evidence": {
+        "model-end.png": "4d0b6459027d80b16df7e521c0a64057cb34283ae553bb3a04ec9fe5b908623d",
+        "model-side.png": "1e9cf56928855ecb08f874fb786daa073fc8ed0145d07cb304e741dbfb6fab56"
+      },
+      "generation": "26215e95a1ea000fc41586b50640bb9739310513b214a1fe10e1d27a69a92712"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Revised Photon captures show a dominant solid steel shell and small clear slits; patterned wall remains visible through aligned empty windows. Steel bevels read clearly at oblique angles.",
+        "scale_readability": "Eight-pixel envelope is twice the previous width. Octagonal end rim and rings read in the oblique corner capture. Flush joints do not swell into repeating bulbs.",
+        "states_motion": "Flow/motion captures show directional amber bands inside horizontal and vertical arms. Expiry assertion and empty capture verify that colored geometry vanishes after transfer events expire. Idle branch remains clear.",
+        "interaction_guides": "Six-direction multipart connections fit around corners and meet the existing flange with no visible gap. No machine guide behavior changed. Larger selection/collision follows connected arms; existing server suite passed.",
+        "inventory_appearance": "Creative hotbar shows the new hollow tube model; a naturally fine silhouette at inventory scale. Native editor views retain its octagonal section and transparent windows.",
+        "integration_limits": "Steel-shell revision passed build/unit and focused Photon checks. Only native model geometry changed; server suite was not repeated. Previous routing, collision and transfer behavior retained. Other shader packs and moving vessels were not individually tested."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "47f6d81ec27a0e2ca6ad1555503d3896530d4efcb37ec1fcf17df514c2b1e802",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\evidence\\industry-machines.png": "5dd5590d1b901f42a47017efe43b24b83bd93a74e824f94d1840a9c6c7eabf2a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\build.py": "6ebdf1c39d164927b167f7059e72ef8e246230d102f9e502513f44127f086869",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\preview.py": "f9af0a54963a7767f4c0230d96e3b75d010f8cf9ff8071c839868eb376a39ac1",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe.bbmodel": "4b58535cd21658ae686299ecdf9c48224b6546c777aeb2ebd1ac6aecd724ff95",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-source.png": "2380697bddf1e21a1823518a4003b0c32afad6d96cbf77d7738117be3af3458b",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\concept-prompt.txt": "cddd16c67debf73ad507f98778a2de38dbae1dae579e834d886f3fd804cc704a",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\steel-shell-prompt.txt": "fa8de52000e23d309fc38b112ca88c95744b5d731e01024c5d777fd7e3e9c2f9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_arm.json": "154774ac37daff38cc6a385bca59c92d52842515b1877bb9229def0c99bb9e78",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_open.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_fitting.json": "398fc05b84873ea83c7d156f6deb36cbf2c2364eea45377c05ad391badc3053c",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_end.json": "20dc6e546c880489d713f1fb77e4ef51222c446d711676405b7bad3d99effc62",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe_item.json": "9ec7e65a2992d20ca34c8e0354b99685f51be4e98691322fbd397a1937a850b2",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_steel.png": "db07bfd545b4b512e63aaf7761d94241e49d9bdf0dc6b578c1e1270c756f00d9",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\pipe_glass.png": "f5dc3a24eb756ed9eb5dd541cd58dbc22cca795ce9be9cf245a688d3006d7b08",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\fluid_pipe.json": "c879898bc719baccb90446ad7fb794e466143f34e0ff0a5283a8f2ebe4065986",
+        "F:\\minecraft project\\art\\assets\\glass_pipes\\item.json": "710f0a42155a0bb82e7cf7a7414a8cc530452813735820f71f83dccd2563ea76"
+      },
+      "evidence": {
+        "evidence/steel-shell/pipes-flow.png": "90647530ac6af2352c057c8895b1b65e92c125a71c2ed0b44e9f84f7ecd72cd5",
+        "evidence/steel-shell/pipes-empty.png": "34578a633a9b6e161fb25d9a2a216ff5181a88284b008daca8bc0d77fb4630a7",
+        "evidence/steel-shell/pipes-corners.png": "74c4aba813a2f9582ed6265727310cbf26bbeb1bd2ad463cc5c662e5752003be",
+        "evidence/steel-shell/pipes-item.png": "725d88adfe55a0b13e0a94d73c1f92d6df319cf6aab7ff98875a133c55c54df4"
+      },
+      "generation": "26215e95a1ea000fc41586b50640bb9739310513b214a1fe10e1d27a69a92712"
+    }
+  ]
+}

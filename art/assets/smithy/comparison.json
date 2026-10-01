@@ -1,0 +1,37 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png",
+      "sha256": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+      "crop": [
+        0,
+        0,
+        1672,
+        941
+      ],
+      "label": "Earlier concept"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\smithy\\ingame-working.png",
+      "sha256": "522219150dd0b93706574e2462320c82225f01f3090a2a93ee89892f382657aa",
+      "crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "label": "Lower table"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\smithy\\ingame-rear.png",
+      "sha256": "c131b3d3cf34e2f9bcbcd2135b930ca8a6c06165d0785f249fb23d461ea135c2",
+      "crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "label": "Rear"
+    }
+  ]
+}

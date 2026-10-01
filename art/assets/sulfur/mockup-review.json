@@ -1,0 +1,13 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "silhouette_scale": "Three connected angular yellow lobes with dark separating creases; compact mineral silhouette.",
+    "implementable_geometry": "Transparent sprite using native generated-item extrusion; no complex mesh required.",
+    "mechanics_clearance": "Static material item; no moving parts.",
+    "period_materials": "Brimstone yellow and ochre mineral rather than shiny gold; plausible industrial raw ingredient.",
+    "family_consistency": "Matches coarse clusters and upper-left light of approved cloth; uses fracture marks instead of fabric weave.",
+    "controls_readability": "Native-size export keeps three faces and subordinate chips visible on light/dark backgrounds.",
+    "gameplay_scope": "Existing sulfur item, no recipes or balance changes."
+  },
+  "remaining_issues": []
+}

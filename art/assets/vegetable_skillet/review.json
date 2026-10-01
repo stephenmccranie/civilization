@@ -1,0 +1,39 @@
+{
+  "mockup": {
+    "decision": "pass",
+    "criteria": {
+      "silhouette_scale": "One shallow cream square bowl with large readable potato/carrot/bread clusters; whole silhouette fits the transparent master.",
+      "implementable_geometry": "Raster item only; exporter will reduce with hard alpha and shared palette.",
+      "mechanics_clearance": "No mechanism or moving parts; no floating utensils.",
+      "period_materials": "Matte cream ceramic and cooked vegetables suit the practical kitchen family.",
+      "family_consistency": "Warm prepared-food palette matches the inspected portioning concept; avoids mechanical ornament.",
+      "controls_readability": "Distinct food item, no controls or illegible text.",
+      "gameplay_scope": "One served portion; no tray, preparation tool, new ingredients or meter."
+    },
+    "remaining_issues": []
+  },
+  "model": {
+    "decision": "pass",
+    "criteria": {
+      "matches_direction": "Native 64px export preserves cream rim and distinct three-ingredient clusters.",
+      "geometry_uvs": "Alpha-safe raster exporter; 60px extent in 64px image, hard alpha. Native generated-item JSON.",
+      "material_consistency": "24 warm colors; cream bowl separates orange carrots and golden potato from bread. No surface noise added.",
+      "assembly_interfaces": "Edible item, no assembly or ports; per-stack quality remains readable through tooltip.",
+      "animation_states": "Fixed served sprite; dynamic food state belongs to stove renderer.",
+      "native_size_readability": "Inspected actual native and 2x exports: clear bowl silhouette, recognizable large clusters and clean edge."
+    },
+    "remaining_issues": []
+  },
+  "ingame": {
+    "decision": "pass",
+    "criteria": {
+      "photon_materials": "Prepared portion has a cream ceramic rim and warm orange/golden ingredient clusters in the actual inventory. Original item sprite remains distinct from pack bread/potato inputs.",
+      "scale_readability": "Bowl silhouette and food clusters survive native inventory scaling; no extraneous utensil or decoration.",
+      "states_motion": "Fixed portion appearance is intentional. Cooking color progression is visible in the stove; finished quality and saved calorie values travel in components/tooltips.",
+      "interaction_guides": "Edible item displays quality, duration and benefit, with calorie tooltip supplied by the existing food inspector. Server consumption check grants the stored calories and nonstacking work benefit.",
+      "inventory_appearance": "Actual Photon/Faithful inventory and stove-menu item views inspected beside the stove. Clean silhouette, restrained detail density and warm food contrast.",
+      "integration_limits": "One recipe and fixed sprite. Sensory playtesting remains; full food-specialty family and moving-vessel handling are not claimed."
+    },
+    "remaining_issues": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Yellow mineral facets and fracture variation remain visible under Photon without glow or metallic finish.",
+    "scale_readability": "Distinct clump silhouette beside gold ingot, Coal and Cloth in actual inventory/frame.",
+    "states_motion": "Static native item; held view reviewed.",
+    "interaction_guides": "Standard item, no custom actions or construction guide.",
+    "inventory_appearance": "No missing texture or alpha fringe; three lobes and smaller material marks read at inventory scale.",
+    "integration_limits": "Art-only, native sprite extrusion rather than a sculpted 3D crystal mesh; production rules unchanged."
+  },
+  "remaining_issues": []
+}

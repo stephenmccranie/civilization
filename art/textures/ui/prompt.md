@@ -1,0 +1,11 @@
+# Shared cabinet master
+
+Generated with the built-in image generation tool on 2026-09-12. Style reference: `../../../concept_art/11_ui_coal_machine.png`. Original returned file: `C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-389d99f9-1048-41b7-a1f5-07ea78f19ddd.png`, copied without modification to `cabinet-master.png`.
+
+## Prompt
+
+Create an actual game UI production texture, NOT a screenshot or mockup. Use the attached approved Minecraft Smithy UI ONLY as material/style reference. Output ONE square orthographic blank cabinet panel, filling the image edge to edge. High-resolution detailed pixel art, crisp stepped metal details, muted soft slightly dark warm mushroom-gray/tan enamel center, charcoal forged metal thin outer frame, subtle top-left bevel light, tiny restrained aged brass corner rivets. All four edges perfectly straight. Center 80 percent completely blank, quiet, even material, minimal grain. Frame occupies only outer 6 percent. No text, slots, icons, machines, scenery, shadows outside, perspective, labels, grids or decorations in the center. This will be downscaled and nine-sliced into variable size native Minecraft menus. Opaque full canvas. Match the gentle tan of the reference, not orange or white.
+
+## Export
+
+Run `python art/textures/ui/export.py` from the project root. The high-resolution master is area-downscaled to 512×512 RGB without palette reduction. Its outer 48 source pixels display as eighteen logical GUI pixels (48/18 source texels per GUI pixel), with a three-pixel outward frame expansion. `MachineUi` stretches only the center and edge lengths; inventory layouts stay unchanged while the larger corner scale thickens the border and enlarges the rivets. This replaces the coarse 128×128, 32-color export. Geometry, native slots, text, brass nameplates, controls, progress and gauge overlays are code-authored, so layouts are not baked into screenshots. The fire window samples Minecraft's animated fire atlas, including resource-pack overrides. No Faithful textures are bundled. `receipt.json` records source/reference/prompt/output hashes and exact export settings. Run `python art/textures/ui/export.py --check` to reconstruct the asset and reject stale pixels or provenance.

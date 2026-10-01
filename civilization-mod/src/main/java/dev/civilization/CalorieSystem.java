@@ -2,8 +2,11 @@ package dev.civilization;
 
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -15,12 +18,15 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.SleepFinishedTimeEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 final class CalorieSystem {
     private final List<Action> actions = new ArrayList<>();
+    private final Map<UUID,SleepSession> sleeping = new HashMap<>();
 
     CalorieSystem() {
         NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::broken);
@@ -32,6 +38,8 @@ final class CalorieSystem {
         NeoForge.EVENT_BUS.addListener(this::respawn);
         NeoForge.EVENT_BUS.addListener(this::dimension);
         NeoForge.EVENT_BUS.addListener(this::logout);
+        NeoForge.EVENT_BUS.addListener(this::woke);
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST,this::sleepFinished);
         NeoForge.EVENT_BUS.addListener(this::stopped);
         NeoForge.EVENT_BUS.addListener(this::breakSpeed);
     }
@@ -39,14 +47,15 @@ final class CalorieSystem {
     private void broken(BlockEvent.BreakEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player && CalorieFoodData.active(player)) {
             actions.add(new Action(player, player.serverLevel(), event.getPos().immutable(),
-                    event.getState(), event, true, LaborCosts.breaking(event.getState())));
+                    event.getState(), event, true, LaborCosts.breaking(event.getState()),false));
         }
     }
 
     private void placed(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof ServerPlayer player && CalorieFoodData.active(player)) {
+            double volume=Math.max(CutPlacement.takePlacedVolume(player,event.getPos()),MachineConstruction.takePlacedVolume(player,event.getPos()));
             actions.add(new Action(player, player.serverLevel(), event.getPos().immutable(),
-                    event.getPlacedBlock(), event, false, LaborCosts.placing(event.getPlacedBlock())));
+                    event.getPlacedBlock(), event, false, volume>0?CalorieConfig.PLACE.get()*volume:LaborCosts.placing(event.getPlacedBlock(),event.getBlockSnapshot().getState()),volume>0));
         }
     }
 
@@ -67,7 +76,7 @@ final class CalorieSystem {
                     : ((BlockEvent.EntityPlaceEvent) action.event).isCanceled();
             if (cancelled) continue;
             BlockState current = action.level.getBlockState(action.pos);
-            boolean completed = action.mining ? !current.equals(action.state) : current.is(action.state.getBlock());
+            boolean completed = action.mining ? !current.equals(action.state) : action.cut || current.is(action.state.getBlock());
             if (completed) {
                 CalorieFoodData.of(action.player).spendLabor(action.player, action.cost, action.mining,
                         net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(action.state.getBlock()).toString()
@@ -81,6 +90,12 @@ final class CalorieSystem {
             }
         }
         actions.clear();
+        CutPlacement.clearPending();
+        for(var player:event.getServer().getPlayerList().getPlayers()) {
+            if(player.isSleeping()&&CalorieFoodData.active(player))
+                sleeping.computeIfAbsent(player.getUUID(),id->new SleepSession(player.serverLevel().getDayTime()));
+            else finishSleep(player);
+        }
     }
 
     private void clonePlayer(PlayerEvent.Clone event) {
@@ -99,8 +114,25 @@ final class CalorieSystem {
     private void login(PlayerEvent.PlayerLoggedInEvent event) { syncPlayer(event); EnergyLog.marker(event.getEntity(), "login"); }
     private void respawn(PlayerEvent.PlayerRespawnEvent event) { syncPlayer(event); EnergyLog.marker(event.getEntity(), "respawn"); }
     private void dimension(PlayerEvent.PlayerChangedDimensionEvent event) { syncPlayer(event); EnergyLog.marker(event.getEntity(), "dimension_change"); }
-    private void logout(PlayerEvent.PlayerLoggedOutEvent event) { EnergyLog.marker(event.getEntity(), "logout"); }
-    private void stopped(ServerStoppedEvent event) { actions.clear(); }
+    private void logout(PlayerEvent.PlayerLoggedOutEvent event) { if(event.getEntity() instanceof ServerPlayer player)finishSleep(player);EnergyLog.marker(event.getEntity(), "logout"); }
+    private void woke(PlayerWakeUpEvent event) { if(event.getEntity() instanceof ServerPlayer player)finishSleep(player); }
+    private void sleepFinished(SleepFinishedTimeEvent event) {
+        var level=(ServerLevel)event.getLevel();
+        for(var player:level.players())if(player.isSleeping())chargeSleep(player,event.getNewTime());
+    }
+    private void finishSleep(ServerPlayer player) {
+        if(sleeping.containsKey(player.getUUID())){
+            chargeSleep(player,player.serverLevel().getDayTime());
+            sleeping.remove(player.getUUID());
+        }
+    }
+    private void chargeSleep(ServerPlayer player,long dayTime) {
+        var session=sleeping.get(player.getUUID());if(session==null)return;
+        long elapsed=Math.max(0,dayTime-session.dayTime);
+        if(elapsed>0)CalorieFoodData.of(player).spendOther(player,LaborCosts.sleeping(elapsed),"sleep","in_game_hours");
+        session.dayTime=dayTime;
+    }
+    private void stopped(ServerStoppedEvent event) { actions.clear();sleeping.clear(); }
 
     private void commands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("civilization")
@@ -111,11 +143,11 @@ final class CalorieSystem {
                             ? "Depleted: eat back to " + (int) data.recoveryThreshold() + " kcal. Empty hands + crouch-right-click natural ground to forage."
                             : "Energy state: normal."), false);
                     context.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
-                            "Calories: %.1f / %.0f kcal | Sprint minimum: %.0f kcal\nLabor: %d broken, %d placed; %.1f kcal\nTravel: %.2f walking blocks, %.2f sprinting blocks; %.2f kcal\nOther work/healing: %.1f kcal | Food absorbed: %.1f kcal\nWalk: %.2f kcal/block | Sprint: %.2f kcal/block",
+                            "Calories: %.1f / %.0f kcal | Sprint minimum: %.0f kcal\nLabor: %d broken, %d placed; %.1f kcal\nTravel: %.2f walking, %.2f sprinting, %.2f rowing blocks; %.2f kcal\nOther/healing/cold: %.1f kcal | Food absorbed: %.1f kcal\nWalk: %.2f | Sprint: %.2f | Row: %.2f kcal/block",
                             data.reserve().calories(), data.reserve().capacity(), CalorieConfig.SPRINT_MINIMUM.get(),
-                            data.broken, data.placed, data.laborSpent, data.walkDistance, data.sprintDistance,
+                            data.broken, data.placed, data.laborSpent, data.walkDistance, data.sprintDistance, data.rowDistance,
                             data.travelSpent, data.otherSpent, data.eaten, CalorieConfig.WALK.get(),
-                            CalorieConfig.WALK.get() * CalorieConfig.SPRINT_MULTIPLIER.get())), false);
+                            CalorieConfig.WALK.get() * CalorieConfig.SPRINT_MULTIPLIER.get(), CalorieConfig.ROW.get())), false);
                     return 1;
                 }).then(Commands.literal("reset").executes(context -> {
                     CalorieFoodData.of(context.getSource().getPlayerOrException()).resetCounters();
@@ -139,5 +171,9 @@ final class CalorieSystem {
     }
 
     private record Action(ServerPlayer player, ServerLevel level, BlockPos pos,
-                          BlockState state, BlockEvent event, boolean mining, double cost) {}
+                          BlockState state, BlockEvent event, boolean mining, double cost, boolean cut) {}
+    private static final class SleepSession {
+        private long dayTime;
+        private SleepSession(long dayTime){this.dayTime=dayTime;}
+    }
 }

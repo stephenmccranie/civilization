@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/cargo_tank",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "civilization:block/cargo_tank",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/cargo_tank",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/cargo_tank",
+      "y": 270
+    }
+  }
+}

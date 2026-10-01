@@ -1,8 +1,36 @@
 {
+  "replace": false,
   "values": [
+    "civilization:uranium_ore",
+    "civilization:street_pavers",
+    "civilization:street_pavers_slab",
+    "civilization:street_pavers_stairs",
     "civilization:brick_kiln",
     "civilization:fertilizer_retort",
-    "civilization:cooking_station"
-  ],
-  "replace": false
+    "civilization:cooking_station",
+    "civilization:foundry",
+    "civilization:tannery",
+    "civilization:textile_workshop",
+    "civilization:smithy",
+    "civilization:land_controller",
+    "civilization:airship_controller",
+    "civilization:oil_pump",
+    "civilization:oil_refinery",
+    "civilization:coal_drill",
+    "civilization:fuel_tank",
+    "civilization:distillation_column",
+    "civilization:condenser",
+    "civilization:oil_engine",
+    "civilization:coal_bunker",
+    "civilization:cargo_tank",
+    "civilization:industrial_casing",
+    "civilization:cooling_grille",
+    "civilization:industrial_guardrail",
+    "civilization:refinery_flue",
+    "civilization:refinery_port",
+    "civilization:fluid_pipe",
+    "civilization:engine_cylinder",
+    "civilization:engine_flywheel",
+    "civilization:prototype_stove"
+  ]
 }

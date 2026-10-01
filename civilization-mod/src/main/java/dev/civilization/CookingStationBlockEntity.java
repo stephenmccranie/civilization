@@ -10,6 +10,7 @@ public final class CookingStationBlockEntity extends KilnBlockEntity {
     public CookingStationBlockEntity(BlockPos pos, BlockState state) {
         super(CookingContent.ENTITY.get(), pos, state, CookingContent.RECIPE_TYPE.get());
     }
+    @Override public double coalWasteHeatFactor(){return ThermalRules.STOVE_WASTE_HEAT_FACTOR;}
     @Override public boolean requiresStructure() { return false; }
     @Override protected String auditPrefix() { return "cooking"; }
     @Override protected AbstractContainerMenu createMenu(int id, Inventory inventory) {

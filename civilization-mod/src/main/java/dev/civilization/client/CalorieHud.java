@@ -22,7 +22,12 @@ public final class CalorieHud {
     public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         event.register(dev.civilization.KilnContent.MENU.get(), KilnScreen::new);
         event.register(dev.civilization.KilnContent.RETORT_MENU.get(), KilnScreen::new);
+        event.register(dev.civilization.KilnContent.FOUNDRY_MENU.get(), KilnScreen::new);
         event.register(dev.civilization.CookingContent.MENU.get(), KilnScreen::new);
+        event.register(dev.civilization.PrototypeStoveContent.MENU.get(), PrototypeStoveScreen::new);
+        event.register(dev.civilization.CivicContent.LAND_MENU.get(), LandScreen::new);
+        event.register(dev.civilization.CivicContent.SHOP_MENU.get(), TradeScreen::new);
+        event.register(dev.civilization.CivicContent.SURVEY_MENU.get(), SurveyScreen::new);
     }
 
     @SubscribeEvent
@@ -78,6 +83,7 @@ public final class CalorieHud {
             String label = String.format(Locale.ROOT, "%,.0f kcal", reserve.calories());
             graphics.drawString(mc.font, label, x + width - mc.font.width(label), y - 10,
                     critical ? 0xFFFF8A75 : low ? 0xFFFFCE76 : 0xFFFFFFFF, true);
+            ComfortHud.draw(graphics, graphics.guiWidth()/2, y);
             mc.gui.rightHeight += 21;
             if (data.isDepleted()) {
                 var warning = Component.translatable("hud.civilization.depleted");

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "equipment-overlay-family",
+  "brief": {
+    "description": "Faithful 32x-aligned material wear on damageable equipment icons",
+    "purpose": "Make below-100% grade legible while retaining the installed pack's silhouettes and keeping 100%+ pristine.",
+    "silhouette": "No replacement silhouette; transparent scuffs sit within the source alpha only.",
+    "materials": "Restrained rust, dark scratches, wood abrasion, leather wear and cooler diamond/turtle marks.",
+    "states": "One to eight non-animated layers as grade falls below 100%; no overlay at 100% or higher. A persistent per-item seed chooses the layers.",
+    "construction": "Deterministic Python generation of sixteen composable transparent 32x32 variants per item. Faithful alpha and brightness guide placement; source color pixels are never copied to the mod.",
+    "invariants": "No change to the base item sprites, equipment recipes or active-pack pixels. Every mark remains inside the Faithful 32x alpha silhouette."
+  },
+  "concept": {
+    "file": "wear-progression-mockup.png",
+    "source": "C:/Users/admin/.codex/generated_images/01a08a58-4280-7292-9a4b-a14f940d3cfc/exec-4626aac3-c5dd-47c3-a1e0-4e3ba163be7b.png",
+    "prompt_note": "The exact image-generation prompt from the concept call was not retained in the asset folder. The production brief is recorded above; do not treat the concept as shipped pixels.",
+    "review": "The earlier five-chestplate concept established a clean-to-worn direction. Fixed per-type marks were later rejected: they were faint and made every same-grade item identical. The final exporter uses connected, seeded marks on the material's lit faces; the model wrapper preserves every selected overlay pass."
+  },
+  "source_pack": "Faithful 32x - 26.2.zip in the local Civilization Dev Prism instance; alpha/brightness placement reference only, never redistributed",
+  "sources": ["generate.py", "items.json", "wear-progression-mockup.png"],
+  "outputs": "Sixteen 32x32 transparent variant PNGs and model JSONs per item under assets/civilization/{textures,models}/item/grade_wear; 69 item identities, 1104 variants, approximately 294 KB of generated source resources",
+  "runtime": "EquipmentGrade.java persists the per-item wear seed; client/GradeModels.java selects up to eight distinct variants after the resource-pack base model; client/GradeBar.java draws grade capacity over the native durability bar.",
+  "review": "Faithful 32x native inventory screenshot in runs/visual/screenshots/inventory-grades.png (ignored test output); shader-disabled hidden client passed. Pixel-aligned comparison found 112 changed pixels between two 45% iron swords with different seeds, 79 between 45% and 100%, and zero between pristine 100% and 115% icons. Photon was not retested after its earlier shader-initialization stall. Worn armor on the player model and changed-silhouette packs remain outside this pass."
+}

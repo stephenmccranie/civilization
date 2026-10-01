@@ -1,0 +1,31 @@
+{
+  "brief_hash": "062d20ca22930bd48e7e20e58568e23d68ccc5bd19eab961c92bde5aee75076f",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\export.py": "fcf56b87909ecef95d5931d1d1c0e01d23ee7021a5dc1ae96f0e4e94d9f66305",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\mockup-02.png": "8347037acfbc53f123aea7694ab8b4ec9d5028eac9b79b3a13f2946db4613a77",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-master.png": "ed3dff10f21d01d6a438a84550b231363c5b4db016afde49e7477d59d3a96630",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-master.png": "7717444dc704ccf9dd32ad6ce0a9bb2cbabec267e8aa5d1f38e742f5c6f300e2",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land-final-prompt.txt": "ae6e1dab542306cf7fdd1ced9e64ef73c71f786de495aa80057fc7a46d5dc4c1",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade-final-prompt.txt": "4af6a3a3089dc6e963a0364dd2ff6c8cee8de3d0acaccbe273c4495d2439adf3",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\texture-provenance.json": "f26dd25b69889b574476cabb8351bc17785f51d12c07afa94fab25739e284bc3",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_front.png": "be5012b2e024994fafddd94cd82498064cdb752dd2dbb898ceba2172a631dcf7",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_side.png": "fe50d853b85f73c0a0349451f721c867639e8627b1d58aedf51cec088254abf2",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller_top.png": "25c90f1082bd90b1e2d500de1ea22f572989fc2286ee0269ed65cc3efe3558f3",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\land_controller.json": "49f74886c54c3580878c82b133b7e70a45aaa2ce5d84e19b997a50571bb67f03",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_front.png": "d86775a0b71b710fa4cf9ea88e65e20e6b7965c66c447d20d2f9036d2fb9bc95",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_side.png": "1ac92ea04b5e4f12397a29be9a0a6d5843131f8d24ee28d7015857625a4ca660",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter_top.png": "776e487676b3815967cbc40ee4469df86223fa99f78d5afa0622e3656c669d73",
+    "F:\\minecraft project\\art\\assets\\civic_cabinets\\trade_counter.json": "7a4e8140e3f313c0e7f8cdd34af1c1d7f9e0fa942358185025e8a13d9694e870"
+  },
+  "outputs": {
+    "textures/block/land_controller_front.png": "be5012b2e024994fafddd94cd82498064cdb752dd2dbb898ceba2172a631dcf7",
+    "textures/block/land_controller_side.png": "fe50d853b85f73c0a0349451f721c867639e8627b1d58aedf51cec088254abf2",
+    "textures/block/land_controller_top.png": "25c90f1082bd90b1e2d500de1ea22f572989fc2286ee0269ed65cc3efe3558f3",
+    "models/block/land_controller.json": "49f74886c54c3580878c82b133b7e70a45aaa2ce5d84e19b997a50571bb67f03",
+    "textures/block/trade_counter_front.png": "d86775a0b71b710fa4cf9ea88e65e20e6b7965c66c447d20d2f9036d2fb9bc95",
+    "textures/block/trade_counter_side.png": "1ac92ea04b5e4f12397a29be9a0a6d5843131f8d24ee28d7015857625a4ca660",
+    "textures/block/trade_counter_top.png": "776e487676b3815967cbc40ee4469df86223fa99f78d5afa0622e3656c669d73",
+    "models/block/trade_counter.json": "7a4e8140e3f313c0e7f8cdd34af1c1d7f9e0fa942358185025e8a13d9694e870"
+  }
+}

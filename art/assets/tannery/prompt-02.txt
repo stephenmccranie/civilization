@@ -1,0 +1,9 @@
+Use case: stylized-concept refinement
+Asset type: implementable Minecraft multiblock design reference
+Primary request: Preserve the selected Civilization Tannery direction from Image 1, but redraw it as a mechanically exact, feasible 3x3 Minecraft assembly informed by the actual blockout in Image 2.
+Reference roles: Image 1 is the selected design and owns silhouette/material hierarchy. Image 2 is the actual current implementation and owns exact scale, footprint, cut-block geometry and controller placement. Image 3 is partial-block presentation language only.
+Subject: A low one-block red-brick 3x3 plinth, a half-height oak rim around a genuinely open vat center, two narrow rear oak posts, and one three-block-wide half-grid oak crossbar. Controller at bottom front center. Keep the existing custom controller identity but do not show liquids, loose hides, pipes, or extra machines.
+Style: polished Minecraft build mockup, Faithful 32x material density, practical late-nineteenth-century frontier industry.
+Composition: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on neutral stone.
+Constraints: exact 3x3 footprint, maximum four blocks high; only full blocks, slabs, quarter beams and eighth cubes; all parts visibly supported; same asset in both views.
+Avoid: solid tall blob, full-width posts, floating fittings, copper vat lining, water, people, text, modern equipment, decorative gears.

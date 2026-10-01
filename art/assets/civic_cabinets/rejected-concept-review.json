@@ -1,0 +1,15 @@
+{
+  "decision": "revise",
+  "criteria": {
+    "silhouette_scale": "Cube scale feasible but cabinet identities too generic.",
+    "implementable_geometry": "Full cube construction is feasible.",
+    "mechanics_clearance": "Static fittings cause no mechanical issue.",
+    "period_materials": "Materials fit, but alone do not communicate role.",
+    "family_consistency": "Iron, stone and timber fit the family.",
+    "controls_readability": "Rejected by user: dial implies pressure, drawers imply storage; neither communicates land ownership or exchange.",
+    "gameplay_scope": "Keep existing one-block footprint and controls."
+  },
+  "remaining_issues": [
+    "Replace generic pressure dial and storage drawers with land-boundary map and recognizable exchange imagery."
+  ]
+}

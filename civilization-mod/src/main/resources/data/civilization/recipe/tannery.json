@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PBP",
+    "PCP",
+    "SSS"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bricks"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "item": "minecraft:barrel"
+    },
+    "S": {
+      "item": "minecraft:cobblestone"
+    }
+  },
+  "result": {
+    "id": "civilization:tannery",
+    "count": 1
+  }
+}

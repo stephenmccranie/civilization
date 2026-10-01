@@ -1,0 +1,16 @@
+{
+  "tool": "built-in image_gen",
+  "stage": "mockup-only",
+  "prompt": "Edit the supplied Minecraft HUD mockup. Keep the same brick workshop waterfront scene and first-person composition. Completely REMOVE BOTH large tan rectangular instrument panels including the enlarged upper-right inset; restore unobstructed scenery in those areas. Redesign ONLY the bottom survival HUD to integrate temperature and comfort as tiny native Minecraft status elements.\nThe finished image must look like a plausible gameplay screenshot, NOT a concept presentation sheet. No inset, arrows, titles, labels, decorative frame, background plate, tan rectangle or separate floating widget.\nKeep the normal nine-slot hotbar at bottom center and red hearts immediately above its left half. Replace vanilla food drumsticks with a narrow amber segmented calorie bar over the hotbar's right half, native pixel HUD thickness, with small right-aligned text \"2400 kcal\" just above that bar. Keep the HUD confined to the immediate hotbar region.\nIn the unused single text-height row immediately above the HEARTS, on the exact same baseline as \"2400 kcal\", place a tiny brass-edged glass thermometer pixel icon, text \"72°F\", then a tiny pale sage green comfort/sun symbol. Beside it three extremely small native-sized pixel benefit glyphs: loaf with a tiny down chevron for calorie saving, pickaxe with up chevron for faster work, boot with up chevron for faster movement. At the end of this SAME row a tiny reddish brick-paving symbol with an up chevron communicates the active road bonus. Everything in this row must fit within the left half of the hotbar width (around 90 logical GUI pixels); do not extend outside it. These tiny icon-only indicators replace ALL percentage readouts and the word Comfortable. Use icon shape and muted sage accents to infer benefits; detailed values can live in an inspection screen later and must NOT be shown here.\nTemperature text same font size as the native calorie number, small white pixel font with dark one-pixel shadow. Four short green chevrons, no particles or glows. Nikola Tesla-era character only in the tiny thermometer's brass-and-glass pixel design. In-world view is the star, HUD quiet and immediately familiar. Crisp pixel sprites, no smooth vector or photoreal UI. Do not enlarge HUD to show details.",
+  "reference": "mockup-01.png",
+  "output": "mockup-02.png",
+  "review": {
+    "result": "pass for compact direction; native layout pending",
+    "findings": [
+      "Removed opaque plate and enlarged inset, leaving world unobstructed.",
+      "Temperature and small benefit glyphs sit directly above survival HUD; road remains distinct.",
+      "Concept icons are slightly oversized relative to the intended 90 GUI pixel budget and calorie baseline; native implementation should align and tighten them.",
+      "Sun-like comfort indicator needs a tooltip/explanation outside normal play; calorie and hotbar artwork are illustrative, not replacement assets."
+    ]
+  }
+}

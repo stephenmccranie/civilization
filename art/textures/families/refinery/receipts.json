@@ -1,0 +1,34 @@
+{
+  "front": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Add an ASYMMETRIC instrument panel: ONE large brass-rimmed ivory analog pressure gauge in the upper LEFT, a narrow vertical amber fluid sight glass with steel cage in the upper RIGHT, and a small rectangular bolted inspection cover across the lower center. Keep shapes big, simple and legible. No paired circular gauges, no face-like arrangement. Preserve exact surrounding steel, rivets and border. Detailed high-resolution pixel art. No lettering or numbers. Preserve the exact blue-gray petrol steel, brass rivets, panel scale, crisp detailed high-resolution pixel art and calm material wear of this master. Do not introduce unrelated colors or change the outer casing. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\refinery-casing-v1.png"
+    ],
+    "reference_sha256": "970cac89f83364b7d0f98537450e0878d77bd28c98ed56b3bce1d2e838bb3f80",
+    "output_sha256": "2e7cb4e79f89ee52bd07c1efe6d8f8e48e9bf39a98ad9d5334c8670731b64220"
+  },
+  "heater": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Add a broad central cast-iron circular furnace access hatch with a brass wheel latch, reinforced hinge and a narrow glowing amber inspection slit below it. The rest remains exactly the supplied riveted steel casing. Detailed high-resolution pixel art, no text. Preserve the exact blue-gray petrol steel, brass rivets, panel scale, crisp detailed high-resolution pixel art and calm material wear of this master. Do not introduce unrelated colors or change the outer casing. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\refinery-casing-v1.png"
+    ],
+    "reference_sha256": "970cac89f83364b7d0f98537450e0878d77bd28c98ed56b3bce1d2e838bb3f80",
+    "output_sha256": "2d9b5983aec661e48eb6f649473c351586151075798166bebd6f07e31a456aa4"
+  },
+  "fins": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Replace the middle panel with closely spaced horizontal steel cooling louvers, deep shaded gaps and crisp worn silver-blue fin edges. Preserve the surrounding riveted casing. Repeated fins must be orderly and visually readable. No gauges or text. Preserve the exact blue-gray petrol steel, brass rivets, panel scale, crisp detailed high-resolution pixel art and calm material wear of this master. Do not introduce unrelated colors or change the outer casing. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\refinery-casing-v1.png"
+    ],
+    "reference_sha256": "970cac89f83364b7d0f98537450e0878d77bd28c98ed56b3bce1d2e838bb3f80",
+    "output_sha256": "be732aef62994f838ed175556f1adb59393f150b872983d98b57888be8f08bf7"
+  },
+  "heater_cold": {
+    "prompt": "Edit the supplied image, which is the exact material and style authority for this block. Change ONLY the glowing orange horizontal inspection slit in the lower portion of the circular door: extinguish its glow and make it unlit dark blue-gray glass. Keep every other detail, wheel, door, brass, hinges, panel and rivets exactly unchanged. Preserve the exact blue-gray petrol steel, brass rivets, panel scale, crisp detailed high-resolution pixel art and calm material wear of this master. Do not introduce unrelated colors or change the outer casing. Full square opaque edge-to-edge orthographic texture. No perspective, scene, labels or margin.",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\refinery-firebox-v1.png"
+    ],
+    "reference_sha256": "2d9b5983aec661e48eb6f649473c351586151075798166bebd6f07e31a456aa4",
+    "output_sha256": "4f2396b30eda09e63d733387a7974e710d5723510e59c1bbf6803313465108ec"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#civilization:uranium_regions",
+  "features": "civilization:uranium_ore",
+  "step": "underground_ores"
+}

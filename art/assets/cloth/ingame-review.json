@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Oatmeal/cream woven clusters remain visible across the held face under Photon, with clear blue edging and no alpha fringe.",
+    "scale_readability": "Folds and blue edge identify cloth in actual hotbar, creative inventory and frame next to wool/leather/coal.",
+    "states_motion": "Static generated item; held view reviewed, no animated state required.",
+    "interaction_guides": "Existing item has no custom interactions or build guide; standard item rendering.",
+    "inventory_appearance": "Native inventory shows restrained surface variation while preserving folds and blue band; reviewed alongside wool/leather/coal.",
+    "integration_limits": "Art-only; no recipe or gameplay changes. Uses flat generated-item extrusion, not a sculpted cloth mesh."
+  },
+  "remaining_issues": []
+}

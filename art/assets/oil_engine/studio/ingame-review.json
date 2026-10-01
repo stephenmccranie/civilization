@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Actual hidden 1920x1080 Photon/Faithful scene inspected. Neutral iron is darker than steel bands, brass remains localized, and the bed uses the current shared casing. No missing textures visible.",
+    "scale_readability": "Front and rear views show distinct body/flanges, thinner wheel, grounded saddles, head bolts and recessed exhaust. Gauge is substantially more legible than the old tiny whole-panel decal. Nearby masonry and refinery structures provide scale/context. Latest rear Photon screenshot confirms projecting black lip is gone; compact burner sits beneath end cap.",
+    "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+    "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+    "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+    "integration_limits": "Build/unit and focused engine visual checks passed. Server behavior was not changed; no full gameplay rerun. Moving Sable vessel rendering is not claimed or tested by this stationary-engine study. Source/export validation and native geometry/animation save-reopen passed separately."
+  },
+  "remaining_issues": []
+}

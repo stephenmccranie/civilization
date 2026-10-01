@@ -7,3 +7,15 @@
 **/.idea/
 *.iml
 dev.local.json
+__pycache__/
+*.py[cod]
+
+**/.dev-libs/
+
+# Local authentication and runtime state
+.env
+.env.*
+!.env.example
+**/saves/
+**/logs/
+.codex/config.toml

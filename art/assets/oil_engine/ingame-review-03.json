@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Actual Photon/Faithful scene inspected: consistent blue-gray iron with brass fittings, normal darker shaded front, clear flanges on lit rear; no copper panel or unintended panel UV patches.",
+    "scale_readability": "Shorter overall silhouette and horizontal barrel/end flanges visible; paired support feet and collared stack remain readable at ordinary distance.",
+    "states_motion": "Stopped/startup/running and two working frames show coherent whole-wheel rotation. Rear flame reaches bulb and smoke originates at stack; feet stay clear.",
+    "interaction_guides": "Oil Engine guide title and full revised loose-wheel preview match model; air requirement replaces old copper support. Existing coarse block-cell collision retained.",
+    "inventory_appearance": "Controller, cylinder and wheel fit hotbar slots; held controller and instrument panel retain recognizable appearance.",
+    "integration_limits": "Standalone commissioning scene with Sable loaded; this does not verify engine aboard a vessel. No user-world edits made."
+  },
+  "remaining_issues": []
+}

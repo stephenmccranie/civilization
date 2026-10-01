@@ -1,0 +1,15 @@
+{
+  "brief_hash": "eb7a9177959ea59df516cc6eabfd3fbb9cd4142e249a129b877c67cee1583c39",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\t2_kitchen\\mockup-03.png": "1a3d1972c674450e7f281cb35b979761a77ebad8a1ce223570503f0000d05ebc",
+    "F:\\minecraft project\\art\\assets\\vegetable_skillet\\master.png": "1d06c110ed68b701587e7de672f2eee6dcd09212c31c11543fb3f972f5f080c0",
+    "F:\\minecraft project\\art\\assets\\vegetable_skillet\\prompt.txt": "1233087d4db6a6e79bb6ff1ff788e40a666c7212ea1d1632d551733d78dbb796",
+    "F:\\minecraft project\\art\\assets\\vegetable_skillet\\export.json": "78730bb8facbb75a7c2d933d2b719e9793b88eaab8af2095df33f375856cc9b1",
+    "F:\\minecraft project\\art\\assets\\vegetable_skillet\\vegetable_skillet.png": "796d8b338d327266184802e272494b6bdc3a374fbee13116b19154ea450b9e34",
+    "F:\\minecraft project\\art\\assets\\vegetable_skillet\\item.json": "bf164af7438dcca03273aeaeb430895c44e6015947d03004059986d6269a8fdc"
+  },
+  "outputs": {
+    "textures/item/vegetable_skillet.png": "796d8b338d327266184802e272494b6bdc3a374fbee13116b19154ea450b9e34",
+    "models/item/vegetable_skillet.json": "bf164af7438dcca03273aeaeb430895c44e6015947d03004059986d6269a8fdc"
+  }
+}

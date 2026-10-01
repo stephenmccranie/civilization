@@ -1,0 +1,51 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.oil_engine_wheel.cycle": {
+      "loop": true,
+      "animation_length": 1.5,
+      "bones": {
+        "wheel": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.375": {
+              "vector": [
+                90,
+                0,
+                0
+              ]
+            },
+            "0.75": {
+              "vector": [
+                180,
+                0,
+                0
+              ]
+            },
+            "1.125": {
+              "vector": [
+                270,
+                0,
+                0
+              ]
+            },
+            "1.5": {
+              "vector": [
+                360,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "geckolib_format_version": 2
+}

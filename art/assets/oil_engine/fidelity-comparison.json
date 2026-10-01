@@ -1,0 +1,26 @@
+{
+  "images": [
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png",
+      "sha256": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+      "crop": [
+        60,
+        180,
+        1240,
+        1170
+      ],
+      "label": "Selected mockup"
+    },
+    {
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine\\model\\assembly-rear-isometric.png",
+      "sha256": "611bbca5df07e13174a918c889b27bf1c22d620527335a524f1b59766600828b",
+      "crop": [
+        520,
+        330,
+        1450,
+        1080
+      ],
+      "label": "Native model - opposite service side"
+    }
+  ]
+}

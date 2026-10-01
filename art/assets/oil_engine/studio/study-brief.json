@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "kind": "animated_machine",
+  "brief": {
+    "description": "Engine modeling study: disciplined native Blockbench construction, uniform texel density, readable layered castings and repeatable multi-view review.",
+    "purpose": "A grounded late nineteenth-century hot-bulb oil engine: refined fuel and lubricant become visible mechanical work. Compact workshop and future marine equipment.",
+    "silhouette": "Octagonal open four-spoke wheel, compact chamfered crankcase, long faceted horizontal barrel with end flanges, two short iron feet on low steel bed. Small brass fittings; no broad copper panels. Barrel must read as a cylinder from both three-quarter views.",
+    "bounds": "3 by 3 footprint: front-center controller; six casing half-slabs behind; cylinder (0,1,1), flywheel (-1,1,1). Integrated iron feet replace the copper slab at (0,1,2); reserve this rear space and machinery headroom as air.",
+    "materials": "Refinery family: medium gray blue cast iron and steel, soft pixel-painted edge highlights, quiet broad surfaces, small warm brass/copper fittings. No black featureless mechanism or noisy speckles.",
+    "interfaces": "Low front-center control pedestal with small physical dial and lever. Fuel left and lubricant right remain accessible. Individual cylinder, wheel and existing bed construction pieces.",
+    "states": "Stopped/neutral; startup local flame only; working whole wheel turns; shortage/off stops. Preserve casing colors and server-owned state.",
+    "construction": "Blockbench cuboids and limited 45-degree bevels, textured seams/rivets. Shaft perpendicular to cylinder axis, supported bearings. Enclosed crankcase avoids exposed rod complexity and interference. Verify wheel clearance in native blockout. Coherent guides/items.",
+    "invariants": "Preserve energy, capacities, crafting recipes and standalone integration boundary. User-authorized removal of copper construction slab; no new gameplay. Keep mechanically correct perpendicular shaft/cylinder axes and clear rotating wheel.",
+    "fidelity_targets": [
+      "Flywheel outer diameter 28 model units with thin 2-unit rim and four spokes; shaft perpendicular to cylinder.",
+      "Barrel 18 units long and 11 units across, pronounced end flanges, small heated end bulb.",
+      "Two grounded feet, low stepped crankcase, readable side access cover and raised control dial.",
+      "Maintain quiet cast-iron faces with continuous steel edge treatment; no full-face repeated rivet panels."
+    ],
+    "role": "Town industry mechanical drive",
+    "technological_stage": "Early hot-bulb oil engine",
+    "material_behavior": "Cast iron with restrained edge wear, machined steel rings, brass only for fittings.",
+    "signature_feature": "Open flywheel and elongated horizontal cylinder on short grounded iron saddles.",
+    "neighboring_assets": [
+      "Oil Engine current version",
+      "Industrial steel refinery controllers",
+      "Canisters"
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/oil_engine/mockup-05.png",
+      "role": "Identity and functional layout only; refine proportions and native-model detail."
+    },
+    {
+      "path": "art/assets/industrial_steel/texture-review.png",
+      "role": "Material family reference only."
+    }
+  ],
+  "sources": [],
+  "outputs": [],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "F:\\minecraft project\\art\\assets\\oil_engine_study\\concept.png",
+      "sha256": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254",
+      "prompt": "Use case: stylized-concept. Create one refined Minecraft/Blockbench-implementable hot-bulb oil engine concept, not competing designs. Reference image 1 supplies identity/layout, image 2 supplies restrained iron/steel/enamel material family only. Render one complete engine in clear rear three-quarter view, wheel on left and cylinder extending right. Quiet warm gray background, no text.\nPreserve the perpendicular crankshaft and horizontal cylinder axes, four open spokes and octagonal flywheel, elongated cylinder with end flanges, short substantial iron supports, low bed of steel half slabs and small front control cabinet. Improve craftsmanship: a thinner layered wheel rim with machined outer band and deep open quadrants, substantial central hub, a stepped crankcase with readable access hatch, discrete fasteners, two narrower cylinder flanges, a small brass hot bulb and burner, small top oil cup, short hollow exhaust stack. Raised brass-rimmed cream dial and physical lever on control cabinet. No giant copper slab. No decorative gears. Do not add pipes that cross the wheel sweep.\nGeometry must look like an ACTUAL native Minecraft cuboid model using axis-aligned cubes and modest 45-degree bevels, no smooth meshes, no tiny machined ridges, no fantasy curves. Clean broad surfaces, restrained pixel clusters, roughly 32 texels per block. Gray-blue cast iron body, slightly lighter steel edge strips, warm brass only fittings. No excessive brass, no black unreadable mechanism, no baked dramatic glow. Carefully supported feet contact the bed, wheel clears bed and body at every angle. Target readable large shapes and secondary fittings rather than illustration detail. Keep silhouette close to the reference but make it refined and functional.\n",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "Open four-spoke wheel, horizontal cylinder, two supports and separate front cabinet preserve engine identity. Native geometry will establish exact proportions rather than trusting illustration perspective.",
+        "implementable_geometry": "Box castings, 45-degree bevels and stepped fittings are implementable in the current Java/GeckoLib split. Tiny bevel highlights are texture treatment, not additional cubes.",
+        "mechanics_clearance": "Wheel shaft is transverse to the cylinder; clear space exists below the rim. Native review must verify the illustrated wheel-to-case separation and full rotation.",
+        "period_materials": "Cast iron and machined steel dominate, with brass oil cup, bearing and gauge. Avoid carrying the illustration's ornamental brass foot trim into the model.",
+        "family_consistency": "Gray castings and readable cream instrument match the refinery family. Material marks must remain quieter than the silhouette.",
+        "controls_readability": "Separate gauge and lever communicate monitoring and control; do not copy the image's extra duplicated oil cup behind the wheel.",
+        "gameplay_scope": "Same footprint, components, supplies and runtime behavior. This study improves modeling and evidence, not engine power or flight mechanics."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "77a39c1ea34972ab4dad77917a2a7a821e4b5c2343e77f77c54ad422b885ed2c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\oil_engine\\mockup-05.png": "f9a15b3d5ceb312e6c7fa667e804ad9b353147c18bf9477359aacecd936ad078",
+        "F:\\minecraft project\\art\\assets\\industrial_steel\\texture-review.png": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7"
+      },
+      "evidence": {
+        "mockup-01.png": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+      },
+      "generation": "280ae61ed5cde975547af8ef8e76cc4d43628d44e932af915cd9421d9fa7b254"
+    }
+  ]
+}

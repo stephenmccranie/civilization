@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:gravel"
+    },
+    {
+      "item": "civilization:sulfur"
+    }
+  ],
+  "result": {
+    "id": "civilization:enriched_mineral_blend",
+    "count": 1
+  }
+}

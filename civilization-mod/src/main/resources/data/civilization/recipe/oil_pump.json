@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ICI",
+    "CHC",
+    "IFI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "H": {
+      "item": "civilization:machine_parts"
+    },
+    "F": {
+      "item": "civilization:machine_parts"
+    }
+  },
+  "result": {
+    "id": "civilization:oil_pump",
+    "count": 1
+  }
+}

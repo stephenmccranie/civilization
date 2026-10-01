@@ -1,0 +1,400 @@
+{
+  "kiln": {
+    "master": "front",
+    "style": "Grey irregular cobblestone masonry with dark iron hardware. Preserve stone scale, grey palette, mortar, wear and detailed high-resolution pixel art from the master.",
+    "faces": {
+      "front": {
+        "source": "sources/kiln_front-stone-v1.png",
+        "operation": "master"
+      },
+      "side": {
+        "source": "sources/kiln_side-stone-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Remove the ironwork and openings and fill with matching cobblestone. Preserve existing stones and outer edges.",
+        "regions": [
+          [
+            9,
+            4,
+            23,
+            10
+          ],
+          [
+            5,
+            11,
+            27,
+            29
+          ]
+        ]
+      },
+      "top": {
+        "operation": "reuse",
+        "reference": "side"
+      },
+      "front_on": {
+        "source": "sources/kiln_front_on-stone-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Add a bed of orange-red coals and restrained yellow-orange flames only inside the lower fire chamber. Preserve all casing, hardware and geometry. No bloom outside the chamber.",
+        "regions": [
+          [
+            9,
+            15,
+            23,
+            26
+          ]
+        ],
+        "heat": true
+      }
+    },
+    "tone": {
+      "floor": 14,
+      "gamma": 0.67
+    },
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/thermal_controllers"
+  },
+  "works": {
+    "master": "front",
+    "style": "Preserve the exact master material, border, rivets, contrast and high-resolution pixel-art detail.",
+    "faces": {
+      "front": {
+        "source": "sources/works_front-v1.png",
+        "operation": "master"
+      },
+      "side": {
+        "source": "sources/works_side-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Remove the pressure gauge and the entire lower door/firebox assembly. Replace them with continuous copper casing matching the surrounding material. Keep the outer iron border, rivets, copper coloration, sparse edge patina and scale exactly unchanged. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+        "regions": [
+          [
+            10,
+            3,
+            22,
+            13
+          ],
+          [
+            5,
+            13,
+            27,
+            27
+          ]
+        ],
+        "heat": false
+      },
+      "top": {
+        "operation": "reuse",
+        "reference": "side"
+      },
+      "front_on": {
+        "source": "sources/works_front_on-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Show the hot state: add subdued bright orange coals and flame visible BEHIND the vertical iron grate in the lower chamber. Keep the grate bars themselves dark and exactly unchanged. Change only the dark gaps between the bars. Preserve all casing, border, gauge, doorframe, handle and fasteners exactly. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+        "regions": [
+          [
+            10,
+            17,
+            11,
+            23
+          ],
+          [
+            13,
+            17,
+            14,
+            23
+          ],
+          [
+            15,
+            17,
+            17,
+            23
+          ],
+          [
+            18,
+            17,
+            19,
+            23
+          ],
+          [
+            21,
+            17,
+            22,
+            23
+          ]
+        ],
+        "heat": true
+      }
+    },
+    "tone": {
+      "floor": 14,
+      "gamma": 0.67
+    },
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/thermal_controllers"
+  },
+  "stove": {
+    "master": "front",
+    "style": "Preserve the exact master material, border, rivets, contrast and high-resolution pixel-art detail.",
+    "faces": {
+      "front": {
+        "source": "sources/stove_front-v1.png",
+        "operation": "master"
+      },
+      "side": {
+        "source": "sources/stove_side-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Remove the upper handle, entire central firebox door/frame, and bottom drawer. Fill the removed areas with matching continuous charcoal-grey cast iron. Keep the outer border and corner bolts exactly unchanged. Add only two subtle thin horizontal cooling ribs to the plain center. Same material and contrast. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+        "regions": [
+          [
+            3,
+            5,
+            29,
+            30
+          ]
+        ],
+        "heat": false
+      },
+      "top": {
+        "source": "sources/stove_top-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Make the top surface of the same stove. Preserve the outer square border and four corner bolts and identical iron material, palette and detail. Replace ALL front fittings inside the border with a flat cooktop bearing two round cast iron burner plates, one upper left and one lower right, each with restrained concentric rings. No perspective; a flat top-view square face. No pots or flames. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+        "regions": [
+          [
+            3,
+            3,
+            29,
+            29
+          ]
+        ],
+        "heat": false
+      },
+      "front_on": {
+        "source": "sources/stove_front_on-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Show the hot state: a modest bed of glowing orange-red coal and small yellow-orange flames inside the central fire chamber, behind the low grate teeth. Keep the low grate teeth dark and unchanged. Change only the chamber interior, preserve the front casing, border, doorframe, hinges, handle and bottom drawer exactly. No glow outside the opening. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+        "regions": [
+          [
+            8,
+            13,
+            24,
+            19
+          ]
+        ],
+        "heat": true
+      }
+    },
+    "tone": {
+      "floor": 14,
+      "gamma": 0.67
+    },
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/thermal_controllers"
+  },
+  "land_controller": {
+    "master": "front",
+    "style": "Warm pale limestone, slate iron edges and aged brass, restrained Art Deco survey engineering. Match the master detailed high-resolution pixel art exactly.",
+    "faces": {
+      "front": {
+        "source": "sources/land_controller_front-v1.png",
+        "operation": "master"
+      },
+      "side": {
+        "source": "sources/land_controller_side-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Remove the entire surveying dial, lower coal hatch and decorative front grooves. Replace the interior with a quiet slab of matching warm limestone and just two narrow vertical brass reinforcement strips at one quarter and three quarters of the width. Preserve the complete outer iron frame and four brass corner bolts exactly.",
+        "regions": [
+          [
+            2,
+            2,
+            30,
+            30
+          ]
+        ]
+      },
+      "top": {
+        "source": "sources/land_controller_top-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Make the top surface of this exact cabinet. Replace all front hardware and front grooves inside the border with a quiet warm limestone slab containing a centered modest flat brass surveying cross inset into the stone, with four simple pointed arms, no circular dial. Keep the outer iron frame and corner rivets exactly. Flat top-down texture.",
+        "regions": [
+          [
+            2,
+            2,
+            30,
+            30
+          ]
+        ]
+      }
+    },
+    "tone": {
+      "floor": 10,
+      "gamma": 0.85
+    },
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/civic_cabinets"
+  },
+  "trade_counter": {
+    "master": "front",
+    "style": "Warm honey oak, restrained walnut grain and aged brass frame fittings. Match the master detailed high-resolution pixel art exactly.",
+    "faces": {
+      "front": {
+        "source": "sources/trade_counter_front-v1.png",
+        "operation": "master"
+      },
+      "side": {
+        "source": "sources/trade_counter_side-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Remove the drawers, handles and central transaction emblem inside the border. Fill the interior with matching warm vertical oak boards with quiet grain and one narrow brass reinforcing strip across their middle. Preserve the complete outer frame and corner hardware exactly.",
+        "regions": [
+          [
+            2,
+            2,
+            30,
+            30
+          ]
+        ]
+      },
+      "top": {
+        "source": "sources/trade_counter_top-v1.png",
+        "operation": "edit",
+        "reference": "front",
+        "instruction": "Make the top work surface of this exact oak counter. Replace all front drawers and hardware inside the perimeter with uninterrupted warm oak boards and a modest rectangular inset brass-edged counting tray outline in the center. The tray is empty and shallow, with oak interior. Keep the exact outer wooden frame and brass corner fasteners. Flat top-down texture, no objects on top.",
+        "regions": [
+          [
+            2,
+            2,
+            30,
+            30
+          ]
+        ]
+      }
+    },
+    "tone": {
+      "floor": 10,
+      "gamma": 0.85
+    },
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/civic_cabinets"
+  },
+  "refinery": {
+    "publication_owner": "tools/modeling/pipeline.py publish art/assets/industrial_steel",
+    "master": "side",
+    "style": "Preserve the exact blue-gray petrol steel, brass rivets, panel scale, crisp detailed high-resolution pixel art and calm material wear of this master. Do not introduce unrelated colors or change the outer casing.",
+    "tone": {
+      "floor": 10,
+      "gamma": 0.87
+    },
+    "faces": {
+      "side": {
+        "source": "sources/refinery-casing-v1.png",
+        "operation": "master"
+      },
+      "top": {
+        "operation": "reuse",
+        "reference": "side"
+      },
+      "front": {
+        "operation": "edit",
+        "reference": "side",
+        "source": "sources/refinery-controls-v2.png",
+        "instruction": "Add an ASYMMETRIC instrument panel: ONE large brass-rimmed ivory analog pressure gauge in the upper LEFT, a narrow vertical amber fluid sight glass with steel cage in the upper RIGHT, and a small rectangular bolted inspection cover across the lower center. Keep shapes big, simple and legible. No paired circular gauges, no face-like arrangement. Preserve exact surrounding steel, rivets and border. Detailed high-resolution pixel art. No lettering or numbers.",
+        "regions": [
+          [
+            4,
+            5,
+            28,
+            27
+          ]
+        ]
+      },
+      "heater": {
+        "operation": "edit",
+        "reference": "side",
+        "source": "sources/refinery-firebox-v1.png",
+        "instruction": "Add a broad central cast-iron circular furnace access hatch with a brass wheel latch, reinforced hinge and a narrow glowing amber inspection slit below it. The rest remains exactly the supplied riveted steel casing. Detailed high-resolution pixel art, no text.",
+        "regions": [
+          [
+            4,
+            5,
+            28,
+            27
+          ]
+        ],
+        "heat": true
+      },
+      "fins": {
+        "operation": "edit",
+        "reference": "side",
+        "source": "sources/refinery-fins-v1.png",
+        "instruction": "Replace the middle panel with closely spaced horizontal steel cooling louvers, deep shaded gaps and crisp worn silver-blue fin edges. Preserve the surrounding riveted casing. Repeated fins must be orderly and visually readable. No gauges or text.",
+        "regions": [
+          [
+            3,
+            5,
+            29,
+            27
+          ]
+        ]
+      },
+      "heater_cold": {
+        "operation": "edit",
+        "reference": "heater",
+        "source": "sources/refinery-firebox-cold-v1.png",
+        "instruction": "Change ONLY the glowing orange horizontal inspection slit in the lower portion of the circular door: extinguish its glow and make it unlit dark blue-gray glass. Keep every other detail, wheel, door, brass, hinges, panel and rivets exactly unchanged.",
+        "regions": [
+          [
+            11,
+            19,
+            21,
+            21
+          ]
+        ],
+        "heat": true
+      }
+    },
+    "accents": [
+      [
+        222,
+        211,
+        182
+      ],
+      [
+        181,
+        145,
+        87
+      ],
+      [
+        107,
+        84,
+        49
+      ],
+      [
+        153,
+        116,
+        64
+      ],
+      [
+        209,
+        174,
+        105
+      ],
+      [
+        41,
+        48,
+        51
+      ],
+      [
+        155,
+        174,
+        178
+      ],
+      [
+        25,
+        32,
+        38
+      ]
+    ]
+  }
+}

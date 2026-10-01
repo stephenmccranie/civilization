@@ -1,0 +1,12 @@
+{
+  "decision": "pass",
+  "criteria": {
+    "photon_materials": "Inspected current Photon/Faithful front and rear screenshots: steel corner fittings, brass pinstripes, dark recessed panels and restrained teal stripe render consistently; no missing textures. Cast iron remains darker than edge steel.",
+    "scale_readability": "Actual front/rear Photon views show complete square bed, longer barrel and clean saddle caps. The earlier exposed coplanar support top is removed.",
+    "states_motion": "Running and later motion screenshots show changed wheel orientation with rim/spokes/hub together, while body remains fixed. Stopped and back views match the static component silhouette. Startup-back captured; this visual pass does not independently retest fuel logic.",
+    "interaction_guides": "Cylinder/wheel guide captures use matching translucent geometry; held flywheel leaves guide aligned. Construction locations and recipes remain unchanged.",
+    "inventory_appearance": "Controller/cylinder/flywheel hotbar icons retain their fitted transforms, and held controller shows the new steel cabinet/gauge material. This is screenshot review, not a comprehensive all-display-transform test.",
+    "integration_limits": "Build/unit checks, all 182 server tests and focused Photon engine visual check passed. First expanded pipe test retained tank stock between rotations; reset its fixture stock and reran successfully. No moving-vessel claim."
+  },
+  "remaining_issues": []
+}

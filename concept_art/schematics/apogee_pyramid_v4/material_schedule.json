@@ -1,0 +1,24 @@
+{
+  "dimensions": {
+    "width": 31,
+    "height": 31,
+    "depth": 31
+  },
+  "orientation": "fourfold symmetric; no exterior entrance selected",
+  "total_blocks": 4254,
+  "materials": {
+    "minecraft:copper_grate": 24,
+    "minecraft:cut_copper": 92,
+    "minecraft:oxidized_cut_copper": 40,
+    "minecraft:polished_deepslate": 961,
+    "minecraft:quartz_pillar": 20,
+    "minecraft:sea_lantern": 1,
+    "minecraft:stone_bricks": 3116
+  },
+  "design_notes": [
+    "The exterior is one continuous fourfold-symmetric stepped pyramid rather than stacked terraces.",
+    "The two-block masonry shell leaves a hollow interior; four internal progression stages and their ascent remain unresolved.",
+    "The crown is an open 7x7 dais with four diagonal corner supports, leaving every cardinal stair approach clear.",
+    "Palette and exact multiblock validation are candidates for review, not approved gameplay rules."
+  ]
+}

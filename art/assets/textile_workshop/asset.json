@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "kind": "multiblock",
+  "brief": {
+    "description": "A broad oak textile bench with an upright open loom frame, copper roller and integrated front controller.",
+    "purpose": "Make wool-to-cloth production recognizable as a skilled town craft and visually distinct from the wet brick tannery.",
+    "silhouette": "Three blocks wide and three deep: low wide workbench in front, two narrow rear loom uprights, one top beam and one horizontal roller across an open center.",
+    "bounds": "Controller at front-center; assembly stays within x=-1..1, depth=0..2 and no more than four blocks high.",
+    "materials": "Vanilla/resource-pack oak construction, restrained copper roller/bearings and a pale woven swatch on the controller face.",
+    "interfaces": "Existing front-center controller, contextual guide, coal processing and inventory behavior remain unchanged.",
+    "states": "Static structure; controller retains existing working/fire state behavior and shared UI.",
+    "construction": "Existing planks, copper and saw-cut slabs/beams/eighth cubes; no new decorative block, banner or entity.",
+    "invariants": "No recipe, production, capacity, fuel or inventory changes. No required wool construction block or invented powered mechanism.",
+    "technological_stage": "Organized town artisan workshop built from frontier timber and simple metal fittings.",
+    "material_behavior": "Directional oak grain, pale woven controller insert and warm copper only at the roller/bearings.",
+    "signature_feature": "Open upright loom frame above a broad low workbench with one copper roller.",
+    "neighboring_assets": "Tannery, Smithy, Cloth and Raw Hide.",
+    "fidelity_targets": [
+      "Workbench reads two to three blocks wide and about one block high with visible legs and a thin top.",
+      "Two narrow loom posts and top beam frame a large open center.",
+      "One horizontal copper roller has visible support at both ends.",
+      "Controller is integrated into the front bench and shows a pale woven swatch."
+    ]
+  },
+  "references": [
+    {
+      "path": "art/assets/textile_workshop/model-context.png",
+      "role": "Frozen assembly and exact Minecraft material/scale context; the revised Textile Workshop is in the middle."
+    },
+    {
+      "path": "art/assets/smithy/mockup-03.png",
+      "role": "Project multiblock presentation and partial-block construction language only."
+    },
+    {
+      "path": "art/assets/cloth/mockup-04.png",
+      "role": "Woven material identity and pale cloth/blue accent language only."
+    }
+  ],
+  "sources": [
+    "mockup-01.png",
+    "controller-front-master.png",
+    "controller-front-prompt.txt",
+    "layout.md",
+    "export.py"
+  ],
+  "outputs": [
+    {
+      "source": "textile_workshop_front.png",
+      "target": "textures/block/textile_workshop_front.png",
+      "format": "png",
+      "size": [
+        32,
+        32
+      ],
+      "alpha": "opaque"
+    },
+    {
+      "source": "textile_workshop.json",
+      "target": "models/block/textile_workshop.json",
+      "format": "java_model"
+    }
+  ],
+  "gecko_manifests": [],
+  "generations": [
+    {
+      "file": "mockup-01.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-accd91ba-803d-4c56-a55f-eb7e152bdee3.png",
+      "sha256": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2",
+      "prompt": "Use case: stylized-concept\nAsset type: implementable Minecraft multiblock design reference\nPrimary request: Redesign the Civilization Textile Workshop as one coherent, attractive late-nineteenth-century loom and workbench assembly.\nInput images: Image 1 is the current in-game workshop lineup and material/scale context; redesign only the middle Textile Workshop. Image 2 is presentation and partial-block construction language only. Image 3 is woven material identity only.\nSubject: A three-block-wide, three-block-deep textile workstation with the controller at bottom front center. Make a low broad oak workbench with a thin slab top and four short partial-block legs. At the rear, two narrow oak loom uprights support one top crossbar around a large open center. One horizontal copper roller spans the frame with visible bearings. Integrate a small pale woven swatch with restrained blue selvage into the controller face at the front; do not invent a separate cloth block.\nStyle/medium: polished Minecraft build mockup using feasible full blocks, slabs, quarter beams and eighth cubes; 32x resource-pack material density; late nineteenth-century artisan workshop.\nComposition/framing: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on a neutral stone floor, matching scale and orientation.\nMaterials/textures: warm oak, restrained copper roller/bearings, small dark iron controller fittings, pale wool swatch with one narrow blue edge.\nConstraints: exact maximum footprint 3x3 blocks, maximum height 4 blocks, controller at front-center, Minecraft half-block geometry, broad negative space, buildable with existing oak/copper cut pieces. No separate cloth panel in the structure.\nAvoid: solid plank cube, full-block fence-like posts, spinning-wheel complexity, decorative gears, belts, pipes, modern machinery, floating thread, people, labels, impossible curves, tiny clutter.\n",
+      "brief_hash": "7ede36842af35028517ef60db19e159265b43a4483fb70673da137b7440afef8",
+      "references": {
+        "F:\\minecraft project\\civilization-mod\\runs\\visual\\screenshots\\workshop-structures.png": "9f0502ab09da83ca73724cea9c8001bd656568b12c52d394087f78f53173b734",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-01.png": "0fc54e268671d5c8bac4341fad152f711f7a42061551bd82ff5f6d6aa859009d"
+      }
+    },
+    {
+      "file": "mockup-02.png",
+      "source": "C:\\Users\\admin\\.codex\\generated_images\\01a08a58-4280-7292-9a4b-a14f940d3cfc\\exec-50208d7f-6e9e-45bc-98a9-547d5e36c5bd.png",
+      "sha256": "607c2dca13dde2b8c3005a5cab7a3671e2a34b1f6ba11303c7b0d82b60fef63f",
+      "prompt": "Use case: stylized-concept refinement\nAsset type: implementable Minecraft multiblock design reference\nPrimary request: Preserve the selected Civilization Textile Workshop direction from Image 1, but redraw it as a mechanically exact, feasible 3x3 Minecraft assembly informed by the actual blockout in Image 2.\nReference roles: Image 1 is the selected design and owns silhouette/material hierarchy. Image 2 is the actual current implementation and owns exact scale, footprint, cut-block geometry and controller placement. Image 3 is partial-block presentation language only. Image 4 is woven material identity only.\nSubject: A low two-block-deep oak workbench with a thin half-block top and four short eighth-block feet, controller at bottom front center, two narrow rear oak posts, one three-block-wide half-grid top crossbar, and one short horizontal copper roller spanning only the clear center cell. The center remains open. The controller has an integrated pale woven swatch with muted indigo edge; no separate cloth block.\nStyle: polished Minecraft build mockup, Faithful 32x material density, practical late-nineteenth-century artisan industry.\nComposition: side-by-side front three-quarter and rear three-quarter views of the same isolated assembly on neutral stone.\nConstraints: exact 3x3 footprint, maximum four blocks high; only full blocks, slabs, quarter beams and eighth cubes; all parts visibly supported; same asset in both views.\nAvoid: solid plank cube, full-width posts, long unsupported roller, floating thread, people, text, modern equipment, decorative gears or belts.\n",
+      "brief_hash": "5797163ad6fcb312150d0cc550bb1cd72e129f5f09d086065625872d4bd7de7c",
+      "references": {
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\mockup-01.png": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\model-front.png": "d39e827209a583348674e96e537e4dea0f3b2e3af60ef6c169b8fdba901d51f1",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "A low broad workbench supports an open upright loom frame, producing a wide artisan-workshop silhouette within the 3x3 envelope.",
+        "implementable_geometry": "The thin bench, eighth-block feet, quarter-beam uprights and crossbar fit the existing cut-block system; the single roller remains the existing copper construction part.",
+        "mechanics_clearance": "The roller spans between two supported uprights with a large open center and no interfering decorative mechanism.",
+        "period_materials": "Warm oak, one copper roller and a pale woven controller insert suit organized late-nineteenth-century textile work without generic steampunk ornament.",
+        "family_consistency": "The assembly uses the Smithy's partial-block craft language while remaining lighter, wider and less masonry-heavy than the Tannery.",
+        "controls_readability": "The front-center controller is integrated into the bench and the woven swatch supplies immediate textile identity.",
+        "gameplay_scope": "The design changes only structure geometry and artwork; it adds no separate cloth block, powered loom mechanism or recipe behavior."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "7ede36842af35028517ef60db19e159265b43a4483fb70673da137b7440afef8",
+      "inputs": {
+        "F:\\minecraft project\\civilization-mod\\runs\\visual\\screenshots\\workshop-structures.png": "9f0502ab09da83ca73724cea9c8001bd656568b12c52d394087f78f53173b734",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "mockup-01.png": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2"
+      },
+      "generation": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "silhouette_scale": "A low broad workbench supports an open upright loom frame, producing a wide artisan-workshop silhouette within the 3x3 envelope.",
+        "implementable_geometry": "The thin bench, eighth-block feet, quarter-beam uprights and crossbar fit the existing cut-block system; the single roller remains the existing copper construction part.",
+        "mechanics_clearance": "The roller spans between two supported uprights with a large open center and no interfering decorative mechanism.",
+        "period_materials": "Warm oak, one copper roller and a pale woven controller insert suit organized late-nineteenth-century textile work without generic steampunk ornament.",
+        "family_consistency": "The assembly uses the Smithy's partial-block craft language while remaining lighter, wider and less masonry-heavy than the Tannery.",
+        "controls_readability": "The front-center controller is integrated into the bench and the woven swatch supplies immediate textile identity.",
+        "gameplay_scope": "The design changes only structure geometry and artwork; it adds no separate cloth block, powered loom mechanism or recipe behavior."
+      },
+      "remaining_issues": [],
+      "stage": "mockup",
+      "brief_hash": "5797163ad6fcb312150d0cc550bb1cd72e129f5f09d086065625872d4bd7de7c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332"
+      },
+      "evidence": {
+        "mockup-02.png": "607c2dca13dde2b8c3005a5cab7a3671e2a34b1f6ba11303c7b0d82b60fef63f",
+        "controller-review.png": "7fff9f2381f0841132800f2a44519fbe0b537a5d137e95d4ec6f8733c177eea3"
+      },
+      "generation": "607c2dca13dde2b8c3005a5cab7a3671e2a34b1f6ba11303c7b0d82b60fef63f"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "matches_direction": "The complete assembly retains the mockup's broad low bench, four short feet, two narrow uprights, open loom center, top beam and single copper roller.",
+        "geometry_uvs": "All structure pieces use the existing slab, quarter-beam and eighth-cell geometry. The custom controller face exports as an opaque 32x32, 20-color texture with broad oak, ivory cloth, indigo, copper and iron regions.",
+        "material_consistency": "Faithful oak remains authoritative on construction blocks; the controller's woven insert directly matches the established Cloth material identity.",
+        "assembly_interfaces": "The controller remains front-center, the roller is supported between posts, the center stays open and all required pieces use the existing saw-cut placement and guide system.",
+        "animation_states": "The structure is static; existing controller active/fire state and ambient light behavior are unchanged.",
+        "native_size_readability": "The pale swatch and blue selvage remain the dominant textile landmark at 32x; dark framing and the copper bearing remain subordinate."
+      },
+      "remaining_issues": [],
+      "stage": "model",
+      "brief_hash": "5797163ad6fcb312150d0cc550bb1cd72e129f5f09d086065625872d4bd7de7c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\mockup-01.png": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-master.png": "4e6127e9dc999cd44d36f27df1ecc36eb799830107410ac2d93f24497097118c",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-prompt.txt": "86e720fdee4e03f82c1d3e96abc1e9e05d62fc2face92983c58225a468cf3023",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\layout.md": "febad1e5f879c3596d68a4af7bd320af29edd74f0a6625190385f2a11bb3f720",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\export.py": "04f0e2f6d1255cd1d0b683e367d3aa8ab59e8b9a2b1372b1f6b52fe931bb9c26",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop_front.png": "f4fce3fb10f3b2abf2941871d2332857db7a4ae65e2bbd1d0eaf5c3e3fe240fa",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop.json": "8ec95eaba86a8161f835118bb1a4750a04473253b1a1e4118f14f90e782991de"
+      },
+      "evidence": {
+        "model-front.png": "d39e827209a583348674e96e537e4dea0f3b2e3af60ef6c169b8fdba901d51f1",
+        "model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "controller-review.png": "7fff9f2381f0841132800f2a44519fbe0b537a5d137e95d4ec6f8733c177eea3"
+      },
+      "generation": "607c2dca13dde2b8c3005a5cab7a3671e2a34b1f6ba11303c7b0d82b60fef63f"
+    },
+    {
+      "decision": "pass",
+      "criteria": {
+        "photon_materials": "Photon and Faithful preserve warm oak, pale woven cloth, muted indigo and restrained copper; the controller reads as part of the bench rather than a separate modern panel.",
+        "scale_readability": "At normal world distance the broad low bench and open loom frame remain distinct from the masonry Tannery and Smithy.",
+        "states_motion": "The static assembly remains coherent while the existing controller fire/working state changes independently; the copper roller is deliberately static.",
+        "interaction_guides": "The focused workshop scene assembles the real Part list and verifies completion, including shared-cell feet and upper slabs through the existing contextual guide system.",
+        "inventory_appearance": "The existing controller item model inherits the redesigned block model and front texture; no item-specific transform changed.",
+        "integration_limits": "Reviewed under the recommended Photon shader with Faithful 32x. The scene verifies the assembled front/side silhouette and controller UI; the roller is one supported central quarter-beam rather than a new animated mechanism."
+      },
+      "remaining_issues": [],
+      "stage": "ingame",
+      "brief_hash": "5797163ad6fcb312150d0cc550bb1cd72e129f5f09d086065625872d4bd7de7c",
+      "inputs": {
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\model-context.png": "2f45875013728c0c9a8ae086ef7fc877df374c89a824a07ddae231028fa9ba57",
+        "F:\\minecraft project\\art\\assets\\smithy\\mockup-03.png": "1ff3077b76d296c6c8c688fc36f6b50849e2ecf9ba603a3f9752e36567e03fa1",
+        "F:\\minecraft project\\art\\assets\\cloth\\mockup-04.png": "c03d0bbacedbef50555c8be077a97c2c898784239f6e3cd938f375cb094d1332",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\mockup-01.png": "f0f312f55c84eb81d622a25036b25ba91d2d64482be99bbbb0337206089049e2",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-master.png": "4e6127e9dc999cd44d36f27df1ecc36eb799830107410ac2d93f24497097118c",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\controller-front-prompt.txt": "86e720fdee4e03f82c1d3e96abc1e9e05d62fc2face92983c58225a468cf3023",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\layout.md": "febad1e5f879c3596d68a4af7bd320af29edd74f0a6625190385f2a11bb3f720",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\export.py": "04f0e2f6d1255cd1d0b683e367d3aa8ab59e8b9a2b1372b1f6b52fe931bb9c26",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop_front.png": "f4fce3fb10f3b2abf2941871d2332857db7a4ae65e2bbd1d0eaf5c3e3fe240fa",
+        "F:\\minecraft project\\art\\assets\\textile_workshop\\textile_workshop.json": "8ec95eaba86a8161f835118bb1a4750a04473253b1a1e4118f14f90e782991de"
+      },
+      "evidence": {
+        "evidence/photon-front.png": "118e2f4ceb49025ec9f0282962d81073b6f60b463b81abbcb235b2bb5a48bc74",
+        "evidence/photon-context.png": "7b10c4609a3637a32baa3e2732098104a024cd4ecc90b50730f89b373ea8b513"
+      },
+      "generation": "607c2dca13dde2b8c3005a5cab7a3671e2a34b1f6ba11303c7b0d82b60fef63f"
+    }
+  ]
+}

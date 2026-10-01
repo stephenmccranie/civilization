@@ -1,0 +1,26 @@
+{
+  "side": {
+    "prompt": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Remove the upper handle, entire central firebox door/frame, and bottom drawer. Fill the removed areas with matching continuous charcoal-grey cast iron. Keep the outer border and corner bolts exactly unchanged. Add only two subtle thin horizontal cooling ribs to the plain center. Same material and contrast. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\stove_front-v1.png"
+    ],
+    "reference_sha256": "c011ba469b9d6e16421614191566785d9be9c2e64ab2d146d66b69e69111e77b",
+    "output_sha256": "29e4fc4a45996ec630213a733851b062da486661c751e4718100624b385dba0f"
+  },
+  "top": {
+    "prompt": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Make the top surface of the same stove. Preserve the outer square border and four corner bolts and identical iron material, palette and detail. Replace ALL front fittings inside the border with a flat cooktop bearing two round cast iron burner plates, one upper left and one lower right, each with restrained concentric rings. No perspective; a flat top-view square face. No pots or flames. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\stove_front-v1.png"
+    ],
+    "reference_sha256": "c011ba469b9d6e16421614191566785d9be9c2e64ab2d146d66b69e69111e77b",
+    "output_sha256": "6bf64f5c4e54c317c3ce914642848019271033e09cac77497b39098aa79de774"
+  },
+  "front_on": {
+    "prompt": "EDIT the attached exact machine master image. It is the edit target and style authority, not loose inspiration. Show the hot state: a modest bed of glowing orange-red coal and small yellow-orange flames inside the central fire chamber, behind the low grate teeth. Keep the low grate teeth dark and unchanged. Change only the chamber interior, preserve the front casing, border, doorframe, hinges, handle and bottom drawer exactly. No glow outside the opening. Preserve the master image's pixel-art detail density, wear, scale and lighting. High-resolution detailed pixel art. Opaque square edge-to-edge orthographic texture. No text, no scene, no margin or extra decoration.\n",
+    "referenced_image_paths": [
+      "F:\\minecraft project\\art\\textures\\sources\\stove_front-v1.png"
+    ],
+    "reference_sha256": "c011ba469b9d6e16421614191566785d9be9c2e64ab2d146d66b69e69111e77b",
+    "output_sha256": "045cc654cdbfb22b51da15ba0d8068bcb58f58abbd2cba57f0f545aa8f4d3bdf"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "brief_hash": "e7eb4e39809014176dc92ff4cc5dfa46581f28866fc0b979613b23f515ca416a",
+  "inputs": {
+    "F:\\minecraft project\\art\\assets\\oil_engine\\texture-master.png": "545ed08519ae5b5e62b6c3a62923e1e4545370e75d925d91e34c5421a1476b27",
+    "F:\\minecraft project\\art\\assets\\machine_parts\\mockup-01.png": "62df952ff028d7bcf1f2fd967b88d591acf2d8bc65b3f319f609974dfb5d2107",
+    "F:\\minecraft project\\art\\assets\\prospecting_rod\\mockup-01.png": "363d3e9910c941d183031ad73a106a9e250d49676ddf3be579570cc929bc1db9",
+    "F:\\minecraft project\\art\\assets\\prospecting_rod\\export.py": "db267101d385ef5c99858b586e09823adb1f81ff6cedd2e2f0286538fe499bb7",
+    "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.png": "1dbfccdd59b124c847f33d164f69adc26d67c6367690663871319f9b4970c3c4",
+    "F:\\minecraft project\\art\\assets\\prospecting_rod\\prospecting_rod.json": "85e3d24366aa83946410e1abb92a709a638c1bfcefa2aba4196c1b8999f50c28"
+  },
+  "outputs": {
+    "textures/item/prospecting_rod.png": "1dbfccdd59b124c847f33d164f69adc26d67c6367690663871319f9b4970c3c4",
+    "models/item/prospecting_rod.json": "85e3d24366aa83946410e1abb92a709a638c1bfcefa2aba4196c1b8999f50c28"
+  }
+}
