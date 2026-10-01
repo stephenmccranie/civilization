@@ -222,5 +222,7 @@
   "item.civilization.geiger_counter": "Geiger Counter",
   "tooltip.civilization.geiger_counter": "Wear in an accessory slot. Clicks faster near uranium ore.",
   "block.civilization.prototype_stove": "Prototype Stove",
-  "item.civilization.vegetable_skillet": "Vegetable Skillet Portion"
+  "item.civilization.vegetable_skillet": "Vegetable Skillet Portion",
+  "item.civilization.skillet": "Skillet",
+  "block.civilization.resting_skillet": "Resting Skillet"
 }

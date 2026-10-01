@@ -25,6 +25,9 @@ public final class PrototypeStoveContent {
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<Double>> QUALITY=COMPONENTS.registerComponentType("meal_quality",b->b.persistent(Codec.DOUBLE).networkSynchronized(ByteBufCodecs.DOUBLE));
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<Double>> CALORIES=COMPONENTS.registerComponentType("meal_calories",b->b.persistent(Codec.DOUBLE).networkSynchronized(ByteBufCodecs.DOUBLE));
     public static final DeferredBlock<PrototypeStoveBlock> STOVE=BLOCKS.register("prototype_stove",PrototypeStoveBlock::new);
+    public static final DeferredBlock<RestingSkilletBlock> RESTING_SKILLET=BLOCKS.register("resting_skillet",RestingSkilletBlock::new);
+    public static final DeferredItem<SkilletItem> SKILLET=ITEMS.register("skillet",SkilletItem::new);
+    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<RestingSkilletEntity>> RESTING_ENTITY=ENTITIES.register("resting_skillet",()->BlockEntityType.Builder.of(RestingSkilletEntity::new,RESTING_SKILLET.get()).build(null));
     public static final DeferredItem<BlockItem> STOVE_ITEM=ITEMS.registerSimpleBlockItem(STOVE);
     public static final DeferredItem<WorkMealItem> MEAL=ITEMS.register("vegetable_skillet",()->new WorkMealItem(new Item.Properties().food(new FoodProperties.Builder().nutrition(4).saturationModifier(0).build())));
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<PrototypeStoveEntity>> ENTITY=ENTITIES.register("prototype_stove",()->BlockEntityType.Builder.of(PrototypeStoveEntity::new,STOVE.get()).build(null));

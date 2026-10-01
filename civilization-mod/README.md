@@ -8,7 +8,7 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 Town manufacturing: [Tannery, Textile Workshop and Smithy](industry.md#town-workshops) connect hides, wool and Foundry metals to equipment production and repairs.
 
-The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Ingredient loading and serving happen at the stove. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.
+The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Load ingredients at the stove, then lift the skillet onto a solid counter to finish with residual heat and serve; it can return to the stove if underdone. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.
 
 [Bulk freight storage](industry.md#bulk-freight-storage) adds a coal bunker and single-liquid cargo tank for land industry, with visible contents, construction guides and local hopper/pipe access.
 

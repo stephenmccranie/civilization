@@ -18,7 +18,7 @@ public final class StoveGameTests {
     @GameTest(template="industrial") public static void batchFuelPersistenceAndConservation(GameTestHelper h){
         var s=stove(h);h.assertTrue(s.start()&&!s.start()&&s.getItem(0).isEmpty()&&s.getItem(1).isEmpty()&&s.getItem(2).isEmpty(),"Ingredients reserved exactly once");
         h.assertTrue(!s.finish()&&s.batch(),"Raw batch remains after early finish");state(h,s,.6,0,10,true);
-        for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()<=10.00001&&!s.fire.lit(),"Finite paid fuel stops progress");double work=s.work();for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()==work,"No work while cold");
+        for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()+s.skillet().warmth()<=10.00001&&!s.fire.lit(),"Finite paid fuel stops progress");for(int i=0;i<2000;i++)s.tick();double work=s.work();for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()==work&&s.skillet().warmth()==0,"Stored heat finishes dissipating; truly cold food stops");
         var saved=s.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new PrototypeStoveEntity(s.getBlockPos(),s.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(saved,h.getLevel().registryAccess());h.assertTrue(restored.batch()&&restored.work()==s.work()&&restored.dial()==s.dial(),"Cooking state survives reload");
         state(h,s,1,900,0,false);h.assertTrue(s.finish()&&!s.finish()&&s.getItem(4).getCount()==4,"Serving produces exactly four portions once");var out=s.getItem(4);double ceiling=2*food(Items.BAKED_POTATO)+2*food(Items.CARROT)+food(Items.BREAD);h.assertTrue(Math.abs(WorkMealItem.calories(out)*4-ceiling)<.00001&&WorkMealItem.quality(out)==1,"Best meal never exceeds configured ingredient budget");
         s.setItem(0,new ItemStack(Items.POTATO,2));s.setItem(1,new ItemStack(Items.CARROT,2));s.setItem(2,new ItemStack(Items.BREAD));h.assertTrue(!s.start()&&s.getItem(0).getCount()==2,"Occupied output rejects next batch without consuming inputs");h.succeed();
@@ -30,7 +30,7 @@ public final class StoveGameTests {
         s.loadWithComponents(saved,h.getLevel().registryAccess());
         var field=ThermalField.get(h.getLevel());long key=s.getBlockPos().asLong();double before=field.pending.get(key);
         for(int i=0;i<400;i++)s.tick();
-        h.assertTrue(s.work()==400&&s.fireHeat()==0&&!s.fire.lit(),"Lower room heat preserves saved coal work and exhaustion");
+        h.assertTrue(Math.abs(s.work()+s.skillet().warmth()-400)<.00001&&s.fireHeat()==0&&!s.fire.lit(),"Lower room heat preserves saved coal work and exhaustion");
         h.assertTrue(Math.abs(field.pending.get(key)-before-325)<.001,"Already-loaded stove coal emits 2.5% of industrial waste heat");
         var p=s.getBlockPos();var l=h.getLevel();
         // Enclosed five-by-five kitchen, three air blocks below its roof.
@@ -57,4 +57,55 @@ public final class StoveGameTests {
         var meal=PrototypeStoveContent.meal(1,1600).copyWithCount(1);meal.finishUsingItem(h.getLevel(),p);h.assertTrue(Math.abs(d.reserve().calories()-900)<.00001&&d.workFactor()==.85,"Actual consumption grants saved calories and work benefit");
         d.workMeal(0);h.assertTrue(d.workFactor()==.9&&d.mealTicks()==36000,"A new meal replaces rather than stacks");double before=d.reserve().calories();d.spendOther(p,100,"sleep");h.assertTrue(d.reserve().calories()==before-100,"Sleep cost receives no discount");before=d.reserve().calories();d.spendOther(p,100,"fertilizer_labor");h.assertTrue(d.reserve().calories()==before-90,"Agricultural work receives discount");var saved=new CompoundTag();d.addAdditionalSaveData(saved);var restored=new CalorieFoodData();restored.readAdditionalSaveData(saved);h.assertTrue(restored.workFactor()==.9&&restored.mealTicks()==36000,"Benefit persists without offline time loss");d.tick(p);h.assertTrue(d.mealTicks()==35999,"Duration counts online ticks");h.succeed();
     }
+    @GameTest(template="industrial") public static void carryoverUsesOnlyPaidHeatAndEarlyRemovalRecovers(GameTestHelper h){
+        var s=stove(h);s.start();state(h,s,1,0,400,true);for(int i=0;i<400;i++)s.tick();
+        double work=s.work(),warmth=s.skillet().warmth();h.assertTrue(work<400&&warmth>100,"Cold cookware stores some paid energy instead of cooking instantly");
+        var item=s.liftSkillet();h.assertTrue(!s.batch()&&!s.hasSkillet()&&s.liftSkillet().isEmpty(),"Lifting transfers the batch exactly once");
+        s.setItem(0,new ItemStack(Items.POTATO,2));s.setItem(1,new ItemStack(Items.CARROT,2));s.setItem(2,new ItemStack(Items.BREAD));
+        h.assertTrue(!s.start()&&s.getItem(0).getCount()==2,"An empty stove cannot reserve a second batch");
+        var tag=new CompoundTag();var pan=SkilletItem.contents(item);h.assertTrue(pan.work()==work&&pan.warmth()==warmth,"Vessel keeps food and stored heat");
+        for(int i=0;i<2000;i++)pan.tick(0);
+        h.assertTrue(pan.work()>work&&pan.work()<=work+warmth&&pan.warmth()==0,"Off-fire cooking draws solely on stored heat and stops");
+        h.assertTrue(pan.serve().isEmpty(),"Early removal is an intact undercooked batch, not a lost batch");
+        SkilletItem.contents(item,pan);h.assertTrue(s.putSkillet(item)&&item.isEmpty()&&s.batch(),"Undercooked vessel can return to the stove without cloning");
+        state(h,s,1,s.work(),800,true);for(int i=0;i<700;i++)s.tick();
+        h.assertTrue(s.finish()&&s.getItem(4).getCount()==4,"Recovering an early batch yields four portions");h.succeed();
+    }
+    @GameTest(template="industrial") public static void actualLiftRestServeAndSupportLossPreserveOneVessel(GameTestHelper h){
+        var l=h.getLevel();var s=stove(h);s.start();state(h,s,1,750,400,true);
+        var tag=s.saveWithoutMetadata(l.registryAccess());tag.putDouble("warmth",130);s.loadWithComponents(tag,l.registryAccess());
+        var p=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"pan"));p.setPos(s.getBlockPos().getX()+.5,s.getBlockPos().getY()+1,s.getBlockPos().getZ()+.5);p.setShiftKeyDown(true);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+        var hit=new net.minecraft.world.phys.BlockHitResult(s.getBlockPos().getCenter(),Direction.UP,s.getBlockPos(),false);
+        PrototypeStoveContent.STOVE.get().useWithoutItem(s.getBlockState(),l,s.getBlockPos(),p,hit);
+        h.assertTrue(p.getMainHandItem().is(PrototypeStoveContent.SKILLET.get())&&!s.hasSkillet(),"Actual empty-hand crouch-use lifts the vessel");
+        var counter=s.getBlockPos().east(2);l.setBlockAndUpdate(counter,net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
+        var context=new net.minecraft.world.item.context.UseOnContext(p,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(counter.getCenter().add(0,.5,0),Direction.UP,counter,false));
+        h.assertTrue(p.gameMode.useItemOn(p,l,p.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(counter.getCenter().add(0,.5,0),Direction.UP,counter,false)).consumesAction()&&p.getMainHandItem().isEmpty(),"Actual placement transfers, even in Creative");
+        var rest=(RestingSkilletEntity)l.getBlockEntity(counter.above());h.assertTrue(rest!=null&&rest.skillet().work()==750&&rest.skillet().warmth()==130,"Supported pan has exactly the transferred contents");
+        var saved=rest.saveWithoutMetadata(l.registryAccess());var reload=new RestingSkilletEntity(rest.getBlockPos(),rest.getBlockState());reload.loadWithComponents(saved,l.registryAccess());h.assertTrue(reload.skillet().warmth()==130&&reload.skillet().work()==750,"Resting food and heat survive reload");
+        for(int i=0;i<110;i++)rest.tick();h.assertTrue(rest.skillet().work()>800&&rest.skillet().work()<880,"Carryover finishes inside the broad golden band");
+        p.setShiftKeyDown(false);var restHit=new net.minecraft.world.phys.BlockHitResult(rest.getBlockPos().getCenter(),Direction.UP,rest.getBlockPos(),false);
+        PrototypeStoveContent.RESTING_SKILLET.get().useWithoutItem(rest.getBlockState(),l,rest.getBlockPos(),p,restHit);
+        h.assertTrue(p.getInventory().countItem(PrototypeStoveContent.MEAL.get())==4&&!rest.skillet().batch(),"Resting serve produces four portions once and preserves empty cookware");
+        PrototypeStoveContent.RESTING_SKILLET.get().useWithoutItem(rest.getBlockState(),l,rest.getBlockPos(),p,restHit);
+        h.assertTrue(p.getInventory().countItem(PrototypeStoveContent.MEAL.get())==4,"Repeated serve cannot duplicate portions");
+        p.getInventory().selected=1;p.setShiftKeyDown(true);PrototypeStoveContent.RESTING_SKILLET.get().useWithoutItem(rest.getBlockState(),l,rest.getBlockPos(),p,restHit);
+        h.assertTrue(l.getBlockState(counter.above()).isAir()&&p.getMainHandItem().is(PrototypeStoveContent.SKILLET.get()),"Resting lift removes the placed vessel");
+        h.assertTrue(l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(counter.above())).isEmpty(),"Lifting does not also drop a duplicate empty pan");
+        p.gameMode.useItemOn(p,l,p.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(counter.getCenter().add(0,.5,0),Direction.UP,counter,false));l.setBlockAndUpdate(counter,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        var drops=l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(counter).inflate(1));
+        h.assertTrue(l.getBlockState(counter.above()).isAir()&&drops.stream().filter(e->e.getItem().is(PrototypeStoveContent.SKILLET.get())).count()==1,"Lost support drops exactly one actual vessel");h.succeed();
+    }
+    @GameTest(template="industrial") public static void carriedWarmthLegacyMigrationAndFailedPlacement(GameTestHelper h){
+        var s=stove(h);s.start();state(h,s,.7,650,400,true);var l=h.getLevel();
+        var old=s.saveWithoutMetadata(l.registryAccess());old.remove("hasSkillet");old.remove("warmth");s.loadWithComponents(old,l.registryAccess());
+        h.assertTrue(s.hasSkillet()&&s.batch()&&s.work()==650&&s.skillet().warmth()==0,"Existing stove saves migrate with their original pan and intact batch");
+        var t=s.saveWithoutMetadata(l.registryAccess());t.putDouble("warmth",100);s.loadWithComponents(t,l.registryAccess());var item=s.liftSkillet();
+        var p=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"carry"));p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,item);
+        var below=s.getBlockPos().below();l.setBlockAndUpdate(below,net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState());
+        var ctx=new net.minecraft.world.item.context.UseOnContext(p,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(below.getCenter(),Direction.UP,below,false));
+        h.assertTrue(PrototypeStoveContent.SKILLET.get().useOn(ctx)==net.minecraft.world.InteractionResult.FAIL&&item.getCount()==1&&SkilletItem.contents(item).work()==650,"Occupied resting position rejects transfer without changing contents");
+        h.onEachTick(()->{PrototypeStoveContent.SKILLET.get().inventoryTick(item,l,p,0,true);if(SkilletItem.contents(item).warmth()<100){h.assertTrue(SkilletItem.contents(item).work()>650,"Carried cookware continues gradually cooling and cooking");p.setPos(s.getBlockPos().getX()+.5,s.getBlockPos().getY()+1,s.getBlockPos().getZ()+.5);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);p.setShiftKeyDown(false);p.gameMode.useItemOn(p,l,p.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(s.getBlockPos().getCenter(),Direction.UP,s.getBlockPos(),false));h.assertTrue(s.hasSkillet()&&s.batch()&&p.getMainHandItem().isEmpty(),"Ordinary Creative use returns the vessel without opening the menu or cloning it");h.succeed();}});
+    }
+
 }

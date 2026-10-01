@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/resting_skillet"
+    },
+    "facing=east": {
+      "model": "civilization:block/resting_skillet",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/resting_skillet",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/resting_skillet",
+      "y": 270
+    }
+  }
+}
