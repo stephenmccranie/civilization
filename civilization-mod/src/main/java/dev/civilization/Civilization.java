@@ -42,6 +42,7 @@ public final class Civilization {
         WorkshopContent.register(modBus);
         CookingContent.register(modBus);
         PrototypeStoveContent.register(modBus);
+        BakingOvenContent.register(modBus);
         CuttingContent.register(modBus);
         RoadContent.register(modBus);
         CivicContent.register(modBus);
