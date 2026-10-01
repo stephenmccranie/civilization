@@ -12,8 +12,6 @@ Use the smallest check that covers the changed behavior. Do not run the whole ba
 
 Verification runs its Gradle tasks in one invocation. Gradle reuses unchanged compilation and unit-test results. Deployment also uses this incremental build and verifies the installed JAR checksum; there is no need for a separate Build or duplicate installed-hash check after a successful Deploy.
 
-The two September 28 gameplay checks each took about **66 seconds** overall. In the 230-test run, the server reported tests starting at 02:46:05 and all passing at 02:46:51; its first batch took about 29 seconds and included a 28.5-second server-overload warning. Long-running thermal simulations are a likely contributor, but individual test costs have not been profiled. Keep the prescribed gameplay check for recipe and production changes; use Quick for routine code and avoid repeating a successful check without another relevant edit. The script reports actual Gradle elapsed time, which can vary by cache state and machine load.
-
 For a narrow change, inspect the owning code and focused reference, keep searches and command output bounded, make one coherent edit, run its check once, then deploy once if the user needs the build in Prism. Update only affected documents and use `tools/check_docs.py` after documentation changes. Profile slow tests before shortening any simulation or reducing coverage.
 
 ## Focused visual checks
