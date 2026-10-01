@@ -30,7 +30,7 @@ The `canisters` scene is a short art-only check of all four canisters in item fr
 
 Other scenes:
 
-- `derrick-guide`: a completely unbuilt Oil Derrick blueprint in a focused Photon/Faithful view. Captures base and middle views, confirms all 671 missing pieces reached the client, and logs FPS with the guide hidden, outline-only, and textured from a fixed mid-height camera. FPS is a local comparison, not a server-scale benchmark.
+- `derrick-guide`: focused Photon/Faithful review of the material-fed Oil Derrick. Uses the actual Assemble button, checks the synchronized built flag, captures the complete native tower from front/rear and gallery/base details, and verifies a real player standing on the modeled middle gallery. Working crosshead frames are inspected. Server coverage checks four facings, obstruction/payment, repeat clicks, saved materials, refunds, collision and construction labor. The long refinery-throughput fixture explicitly loads its own ticking area rather than relying on adjacent tests.
 - `uranium`: exposed ore, a chest stocked with Raw Uranium and Raw Uranium in the first-person hand under Photon/Faithful. The short scene captures several moments because streak launches are intentionally irregular; one frame can be quiet. It checks visual origin and client chest synchronization, not long-session animation cadence or multiplayer load.
 - `bulk`: land Coal Bunker and Cargo Tank assembled, filled and empty views, synchronized 64,000 mB menu, real coal withdrawal, and incomplete construction guide under Photon/Faithful. Server checks cover rotations, capacity, canister conservation, fluid mixing, persistence, incomplete shells, cached capabilities, mining policy, actual hopper insertion/extraction, pipe budgets and claim revocation.
 
@@ -45,7 +45,7 @@ Other scenes:
 - `thermal-art`: cold/lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy assembled views, rear material continuity and native inventory icons under Photon/Faithful.
 - `road`: a broad Street Paver surface with independent texture variants, nearby ordinary red bricks, and slab/stair forms under Photon/Faithful; captures wide and close views.
 
-- `industry`: connected refinery, casing/cooling surfaces, the wooden Oil Derrick front/rear and its small moving crosshead, derrick guide, column guide and all six industrial controller faces in world and inventory. Coal fixtures explicitly start lit; ignition behavior remains covered separately.
+- `industry`: connected refinery, casing/cooling surfaces, the native Oil Derrick front/rear and its moving crosshead, construction cabinet, column guide and all six industrial controller faces in world and inventory. Coal fixtures explicitly start lit; ignition behavior remains covered separately.
 
 - `manufactured`: Steel Ingot and Prospecting Rod beside Machine Parts and vanilla iron/copper, including the held rod.
 

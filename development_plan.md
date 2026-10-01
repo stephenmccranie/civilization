@@ -2,7 +2,7 @@
 
 [Status](docs/status.md) owns the current build and validation; [design](design_direction.md) owns agreed rules; [open decisions](open_decisions.md) owns unresolved choices. This file owns work order and remaining deliverables. Original checklist IDs are retained.
 
-Current priority: Tier 2 cooking, then coal extraction. Flight optimization is deferred; the user will build the demonstration area later, so W01 is not a prerequisite.
+Current priority: Tier 2 cooking, then coal extraction. The requested full Oil Derrick redesign is implemented with controller-fed material assembly; [industry](civilization-mod/industry.md#build-and-supply-machines) owns its construction and migration. Flight optimization is deferred; the user will build the demonstration area later, so W01 is not a prerequisite.
 
 ### Tier 2 cooking — first prototype plan
 

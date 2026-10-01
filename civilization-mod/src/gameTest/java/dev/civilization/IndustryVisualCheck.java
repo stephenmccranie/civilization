@@ -9,7 +9,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
+    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble(m);else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);
@@ -66,9 +66,9 @@ final class IndustryVisualCheck {
         if(ticks==420)shot(mc,"pump-front");
         if(ticks==425)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),23,117,40,java.util.Set.of(),180,0);});
         if(ticks==495)shot(mc,"pump-rear");
-        if(ticks==500){mc.options.hideGui=false;server.execute(()->{var l=server.overworld();var at=new BlockPos(23,101,-12);var missing=IndustrialStructure.parts(IndustrialBlock.Kind.PUMP).stream().filter(part->part.material().equals("planks")&&part.y()>=2&&part.y()<=4).findFirst().orElseThrow();l.removeBlock(MachineStructure.position(at,Direction.NORTH,missing),false);var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,23.5,102,-15,java.util.Set.of(),0,32);p.getInventory().setItem(0,IndustrialContent.PUMP.toStack());p.getInventory().setItem(1,CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),1,16));});}
+        if(ticks==500){mc.options.hideGui=false;server.execute(()->{var l=server.overworld();var at=new BlockPos(23,101,-12);l.removeBlock(at,false);l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,23.5,102,-15,java.util.Set.of(),0,32);p.getInventory().setItem(0,IndustrialContent.PUMP.toStack());p.openMenu((IndustrialBlockEntity)l.getBlockEntity(at));});}
         if(ticks==550)shot(mc,"pump-select");
-        if(ticks==560)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),23.5,103,-17,java.util.Set.of(),0,0);});
+        if(ticks==560)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),23.5,103,-17,java.util.Set.of(),0,0);});
         if(ticks==610)shot(mc,"pump-guide");
         if(ticks==615){mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();int i=0;for(var block:java.util.List.of(IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),IndustrialContent.TANK.get(),IndustrialContent.DRILL.get())){l.setBlockAndUpdate(new BlockPos(22+i*2,101,-22),block.defaultBlockState());p.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(block));}p.teleportTo(l,27.5,102,-32,java.util.Set.of(),0,4);});}
         if(ticks==650)shot(mc,"controller-family");

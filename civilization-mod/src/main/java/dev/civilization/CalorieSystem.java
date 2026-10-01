@@ -52,6 +52,7 @@ final class CalorieSystem {
     }
 
     private void placed(BlockEvent.EntityPlaceEvent event) {
+        if(event.getPlacedBlock().getBlock() instanceof DerrickPartBlock)return;
         if (event.getEntity() instanceof ServerPlayer player && CalorieFoodData.active(player)) {
             double volume=Math.max(CutPlacement.takePlacedVolume(player,event.getPos()),MachineConstruction.takePlacedVolume(player,event.getPos()));
             actions.add(new Action(player, player.serverLevel(), event.getPos().immutable(),

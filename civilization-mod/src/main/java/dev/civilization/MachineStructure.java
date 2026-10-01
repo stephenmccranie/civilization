@@ -61,7 +61,7 @@ public final class MachineStructure {
     public static List<Part> guideParts(BlockState state) {
         if (state.getBlock() instanceof BulkBlock bulk) return BulkStructure.parts(bulk.liquid);
         if (state.getBlock() instanceof OilEngineBlock) return OilEngineStructure.PARTS;
-        if (state.getBlock() instanceof IndustrialBlock industrial) return IndustrialStructure.parts(industrial.kind);
+        if (state.getBlock() instanceof IndustrialBlock industrial) return industrial.kind==IndustrialBlock.Kind.PUMP?List.of():IndustrialStructure.parts(industrial.kind);
         if (state.is(CivicContent.TABLE.get())) return SurveyTable.PARTS;
         if (state.getBlock() instanceof KilnBlock) return parts(state);
         return List.of();

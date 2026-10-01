@@ -1,6 +1,6 @@
 # Multiblock machines
 
-Craft and place a controller, then build the machine around it. This page covers the Kiln and Fertilizer Furnace; [oil industry](industry.md) owns the newer pump/refinery/drill layouts, which use the same contextual guides. For the machines below, the controller's furnace-like front faces outwards at the bottom-center of the structure's front wall. The body extends two blocks behind it, one left and one right, and two blocks above it. The Fertilizer Furnace adds a fourth-height chimney.
+Craft and place a controller, then build the machine around it. This page covers the Kiln and Fertilizer Furnace; [oil industry](industry.md) owns the newer pump/refinery/drill layouts, which use contextual guides except for the material-fed, fully modeled Oil Derrick. For the machines below, the controller's furnace-like front faces outwards at the bottom-center of the structure's front wall. The body extends two blocks behind it, one left and one right, and two blocks above it. The Fertilizer Furnace adds a fourth-height chimney.
 
 ## In-world building flow
 

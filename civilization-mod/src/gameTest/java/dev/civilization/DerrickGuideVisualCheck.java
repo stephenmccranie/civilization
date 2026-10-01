@@ -6,71 +6,41 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 
-/** Focused full-blueprint guide check, without the long industry tour. */
+/** Focused controller construction and full native derrick review under Photon. */
 final class DerrickGuideVisualCheck {
-    private static int ticks;
-
-    static void tick(Minecraft mc) {
-        ticks++;
-        if (ticks == 100) {
-            mc.options.pauseOnLostFocus = false;
-            mc.options.renderDistance().set(8);
-            mc.options.hideGui = false;
-            PreviewConfig.MODE.set(PreviewConfig.Mode.TEXTURED);
-            mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
-            mc.getSingleplayerServer().execute(() -> {
-                var level = mc.getSingleplayerServer().overworld();
-                level.setDayTime(6000);
-                for (int cx = -1; cx <= 1; cx++) for (int cz = -1; cz <= 1; cz++) level.getChunk(cx, cz);
-                for (int x = -7; x <= 7; x++) for (int z = -7; z <= 12; z++) {
-                    level.setBlockAndUpdate(new BlockPos(x, 100, z), Blocks.STONE_BRICKS.defaultBlockState());
-                    for (int y = 101; y <= 136; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
-                }
-                level.setBlockAndUpdate(new BlockPos(0, 101, 0), IndustrialContent.PUMP.get().defaultBlockState());
-                var player = mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();
-                player.setGameMode(GameType.CREATIVE);
-                player.getInventory().clearContent();
-                player.getAbilities().flying = true;
-                player.onUpdateAbilities();
-                player.teleportTo(level, .5, 101, -3.5, java.util.Set.of(), 0, 18);
-            });
-        }
-        if (ticks == 145 || ticks == 210 || ticks == 270 || ticks == 330) {
-            try {
-                var type = dev.civilization.client.MachinePreview.class;
-                var selected = type.getDeclaredField("selected");
-                var ghosts = type.getDeclaredField("ghosts");
-                var showGuide = type.getDeclaredField("showGuide");
-                selected.setAccessible(true);
-                ghosts.setAccessible(true);
-                showGuide.setAccessible(true);
-                com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE STATE tick={} hit={} selected={} ghosts={} shown={}",
-                        ticks, mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult hit
-                                ? hit.getBlockPos() + " " + mc.level.getBlockState(hit.getBlockPos()) : mc.hitResult,
-                        selected.get(null), ((java.util.List<?>) ghosts.get(null)).size(), showGuide.get(null));
-                if (ticks >= 210) com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE FPS tick={} fps={}", ticks, mc.getFps());
-                if (ticks >= 270 && (!Boolean.TRUE.equals(showGuide.get(null))
-                        || ((java.util.List<?>) ghosts.get(null)).size() < 600))
-                    throw new IllegalStateException("Full Oil Derrick guide was not visible");
-            } catch (ReflectiveOperationException exception) {
-                throw new IllegalStateException(exception);
-            }
-        }
-        if (ticks == 150) {
-            Screenshot.grab(mc.gameDirectory, "derrick-guide-base.png", mc.getMainRenderTarget(), message -> {});
-            mc.getSingleplayerServer().execute(() -> {
-                var player = mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();
-                player.teleportTo(mc.getSingleplayerServer().overworld(), .5, 112, -6, java.util.Set.of(), 0, -12);
-            });
-        }
-        if (ticks == 160) mc.options.hideGui = true;
-        if (ticks == 220) { mc.options.hideGui = false; PreviewConfig.MODE.set(PreviewConfig.Mode.OUTLINE); }
-        if (ticks == 280) PreviewConfig.MODE.set(PreviewConfig.Mode.TEXTURED);
-        if (ticks == 310)
-            Screenshot.grab(mc.gameDirectory, "derrick-guide-middle.png", mc.getMainRenderTarget(), message -> {});
-        if (ticks > 335) {
-            com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED");
-            mc.stop();
-        }
+    private static int ticks;private static volatile String failure;private static volatile boolean ready,galleryChecked;
+    private static final BlockPos AT=new BlockPos(0,101,0);
+    static void tick(Minecraft mc){
+        ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException(failure);
+        if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.renderDistance().set(8);mc.options.fov().set(40);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
+            check(mc,()->{var l=server.overworld();l.setDayTime(6000);l.setWeatherParameters(100000,0,false,false);
+                for(int x=-10;x<=12;x++)for(int z=-4;z<=13;z++){l.getChunkAt(new BlockPos(x,101,z));l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<=129;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
+                l.setBlockAndUpdate(AT,IndustrialContent.PUMP.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.getInventory().clearContent();p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);p.openMenu((IndustrialBlockEntity)l.getBlockEntity(AT));ready=true;
+            });}
+        if(ticks>100&&!ready){ticks=101;return;}
+        if(ticks==135){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.data.get(13)!=0)throw new IllegalStateException("Construction cabinet did not synchronize");shot(mc,"construction");}
+        if(ticks==140){int x=(mc.getWindow().getGuiScaledWidth()-176)/2,y=(mc.getWindow().getGuiScaledHeight()-214)/2;mc.screen.mouseClicked(x+88,y+49,0);mc.screen.mouseReleased(x+88,y+49,0);}
+        if(ticks==160)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);if(!m.derrickBuilt||!IndustrialStructure.bind(m))throw new IllegalStateException("Actual Assemble button failed");
+            var site=new Deposits.Site(0,101,0,Deposits.Kind.OIL,2);int stock=0;for(int i=0;i<site.cells()&&stock<20;i++){var pos=site.cell(i);if(site.body(pos)){l.setBlockAndUpdate(pos,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());stock++;}}
+            try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,site);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}
+            m.setItem(0,KilnContent.MINERAL_COAL.toStack(16));CoalFireFixture.light(m);var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(l,8,114,-40,java.util.Set.of(),9.5f,0);
+        });
+        if(ticks==165)mc.options.hideGui=true;
+        if(ticks==210)shot(mc,"front");
+        if(ticks==215)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),-21,114,42,java.util.Set.of(),208,0);});
+        if(ticks==255)shot(mc,"rear");
+        if(ticks==260)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),13,119,-9,java.util.Set.of(),43,10);});
+        if(ticks==295)shot(mc,"gallery-detail");
+        if(ticks==300)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=false;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,116.5,1.9,java.util.Set.of(),0,5);});
+        if(ticks==325)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!p.onGround()||Math.abs(p.getY()-116.40625)>.04)throw new IllegalStateException("Gallery collision does not support the actual player: "+p.getY()+" ground="+p.onGround());galleryChecked=true;});
+        if(ticks==330)shot(mc,"on-gallery");
+        if(ticks==335)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),7,104,-6,java.util.Set.of(),34,0);});
+        if(ticks==365)shot(mc,"working-base");
+        if(ticks==376)shot(mc,"working-next");
+        if(ticks==380){mc.options.hideGui=false;check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),.5,102,-3,java.util.Set.of(),0,15);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(AT));});}
+        if(ticks==410){if(((IndustrialMenu)mc.player.containerMenu).data.get(13)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
+        if(ticks>420){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: actual Assemble button, complete native tower, working cycle and actual gallery support");mc.stop();}
     }
+    private static void check(Minecraft mc,Runnable action){mc.getSingleplayerServer().execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
+    private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"derrick-"+name+".png",mc.getMainRenderTarget(),m->{});}
 }

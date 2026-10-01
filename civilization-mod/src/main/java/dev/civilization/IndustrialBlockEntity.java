@@ -34,7 +34,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     private final DepositWork work=new DepositWork();
     private Deposits.Site site;
     private boolean surveyed,firePaused;
-    public boolean formed;
+    public boolean formed,derrickBuilt;
+    public final java.util.List<ItemStack> derrickMaterials=new java.util.ArrayList<>();
     private int lastPumpView = -1;
     public IndustrialBlockEntity(BlockPos p,BlockState s){super(IndustrialContent.ENTITY.get(),p,s);kind=((IndustrialBlock)s.getBlock()).kind;
         input=tank(kind==Kind.TANK?16000:4000,stack->switch(kind){case TANK->IndustrialContent.industrial(stack);case REFINERY->stack.is(IndustrialContent.CRUDE.get());case COLUMN->stack.is(IndustrialContent.HEATED.get());case CONDENSER->stack.is(IndustrialContent.VAPOR.get());case DRILL->stack.is(IndustrialContent.FUEL.get());default->false;});
@@ -62,7 +63,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(!(level instanceof ServerLevel server)||kind==Kind.TANK)return;
         int structure=IndustrialStructure.bindStatus(this);
         if(structure==MachineStructure.UNLOADED){formed=false;firePaused=true;pause(MachineStatus.Industry.UNLOADED);return;}
-        if(structure!=MachineStructure.COMPLETE){formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
+        if(structure!=MachineStructure.COMPLETE){if(kind==Kind.PUMP&&derrickBuilt)ModeledDerrick.dismantle(this);formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
         formed=true;
         if(kind==Kind.REFINERY&&MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Industry.WET);return;}
         if(coalPowered()&&!fire.lit()){pause(MachineStatus.Industry.FIRE_UNLIT);return;}
@@ -138,8 +139,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(result!=null)p.setItemInHand(hand,new ItemStack(result));else p.displayClientMessage(Component.literal("Needs 1,000 mB available or room for one full canister of the right liquid."),true);
     }
     public final ContainerData data=new ContainerData(){
-        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->heat;case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->fire.remaining();default->0;};}
-        public void set(int i,int v){}public int getCount(){return 13;}
+        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->heat;case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->fire.remaining();case 13->derrickBuilt?1:0;default->0;};}
+        public void set(int i,int v){}public int getCount(){return 14;}
     };
     @Override public void onLoad(){
         super.onLoad();
@@ -150,8 +151,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
             }
         }
     }
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putBoolean("derrickBuilt",derrickBuilt);var paid=new net.minecraft.nbt.ListTag();for(var stack:derrickMaterials)if(!stack.isEmpty())paid.add(stack.save(r));t.put("derrickMaterials",paid);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);derrickBuilt=t.getBoolean("derrickBuilt");derrickMaterials.clear();for(var tag:t.getList("derrickMaterials",10))derrickMaterials.add(ItemStack.parseOptional(r,(CompoundTag)tag));fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=saveWithoutMetadata(r);t.putBoolean("formed",formed);return t;}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}

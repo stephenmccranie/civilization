@@ -1,50 +1,43 @@
 package dev.civilization.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import dev.civilization.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import software.bernie.geckolib.animatable.GeoBlockEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-/** Small moving crosshead inside the player-built wooden derrick. */
+/** Complete native tower, backed by invisible collision cells. */
 @EventBusSubscriber(modid="civilization", value=Dist.CLIENT, bus=EventBusSubscriber.Bus.MOD)
 public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialBlockEntity> {
+    private final GeoBlockRenderer<DerrickAnimation> renderer=new GeoBlockRenderer<>(new MachineGeoModel<>("oil_derrick"));
+    private final java.util.Map<IndustrialBlockEntity,DerrickAnimation> instances=new java.util.WeakHashMap<>();
     public OilDerrickRenderer(BlockEntityRendererProvider.Context context) {}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),OilDerrickRenderer::new);}
     @Override public AABB getRenderBoundingBox(IndustrialBlockEntity m){return new AABB(m.getBlockPos()).inflate(10,34,10);}
     @Override public int getViewDistance(){return 128;}
 
     @Override public void render(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
-        if(m.kind!=IndustrialBlock.Kind.PUMP || !m.formed || m.getLevel()==null)return;
-        boolean working=m.getBlockState().getValue(MachineFeedback.WORKING);
-        double time=m.getLevel().getGameTime()+partial;
-        double stroke=working?(1-Math.cos(time*.32))*.5:0;
-        pose.pushPose();
-        pose.translate(.5,0,.5);
-        pose.mulPose(Axis.YP.rotationDegrees(switch(m.front()){case EAST->-90;case SOUTH->180;case WEST->90;default->0;}));
-        pose.translate(-.5,0,-.5);
-
-        // The built iron string is the fixed guide; this low crosshead strokes
-        // around it. Its motion is feedback, not a required construction part.
-        double y=3.1+stroke*1.2;
-        block(pose,buffers,Blocks.IRON_BLOCK.defaultBlockState(),-.55,y,5.02,.45,.28,.46,light,overlay);
-        block(pose,buffers,Blocks.IRON_BLOCK.defaultBlockState(),.60,y,5.02,.45,.28,.46,light,overlay);
-        block(pose,buffers,Blocks.IRON_BLOCK.defaultBlockState(),-.55,y,4.68,1.60,.28,.26,light,overlay);
-        block(pose,buffers,Blocks.COPPER_BLOCK.defaultBlockState(),.10,y+.28,4.73,.30,.16,.16,light,overlay);
-        pose.popPose();
+        if(m.kind!=IndustrialBlock.Kind.PUMP || !m.derrickBuilt || m.getLevel()==null)return;
+        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
+        renderer.render(a,partial,pose,buffers,light,overlay);
     }
 
-    private static void block(PoseStack p,MultiBufferSource buffers,net.minecraft.world.level.block.state.BlockState state,
-                              double x,double y,double z,double w,double h,double d,int light,int overlay){
-        p.pushPose();p.translate(x,y,z);p.scale((float)w,(float)h,(float)d);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state,p,buffers,light,overlay);p.popPose();
+    private static final class DerrickAnimation extends BlockEntity implements GeoBlockEntity {
+        private static final RawAnimation CYCLE=RawAnimation.begin().thenLoop("animation.oil_derrick.cycle");
+        private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);private boolean running;
+        DerrickAnimation(IndustrialBlockEntity m){super(IndustrialContent.ENTITY.get(),m.getBlockPos(),m.getBlockState());}
+        @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
+        @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers){controllers.add(new AnimationController<DerrickAnimation>(this,"work",0,state->{state.setControllerSpeed(running?1:0);return state.setAndContinue(CYCLE);}));}
     }
 }

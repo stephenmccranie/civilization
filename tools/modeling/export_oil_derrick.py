@@ -1,4 +1,4 @@
-"""Export the reviewed half-grid oil derrick plan as a Minecraft multiblock pattern.
+"""Export the retired half-grid oil derrick plan as a local multiblock study.
 
 The isometric plan is the geometry source. Run from the project root with the
 workspace Python runtime; the output is deterministic and has no art dependency.
@@ -88,6 +88,7 @@ for (x, y, z), pieces in sorted(by_block.items(), key=lambda item: (item[0][1], 
         entries.append(f'        new MachineStructure.Part({x-4}, {y}, {z+1}, "{material}", {units}, Direction.{side}, {corner}, 0, {union if shared else 0})')
 lines.append(",\n".join(entries))
 lines.extend(["    );", "}", ""])
-out = ROOT / "civilization-mod/src/main/java/dev/civilization/OilDerrickStructure.java"
+out = ROOT / ".tools/modeling/legacy-derrick/OilDerrickStructure.java"
+out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text("\n".join(lines), encoding="utf-8")
 print(f"Exported {len(entries)} parts to {out}")
