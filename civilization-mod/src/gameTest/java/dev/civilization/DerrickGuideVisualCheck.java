@@ -51,7 +51,44 @@ final class DerrickGuideVisualCheck {
         if(ticks==476)shot(mc,"working-next");
         if(ticks==480){mc.options.hideGui=false;check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),.5,102,-3,java.util.Set.of(),0,15);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(AT));});}
         if(ticks==510){if(((IndustrialMenu)mc.player.containerMenu).data.get(13)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
-        if(ticks>520){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: actual held-stack build, partial/damaged guides, complete native tower, working cycle and actual gallery support");mc.stop();}
+        if(ticks==520){mc.setScreen(null);mc.options.hideGui=true;mc.options.fov().set(70);check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-30);});}
+        if(ticks==545)shot(mc,"crown-level-photon");
+        if(ticks==550)check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-55));
+        if(ticks==575){verifyCrownRenderer(mc);shot(mc,"crown-up-photon");}
+        if(ticks==580){shaders(false);check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,102,-3,java.util.Set.of(),0,0));}
+        // Shader reload discards Sodium's compiled sections. Warm the controller
+        // section again before repeating the same crown camera regression.
+        if(ticks==620)check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-55));
+        if(ticks==650){verifyCrownRenderer(mc);shot(mc,"crown-up-sodium");}
+        if(ticks==655)check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-30));
+        if(ticks==680)shot(mc,"crown-level-sodium");
+        if(ticks==685)shaders(true);
+        if(ticks>700){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: held-stack build, partial/damaged guides, working cycle, gallery support and crown look-up with Sodium, both Photon and shaders disabled");mc.stop();}
+    }
+    private static void verifyCrownRenderer(Minecraft mc){
+        var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var renderer=mc.getBlockEntityRenderDispatcher().getRenderer(m);
+        if(renderer==null||!renderer.shouldRenderOffScreen(m)||!renderer.shouldRender(m,mc.gameRenderer.getMainCamera().getPosition()))throw new IllegalStateException("Derrick must remain eligible when its controller section leaves view");
+        if(renderer.shouldRenderOffScreen(new IndustrialBlockEntity(AT,IndustrialContent.REFINERY.get().defaultBlockState())))throw new IllegalStateException("Only derricks should bypass controller-section culling");
+        if(!renderer.getRenderBoundingBox(m).contains(.5,127,5))throw new IllegalStateException("Render bounds omit the crown");
+        if(renderer.shouldRender(m,new net.minecraft.world.phys.Vec3(500,121,0)))throw new IllegalStateException("Global registration bypassed the view-distance limit");
+        if(mc.levelRenderer.getFrustum().isVisible(new net.minecraft.world.phys.AABB(AT)))throw new IllegalStateException("Crown regression camera must exclude the ground controller");
+        try{
+            var sodium=Class.forName("net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer");var world=sodium.getMethod("instance").invoke(null);
+            var seen=new java.util.concurrent.atomic.AtomicBoolean();
+            java.util.function.Consumer<net.minecraft.world.level.block.entity.BlockEntity> visitor=b->{if(b==m)seen.set(true);};
+            sodium.getMethod("iterateVisibleBlockEntities",java.util.function.Consumer.class).invoke(world,visitor);
+            if(!seen.get())throw new IllegalStateException("Sodium omitted the derrick at the crown look-up camera");
+        }catch(ReflectiveOperationException e){throw new IllegalStateException("Crown regression requires the configured Sodium runtime",e);}
+    }
+    private static void shaders(boolean enabled){
+        try{
+            var iris=Class.forName("net.irisshaders.iris.Iris");var config=iris.getMethod("getIrisConfig").invoke(null);
+            config.getClass().getMethod("setShadersEnabled",boolean.class).invoke(config,enabled);
+            // Only this disposable client's copied configuration is changed.
+            config.getClass().getMethod("save").invoke(config);iris.getMethod("reload").invoke(null);
+            if((boolean)iris.getMethod("isPackInUseQuick").invoke(null)!=enabled)throw new IllegalStateException("Shader toggle did not apply");
+            com.mojang.logging.LogUtils.getLogger().info("DERRICK CROWN SHADERS: {}",enabled);
+        }catch(ReflectiveOperationException e){throw new IllegalStateException("Crown regression requires the configured Iris runtime",e);}
     }
     private static net.minecraft.world.phys.shapes.VoxelShape uncachedShape(ModeledDerrick.Cell cell,net.minecraft.core.Direction front,int mask){
         var shape=net.minecraft.world.phys.shapes.Shapes.empty();for(var entry:cell.pieces().entrySet())if((mask&(1<<entry.getKey()))!=0)shape=net.minecraft.world.phys.shapes.Shapes.or(shape,entry.getValue()[front.get2DDataValue()]);return shape;

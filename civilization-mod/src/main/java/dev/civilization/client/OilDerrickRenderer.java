@@ -38,7 +38,16 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
     public OilDerrickRenderer(BlockEntityRendererProvider.Context context) {}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),OilDerrickRenderer::new);}
     @Override public AABB getRenderBoundingBox(IndustrialBlockEntity m){return new AABB(m.getBlockPos()).inflate(10,34,10);}
+    // The tower spans sections above its controller. Sodium must not discard it
+    // when that controller's section leaves the camera view near the crown.
+    @Override public boolean shouldRenderOffScreen(IndustrialBlockEntity m){return m.kind==IndustrialBlock.Kind.PUMP;}
     @Override public int getViewDistance(){return 128;}
+    @Override public boolean shouldRender(IndustrialBlockEntity m,net.minecraft.world.phys.Vec3 camera){
+        if(m.kind!=IndustrialBlock.Kind.PUMP||!BlockEntityRenderer.super.shouldRender(m,camera))return false;
+        // Global registration bypasses section culling, not whole-tower visibility.
+        var frustum=net.minecraft.client.Minecraft.getInstance().levelRenderer.getFrustum();
+        return frustum==null||frustum.isVisible(getRenderBoundingBox(m));
+    }
 
     @Override public void render(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         if(m.kind!=IndustrialBlock.Kind.PUMP || m.getLevel()==null)return;
