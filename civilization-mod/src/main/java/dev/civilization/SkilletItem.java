@@ -58,7 +58,7 @@ public final class SkilletItem extends Item {
     }
     @Override public void appendHoverText(ItemStack stack, TooltipContext c, java.util.List<Component> lines, TooltipFlag flag) {
         lines.add(Component.literal(contents(stack).observation()));
-        lines.add(Component.literal("Use on an empty stove or a solid countertop."));
-        lines.add(Component.literal("Crouch + use with both hands empty lifts it."));
+        lines.add(Component.literal("Place on an empty stove or solid counter."));
+        lines.add(Component.literal("Lift: crouch + use, both hands empty."));
     }
 }

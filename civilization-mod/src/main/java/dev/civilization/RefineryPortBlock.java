@@ -22,5 +22,5 @@ public final class RefineryPortBlock extends Block implements EntityBlock {
         if(l.getBlockEntity(at) instanceof RefineryPortEntity p&&p.keepAssemblyCheck())l.scheduleTick(at,this,1200);
     }
     @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState s,Level l,BlockPos at,net.minecraft.world.entity.player.Player p,net.minecraft.world.phys.BlockHitResult hit){if(!l.isClientSide&&CivicAccess.allowed(l,at,p)&&l.getBlockEntity(at) instanceof RefineryPortEntity port)p.displayClientMessage(port.description(),true);return net.minecraft.world.InteractionResult.sidedSuccess(l.isClientSide);}
-    @Override public void appendHoverText(net.minecraft.world.item.ItemStack s,net.minecraft.world.item.Item.TooltipContext c,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag f){lines.add(net.minecraft.network.chat.Component.literal("Build into the guide. Automatically faces its pipe connection."));}
+    @Override public void appendHoverText(net.minecraft.world.item.ItemStack s,net.minecraft.world.item.Item.TooltipContext c,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag f){lines.add(net.minecraft.network.chat.Component.literal("Pipe connection · place in the build guide"));}
 }

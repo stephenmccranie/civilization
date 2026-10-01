@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-01**. Current build: **0.34.24-dev**, installed in Civilization Dev. Build and installed SHA-256: `3079748DF605FFE8B0285B43BD25DFC1C7D1AA40F4A0FD524F2AE55233781527`.
+Last reviewed: **2026-10-01**. Current build: **0.34.25-dev**, installed in Civilization Dev. Build and installed SHA-256: `DE3D1A8215A2EC43F81E8C234397C19238E7DAE71D938388F866C2CE6E0DBECF`.
 
 ## Implemented
 
@@ -19,7 +19,8 @@ Last reviewed: **2026-10-01**. Current build: **0.34.24-dev**, installed in Civi
 
 ## Validation and limits
 
-- **Latest build/unit and gameplay check:** all **258 server GameTests** passed in 0.34.24-dev. The complete modeled Oil Derrick covers material-fed construction, four facings, collision, payment/labor, persistence and exact refunds through controller/brace/port dismantling. The refinery fixture now explicitly supplies its required ticking area.
+- **Latest tooltip check:** 0.34.25-dev build and fast unit tests passed; deployed JAR checksum verified. Item descriptions now use short purpose/control/warning hints, without full construction bills. No in-game tooltip review was run for this text-only change.
+- **Latest gameplay check:** all **258 server GameTests** passed in 0.34.24-dev. The complete modeled Oil Derrick covers material-fed construction, four facings, collision, payment/labor, persistence and exact refunds through controller/brace/port dismantling. The refinery fixture now explicitly supplies its required ticking area.
 - **Latest derrick client check:** actual Assemble button, complete native timber tower, moving crosshead, synchronized cabinet and a real player standing on the middle gallery passed under Photon/Faithful. Native asset validation is complete; original art and editable Blockbench source remain local.
 - **Latest kitchen client check:** 0.34.22-dev passed under Photon/Faithful, including actual lift/rest/return/serve and a held skillet staying steady through repeated cooling updates. Earlier cookware extraction passed complete asset validation. The subsequent stove heat tuning remains validated by its two-minute enclosed-room test (10–30°F adjacent rise); it has not had a manual Survival review.
 - Dedicated local startup and selected graceful vehicle restart checks are verified. Real multi-client transactions/protection, crash recovery across separate saves, restore drills and representative 200-player load remain unverified. Diagnostic logs are not a transaction database.

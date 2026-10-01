@@ -34,7 +34,7 @@ public final class ThermalVision {
 
     @SubscribeEvent public static void tooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent e){
         if(e.getItemStack().is(ThermalContent.HELMET.get()))
-            e.getToolTip().add(net.minecraft.network.chat.Component.literal("Wear to see surface temperatures and heat-transfer arrows."));
+            e.getToolTip().add(net.minecraft.network.chat.Component.literal("Wear to see temperatures and heat flow."));
     }
 
     public static void accept(ThermalPayload packet){

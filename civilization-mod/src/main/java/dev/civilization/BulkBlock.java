@@ -32,12 +32,8 @@ public final class BulkBlock extends Block implements EntityBlock {
     }
     @SubscribeEvent public static void breaking(BlockEvent.BreakEvent e){if(e.getLevel().getBlockEntity(e.getPos()) instanceof BulkEntity b&&b.amount()>0){e.setCanceled(true);e.getPlayer().displayClientMessage(Component.literal("Empty the cargo store before removing its controller."),true);}}
     @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<Component> lines,TooltipFlag f){
-        lines.add(Component.literal(liquid?"64,000 mB · crude, fuel or lubricant":"8,192 coal · visible bulk storage"));
-        var parts=BulkStructure.parts(liquid);for(int units:new int[]{4,2,1}){
-            long n=parts.stream().filter(p->p.material().equals("casing")&&p.units()==units).count();
-            lines.add(Component.literal(n+" Industrial Casing "+(units==4?"blocks":units==2?"halves":"beams")));
-        }
-        if(liquid)lines.add(Component.literal("1 Glass block"));
-        lines.add(Component.literal("3×5×3 · place for construction guide"));lines.add(Component.literal("Empty before removing; destruction loses contents."));
+        lines.add(Component.literal(liquid?"64,000 mB · crude, fuel or lubricant":"8,192 coal"));
+        lines.add(Component.literal("3 × 5 × 3 · place for the build guide"));
+        lines.add(Component.literal("Empty first; destruction loses contents."));
     }
 }

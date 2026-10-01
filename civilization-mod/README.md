@@ -4,6 +4,8 @@
 
 This file describes the working mod. [Game rules](../design_direction.md) describe the intended game; [development plan](../development_plan.md) separates shipped work from future features.
 
+Item tooltips give short purpose, control and safety hints. Construction bills and processing details belong in the placed build guides, machine interfaces, JEI and the focused references below.
+
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace are included automatically. They also remain discoverable through creative search.
 
 Town manufacturing: [Tannery, Textile Workshop and Smithy](industry.md#town-workshops) connect hides, wool and Foundry metals to equipment production and repairs.

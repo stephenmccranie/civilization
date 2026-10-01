@@ -38,5 +38,5 @@ public final class FluidPipeBlock extends Block implements net.minecraft.world.l
     @Override protected boolean triggerEvent(BlockState s,Level l,BlockPos p,int id,int value){
         if(l.getBlockEntity(p) instanceof PipeFlowEntity pipe){pipe.flow(id,value);return true;}return false;
     }
-    @Override public void appendHoverText(net.minecraft.world.item.ItemStack s,net.minecraft.world.item.Item.TooltipContext c,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag f){lines.add(net.minecraft.network.chat.Component.literal("50 mB/s shared capacity. Clear glass shows moving fluid."));lines.add(net.minecraft.network.chat.Component.literal("128 pipes per network. No stored fluid or chunk loading."));}
+    @Override public void appendHoverText(net.minecraft.world.item.ItemStack s,net.minecraft.world.item.Item.TooltipContext c,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag f){lines.add(net.minecraft.network.chat.Component.literal("50 mB/s · shared across the network"));lines.add(net.minecraft.network.chat.Component.literal("Up to 128 pipes per network"));}
 }
