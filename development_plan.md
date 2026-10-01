@@ -6,7 +6,7 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 
 ### Tier 2 cooking — first prototype plan
 
-**Implemented:** one Creative/admin stove with continuous heat, sensory quality, portioned work meals, removable skillet and paid carryover. The preparation table is deferred; full kitchen multiblocks remain later work. [Cooking](civilization-mod/cooking.md) owns controls, recipes, timing, fuel and persistence; [testing](civilization-mod/testing.md) owns checks.
+**Implemented:** one Creative/admin stove with continuous heat, sensory quality, portioned work meals, removable skillet and paid carryover. Three imported audio loops retain a frying bed throughout, with plateau crackle and overcooking sputter; cue recognition still needs ordinary play. The preparation table is deferred; full kitchen multiblocks remain later work. [Cooking](civilization-mod/cooking.md) owns controls, recipes, timing, fuel and persistence; [testing](civilization-mod/testing.md) owns checks.
 
 **Next:** repeat gentle and strong-heat batches to assess color/sound recognition, carryover anticipation, useful throughput and warmth. Tune from ordinary play before adding dishes, specialties, heated positions or other stations. There is no cooking XP or chopping mechanic. [Kitchen proposals](open_decisions.md#tier-2-kitchen-workshop) own the remaining station choices; the [stove asset](art/assets/prototype_stove/asset.json) and [meal asset](art/assets/vegetable_skillet/asset.json) own artwork and evidence.
 

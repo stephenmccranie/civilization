@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-01**. Current build: **0.34.28-dev**, installed in Civilization Dev. Build and installed SHA-256: `248F8ECC942F7FCDC74A7EE01CC47CE225F7E0C638D6A4CF6D5768B44CD1AEEF`.
+Last reviewed: **2026-10-01**. Current build: **0.34.29-dev**, installed in Civilization Dev. Build and installed SHA-256: `8F1E719082CE5FCA124729229B5BDA33FA2694FB20A908FD1EAF3CF4D4BAACD0`.
 
 ## Implemented
 
@@ -19,6 +19,7 @@ Last reviewed: **2026-10-01**. Current build: **0.34.28-dev**, installed in Civi
 
 ## Validation and limits
 
+- **Latest stove audio check:** 0.34.29-dev passed build and all **63 fast unit tests**, including two blend checks for a persistent frying bed, continuous gain, constant squared gain and the golden plateau. Three supplied ElevenLabs recordings were exported as level-matched 13.5-second, 48 kHz mono Vorbis loops; decoded peaks, RMS, quiet-gap checks, seam-step checks and source/export hashes passed. The Photon/Faithful kitchen client passed lift/rest/return/serve and cooling checks without stove sound-loading warnings; the resting view was inspected. Deployment checksum verified. A local blended listening preview is available; human audibility, cue recognition and dense-kitchen balance remain unverified. [Cooking audio behavior](../civilization-mod/cooking.md#try-it) and the local asset audio receipt own details.
 - **Latest tooltip check:** 0.34.25-dev build and fast unit tests passed; deployed JAR checksum verified. Item descriptions now use short purpose/control/warning hints, without full construction bills. No in-game tooltip review was run for this text-only change.
 - **Latest gameplay check:** all **259 server GameTests** passed in 0.34.26-dev, including four derrick facings, held-stack isolation, partial saves, local damage/refunds/repair and chunk-based collision. Build/unit checks and installed JAR checksum passed.
 - **Latest shared guide check:** 0.34.28-dev passed build/unit tests, including refresh cadence, visibility culling and the strict outline cap. Ordinary `guide` and native `derrick-guide` Photon/Faithful scenes passed. Both renderers now use the shared policy; future guides must follow the [performance contract](../civilization-mod/multiblock-builds.md#guide-performance-contract). The ordinary fixture clears leftover tower scenery and resets camera/HUD state. Deployment checksum verified.
