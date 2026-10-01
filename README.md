@@ -31,4 +31,4 @@ Each rule has one home. Update the relevant reference with the code or decision;
 
 ## Source control
 
-The project is maintained in the private GitHub repository `stephenmccranie/civilization`. Continue development in this local checkout; completed, validated changes are committed and pushed under the [GitHub workflow](AGENTS.md#github-workflow). Original art, editable models, evidence, tools and documentation belong in the repository. Worlds, authentication, machine-local configuration, downloaded dependencies and build caches remain local.
+The project is maintained in the public GitHub repository `stephenmccranie/civilization`. Continue development in this local checkout; completed, validated changes are committed and pushed under the [GitHub workflow](AGENTS.md#github-workflow). Original art, editable models, evidence, tools and documentation belong in the repository. Worlds, authentication, machine-local configuration, downloaded dependencies and build caches remain local.
