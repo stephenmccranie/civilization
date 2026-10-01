@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 /** Uses actual client input events/packets; the window stays hidden and cannot grab the mouse. */
 final class FirearmVisualCheck {
     private static int ticks,sounds;private static boolean centeredSound;private static volatile Throwable failure;private static volatile boolean verified;
-    private static float beforePitch;private static int fpsTotal,fpsSamples;
+    private static float beforePitch;private static int fpsTotal,fpsSamples,emptyFpsTotal,emptyFpsSamples;
     private static void server(Minecraft mc,Runnable action){mc.getSingleplayerServer().execute(()->{try{action.run();}catch(Throwable t){failure=t;}});}
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException("Firearm visual check",failure);
@@ -24,7 +24,7 @@ final class FirearmVisualCheck {
         if(ticks==180){if(!PatersonItem.reloading(mc.player.getMainHandItem()))throw new IllegalStateException("R key did not start synchronized reload");shot(mc,"reload-open");}
         if(ticks==250)shot(mc,"reload-cylinder");
         if(ticks==335){server(mc,()->{var p=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();if(PatersonItem.rounds(p.getMainHandItem())!=5||PatersonItem.inventoryAmmo(p)!=7)throw new IllegalStateException("Inventory reload conservation failed");});shot(mc,"held-loaded");}
-        if(ticks>=320&&ticks<345){fpsTotal+=mc.getFps();fpsSamples++;}
+        if(ticks>=670&&ticks<730){fpsTotal+=mc.getFps();fpsSamples++;}
         if(ticks==337)net.minecraft.client.KeyMapping.click(com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_R));
         if(ticks==374){if(!PatersonItem.armed(mc.player.getMainHandItem()))throw new IllegalStateException("R did not cock hammer");pose(mc,true);shot(mc,"cocked");}
         if(ticks==375){beforePitch=mc.player.getXRot();var e=new net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered(0,mc.options.keyAttack,InteractionHand.MAIN_HAND);dev.civilization.client.FirearmClient.input(e);if(!e.isCanceled()||e.shouldSwingHand())throw new IllegalStateException("Left click did not suppress melee/mining");}
@@ -37,7 +37,10 @@ final class FirearmVisualCheck {
         if(ticks==600){mc.setScreen(new InventoryScreen(mc.player));}
         if(ticks==620)shot(mc,"inventory");
         if(ticks==630)mc.setScreen(null);
-        if(ticks>645&&verified){var message="FIREARM_VISUAL_PASS reload=5 ammo=7 fire=4 partial=5 remainingAmmo=6 manual_cock=true centered_sound=true actual_input=true sound="+sounds+" recoil="+(beforePitch-mc.player.getXRot())+" heldFPS="+(fpsTotal/Math.max(1,fpsSamples));System.out.println(message);try{java.nio.file.Files.writeString(mc.gameDirectory.toPath().resolve("paterson-check.txt"),message);}catch(java.io.IOException e){throw new IllegalStateException(e);}mc.stop();}
+        if(ticks==745)mc.player.getInventory().selected=2;
+        if(ticks>=775&&ticks<835){emptyFpsTotal+=mc.getFps();emptyFpsSamples++;}
+        if(ticks==840)mc.player.getInventory().selected=0;
+        if(ticks>850&&verified){var message="FIREARM_VISUAL_PASS reload=5 ammo=7 fire=4 partial=5 remainingAmmo=6 manual_cock=true centered_sound=true actual_input=true sound="+sounds+" recoil="+(beforePitch-mc.player.getXRot())+" heldFPS="+(fpsTotal/Math.max(1,fpsSamples))+" emptyHandFPS="+(emptyFpsTotal/Math.max(1,emptyFpsSamples));System.out.println(message);try{java.nio.file.Files.writeString(mc.gameDirectory.toPath().resolve("paterson-check.txt"),message);}catch(java.io.IOException e){throw new IllegalStateException(e);}mc.stop();}
     }
     private static void pose(Minecraft mc,boolean armed){var renderer=(dev.civilization.client.PatersonRenderer)net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(FirearmContent.PATERSON.get()).getCustomRenderer();double hammer=renderer.lastHeldHammerAngle,trigger=renderer.lastHeldTriggerAngle;if(Math.abs(hammer-(armed?-43:0))>3||Math.abs(trigger-(armed?-145:0))>3)throw new IllegalStateException("Hammer/trigger pose failed: "+armed+" "+hammer+" "+trigger);}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"paterson-"+name+".png",mc.getMainRenderTarget(),m->{});}
