@@ -42,7 +42,7 @@ New artwork uses **four texture pixels per model unit** (64px per standard block
 
 Explicit `fit` regions are for authored decals such as a gauge, not an escape hatch for all materials. A gauge decal must contain just the gauge. Mapping an entire instrument panel onto a small gauge gives duplicate controls and an unreadably tiny face. Declare per-face overrides so the decal does not wrap around every side of the housing.
 
-Generate one coherent master, reduce through the existing texture pipeline, and reuse its materials. Verify material boundaries and tiling in the model. Quiet surfaces still need purposeful variation; there is no global noise pass. Reserve brighter steel for joints/rims and inspect it against the body at gameplay scale.
+Reuse inspected catalog materials where suitable; otherwise generate one coherent master and reduce it through the existing texture pipeline. Verify material boundaries and tiling in the model. Quiet surfaces still need purposeful variation; there is no global noise pass. Reserve brighter steel for joints/rims and inspect it against the body at gameplay scale.
 
 The engine study uses material reuse for unimportant faces and a dedicated instrument decal. Unique painted islands can be added for a specific visual need; do not automatically create a full custom unwrap for every cube.
 
@@ -67,6 +67,10 @@ Support posts should stop at the underside of a cap, not share its exposed top p
 Do not distribute panel borders, corner plates or brass squares across structural feet by default. Detail must describe construction: access covers can have seams and fasteners; cast supports use quiet metal variation and actual mounting hardware.
 
 ## Surface accents
+
+Custom modeled machines are not constrained to one-block material tiles. Reduce an aspect-matched crop from the original master to each measured face, preserving continuous grain without a periodic block grid. Recessed panels, raised rims and prominent fastener heads need geometry when their depth should be visible; reserve painted marks for secondary detail. Closed doors meet a modeled seat/rebate, and fixed firebox surrounds close unintended gaps while keeping deliberate vents open.
+
+Prevent overlap in the source geometry: adjacent panels and posts meet at boundaries; raised fittings replace or sit clearly ahead of their backing surface. Remove duplicate buried faces where appropriate. Shared exposed planes cause z-fighting even if a still view looks acceptable. Check close and grazing views, including moving poses; brighter trim cannot repair an overlap. Keep authored UV islands disjoint with padding, and contain painted strokes within their island. Intentional reuse of a base material crop is different from overwriting an authored island. Use coherent trim tones rather than alternating bright edge pixels. Transparent windows must expose the chamber, and controls should visibly connect to their mechanism.
 
 Shared material tiles alone do not place corners or seams on a part. For prominent covers and supports, allocate face-sized UV islands at the established density, then use nine-slice panel layouts to preserve corner pixels while fitting the middle. Keep secondary faces quieter; do not paste a complete framed panel onto every surface. Inspect actual model and shader views before increasing contrast. The engine `studio/surface_textures.py` demonstrates this reproducibly.
 

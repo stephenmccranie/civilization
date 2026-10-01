@@ -15,22 +15,13 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class PrototypeStoveRenderer implements BlockEntityRenderer<PrototypeStoveEntity> {
     private static final ResourceLocation TEXTURE=ResourceLocation.parse("civilization:textures/block/prototype_stove_brass.png");
-    private static final ResourceLocation FOOD=ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
-    private final java.util.Map<net.minecraft.core.BlockPos,java.util.List<StoveSound>> sounds=new java.util.HashMap<>();
     public PrototypeStoveRenderer(BlockEntityRendererProvider.Context c){}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(PrototypeStoveContent.ENTITY.get(),PrototypeStoveRenderer::new);}
     @Override public void render(PrototypeStoveEntity b,float dt,PoseStack p,MultiBufferSource buffers,int light,int overlay){
-        var manager=Minecraft.getInstance().getSoundManager();sounds.values().removeIf(list->list.getFirst().ended());
-        if(b.batch()&&b.fire.lit()){var loops=sounds.computeIfAbsent(b.getBlockPos(),k->java.util.List.of(new StoveSound(b,0),new StoveSound(b,1),new StoveSound(b,2)));for(var s:loops)if(!manager.isActive(s))manager.play(s);}
-        p.pushPose();p.translate(.5,0,.5);p.mulPose(Axis.YP.rotationDegrees(switch(b.getBlockState().getValue(CivicBlock.FACING)){case EAST->-90;case SOUTH->180;case WEST->90;default->0;}));p.translate(-.5,0,-.5);
-        if(b.batch()){
-            var v=buffers.getBuffer(RenderType.entityCutoutNoCull(FOOD));
-            for(int i=0;i<24;i++){
-                float x=(4.2f+(i%6)*1.45f+((i/6)%2)*.3f)/16,z=(3.2f+(i/6)*2.1f+(i%3)*.2f)/16,y=(15.8f+(i%4)*.25f)/16;
-                int color=StoveCooking.color(b.work()+(i%5-2)*14,i%3==0);
-                if(i%4==1)color=StoveCooking.color(b.work()+220,false);
-                box(v,p,x,y,z,x+(.0625f+(i%3)*.008f),y+.06f+(i%2)*.025f,z+.085f+(i%3)*.01f,color,light,overlay);
-            }
+        SkilletRenderer.sound(b);
+        p.pushPose();SkilletRenderer.rotation(b,p);
+        if(b.hasSkillet()){
+            p.pushPose();p.translate(0,14.5/16,0);SkilletRenderer.vessel(p,buffers,light,overlay);SkilletRenderer.food(b.skillet(),p,buffers,light,overlay);p.popPose();
         }
         if(b.fire.lit()){
             var fire=buffers.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.parse("civilization:textures/block/prototype_stove_ember.png")));

@@ -110,20 +110,16 @@ public final class CalorieHud {
                     || event.getItemStack().is(dev.civilization.CookingContent.CAKE_BATTER.get()))
                 event.getToolTip().add(Component.translatable("tooltip.civilization.bake").withStyle(ChatFormatting.GRAY));
             if (event.getItemStack().is(dev.civilization.KilnContent.RETORT_ITEM.get())) {
-                event.getToolTip().add(Component.translatable("tooltip.civilization.works_blocks").withStyle(ChatFormatting.GOLD));
                 event.getToolTip().add(Component.translatable("tooltip.civilization.preview").withStyle(ChatFormatting.GRAY));
                 event.getToolTip().add(Component.translatable("tooltip.civilization.retort_input").withStyle(ChatFormatting.GRAY));
-                event.getToolTip().add(Component.translatable("tooltip.civilization.retort_fuel").withStyle(ChatFormatting.GRAY));
             }
             if (event.getItemStack().is(dev.civilization.FarmingContent.MINERAL_BLEND.get()))
                 event.getToolTip().add(Component.translatable("tooltip.civilization.mineral_blend").withStyle(ChatFormatting.GRAY));
             if (event.getItemStack().is(dev.civilization.KilnContent.MINERAL_COAL.get()))
                 event.getToolTip().add(Component.translatable("tooltip.civilization.mineral_coal").withStyle(ChatFormatting.GRAY));
             if (event.getItemStack().is(dev.civilization.KilnContent.KILN_ITEM.get())) {
-                event.getToolTip().add(Component.translatable("tooltip.civilization.kiln_blocks").withStyle(ChatFormatting.GOLD));
                 event.getToolTip().add(Component.translatable("tooltip.civilization.preview").withStyle(ChatFormatting.GRAY));
                 event.getToolTip().add(Component.translatable("tooltip.civilization.kiln_input").withStyle(ChatFormatting.GRAY));
-                event.getToolTip().add(Component.translatable("tooltip.civilization.kiln_fuel").withStyle(ChatFormatting.GRAY));
             }
             if (event.getItemStack().is(dev.civilization.FarmingContent.FERTILIZER.get()))
                 event.getToolTip().add(Component.translatable("tooltip.civilization.fertilizer").withStyle(ChatFormatting.GRAY));

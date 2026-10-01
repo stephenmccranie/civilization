@@ -12,9 +12,9 @@ Use the smallest check that covers the changed behavior. Do not run the whole ba
 
 Verification runs its Gradle tasks in one invocation. Gradle reuses unchanged compilation and unit-test results. Deployment also uses this incremental build and verifies the installed JAR checksum; there is no need for a separate Build or duplicate installed-hash check after a successful Deploy.
 
-The two September 28 gameplay checks each took about **66 seconds** overall. In the 230-test run, the server reported tests starting at 02:46:05 and all passing at 02:46:51; its first batch took about 29 seconds and included a 28.5-second server-overload warning. Long-running thermal simulations are a likely contributor, but individual test costs have not been profiled. Keep the prescribed gameplay check for recipe and production changes; use Quick for routine code and avoid repeating a successful check without another relevant edit. The script reports actual Gradle elapsed time, which can vary by cache state and machine load.
-
 For a narrow change, inspect the owning code and focused reference, keep searches and command output bounded, make one coherent edit, run its check once, then deploy once if the user needs the build in Prism. Update only affected documents and use `tools/check_docs.py` after documentation changes. Profile slow tests before shortening any simulation or reducing coverage.
+
+Shared multiblock guide changes must preserve `GuidePerformanceTest` coverage for refresh cadence, key invalidation, visibility culling and retaining the aimed part inside the outline cap. Use `guide` for ordinary block guides and `derrick-guide` when native section geometry changes.
 
 ## Focused visual checks
 
@@ -32,7 +32,7 @@ The `canisters` scene is a short art-only check of all four canisters in item fr
 
 Other scenes:
 
-- `derrick-guide`: a completely unbuilt Oil Derrick blueprint in a focused Photon/Faithful view. Captures base and middle views, confirms all 671 missing pieces reached the client, and logs FPS with the guide hidden, outline-only, and textured from a fixed mid-height camera. FPS is a local comparison, not a server-scale benchmark.
+- `derrick-guide`: Photon/Faithful review using actual held-stack right-clicks for footings and a partial frame. Captures missing-section guides and local damage, then completes the native tower and checks the synchronized built flag, working crosshead and a real player on its middle gallery. The fixture respawns a dead saved test player before review. Server coverage checks all facings, held-stack isolation, obstruction/payment, partial saves, local refunds/repairs, controller dismantling, construction labor and collision through Minecraft's chunk getter. The refinery-throughput fixture supplies its own ticking area. The derrick scene also compares old voxel-union bounds with cached bounds for empty and partial builds, asserts identical missing-cell outlines and logs three-sample CPU timings. These measure geometry preparation, not total FPS. The scene also flies beside the crown at two upward camera angles, first under Photon and then with shaders disabled. It checks that the ground controller is outside the camera frustum, Sodium still lists the derrick for rendering, the full-tower bounds contain the crown, other industrial controllers retain normal section culling, and the 128-block distance limit remains. Review the four crown screenshots; shader switching changes only the disposable client configuration. It also compares exact seven-section gallery-corner collision geometry, verifies repeated chunk-getter queries reuse the same shape and measures actual player movement at all four middle-gallery corners. Server coverage checks full, damaged and empty cached shapes in every facing, including unrelated section-bit changes.
 - `uranium`: exposed ore, a chest stocked with Raw Uranium and Raw Uranium in the first-person hand under Photon/Faithful. The short scene captures several moments because streak launches are intentionally irregular; one frame can be quiet. It checks visual origin and client chest synchronization, not long-session animation cadence or multiplayer load.
 - `bulk`: land Coal Bunker and Cargo Tank assembled, filled and empty views, synchronized 64,000 mB menu, real coal withdrawal, and incomplete construction guide under Photon/Faithful. Server checks cover rotations, capacity, canister conservation, fluid mixing, persistence, incomplete shells, cached capabilities, mining policy, actual hopper insertion/extraction, pipe budgets and claim revocation.
 
@@ -47,7 +47,7 @@ Other scenes:
 - `thermal-art`: cold/lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy assembled views, rear material continuity and native inventory icons under Photon/Faithful.
 - `road`: a broad Street Paver surface with independent texture variants, nearby ordinary red bricks, and slab/stair forms under Photon/Faithful; captures wide and close views.
 
-- `industry`: connected refinery, casing/cooling surfaces, the wooden Oil Derrick front/rear and its small moving crosshead, derrick guide, column guide and all six industrial controller faces in world and inventory. Coal fixtures explicitly start lit; ignition behavior remains covered separately.
+- `industry`: connected refinery, casing/cooling surfaces, the native Oil Derrick front/rear and its moving crosshead, construction cabinet, column guide and all six industrial controller faces in world and inventory. Coal fixtures explicitly start lit; ignition behavior remains covered separately.
 
 - `manufactured`: Steel Ingot and Prospecting Rod beside Machine Parts and vanilla iron/copper, including the held rod.
 
@@ -89,7 +89,7 @@ Keep the hidden 1920x1080 window, mouse-capture guard, and three-minute timeout.
 
 Use the longer visual tour independently of scope: `-Scope Full` selects server plus visual checks, while `-FullVisual` selects the extended scene sequence. Modular and material-sync scenes already have focused sequences and do not add an extended tour.
 
-The `kitchen` scene reviews the prototype stove beside the existing Cooking Stove, pale/golden/charred food, a running fire, actual rotary menu input reaching the server, serving and inventory appearance. It clears dropped items only inside its disposable fixture area so repeat reviews do not obscure the cookware. Server stove checks cover fuel/batch conservation, persistence, input validation and meal-benefit accounting.
+The `kitchen` scene reviews the prototype stove beside the existing Cooking Stove, pale/golden/charred food, a running fire, actual rotary menu input reaching the server, serving and inventory appearance, plus actual crouch lift, countertop placement, carried food, return and resting serve. It holds a cooling skillet through repeated server component updates and checks the actual first-person equip height every tick, so refreshing heat cannot replay the equip animation. With sound enabled in the disposable client, it also checks active held sound channels after lifting, unchanged loop instances through cooling updates, falling audio energy and no duplicate held channels after returning the pan. The player is explicitly Creative with flight disabled for these physical interactions. Server-task failures propagate to the render thread before a successful receipt. It clears dropped items only inside its disposable fixture area so repeat reviews do not obscure the cookware. Server stove checks cover fuel/batch conservation, persistence, input validation and meal-benefit accounting, plus paid carryover, early recovery, real Creative placement custody, resting save/serve/lift, support-loss drops and legacy migration.
 
 ## Documentation checks
 

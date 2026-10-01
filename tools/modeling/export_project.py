@@ -18,12 +18,21 @@ def main():
     parser.add_argument('directory', type=Path)
     parser.add_argument('--name', required=True)
     parser.add_argument('--replace', action='store_true')
+    parser.add_argument('--project', type=Path, help='Open this saved project before exporting; source is preserved')
     args = parser.parse_args()
     folder = args.directory.resolve()
     if not folder.is_relative_to(ROOT) or not re.fullmatch('[a-z0-9_]+', args.name):
         raise ValueError('Use a project directory and lowercase resource name')
     client = Client()
     try:
+        if args.project:
+            project = args.project.resolve()
+            if not project.is_relative_to(ROOT): raise ValueError('Keep project source in the workspace')
+            source = json.loads(project.read_text(encoding='utf-8'))
+            fmt = source['meta']['model_format']
+            if fmt not in ('java_block', 'geckolib_model'): raise ValueError('Unsupported project format')
+            client.call('create_project', {'name': args.name+'_export', 'format': fmt})
+            evaluate(client, 'Codecs.project.parse('+json.dumps(source).replace('/', '\\u002f')+');true')
         info = evaluate(client, '({format: Format.id, textures: Texture.all.map(t => t.uuid)})')
         if info['format'] not in ('java_block', 'geckolib_model'):
             raise ValueError('Choose Java Block/Item or GeckoLib format before export')

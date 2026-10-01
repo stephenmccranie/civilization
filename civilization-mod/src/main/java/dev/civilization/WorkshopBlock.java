@@ -29,10 +29,7 @@ public final class WorkshopBlock extends KilnBlock {
     @Override protected void openContainer(Level l,BlockPos p,Player player){if(l.getBlockEntity(p) instanceof WorkshopBlockEntity w&&CivicAccess.allowed(l,p,player))player.openMenu(w);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> t){return l.isClientSide?null:createTickerHelper(t,WorkshopContent.ENTITY.get(),(world,pos,state,w)->w.tick());}
     @Override public void appendHoverText(net.minecraft.world.item.ItemStack stack,net.minecraft.world.item.Item.TooltipContext context,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag flag){
-        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Raw Hide → Leather";case 1->"Wool → Cloth";default->"Make and repair metal equipment";}));
-        var counts=new java.util.LinkedHashMap<String,Integer>();
-        for(var part:WorkshopStructure.parts(kind))if(!part.material().equals("air"))counts.merge(part.material()+(part.units()==2?" half":part.units()==1?" beam":part.units()==3?" cube":""),1,Integer::sum);
-        lines.add(net.minecraft.network.chat.Component.literal("Build: "+counts.entrySet().stream().map(e->e.getValue()+" "+e.getKey()).collect(java.util.stream.Collectors.joining(", "))));
-        lines.add(net.minecraft.network.chat.Component.literal("Coal • Place for the build guide"));
+        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Hide → leather";case 1->"Wool → cloth";default->"Make and repair metal equipment";}));
+        lines.add(net.minecraft.network.chat.Component.literal("Coal-fired · place for the build guide"));
     }
 }

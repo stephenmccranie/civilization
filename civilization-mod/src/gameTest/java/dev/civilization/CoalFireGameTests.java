@@ -62,7 +62,7 @@ public final class CoalFireGameTests {
     }
     @GameTest(template="empty") public static void industrialIdleIsFiniteAndNeedsRelight(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,67,4));l.setBlockAndUpdate(p,IndustrialContent.PUMP.get().defaultBlockState());
-        var m=(IndustrialBlockEntity)l.getBlockEntity(p);for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(l,p,m.front(),part);
+        var m=(IndustrialBlockEntity)l.getBlockEntity(p);DerrickFixture.assemble(m);
         m.setItem(0,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(m.heat==0&&m.getItem(0).getCount()==1,"Pump coal waits for strike");
         roll(h,true);h.assertTrue(m.fire.strike(IndustrialStructure.bind(m))&&m.heat==250,"Pump strike purchases one coal reserve");
         for(int i=0;i<400;i++)m.fire.finish(10,false);

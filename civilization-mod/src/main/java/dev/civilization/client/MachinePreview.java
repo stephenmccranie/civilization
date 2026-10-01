@@ -20,10 +20,16 @@ import net.neoforged.neoforge.client.event.*;
 /** Client-only guide for one selected nearby controller. Never places blocks or scans chunks. */
 @EventBusSubscriber(modid = "civilization", value = Dist.CLIENT)
 public final class MachinePreview {
-    private record Ghost(BlockPos pos, MachineStructure.Part part, net.minecraft.core.Direction front, boolean wrong, AABB box) {
+    private record Ghost(BlockPos pos, MachineStructure.Part part, net.minecraft.core.Direction front, boolean wrong, boolean obstructed, AABB box) {
         String material() { return part.material(); }
         String label() { return material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : part.units()==3?"_eighth":"_quarter"); }
     }
+    private record LayoutKey(Level level,BlockPos at,net.minecraft.world.level.block.state.BlockState state) {}
+    private record LayoutPart(BlockPos pos,MachineStructure.Part part,net.minecraft.core.Direction front,AABB box) {}
+    private record UpdateKey(LayoutKey layout,net.minecraft.world.item.Item held,int count,net.minecraft.world.level.block.state.BlockState material,int units) {}
+    private static LayoutKey layoutKey;
+    private static List<LayoutPart> layout=List.of();
+    private static final GuidePerformance.Refresh refresh=new GuidePerformance.Refresh();
     private record Need(String material, int units) {}
     private static BlockPos selected, focusedController;
     private static final GuideFocus focus=new GuideFocus();
@@ -40,30 +46,34 @@ public final class MachinePreview {
 
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         var mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();showGuide=false;return; }
-        if (dimension != mc.level.dimension()) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();showGuide=false;dimension = mc.level.dimension(); }
+        if (mc.level == null || mc.player == null) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;return; }
+        if (dimension != mc.level.dimension()) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;dimension = mc.level.dimension(); }
         if (mc.screen == null && mc.hitResult instanceof BlockHitResult hit && (mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof BulkBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof OilEngineBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof IndustrialBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof KilnBlock || mc.level.getBlockState(hit.getBlockPos()).is(CivicContent.TABLE.get())))
             selected = hit.getBlockPos().immutable();
         if (selected == null) return;
         var state = mc.level.getBlockState(selected);
         if (!(state.getBlock() instanceof BulkBlock) && !(state.getBlock() instanceof OilEngineBlock) && !(state.getBlock() instanceof IndustrialBlock) && !(state.getBlock() instanceof KilnBlock) && !state.is(CivicContent.TABLE.get()) || selected.distToCenterSqr(mc.player.position()) > 32 * 32) {
-            selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();showGuide=false;return;
+            selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;return;
         }
         works = state.is(KilnContent.RETORT.get()); survey=state.is(CivicContent.TABLE.get());
         industry=state.getBlock() instanceof IndustrialBlock b?b.kind:null;
-        area = new AABB(selected);
-        var next = new ArrayList<Ghost>();
-        missing = 0; wrong = 0; unloaded = false;
-        for (var part : MachineStructure.guideParts(state)) {
-            var pos = MachineStructure.position(selected, state.getValue(AbstractFurnaceBlock.FACING), part);
-            area = area.minmax(new AABB(pos));
-            if (!mc.level.hasChunkAt(pos)) { unloaded = true; continue; }
-            var actual = mc.level.getBlockState(pos);
-            if (MachineConstruction.present(mc.level, pos, part, state.getValue(AbstractFurnaceBlock.FACING))) continue;
-            boolean occupied = MachineConstruction.blocked(mc.level,pos,part,state.getValue(AbstractFurnaceBlock.FACING));
-            if (occupied) wrong++; else missing++;
-            var front = state.getValue(AbstractFurnaceBlock.FACING);
-            next.add(new Ghost(pos, part, front, occupied, bounds(pos, part, front)));
+        var key=new LayoutKey(mc.level,selected,state);
+        if(!key.equals(layoutKey)){
+            layoutKey=key;var parts=new ArrayList<LayoutPart>();area=new AABB(selected);
+            var front=state.getValue(AbstractFurnaceBlock.FACING);
+            for(var part:MachineStructure.guideParts(state)){var pos=MachineStructure.position(selected,front,part);area=area.minmax(new AABB(pos));parts.add(new LayoutPart(pos,part,front,bounds(pos,part,front)));}
+            layout=List.copyOf(parts);
+        }
+        var held=mc.player.getMainHandItem();
+        if(!refresh.due(new UpdateKey(key,held.getItem(),held.getCount(),CuttingContent.material(held),CuttingContent.units(held))))return;
+        var next = new ArrayList<Ghost>();missing=0;wrong=0;unloaded=false;
+        for(var entry:layout){
+            var pos=entry.pos();var part=entry.part();var front=entry.front();
+            if(!mc.level.hasChunkAt(pos)){unloaded=true;continue;}
+            if(MachineConstruction.present(mc.level,pos,part,front))continue;
+            boolean occupied=MachineConstruction.blocked(mc.level,pos,part,front);
+            if(occupied)wrong++;else missing++;
+            next.add(new Ghost(pos,part,front,occupied,MachineStructure.obstructed(mc.level,pos,part,front),entry.box()));
         }
         ghosts = List.copyOf(next);
         blockers = ghosts.stream().map(ghost -> ghost.box().deflate(.0001)).distinct().toList();
@@ -142,7 +152,7 @@ public final class MachinePreview {
                 for (var ghost : visibleGhosts) {
                     // Occupied cells already have a real surface: use the red outline only.
                     // Layering a full-bright ghost onto newly rebuilt terrain causes a bright flash.
-                    if(MachineStructure.obstructed(mc.level,ghost.pos(),ghost.part(),ghost.front()))continue;
+                    if(ghost.obstructed())continue;
                     var block = previewState(ghost);
                     if (block == null) continue; // An obstructed air chamber gets a red outline, never a fake block.
                     pose.pushPose();
@@ -157,18 +167,8 @@ public final class MachinePreview {
                 buffers.endBatch(ghostType);
             }
             var aimed=aimedGhost();
-            boolean largeGuide = ghosts.size() > 128;
-            int outlineSteps = largeGuide ? 6 : 16;
-            // Large open frames remain legible through all their translucent parts, but
-            // only the nearest edges need hard outlines. This also bounds ray tests.
-            List<Ghost> outlined = visibleGhosts;
-            if (largeGuide && visibleGhosts.size() > 64) {
-                var nearest = new ArrayList<>(visibleGhosts);
-                nearest.sort(java.util.Comparator.comparingDouble(ghost -> camera.distanceToSqr(ghost.box().getCenter())));
-                nearest.subList(64, nearest.size()).clear();
-                if (aimed != null && visibleGhosts.contains(aimed) && !nearest.contains(aimed)) nearest.add(aimed);
-                outlined = nearest;
-            }
+            int outlineSteps=GuidePerformance.outlineSteps(ghosts.size());
+            var outlined=GuidePerformance.outlines(visibleGhosts,ghost->true,ghost->camera.distanceToSqr(ghost.box().getCenter()),aimed);
             for (var ghost : outlined) {
                 boolean highlight=ghost==aimed;
                 GuideOutline.draw(pose, buffers.getBuffer(PreviewRenderTypes.OUTLINE), ghost.box().inflate(.002),blockers,camera,outlineSteps,

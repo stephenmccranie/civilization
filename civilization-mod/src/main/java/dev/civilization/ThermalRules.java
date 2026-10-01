@@ -12,7 +12,7 @@ public final class ThermalRules {
     private ThermalRules() {}
     public static final int MAX_CELLS = 262144;
     public static final double COAL_WASTE_HEAT = 13000;
-    public static final double STOVE_WASTE_HEAT_FACTOR = .025;
+    public static final double STOVE_WASTE_HEAT_FACTOR = .05;
     public static final double MAX_SOURCE_HEAT_PER_SECOND = 800;
     public static final double CAMPFIRE_HEAT = 24;
     public static final double TORCH_HEAT = 6; // Heat units per loaded second, not machine work credit.

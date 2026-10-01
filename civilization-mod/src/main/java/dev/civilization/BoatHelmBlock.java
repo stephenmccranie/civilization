@@ -43,9 +43,7 @@ public final class BoatHelmBlock extends HorizontalDirectionalBlock {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
     @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<net.minecraft.network.chat.Component> lines,TooltipFlag f){
-        lines.add(net.minecraft.network.chat.Component.literal("Two-wide console. Attach it to any connected hull on water."));
-        lines.add(net.minecraft.network.chat.Component.literal("Running Hot-Bulb Engines provide thrust; mass slows the vessel."));
-        lines.add(net.minecraft.network.chat.Component.literal("W/S: gear up/down. A/D: steer. Shift: leave helm."));
-        lines.add(net.minecraft.network.chat.Component.literal("Build freely aboard; new blocks must touch the vessel."));
+        lines.add(net.minecraft.network.chat.Component.literal("Boat helm · needs a powered hull"));
+        lines.add(net.minecraft.network.chat.Component.literal("W/S: gears · A/D: steer · Shift: leave"));
     }
 }

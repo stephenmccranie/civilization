@@ -6,6 +6,7 @@
 | [Ownership and trade](../civilization-mod/ownership-trade.md) | Powered claim tiers, whitelists, takeover lifecycle, local counters and protection scope |
 | [Geography](../civilization-mod/geography.md) | Regional eligibility, inspection, configuration and terrain limits |
 | [Weather and farming](../civilization-mod/weather.md) | Regional rain, soil water, crop timing/yields, Rain Caller and growable exceptions |
+| [Tier 2 cooking](../civilization-mod/cooking.md) | Prototype stove, sensory quality, work meals and removable cookware |
 | [Heat and thermal comfort](../civilization-mod/heat.md) | Environmental heat, insulation, machine losses, labor benefits and Thermal Survey Helmet |
 | [Industry](../civilization-mod/industry.md) | Finite deposits, prospecting, oil bootstrap, town workshops/equipment repairs, liquid storage and machine recipes |
 | [Status](status.md) | Current build, completed scope, validation and limitations |

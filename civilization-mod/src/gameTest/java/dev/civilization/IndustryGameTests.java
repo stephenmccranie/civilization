@@ -38,45 +38,52 @@ public final class IndustryGameTests {
         h.succeed();
     }
 
-    @GameTest(template="empty") public static void controllerBuildsOilDerrickFromHeldMaterials(GameTestHelper h){
-        var level=h.getLevel();var at=h.absolutePos(new BlockPos(8,67,8));
-        var front=Direction.EAST;
-        level.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front));
-        for(var part:IndustrialStructure.parts(IndustrialBlock.Kind.PUMP))level.getChunkAt(MachineStructure.position(at,front,part));
-        var player=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"oil-builder"));
-        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        player.setPos(at.getX()+.5,at.getY()+1,at.getZ()-3);
-        var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
-
-        player.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Blocks.COBBLESTONE,7));
-        h.assertTrue(player.gameMode.useItemOn(player,level,player.getMainHandItem(),InteractionHand.MAIN_HAND,hit).consumesAction(),"Controller accepts structural material");
-        h.assertTrue(player.getMainHandItem().isEmpty(),"One click consumes only the seven supplied stones");
-        long placed=IndustrialStructure.parts(IndustrialBlock.Kind.PUMP).stream().filter(part->part.material().equals("stone")&&part.units()==4)
-                .filter(part->MachineStructure.matches(level,MachineStructure.position(at,front,part),part,front)).count();
-        h.assertTrue(placed==7,"Held stack fills seven real footing positions, including rotation");
-
-        var half=CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),2,4);
-        player.setItemInHand(InteractionHand.MAIN_HAND,half);
-        player.gameMode.useItemOn(player,level,half,InteractionHand.MAIN_HAND,hit);
-        long halves=IndustrialStructure.parts(IndustrialBlock.Kind.PUMP).stream().filter(part->part.material().equals("planks")&&part.units()==2)
-                .filter(part->MachineStructure.matches(level,MachineStructure.position(at,front,part),part,front)).count();
-        h.assertTrue(half.isEmpty()&&halves==4,"Cut planks place at the blueprint's exact orientation and volume (held="+half.getCount()+", matched="+halves+")");
-
-        var port=new ItemStack(IndustrialContent.PORT.get());
-        player.setItemInHand(InteractionHand.MAIN_HAND,port);
-        player.gameMode.useItemOn(player,level,port,InteractionHand.MAIN_HAND,hit);
-        var firstPort=IndustrialStructure.parts(IndustrialBlock.Kind.PUMP).stream().filter(part->part.material().endsWith("_port")).findFirst().orElseThrow();
-        var portPos=MachineStructure.position(at,front,firstPort);
-        h.assertTrue(port.isEmpty()&&level.getBlockState(portPos).getValue(RefineryPortBlock.FACING)==MachineStructure.side(firstPort,front),"Port faces the intended side");
-
-        var nextStone=IndustrialStructure.parts(IndustrialBlock.Kind.PUMP).stream().filter(part->part.material().equals("planks")&&part.units()==2)
-                .filter(part->!MachineStructure.matches(level,MachineStructure.position(at,front,part),part,front)).findFirst().orElseThrow();
-        var obstructed=MachineStructure.position(at,front,nextStone);
-        level.setBlockAndUpdate(obstructed,Blocks.DIAMOND_BLOCK.defaultBlockState());
-        var extra=CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),2,1);
-        player.setItemInHand(InteractionHand.MAIN_HAND,extra);
-        player.gameMode.useItemOn(player,level,extra,InteractionHand.MAIN_HAND,hit);
-        h.assertTrue(level.getBlockState(obstructed).is(Blocks.DIAMOND_BLOCK)&&extra.isEmpty(),"Controller skips an obstruction without destroying it or consuming extra material");
+    @GameTest(template="empty",batch="derrick-construction") public static void modeledDerrickConstructionConservesMaterials(GameTestHelper h){
+        var l=h.getLevel();var at=h.absolutePos(new BlockPos(8,67,8));
+        var player=new FakePlayer(l,new GameProfile(UUID.randomUUID(),"derrick-builder"));player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.setPos(at.getX()+.5,at.getY()+1,at.getZ()-3);
+        for(var front:Direction.Plane.HORIZONTAL){
+            l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front));var m=(IndustrialBlockEntity)l.getBlockEntity(at);
+            for(var cell:ModeledDerrick.CELLS){var p=ModeledDerrick.position(at,front,cell);l.getChunkAt(p);l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());}
+            var port=MachineStructure.position(at,front,ModeledDerrick.PORT);l.setBlockAndUpdate(port,Blocks.AIR.defaultBlockState());
+            player.getInventory().clearContent();player.getInventory().setItem(1,new ItemStack(Items.OAK_PLANKS,64));
+            var held=new ItemStack(Items.OAK_PLANKS,5);
+            h.assertTrue(!ModeledDerrick.build(m,player,held)&&held.getCount()==5&&player.getInventory().getItem(1).getCount()==64,"Never draw missing materials from another inventory slot");
+            var blocked=ModeledDerrick.CELLS.stream().filter(c->c.pieces().containsKey(0)).findFirst().orElseThrow();var blockedAt=ModeledDerrick.position(at,front,blocked);l.setBlockAndUpdate(blockedAt,Blocks.DIAMOND_BLOCK.defaultBlockState());held=new ItemStack(Items.COBBLESTONE,7);
+            h.assertTrue(!ModeledDerrick.build(m,player,held)&&held.getCount()==7&&m.derrickSections==0,"Obstruction preserves held stock and terrain");l.removeBlock(blockedAt,false);
+            double labor=CalorieFoodData.of(player).laborSpent;
+            h.assertTrue(ModeledDerrick.build(m,player,held)&&held.isEmpty()&&m.derrickSections==1&&!IndustrialStructure.bind(m),"Footings are visible and solid before completion");
+            var partial=new IndustrialBlockEntity(at,m.getBlockState());partial.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(partial.derrickSections==1&&partial.derrickPaid.get(0).getFirst().is(Items.COBBLESTONE),"Partial construction and paid material identity survive save/load");
+            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,29),new ItemStack(Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledDerrick.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
+            h.assertTrue(m.derrickSections==ModeledDerrick.ALL&&IndustrialStructure.bind(m)&&player.getInventory().getItem(1).getCount()==64,"Complete all rotations without touching inventory reserves");
+            h.assertTrue(CalorieFoodData.of(player).laborSpent-labor>0&&CalorieFoodData.of(player).laborSpent-labor<500,"Charge material labor, not hidden cells");
+            int dropped=derrickDrops(l,at);l.destroyBlock(port,true);
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.derrickSections)==24&&!IndustrialStructure.bind(m)&&derrickDrops(l,at)-dropped==1,"Port damage is local and refunds exactly one paid port");
+            h.assertTrue(ModeledDerrick.build(m,player,IndustrialContent.PORT.toStack())&&IndustrialStructure.bind(m),"Repair port from held materials");
+            dropped=derrickDrops(l,at);var cell=ModeledDerrick.CELLS.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(1)).findFirst().orElseThrow();l.destroyBlock(ModeledDerrick.position(at,front,cell),true);
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.derrickSections)==24&&derrickDrops(l,at)-dropped==6,"A broken panel leaves the other sections standing");
+            m.process();h.assertTrue(!m.formed&&Integer.bitCount(m.derrickSections)==24,"Incomplete pump stops without dismantling");
+            h.assertTrue(ModeledDerrick.build(m,player,new ItemStack(Items.OAK_PLANKS,6))&&IndustrialStructure.bind(m),"Repair the missing frame panel");
+            var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(copy.derrickPaid.values().stream().flatMap(List::stream).mapToInt(ItemStack::getCount).sum()==165,"Exact per-section refund ledger survives reload");
+            dropped=derrickDrops(l,at);l.removeBlock(at,false);h.assertTrue(derrickDrops(l,at)-dropped==165,"Controller removal refunds remaining materials exactly once");
+            h.assertTrue(ModeledDerrick.CELLS.stream().allMatch(c->l.getBlockState(ModeledDerrick.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Controller removal clears owned physical cells");
+        }h.succeed();
+    }
+    private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
+    @GameTest(template="empty",batch="derrick-construction") public static void derrickCollisionThroughChunkGetter(GameTestHelper h){
+        var m=machine(h,IndustrialContent.PUMP.get(),8);var l=h.getLevel();
+        var cell=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).findFirst().orElseThrow();var at=ModeledDerrick.position(m.getBlockPos(),m.front(),cell);var state=l.getBlockState(at);
+        h.assertTrue(!state.getCollisionShape(l.getChunkAt(at),at).isEmpty(),"Collision getter uses a chunk, and still resolves controller ownership");h.succeed();
+    }
+    @GameTest(template="empty",batch="derrick-construction") public static void derrickCornerCollisionReusesExactShapes(GameTestHelper h){
+        var cell=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).max(java.util.Comparator.comparingInt(c->c.pieces().size())).orElseThrow();
+        int bits=0;for(int part:cell.pieces().keySet())bits|=1<<part;
+        for(var front:net.minecraft.core.Direction.Plane.HORIZONTAL)for(int mask:new int[]{0,ModeledDerrick.ALL,ModeledDerrick.ALL^(1<<21),bits&~Integer.lowestOneBit(bits)}){
+            var expected=net.minecraft.world.phys.shapes.Shapes.empty();
+            for(var entry:cell.pieces().entrySet())if((mask&(1<<entry.getKey()))!=0)expected=net.minecraft.world.phys.shapes.Shapes.or(expected,entry.getValue()[front.get2DDataValue()]);
+            var shape=cell.shape(front,mask);
+            h.assertTrue(!net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(expected,shape,net.minecraft.world.phys.shapes.BooleanOp.NOT_SAME),"Cached corner collision exactly matches section geometry");
+            for(int i=0;i<100;i++)h.assertTrue(cell.shape(front,mask)==shape&&cell.shape(front,mask^(1<<24))==shape,"Repeated movement and unrelated section changes reuse the same local shape");
+        }
         h.succeed();
     }
     @GameTest(template="empty") public static void stoneToolsRecoverControllers(GameTestHelper h){
@@ -100,9 +107,9 @@ public final class IndustryGameTests {
         h.succeed();
     }
     private static IndustrialBlockEntity machine(GameTestHelper h,IndustrialBlock block,int x){
-        var at=h.absolutePos(new BlockPos(x,67,2));h.getLevel().setBlockAndUpdate(at,block.defaultBlockState());
+        var at=h.absolutePos(new BlockPos(x,67,2));h.getLevel().removeBlock(at,false);h.getLevel().setBlockAndUpdate(at,block.defaultBlockState());
         var m=(IndustrialBlockEntity)h.getLevel().getBlockEntity(at);
-        for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
+        if(m.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble(m);else for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
     }
     private static void bind(IndustrialBlockEntity m,Deposits.Site s){try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,s);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}}
     private static Deposits.Site site(IndustrialBlockEntity m,Deposits.Kind k,int count){
@@ -145,8 +152,11 @@ public final class IndustryGameTests {
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(2));pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),4000),EXECUTE);run(pump,12);
         h.assertTrue(pump.getItem(0).getCount()==1&&pump.heat==243&&stock(h,s)==1000&&pump.status==4,"Full output preserves oil while burning idle coal");
         pump.output.drain(4000,EXECUTE);var frame=IndustrialStructure.parts(pump.kind).stream().filter(p->!p.material().equals("air")).findFirst().orElseThrow();
-        h.getLevel().removeBlock(MachineStructure.position(pump.getBlockPos(),pump.front(),frame),false);run(pump,12);
-        h.assertTrue(pump.getItem(0).getCount()==1&&!pump.fire.lit()&&pump.status==1&&stock(h,s)==1000,"Incomplete frame pauses production");h.succeed();
+        var area=new net.minecraft.world.phys.AABB(pump.getBlockPos()).inflate(3);
+        int coal=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
+        h.getLevel().removeBlock(MachineStructure.position(pump.getBlockPos(),pump.front(),frame),false);
+        int dropped=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
+        run(pump,2);h.assertTrue(h.getLevel().getBlockEntity(pump.getBlockPos())==pump&&!pump.formed&&dropped==coal&&pump.getItem(0).getCount()==1&&stock(h,s)==1000,"Local damage stops production without consuming coal or oil or dropping inventory");h.succeed();
     }
     @GameTest(template="empty") public static void machineSaveReloadAndRebuildDoNotRefillDeposit(GameTestHelper h){
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack());run(pump,5);
@@ -282,15 +292,18 @@ public final class IndustryGameTests {
     }
     @GameTest(template="empty") public static void industrialStructuresRotateWithCutSlabs(GameTestHelper h){
         var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
-            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
-            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
+            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble((IndustrialBlockEntity)h.getLevel().getBlockEntity(at));else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
+            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.kind==IndustrialBlock.Kind.PUMP)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
         }h.succeed();
     }
 
     private static BlockPos port(IndustrialBlockEntity m,String role){return IndustrialStructure.parts(m.kind).stream().filter(p->p.material().equals(role)).map(p->MachineStructure.position(m.getBlockPos(),m.front(),p)).findFirst().orElseThrow();}
     private static void pipe(GameTestHelper h,BlockPos p){h.getLevel().setBlockAndUpdate(p,IndustrialContent.PIPE.get().defaultBlockState());}
-    @GameTest(template="empty",timeoutTicks=440) public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
-        var l=h.getLevel();var pump=machine(h,IndustrialContent.PUMP.get(),15);
+    @GameTest(template="empty",timeoutTicks=440,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
+        var l=h.getLevel();var origin=h.absolutePos(new BlockPos(0,67,0));
+        // This 60-block pipeline extends beyond the tiny empty template's ticking area.
+        for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
+        h.runAfterDelay(20,()->{var pump=machine(h,IndustrialContent.PUMP.get(),15);
         var oil=site(pump,Deposits.Kind.OIL,1000);bind(pump,oil);int initialStock=stock(h,oil);
         var heater=machine(h,IndustrialContent.REFINERY.get(),24);
         var column=machine(h,IndustrialContent.COLUMN.get(),38);
@@ -317,10 +330,12 @@ public final class IndustryGameTests {
         h.runAfterDelay(400,()->{
             h.assertTrue(initialStock-stock(h,oil)==1000,"Twenty seconds removes precisely 1,000 mB physical crude");
             h.assertTrue(heater.input.getFluidAmount()==500&&column.input.getFluidAmount()==2000,"Matched upstream stages hold stable input inventories: "+heater.input.getFluidAmount()+", "+column.input.getFluidAmount());
-            h.assertTrue(column.lubricant.getFluidAmount()==200&&column.getItem(1).getCount()==1,"One column batch yields 200 mB oil and one sulfur");
-            h.assertTrue(condenser.output.getFluidAmount()+tank.input.getFluidAmount()==800,"One condenser delivers 800 mB fuel per twenty seconds");
+            h.assertTrue(column.lubricant.getFluidAmount()==200&&column.getItem(1).getCount()==1,"One column batch yields 200 mB oil and one sulfur: "+column.lubricant.getFluidAmount()+", sulfur="+column.getItem(1)+", progress="+column.progress);
+            h.assertTrue(condenser.output.getFluidAmount()+tank.input.getFluidAmount()==800,"One condenser delivers 800 mB fuel per twenty seconds: "+condenser.output.getFluidAmount()+" + "+tank.input.getFluidAmount()+", status="+condenser.status+", progress="+condenser.progress);
             for(var m:java.util.List.of(pump,heater,column,condenser))h.assertTrue(m.status==7&&m.progress==0,"Every primed stage completes its matched batches without starving: "+m.kind);
+            for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,false);
             h.succeed();
+        });
         });
     }
     @GameTest(template="empty") public static void pipeCapacitySharedAcrossPushPullAndBranches(GameTestHelper h){

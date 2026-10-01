@@ -2,9 +2,13 @@
 
 Start with [README.md](README.md), [current status](docs/status.md), and the active package in [development_plan.md](development_plan.md). Read the relevant implementation reference before changing behavior. The user's latest decisions take precedence over older documents.
 
+## Multiblock guide performance
+
+All current and future multiblock guides, including native model guides, must follow the [shared guide performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract). Use `GuidePerformance` for refresh cadence and bounded visible outlines; cache layout and construction geometry outside the frame loop. Do not introduce separate polling/budget constants or per-frame collision unions.
+
 ## Keep documentation current in the same change
 
-For asset creation/redesign, use the project [Civilization art skill](.agents/skills/civilization-art/SKILL.md) and [shared asset pipeline](tools/modeling/README.md#complete-asset-pipeline): brief → one generated direction → autonomous visual review/iteration → implementation → actual model/in-game review. Do not default to competing concepts or routine user approval gates. Concept selection does not approve generated mechanical errors.
+For asset creation/redesign, use the [Civilization art skill](.agents/skills/civilization-art/SKILL.md) and [shared asset workflow](tools/modeling/README.md#complete-asset-pipeline): Define → Build and refine → Verify and publish. Use compact new asset records, one authoritative source, reusable materials and actual visual proofs. Concepts are optional for established directions; routine approval gates are unnecessary. Preserve legacy assets and provenance.
 
 For multiblocks built mostly from full and saw-cut blocks, use the small [isometric plan script](tools/modeling/README.md#isometric-block-plans). Define the block placements in one short Python layout file and review its two complete isometric views plus half-block layer diagrams. Blockbench remains for custom moving models; neither it nor Minecraft is needed for block-layout planning. The diagrams are engineering plans, not implemented machine art.
 

@@ -32,7 +32,7 @@ public final class ControllerConstructionGameTests {
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
         List<Block> controllers=List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),KilnContent.FOUNDRY.get(),
                 WorkshopContent.TANNERY.get(),WorkshopContent.TEXTILE.get(),WorkshopContent.SMITHY.get(),
-                IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
+                IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
                 BulkContent.TANK.get(),OilEngineContent.ENGINE.get(),CivicContent.TABLE.get());
         for(var block:controllers) {

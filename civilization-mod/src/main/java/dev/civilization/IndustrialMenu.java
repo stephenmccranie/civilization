@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 public final class IndustrialMenu extends AbstractContainerMenu implements CoalFireMenu {
     public final ContainerData data;
     private final Container inventory;
-    public IndustrialMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(13));}
+    public IndustrialMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(14));}
     public IndustrialMenu(int id,Inventory inv,Container machine,ContainerData data){super(IndustrialContent.MENU.get(),id);this.data=data;inventory=machine;
         for(int bank=0;bank<2;bank++)for(int n=0;n<4;n++){
             final boolean input=bank==0;final int offset=n;int slot=(input?new int[]{0,2,3,4}:MachineInventory.INDUSTRIAL_OUTPUT)[n];
