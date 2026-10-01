@@ -27,6 +27,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==165)useController(mc);
         if(ticks==175)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();var m=(IndustrialBlockEntity)server.overworld().getBlockEntity(AT);if(Integer.bitCount(m.derrickSections)!=11||!p.getMainHandItem().isEmpty())throw new IllegalStateException("Held wood did not build partial tower");p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,110,-3,java.util.Set.of(),0,-15);});
         if(ticks==180){mc.options.fov().set(80);mc.gui.getChat().clearMessages(false);}
+        if(ticks==183)profileGuide(mc);
         if(ticks==185)shot(mc,"partial-guide");
         if(ticks==200)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);var cell=ModeledDerrick.CELLS.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(1)).findFirst().orElseThrow();l.destroyBlock(ModeledDerrick.position(AT,m.front(),cell),true);if(l.getBlockEntity(AT)!=m||Integer.bitCount(m.derrickSections)!=10)throw new IllegalStateException("Panel damage collapsed tower");});
         if(ticks==220)shot(mc,"damaged-guide");
@@ -51,6 +52,20 @@ final class DerrickGuideVisualCheck {
         if(ticks==480){mc.options.hideGui=false;check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),.5,102,-3,java.util.Set.of(),0,15);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(AT));});}
         if(ticks==510){if(((IndustrialMenu)mc.player.containerMenu).data.get(13)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
         if(ticks>520){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: actual held-stack build, partial/damaged guides, complete native tower, working cycle and actual gallery support");mc.stop();}
+    }
+    private static void profileGuide(Minecraft mc){
+        var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var log=com.mojang.logging.LogUtils.getLogger();
+        for(int mask:new int[]{0,m.derrickSections}){
+            long oldTime=0,newTime=0;int count=0;
+            for(int repeat=0;repeat<3;repeat++){
+                long start=System.nanoTime();var expected=new java.util.HashMap<Integer,net.minecraft.world.phys.AABB>();
+                for(int i=0;i<ModeledDerrick.CELLS.size();i++){var cell=ModeledDerrick.CELLS.get(i);var shape=cell.shape(m.front(),ModeledDerrick.ALL^mask);if(!shape.isEmpty())expected.put(i,shape.bounds().move(ModeledDerrick.position(AT,m.front(),cell)));}
+                oldTime+=System.nanoTime()-start;start=System.nanoTime();var snapshot=dev.civilization.client.DerrickGuideGeometry.build(AT,m.front(),mask);newTime+=System.nanoTime()-start;count=snapshot.cells().size();
+                if(count!=expected.size())throw new IllegalStateException("Cached guide lost missing cells");
+                for(var cell:snapshot.cells())if(!cell.box().equals(expected.get(cell.index())))throw new IllegalStateException("Cached guide changed collision outline bounds");
+            }
+            log.info("DERRICK GUIDE CPU: mask={}, cells={}, old voxel unions={} ms/build, cached bounds snapshot={} ms/build; render performs zero voxel unions",mask,count,oldTime/3e6,newTime/3e6);
+        }
     }
     private static void useController(Minecraft mc){mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(.5,101.5,0),net.minecraft.core.Direction.NORTH,AT,false));}
     private static void check(Minecraft mc,Runnable action){mc.getSingleplayerServer().execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}

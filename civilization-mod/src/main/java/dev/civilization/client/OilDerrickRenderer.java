@@ -23,13 +23,16 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
     private final GeoBlockRenderer<DerrickAnimation> renderer=new GeoBlockRenderer<>(new MachineGeoModel<>("oil_derrick")){
         @Override public void preRender(PoseStack pose,DerrickAnimation a,software.bernie.geckolib.cache.object.BakedGeoModel model,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
             super.preRender(pose,a,model,buffers,vertices,reRender,partial,light,overlay,color);
-            for(var bone:model.topLevelBones())visibility(bone,a.mask,a.guide);
+            if(visibilityModel!=model){visibilityModel=model;visibilityBones.clear();for(var bone:model.topLevelBones())indexVisibility(bone);}
+            for(var entry:visibilityBones)entry.bone().setHidden(entry.part()>=0?(a.mask&(1<<entry.part()))==0:a.guide&&entry.controller());
         }
     };
-    private static void visibility(software.bernie.geckolib.cache.object.GeoBone bone,int mask,boolean guide){
-        String name=bone.getName();boolean hidden=name.equals("controller")&&guide;
-        if(name.startsWith("section_")){int part=Integer.parseInt(name.substring(8,name.indexOf('_',8)));hidden=(mask&(1<<part))==0;}
-        bone.setHidden(hidden);for(var child:bone.getChildBones())visibility(child,mask,guide);
+    private record Visibility(software.bernie.geckolib.cache.object.GeoBone bone,int part,boolean controller) {}
+    private software.bernie.geckolib.cache.object.BakedGeoModel visibilityModel;
+    private final java.util.List<Visibility> visibilityBones=new java.util.ArrayList<>();
+    private void indexVisibility(software.bernie.geckolib.cache.object.GeoBone bone){
+        String name=bone.getName();int part=name.startsWith("section_")?Integer.parseInt(name.substring(8,name.indexOf('_',8))):-1;
+        visibilityBones.add(new Visibility(bone,part,name.equals("controller")));for(var child:bone.getChildBones())indexVisibility(child);
     }
     private final java.util.Map<IndustrialBlockEntity,DerrickAnimation> instances=new java.util.WeakHashMap<>();
     public OilDerrickRenderer(BlockEntityRendererProvider.Context context) {}

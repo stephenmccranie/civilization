@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-01**. Current build: **0.34.26-dev**, installed in Civilization Dev. Build and installed SHA-256: `D9ED5516D71A1E468272D568915877C7D3D2C117CAF9FFB3B126D8712174DD38`.
+Last reviewed: **2026-10-01**. Current build: **0.34.27-dev**, installed in Civilization Dev. Build and installed SHA-256: `97611E08C31F12433E7D45AACDC2BA52131271B00F3B354B8E850EB758FA5205`.
 
 ## Implemented
 
@@ -21,7 +21,7 @@ Last reviewed: **2026-10-01**. Current build: **0.34.26-dev**, installed in Civi
 
 - **Latest tooltip check:** 0.34.25-dev build and fast unit tests passed; deployed JAR checksum verified. Item descriptions now use short purpose/control/warning hints, without full construction bills. No in-game tooltip review was run for this text-only change.
 - **Latest gameplay check:** all **259 server GameTests** passed in 0.34.26-dev, including four derrick facings, held-stack isolation, partial saves, local damage/refunds/repair and chunk-based collision. Build/unit checks and installed JAR checksum passed.
-- **Latest derrick client check:** live Survival held-stack right-clicks, partial/damaged native guides, completed tower, working crosshead, synchronized cabinet and a real player on the gallery passed under Photon/Faithful. Dead-player fixture recovery and chunk collision lookup were corrected during review. Original art and editable master remain local.
+- **Latest derrick client check:** 0.34.27-dev passed build/unit tests and the Photon/Faithful scene, including held-stack construction, partial/damaged guides, working crosshead and gallery support. Missing bounds exactly match the old voxel-union result. Three-sample geometry timings: empty guide 149.95 ms versus 0.91 ms; partial guide 72.20 ms versus 0.69 ms. The new snapshot is cached until selection/orientation/construction changes; rendering performs zero voxel unions. Outlines are capped at 64 visible nearby cells, obstruction checks run every ten client ticks, and bone visibility indexes are cached. These are geometry CPU timings, not a total-FPS benchmark. Deployment checksum verified.
 - **Latest kitchen client check:** 0.34.22-dev passed under Photon/Faithful, including actual lift/rest/return/serve and a held skillet staying steady through repeated cooling updates. Earlier cookware extraction passed complete asset validation. The subsequent stove heat tuning remains validated by its two-minute enclosed-room test (10–30°F adjacent rise); it has not had a manual Survival review.
 - Dedicated local startup and selected graceful vehicle restart checks are verified. Real multi-client transactions/protection, crash recovery across separate saves, restore drills and representative 200-player load remain unverified. Diagnostic logs are not a transaction database.
 - Survival kitchen construction, powered docks, cargo-content mass, vehicle lifecycle/crew rules, death recovery, map item search/external counter storage, nuclear flight and sky/weather machinery remain incomplete. Unresolved choices belong in [open decisions](../open_decisions.md).
