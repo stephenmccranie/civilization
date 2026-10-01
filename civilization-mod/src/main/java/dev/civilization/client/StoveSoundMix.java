@@ -6,9 +6,14 @@ import dev.civilization.StoveCooking;
 final class StoveSoundMix {
     private StoveSoundMix() {}
 
-    /** Preserve the former 16-block linear reach without OpenAL point-source panning. */
+    /** Preserve the former 16-block linear reach independently of stereo placement. */
     static double distanceGain(double distance) {
         return Math.clamp(1 - distance / 16, 0, 1);
+    }
+
+    /** A source one unit forward moves at most .18 sideways (about ten degrees). */
+    static double panOffset(double rightward, double distance) {
+        return .18 * Math.clamp(rightward / Math.max(1, distance), -1, 1);
     }
 
     static double gain(double work, int layer) {
