@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 import re
 from mcp import Client
-from proof import evaluate, export
+from proof import evaluate, export, load_project
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,7 +32,7 @@ def main():
             fmt = source['meta']['model_format']
             if fmt not in ('java_block', 'geckolib_model'): raise ValueError('Unsupported project format')
             client.call('create_project', {'name': args.name+'_export', 'format': fmt})
-            evaluate(client, 'Codecs.project.parse('+json.dumps(source).replace('/', '\\u002f')+');true')
+            load_project(client, json.dumps(source))
         info = evaluate(client, '({format: Format.id, textures: Texture.all.map(t => t.uuid)})')
         if info['format'] not in ('java_block', 'geckolib_model'):
             raise ValueError('Choose Java Block/Item or GeckoLib format before export')

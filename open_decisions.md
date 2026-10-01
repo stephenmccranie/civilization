@@ -2,6 +2,10 @@
 
 This is the only active register of unresolved design choices. Agreed rules live in [design_direction.md](design_direction.md); implementation work lives in [development_plan.md](development_plan.md). Entries are gaps, not permission to reopen settled intent.
 
+## Guns — first Paterson model
+
+The user selected a detailed animated Colt Paterson as the first firearm artwork; [design](design_direction.md#setting-and-material-style) owns that agreed direction and [development plan](development_plan.md#guns-branch--first-paterson-model) owns integration work. The native model is a visual asset only. Item controls, ammunition/reloading representation, acquisition and combat/protection rules remain unresolved. No recipes, damage values or playable firearm behavior are adopted by the artwork pass.
+
 ## Simplification recommendations
 
 These recommendations consolidate implementation choices; they do not silently add game rules.

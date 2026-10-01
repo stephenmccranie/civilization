@@ -26,6 +26,20 @@ def export(client, codec):
         raise RuntimeError(f'Incomplete native {codec} export')
     return result['content']
 
+
+def load_project(client, source):
+    """Load native project JSON without one enormous JavaScript object literal.
+
+    Detailed sources can freeze the editor when sent as eval syntax. Transfer
+    bounded string chunks and let JSON.parse read the data before the native codec.
+    The caller selects/creates the destination project first.
+    """
+    evaluate(client, "globalThis.civilizationProjectSource='';true")
+    for start in range(0, len(source), 60000):
+        chunk = json.dumps(source[start:start+60000]).replace('/', '\\u002f')
+        evaluate(client, 'globalThis.civilizationProjectSource+='+chunk+';true')
+    return evaluate(client, '(() => {try {Codecs.project.parse(JSON.parse(globalThis.civilizationProjectSource));return true;} finally {delete globalThis.civilizationProjectSource;}})()')
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verify', action='store_true', help='Reopen existing source and check native exports without replacing it')

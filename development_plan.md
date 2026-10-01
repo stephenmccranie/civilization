@@ -12,6 +12,12 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 
 **Next:** review the oven model, then specify its first playable batch before implementing gameplay. Repeat gentle and strong-heat stove batches to assess color/sound recognition, carryover anticipation, throughput and warmth. Tune rewards from ordinary play before adding specialties or more heated positions. Preparation remains deferred; there is no cooking XP or chopping mechanic. The [stove asset](art/assets/prototype_stove/asset.json) and [meal asset](art/assets/vegetable_skillet/asset.json) own their artwork and evidence.
 
+### Guns branch — first Paterson model
+
+The requested `codex/guns-colt-paterson` branch begins with a [local editable Paterson asset](art/assets/colt_paterson/asset.json). The detailed Blockbench model and native cock, release, five-index cycle and disassembly previews are complete at build-review scope. The user's rear-frame correction adds a domed recoil shield, filled shaped cheeks meeting the grip and a curved hammer. Native geometry/animation round-trip, UV density, whole-model views and actual revised animation playback were checked; [status](docs/status.md) owns validation limits. Original references, editable source and visual history stay local under the GitHub policy.
+
+Next: integrate the held/inventory model, preserve chamber orientation between actions, optimize hidden faces as needed and review it under Photon/Faithful before runtime publication. Resolve [item/gameplay rules](open_decisions.md#guns--first-paterson-model) before implementing combat. The agreed visual direction lives in [design](design_direction.md#setting-and-material-style).
+
 ## 1. Implemented foundation
 
 | IDs | Completed scope |
