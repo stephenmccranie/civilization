@@ -359,7 +359,7 @@ Keep ordinary outdoor life viable. Prioritize useful spaces and new capabilities
 
 ### Straight-line hand tool — planned
 
-Add an offhand tool for quickly building or destroying a straight line selected by two endpoints. Placement uses blocks held in the main hand; demolition uses a tool held in the main hand. Lines run along one world axis (X, Y or Z), never diagonally. This is agreed intent, not shipped behavior. The name, appearance, controls, speed, reach, acquisition and initial block coverage remain in the [Builder's Line proposal](open_decisions.md#builders-line--proposed-hand-tool); the [implementation package](development_plan.md#builders-line--planning-package) owns delivery.
+Add an offhand tool for quickly building or destroying a straight line selected by two endpoints. Placement uses blocks held in the main hand; demolition uses a tool held in the main hand. Lines run along one world axis (X, Y or Z), never diagonally. This is agreed intent, not shipped behavior. Right-click marks the first endpoint, then right-click marks the second and immediately triggers building or demolition according to the main-hand item, without another confirmation or held-button step. Show the candidate line before the second click. The name, appearance, processing speed, reach, acquisition and initial block coverage remain in the [Builder's Line proposal](open_decisions.md#builders-line--proposed-hand-tool); the [implementation package](development_plan.md#builders-line--planning-package) owns delivery.
 
 ## Shared heat and thermal comfort
 
