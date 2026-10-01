@@ -11,9 +11,9 @@ final class StoveSoundMix {
         return Math.clamp(1 - distance / 16, 0, 1);
     }
 
-    /** A source one unit forward moves at most .18 sideways (about ten degrees). */
+    /** A source one unit forward moves at most .5 sideways (about 27 degrees). */
     static double panOffset(double rightward, double distance) {
-        return .18 * Math.clamp(rightward / Math.max(1, distance), -1, 1);
+        return .5 * Math.clamp(rightward / Math.max(1, distance), -1, 1);
     }
 
     static double gain(double work, int layer) {

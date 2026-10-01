@@ -15,12 +15,12 @@ class StoveSoundMixTest {
 
     @Test void stereoKeepsLeftAndRightButCapsItsAngleEvenBesideThePan() {
         assertEquals(0, StoveSoundMix.panOffset(0, 0));
-        assertEquals(.18, StoveSoundMix.panOffset(8, 8));
-        assertEquals(-.18, StoveSoundMix.panOffset(-8, 8));
-        assertEquals(.018, StoveSoundMix.panOffset(.1, .1), 1e-12);
+        assertEquals(.5, StoveSoundMix.panOffset(8, 8));
+        assertEquals(-.5, StoveSoundMix.panOffset(-8, 8));
+        assertEquals(.05, StoveSoundMix.panOffset(.1, .1), 1e-12);
         for (int degrees=-180;degrees<=180;degrees++) {
             double offset=StoveSoundMix.panOffset(4*Math.sin(Math.toRadians(degrees)),4);
-            assertTrue(Math.abs(Math.toDegrees(Math.atan(offset)))<11);
+            assertTrue(Math.abs(Math.toDegrees(Math.atan(offset)))<27);
             assertEquals(-offset,StoveSoundMix.panOffset(-4*Math.sin(Math.toRadians(degrees)),4),1e-12);
         }
     }
