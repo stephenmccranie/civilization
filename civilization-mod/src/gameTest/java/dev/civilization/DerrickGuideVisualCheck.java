@@ -44,7 +44,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==360)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),13,119,-9,java.util.Set.of(),43,10);});
         if(ticks==395)shot(mc,"gallery-detail");
         if(ticks==400)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=false;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,116.5,1.9,java.util.Set.of(),0,5);});
-        if(ticks==425)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!p.onGround()||Math.abs(p.getY()-116.40625)>.04)throw new IllegalStateException("Gallery collision does not support the actual player: "+p.getY()+" ground="+p.onGround());galleryChecked=true;});
+        if(ticks==425)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!p.onGround()||Math.abs(p.getY()-116.40625)>.04)throw new IllegalStateException("Gallery collision does not support the actual player: "+p.getY()+" ground="+p.onGround());profileCornerCollision(mc);galleryChecked=true;});
         if(ticks==430)shot(mc,"on-gallery");
         if(ticks==435)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),7,104,-6,java.util.Set.of(),34,0);});
         if(ticks==465)shot(mc,"working-base");
@@ -53,13 +53,33 @@ final class DerrickGuideVisualCheck {
         if(ticks==510){if(((IndustrialMenu)mc.player.containerMenu).data.get(13)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
         if(ticks>520){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: actual held-stack build, partial/damaged guides, complete native tower, working cycle and actual gallery support");mc.stop();}
     }
+    private static net.minecraft.world.phys.shapes.VoxelShape uncachedShape(ModeledDerrick.Cell cell,net.minecraft.core.Direction front,int mask){
+        var shape=net.minecraft.world.phys.shapes.Shapes.empty();for(var entry:cell.pieces().entrySet())if((mask&(1<<entry.getKey()))!=0)shape=net.minecraft.world.phys.shapes.Shapes.or(shape,entry.getValue()[front.get2DDataValue()]);return shape;
+    }
+    private static void profileCornerCollision(Minecraft mc){
+        var level=mc.getSingleplayerServer().overworld();var m=(IndustrialBlockEntity)level.getBlockEntity(AT);
+        var corner=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).max(java.util.Comparator.comparingInt(c->c.pieces().size())).orElseThrow();
+        var at=ModeledDerrick.position(AT,m.front(),corner);var state=level.getBlockState(at);var getter=level.getChunkAt(at);
+        var expected=uncachedShape(corner,m.front(),m.derrickSections);var actual=state.getCollisionShape(getter,at);
+        if(net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(expected,actual,net.minecraft.world.phys.shapes.BooleanOp.NOT_SAME))throw new IllegalStateException("Corner collision changed geometry");
+        long start=System.nanoTime();for(int i=0;i<20;i++)uncachedShape(corner,m.front(),m.derrickSections);double old=(System.nanoTime()-start)/20e6;
+        start=System.nanoTime();for(int i=0;i<1000;i++)if(state.getCollisionShape(getter,at)!=actual)throw new IllegalStateException("Corner collision rebuilt while walking");double cached=(System.nanoTime()-start)/1000e6;
+        // Exercise Minecraft's actual movement collision path at all four gallery corners.
+        var player=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();double max=0;
+        for(double x:new double[]{-2.4,3.4})for(double z:new double[]{2.6,7.4}){
+            player.teleportTo(level,x,116.40625,z,java.util.Set.of(),0,0);
+            for(int step=0;step<20;step++){start=System.nanoTime();player.move(net.minecraft.world.entity.MoverType.SELF,new net.minecraft.world.phys.Vec3(step%2==0?.06:-.06,-.01,0));max=Math.max(max,(System.nanoTime()-start)/1e6);}
+        }
+        player.teleportTo(level,.5,116.40625,1.9,java.util.Set.of(),0,5);
+        com.mojang.logging.LogUtils.getLogger().info("DERRICK CORNER CPU: sections={}, old={} ms/query, cached={} ms/query; 1000 identical chunk collision shapes; max of 80 corner movement calls={} ms",corner.pieces().size(),old,cached,max);
+    }
     private static void profileGuide(Minecraft mc){
         var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var log=com.mojang.logging.LogUtils.getLogger();
         for(int mask:new int[]{0,m.derrickSections}){
             long oldTime=0,newTime=0;int count=0;
             for(int repeat=0;repeat<3;repeat++){
                 long start=System.nanoTime();var expected=new java.util.HashMap<Integer,net.minecraft.world.phys.AABB>();
-                for(int i=0;i<ModeledDerrick.CELLS.size();i++){var cell=ModeledDerrick.CELLS.get(i);var shape=cell.shape(m.front(),ModeledDerrick.ALL^mask);if(!shape.isEmpty())expected.put(i,shape.bounds().move(ModeledDerrick.position(AT,m.front(),cell)));}
+                for(int i=0;i<ModeledDerrick.CELLS.size();i++){var cell=ModeledDerrick.CELLS.get(i);var shape=uncachedShape(cell,m.front(),ModeledDerrick.ALL^mask);if(!shape.isEmpty())expected.put(i,shape.bounds().move(ModeledDerrick.position(AT,m.front(),cell)));}
                 oldTime+=System.nanoTime()-start;start=System.nanoTime();var snapshot=dev.civilization.client.DerrickGuideGeometry.build(AT,m.front(),mask);newTime+=System.nanoTime()-start;count=snapshot.cells().size();
                 if(count!=expected.size())throw new IllegalStateException("Cached guide lost missing cells");
                 for(var cell:snapshot.cells())if(!cell.box().equals(expected.get(cell.index())))throw new IllegalStateException("Cached guide changed collision outline bounds");

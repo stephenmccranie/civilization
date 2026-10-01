@@ -74,6 +74,18 @@ public final class IndustryGameTests {
         var cell=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).findFirst().orElseThrow();var at=ModeledDerrick.position(m.getBlockPos(),m.front(),cell);var state=l.getBlockState(at);
         h.assertTrue(!state.getCollisionShape(l.getChunkAt(at),at).isEmpty(),"Collision getter uses a chunk, and still resolves controller ownership");h.succeed();
     }
+    @GameTest(template="empty",batch="derrick-construction") public static void derrickCornerCollisionReusesExactShapes(GameTestHelper h){
+        var cell=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).max(java.util.Comparator.comparingInt(c->c.pieces().size())).orElseThrow();
+        int bits=0;for(int part:cell.pieces().keySet())bits|=1<<part;
+        for(var front:net.minecraft.core.Direction.Plane.HORIZONTAL)for(int mask:new int[]{0,ModeledDerrick.ALL,ModeledDerrick.ALL^(1<<21),bits&~Integer.lowestOneBit(bits)}){
+            var expected=net.minecraft.world.phys.shapes.Shapes.empty();
+            for(var entry:cell.pieces().entrySet())if((mask&(1<<entry.getKey()))!=0)expected=net.minecraft.world.phys.shapes.Shapes.or(expected,entry.getValue()[front.get2DDataValue()]);
+            var shape=cell.shape(front,mask);
+            h.assertTrue(!net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(expected,shape,net.minecraft.world.phys.shapes.BooleanOp.NOT_SAME),"Cached corner collision exactly matches section geometry");
+            for(int i=0;i<100;i++)h.assertTrue(cell.shape(front,mask)==shape&&cell.shape(front,mask^(1<<24))==shape,"Repeated movement and unrelated section changes reuse the same local shape");
+        }
+        h.succeed();
+    }
     @GameTest(template="empty") public static void stoneToolsRecoverControllers(GameTestHelper h){
         var pick=new ItemStack(Items.STONE_PICKAXE).get(net.minecraft.core.component.DataComponents.TOOL);
         for(var block:List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),CookingContent.STATION.get(),KilnContent.FOUNDRY.get(),

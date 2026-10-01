@@ -20,9 +20,29 @@ public final class ModeledDerrick {
     public static final int BUILD_BUTTON=20;
     public static final String BILL="149 planks, 8 iron blocks, 7 stone/cobblestone, 1 Refinery Port";
     public static final MachineStructure.Part PORT=new MachineStructure.Part(1,0,0,"output_port",4,Direction.EAST);
-    public record Cell(int x,int y,int z,VoxelShape[] shapes,Map<Integer,VoxelShape[]> pieces){
+    public static final class Cell {
+        private final int x,y,z,sectionMask;
+        private final VoxelShape[] shapes;
+        private final Map<Integer,VoxelShape[]> pieces;
+        // Only local section bits matter: at most 128 subsets in the current asset.
+        // No controller/world references; safe to share between client and server.
+        private final Map<Integer,VoxelShape> partial=new java.util.concurrent.ConcurrentHashMap<>();
+        public Cell(int x,int y,int z,VoxelShape[] shapes,Map<Integer,VoxelShape[]> pieces){
+            this.x=x;this.y=y;this.z=z;this.shapes=shapes;this.pieces=Collections.unmodifiableMap(new TreeMap<>(pieces));
+            int bits=0;for(int part:pieces.keySet())bits|=1<<part;sectionMask=bits;
+        }
+        public int x(){return x;}public int y(){return y;}public int z(){return z;}
+        public Map<Integer,VoxelShape[]> pieces(){return pieces;}
         public VoxelShape shape(Direction front){return shapes[front.get2DDataValue()];}
-        public VoxelShape shape(Direction front,int mask){var result=Shapes.empty();for(var e:pieces.entrySet())if((mask&(1<<e.getKey()))!=0)result=Shapes.or(result,e.getValue()[front.get2DDataValue()]);return result;}
+        public VoxelShape shape(Direction front,int mask){
+            int active=mask&sectionMask,index=front.get2DDataValue();
+            if(active==sectionMask)return shapes[index];
+            if(active==0)return Shapes.empty();
+            if(Integer.bitCount(active)==1)return pieces.get(Integer.numberOfTrailingZeros(active))[index];
+            return partial.computeIfAbsent((active<<2)|index,key->{
+                var result=Shapes.empty();for(var e:pieces.entrySet())if((active&(1<<e.getKey()))!=0)result=Shapes.or(result,e.getValue()[index]);return result;
+            });
+        }
     }
     public static final List<Cell> CELLS=load();
     private ModeledDerrick(){}
