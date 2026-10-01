@@ -8,7 +8,9 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 
 **Implemented:** one Creative/admin stove with continuous heat, sensory quality, portioned work meals, removable skillet and paid carryover. Three imported audio loops retain a frying bed throughout, with plateau crackle and overcooking sputter; cue recognition still needs ordinary play. The preparation table is deferred; full kitchen multiblocks remain later work. [Cooking](civilization-mod/cooking.md) owns controls, recipes, timing, fuel and persistence; [testing](civilization-mod/testing.md) owns checks.
 
-**Next:** repeat gentle and strong-heat batches to assess color/sound recognition, carryover anticipation, useful throughput and warmth. Tune from ordinary play before adding dishes, specialties, heated positions or other stations. There is no cooking XP or chopping mechanic. [Kitchen proposals](open_decisions.md#tier-2-kitchen-workshop) own the remaining station choices; the [stove asset](art/assets/prototype_stove/asset.json) and [meal asset](art/assets/vegetable_skillet/asset.json) own artwork and evidence.
+**Oven design/model pass complete:** the [local oven asset](art/assets/baking_oven/asset.json) contains the fresh industrial direction, editable native model, opening/closing door clips and inspected closed/open views. Exterior brick siding was rejected and replaced with cast iron. This pass adds no playable station; construction, thermal behavior and baking recipes remain in [kitchen proposals](open_decisions.md#tier-2-kitchen-workshop).
+
+**Next:** review the oven model, then specify its first playable batch before implementing gameplay. Repeat gentle and strong-heat stove batches to assess color/sound recognition, carryover anticipation, throughput and warmth. Tune rewards from ordinary play before adding specialties or more heated positions. Preparation remains deferred; there is no cooking XP or chopping mechanic. The [stove asset](art/assets/prototype_stove/asset.json) and [meal asset](art/assets/vegetable_skillet/asset.json) own their artwork and evidence.
 
 ## 1. Implemented foundation
 
