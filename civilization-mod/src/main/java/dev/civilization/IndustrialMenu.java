@@ -20,7 +20,7 @@ public final class IndustrialMenu extends AbstractContainerMenu implements CoalF
     public int fireState(){return data.get(11);}
     public int coalRemaining(){return data.get(12);}
     public boolean hasCoalFire(){return kind()==IndustrialBlock.Kind.PUMP||kind()==IndustrialBlock.Kind.REFINERY;}
-    @Override public boolean clickMenuButton(Player p,int id){if(id==ModeledDerrick.BUILD_BUTTON){boolean ok=stillValid(p)&&inventory instanceof IndustrialBlockEntity m&&ModeledDerrick.build(m,p);broadcastChanges();return ok;}if(id!=CoalFire.BUTTON||!stillValid(p)||!(inventory instanceof IndustrialBlockEntity m)||!m.coalPowered())return false;boolean ok=m.fire.strike(p,IndustrialStructure.bind(m));broadcastChanges();return ok;}
+    @Override public boolean clickMenuButton(Player p,int id){if(id!=CoalFire.BUTTON||!stillValid(p)||!(inventory instanceof IndustrialBlockEntity m)||!m.coalPowered())return false;boolean ok=m.fire.strike(p,IndustrialStructure.bind(m));broadcastChanges();return ok;}
     public IndustrialBlock.Kind kind(){return IndustrialBlock.Kind.values()[Math.clamp(data.get(0),0,IndustrialBlock.Kind.values().length-1)];}
     @Override public boolean stillValid(Player p){return inventory.stillValid(p);}
     @Override public void clicked(int slot,int button,ClickType type,Player p){if(!stillValid(p)){p.closeContainer();return;}super.clicked(slot,button,type,p);}

@@ -40,31 +40,39 @@ public final class IndustryGameTests {
 
     @GameTest(template="empty",batch="derrick-construction") public static void modeledDerrickConstructionConservesMaterials(GameTestHelper h){
         var l=h.getLevel();var at=h.absolutePos(new BlockPos(8,67,8));
-        var player=new FakePlayer(l,new GameProfile(UUID.randomUUID(),"derrick-builder"));
-        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.setPos(at.getX()+.5,at.getY()+1,at.getZ()-3);
+        var player=new FakePlayer(l,new GameProfile(UUID.randomUUID(),"derrick-builder"));player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.setPos(at.getX()+.5,at.getY()+1,at.getZ()-3);
         for(var front:Direction.Plane.HORIZONTAL){
-            l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front));
-            var m=(IndustrialBlockEntity)l.getBlockEntity(at);
+            l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front));var m=(IndustrialBlockEntity)l.getBlockEntity(at);
             for(var cell:ModeledDerrick.CELLS){var p=ModeledDerrick.position(at,front,cell);l.getChunkAt(p);l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());}
             var port=MachineStructure.position(at,front,ModeledDerrick.PORT);l.setBlockAndUpdate(port,Blocks.AIR.defaultBlockState());
-            player.getInventory().clearContent();player.getInventory().setItem(0,new ItemStack(Items.OAK_PLANKS,64));player.getInventory().setItem(1,new ItemStack(Items.BIRCH_PLANKS,64));player.getInventory().setItem(2,new ItemStack(Items.OAK_PLANKS,22));player.getInventory().setItem(3,new ItemStack(Items.IRON_BLOCK,8));player.getInventory().setItem(4,new ItemStack(Items.COBBLESTONE,7));player.getInventory().setItem(5,IndustrialContent.PORT.toStack());
-            var blocked=ModeledDerrick.position(at,front,ModeledDerrick.CELLS.get(8));l.setBlockAndUpdate(blocked,Blocks.DIAMOND_BLOCK.defaultBlockState());
-            h.assertTrue(!ModeledDerrick.build(m,player)&&player.getInventory().getItem(0).getCount()==64&&!m.derrickBuilt,"Obstruction preserves stock and terrain");
-            l.removeBlock(blocked,false);var menu=new IndustrialMenu(1,player.getInventory(),m,m.data);
+            player.getInventory().clearContent();player.getInventory().setItem(1,new ItemStack(Items.OAK_PLANKS,64));
+            var held=new ItemStack(Items.OAK_PLANKS,5);
+            h.assertTrue(!ModeledDerrick.build(m,player,held)&&held.getCount()==5&&player.getInventory().getItem(1).getCount()==64,"Never draw missing materials from another inventory slot");
+            var blocked=ModeledDerrick.CELLS.stream().filter(c->c.pieces().containsKey(0)).findFirst().orElseThrow();var blockedAt=ModeledDerrick.position(at,front,blocked);l.setBlockAndUpdate(blockedAt,Blocks.DIAMOND_BLOCK.defaultBlockState());held=new ItemStack(Items.COBBLESTONE,7);
+            h.assertTrue(!ModeledDerrick.build(m,player,held)&&held.getCount()==7&&m.derrickSections==0,"Obstruction preserves held stock and terrain");l.removeBlock(blockedAt,false);
             double labor=CalorieFoodData.of(player).laborSpent;
-            h.assertTrue(menu.clickMenuButton(player,ModeledDerrick.BUILD_BUTTON)&&IndustrialStructure.bind(m),"Real assembly button builds every rotation");
-            h.assertTrue(CalorieFoodData.of(player).laborSpent>labor&&CalorieFoodData.of(player).laborSpent-labor<500,"Construction charges supplied material labor, not each invisible cell");
-            h.assertTrue(player.getInventory().getItem(2).getCount()==1&&player.getInventory().getItem(3).isEmpty(),"Only the exact bill is consumed");
-            h.assertTrue(!menu.clickMenuButton(player,ModeledDerrick.BUILD_BUTTON),"Repeated assembly cannot charge or duplicate");
-            var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());
-            h.assertTrue(copy.derrickBuilt&&copy.derrickMaterials.stream().mapToInt(ItemStack::getCount).sum()==165,"Construction and exact refund survive reload");
-            var deck=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.shape(front).max(Direction.Axis.Y)>.2).findFirst().orElseThrow();
-            h.assertTrue(!l.getBlockState(ModeledDerrick.position(at,front,deck)).getCollisionShape(l,at).isEmpty(),"Gallery has real collision");
-            int dropped=l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();
-            if(front==Direction.NORTH)l.destroyBlock(port,true);else if(front==Direction.EAST)l.destroyBlock(blocked,true);else l.removeBlock(at,false);
-            h.assertTrue(l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum()-dropped==165,"Exact construction bill is refunded once");
-            h.assertTrue(ModeledDerrick.CELLS.stream().allMatch(c->l.getBlockState(ModeledDerrick.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Dismantling removes only owned physical cells and port");
-        }h.runAfterDelay(2,()->{h.assertTrue(CalorieFoodData.of(player).laborSpent<1500,"Collision proxies never charge extra placement labor");h.succeed();});
+            h.assertTrue(ModeledDerrick.build(m,player,held)&&held.isEmpty()&&m.derrickSections==1&&!IndustrialStructure.bind(m),"Footings are visible and solid before completion");
+            var partial=new IndustrialBlockEntity(at,m.getBlockState());partial.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(partial.derrickSections==1&&partial.derrickPaid.get(0).getFirst().is(Items.COBBLESTONE),"Partial construction and paid material identity survive save/load");
+            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,29),new ItemStack(Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledDerrick.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
+            h.assertTrue(m.derrickSections==ModeledDerrick.ALL&&IndustrialStructure.bind(m)&&player.getInventory().getItem(1).getCount()==64,"Complete all rotations without touching inventory reserves");
+            h.assertTrue(CalorieFoodData.of(player).laborSpent-labor>0&&CalorieFoodData.of(player).laborSpent-labor<500,"Charge material labor, not hidden cells");
+            int dropped=derrickDrops(l,at);l.destroyBlock(port,true);
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.derrickSections)==24&&!IndustrialStructure.bind(m)&&derrickDrops(l,at)-dropped==1,"Port damage is local and refunds exactly one paid port");
+            h.assertTrue(ModeledDerrick.build(m,player,IndustrialContent.PORT.toStack())&&IndustrialStructure.bind(m),"Repair port from held materials");
+            dropped=derrickDrops(l,at);var cell=ModeledDerrick.CELLS.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(1)).findFirst().orElseThrow();l.destroyBlock(ModeledDerrick.position(at,front,cell),true);
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.derrickSections)==24&&derrickDrops(l,at)-dropped==6,"A broken panel leaves the other sections standing");
+            m.process();h.assertTrue(!m.formed&&Integer.bitCount(m.derrickSections)==24,"Incomplete pump stops without dismantling");
+            h.assertTrue(ModeledDerrick.build(m,player,new ItemStack(Items.OAK_PLANKS,6))&&IndustrialStructure.bind(m),"Repair the missing frame panel");
+            var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(copy.derrickPaid.values().stream().flatMap(List::stream).mapToInt(ItemStack::getCount).sum()==165,"Exact per-section refund ledger survives reload");
+            dropped=derrickDrops(l,at);l.removeBlock(at,false);h.assertTrue(derrickDrops(l,at)-dropped==165,"Controller removal refunds remaining materials exactly once");
+            h.assertTrue(ModeledDerrick.CELLS.stream().allMatch(c->l.getBlockState(ModeledDerrick.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Controller removal clears owned physical cells");
+        }h.succeed();
+    }
+    private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
+    @GameTest(template="empty",batch="derrick-construction") public static void derrickCollisionThroughChunkGetter(GameTestHelper h){
+        var m=machine(h,IndustrialContent.PUMP.get(),8);var l=h.getLevel();
+        var cell=ModeledDerrick.CELLS.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).findFirst().orElseThrow();var at=ModeledDerrick.position(m.getBlockPos(),m.front(),cell);var state=l.getBlockState(at);
+        h.assertTrue(!state.getCollisionShape(l.getChunkAt(at),at).isEmpty(),"Collision getter uses a chunk, and still resolves controller ownership");h.succeed();
     }
     @GameTest(template="empty") public static void stoneToolsRecoverControllers(GameTestHelper h){
         var pick=new ItemStack(Items.STONE_PICKAXE).get(net.minecraft.core.component.DataComponents.TOOL);
@@ -136,7 +144,7 @@ public final class IndustryGameTests {
         int coal=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
         h.getLevel().removeBlock(MachineStructure.position(pump.getBlockPos(),pump.front(),frame),false);
         int dropped=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
-        h.assertTrue(h.getLevel().getBlockEntity(pump.getBlockPos())==null&&dropped-coal==1&&stock(h,s)==1000,"Breaking the owned port dismantles without extra coal or oil consumption");h.succeed();
+        run(pump,2);h.assertTrue(h.getLevel().getBlockEntity(pump.getBlockPos())==pump&&!pump.formed&&dropped==coal&&pump.getItem(0).getCount()==1&&stock(h,s)==1000,"Local damage stops production without consuming coal or oil or dropping inventory");h.succeed();
     }
     @GameTest(template="empty") public static void machineSaveReloadAndRebuildDoNotRefillDeposit(GameTestHelper h){
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack());run(pump,5);

@@ -9,7 +9,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 public final class RefineryPortEntity extends BlockEntity {
     private BlockPos controller;private String role="";private boolean derrickAssembly;
     public boolean derrickAssembly(){return derrickAssembly;}
-    public void breakAssembly(){var m=owner();if(derrickAssembly&&m!=null&&m.derrickBuilt)level.destroyBlock(m.getBlockPos(),true);}
+    public void breakAssembly(){var m=owner();if(derrickAssembly&&m!=null&&!m.derrickChanging)ModeledDerrick.removeSection(m,24,true);}
     public boolean keepAssemblyCheck(){
         if(!derrickAssembly||level==null||controller==null)return false;
         if(!level.hasChunkAt(controller))return true;

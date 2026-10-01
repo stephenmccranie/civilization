@@ -20,7 +20,17 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 /** Complete native tower, backed by invisible collision cells. */
 @EventBusSubscriber(modid="civilization", value=Dist.CLIENT, bus=EventBusSubscriber.Bus.MOD)
 public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialBlockEntity> {
-    private final GeoBlockRenderer<DerrickAnimation> renderer=new GeoBlockRenderer<>(new MachineGeoModel<>("oil_derrick"));
+    private final GeoBlockRenderer<DerrickAnimation> renderer=new GeoBlockRenderer<>(new MachineGeoModel<>("oil_derrick")){
+        @Override public void preRender(PoseStack pose,DerrickAnimation a,software.bernie.geckolib.cache.object.BakedGeoModel model,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
+            super.preRender(pose,a,model,buffers,vertices,reRender,partial,light,overlay,color);
+            for(var bone:model.topLevelBones())visibility(bone,a.mask,a.guide);
+        }
+    };
+    private static void visibility(software.bernie.geckolib.cache.object.GeoBone bone,int mask,boolean guide){
+        String name=bone.getName();boolean hidden=name.equals("controller")&&guide;
+        if(name.startsWith("section_")){int part=Integer.parseInt(name.substring(8,name.indexOf('_',8)));hidden=(mask&(1<<part))==0;}
+        bone.setHidden(hidden);for(var child:bone.getChildBones())visibility(child,mask,guide);
+    }
     private final java.util.Map<IndustrialBlockEntity,DerrickAnimation> instances=new java.util.WeakHashMap<>();
     public OilDerrickRenderer(BlockEntityRendererProvider.Context context) {}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),OilDerrickRenderer::new);}
@@ -28,14 +38,18 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
     @Override public int getViewDistance(){return 128;}
 
     @Override public void render(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
-        if(m.kind!=IndustrialBlock.Kind.PUMP || !m.derrickBuilt || m.getLevel()==null)return;
-        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
+        if(m.kind!=IndustrialBlock.Kind.PUMP || m.getLevel()==null)return;
+        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.mask=m.derrickSections;a.guide=false;a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
         renderer.render(a,partial,pose,buffers,light,overlay);
     }
 
+    public void renderGuide(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers){
+        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.running=false;a.guide=true;a.mask=ModeledDerrick.ALL^m.derrickSections;
+        renderer.render(a,partial,pose,buffers,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+    }
     private static final class DerrickAnimation extends BlockEntity implements GeoBlockEntity {
         private static final RawAnimation CYCLE=RawAnimation.begin().thenLoop("animation.oil_derrick.cycle");
-        private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);private boolean running;
+        private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);private boolean running,guide;private int mask;
         DerrickAnimation(IndustrialBlockEntity m){super(IndustrialContent.ENTITY.get(),m.getBlockPos(),m.getBlockState());}
         @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
         @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers){controllers.add(new AnimationController<DerrickAnimation>(this,"work",0,state->{state.setControllerSpeed(running?1:0);return state.setAndContinue(CYCLE);}));}

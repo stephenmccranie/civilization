@@ -30,6 +30,10 @@ public final class IndustrialBlock extends Block implements EntityBlock {
             if(!l.isClientSide && CivicAccess.allowed(l,pos,p) && l.getBlockEntity(pos) instanceof IndustrialBlockEntity machine)machine.canister(p,hand);
             return ItemInteractionResult.sidedSuccess(l.isClientSide);
         }
+        if(kind==Kind.PUMP&&java.util.stream.IntStream.range(0,4).anyMatch(i->ModeledDerrick.accepts(stack,i))){
+            if(!l.isClientSide&&l.getBlockEntity(pos) instanceof IndustrialBlockEntity m)ModeledDerrick.build(m,p,stack);
+            return ItemInteractionResult.sidedSuccess(l.isClientSide);
+        }
         return MachineConstruction.useOn(stack,state,l,pos,p);
     }
     @Override protected InteractionResult useWithoutItem(BlockState s,Level l,BlockPos pos,Player p,BlockHitResult hit){
@@ -39,7 +43,7 @@ public final class IndustrialBlock extends Block implements EntityBlock {
     @Override protected void onRemove(BlockState state,Level l,BlockPos p,BlockState next,boolean moving){if(!state.is(next.getBlock())&&l.getBlockEntity(p) instanceof IndustrialBlockEntity machine){if(!l.isClientSide&&kind==Kind.PUMP)ModeledDerrick.dismantle(machine);Containers.dropContents(l,p,machine);}super.onRemove(state,l,p,next,moving);}
     @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,java.util.List<Component> lines,TooltipFlag flag){
         lines.add(Component.literal(switch(kind){case PUMP->"Crude oil: 50 mB/s from oil fields";case REFINERY->"Coal-fired crude oil heater";case DRILL->"Fuel-powered coal seam extraction";case TANK->"16,000 mB · one liquid";case COLUMN->"Hot crude → vapor, oil and sulfur";case CONDENSER->"Vapor → refined fuel · 40 mB/s";}).withStyle(net.minecraft.ChatFormatting.GRAY));
-        if(kind!=Kind.TANK)lines.add(Component.literal(kind==Kind.PUMP?"Place at ground level; open to assemble.":"Place for the construction guide.").withStyle(net.minecraft.ChatFormatting.GRAY));
+        if(kind!=Kind.TANK)lines.add(Component.literal(kind==Kind.PUMP?"Supply held materials to the controller.":"Place for the construction guide.").withStyle(net.minecraft.ChatFormatting.GRAY));
         if(kind==Kind.PUMP)lines.add(Component.literal("Clear 8 × 10 × 26 blocks behind controller.").withStyle(net.minecraft.ChatFormatting.GRAY));
         lines.add(Component.literal("Drain liquids before breaking.").withStyle(net.minecraft.ChatFormatting.GRAY));
     }
