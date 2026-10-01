@@ -8,6 +8,8 @@ Item tooltips give short purpose, control and safety hints. Construction bills a
 
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace are included automatically. They also remain discoverable through creative search.
 
+The [Colt Paterson prototype](firearms.md) adds left-click firing, R reload from inventory .36 ammunition, slight recoil, the extracted firing sound and server-side bullets with drop, drag and damage.
+
 Town manufacturing: [Tannery, Textile Workshop and Smithy](industry.md#town-workshops) connect hides, wool and Foundry metals to equipment production and repairs.
 
 The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Load ingredients at the stove, then lift the skillet onto a solid counter to finish with residual heat and serve; it can return to the stove if underdone. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.

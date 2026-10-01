@@ -4,7 +4,7 @@ This is the only active register of unresolved design choices. Agreed rules live
 
 ## Guns — first Paterson model
 
-The user selected a detailed animated Colt Paterson as the first firearm artwork; [design](design_direction.md#setting-and-material-style) owns that agreed direction and [development plan](development_plan.md#guns-branch--first-paterson-model) owns integration work. The native model is a visual asset only. Item controls, ammunition/reloading representation, acquisition and combat/protection rules remain unresolved. No recipes, damage values or playable firearm behavior are adopted by the artwork pass.
+The user approved the playable Paterson prototype: left-click firing, R reload, slight recoil, projectiles and tunable damage. The user selected one complete .36 ammunition item per chamber, shown as a conical lead projectile with no cartridge case. These rules now live in [design](design_direction.md#setting-and-material-style); [firearms](civilization-mod/firearms.md) owns implementation and trial values. Acquisition/crafting progression, production combat balance, any later headshot/penetration rules and full historical loading fidelity remain unresolved. No crafting recipe is adopted.
 
 ## Simplification recommendations
 
