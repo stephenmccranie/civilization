@@ -116,7 +116,7 @@ python tools/modeling/art.py check art/assets/example --complete
 
 Output entries retain the existing `source`, `target`, `format`, PNG `size`/`alpha` and GeckoLib manifest validation. Existing item/family reducers and `assets.py` remain export backends. `prepare` for a saved project preserves its source and exports the explicitly selected project, never an arbitrary current tab. Native `views` opens review tabs; close only known generated tabs after saving authored work.
 
-Saved-project export transfers JSON in bounded string chunks before invoking the native project codec. This avoids sending detailed models as one giant JavaScript object literal through MCP; the Paterson model passed reopening and native geometry/animation comparison using this path.
+Native model creation and saved-project export transfer JSON in bounded string chunks before invoking the native project codec. This avoids sending detailed models as one giant JavaScript object literal through MCP; the Paterson model passed reopening and native geometry/animation comparison using this path.
 
 Fast tool checks: `python -m unittest discover -s tools/modeling -p "test_art.py"` and the existing `test_pipeline.py`, `test_assets.py`, `test_studio.py`. No Minecraft launch is required for workflow/documentation changes. The baking-oven pilot reached native modeling; user review exposed insufficient surface detail despite the first build review passing. The authoring guidance above addresses that failure. In-game oven integration remains pending; judge the workflow by actual art and defects the user still has to identify.
 
