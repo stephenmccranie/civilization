@@ -1,5 +1,7 @@
 # Original texture artwork
 
+The [four-seat helicopter mockups](../../concept_art/helicopters/four-seat/README.md) compare three separate single-main-rotor designs: open Lark, utility Porter and ivory/turquoise Aurelia. These are concept renders only; prompts, sources and review are preserved with the images, and no runtime textures or vehicles are implemented.
+
 New standard block faces and item sprites target 64×64, beginning with Street Pavers. Previously shipped 32×32 families stay at their documented native sizes until each is reviewed and migrated; assembled model atlases and UI keep their declared dimensions. High-resolution original generated masters are reduced by the pipeline; Faithful assets are never copied into the mod. `pipeline.json`, `block_families.json`, and newer per-asset `asset.json` manifests own their respective source/output mappings. Runtime textures live in `civilization-mod/src/main/resources/assets/civilization/textures`.
 
 The item set includes food/preparations, fertilizer ingredients, coal and saws. Machines use coherent generated families; the kiln layers custom ports over the active resource pack’s cobblestone. Cut pieces crop their source material textures. Earlier rejected masters remain provenance, not current directions.

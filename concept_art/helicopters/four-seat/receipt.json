@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-30",
+  "tool": "built-in image_gen",
+  "stage": "mockups only",
+  "constraints": "four seats, single main lift rotor, conventional tail rotor",
+  "reference": "art/assets/industrial_steel/texture-review.png",
+  "reference_role": "material style only",
+  "reference_sha256": "e313e17b6b6fbe15cdfe1151ccd2aa26c25a6a7f8acc0dd15f81abba9aab5ae7",
+  "review": "README.md",
+  "images": [
+    {
+      "name": "lark",
+      "image": "lark.png",
+      "prompt": "lark-four-seat-prompt.txt",
+      "original_source": "C:/Users/admin/.codex/generated_images/01a0f541-2a0e-7451-a380-3b54dfd996d4/exec-b5b2ef3b-983c-4750-afc8-0020ce50742c.png",
+      "sha256": "cd51044244df680f13359942a393c29cdbddf54f4f9d13030fafada21aaaf039"
+    },
+    {
+      "name": "porter",
+      "image": "porter.png",
+      "prompt": "porter-four-seat-prompt.txt",
+      "original_source": "C:/Users/admin/.codex/generated_images/01a0f541-2a0e-7451-a380-3b54dfd996d4/exec-8fbfbab8-9637-43c3-8762-055b563e6de9.png",
+      "sha256": "2349ac705097f77a8108331945a92302fc4495238ce73fa15c4303c6f3f9fee1"
+    },
+    {
+      "name": "aurelia",
+      "image": "aurelia.png",
+      "prompt": "aurelia-four-seat-prompt.txt",
+      "original_source": "C:/Users/admin/.codex/generated_images/01a0f541-2a0e-7451-a380-3b54dfd996d4/exec-2b129cbd-f8cf-4e6a-b1af-f6f383ec3483.png",
+      "sha256": "1178e2c8710ea8f8149ee8515a3407197ec08970b8ca62c3f21664d3f74e5fa6"
+    }
+  ]
+}
