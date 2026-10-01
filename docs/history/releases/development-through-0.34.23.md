@@ -378,7 +378,3 @@ The first [town workshop package](../../../civilization-mod/industry.md#town-wor
 Existing source changes remain uncommitted; the latest Git commit is `93e859e`. A commit is not implied by successful deployment.
 
 **Civilization Compact Campus** is installed as a new, smaller superflat save; the earlier campus and user builds remain intact. Controls are wall-mounted with concealed command blocks. Coal, oil and forestry are local, with a pipe-fed oil pump Ã¢â€ â€™ crude tank Ã¢â€ â€™ refinery. The world-specific deposit geometry persists in vanilla command storage; natural worlds retain their existing generation. Build/unit and 121 server tests passed; the focused hidden campus check verified reload, drained 5,000 mB of physical oil, produced 3,200 mB of fuel through the pipeline and extracted 32 coal. Photon screenshots were reviewed. Clicking a boat console no longer changes throttle; W/S is the only gear input. See [testing](../../../civilization-mod/testing.md#user-testing-campus).
-
-
-
-
