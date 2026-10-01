@@ -68,6 +68,8 @@ Do not distribute panel borders, corner plates or brass squares across structura
 
 ## Surface accents
 
+Prevent overlap in the source geometry: adjacent panels and posts meet at boundaries; raised fittings replace or sit clearly ahead of their backing surface. Remove duplicate buried faces where appropriate. Shared exposed planes cause z-fighting even if a still view looks acceptable. Check close and grazing views, including moving poses; brighter trim cannot repair an overlap. Keep authored UV islands disjoint with padding, and contain painted strokes within their island. Intentional reuse of a base material crop is different from overwriting an authored island. Use coherent trim tones rather than alternating bright edge pixels. Transparent windows must expose the chamber, and controls should visibly connect to their mechanism.
+
 Shared material tiles alone do not place corners or seams on a part. For prominent covers and supports, allocate face-sized UV islands at the established density, then use nine-slice panel layouts to preserve corner pixels while fitting the middle. Keep secondary faces quieter; do not paste a complete framed panel onto every surface. Inspect actual model and shader views before increasing contrast. The engine `studio/surface_textures.py` demonstrates this reproducibly.
 
 ## Sources and scope
