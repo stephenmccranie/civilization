@@ -55,11 +55,13 @@ The [asset brief](../art/assets/prototype_stove/asset.json) owns editable Blockb
 
 ## Baking oven: physical first pass
 
-**Baking Oven** is available in the Civilization Creative tab or through `/give @s civilization:baking_oven`. Place it on a solid 2x2 base with four blocks of clear space above. It faces the player and rejects obstructed or unauthorized placement. The cast-iron body occupies 2x2 blocks; the rear flue reaches about 3.2 blocks high. Leave room in front for the door swing.
+**Baking Oven** is available in the Civilization Creative tab or through `/give @s civilization:baking_oven`. Place it on a solid 2x2 base with three blocks of clear space above. It faces the player and rejects obstructed or unauthorized placement. The cast-iron body fits within 2x2x2 blocks and stands 1.8 blocks high, matching a standing player. The rear flue extends above the body to about 2.3 blocks high. Leave room in front for the door swing.
 
 - Right-click the oven with an empty hand to open or close its main door. The leaf swings outward over 0.8 seconds; the viewing window is transparent.
 - Crouch and scroll while looking at the oven to turn its continuous draft dial. Hold the sprint key for fine adjustment. The pointer moves and an action-bar percentage confirms the setting; it persists on reload.
 - The shell and closed door have cached collision. Opening clears the chamber entrance; the swinging leaf has no separate collision outside the base.
 - The occupied cells belong to one placed oven. Breaking any part removes the assembly and drops one oven item in Survival. This is a single Creative preview object, not progressive multiblock construction.
+
+Existing tall ovens adopt the new size on loading; their obsolete top-row cells are removed without dropping items or resetting the draft dial. Unrelated blocks above them are preserved.
 
 The chamber is empty apart from its fixed rack. The lower firebox door remains fixed. The draft dial is a physical control only: no fuel, heat, tray handling, recipes or work meals are implemented for this oven yet. Survival construction and baking remain [kitchen proposals](../open_decisions.md#tier-2-kitchen-workshop).

@@ -41,7 +41,9 @@ final class OvenVisualCheck {
         if(ticks==400)use(mc);
         if(ticks==425)shot(mc,"open-vanilla");
         if(ticks==430)shaders(true);
-        if(ticks>440){if(!verified)throw new IllegalStateException("Server input check missing");com.mojang.logging.LogUtils.getLogger().info("OVEN VISUAL VERIFIED: actual Creative placement, animated opening and closing, continuous scroll input, native model and inventory, Photon and shaders disabled");mc.stop();}
+        if(ticks==440){mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);check(server,()->{BakingOvenBlock.toggle((BakingOvenEntity)server.overworld().getBlockEntity(POS));server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),-1,100,-1,java.util.Set.of(),-35,5);});}
+        if(ticks==470)shot(mc,"player-scale");
+        if(ticks>480){if(!verified)throw new IllegalStateException("Server input check missing");com.mojang.logging.LogUtils.getLogger().info("OVEN VISUAL VERIFIED: actual Creative placement, animated opening and closing, continuous scroll input, native model and inventory, Photon and shaders disabled, standing player scale");mc.stop();}
     }
     private static void check(net.minecraft.server.MinecraftServer s,Runnable r){s.execute(()->{try{r.run();}catch(Throwable e){failure=e.toString();}});}
     private static void use(Minecraft mc){mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(POS.getCenter(),Direction.NORTH,POS,false));}
