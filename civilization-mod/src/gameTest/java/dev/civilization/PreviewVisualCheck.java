@@ -70,6 +70,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("thermal")){ThermalVisualCheck.tick(mc);return;}
         if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")){ItemArtVisualCheck.tick(mc,CHECK);return;}
         if(CHECK.equals("canisters")){CanisterVisualCheck.tick(mc);return;}
+        if(CHECK.equals("oven")){OvenVisualCheck.tick(mc);return;}
         if(CHECK.equals("kitchen")){KitchenVisualCheck.tick(mc);return;}
         if(CHECK.equals("civic")){CivicVisualCheck.tick(mc);return;}
         if (!prepared && ++setupTicks < 100) return; // Let the initial chunk snapshot arrive before editing the display.

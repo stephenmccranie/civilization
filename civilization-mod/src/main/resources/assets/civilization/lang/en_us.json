@@ -1,4 +1,5 @@
 {
+  "block.civilization.baking_oven": "Baking Oven",
   "preview.civilization.legend_outline": "Place or feed controller | Red: clear obstruction",
   "message.civilization.preview_mode": "Build preview: %s",
   "message.civilization.preview_opacity": "Build preview opacity: %s%%",

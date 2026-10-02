@@ -1,6 +1,6 @@
 # Cooking stove prototype
 
-The experimental **Prototype Stove** tests the first Tier 2 sensory cooking loop. The kitchen's later multiblock stations remain [proposals](../open_decisions.md#tier-2-kitchen-workshop). This slice uses a dedicated cast-iron stovetop on an open steel stand, with one removable exposed skillet, one rotary heat dial and four narrow ember vents. It has no oven door or baking cavity; the separate oven remains later kitchen work. Original materials use 64 pixels per block face in a 512×256 model atlas. Quiet metal fills have component-specific seams, steel fasteners, a fitted vent surround, dial calibration ticks and restrained skillet-lip wear; the marks are mapped to measured faces rather than repeated as a generic tile. Ingredient loading and serving are built into its menu.
+The experimental **Prototype Stove** tests the first Tier 2 sensory cooking loop. The kitchen's later multiblock stations remain [proposals](../open_decisions.md#tier-2-kitchen-workshop). This slice uses a dedicated cast-iron stovetop on an open steel stand, with one removable exposed skillet, one rotary heat dial and four narrow ember vents. It has no oven door or baking cavity; the separate oven now has a physical Creative preview described below. Original materials use 64 pixels per block face in a 512×256 model atlas. Quiet metal fills have component-specific seams, steel fasteners, a fitted vent surround, dial calibration ticks and restrained skillet-lip wear; the marks are mapped to measured faces rather than repeated as a generic tile. Ingredient loading and serving are built into its menu.
 
 ## Try it
 
@@ -52,3 +52,16 @@ Dial, mounted-vessel presence, reserved batch, recipe calorie ceiling, cooking p
 This is one dish, one heated position, removable cookware and one pan per supported resting block. Multiple kitchen multiblocks, recipe specialties, ingredient substitutions and oven cooking are later work. There is no preparation-table requirement, precision handling, physics spill or cooking XP. The color/sound cues and throughput need ordinary player playtesting; automated checks establish operation and conservation, not whether cooks enjoy or master them. No claim is made for cooking aboard moving vessels.
 
 The [asset brief](../art/assets/prototype_stove/asset.json) owns editable Blockbench geometry, original material references, generated concept provenance and original sound sources and the hashed audio export receipt. The [meal asset](../art/assets/vegetable_skillet/asset.json) owns its transparent master and native sprite export.
+
+## Baking oven: physical first pass
+
+**Baking Oven** is available in the Civilization Creative tab or through `/give @s civilization:baking_oven`. Place it on a solid 2x2 base with three blocks of clear space above. It faces the player and rejects obstructed or unauthorized placement. The cast-iron body fits within 2x2x2 blocks and stands 1.8 blocks high, matching a standing player. The rear flue extends above the body to about 2.3 blocks high. Leave room in front for the door swing.
+
+- Right-click the oven with an empty hand to open or close its main door. The leaf swings outward over 0.8 seconds; the viewing window is transparent.
+- Crouch and scroll while looking at the oven to turn its continuous draft dial. Hold the sprint key for fine adjustment. The pointer moves and an action-bar percentage confirms the setting; it persists on reload.
+- The shell and closed door have cached collision. Opening clears the chamber entrance; the swinging leaf has no separate collision outside the base.
+- The occupied cells belong to one placed oven. Breaking any part removes the assembly and drops one oven item in Survival. This is a single Creative preview object, not progressive multiblock construction.
+
+Existing tall ovens adopt the new size on loading; their obsolete top-row cells are removed without dropping items or resetting the draft dial. Unrelated blocks above them are preserved.
+
+The chamber is empty apart from its fixed rack. The lower firebox door remains fixed. The draft dial is a physical control only: no fuel, heat, tray handling, recipes or work meals are implemented for this oven yet. Survival construction and baking remain [kitchen proposals](../open_decisions.md#tier-2-kitchen-workshop).
