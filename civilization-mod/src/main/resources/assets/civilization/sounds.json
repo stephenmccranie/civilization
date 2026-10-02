@@ -1,1 +1,35 @@
-{"stove_wet":{"sounds":[{"name":"civilization:stove_wet","volume":0.8}]},"stove_sizzle":{"sounds":[{"name":"civilization:stove_sizzle","volume":0.8}]},"stove_char":{"sounds":[{"name":"civilization:stove_char","volume":0.8}]}}
+{
+  "stove_wet": {
+    "sounds": [
+      {
+        "name": "civilization:stove_wet",
+        "volume": 0.8
+      }
+    ]
+  },
+  "stove_sizzle": {
+    "sounds": [
+      {
+        "name": "civilization:stove_sizzle",
+        "volume": 0.8
+      }
+    ]
+  },
+  "stove_char": {
+    "sounds": [
+      {
+        "name": "civilization:stove_char",
+        "volume": 0.8
+      }
+    ]
+  },
+  "paterson_fire": {
+    "subtitle": "subtitles.civilization.paterson_fire",
+    "sounds": [
+      {
+        "name": "civilization:paterson_fire",
+        "attenuation_distance": 48
+      }
+    ]
+  }
+}

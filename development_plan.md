@@ -18,6 +18,12 @@ The offhand reel marks two endpoints with right-click and immediately starts axi
 
 Next: ordinary Survival building/demolition play to judge length, pace and reach. Cut pieces, functional blocks and vessels remain [follow-up choices](open_decisions.md#builders-line--follow-up-choices), rather than silently broadening this item. Cooking and coal work retain their existing order after this requested tool.
 
+### Colt Paterson — implemented prototype
+
+The implemented Creative/admin prototype uses a [local editable Paterson asset](art/assets/colt_paterson/asset.json). The detailed Blockbench model, chamber noses, native cock/release/index/disassembly and reload previews are implemented, with held/inventory rendering, left-click firing, tap R to cock each shot/empty reload and hold R for partial reload, extracted sound, slight recoil and server-side projectile physics/damage. [Firearms](civilization-mod/firearms.md) owns shipped controls and prototype tuning. The user's rear-frame correction adds a domed recoil shield, filled shaped cheeks meeting the grip and a curved hammer. The latest proportion correction lengthens the barrel and reduces the rear cylinder gap to a narrow visible seam and corrects the handle and rear frame cheek from a hand-traced reference silhouette, verified with uniformly aligned before/after overlays. The wood/frame interface shares one boundary and row grid, and a solid saddle seats the rear shield; close side, rear and underside joint views were checked. Native geometry/animation round-trip, UV density, whole-model views and actual revised animation playback were checked; [status](docs/status.md) owns validation limits. Original references, editable source and visual history stay local under the GitHub policy.
+
+Next: play the prototype to tune cadence, reload time and damage, then resolve [acquisition and production balance](open_decisions.md#guns--first-paterson-model). Chamber orientation and spent-round visibility persist between actions. The quality pass smooths the cylinder/rear shield and grip edges, refines the weathered steel/walnut materials from the supplied photographs and removes buried faces within each moving bone. Visible reload surfaces remain; the detailed cuboid model still carries a rendering cost documented in status. The agreed visual direction lives in [design](design_direction.md#setting-and-material-style).
+
 ## 1. Implemented foundation
 
 | IDs | Completed scope |

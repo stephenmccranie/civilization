@@ -43,6 +43,8 @@ public final class Civilization {
         CookingContent.register(modBus);
         PrototypeStoveContent.register(modBus);
         BakingOvenContent.register(modBus);
+        FirearmContent.register(modBus);
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER,FirearmConfig.SPEC,"civilization-firearms.toml");
         CuttingContent.register(modBus);
         BuilderLineContent.register(modBus);
         RoadContent.register(modBus);

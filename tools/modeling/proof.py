@@ -22,9 +22,41 @@ def evaluate(client, code):
 
 def export(client, codec):
     result = text_result(client.call('export_model', {'codec_id': codec, 'max_content_length': 2_000_000}))
-    if result.get('truncated') or not result.get('content'):
+    if not result.get('truncated') and result.get('content'):
+        return result['content']
+    if not result.get('truncated'):
         raise RuntimeError(f'Incomplete native {codec} export')
-    return result['content']
+    # Detailed native projects exceed the plugin's one-response limit. Compile
+    # inside Blockbench once, then transfer bounded text slices without truncation.
+    native= json.dumps(codec)
+    try:
+        length=evaluate(client,f"(() => {{const value=Codecs[{native}].compile();globalThis.civilizationNativeExport=typeof value==='string'?value:JSON.stringify(value);return globalThis.civilizationNativeExport.length;}})()")
+        if not isinstance(length,int) or length<=0:
+            raise RuntimeError(f'Incomplete native {codec} export')
+        pieces=[]
+        for start in range(0,length,60000):
+            piece=evaluate(client,f'globalThis.civilizationNativeExport.slice({start},{min(start+60000,length)})')
+            if not isinstance(piece,str) or len(piece)!=min(60000,length-start):
+                raise RuntimeError(f'Incomplete native {codec} export chunk at {start}')
+            pieces.append(piece)
+        return ''.join(pieces)
+    finally:
+        evaluate(client,'delete globalThis.civilizationNativeExport;true')
+
+
+
+def load_project(client, source):
+    """Load native project JSON without one enormous JavaScript object literal.
+
+    Detailed sources can freeze the editor when sent as eval syntax. Transfer
+    bounded string chunks and let JSON.parse read the data before the native codec.
+    The caller selects/creates the destination project first.
+    """
+    evaluate(client, "globalThis.civilizationProjectSource='';true")
+    for start in range(0, len(source), 60000):
+        chunk = json.dumps(source[start:start+60000]).replace('/', '\\u002f')
+        evaluate(client, 'globalThis.civilizationProjectSource+='+chunk+';true')
+    return evaluate(client, '(() => {try {Codecs.project.parse(JSON.parse(globalThis.civilizationProjectSource));return true;} finally {delete globalThis.civilizationProjectSource;}})()')
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
