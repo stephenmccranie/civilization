@@ -225,5 +225,7 @@
   "block.civilization.prototype_stove": "Prototype Stove",
   "item.civilization.vegetable_skillet": "Vegetable Skillet Portion",
   "item.civilization.skillet": "Skillet",
-  "block.civilization.resting_skillet": "Resting Skillet"
+  "block.civilization.resting_skillet": "Resting Skillet",
+  "item.civilization.builders_line": "Builder’s Line",
+  "tooltip.civilization.builders_line": "Offhand: right-click two aligned endpoints to build with blocks or mine with a tool. Crouch-right-click cancels. Up to 16 blocks."
 }

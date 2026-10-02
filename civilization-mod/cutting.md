@@ -61,6 +61,23 @@ Stone means cobblestone or stone bricks. Accepted copper oxidation/wax variants 
 
 Existing custom halves remain usable and return vanilla slab items where available. Old quarter plates become quarter beams, preserving quarter-block volume and material. The new eighth stage is additional. No quarter-thickness plates remain.
 
+## Builder's Line
+
+Craft **Builder's Line** at the Smithy from **2 iron ingots + 1 plank of any wood + 2 string**: one reel in **20 seconds** of productive work. Base productive coal cost is one Coal; temperature, ignition and idle burn follow ordinary Smithy rules. It is also in the Civilization Creative tab or `/give @s civilization:builders_line`.
+
+- Put the reel in the **offhand**. Hold ordinary full building blocks or a **pickaxe, axe or shovel** in the main hand.
+- **Right-click** a face to mark the start. For building, the mark is the cell normal placement would fill; for mining, it is the block hit. The first click performs no placement, mining or container action.
+- Aim at the end to inspect translucent block ghosts (building), amber target outlines (mining) and a thin cord between endpoints. Red outlines mark invalid/blocked cells. **Right-click again** to immediately start the operation; releasing the button does not interrupt work. Both endpoint cells count. Holding the button cannot double-select or repeat an operation.
+- Lines run along **X, Y or Z only**, with **16 cells maximum**, including a valid single-cell line. A diagonal/over-limit second mark is rejected while keeping the first point selected. Marks use ordinary interaction reach; you may walk between them. Active work checks a **16-block eye-to-cell-center range**, clear sight, loaded terrain, world bounds and current claim access. It cannot operate through walls or force-load chunks.
+- **Crouch-right-click cancels**. Switching the selected slot, working item/components, offhand reel or dimension, dying, disconnecting or leaving reach clears the operation. Completed cells remain. A new line requires two new clicks.
+- Building places **four blocks per second at 20 TPS**, consuming only the current main-hand stack. Normal placement events reject occupied/fluid cells and entity collisions and pay ordinary calories once. No automatic inventory refill or replacement of existing blocks.
+- Mining uses the held tool's **normal effective mining speed**, including hardness, enchantments, equipment grade, bonuses and depletion, with a short ordinary post-break delay. Each harvest uses normal cancellable player break events, durability, enchantment drops, experience and calories. Drops remain in the world. Insufficient harvest tools, a broken tool or a changed target stop the line before another cell is affected.
+- Work stops at the first obstruction, denied/canceled action, unloaded cell or inaccessible target; only successful preceding cells are paid. No whole-line rollback, automatic skipping or saved/offline jobs. There is no separate reel fuel or wear.
+
+Initial coverage is inert full-cube vanilla blocks and full Street Pavers. Glass and ordinary ores are included when harvestable; shaped pieces, stairs, slabs, leaves/plants, falling blocks, TNT, fluids, containers/block entities, custom machine parts and moving vessels are excluded. Shaped-piece repetition remains a follow-up through the existing half-grid system. Unsupported held items retain their ordinary interactions.
+
+The client preview is advisory; the server raycasts endpoint clicks and rechecks every target and actual stack. One bounded operation exists per player. Preview layout is cached outside rendering, with shared `GuidePerformance` cadence and visibility/outline bounds under the [guide performance contract](multiblock-builds.md#guide-performance-contract).
+
 ## Verification
 
 Server tests cover vanilla slab mappings and actual placement, cutting yields through the eighth stage, durability, persistence, joining consumption, exactly 6/12/8 unique shapes, half-grid dimensions, rotations, waterlogging, and multiblock geometry/material checks. Hidden 1920×1080 visual checks cover the slab, beam and cube previews and assembled machines with Photon and Faithful.

@@ -12,14 +12,11 @@ Current priority: Tier 2 cooking, then coal extraction. The requested full Oil D
 
 **Next:** try the physical oven in an ordinary kitchen, then choose its first baking batch. Continue ordinary stove play to assess sensory timing, carryover, warmth and rewards. Preparation remains deferred; there is no cooking XP or chopping mechanic.
 
-### Builder's Line — planning package
+### Builder's Line — implemented package
 
-The requested offhand, two-point, straight-line construction/demolition tool is in planning. [Design](design_direction.md#straight-line-hand-tool--planned) records agreed intent; the [proposal](open_decisions.md#builders-line--proposed-hand-tool) owns the visual brief, recommended controls, constraints and unresolved choices. No runtime behavior, recipe or asset is implemented, and this planning entry does not reorder the existing cooking/coal priorities.
+The offhand reel marks two endpoints with right-click and immediately starts axis-aligned building or held-tool demolition on the second click. The first pass includes cached previews, cancellation, server-authoritative hits and work, normal stock/labor/tool/drop accounting, conservative full-block coverage and a Smithy recipe. [Construction](civilization-mod/cutting.md#builders-line) owns controls, costs and limits; [status](docs/status.md) owns actual validation/deployment; the [asset](art/assets/builders_line/asset.json) owns original sources and inspected visual receipts.
 
-1. Settle processing speed, supporting cancel behavior, initial length/reach and block coverage. Right-click marks both endpoints and the valid second click immediately triggers the action, as agreed in the design. Choose name/appearance and acquisition before claiming a Survival-ready item.
-2. Build the smallest Creative-granted functional prototype: offhand detection, authoritative right-click endpoint selection with automatic execution on the second click, inclusive axis-only line enumeration, live preview/cancel, paced full-block placement and sequential held-tool demolition. Prevent held-click repeats and ordinary main-hand/container actions during marking. Reuse protection, labor and ordinary item/break behavior; verify cancellation and conservation before expanding coverage.
-3. Create the reel sprite through Define → Build and refine → Verify and publish; review actual inventory/offhand readability and cached previews under Photon/Faithful. Play one short construction/demolition loop and tune only from observed behavior.
-4. Add the chosen Survival recipe and acquisition gating, update shipped controls/limits in the focused construction reference, validate under [testing](civilization-mod/testing.md), and deploy/update status when a runtime build exists. Cut-piece support follows only if selected, through the existing half-grid placement path.
+Next: ordinary Survival building/demolition play to judge length, pace and reach. Cut pieces, functional blocks and vessels remain [follow-up choices](open_decisions.md#builders-line--follow-up-choices), rather than silently broadening this item. Cooking and coal work retain their existing order after this requested tool.
 
 ## 1. Implemented foundation
 

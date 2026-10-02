@@ -230,6 +230,8 @@ Craft two matching pieces in any two slots to recombine: eighths → beam → sl
 
 Stone, iron and diamond saws cut full blocks into slabs (½), slabs into beams (¼), and beams into small cubes (⅛). Every shape uses a 2×2×2 half-block grid. Existing vanilla slab items are the half stage and gain vertical placement and previews. Horizontal halves use vanilla slab blocks. The kiln and Fertilizer Furnace use quarter-beam supports, slab roof edges and eighth-cube corners. See [cutting](cutting.md) for controls, recipes and saved-build changes.
 
+The [Builder's Line](cutting.md#builders-line) is an offhand Smithy tool: hold full blocks or a pickaxe/axe/shovel in the main hand and right-click two aligned endpoints. The second click immediately starts a line of up to 16 blocks; crouch-right-click cancels. Actual materials, tool wear, drops, calories and protection still apply. The construction reference owns coverage and reach limits.
+
 ## Optional vehicle physics laboratory
 
 An isolated Sable-only development profile now contains a controllable cargo-platform example and server restart/hidden client checks. It is excluded from the normal JAR and is not installed into Prism. See [vehicle physics integration](vehicle-physics.md) for setup and executable API examples. Boats, airship gameplay and production integration remain unimplemented.

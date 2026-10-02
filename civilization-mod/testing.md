@@ -16,6 +16,8 @@ For a narrow change, inspect the owning code and focused reference, keep searche
 
 Shared multiblock guide changes must preserve `GuidePerformanceTest` coverage for refresh cadence, key invalidation, visibility culling and retaining the aimed part inside the outline cap. Use `guide` for ordinary block guides and `derrick-guide` when native section geometry changes.
 
+The `BuilderLineGameTests` checks cover inclusive axis-only lines, conservative block coverage, immediate second-mark placement, normal stock/labor/tool/drop accounting, obstruction/exhaustion/cancel behavior, broken/changed tools, changed targets/range, canceled-event rollback, whitelist revocation and the Smithy quote. The `builders-line` guarded client scene exercises actual right-click input/payloads, held-click suppression, automatic building/mining after release, diagonal rejection, crouch-right-click cancel and inventory/offhand plus preview screenshots under Photon/Faithful.
+
 ## Focused visual checks
 
 `models` is a development-only GeckoLib integration scene beside the Oil Engine. First create and publish the native editor fixture using the [model toolset](../tools/modeling/README.md). The fixture source and native exports are now included, with successful editor round-trip and Photon motion-frame review. The ordinary `engine` scene continues to test the production renderer; success there only verifies that the added dependency coexists with the current graphics setup.

@@ -58,6 +58,8 @@ public final class WorkshopJobs {
         EQUIPMENT.put(Items.SHIELD,new Equipment(Items.SHIELD,Items.IRON_INGOT,1,false));
         a.add(new Job(Items.SHIELD.getDescriptionId(),new ItemStack(Items.SHIELD),List.of(
                 need(Items.IRON_INGOT,1),new Need(Ingredient.of(ItemTags.PLANKS),6),need(Items.LEATHER,1),empty()),600));
+        a.add(new Job(BuilderLineContent.LINE.get().getDescriptionId(),BuilderLineContent.LINE.toStack(),List.of(
+                need(Items.IRON_INGOT,2),new Need(Ingredient.of(ItemTags.PLANKS),1),need(Items.STRING,2),empty()),400));
         smithy=List.copyOf(a);return smithy;
     }
     private static void add(List<Job> jobs,Item result,Item material,int amount,boolean armor,int sticks){

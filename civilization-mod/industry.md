@@ -70,6 +70,7 @@ Open the controller and insert materials, or choose a job in the searchable reci
 | Smithy tools/weapons | Familiar metal/stick counts + 1 Leather → 1 item | 30 seconds |
 | Smithy armor | Familiar metal count + 1 Leather + 2 Cloth → 1 armor piece | 60 seconds |
 | Shears | 2 iron ingots + 1 Leather → 1 shears | 20 seconds |
+| [Builder's Line](cutting.md#builders-line) | 2 iron ingots + 1 plank of any wood + 2 string → 1 reel | 20 seconds |
 | Shield | 1 iron ingot + 6 Planks of any wood + 1 Leather → 1 shield | 30 seconds |
 | Repairs | Damaged equipment + quoted primary material + 1 Leather (tools) or 1 Cloth (armor) → repaired item | 20 seconds |
 
