@@ -8,6 +8,8 @@ Item tooltips give short purpose, control and safety hints. Construction bills a
 
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace are included automatically. They also remain discoverable through creative search.
 
+The [Colt Paterson prototype](firearms.md) adds left-click firing, tap R to cock each shot or reload an empty gun, hold R for a partial reload from inventory .36 ammunition, slight recoil, the extracted firing sound and server-side bullets with drop, drag and damage.
+
 Town manufacturing: [Tannery, Textile Workshop and Smithy](industry.md#town-workshops) connect hides, wool and Foundry metals to equipment production and repairs.
 
 The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Load ingredients at the stove, then lift the skillet onto a solid counter to finish with residual heat and serve; it can return to the stove if underdone. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.
@@ -229,6 +231,8 @@ Slabs, beams and cubes now share all eight half-grid cells freely, including mix
 Craft two matching pieces in any two slots to recombine: eighths → beam → slab → full block. No saw required; the player crafting grid works. Conflicting two-slab decorative recipes now use one full source block.
 
 Stone, iron and diamond saws cut full blocks into slabs (½), slabs into beams (¼), and beams into small cubes (⅛). Every shape uses a 2×2×2 half-block grid. Existing vanilla slab items are the half stage and gain vertical placement and previews. Horizontal halves use vanilla slab blocks. The kiln and Fertilizer Furnace use quarter-beam supports, slab roof edges and eighth-cube corners. See [cutting](cutting.md) for controls, recipes and saved-build changes.
+
+The [Builder's Line](cutting.md#builders-line) is an offhand Smithy tool: hold full blocks or a pickaxe/axe/shovel in the main hand and right-click two aligned endpoints. The second click immediately starts a line of up to 16 blocks; crouch-right-click cancels. Actual materials, tool wear, drops, calories and protection still apply. The construction reference owns coverage and reach limits.
 
 ## Optional vehicle physics laboratory
 

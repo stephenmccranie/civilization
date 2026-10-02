@@ -99,7 +99,7 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
              texture='data:image/png;base64,'+base64.b64encode(Path(atlas).read_bytes()).decode(),gecko=gecko)
     client.call('create_project',{'name':name,'format':'geckolib_model' if gecko else 'java_block'})
     script='''(() => {
-      const c=CONFIG;
+      const c=JSON.parse(globalThis.civilizationModelConfig);
       Project.name=c.name; Project.geometry_name=c.name; Project.box_uv=false;
       Project.texture_width=c.size[0]; Project.texture_height=c.size[1];
       if(c.gecko) Project.geckolib_model_type='block';
@@ -113,7 +113,17 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
       }
       Canvas.updateAll();return {cubes:Cube.all.length,bones:Group.all.length};
     })()'''
-    return evaluate(client,script.replace('CONFIG',json.dumps(cfg).replace('/','\\u002f')))
+    # Large literal objects can exhaust the editor's JavaScript parser.
+    # Transfer bounded string chunks, then parse the configuration once.
+    payload=json.dumps(cfg)
+    evaluate(client,"globalThis.civilizationModelConfig='';true")
+    try:
+        for start in range(0,len(payload),60000):
+            chunk=json.dumps(payload[start:start+60000]).replace('/', '\\u002f')
+            evaluate(client,'globalThis.civilizationModelConfig+='+chunk+';true')
+        return evaluate(client,script)
+    finally:
+        evaluate(client,'delete globalThis.civilizationModelConfig;true')
 
 
 def save(client,folder,name,gecko=True):
