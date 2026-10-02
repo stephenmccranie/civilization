@@ -2,6 +2,8 @@
 
 The development handoff is a source snapshot of the working files, including changes not yet committed in the owner's repository. `HANDOFF-MANIFEST.json` in the exported archive records its version and SHA-256 file hashes. It is not a launcher instance or a ready-to-run modpack. It includes original artwork, concepts, tools and documentation, but excludes `.git`, local configuration, downloaded dependencies, caches, logs and worlds.
 
+This archive workflow is for a separate local handoff repository. Publishing and integrating work in the owner's GitHub repository follows the [GitHub workflow](../AGENTS.md#github-workflow); do not push this artwork-containing archive baseline there.
+
 ## Start from the archive
 
 Extract the ZIP into its own folder, outside any existing repository. Open that folder in Codex or your editor. Install Git and JDK 21. No GitHub account is necessary for local branches.

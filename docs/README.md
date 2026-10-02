@@ -2,6 +2,7 @@
 
 | Active home | Owns |
 | --- | --- |
+| [GitHub workflow](../AGENTS.md#github-workflow) | Focused task branches/PRs, validation before automatic squash merge, safe cleanup and publication boundaries |
 | [Collaboration handoff](collaboration.md) | Source snapshots, local helicopter branch setup, dependencies and returning changes without hosting |
 | [Ownership and trade](../civilization-mod/ownership-trade.md) | Powered claim tiers, whitelists, takeover lifecycle, local counters and protection scope |
 | [Geography](../civilization-mod/geography.md) | Regional eligibility, inspection, configuration and terrain limits |
