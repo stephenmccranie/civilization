@@ -42,6 +42,6 @@ Last reviewed: **2026-10-01**. Current build: **0.34.41-dev**, installed in Civi
 
 ## Work direction
 
-Next: ordinary gentle/strong-heat cooking batches to judge cue recognition, carryover, throughput and warmth. Tune from that play before adding dishes, specialties or kitchen stations. Cooking precedes coal-extraction redesign; existing drills/refinery remain implemented. Flight optimization is deferred at the userâ€™s request. The [development plan](../development_plan.md) owns package order and remaining work.
+The [manual huge-vein mining plan](../development_plan.md#manual-coal-mining--planned-package) now defines the coal replacement: preserve normal small-coal mining, unlock richer huge veins with click-triggered/camera-shaped pick work, shovel loose coal into carts and prepare it into usable Coal. This is documentation only; the current Coal Drill/refinery, build, installed JAR and validation results above are unchanged. Cooking retains ordinary gentle/strong-heat batches to judge cue recognition, carryover, throughput and warmth before adding dishes or stations. Flight optimization remains deferred. The [development plan](../development_plan.md) owns package order and acceptance.
 
 Completed code/docs/runtime resources are committed and pushed under the [GitHub workflow](../AGENTS.md#github-workflow); original art and visual-review history remain local. Older release hashes, experiments and session observations are preserved in the [development record](history/releases/development-through-0.34.23.md) and [history index](history/README.md).
