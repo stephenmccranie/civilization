@@ -49,7 +49,7 @@ public final class CutModel extends BakedModelWrapper<BakedModel> {
         return crop(quad,CutBlock.bounds(state));
     }
     private static BakedQuad cellTint(BakedQuad quad,int cell) {return quad.isTinted()?new BakedQuad(quad.getVertices(),(cell+1)*256+quad.getTintIndex(),quad.getDirection(),quad.getSprite(),quad.isShade()):quad;}
-    private static BakedQuad crop(BakedQuad quad, net.minecraft.world.phys.AABB box) {
+    public static BakedQuad crop(BakedQuad quad, net.minecraft.world.phys.AABB box) {
         int[] original = quad.getVertices(), out = original.clone(); int stride = original.length / 4;
         double[] lows={box.minX,box.minY,box.minZ},sizes={box.getXsize(),box.getYsize(),box.getZsize()};
         for(int i=0;i<4;i++) for(int a=0;a<3;a++) {

@@ -4,7 +4,7 @@ param(
     [string]$Task = 'Build',
     [ValidateSet('Quick', 'Gameplay', 'Visual', 'Full')]
     [string]$Scope = 'Quick',
-    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','thermal','road','uranium','derrick-guide','kitchen','oven','builders-line','paterson')]
+    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','thermal','road','uranium','derrick-guide','kitchen','oven','builders-line','paterson','coal-mining')]
     [string]$Scene = 'machines',
     [switch]$FullVisual
 )

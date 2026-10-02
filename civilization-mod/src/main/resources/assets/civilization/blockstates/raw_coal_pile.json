@@ -1,0 +1,196 @@
+{
+  "variants": {
+    "units=1": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=2": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=3": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=4": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=5": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=6": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=7": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=8": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=9": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=10": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=11": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=12": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=13": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=14": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=15": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=16": {
+      "model": "civilization:block/raw_coal_pile_1"
+    },
+    "units=17": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=18": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=19": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=20": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=21": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=22": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=23": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=24": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=25": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=26": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=27": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=28": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=29": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=30": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=31": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=32": {
+      "model": "civilization:block/raw_coal_pile_2"
+    },
+    "units=33": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=34": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=35": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=36": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=37": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=38": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=39": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=40": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=41": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=42": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=43": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=44": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=45": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=46": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=47": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=48": {
+      "model": "civilization:block/raw_coal_pile_3"
+    },
+    "units=49": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=50": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=51": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=52": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=53": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=54": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=55": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=56": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=57": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=58": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=59": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=60": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=61": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=62": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=63": {
+      "model": "civilization:block/raw_coal_pile_4"
+    },
+    "units=64": {
+      "model": "civilization:block/raw_coal_pile_4"
+    }
+  }
+}
