@@ -13,6 +13,8 @@ python tools/modeling/setup.py
 
 The portable editor, plugins and separate profile live in ignored `.tools/modeling`. In Blockbench use File → Plugins → Load Plugin from File for `.tools/modeling/mcp.js` and `.tools/modeling/geckolib.js`. Permit MCP network access. Leave the editor open during work. No debugging port is needed.
 
+The launcher reuses a ready editor and waits up to 45 seconds for a successful MCP initialization. If this project profile is already running, it waits for that instance instead of opening a duplicate. New launches write diagnostics to ignored `.tools/modeling/startup.log`; a timeout reports that path and leaves open projects intact. Preserve/save projects before restarting an unresponsive editor.
+
 Setup applies one explicit patch to the pinned MCP artifact: bind to `127.0.0.1`, because upstream binds all interfaces. Its local receipt records original/patched hashes. This remains [Jason Gardner's plugin](https://github.com/jasonjgardner/blockbench-mcp-plugin/tree/b187b4b056f0efafcc573335400ecbb21ad26ecc), not our own modeling server. Retain its upstream license/provenance and do not put authoring tools in the Minecraft JAR.
 
 The project `.codex/config.toml` declares `http://127.0.0.1:3000/bb-mcp` for future tasks. A running task may need to restart to discover native MCP tools. The direct HTTP client works without rediscovery:
