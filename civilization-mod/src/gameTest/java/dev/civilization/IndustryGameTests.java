@@ -220,10 +220,17 @@ public final class IndustryGameTests {
         h.getLevel().getFluidState(p).tick(h.getLevel(),p);
         h.runAfterDelay(10,()->{h.assertTrue(h.getLevel().getBlockState(p).is(block)&&h.getLevel().getBlockState(p).getValue(net.minecraft.world.level.block.LiquidBlock.LEVEL)==4&&!h.getLevel().getBlockState(p.below()).is(block),"Finite fluid height neither flows nor regenerates");h.succeed();});
     }
-    @GameTest(template="empty",timeoutTicks=90) public static void surfaceOilFlowsAndDerricksUseTheColumn(GameTestHelper h){
+    // The 13x6x13 template reserves the whole bed and its flow margin, unlike empty (5x3x5).
+    private static BlockPos surfaceOilBed(GameTestHelper h){
         var source=h.absolutePos(new BlockPos(6,4,6));
+        h.assertTrue(h.getBounds().contains(Vec3.atCenterOf(source.offset(-3,-1,-3)))
+                &&h.getBounds().contains(Vec3.atCenterOf(source.offset(3,0,3))),"Oil flow bed stays inside the reserved test area");
         for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)
-            h.getLevel().setBlockAndUpdate(source.offset(x,-1,z),Blocks.STONE.defaultBlockState());
+            h.getLevel().setBlockAndUpdate(source.offset(x,-1,z),Blocks.DIRT.defaultBlockState());
+        return source;
+    }
+    @GameTest(template="surface_oil",timeoutTicks=90) public static void surfaceOilFlowsAndDerricksUseTheColumn(GameTestHelper h){
+        var source=surfaceOilBed(h);
         h.getLevel().setBlockAndUpdate(source,IndustrialContent.SURFACE_OIL.get().defaultBlockState());
         var site=new Deposits.Site(source.getX(),source.getY(),source.getZ(),Deposits.Kind.OIL,3);
         h.assertTrue(site.contains(source.above(50))&&site.contains(source.east(3).above(20))
@@ -236,11 +243,10 @@ public final class IndustryGameTests {
             h.succeed();
         });
     }
-    @GameTest(template="empty",timeoutTicks=90) public static void generatedSurfaceOilStartsWithoutNeighborChange(GameTestHelper h){
-        var source=h.absolutePos(new BlockPos(6,4,6));
-        for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)
-            h.getLevel().setBlockAndUpdate(source.offset(x,-1,z),Blocks.STONE.defaultBlockState());
+    @GameTest(template="surface_oil",timeoutTicks=90) public static void generatedSurfaceOilStartsWithoutNeighborChange(GameTestHelper h){
+        var source=surfaceOilBed(h);
         h.getLevel().setBlockAndUpdate(source.east(),Blocks.SHORT_GRASS.defaultBlockState());
+        h.runAfterDelay(1,()->h.assertTrue(h.getLevel().getBlockState(source.east()).is(Blocks.SHORT_GRASS),"Grass survives on the bed until the scheduled oil flow"));
         h.getLevel().setBlock(source,IndustrialContent.SURFACE_OIL.get().defaultBlockState(),2);
         SurfaceOilFlow.activate(h.getLevel(),source);
         h.assertTrue(h.getLevel().getFluidTicks().hasScheduledTick(source,IndustrialContent.CRUDE.get()),
@@ -299,7 +305,7 @@ public final class IndustryGameTests {
 
     private static BlockPos port(IndustrialBlockEntity m,String role){return IndustrialStructure.parts(m.kind).stream().filter(p->p.material().equals(role)).map(p->MachineStructure.position(m.getBlockPos(),m.front(),p)).findFirst().orElseThrow();}
     private static void pipe(GameTestHelper h,BlockPos p){h.getLevel().setBlockAndUpdate(p,IndustrialContent.PIPE.get().defaultBlockState());}
-    @GameTest(template="empty",timeoutTicks=440,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
+    @GameTest(template="empty",timeoutTicks=460,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
         var l=h.getLevel();var origin=h.absolutePos(new BlockPos(0,67,0));
         // This 60-block pipeline extends beyond the tiny empty template's ticking area.
         for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
@@ -308,15 +314,6 @@ public final class IndustryGameTests {
         var heater=machine(h,IndustrialContent.REFINERY.get(),24);
         var column=machine(h,IndustrialContent.COLUMN.get(),38);
         var condenser=machine(h,IndustrialContent.CONDENSER.get(),52);
-        pump.setItem(0,KilnContent.MINERAL_COAL.toStack(32));heater.setItem(0,KilnContent.MINERAL_COAL.toStack(32));
-        CoalFireFixture.light(pump);CoalFireFixture.light(heater);
-        // Startup inventory isolates sustained throughput from first-fill latency.
-        pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),125),EXECUTE);
-        heater.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),500),EXECUTE);
-        heater.output.fill(new FluidStack(IndustrialContent.HEATED.get(),250),EXECUTE);
-        column.input.fill(new FluidStack(IndustrialContent.HEATED.get(),2000),EXECUTE);
-        column.output.fill(new FluidStack(IndustrialContent.VAPOR.get(),800),EXECUTE);
-        condenser.input.fill(new FluidStack(IndustrialContent.VAPOR.get(),400),EXECUTE);
         // The derrick's crude port is beside its ground-level controller.
         for(int x=17;x<=21;x++)pipe(h,h.absolutePos(new BlockPos(x,67,2)));
         pipe(h,h.absolutePos(new BlockPos(21,68,2)));
@@ -327,6 +324,19 @@ public final class IndustryGameTests {
         pipe(h,h.absolutePos(new BlockPos(56,69,4)));
         var tankPos=h.absolutePos(new BlockPos(57,69,4));l.setBlockAndUpdate(tankPos,IndustrialContent.TANK.get().defaultBlockState());
         var tank=(IndustrialBlockEntity)l.getBlockEntity(tankPos);
+        // Let newly placed block-entity tickers/ports settle before the fixed 400-tick measurement.
+        h.runAfterDelay(20,()->{
+        for(var m:java.util.List.of(pump,heater,column,condenser))
+            h.assertTrue(l.isPositionEntityTicking(m.getBlockPos())&&m.formed&&m.progress==0,"Every stage is loaded and idle before priming: "+m.kind);
+        pump.setItem(0,KilnContent.MINERAL_COAL.toStack(32));heater.setItem(0,KilnContent.MINERAL_COAL.toStack(32));
+        CoalFireFixture.light(pump);CoalFireFixture.light(heater);
+        // Startup inventory isolates sustained throughput from first-fill latency.
+        pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),125),EXECUTE);
+        heater.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),500),EXECUTE);
+        heater.output.fill(new FluidStack(IndustrialContent.HEATED.get(),250),EXECUTE);
+        column.input.fill(new FluidStack(IndustrialContent.HEATED.get(),2000),EXECUTE);
+        column.output.fill(new FluidStack(IndustrialContent.VAPOR.get(),800),EXECUTE);
+        condenser.input.fill(new FluidStack(IndustrialContent.VAPOR.get(),400),EXECUTE);
         h.runAfterDelay(400,()->{
             h.assertTrue(initialStock-stock(h,oil)==1000,"Twenty seconds removes precisely 1,000 mB physical crude");
             h.assertTrue(heater.input.getFluidAmount()==500&&column.input.getFluidAmount()==2000,"Matched upstream stages hold stable input inventories: "+heater.input.getFluidAmount()+", "+column.input.getFluidAmount());
@@ -335,6 +345,7 @@ public final class IndustryGameTests {
             for(var m:java.util.List.of(pump,heater,column,condenser))h.assertTrue(m.status==7&&m.progress==0,"Every primed stage completes its matched batches without starving: "+m.kind);
             for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,false);
             h.succeed();
+        });
         });
         });
     }

@@ -18,6 +18,10 @@ Shared multiblock guide changes must preserve `GuidePerformanceTest` coverage fo
 
 The `BuilderLineGameTests` checks cover inclusive axis-only lines, conservative block coverage, immediate second-mark placement, normal stock/labor/tool/drop accounting, obstruction/exhaustion/cancel behavior, broken/changed tools, changed targets/range, canceled-event rollback, whitelist revocation and the Smithy quote. The `builders-line` guarded client scene exercises actual right-click input/payloads, held-click suppression, automatic building/mining after release, diagonal rejection, crouch-right-click cancel and inventory/offhand plus preview screenshots under Photon/Faithful.
 
+Scheduled surface-oil tests use a dedicated 13x6x13 `surface_oil` template. The whole seven-block-wide bed and its flow margin must stay inside the declared area so native scheduled ticks and neighboring test cleanup are independent of suite layout. The grass-displacement fixture uses dirt and checks that grass survives before oil arrives; both tests retain their 65-tick flow assertions. Do not drive the fluid manually or extend deadlines to hide fixture failures.
+
+The refinery throughput fixture lets newly assembled block-entity tickers and ports settle for 20 ticks, then asserts every stage is loaded, formed and idle before adding its startup inventory and lighting fires. Its measured production interval remains exactly 400 ticks, with exact batch, stock, input and output totals; assembly startup is outside that interval.
+
 ## Focused visual checks
 
 `models` is a development-only GeckoLib integration scene beside the Oil Engine. First create and publish the native editor fixture using the [model toolset](../tools/modeling/README.md). The fixture source and native exports are now included, with successful editor round-trip and Photon motion-frame review. The ordinary `engine` scene continues to test the production renderer; success there only verifies that the added dependency coexists with the current graphics setup.
