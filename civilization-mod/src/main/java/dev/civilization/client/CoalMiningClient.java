@@ -53,7 +53,7 @@ public final class CoalMiningClient {
                 frameTime=now;cameraYaw=viewYaw;cameraPitch=viewPitch;
                 var motion=CoalPickMotion.swing(age,CoalPickItem.CONTACT,CoalPickItem.DURATION);
                 lastArc=motion.pitch()-MOTION.pitch();lastSide=MOTION.yaw();lastAge=age;
-                pose.translate(sign*.38+MOTION.yaw()*.004+sign*motion.x(),-.42-equip*.6-MOTION.pitch()*.003+motion.y(),-.6+motion.z());
+                pose.translate(sign*.3+MOTION.yaw()*.002+sign*motion.x(),-.42-equip*.6-MOTION.pitch()*.002+motion.y(),-.35+motion.z());
                 pose.mulPose(Axis.YP.rotationDegrees((float)-MOTION.yaw()));pose.mulPose(Axis.XP.rotationDegrees((float)-MOTION.pitch()));
                 // Rotate around the lower grip, giving the pick head a broad physical arc.
                 pose.translate(0,-.22,0);

@@ -30,10 +30,10 @@ final class CoalMiningVisualCheck {
         });}
         if(ticks==120)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
         if(ticks==125){mc.player.setYRot(mc.player.getYRot()+24);mc.player.setXRot(mc.player.getXRot()-8);}
-        if(ticks>=126&&ticks<=131)idleLag=Math.max(idleLag,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
+        if(ticks>=126&&ticks<=131)idleLag=Math.max(idleLag,dev.civilization.client.CoalMiningClient.lastSide);
         if(ticks==129)shot(mc,"camera-drag-idle");
         if(ticks==132)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
-        if(ticks==135&&idleLag<8)throw new IllegalStateException("Resting pick did not trail a camera turn: "+idleLag);
+        if(ticks==135&&idleLag<4)throw new IllegalStateException("Resting head did not follow the camera turn: "+idleLag);
         if(ticks==135)check(server,()->assertFace(server,64,0)); // Camera movement alone never mines.
         if(ticks==140){click(mc);click(mc);}
         if(ticks>140&&ticks<163){
@@ -49,10 +49,10 @@ final class CoalMiningVisualCheck {
         if(ticks==200)check(server,()->assertFace(server,56,2)); // Held input repeated; releasing prevents a third swing.
         if(ticks==210)click(mc);
         if(ticks==213){mc.player.setYRot(mc.player.getYRot()+18);mc.player.setXRot(mc.player.getXRot()-10);}
-        if(ticks>=214&&ticks<=224)cameraShape=Math.max(cameraShape,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
+        if(ticks>=214&&ticks<=224)cameraShape=Math.max(cameraShape,dev.civilization.client.CoalMiningClient.lastSide);
         if(ticks==217)shot(mc,"camera-shaped");
         if(ticks==218){release(mc);aim(server,FACE.getCenter().add(-.25,-.25,-.5));}
-        if(ticks==235){if(cameraShape<8)throw new IllegalStateException("Camera did not visibly drag the rendered pick: "+cameraShape);check(server,()->assertFace(server,52,3));}
+        if(ticks==235){if(cameraShape<4)throw new IllegalStateException("Rendered head did not follow the camera turn: "+cameraShape);check(server,()->assertFace(server,52,3));}
         if(ticks==250)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
         if(ticks==252)mc.options.keyAttack.setDown(true);
         if(ticks==270)check(server,()->assertFace(server,52,3)); // GUI input never schedules another swing.
