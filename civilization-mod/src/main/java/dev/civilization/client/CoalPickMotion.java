@@ -1,0 +1,34 @@
+package dev.civilization.client;
+
+/** Bounded weighted camera following. Advance once per rendered frame, never per hand. */
+public final class CoalPickMotion {
+    private double yaw,pitch,yawSpeed,pitchSpeed;
+    public double yaw(){return yaw;}
+    public double pitch(){return pitch;}
+    public void reset(){yaw=pitch=yawSpeed=pitchSpeed=0;}
+    public void advance(double cameraYaw,double cameraPitch,double seconds){
+        if(!Double.isFinite(cameraYaw)||!Double.isFinite(cameraPitch)||!Double.isFinite(seconds)){reset();return;}
+        // Carry the head into the turn, then settle; do not leave it behind the view.
+        yaw=Math.clamp(yaw+cameraYaw*.55,-28,28);pitch=Math.clamp(pitch+cameraPitch*.55,-24,24);
+        double dt=Math.clamp(seconds,0,.1),omega=9,decay=Math.exp(-omega*dt);
+        double y=yawSpeed+omega*yaw,p=pitchSpeed+omega*pitch;
+        yaw=(yaw+y*dt)*decay;pitch=(pitch+p*dt)*decay;
+        yawSpeed=(yawSpeed-omega*y*dt)*decay;pitchSpeed=(pitchSpeed-omega*p*dt)*decay;
+        yaw=Math.clamp(yaw,-28,28);pitch=Math.clamp(pitch,-24,24);
+    }
+    public record Pose(double pitch,double yaw,double roll,double x,double y,double z){}
+    /** Raise the grip and draw the head behind the shoulder, then strike in one plane. */
+    public static Pose swing(double age,int contact,int duration){
+        if(age<0||age>=duration)return new Pose(0,0,0,0,0,0);
+        double wind=smooth(age/(contact-4.0));
+        double hit=smooth((age-(contact-4))/4);
+        double follow=smooth((age-contact)/3);
+        double rest=1-smooth((age-contact-3)/(duration-contact-3.0));
+        // Positive pitch brings the upright head back toward the shoulder;
+        // negative pitch drives it forward/down. No scripted sideways spin.
+        return new Pose((115*wind-135*hit-25*follow)*rest,0,0,
+                (-.1*wind-.18*hit)*rest,(.9*wind-.32*hit-.22*follow)*rest,
+                (.15*wind-.25*hit-.04*follow)*rest);
+    }
+    private static double smooth(double t){t=Math.clamp(t,0,1);return t*t*(3-2*t);}
+}
