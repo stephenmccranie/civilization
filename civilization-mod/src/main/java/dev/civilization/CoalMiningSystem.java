@@ -22,14 +22,15 @@ public final class CoalMiningSystem {
         int pace=CalorieFoodData.active(p)&&CalorieFoodData.of(p).isDepleted()?2:1;
         long now=p.serverLevel().getGameTime();SWINGS.put(p.getUUID(),new Swing(stack,p.getInventory().selected,now,CoalPickItem.CONTACT*pace,p.serverLevel()));p.getCooldowns().addCooldown(stack.getItem(),CoalPickItem.DURATION*pace);
         var t=CoalPickItem.state(stack);t.putLong("coalSwing",now);t.putInt("coalDuration",CoalPickItem.DURATION*pace);t.putFloat("swingYaw",p.getYRot());t.putFloat("swingPitch",p.getXRot());CoalPickItem.save(stack,t);
-        p.serverLevel().playSound(null,p.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,.35f,.7f);return true;
+        return true;
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post e){if(e.getEntity() instanceof ServerPlayer p)step(p);}
     public static void step(ServerPlayer p){
         var swing=SWINGS.get(p.getUUID());if(swing==null)return;
         if(!p.isAlive()||p.isSpectator()||p.serverLevel()!=swing.level||p.getInventory().selected!=swing.slot||p.getMainHandItem()!=swing.tool){SWINGS.remove(p.getUUID());return;}
         if(swing.level.getGameTime()-swing.start<swing.contact)return;
-        SWINGS.remove(p.getUUID());p.swing(net.minecraft.world.InteractionHand.MAIN_HAND,true);strike(p);
+        SWINGS.remove(p.getUUID());p.swing(net.minecraft.world.InteractionHand.MAIN_HAND,true);
+        p.serverLevel().playSound(null,p.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,.35f,.7f);strike(p);
     }
     @SubscribeEvent public static void logout(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e){SWINGS.remove(e.getEntity().getUUID());}
     @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent e){SWINGS.clear();}

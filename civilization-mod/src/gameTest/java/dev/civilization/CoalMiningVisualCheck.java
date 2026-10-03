@@ -14,6 +14,8 @@ final class CoalMiningVisualCheck {
     private static volatile String failure;
     private static volatile boolean verified;
     private static double cameraShape;
+    private static double idleLag;
+    private static boolean windupShot,contactShot,followShot;
     private static int auditedContacts;
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException(failure);var server=mc.getSingleplayerServer();
@@ -27,19 +29,29 @@ final class CoalMiningVisualCheck {
             var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);p.getInventory().clearContent();select(p,0);p.getInventory().setItem(0,CoalMiningContent.PICK.toStack());EquipmentGrade.apply(p.getMainHandItem(),100,12345);p.getInventory().setItem(1,CoalMiningContent.SHOVEL.toStack());p.getInventory().setItem(2,CoalMiningContent.CART_ITEM.toStack());p.getInventory().setItem(4,CoalMiningContent.SCREEN_ITEM.toStack());p.getInventory().setItem(5,CoalMiningContent.FACE_ITEM.toStack());CalorieFoodData.of(p).reserve().set(2400);CalorieFoodData.of(p).resetCounters();p.teleportTo(l,.5,100,-3,java.util.Set.of(),0,5);
         });}
         if(ticks==120)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
+        if(ticks==125){mc.player.setYRot(mc.player.getYRot()+24);mc.player.setXRot(mc.player.getXRot()-8);}
+        if(ticks>=126&&ticks<=131)idleLag=Math.max(idleLag,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
+        if(ticks==129)shot(mc,"camera-drag-idle");
+        if(ticks==132)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
+        if(ticks==135&&idleLag<8)throw new IllegalStateException("Resting pick did not trail a camera turn: "+idleLag);
         if(ticks==135)check(server,()->assertFace(server,64,0)); // Camera movement alone never mines.
         if(ticks==140){click(mc);click(mc);}
-        if(ticks==144)shot(mc,"windup");
-        if(ticks==149)shot(mc,"contact");
+        if(ticks>140&&ticks<163){
+            double age=dev.civilization.client.CoalMiningClient.lastAge;
+            if(!windupShot&&age>=9&&age<12){shot(mc,"windup");windupShot=true;}
+            if(!contactShot&&age>=12&&age<15){shot(mc,"contact");contactShot=true;}
+            if(!followShot&&age>=15&&age<19){shot(mc,"follow-through");followShot=true;}
+        }
         if(ticks==165)check(server,()->assertFace(server,60,1));
         if(ticks==170)click(mc); // Still held, even after recovery: no repeat action.
         if(ticks==177)check(server,()->assertFace(server,60,1));
         if(ticks==180)release(mc);
         if(ticks==190)click(mc);
-        if(ticks==193){mc.player.setYRot(mc.player.getYRot()+3);mc.player.setXRot(mc.player.getXRot()-2);}
+        if(ticks==193){mc.player.setYRot(mc.player.getYRot()+18);mc.player.setXRot(mc.player.getXRot()-10);}
         if(ticks>=194&&ticks<=204)cameraShape=Math.max(cameraShape,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
-        if(ticks==198){shot(mc,"camera-shaped");release(mc);}
-        if(ticks==215){if(cameraShape<.5)throw new IllegalStateException("Camera did not shape the rendered pick arc");check(server,()->assertFace(server,56,2));}
+        if(ticks==197)shot(mc,"camera-shaped");
+        if(ticks==198){release(mc);aim(server,FACE.getCenter().add(-.25,-.25,-.5));}
+        if(ticks==215){if(cameraShape<8)throw new IllegalStateException("Camera did not visibly drag the rendered pick: "+cameraShape);check(server,()->assertFace(server,56,2));}
         if(ticks==225)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
         if(ticks==240)click(mc);
         if(ticks==250)release(mc);

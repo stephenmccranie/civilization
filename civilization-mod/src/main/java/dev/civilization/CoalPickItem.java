@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class CoalPickItem extends Item {
-    public static final int CONTACT=7,DURATION=20;
+    public static final int CONTACT=12,DURATION=32;
     public CoalPickItem(){super(new Properties().durability(768));}
     public static CompoundTag state(ItemStack s){return s.getOrDefault(DataComponents.CUSTOM_DATA,CustomData.EMPTY).copyTag();}
     public static void save(ItemStack s,CompoundTag t){s.set(DataComponents.CUSTOM_DATA,CustomData.of(t));}

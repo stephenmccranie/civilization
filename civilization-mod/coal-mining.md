@@ -6,7 +6,7 @@ The first Creative/admin loop implements pick → loose coal → shovel → rail
 
 Use the Civilization Creative tab to obtain **Coal Mining Pick**, **Coal Loading Shovel**, **Coal Minecart**, **Coal Preparation Screen** and **Huge Coal Vein**. Place a workface above a solid floor, ordinary rails beside it, and a screen beside the destination rail. Return to Survival to try paid work; these items have no Survival recipes yet. The special pick also starts manual excavation of existing dense geological coal-seam blocks.
 
-1. Hold the pick and click the exposed coal. Each new click commits one swing; holding the button never repeats, and camera movement alone never strikes. Aim through the swing: bounded camera yaw/pitch shapes the first-person arc and follow-through. The server resolves the actual current aim at contact, within normal reach capped at 4.5 blocks.
+1. Hold the pick and click the exposed coal. Each new click commits one swing; holding the button never repeats, and camera movement alone never strikes. Turn your view to pull the pick around: it trails camera yaw/pitch with weight, then settles back into alignment when you stop. Clicking commits a higher, longer backswing, accelerating strike and broad follow-through around the lower grip. The camera remains freely responsive; there is no forced shake or extra stock from faster turns. The inertial first-person pose also responds between strikes; looking alone never mines. The server resolves the actual current aim at contact, within normal reach capped at 4.5 blocks.
 2. Each successful contact removes an exposed 2×2 patch one quarter-cell deep in a 4×4×4 block grid. Collision, outline and chunk mesh follow the saved remaining material. Work through the notch to reach deeper layers. The final portion clears the block.
 3. Loosened stock falls toward the miner and settles into persistent piles on supported, empty floor cells. Walking over it gives no items. Right-click a pile with the shovel to scoop up to 16 raw units, visibly carried on that actual shovel.
 4. Place the Coal Minecart on rails; right-click it with the loaded shovel. Only available space transfers. Empty-hand right-click pushes the cart in your viewing direction using native rail movement.
@@ -22,7 +22,7 @@ Use the Civilization Creative tab to obtain **Coal Mining Pick**, **Coal Loading
 | Shovel | 16 raw units, equivalent to 4 Coal |
 | Cart | 4,096 raw units, equivalent to 1,024 Coal |
 | Screen | 256 raw input units and 64 ready Coal; no idle production |
-| Pick | Contact at tick 7, recovery through tick 20; depleted players take twice as long |
+| Pick | Contact at tick 12, recovery through tick 32; depleted players take twice as long |
 | Successful pick contact | 1 durability and 2 base kcal; misses/rejected contacts are free |
 | Scoop, accepted push, preparation batch | 1 base kcal each; normal comfort/meal adjustments apply |
 | Preparation | 4 raw units per Coal; at least 10 ticks between accepted batches; blocked when depleted |
