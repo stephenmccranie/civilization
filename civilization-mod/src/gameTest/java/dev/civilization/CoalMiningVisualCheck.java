@@ -43,18 +43,20 @@ final class CoalMiningVisualCheck {
             if(!followShot&&age>=15&&age<19){shot(mc,"follow-through");followShot=true;}
         }
         if(ticks==165)check(server,()->assertFace(server,60,1));
-        if(ticks==170)click(mc); // Still held, even after recovery: no repeat action.
+        if(ticks==170)click(mc); // Duplicate input during recovery cannot accelerate the held cadence.
         if(ticks==177)check(server,()->assertFace(server,60,1));
         if(ticks==180)release(mc);
-        if(ticks==190)click(mc);
-        if(ticks==193){mc.player.setYRot(mc.player.getYRot()+18);mc.player.setXRot(mc.player.getXRot()-10);}
-        if(ticks>=194&&ticks<=204)cameraShape=Math.max(cameraShape,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
-        if(ticks==197)shot(mc,"camera-shaped");
-        if(ticks==198){release(mc);aim(server,FACE.getCenter().add(-.25,-.25,-.5));}
-        if(ticks==215){if(cameraShape<8)throw new IllegalStateException("Camera did not visibly drag the rendered pick: "+cameraShape);check(server,()->assertFace(server,56,2));}
-        if(ticks==225)aim(server,FACE.getCenter().add(-.25,-.25,-.5));
-        if(ticks==240)click(mc);
-        if(ticks==250)release(mc);
+        if(ticks==200)check(server,()->assertFace(server,56,2)); // Held input repeated; releasing prevents a third swing.
+        if(ticks==210)click(mc);
+        if(ticks==213){mc.player.setYRot(mc.player.getYRot()+18);mc.player.setXRot(mc.player.getXRot()-10);}
+        if(ticks>=214&&ticks<=224)cameraShape=Math.max(cameraShape,Math.abs(dev.civilization.client.CoalMiningClient.lastSide));
+        if(ticks==217)shot(mc,"camera-shaped");
+        if(ticks==218){release(mc);aim(server,FACE.getCenter().add(-.25,-.25,-.5));}
+        if(ticks==235){if(cameraShape<8)throw new IllegalStateException("Camera did not visibly drag the rendered pick: "+cameraShape);check(server,()->assertFace(server,52,3));}
+        if(ticks==250)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+        if(ticks==252)mc.options.keyAttack.setDown(true);
+        if(ticks==270)check(server,()->assertFace(server,52,3)); // GUI input never schedules another swing.
+        if(ticks==275){release(mc);mc.player.closeContainer();}
         if(ticks==275)aim(server,FACE.getCenter().add(.25,-.25,-.5));
         if(ticks==290)click(mc);
         if(ticks==300)release(mc);
@@ -89,7 +91,7 @@ final class CoalMiningVisualCheck {
         if(ticks==685){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);check(server,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),-1.5,100,-2,java.util.Set.of(),-40,5));}
         if(ticks==715)shot(mc,"player-scale");
         if(ticks==720){mc.options.setCameraType(CameraType.FIRST_PERSON);shaders(true);}
-        if(ticks>730){if(!verified)throw new IllegalStateException("Server loop acceptance missing");com.mojang.logging.LogUtils.getLogger().info("COAL MINING VISUAL VERIFIED: click input, camera-only/held-click guards, shaped rendered arc, partial synchronized face, exact stock/wear/labor, visible shovel load, native rail push, paced screen, existing Coal consumption, inventory, Photon and shaders disabled");mc.stop();}
+        if(ticks>730){if(!verified)throw new IllegalStateException("Server loop acceptance missing");com.mojang.logging.LogUtils.getLogger().info("COAL MINING VISUAL VERIFIED: held repeat cadence, release/GUI guards, camera-only guard, overhead rendered arc, partial synchronized face, exact stock/wear/labor, visible shovel load, native rail push, paced screen, existing Coal consumption, inventory, Photon and shaders disabled");mc.stop();}
     }
     private static void select(net.minecraft.server.level.ServerPlayer p,int slot){p.getInventory().selected=slot;p.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(slot));}
     private static void assertFace(net.minecraft.server.MinecraftServer s,int cells,int wear){var e=(CoalWorkfaceEntity)s.overworld().getBlockEntity(FACE);if(e==null||Long.bitCount(e.mask())!=cells||s.getPlayerList().getPlayers().getFirst().getMainHandItem().getDamageValue()!=wear)throw new IllegalStateException("Face/contact mismatch: "+(e==null?"missing":Long.bitCount(e.mask()))+" cells, expected "+cells);}

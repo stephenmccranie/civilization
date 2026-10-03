@@ -19,7 +19,8 @@ class CoalPickMotionTest {
         motion.advance(Double.NaN,0,.01);assertEquals(0,motion.yaw());assertEquals(0,motion.pitch());
     }
     @Test void fullBackswingPrecedesContactAndFollowThroughRecoversContinuously(){
-        assertTrue(CoalPickMotion.swing(8,12,32).pitch()>70,"Head draws back behind the raised grip");
+        var overhead=CoalPickMotion.swing(8,12,32);
+        assertTrue(overhead.pitch()>=115&&overhead.y()>=.9&&overhead.z()>0,"Raised grip draws the head over the player rather than forward");
         assertTrue(CoalPickMotion.swing(12,12,32).pitch()<-15,"Head drives forward and down at contact");
         assertTrue(CoalPickMotion.swing(15,12,32).pitch()<CoalPickMotion.swing(12,12,32).pitch());
         for(int age=0;age<=32;age++){

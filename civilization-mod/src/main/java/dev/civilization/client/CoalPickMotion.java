@@ -26,9 +26,9 @@ public final class CoalPickMotion {
         double rest=1-smooth((age-contact-3)/(duration-contact-3.0));
         // Positive pitch brings the upright head back toward the shoulder;
         // negative pitch drives it forward/down. No scripted sideways spin.
-        return new Pose((75*wind-95*hit-25*follow)*rest,0,0,
-                (-.1*wind-.3*hit)*rest,(.48*wind+.1*hit-.22*follow)*rest,
-                (-.22*wind-.06*hit-.04*follow)*rest);
+        return new Pose((115*wind-135*hit-25*follow)*rest,0,0,
+                (-.1*wind-.18*hit)*rest,(.9*wind-.32*hit-.22*follow)*rest,
+                (.1*wind-.58*hit-.04*follow)*rest);
     }
     private static double smooth(double t){t=Math.clamp(t,0,1);return t*t*(3-2*t);}
 }

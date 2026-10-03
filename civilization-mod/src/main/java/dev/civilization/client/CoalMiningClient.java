@@ -17,7 +17,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class CoalMiningClient {
-    private static boolean pressed;
     private static long predicted=-100;
     private static final CoalPickMotion MOTION=new CoalPickMotion();
     private static long frameTime;
@@ -27,12 +26,17 @@ public final class CoalMiningClient {
     public static boolean holding(){var p=Minecraft.getInstance().player;return p!=null&&p.getMainHandItem().is(CoalMiningContent.PICK.get());}
     @SubscribeEvent public static void input(InputEvent.InteractionKeyMappingTriggered e){
         var mc=Minecraft.getInstance();if(!e.isAttack()||mc.screen!=null||!holding())return;e.setCanceled(true);e.setSwingHand(false);
-        if(e.getHand()!=InteractionHand.MAIN_HAND||pressed)return;pressed=true;
+        if(e.getHand()==InteractionHand.MAIN_HAND)trySwing(mc);
+    }
+    private static void trySwing(Minecraft mc){
         if(mc.player.getCooldowns().isOnCooldown(CoalMiningContent.PICK.get())||mc.level.getGameTime()-predicted<predictedDuration)return;
         predictedDuration=CoalPickItem.DURATION*(!mc.player.isCreative()&&!mc.player.isSpectator()&&CalorieFoodData.of(mc.player).isDepleted()?2:1);
         predicted=mc.level.getGameTime();PacketDistributor.sendToServer(new CoalPickPayload(mc.player.getYRot(),mc.player.getXRot()));
     }
-    @SubscribeEvent public static void tick(ClientTickEvent.Post e){var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null||!holding()){predicted=-100;pressed=false;frameTime=0;MOTION.reset();return;}if(!mc.options.keyAttack.isDown()||mc.screen!=null)pressed=false;}
+    @SubscribeEvent public static void tick(ClientTickEvent.Post e){
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null||!holding()){predicted=-100;frameTime=0;MOTION.reset();return;}
+        if(mc.screen==null&&!mc.isPaused()&&mc.options.keyAttack.isDown())trySwing(mc);
+    }
     @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
     public static final class Extensions {
         @SubscribeEvent public static void setup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent e){e.enqueueWork(()->net.minecraft.client.renderer.item.ItemProperties.register(CoalMiningContent.SHOVEL.get(),net.minecraft.resources.ResourceLocation.parse("civilization:loaded"),(s,l,p,seed)->CoalMiningContent.load(s)>0?1:0));}
@@ -49,7 +53,7 @@ public final class CoalMiningClient {
                 frameTime=now;cameraYaw=viewYaw;cameraPitch=viewPitch;
                 var motion=CoalPickMotion.swing(age,CoalPickItem.CONTACT,CoalPickItem.DURATION);
                 lastArc=motion.pitch()-MOTION.pitch();lastSide=MOTION.yaw();lastAge=age;
-                pose.translate(sign*.52+MOTION.yaw()*.004+sign*motion.x(),-.42-equip*.6-MOTION.pitch()*.003+motion.y(),-.8+motion.z());
+                pose.translate(sign*.38+MOTION.yaw()*.004+sign*motion.x(),-.42-equip*.6-MOTION.pitch()*.003+motion.y(),-.6+motion.z());
                 pose.mulPose(Axis.YP.rotationDegrees((float)-MOTION.yaw()));pose.mulPose(Axis.XP.rotationDegrees((float)-MOTION.pitch()));
                 // Rotate around the lower grip, giving the pick head a broad physical arc.
                 pose.translate(0,-.22,0);
