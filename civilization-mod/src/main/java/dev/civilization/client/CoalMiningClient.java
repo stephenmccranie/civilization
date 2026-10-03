@@ -53,7 +53,7 @@ public final class CoalMiningClient {
                 pose.mulPose(Axis.YP.rotationDegrees((float)-MOTION.yaw()));pose.mulPose(Axis.XP.rotationDegrees((float)-MOTION.pitch()));
                 // Rotate around the lower grip, giving the pick head a broad physical arc.
                 pose.translate(0,-.22,0);
-                pose.mulPose(Axis.YP.rotationDegrees((float)(sign*motion.yaw())));pose.mulPose(Axis.XP.rotationDegrees((float)motion.pitch()));pose.mulPose(Axis.ZP.rotationDegrees((float)(sign*(12+motion.roll())+MOTION.yaw()*.3)));
+                pose.mulPose(Axis.XP.rotationDegrees((float)(-25+motion.pitch())));
                 pose.translate(0,.22,0);return true;
             }
         },CoalMiningContent.PICK.get());}

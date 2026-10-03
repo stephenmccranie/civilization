@@ -19,10 +19,15 @@ class CoalPickMotionTest {
         motion.advance(Double.NaN,0,.01);assertEquals(0,motion.yaw());assertEquals(0,motion.pitch());
     }
     @Test void fullBackswingPrecedesContactAndFollowThroughRecoversContinuously(){
-        assertTrue(CoalPickMotion.swing(10,12,32).pitch()<-90);
-        assertTrue(CoalPickMotion.swing(12,12,32).pitch()>50);
-        assertTrue(CoalPickMotion.swing(15,12,32).pitch()>CoalPickMotion.swing(12,12,32).pitch());
-        for(int corner:new int[]{10,12,15,32}){
+        assertTrue(CoalPickMotion.swing(8,12,32).pitch()>70,"Head draws back behind the raised grip");
+        assertTrue(CoalPickMotion.swing(12,12,32).pitch()<-15,"Head drives forward and down at contact");
+        assertTrue(CoalPickMotion.swing(15,12,32).pitch()<CoalPickMotion.swing(12,12,32).pitch());
+        for(int age=0;age<=32;age++){
+            var pose=CoalPickMotion.swing(age,12,32);
+            assertEquals(0,pose.yaw(),"Still-camera strikes never spin sideways");
+            assertEquals(0,pose.roll(),"Handle stays in the strike plane");
+        }
+        for(int corner:new int[]{8,12,15,32}){
             var a=CoalPickMotion.swing(corner-.001,12,32);var b=CoalPickMotion.swing(corner+.001,12,32);
             assertEquals(a.pitch(),b.pitch(),.001);assertEquals(a.yaw(),b.yaw(),.001);assertEquals(a.z(),b.z(),.001);
         }

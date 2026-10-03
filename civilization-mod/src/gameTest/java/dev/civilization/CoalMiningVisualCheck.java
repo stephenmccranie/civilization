@@ -38,7 +38,7 @@ final class CoalMiningVisualCheck {
         if(ticks==140){click(mc);click(mc);}
         if(ticks>140&&ticks<163){
             double age=dev.civilization.client.CoalMiningClient.lastAge;
-            if(!windupShot&&age>=9&&age<12){shot(mc,"windup");windupShot=true;}
+            if(!windupShot&&age>=6.5&&age<8){shot(mc,"windup");windupShot=true;}
             if(!contactShot&&age>=12&&age<15){shot(mc,"contact");contactShot=true;}
             if(!followShot&&age>=15&&age<19){shot(mc,"follow-through");followShot=true;}
         }
