@@ -19,6 +19,20 @@ Current package: the first playable manual-coal prototype, preserving ordinary s
 
 Mining-feel refinement remains active: the user rejected the initial fixed wrist swing and requested a big windup with the tool somewhat detached from, and pulled around by, camera motion. The second revision was also rejected: it dipped the head during windup and spun sideways at contact. The current revision follows the supplied motion sequence with a close overhead backswing, a forward/downward strike and recovery in one plane, using weighted camera following rather than a trailing head; the grip stays close during contact as well as windup. Held left-click repeats after recovery; release/menu guards stop further swings; ordinary play must judge the revised feel. Stages 1–2 pass the guarded client loop: four real contacts, exact stock/wear/labor, scoop/load, native rail travel, preparation and consumption in an existing cooking station. Pick/shovel/screen native views, held/inventory, notches without shaders and player scale were inspected. Art and rates remain provisional; ordinary play must judge mining feel. Eight targeted server checks already cover core conservation, cancellation, partial transfers, support loss, saved masks/cart stock and access/tool revocation. Stage 3 precedes broader content; repeat its relevant checks after later changes. Stage 6 waits for a working Survival replacement. Use [testing](civilization-mod/testing.md#development-checks) for the smallest relevant checks: use `coal-mining` for this prototype. The movement-fixture interference that held publication is resolved; [status](docs/status.md#validation-and-limits) records the final checks. Mine hazards, elaborate rail/haulage machinery and coal-site sieges are outside this package.
 
+### Gladiator pit — layout and rules package
+
+Current requested scope is planning. [Design](design_direction.md#gladiator-pit--planned) owns agreed rules; [open decisions](open_decisions.md#gladiator-pit--layout-and-match-rules) owns proposed dimensions, match flow, matched spectator wagers and interruption handling. This new package does not mark existing manual-coal work complete.
+
+The local block layout and its two complete isometric views/half-block layers are prepared and inspected. Dimensions and mechanics remain proposals. No controller registration, recipe, combat override or escrow system is shipped.
+
+| Stage | Deliverable and acceptance |
+| --- | --- |
+| 1. Layout and rules — current planning pass | Review oval, opposed rooms, central flush controller and outside seating freedom; resolve gameplay-changing open choices before coding |
+| 2. Construction prototype | Material-paid walls/rooms with cached layout and shared `GuidePerformance` cadence/outlines; check orientations, support, clear volume, custom seating, obstruction, repair and unloaded terrain without forced loads |
+| 3. Two-player knockout | Explicit join/accept/ready, countdown, safe pair-only combat, one result and gear retention; real peers exercise claims, outside projectiles, simultaneous defeat, departure, disconnect and restart |
+| 4. Wager custody | Persist stakes/offers/reservations and payout/refund claims; verify competing acceptors, duplicates, changed terms, full inventories, controller removal, unload/restart and exact conservation with real peers |
+| 5. Presentation and publication | Review controller/gates and actual build/combat/collection feedback through the asset workflow; complete change-specific checks and documentation before publishing a playable package |
+
 ### Tier 2 cooking — first prototype plan
 
 **Implemented:** one Creative/admin stove with continuous heat, sensory quality, portioned work meals, removable skillet and paid carryover. Three imported audio loops retain a frying bed throughout, with plateau crackle and overcooking sputter; cue recognition still needs ordinary play. The preparation table is deferred; full kitchen multiblocks remain later work. [Cooking](civilization-mod/cooking.md) owns controls, recipes, timing, fuel and persistence; [testing](civilization-mod/testing.md) owns checks.
