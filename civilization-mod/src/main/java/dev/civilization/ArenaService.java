@@ -57,8 +57,9 @@ public final class ArenaService {
             if(side<0||!p.accepted[0]||!p.accepted[1]||p.ready[side])return false;
             if(player.getHealth()<player.getMaxHealth()||!player.getActiveEffects().isEmpty()||player.isCreative()||player.isSpectator()){say(player,"Ready requires full health, no potion effects and Survival mode");return false;}
             for(var fighterId:p.fighters){var other=level.getServer().getPlayerList().getPlayer(fighterId);if(other==null||other.level()!=level)return false;}
+            var target=ArenaStructure.prepPosition(player,p,side);
+            if(target==null){say(player,"Make a safe standing space in your prep room before Ready");return false;}
             p.health[side]=player.getHealth();p.ready[side]=true;player.closeContainer();
-            var prep=ArenaStructure.position(p.at.pos(),p.front,side==0?-17:17,1,0);var target=Vec3.atBottomCenterOf(prep);
             player.teleportTo(level,target.x,target.y,target.z,Set.of(),side==0?p.front.getClockWise().toYRot():p.front.getCounterClockWise().toYRot(),0);
             if(p.ready[0]&&p.ready[1]){
                 for(var it=p.bets.iterator();it.hasNext();){var b=it.next();if(b.opponent==null){d.credit(b.owner,b.stake);it.remove();}}

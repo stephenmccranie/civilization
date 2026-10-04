@@ -27,7 +27,7 @@ public final class ArenaLayout {
         for(int side:new int[]{-1,1}) {
             for(int d=14;d<=20;d++) for(int z=-3;z<=3;z++) floor.add(new Cell(side*d,z));
             for(int d=14;d<=20;d++) for(int z:new int[]{-3,3}) for(int y=1;y<=3;y++) pieces.add(new Piece(side*d,y,z,false,false));
-            for(int z=-2;z<=2;z++) if(z!=0 && z!=1) for(int y=1;y<=3;y++) pieces.add(new Piece(side*20,y,z,false,false));
+            for(int z=-2;z<=2;z++) if(z!=0) for(int y=1;y<=3;y++) pieces.add(new Piece(side*20,y,z,false,false));
             for(int d=14;d<=20;d++) for(int z=-3;z<=3;z++) pieces.add(new Piece(side*d,4,z,true,false));
         }
         var fighting=new LinkedHashSet<>(oval); fighting.removeAll(wall);
