@@ -16,10 +16,13 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder("civilization")
 @PrefixGameTestTemplate(false)
 public final class MovementGameTests {
-    @GameTest(template = "empty")
+    @GameTest(template = "movement_runway")
     public static void ordinaryGroundSpeedsAndJumping(GameTestHelper h) {
         var level = h.getLevel();
-        var origin = h.absolutePos(new BlockPos(4, 1, 4));
+        var origin = h.absolutePos(new BlockPos(4, 2, 4));
+        h.assertTrue(h.getBounds().contains(origin.offset(-2, -1, -2).getCenter())
+                        && h.getBounds().contains(origin.offset(2, 3, 79).getCenter()),
+                "The full runway and cleared headroom must stay inside the movement template");
         for (int x = -2; x <= 2; x++) for (int z = -2; z < 80; z++) {
             var p = origin.offset(x, -1, z);
             level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
