@@ -45,6 +45,8 @@ final class CalorieSystem {
     }
 
     private void broken(BlockEvent.BreakEvent event) {
+        // Partial-coal strikes pay their own labor only after a committed extraction.
+        if(event.getState().is(CoalMiningContent.FACE.get()) || event.getState().is(IndustrialContent.COAL_SEAM.get()) && event.getPlayer().getMainHandItem().is(CoalMiningContent.PICK.get()))return;
         if (event.getPlayer() instanceof ServerPlayer player && CalorieFoodData.active(player)) {
             actions.add(new Action(player, player.serverLevel(), event.getPos().immutable(),
                     event.getState(), event, true, LaborCosts.breaking(event.getState()),false));

@@ -112,7 +112,7 @@ public class EverydayGameTests {
         dispenser.setItem(0, new ItemStack(Items.BONE_MEAL, 4));
         h.getLevel().setBlockAndUpdate(pos.above(), Blocks.REDSTONE_BLOCK.defaultBlockState());
         h.runAfterDelay(10, () -> {
-            h.assertTrue(dispenser.getItem(0).getCount() == 4, "Powered dispenser consumes no meal");
+            h.assertTrue(dispenser.getItem(0).getCount() == 4, "Powered dispenser consumes no meal: count="+dispenser.getItem(0).getCount()+", removed="+dispenser.isRemoved()+", current="+h.getLevel().getBlockState(pos));
             h.assertTrue(h.getLevel().getBlockState(pos.east()).getValue(CropBlock.AGE) == 0, "Crop stays young");
             h.succeed();
         });

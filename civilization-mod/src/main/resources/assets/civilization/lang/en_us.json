@@ -232,5 +232,13 @@
   "item.civilization.paterson_36_ammunition": ".36 Paterson Ammunition",
   "key.civilization.reload": "Cock / reload firearm",
   "key.categories.civilization": "Civilization",
-  "subtitles.civilization.paterson_fire": "Colt Paterson fires"
+  "subtitles.civilization.paterson_fire": "Colt Paterson fires",
+  "item.civilization.coal_pick": "Coal Mining Pick",
+  "item.civilization.coal_loading_shovel": "Coal Loading Shovel",
+  "item.civilization.coal_minecart": "Coal Minecart",
+  "entity.civilization.coal_minecart": "Coal Minecart",
+  "entity.civilization.loose_coal": "Loose Raw Coal",
+  "block.civilization.coal_workface": "Huge Coal Vein",
+  "block.civilization.raw_coal_pile": "Loose Raw Coal",
+  "block.civilization.coal_preparation_screen": "Coal Preparation Screen"
 }

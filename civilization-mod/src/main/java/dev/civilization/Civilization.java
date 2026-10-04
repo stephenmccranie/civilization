@@ -47,6 +47,7 @@ public final class Civilization {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER,FirearmConfig.SPEC,"civilization-firearms.toml");
         CuttingContent.register(modBus);
         BuilderLineContent.register(modBus);
+        CoalMiningContent.register(modBus);
         RoadContent.register(modBus);
         CivicContent.register(modBus);
         IndustrialContent.register(modBus);
