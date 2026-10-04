@@ -4,6 +4,8 @@
 
 This file describes the working mod. [Game rules](../design_direction.md) describe the intended game; [development plan](../development_plan.md) separates shipped work from future features.
 
+The [Gladiator Pit](gladiator-pit.md) adds an exactly centered oval arena, two prep rooms, player-built surrounding seating, consenting two-player knockout matches and escrowed item wagers for fighters and spectators. The controller has a Survival recipe; interruptions refund unfinished stakes to saved personal collection.
+
 Item tooltips give short purpose, control and safety hints. Construction bills and processing details belong in the placed build guides, machine interfaces, JEI and the focused references below.
 
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace are included automatically. They also remain discoverable through creative search.

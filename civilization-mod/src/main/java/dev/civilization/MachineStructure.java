@@ -59,6 +59,7 @@ public final class MachineStructure {
     public static List<Part> parts(BlockState state) {return state.getBlock() instanceof WorkshopBlock w?WorkshopStructure.parts(w.kind):state.is(KilnContent.FOUNDRY.get())?FOUNDRY:parts(state.is(KilnContent.RETORT.get()));}
     /** Every controller that exposes the contextual construction guide uses this blueprint. */
     public static List<Part> guideParts(BlockState state) {
+        if (state.getBlock() instanceof ArenaBlock) return ArenaStructure.PARTS;
         if (state.getBlock() instanceof BulkBlock bulk) return BulkStructure.parts(bulk.liquid);
         if (state.getBlock() instanceof OilEngineBlock) return OilEngineStructure.PARTS;
         if (state.getBlock() instanceof IndustrialBlock industrial) return industrial.kind==IndustrialBlock.Kind.PUMP?List.of():IndustrialStructure.parts(industrial.kind);
@@ -72,6 +73,8 @@ public final class MachineStructure {
     }
     public static boolean matches(BlockState state, String material) {
         return switch (material) {
+            case "arena_stone" -> state.is(Blocks.STONE_BRICKS);
+            case "arena_gate" -> state.is(Blocks.OAK_FENCE_GATE);
             case "glass" -> state.is(Blocks.GLASS);
             case "anvil" -> state.is(net.minecraft.tags.BlockTags.ANVIL);
             case "planks" -> state.is(net.minecraft.tags.BlockTags.PLANKS);
@@ -101,6 +104,8 @@ public final class MachineStructure {
     }
     public static BlockState materialState(String material) {
         return switch (material) {
+            case "arena_stone" -> Blocks.STONE_BRICKS.defaultBlockState();
+            case "arena_gate" -> Blocks.OAK_FENCE_GATE.defaultBlockState();
             case "glass" -> Blocks.GLASS.defaultBlockState();
             case "anvil" -> Blocks.ANVIL.defaultBlockState();
             case "planks" -> Blocks.OAK_PLANKS.defaultBlockState();
@@ -124,6 +129,7 @@ public final class MachineStructure {
     }
     public static BlockState shape(Part part, Direction front) {
         if(part.units()==4){var state=materialState(part.material());
+            if(part.material().equals("arena_gate"))return state.setValue(FenceGateBlock.FACING,front.getClockWise());
             if(state.is(IndustrialContent.GUARDRAIL.get())) {
                 for(var d:Direction.Plane.HORIZONTAL)state=state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(d),(part.railConnections() & (1 << d.get2DDataValue()))!=0);
                 state=state.rotate(switch(front){case EAST->Rotation.CLOCKWISE_90;case SOUTH->Rotation.CLOCKWISE_180;case WEST->Rotation.COUNTERCLOCKWISE_90;default->Rotation.NONE;});
@@ -154,7 +160,8 @@ public final class MachineStructure {
             for(int i=0;i<8;i++)if((required&(1<<i))!=0 && !matches(cells[i],part.material()))return false;
             return true;
         }
-        if (part.units() == 4) return matches(actual, part.material()) && (!part.material().startsWith("engine_") || actual.getValue(CivicBlock.FACING)==front);
+        if (part.units() == 4) return matches(actual, part.material()) && (!part.material().startsWith("engine_") || actual.getValue(CivicBlock.FACING)==front)
+                && (!part.material().equals("arena_gate") || actual.getValue(FenceGateBlock.FACING).getAxis()==front.getClockWise().getAxis());
         var expected=CutBlock.bounds(shape(part,front));
         if(actual.getBlock() instanceof SlabBlock && part.units()==2)
             return matches(SlabIntegration.material(actual),part.material()) && actual.getShape(level,pos).bounds().equals(expected);

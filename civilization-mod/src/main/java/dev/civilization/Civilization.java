@@ -50,6 +50,7 @@ public final class Civilization {
         CoalMiningContent.register(modBus);
         RoadContent.register(modBus);
         CivicContent.register(modBus);
+        ArenaContent.register(modBus);
         IndustrialContent.register(modBus);
         FrontierContent.register(modBus);
         OilEngineContent.register(modBus);

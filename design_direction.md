@@ -342,11 +342,17 @@ Approved land-storage starting rules: both stores occupy 3×5×3 blocks. The Coa
 
 The first generic drive is a **Hot-Bulb Engine**, with refined fuel and lubricating oil. Its grounded early oil-engine appearance bridges coal workshops and later extraordinary nuclear/sky machinery. Keep controls simple and preserve the refinery requirement. It now powers freeform boats directly and remains reusable by later land machinery. Exact recipes and operation live in [industry](civilization-mod/industry.md#oil-engine).
 
-## Gladiator pit — planned
+## Gladiator pit
 
-A controller-centered multiblock enables two players to fight in an oval arena on flat ground. The official structure defines the oval walls and two fighter prep rooms; players build their own seating around it. The controller's horizontal center must coincide exactly with the oval's geometric center on both axes. This is layout/rules planning, not implemented behavior.
+The Gladiator Pit is a stationary multiblock for two consenting players to fight on flat ground. Its official 29×19 oval walls and two opposed 5×5 prep interiors occupy 41×19 overall; players custom-build seating outside the requirements. Use stone bricks, half-slab caps/roofs and six oak fence gates. The flush controller's horizontal center coincides exactly with the oval's geometric center on both axes. Prepared solid natural ground supplies the floor; the arena needs no operating fuel.
 
-Matches end in a knockout rather than an ordinary lethal death, and both fighters keep their gear. Fighters and spectators can wager existing items and materials through the controller. Dimensions, match flow, settlement, interruption and interaction with ordinary PvP/claims remain [proposals and open choices](open_decisions.md#gladiator-pit--layout-and-match-rules). [Work order](development_plan.md#gladiator-pit--layout-and-rules-package) owns implementation acceptance.
+The controller enrolls two fighters, escrows optional item stakes, requires both to accept the current terms, and moves each ready fighter into their prep room. Ready requires Survival, full health and no active potion effects. A five-second countdown locks betting and opens the gates together. Enter the oval within ten seconds; the fight lasts at most five minutes, with ten minutes allowed for enrollment/preparation. An opponent's would-be lethal hit becomes a knockout without death drops. Ordinary equipment wear/breakage, ammunition and consumables remain spent; entry health is restored and harmful effects/fire/fall state are cleared, without copying inventory.
+
+Fighters and spectators wager real item stacks, preserving their components. Fighter offers may differ and both fighters explicitly accept them. Spectators match opposing identical item/quantity offers: one wager per spectator per match, at most 64 offers, no house cut, pooled odds or currency. A knockout pays both stakes to the corresponding winner; unmatched bets refund when betting locks. Payouts/refunds persist for personal collection independently of the controller.
+
+Arena consent permits combat only between its enrolled opponents inside the live fighting volume, overriding ordinary server PvP/team restrictions for that pair alone. Prep rooms remain safe, outsiders cannot damage protected fighters, and ready fighters cannot harm spectators through the match damage path. Joining an unready lobby grants no world immunity. The placer retains host cancellation and must retain claim rights over the footprint; public controller participation grants no other claim access.
+
+Departure, disconnect, invalid/unloaded structure, lost structural authority, cancellation, expiry/draw or restart refunds unfinished deposits rather than imposing a forfeit. This conservative first pass permits deliberate aborts; competitive adjudication remains follow-up work. The result has a five-second reset/protection interval. [Gladiator Pit reference](civilization-mod/gladiator-pit.md) owns the recipe, material bill, controls, boundaries and persistence; [status](docs/status.md) owns verification limits.
 
 ## Pickpocketing and wearable PvP flag — planned
 

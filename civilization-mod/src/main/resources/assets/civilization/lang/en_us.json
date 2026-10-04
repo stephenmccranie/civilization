@@ -240,5 +240,11 @@
   "entity.civilization.loose_coal": "Loose Raw Coal",
   "block.civilization.coal_workface": "Huge Coal Vein",
   "block.civilization.raw_coal_pile": "Loose Raw Coal",
-  "block.civilization.coal_preparation_screen": "Coal Preparation Screen"
+  "block.civilization.coal_preparation_screen": "Coal Preparation Screen",
+  "block.civilization.gladiator_pit": "Gladiator Pit Controller",
+  "preview.civilization.material.arena_stone": "Stone Bricks",
+  "preview.civilization.material.arena_gate": "Oak Fence Gates",
+  "material.civilization.arena_stone": "Stone Bricks",
+  "material.civilization.arena_stone_half": "Stone Brick Slab",
+  "material.civilization.arena_gate": "Oak Fence Gate"
 }

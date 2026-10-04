@@ -74,6 +74,32 @@ class ArtTests(unittest.TestCase):
         self.assertFalse(self.runtime.exists())
         with self.assertRaisesRegex(ValueError,'escapes'): art.local(self.folder,'../outside')
 
+    def java_model(self):
+        self.asset['models']=['block.json'];self.asset['sources']=['icon.png'];self.asset['material_textures']={'minecraft:block/stone':'icon.png'}
+        model={'textures':{'stone':'minecraft:block/stone','alias':'#stone'},'elements':[{'from':[0,16,0],'to':[16,16,16],'faces':{'up':{'texture':'#alias','uv':[0,0,16,16]}}}]}
+        art.write(self.folder/'block.json',model);return model
+
+    def test_java_texture_pixels_and_plane_density(self):
+        model=self.java_model();art.uv_density(self.asset,self.folder)
+        model['elements'][0]['faces']['up']['uv']=[0,0,8,8];art.write(self.folder/'block.json',model)
+        with self.assertRaisesRegex(ValueError,'density mismatch'):art.uv_density(self.asset,self.folder)
+
+    def test_java_material_source_required_and_confined(self):
+        self.java_model();self.asset['sources']=[]
+        with self.assertRaisesRegex(ValueError,'declared sources'):art.uv_density(self.asset,self.folder)
+        self.asset['sources']=['../icon.png'];self.asset['material_textures']['minecraft:block/stone']='../icon.png'
+        with self.assertRaisesRegex(ValueError,'escapes'):art.uv_density(self.asset,self.folder)
+
+    def test_java_alias_cycle_and_missing_source(self):
+        model=self.java_model();model['textures']['stone']='#alias';art.write(self.folder/'block.json',model)
+        with self.assertRaisesRegex(ValueError,'Cyclic'):art.uv_density(self.asset,self.folder)
+        model['textures']['stone']='minecraft:block/unknown';art.write(self.folder/'block.json',model)
+        with self.assertRaisesRegex(ValueError,'source pixels'):art.uv_density(self.asset,self.folder)
+
+    def test_java_default_uv_matches_partial_face(self):
+        model=self.java_model();model['elements'][0]['to']=[8,16,16];model['elements'][0]['faces']['up'].pop('uv');art.write(self.folder/'block.json',model)
+        art.uv_density(self.asset,self.folder)
+
     def test_failed_copy_restores_bundle(self):
         first=self.runtime/'textures/item/test.png'; second=self.runtime/'textures/item/other.png'
         first.parent.mkdir(parents=True); first.write_bytes(b'original')

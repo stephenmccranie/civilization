@@ -33,6 +33,10 @@ The controller's recipe remains four brick blocks, four copper ingots and a furn
 
 A separate **2×2, one-block-high** assembly: one Survey Table Controller and three Survey Table Sections. Its contextual guide uses the same transparent models and visible-surface outlines as the machines. The controller sits at a corner; follow its guide for the other three positions. Completing the structure enables a continuous tabletop map and right-click inspection. Removing any section disables both. See [Survey Table recipes and behavior](ownership-trade.md#survey-table).
 
+## Gladiator Pit
+
+The [Gladiator Pit](gladiator-pit.md#build-and-materials) uses the ordinary contextual guide and held-material construction, with its controller flush in the exact center of a 29×19 oval. Official walls and two prep rooms occupy 41×19 overall; outside seating is player-built. Its focused reference owns the masonry/slab/gate bill, flat-floor requirements and match controls.
+
 ## Town workshops
 
 The Tannery, Textile Workshop and Smithy use the same partial-block guide system. The Tannery is a low brick vat with an open center and narrow oak rack; the Textile Workshop is a thin oak bench on shared-cell feet with an open loom frame and central copper roller; the Smithy combines a broad hearth, chimney, bench and real anvil. Exact material counts, recipes and migration behavior live in [Town workshops](industry.md#town-workshops).
