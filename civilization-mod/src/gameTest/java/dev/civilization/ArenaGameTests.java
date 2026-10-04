@@ -32,7 +32,7 @@ public final class ArenaGameTests {
         ArenaStructure.gates(h.getLevel(),p,true);h.assertTrue(ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Open gates validate");ArenaStructure.gates(h.getLevel(),p,false);
         h.getLevel().setBlockAndUpdate(p.at.pos().offset(0,1,10),Blocks.OAK_STAIRS.defaultBlockState());h.assertTrue(ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Outside seats independent");
         var wall=ArenaStructure.position(p.at.pos(),p.front,0,1,9);h.getLevel().removeBlock(wall,false);h.assertTrue(!ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Missing wall rejects");h.getLevel().setBlockAndUpdate(wall,Blocks.STONE_BRICKS.defaultBlockState());
-        h.getLevel().setBlockAndUpdate(p.at.pos().above(),Blocks.STONE.defaultBlockState());h.assertTrue(!ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Blocked fighting space rejects");h.getLevel().removeBlock(p.at.pos().above(),false);h.getLevel().removeBlock(p.at.pos().offset(1,0,0),false);h.assertTrue(!ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Floor holes reject");h.succeed();
+        h.getLevel().setBlockAndUpdate(p.at.pos().above(),Blocks.STONE.defaultBlockState());h.assertTrue(ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Interior obstacles validate");h.getLevel().removeBlock(p.at.pos().above(),false);h.getLevel().removeBlock(p.at.pos().offset(1,0,0),false);h.assertTrue(ArenaStructure.problem(h.getLevel(),p).isEmpty(),"Floor holes validate");h.succeed();
     }
     @GameTest(template="arena") public static void heldConstructionConservesMaterials(GameTestHelper h){
         var p=pit(h);var user=player(h,"builder");var missing=ArenaStructure.position(p.at.pos(),p.front,0,1,9);h.getLevel().removeBlock(missing,false);var stock=new ItemStack(Items.STONE_BRICKS,2);
@@ -72,6 +72,18 @@ public final class ArenaGameTests {
     }
     @GameTest(template="arena") public static void interruptionCannotAwardWinner(GameTestHelper h){
         var p=pit(h);var d=new ArenaData();p.fighters[0]=UUID.randomUUID();p.fighters[1]=UUID.randomUUID();p.stakes[0]=new ItemStack(Items.DIAMOND,4);p.stakes[1]=new ItemStack(Items.IRON_INGOT,6);p.phase=ArenaData.LIVE;
-        h.getLevel().removeBlock(p.at.pos().offset(1,0,0),false);ArenaService.finish(d,p,h.getLevel(),0,"attempted knockout");h.assertTrue(p.winner==-1&&d.credits.get(p.fighters[0]).getFirst().getCount()==4&&d.credits.get(p.fighters[1]).getFirst().getCount()==6,"Damaged floor converts result into original-player refunds");h.succeed();
+        h.getLevel().removeBlock(ArenaStructure.position(p.at.pos(),p.front,0,1,9),false);ArenaService.finish(d,p,h.getLevel(),0,"attempted knockout");h.assertTrue(p.winner==-1&&d.credits.get(p.fighters[0]).getFirst().getCount()==4&&d.credits.get(p.fighters[1]).getFirst().getCount()==6,"Damaged wall converts result into original-player refunds");h.succeed();
+    }
+    @GameTest(template="arena") public static void customTerrainRoomsAndRaisedFightBounds(GameTestHelper h){
+        var p=pit(h);var level=h.getLevel();var user=player(h,"custom");
+        level.removeBlock(ArenaStructure.position(p.at.pos(),p.front,2,0,0),false);
+        level.setBlockAndUpdate(ArenaStructure.position(p.at.pos(),p.front,3,1,0),Blocks.LAVA.defaultBlockState());
+        level.setBlockAndUpdate(ArenaStructure.position(p.at.pos(),p.front,4,4,0),Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(ArenaStructure.position(p.at.pos(),p.front,-17,1,0),Blocks.CHEST.defaultBlockState());
+        h.assertTrue(ArenaStructure.problem(level,p).isEmpty(),"Terrain, hazards, raised blocks and prep furniture are independent of the shell");
+        var spawn=ArenaStructure.prepPosition(user,p,0);h.assertTrue(spawn!=null&&level.noCollision(user,user.getBoundingBox().move(spawn.subtract(user.position()))),"Prep spawn avoids furniture");
+        h.assertTrue(ArenaStructure.inside(p,net.minecraft.world.phys.Vec3.atCenterOf(p.at.pos()).add(2,-8,0),true)&&ArenaStructure.inside(p,net.minecraft.world.phys.Vec3.atCenterOf(p.at.pos()).add(2,12,0),true),"Custom elevations remain fighting space");
+        for(int x=-19;x<=-15;x++)for(int z=-2;z<=2;z++)for(int y=1;y<=3;y++)level.setBlockAndUpdate(ArenaStructure.position(p.at.pos(),p.front,x,y,z),Blocks.STONE.defaultBlockState());
+        h.assertTrue(ArenaStructure.problem(level,p).isEmpty()&&ArenaStructure.prepPosition(user,p,0)==null,"Filled room still forms but cannot teleport a fighter into solid blocks");h.succeed();
     }
 }

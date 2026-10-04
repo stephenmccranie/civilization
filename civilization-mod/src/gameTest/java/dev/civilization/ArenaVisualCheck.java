@@ -31,11 +31,17 @@ final class ArenaVisualCheck {
             level.setDayTime(6000);level.setWeatherParameters(100000,0,false,false);host.setGameMode(GameType.CREATIVE);host.getAbilities().flying=true;host.onUpdateAbilities();host.teleportTo(level,320,119,-27,Set.of(),0,31);
             // Minimal optional stands demonstrate their independence from the blueprint.
             for(int x=310;x<=330;x++)for(int row=0;row<3;row++)level.setBlockAndUpdate(new BlockPos(x,101+row,12+row),Blocks.STONE_BRICK_STAIRS.defaultBlockState());
+            for(int x:new int[]{-7,7})for(int y=1;y<=2;y++)level.setBlockAndUpdate(AT.offset(x,y,3),Blocks.STONE.defaultBlockState());
+            level.removeBlock(AT.offset(5,0,2),false);level.setBlockAndUpdate(AT.offset(5,-1,2),Blocks.DIRT.defaultBlockState());
+            level.setBlockAndUpdate(AT.offset(17,1,1),Blocks.CHEST.defaultBlockState());
+            if(!ArenaStructure.problem(level,pit).isEmpty())throw new IllegalStateException("Custom interior invalidated the arena");
             server.setUsesAuthentication(false);if(!server.publishServer(GameType.SURVIVAL,false,25570))throw new IllegalStateException("Cannot open arena test port");ready=true;write(mc,"ready","ready");
         }catch(Throwable t){failure=t;}});}
         if(!ready||ticks<150)return;
         if(ticks==150)shot(mc,"complete-oval");
-        if(step==0&&ticks>155&&!configured)server.execute(()->{try{var players=server.getPlayerList().getPlayers();if(players.size()<2)return;var host=players.stream().filter(p->!p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();var peer=players.stream().filter(p->p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();
+        if(ticks==151)server.execute(()->{var host=server.getPlayerList().getPlayers().getFirst();host.teleportTo(server.overworld(),342.5,103,.5,Set.of(),90,10);});
+        if(ticks==180)shot(mc,"rear-doorway");
+        if(step==0&&ticks>185&&!configured)server.execute(()->{try{var players=server.getPlayerList().getPlayers();if(players.size()<2)return;var host=players.stream().filter(p->!p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();var peer=players.stream().filter(p->p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();
             for(var p:List.of(host,peer)){p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setHealth(p.getMaxHealth());p.removeAllEffects();p.teleportTo(server.overworld(),320.5,101,p==host?2.5:-2.5,Set.of(),p==host?180:0,30);}
             host.getInventory().setItem(0,new ItemStack(Items.DIAMOND,4));peer.getInventory().setItem(0,new ItemStack(Items.IRON_INGOT,6));ArenaMenu.open(host,AT);ArenaMenu.open(peer,AT);configured=true;
         }catch(Throwable t){failure=t;}});

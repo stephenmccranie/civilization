@@ -35,7 +35,7 @@ A separate **2×2, one-block-high** assembly: one Survey Table Controller and th
 
 ## Gladiator Pit
 
-The [Gladiator Pit](gladiator-pit.md#build-and-materials) uses the ordinary contextual guide and held-material construction, with its controller flush in the exact center of a 29×19 oval. Official walls and two prep rooms occupy 41×19 overall; outside seating is player-built. Its focused reference owns the masonry/slab/gate bill, flat-floor requirements and match controls.
+The [Gladiator Pit](gladiator-pit.md#build-and-materials) uses the ordinary contextual guide and held-material construction, with its controller flush in the exact center of a 29×19 oval. Official walls and two prep rooms occupy 41×19 overall, with centered one-block rear exits and three-wide gates. Interior blocks, furniture and terrain are player-built and excluded from validation, as is outside seating. Its focused reference owns the masonry/slab/gate bill, shell requirements and match controls.
 
 ## Town workshops
 
