@@ -18,7 +18,8 @@ public final class PatersonBullet extends Projectile {
         super.tick();if(tickCount>lifetime||!level().hasChunkAt(blockPosition())){discard();return;}
         var hit=ProjectileUtil.getHitResultOnMoveVector(this,this::canHitEntity);
         if(!level().isClientSide&&hit.getType()!=HitResult.Type.MISS){
-            if(hit instanceof EntityHitResult e&&getOwner() instanceof net.minecraft.world.entity.player.Player p&&CivicAccess.allowed(level(),e.getEntity().blockPosition(),p)){
+            if(hit instanceof EntityHitResult e&&getOwner() instanceof net.minecraft.world.entity.player.Player p&&(CivicAccess.allowed(level(),e.getEntity().blockPosition(),p)
+                    ||level() instanceof net.minecraft.server.level.ServerLevel server&&e.getEntity() instanceof net.minecraft.world.entity.player.Player target&&ArenaService.opposed(ArenaData.get(server.getServer()),p,target))){
                 e.getEntity().hurt(damageSources().thrown(this,p),(float)damage);
             }
             discard();return;

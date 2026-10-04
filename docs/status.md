@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-03**. Current build: **0.34.46-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `439d7747097789b1c4255ed6f0a0293e8c48712f36291757898c8db7536b3cd8`.
+Last reviewed: **2026-10-03**. Current build: **0.34.47-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `2fdd24b970a0caca8bc7771ce680ee4768f2b7cb17efb05875946f670d898d23`.
 
 ## Implemented
 
@@ -13,6 +13,7 @@ Last reviewed: **2026-10-03**. Current build: **0.34.46-dev**, verified for publ
 | Manual coal prototype | Creative/admin partial workfaces, camera-shaped pick swings, saved loose stock, shovel loads, rail carts and hand preparation: [coal mining](../civilization-mod/coal-mining.md) |
 | Industry | Finite coal/oil fields, prospecting, physical extraction, refinery, pipes, workshops, graded equipment/repairs and bulk cargo stores: [industry](../civilization-mod/industry.md) |
 | Construction | Half-grid cutting, straight-line offhand building/demolition, contextual multiblock guides and actual structural-item placement: [cutting](../civilization-mod/cutting.md), [multiblocks](../civilization-mod/multiblock-builds.md) |
+| Gladiator Pit | Exactly centered masonry oval, opposed prep rooms, two-fighter knockout matches and physical item wagers: [arena reference](../civilization-mod/gladiator-pit.md) |
 | Firearms | Creative/admin Colt Paterson with cocking, reload custody and server-side projectiles: [firearms](../civilization-mod/firearms.md) |
 | Heat | Persistent local heat, material exchange, finite waste heat, shelter/rain effects, felt temperature, comfort and survey helmet: [heat](../civilization-mod/heat.md) |
 | Vehicles | Freeform engine-powered boats and a development-power airship prototype with assembly/disassembly and terrain safety: [vehicles](../civilization-mod/vehicle-physics.md) |
@@ -20,6 +21,8 @@ Last reviewed: **2026-10-03**. Current build: **0.34.46-dev**, verified for publ
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Latest Gladiator Pit check:** 0.34.47-dev build, all **72 fast tests**, all **294 required server GameTests**, all **36 modeling-tool tests** and documentation checks passed. Server checks cover supported structure/clearance, material consumption, mutual consent, fighter and matched spectator item custody, exact components, competing acceptors, full inventories, saved refunds, stale menus, controller removal, ordinary lobby damage, actual knockout and damaged-result refunds. Two independent hidden Photon/Faithful clients passed real menu payloads, fighter deposits/acceptance, prep/countdown, actual melee knockout, retained gear, health recovery and winner collection. Complete oval, cabinet, deposited stakes and winner-credit images were inspected; native art publication receipts passed. Deployment checksum matched. The guide shares cached layout and existing performance budgets. Ordinary Survival balance, four real clients including spectator transactions, abrupt-crash cross-file atomicity and multiplayer load remain unreviewed. Interruptions refund rather than award forfeits, so deliberate withdrawal can evade a losing wager. [Controls, materials and limits](../civilization-mod/gladiator-pit.md).
 
 - **Combined integration check:** oven height/migration, Builder's Line, Paterson and native-source transport are combined for publication to `main`. Build, all **65 fast tests**, all **32 modeling-tool tests** and documentation checks passed. Both hidden Photon/Faithful client scenes passed actual input and server synchronization; Builder's Line preview/offhand and Paterson held/reload views were inspected. Paterson's sequential sample measured **36 FPS held / 86 FPS empty-handed**; its existing rendering cost remains. The updated combined server result and fixture corrections are recorded below. Deployment checksum matched; original art, full-project history and user worlds remain local.
 

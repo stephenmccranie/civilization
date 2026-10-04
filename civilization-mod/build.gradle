@@ -71,6 +71,13 @@ neoForge {
             systemProperty 'civilization.visualHeadless', 'true'
             programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--width', '1920', '--height', '1080', '--username', 'WeatherPeer')
         }
+        arenaPeer {
+            client()
+            gameDirectory = project.file('runs/arena-peer')
+            systemProperty 'civilization.previewCheck', 'gladiator-peer'
+            systemProperty 'civilization.visualHeadless', 'true'
+            programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--width', '1920', '--height', '1080', '--username', 'ArenaPeer')
+        }
         server {
             server()
             gameDirectory = project.file('runs/server')
@@ -146,8 +153,10 @@ tasks.named('runServer', JavaExec) {
 }
 
 tasks.named('runVisualClient', JavaExec) {
-    timeout = java.time.Duration.ofMinutes(3)
+    timeout = java.time.Duration.ofMinutes(providers.gradleProperty('visualScene').getOrElse('') == 'gladiator' ? 6 : 3)
 }
+
+tasks.named('runArenaPeer', JavaExec) { timeout = java.time.Duration.ofMinutes(6) }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def properties = [

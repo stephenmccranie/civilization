@@ -105,7 +105,7 @@ public final class MachineConstruction {
                 if (state == null) state = CuttingContent.PIECE.get().defaultBlockState();
                 if (state.is(CuttingContent.PIECE.get()) && state.equals(level.getBlockState(pos))) state = state.cycle(CutBlock.REVISION);
             } else if (part.units() == 4 && !part.material().endsWith("_port") && !part.material().equals("guardrail")
-                    && !part.material().startsWith("engine_") && !part.material().equals("anvil") && stack.getItem() instanceof BlockItem block)
+                    && !part.material().startsWith("engine_") && !part.material().equals("anvil") && !part.material().equals("arena_gate") && stack.getItem() instanceof BlockItem block)
                 state = block.getBlock().defaultBlockState();
             var shape = part.units() == 4 ? state.getCollisionShape(level, pos)
                     : Shapes.create(CutBlock.bounds(MachineStructure.shape(part, front)));

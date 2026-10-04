@@ -10,6 +10,7 @@
 | [Tier 2 cooking](../civilization-mod/cooking.md) | Prototype stove, sensory quality, work meals and removable cookware |
 | [Heat and thermal comfort](../civilization-mod/heat.md) | Environmental heat, insulation, machine losses, labor benefits and Thermal Survey Helmet |
 | [Industry](../civilization-mod/industry.md) | Finite deposits, prospecting, oil bootstrap, town workshops/equipment repairs, liquid storage and machine recipes |
+| [Gladiator Pit](../civilization-mod/gladiator-pit.md) | Centered oval structure, prep rooms, knockout matches, fighter stakes and spectator wagers |
 | [Status](status.md) | Current build, completed scope, validation and limitations |
 | [Design](../design_direction.md) | Agreed rules and creative direction |
 | [Development plan](../development_plan.md) | Dependency order, checklist and implementation contracts |

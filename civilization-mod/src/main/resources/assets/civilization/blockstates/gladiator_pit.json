@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "civilization:block/gladiator_pit",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "civilization:block/gladiator_pit",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "civilization:block/gladiator_pit",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "civilization:block/gladiator_pit",
+      "y": 270
+    }
+  }
+}

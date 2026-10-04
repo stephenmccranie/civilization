@@ -2,37 +2,11 @@
 
 This is the only active register of unresolved design choices. Agreed rules live in [design_direction.md](design_direction.md); implementation work lives in [development_plan.md](development_plan.md). Entries are gaps, not permission to reopen settled intent.
 
-## Gladiator pit — layout and match rules
+## Gladiator pit — follow-up review
 
-[Approved direction](design_direction.md#gladiator-pit--planned): oval walls on flat ground, central controller, two prep rooms, custom player seating, two fighters, knockouts with gear retained, and item wagers for fighters and spectators. Layout and rules first; no playable implementation is requested in this pass.
+The owner authorized choosing the remaining first-pass rules and building the pit. Those decisions now live in [design](design_direction.md#gladiator-pit) and the [implementation reference](civilization-mod/gladiator-pit.md); the original local engineering study is preserved as proposal provenance, with runtime geometry authoritative in ArenaLayout.
 
-### Proposed layout
-
-The [local authoritative layout](concept_art/gladiator_pit/layout.py) proposes a **29×19-block oval** and **41×19 overall footprint** including two opposed end rooms. Walls are 2.5 blocks high; each prep room has a 5×5 clear interior and three-block headroom under a slab roof. Three-wide portals face the arena; two-wide rear entrances admit fighters separately. Ordinary stone/stone-brick blocks and saw-cut slabs supply the masonry silhouette. The controller replaces one ground block, flush with the fighting floor; prepared natural terrain supplies the floor. No excavation or stands are required.
-
-The diagram bill is 226 full masonry blocks, 160 masonry slabs and one controller, excluding ground preparation and undecided gates. Exact dimensions, material alternatives, controller recipe/art and gate mechanism remain proposals. The [local brief and visual review](concept_art/gladiator_pit/README.md) links both complete isometric views and half-block layers; these are engineering plans, not runtime machine art. Portals are open in the study, not working gates. Require supported level ground, formed walls/rooms and a safe clear fighting volume without validating outside seating. Decide allowable floor substitutions and prep-room furniture before coding.
-
-### Proposed match flow
-
-1. Two players join opposite fighter slots at the controller. They review each other's identity and optional offered stakes; both explicitly accept the terms. Changing players or stakes clears acceptance. Unwagered fights should remain possible; nobody can enroll or spend items for another player.
-2. Each fighter enters their prep room and marks Ready. Betting remains open during preparation. Before both are ready, allow cancellation. Once both are ready, lock participants and accepted wagers and begin a short visible countdown.
-3. Open inward gates together and enable combat between the enrolled opponents. Decide countdown duration, how readiness is reached from the prep rooms, and when fighters must leave those rooms. The centrally located controller remains the shared enrollment/wager interface.
-4. A would-be lethal hit resolves one knockout, disables further match damage and declares one winner. Gear retention is approved; durability/ammunition costs, health restoration, post-match placement and environmental-death handling are not yet chosen.
-5. Settle accepted wagers once, show the result and let players collect owed items. Reopen after fighters leave; unclaimed payouts persist independently of the next match.
-
-Recommended protection: match consent permits damage only between the enrolled opponents inside the fighting volume while live. Prevent outside attacks/projectiles and fighters harming spectators; prep rooms remain safe. Resolve claims and the planned wearable PvP flag explicitly without changing global combat rules. Indirect damage, pets, explosions, environmental hazards and projectiles crossing the boundary require concrete rules.
-
-### Proposed wagers
-
-Escrow actual item stacks with all components intact. Fighter stakes are an optional pair of offers accepted by both fighters; the winner receives both. For spectators, start with **matched opposing wagers**: one backs a fighter and offers a specific item/quantity; another backs the opponent and deposits an identical stack/quantity. For example, each deposits eight Coal and the winning backer receives sixteen Coal. No pooled odds or rounding is required. Propose one backed side per spectator per match, with enrolled fighters excluded from the spectator ledger.
-
-Unmatched offers remain refundable and never become accepted bets. No new/changed bets after countdown locks. A completed knockout pays each wager independently; an invalid/cancelled match refunds each depositor's own items. No house cut, currency, remote betting or bookmaker role is proposed. Settle eligible items, stake/offer limits, expiry, unequal fighter offers and inventory-full collection before implementation. Competing acceptors and repeated requests cannot reserve or pay the same items twice.
-
-### Interruptions and remaining choices
-
-Recommended conservative first pass: leaving the combat volume, disconnect, unloaded required chunks, structural damage, controller destruction, permission loss or server restart aborts/refunds an unfinished match. Recovery records survive independently of the controller and pay original players once; never leave escrow as dropped items. This avoids an implicit forfeit rule but permits deliberate aborts. Choose any forfeit/reconnect policy explicitly before public wagered play. Match duration and draw/refund rules are also open.
-
-Before implementation resolve layout/materials/gates, host and claim authority, loadout restrictions, knockout/health semantics, safe boundaries, wagering limits and interruption policy. Rankings, tournaments, NPC opponents, seating validation and operating fuel are outside this initial proposal. [Implementation stages](development_plan.md#gladiator-pit--layout-and-rules-package) own work and acceptance.
+Follow-up reviews: ordinary Survival construction and wager UX; four simultaneous real fighter/spectator clients; abrupt-crash consistency across player/world saves; and crowded-arena work. The implemented abort/refund rule deliberately allows a fighter to avoid losing by leaving or disconnecting. Any later forfeit/reconnect adjudication, rankings/tournaments, configurable loadouts, furnishing exceptions or expanded betting must be chosen separately. None is required to use the initial two-player arena.
 
 ## Guns — first Paterson model
 

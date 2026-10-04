@@ -48,11 +48,11 @@ public final class MachinePreview {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;return; }
         if (dimension != mc.level.dimension()) { selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;dimension = mc.level.dimension(); }
-        if (mc.screen == null && mc.hitResult instanceof BlockHitResult hit && (mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof BulkBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof OilEngineBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof IndustrialBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof KilnBlock || mc.level.getBlockState(hit.getBlockPos()).is(CivicContent.TABLE.get())))
+        if (mc.screen == null && mc.hitResult instanceof BlockHitResult hit && (mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof ArenaBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof BulkBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof OilEngineBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof IndustrialBlock || mc.level.getBlockState(hit.getBlockPos()).getBlock() instanceof KilnBlock || mc.level.getBlockState(hit.getBlockPos()).is(CivicContent.TABLE.get())))
             selected = hit.getBlockPos().immutable();
         if (selected == null) return;
         var state = mc.level.getBlockState(selected);
-        if (!(state.getBlock() instanceof BulkBlock) && !(state.getBlock() instanceof OilEngineBlock) && !(state.getBlock() instanceof IndustrialBlock) && !(state.getBlock() instanceof KilnBlock) && !state.is(CivicContent.TABLE.get()) || selected.distToCenterSqr(mc.player.position()) > 32 * 32) {
+        if (!(state.getBlock() instanceof ArenaBlock) && !(state.getBlock() instanceof BulkBlock) && !(state.getBlock() instanceof OilEngineBlock) && !(state.getBlock() instanceof IndustrialBlock) && !(state.getBlock() instanceof KilnBlock) && !state.is(CivicContent.TABLE.get()) || selected.distToCenterSqr(mc.player.position()) > 32 * 32) {
             selected = null; ghosts = List.of(); blockers = List.of(); focus.reset();refresh.reset();layoutKey=null;layout=List.of();showGuide=false;return;
         }
         works = state.is(KilnContent.RETORT.get()); survey=state.is(CivicContent.TABLE.get());
@@ -188,7 +188,7 @@ public final class MachinePreview {
         var mc = Minecraft.getInstance();
         if (!showGuide || !eligible()) return;
         var graphics = event.getGuiGraphics();
-        var label = mc.level.getBlockState(selected).getBlock() instanceof BulkBlock||industry!=null||mc.level.getBlockState(selected).getBlock() instanceof OilEngineBlock||mc.level.getBlockState(selected).getBlock() instanceof KilnBlock?mc.level.getBlockState(selected).getBlock().getName():Component.translatable(survey ? "guide.civilization.survey" : works ? "guide.civilization.works" : "guide.civilization.kiln");
+        var label = mc.level.getBlockState(selected).getBlock() instanceof ArenaBlock||mc.level.getBlockState(selected).getBlock() instanceof BulkBlock||industry!=null||mc.level.getBlockState(selected).getBlock() instanceof OilEngineBlock||mc.level.getBlockState(selected).getBlock() instanceof KilnBlock?mc.level.getBlockState(selected).getBlock().getName():Component.translatable(survey ? "guide.civilization.survey" : works ? "guide.civilization.works" : "guide.civilization.kiln");
         graphics.drawString(mc.font, label, 8, 8, 0xFFFFD180);
         graphics.drawString(mc.font, unloaded ? Component.translatable("gui.civilization.structure_2") :
                 ghosts.isEmpty() ? Component.translatable("gui.civilization.structure_1") :

@@ -33,6 +33,7 @@ public final class PreviewVisualCheck {
                 || mc.mouseHandler.isMouseGrabbed())
             throw new IllegalStateException("Visual client must stay hidden, unfocused and unable to grab the mouse");
         if(CHECK.equals("weather-peer")){WeatherVisualCheck.peer(mc);return;}
+        if(CHECK.equals("gladiator-peer")){ArenaVisualCheck.peer(mc);return;}
         if (!opened && mc.screen instanceof TitleScreen) {
             opened = true;
             mc.createWorldOpenFlows().openWorld(System.getProperty("civilization.previewWorld","preview-compatibility"), mc::stop);
@@ -48,6 +49,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}
         if(CHECK.equals("coal-mining")){CoalMiningVisualCheck.tick(mc);return;}
+        if(CHECK.equals("gladiator")){ArenaVisualCheck.tick(mc);return;}
         if(CHECK.equals("uranium")){UraniumVisualCheck.tick(mc);return;}
         if(CHECK.equals("derrick-guide")){DerrickGuideVisualCheck.tick(mc);return;}
         if(CHECK.equals("material-sync")){MaterialSyncVisualCheck.tick(mc);return;}

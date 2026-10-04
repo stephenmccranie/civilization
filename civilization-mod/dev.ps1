@@ -4,7 +4,7 @@ param(
     [string]$Task = 'Build',
     [ValidateSet('Quick', 'Gameplay', 'Visual', 'Full')]
     [string]$Scope = 'Quick',
-    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','thermal','road','uranium','derrick-guide','kitchen','oven','builders-line','paterson','coal-mining')]
+    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','thermal','road','uranium','derrick-guide','kitchen','oven','builders-line','paterson','coal-mining','gladiator')]
     [string]$Scene = 'machines',
     [switch]$FullVisual
 )
@@ -25,6 +25,7 @@ if ($LASTEXITCODE -ne 0 -or "$compilerVersion" -notmatch '^javac 21(?:\.|$)') {
 }
 
 $previousJavaHome = $env:JAVA_HOME
+$arenaPeerProcess = $null
 Push-Location $PSScriptRoot
 try {
     $env:JAVA_HOME = $devConfig.javaHome
@@ -82,6 +83,22 @@ try {
         # Disable NeoForge's separate early splash window before any native window is created.
         [IO.File]::WriteAllText((Join-Path $visualPath 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 1920`nearlyWindowHeight = 1080`n")
         Write-Host "Hidden 1920x1080 visual check: $Scene (extended tour: $($FullVisual.IsPresent)). Mouse capture disabled. Output: runs/visual/screenshots."
+        if ($Scene -eq 'gladiator') {
+            $arenaPeerDirectory = Join-Path $PSScriptRoot 'runs/arena-peer'
+            foreach ($arenaSubdir in @('config','mods','resourcepacks','shaderpacks')) {
+                $arenaDestination = Join-Path $arenaPeerDirectory $arenaSubdir
+                New-Item -ItemType Directory -Force $arenaDestination | Out-Null
+                Get-ChildItem -LiteralPath (Join-Path $visualPath $arenaSubdir) -File | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $arenaDestination -Force }
+            }
+            Copy-Item -LiteralPath (Join-Path $visualPath 'options.txt') -Destination (Join-Path $arenaPeerDirectory 'options.txt') -Force
+            foreach ($arenaMarker in @('step.txt','done.txt','ready.txt','peer-exit.txt')) {
+                $arenaMarkerPath = Join-Path $arenaPeerDirectory $arenaMarker
+                if (Test-Path -LiteralPath $arenaMarkerPath) { Remove-Item -LiteralPath $arenaMarkerPath }
+            }
+            $arenaShell = (Get-Process -Id $PID).Path
+            $arenaScript = Join-Path $PSScriptRoot 'arena-peer.ps1'
+            $arenaPeerProcess = Start-Process -FilePath $arenaShell -ArgumentList @('-NoProfile','-File',('"' + $arenaScript + '"')) -WindowStyle Hidden -PassThru
+        }
     }
 
     if ($Task -eq 'Server') {
@@ -120,6 +137,11 @@ try {
     $verificationTimer = [Diagnostics.Stopwatch]::StartNew()
     & (Join-Path $PSScriptRoot 'gradlew.bat') @gradleTasks @gradleArguments
     if ($LASTEXITCODE -ne 0) { throw "Gradle $($gradleTasks -join ', ') failed ($LASTEXITCODE)." }
+    if ($arenaPeerProcess) {
+        if (-not $arenaPeerProcess.WaitForExit(30000)) { throw 'Arena companion client did not exit after the host.' }
+        $arenaExitFile = Join-Path $PSScriptRoot 'runs/arena-peer/peer-exit.txt'
+        if (-not (Test-Path -LiteralPath $arenaExitFile) -or (Get-Content -LiteralPath $arenaExitFile -Raw) -ne '0') { throw 'Arena companion client failed; see .tools/arena-peer-auto.log.' }
+    }
     Write-Host ("Completed {0} in {1:N1}s." -f ($gradleTasks -join ', '), $verificationTimer.Elapsed.TotalSeconds)
 
     if ($Task -eq 'Deploy') {

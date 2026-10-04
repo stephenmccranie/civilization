@@ -20,6 +20,12 @@ public final class CivicProtection {
             e.setCanceled(true); e.setCancellationResult(InteractionResult.SUCCESS);
             if (e.getEntity() instanceof ServerPlayer player && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
                 CivicMenu.open(player, CivicService.address(level, e.getPos()), block.land);
+        } else if (level.getBlockState(e.getPos()).getBlock() instanceof ArenaBlock) {
+            // Public enrollment/wager access; material construction still checks claim rights.
+            if (!CivicAccess.allowed(level,e.getPos(),e.getEntity())) {
+                e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);
+                if(e.getEntity() instanceof ServerPlayer player&&e.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND)ArenaMenu.open(player,e.getPos());
+            }
         } else if (!CivicAccess.allowed(level, e.getPos(), e.getEntity())) {
             e.setCanceled(true); e.setCancellationResult(InteractionResult.FAIL);
             e.getEntity().displayClientMessage(Component.literal("This land is protected."), true);
@@ -57,6 +63,7 @@ public final class CivicProtection {
         for (var pos : resolver.getToDestroy()) if (!CivicAccess.boundary(level, e.getPos(), pos)) e.setCanceled(true);
     }
     @SubscribeEvent public static void attack(net.neoforged.neoforge.event.entity.player.AttackEntityEvent e) {
+        if(e.getEntity().level() instanceof ServerLevel level&&e.getTarget() instanceof Player target&&ArenaService.opposed(ArenaData.get(level.getServer()),e.getEntity(),target))return;
         if (!CivicAccess.allowed(e.getEntity().level(), e.getTarget().blockPosition(), e.getEntity())) e.setCanceled(true);
     }
     @SubscribeEvent public static void interactEntity(PlayerInteractEvent.EntityInteract e) {
@@ -66,6 +73,7 @@ public final class CivicProtection {
         if (!CivicAccess.allowed(e.getLevel(), e.getTarget().blockPosition(), e.getEntity())) e.setCanceled(true);
     }
     @SubscribeEvent public static void projectile(net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent e) {
+        if(e.getEntity().level() instanceof ServerLevel level&&e.getEntity() instanceof Player target&&e.getSource().getEntity() instanceof Player attacker&&ArenaService.opposed(ArenaData.get(level.getServer()),attacker,target))return;
         if (e.getSource().getEntity() instanceof Player player && !CivicAccess.allowed(e.getEntity().level(), e.getEntity().blockPosition(), player)) e.setInvulnerable(true);
     }
     @SubscribeEvent public static void grief(net.neoforged.neoforge.event.entity.EntityMobGriefingEvent e) {
