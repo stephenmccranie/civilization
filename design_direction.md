@@ -342,6 +342,12 @@ Approved land-storage starting rules: both stores occupy 3×5×3 blocks. The Coa
 
 The first generic drive is a **Hot-Bulb Engine**, with refined fuel and lubricating oil. Its grounded early oil-engine appearance bridges coal workshops and later extraordinary nuclear/sky machinery. Keep controls simple and preserve the refinery requirement. It now powers freeform boats directly and remains reusable by later land machinery. Exact recipes and operation live in [industry](civilization-mod/industry.md#oil-engine).
 
+## Gladiator pit — planned
+
+A controller-centered multiblock enables two players to fight in an oval arena on flat ground. The official structure defines the oval walls and two fighter prep rooms; players build their own seating around it. The controller sits at the center. This is layout/rules planning, not implemented behavior.
+
+Matches end in a knockout rather than an ordinary lethal death, and both fighters keep their gear. Fighters and spectators can wager existing items and materials through the controller. Dimensions, match flow, settlement, interruption and interaction with ordinary PvP/claims remain [proposals and open choices](open_decisions.md#gladiator-pit--layout-and-match-rules). [Work order](development_plan.md#gladiator-pit--layout-and-rules-package) owns implementation acceptance.
+
 ## Pickpocketing and wearable PvP flag — planned
 
 A designated wearable item opts its wearer into PvP: other flagged players can attack and kill them, and wearing it prevents pickpocketing. Players who do not wear it can be pickpocketed from behind. This is approved future work, not implemented behavior. Exact item, theft interaction and switching/protection boundaries remain [open](open_decisions.md#pickpocketing-and-wearable-pvp-flag).
