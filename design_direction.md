@@ -344,7 +344,7 @@ The first generic drive is a **Hot-Bulb Engine**, with refined fuel and lubricat
 
 ## Gladiator pit — planned
 
-A controller-centered multiblock enables two players to fight in an oval arena on flat ground. The official structure defines the oval walls and two fighter prep rooms; players build their own seating around it. The controller sits at the center. This is layout/rules planning, not implemented behavior.
+A controller-centered multiblock enables two players to fight in an oval arena on flat ground. The official structure defines the oval walls and two fighter prep rooms; players build their own seating around it. The controller's horizontal center must coincide exactly with the oval's geometric center on both axes. This is layout/rules planning, not implemented behavior.
 
 Matches end in a knockout rather than an ordinary lethal death, and both fighters keep their gear. Fighters and spectators can wager existing items and materials through the controller. Dimensions, match flow, settlement, interruption and interaction with ordinary PvP/claims remain [proposals and open choices](open_decisions.md#gladiator-pit--layout-and-match-rules). [Work order](development_plan.md#gladiator-pit--layout-and-rules-package) owns implementation acceptance.
 
