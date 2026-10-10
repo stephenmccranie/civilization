@@ -9,7 +9,7 @@ from assets import confined, validate as validate_gecko, vector
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = ROOT / 'civilization-mod/src/main/resources/assets/civilization'
-KINDS = ('item', 'block', 'multiblock', 'animated_machine', 'ui')
+KINDS = ('item', 'block', 'multiblock', 'animated_machine', 'entity', 'ui')
 CRITERIA = {
     'mockup': ('silhouette_scale', 'implementable_geometry', 'mechanics_clearance', 'period_materials', 'family_consistency', 'controls_readability', 'gameplay_scope'),
     'model': ('matches_direction', 'geometry_uvs', 'material_consistency', 'assembly_interfaces', 'animation_states', 'native_size_readability'),

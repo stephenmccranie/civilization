@@ -68,6 +68,22 @@ class ArtTests(unittest.TestCase):
         self.asset['decals'].append('model.bbmodel:missing/up')
         with self.assertRaisesRegex(ValueError,'Unknown decal'): art.uv_density(self.asset,self.folder)
 
+    def test_entity_requires_density_checked_native_model(self):
+        self.asset['kind']='entity'
+        art.definition(self.asset,self.folder)
+        with self.assertRaisesRegex(ValueError,'Declare native models'):
+            art.uv_density(self.asset,self.folder)
+        model={'resolution':{'width':64,'height':64},'textures':[{'width':64,'height':64}],
+               'elements':[{'name':'body','from':[0,0,0],'to':[16,16,16],
+                            'faces':{'north':{'uv':[0,0,64,64],'texture':0}}}]}
+        art.write(self.folder/'entity.bbmodel',model)
+        self.asset['models']=['entity.bbmodel']
+        art.uv_density(self.asset,self.folder)
+        model['elements'][0]['faces']['north']['uv']=[0,0,32,32]
+        art.write(self.folder/'entity.bbmodel',model)
+        with self.assertRaisesRegex(ValueError,'density mismatch'):
+            art.uv_density(self.asset,self.folder)
+
     def test_bundle_validates_before_copy_and_rejects_escape(self):
         self.asset['outputs'].append(dict(self.asset['outputs'][0], source='missing.png',target='textures/item/missing.png')); self.save()
         with self.assertRaises(FileNotFoundError): self.command('preview')

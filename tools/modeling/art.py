@@ -98,7 +98,7 @@ def uv_density(asset, folder):
                 if any(abs(a-b) > 1.01 for a, b in zip(actual, expected)):
                     raise ValueError(f'UV density mismatch: {key}: {actual} versus {expected}')
     if exceptions-used: raise ValueError(f'Unknown decal exceptions: {sorted(exceptions-used)}')
-    if asset['kind'] in ('block', 'multiblock', 'animated_machine') and not models:
+    if asset['kind'] in ('block', 'multiblock', 'animated_machine', 'entity') and not models:
         raise ValueError('Declare native models for density checks')
 
 

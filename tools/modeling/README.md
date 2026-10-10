@@ -79,6 +79,8 @@ The [project art skill](../../.agents/skills/civilization-art/SKILL.md) follows 
 
 ### Define
 
+Use `--kind entity` for native character models. Entity assets use the same explicit 64px/block density checks, paired GeckoLib manifests and original-source/publication boundaries as other modeled assets. A model-only task may complete at a reviewed native source/export bundle; do not call it runtime-published or in-game verified until it has passed the relevant Minecraft scene. Keep editable characters and editor proofs local under the GitHub policy.
+
 Fill three short brief fields: `purpose`, `target` (recognizable features and intended material treatment), and `constraints` (bounds, interfaces, motion/construction and gameplay invariants). Name inspected references by role: shape, material or project style. Choose one authoritative `source`: a hand-edited `project` or a Python `recipe`. Declare extra source dependencies, native `models`, output mappings and any GeckoLib manifests. A recipe owns generated models; a project owns its derived exports. Never silently overwrite manual edits with a recipe.
 
 Generate one coherent concept when the shape or direction needs exploration, using actual inspected image references and preserving the exact prompt. Routine repairs and established designs can use existing references directly. Competing concepts remain opt-in. Concepts are visual targets, not dimensioned engineering or finished textures.
