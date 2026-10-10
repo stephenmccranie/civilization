@@ -6,7 +6,7 @@ Current package: the first playable manual-coal prototype, preserving ordinary s
 
 ### First custom mob — concept study
 
-Requested scope: describe a reptilian humanoid inspired by the supplied illustration and Lacerta lore, propose behavior and generate a character card for later modeling. The first study proposes a Lacertan scout; [the proposal](open_decisions.md#first-mob--lacertan-scout-proposal) owns its appearance, encounter loop and unresolved gameplay choices. Local sources, prompt and card live in `concept_art/lacertan/`. Concept work does not replace the active manual-coal package or claim a shipped entity. Next: review the concept, settle the encounter specification, then build and inspect a native model through the shared asset workflow.
+Requested scope: describe a reptilian humanoid inspired by the supplied illustration and Lacerta lore, propose behavior and generate a character card for later modeling. The current v2 Lacertan observer study lets written anatomy lead and corrects basking to expose its back plates to the sun; v1 is superseded. [The proposal](open_decisions.md#first-mob--lacertan-scout-proposal) owns appearance, encounter ideas and unresolved choices. Local sources, both prompts/cards and provenance live in `concept_art/lacertan/`. Concept work does not replace the active manual-coal package or claim a shipped entity. Next: review the revised concept, settle the encounter specification, then build and inspect a native model through the shared asset workflow.
 
 ### Manual coal mining — prototype package
 
