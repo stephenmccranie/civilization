@@ -4,6 +4,10 @@
 
 Current package: the first playable manual-coal prototype, preserving ordinary small-coal mining. Stages 1–2 are implemented for Creative/admin testing; Survival acquisition, broader custody checks and drill retirement remain next. Cooking retains its ordinary-play follow-ups below. The requested full Oil Derrick redesign is implemented with progressive held-material construction, contextual guides and local section repair; [industry](civilization-mod/industry.md#build-and-supply-machines) owns its construction and migration. Flight optimization is deferred; the user will build the demonstration area later, so W01 is not a prerequisite.
 
+### First custom mob — concept study
+
+Requested scope: describe a reptilian humanoid inspired by the supplied illustration and Lacerta lore, propose behavior and generate a character card for later modeling. The first study proposes a Lacertan scout; [the proposal](open_decisions.md#first-mob--lacertan-scout-proposal) owns its appearance, encounter loop and unresolved gameplay choices. Local sources, prompt and card live in `concept_art/lacertan/`. Concept work does not replace the active manual-coal package or claim a shipped entity. Next: review the concept, settle the encounter specification, then build and inspect a native model through the shared asset workflow.
+
 ### Manual coal mining — prototype package
 
 **Agreed:** ordinary small coal remains normally mineable; special equipment unlocks richer huge veins. Click/hold-triggered, camera-shaped pick swings chip visible portions loose, a special shovel loads raw coal into minecarts, and surface preparation produces usable Coal. This replaces the Coal Drill, rather than redesigning its model. [Design](design_direction.md#4-regional-land-and-materials) owns those rules; [proposed mechanics and unresolved choices](open_decisions.md#manual-coal-mining--proposed-implementation-plan) own controls, geometry, custody, power and balance. The [first prototype](civilization-mod/coal-mining.md) implements the placed-face and short rail loop with trial values. The drill remains during the transition.
