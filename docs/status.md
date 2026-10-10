@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-03**. Current build: **0.34.48-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `9c27577e09c3e94596df89d506c761387f699825199b2fe90ed562a48881f2d8`.
+Last reviewed: **2026-10-10**. Current build: **0.34.48-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `9c27577e09c3e94596df89d506c761387f699825199b2fe90ed562a48881f2d8`.
 
 ## Implemented
 
@@ -21,6 +21,8 @@ Last reviewed: **2026-10-03**. Current build: **0.34.48-dev**, verified for publ
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Lacertan modeling study:** the owner rejected the first native translation despite its successful technical checks. The latest direct-Blockbench experiment produced a 60-cuboid head with matching-camera reference/prior/current evidence and a 395-cuboid integration on the original 18-bone rig. Native geometry and all four inherited animation exports survived save/reopen; the head checks cover 360 faces at 64px/block. The body and clips are inherited, with no final visual acceptance, Minecraft appearance/performance review or entity behavior. All **37 modeling-tool tests** passed. No paid service, plugin upgrade or renderer change was used. Earlier research and the quota-blocked public demo remain local provenance. [Remaining work](../development_plan.md#first-custom-mob--modeling-approach-study). Current runtime build/deployment remain unchanged.
 
 - **Latest Gladiator Pit check:** 0.34.48-dev build, all **72 fast tests**, all **295 required server GameTests** and documentation checks passed. Required geometry is only the controller, walls, room shells/roofs and six unchanged gates; interior blocks, liquids, furniture and terrain are independent of formation. Centered rear exits are one block wide, requiring six extra Stone Bricks for existing two-wide exits. Server checks verify obstacles/floor holes, arbitrary-height fight bounds, safe prep positioning and a fully filled room that still forms but cannot accept Ready. The updated two-client Photon/Faithful scene passed actual enrollment, stakes/consent, prep/countdown, melee knockout, recovery and winner collection in a fixture with custom obstacles, excavation and furniture. Both complete isometric views, half-block layers, the actual rear doorway and game/menu evidence were inspected; native publication receipts passed. Deployment checksum matched. The unchanged modeling tools previously passed 36 tests. Ordinary Survival balance, four real clients including spectator transactions, abrupt-crash cross-file atomicity and multiplayer load remain unreviewed. Interruptions refund rather than award forfeits. [Controls, materials and limits](../civilization-mod/gladiator-pit.md).
 
