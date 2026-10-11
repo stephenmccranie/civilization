@@ -1,6 +1,6 @@
 # Native modeling practice
 
-Read this for shaped blocks, machines and vehicles. The asset pipeline in [README](README.md#complete-asset-pipeline) still owns briefs, provenance and publication. This reference covers the gap between a good concept and a good native model.
+Read this for shaped blocks, machines, vehicles and creatures. The asset pipeline in [README](README.md#complete-asset-pipeline) still owns briefs, provenance and publication. This reference covers the gap between a good concept and a good native model.
 
 ## Make the model easy to judge
 
@@ -73,6 +73,19 @@ Custom modeled machines are not constrained to one-block material tiles. Reduce 
 Prevent overlap in the source geometry: adjacent panels and posts meet at boundaries; raised fittings replace or sit clearly ahead of their backing surface. Remove duplicate buried faces where appropriate. Shared exposed planes cause z-fighting even if a still view looks acceptable. Check close and grazing views, including moving poses; brighter trim cannot repair an overlap. Keep authored UV islands disjoint with padding, and contain painted strokes within their island. Intentional reuse of a base material crop is different from overwriting an authored island. Use coherent trim tones rather than alternating bright edge pixels. Transparent windows must expose the chamber, and controls should visibly connect to their mechanism.
 
 Shared material tiles alone do not place corners or seams on a part. For prominent covers and supports, allocate face-sized UV islands at the established density, then use nine-slice panel layouts to preserve corner pixels while fitting the middle. Keep secondary faces quieter; do not paste a complete framed panel onto every surface. Inspect actual model and shader views before increasing contrast. The engine `studio/surface_textures.py` demonstrates this reproducibly.
+
+## Creature modeling
+
+For custom mobs, establish the whole silhouette and a representative joint/material treatment before multiplying detail. Keep the approved concept's identity, expression and color distribution visible in the native model. The following route works within Minecraft's cuboid language and GeckoLib; it does not require a reconstruction service.
+
+1. **Measure the character.** Record height, head/body ratio, shoulder-to-waist width, limb lengths, hand/foot size and distinctive features in the brief. Assign references separate roles for anatomy, expression, palette and surface detail. Infer hidden shapes deliberately; perspective art is not a blueprint.
+2. **Build the whole body in clay.** Use connected primary masses, purposeful tapers and joint pivots. Inspect front, side, back and three-quarter views at matching scale. Fix gaps, bulky transitions and the resting expression here. Use rotations where they improve silhouette or movement; circular layers of small cubes rarely preserve the intended Minecraft shape.
+3. **Finish one representative section.** For a humanoid, test the torso, shoulder and one complete arm with both neutral clay and fitted pixel art. Resolve the shoulder/elbow/wrist transitions and material treatment before extending them across the body. Choose a similarly revealing section for other anatomies. Preserve parts that already work rather than rebuilding the whole character each turn.
+4. **Give geometry and paint distinct jobs.** Use cuboids for silhouette, joint structure, useful fingers/claws and prominent signature plates. Paint smaller scales, anatomical shading and cloth folds on measured face islands. Use deliberate pixel clusters, shaped highlights, contact shadows and quiet regions; avoid generic noise or repeated raised grids across every body part. Retain the concept's broad color regions while simplifying. A few connected clothing panels with painted folds can read better than many raised strips. Fit the treatment to anatomy rather than copying machine panel borders onto skin.
+5. **Extend, then inspect the actual whole model.** Review the finished treatment from all sides in clay and color, including an ordinary gameplay-distance framing. Keep one matching-camera before/after comparison. Check close joint views and relevant animation poses; sample full cycles for clearance before publication. Correct specific defects such as accidental spikes, exposed gaps or stiff transitions before adding more detail. Cube count is a cost to assess, not a quality target or a universal cap.
+6. **Save and verify the native source.** Keep one authoritative editable `.bbmodel`, with the recipe as reconciled provenance when the saved project owns edits. Use the existing `studio.capture`/`review_model.py` helpers for real views, padded authored UV islands at the declared 64px/block density, and the existing export validators. Verify saved/reopened geometry, animation and texture mapping. Native acceptance does not establish Minecraft lighting, motion or performance; those remain part of the shared publication stage.
+
+The local [Lacertan study](../../art/assets/lacertan/head-study/README.md) is the accepted native example: connected torso/arm masses, fitted painted body scales and cloth, with the neutral head and exposed dorsal plates retained. Its representative clay/painted section, full views and comparison are reusable review examples. The original project and visual history stay local under the publication boundary; this procedure remains usable without those files.
 
 ## Sources and scope
 
