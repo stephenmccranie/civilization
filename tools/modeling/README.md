@@ -46,6 +46,8 @@ The retired real-block Oil Derrick provides a small conversion example: [export_
 
 For shaped or animated assets, use the [native modeling practice](MODELING.md): whole-assembly blockouts, measured landmarks, fixed offscreen cameras, explicit UV density and functional detail. `studio.py` supplies reusable native construction/capture helpers; asset-specific geometry stays with its source files.
 
+For custom mobs, follow the [creature modeling route](MODELING.md#creature-modeling) before detailing: review a whole-body clay blockout, finish a representative joint/material section, then extend and verify the actual model. It owns the creature-specific geometry and painted-surface guidance.
+
 This section covers native model export. Use the shared workflow below and establish the visual target before authoring.
 
 1. Model a silhouette in the correct GeckoLib format with named groups/pivots. Preserve existing project tabs. Review front, side and isometric views before detailing.
