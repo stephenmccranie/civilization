@@ -86,6 +86,8 @@ Natural rain should last about **30 minutes** and supply a bonus sufficient for 
 
 Terrain must make productive opportunities understandable. Use a shared region/biome foundation for growth, natural spawning and deposit placement. Regions can overlap.
 
+The dedicated server uses [Alesrr's Terra Diffusion](https://github.com/Alesrr/terra-diffusion) at **world scale 6**, selected by the owner on 2026-10-27. Replace that server's existing world after backing it up; a separate test world is not required for this switch. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
+
 | Landscape/activity | Rule |
 | --- | --- |
 | River floodplain | Farming requires a natural river band with bounded vertical reach. Terraces can qualify; sky platforms do not inherit eligibility merely by being above a river |
