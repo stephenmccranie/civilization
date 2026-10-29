@@ -14,7 +14,7 @@ Develop the [approved direction](design_direction.md#physical-material-storage-a
 | 2. Manual handling — next | One inexpensive stockpile and ground-pushed wheelbarrow, simple partial loading/unloading, visible stock/capacity and saved custody. No rail requirement; retain the coal minecart separately. Review actual visuals through the art workflow. Verify full targets, competing transfers, access loss, destruction and save/reload preserve exactly one stock balance |
 | 3. Local building | Explicitly selected nearby supplies for ordinary placement and Builder's Line; preserve labor, access and canceled-placement accounting. Build a small home plus a modest road/embankment and compare personal/wheelbarrow-assisted time and handling |
 | 4. Carrying/storage rollout | Tune personal allowance, audit recipe/automation/nesting/bulk-store adapters and implement explicit old-stock recovery before enforcing volume. Expand material coverage by audited family |
-| 5. Powered/regional loop | One powered extraction/loading upgrade and useful loaded voyage. Match handling to production; check a real scale-6 route, farming/deposits and bounded generation/streaming before broader machinery or world-distance promises |
+| 5. Powered/regional loop | One powered extraction/loading upgrade and useful loaded river voyage. Match handling to production; check a real scale-6 sea-to-inland connection, farming/deposits and bounded generation/streaming before broader machinery or world-distance promises. Follow the [river/ocean direction](design_direction.md#rivers-and-ocean-trade) |
 
 Use cached aggregate visuals and on-demand or stock-change accounting; no per-frame inventory scans, loose entity per item, recursive container expansion or forced world loading. Dynamic vehicle cargo mass remains a separately verified Sable integration. Stage 1 measures the problem; it does not claim the playable wheelbarrow/building loop or balance is complete.
 
@@ -94,10 +94,10 @@ Advance connected player loops. Basic operational readiness proceeds alongside d
 
 | Package | Remaining deliverable / dependency |
 | --- | --- |
-| Regional foundation | Navigable sample terrain and representative reserves; resolve travel, river elevation and world lifespan (D03/D04/D12) |
+| Regional foundation | Evaluate a connected ocean → river mouth → inland route on scale-6 terrain, representative reserves and useful settlement/landing sites; resolve travel, river elevation and world lifespan (D03/D04/D12) |
 | Ownership and recovery | Real multi-client/protection audit plus owner-only death recovery; settle inaccessible-claim and vehicle custody rules (D08–D10) |
 | Trade and discovery | External storage, item search/pins and actual competing-client transactions (D05/D11) |
-| River freight | Powered docking, practical routes and vessel lifecycle; depends on regions, permissions and fuel/cargo policy |
+| River freight | Primary long-distance passenger/freight network: powered docking, practical sea-to-inland routes and vessel lifecycle. Plan finite offshore oil after route feasibility; [remaining choices](open_decisions.md#river-network-and-ocean-opportunities) |
 | Economy evidence | Repeat voluntary farm/forest/mine → carrier → buyer exchanges; measure labor, food, fuel, stock, travel and useful demand |
 | Later scale | Broader oil/uranium industry, rail, large construction and sky/weather services after useful ground demand |
 
@@ -124,7 +124,7 @@ Advance connected player loops. Basic operational readiness proceeds alongside d
 **Remaining sequence:**
 
 1. Stationary mooring and engine-driven loading on land, with explicit port-to-port transfers. Verify disconnect/movement, full target, lost access, chunk unload and competing transfers preserve stock.
-2. One extraction → loaded voyage → unloading loop on a representative river. Demonstrate useful freight capacity, credible fuel cost and graceful reload; test peer docking/access before claiming multiplayer readiness.
+2. One extraction → loaded voyage → unloading loop on a representative river, with an evaluated connection to the ocean. Demonstrate useful freight capacity, credible fuel cost and graceful reload; test peer docking/access before claiming multiplayer readiness. After route feasibility, design the offshore reserve/extraction stage and extend this loop to ocean crude → river transport → inland storage/refining. Preserve the initial onshore bootstrap; the current land Derrick is not an offshore implementation.
 3. Finish the relevant assembly/feedback review through the [asset pipeline](tools/modeling/README.md).
 
 Reuse existing guides, cabinet controls, fluid/stock adapters, claim checks and engine accounting. Capability access must obey the same stock bounds. Keep the coal-fired oil bootstrap; no universal grid, shaft simulation, boilers, new fuel grades, automatic trade or crew framework is part of this package. [Unresolved dock and lifecycle rules](open_decisions.md#bulk-freight-implementation-details).

@@ -155,6 +155,17 @@ A disposable run of the original snippet, changing only its working directory, p
 
 Remaining evaluation on the selected server world: generated river continuity and navigable width/depth, generation cost, and Civilization farming/deposit compatibility. Our [geography provider](civilization-mod/geography.md) currently assumes a fixed river elevation and generator river-biome corridors; visible water alone will not make farmland eligible. Long-term world preservation/reset policy remains open.
 
+## River network and ocean opportunities
+
+The owner selected [rivers as the main long-distance passenger/freight network and offshore oil as the first ocean-resource use case](design_direction.md#rivers-and-ocean-trade). These directions are settled; the following mechanics remain open:
+
+- **Connected routes:** identify an actual ocean → river mouth → inland destination on the selected scale-6 terrain. Review loaded travel both ways, channel clearance, river elevations, waterfalls, turning/landing sites and useful journey times. Set vessel/channel targets from that evidence. Locks, dredging and canals are possible later engineering responses, not approved systems or prerequisites for every route.
+- **Offshore oil:** choose reserve distribution/quantity, discovery clues, extraction depth/reach, structure and construction access. Do not reuse the dry-ground seep/land-Derrick assumptions without a dedicated design. Preserve finite stock and a non-circular initial oil bootstrap; neither offshore exclusivity nor removal of onshore reserves is approved.
+- **Sea-to-river handling:** decide whether the first route uses one vessel or transfers between coastal and river craft, with practical shore storage/loading and current access rules. Account for actual tank cargo and fuel through loading, travel, unloading and reload; no remote stock transfer. Existing powered-docking and vehicle-lifecycle work remains necessary.
+- **Useful trade:** identify inland refinery/industry demand for ocean cargo and test whether outbound supplies or other return cargo make the route worthwhile. Fishing grounds, islands, salvage and other ocean destinations are candidates only; select further opportunities for a useful player loop rather than adding a general ocean-content catalog now.
+
+The immediate wheelbarrow/storage package stays active. Evaluate terrain connections before investing in offshore machinery; a navigable route alone does not prove a functioning trade economy.
+
 ## Tectonic terrain trial — 2026-09-27
 
 Tectonic 3.0.28 is installed in Civilization Dev as a candidate terrain generator, not yet the permanent-world choice. Its supplied Overworld settings keep the vanilla vertical range and sea level. A fresh dedicated-server trial with the same Tectonic/Lithostitched versions generated an elevated savanna-plateau coal clue and buried seam and a dry-desert oil seep and reservoir after terrain-aware placement changes; details and limits are in [status](docs/status.md). Deposit compatibility at those sites is verified. Still evaluate river width, depth, continuity and local water elevations against the 48-block/Y58–70 farming rule, representative boat routes, world-generation cost and broader deposit abundance before adopting a permanent-world preset.
