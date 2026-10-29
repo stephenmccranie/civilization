@@ -11,12 +11,12 @@ Develop the [approved direction](design_direction.md#physical-material-storage-a
 | Stage | Deliverable and acceptance |
 | --- | --- |
 | 1. Exact accounting — implemented foundation | Shared integer eighth-m³ quantities; stone/cobblestone full and saw-cut item accounting; separate material/storage volume and shared-material estimated mass; on-demand operator inventory/container audit with explicit unknowns. [Implemented boundary](civilization-mod/physics.md#stone-cargo-accounting). No capacity enforcement yet |
-| 2. Manual handling — next | One inexpensive stockpile and cart, simple partial loading/unloading, visible stock/capacity and saved custody. Review actual visuals through the art workflow. Verify full targets, competing transfers, access loss, destruction and save/reload preserve exactly one stock balance |
-| 3. Local building | Explicitly selected nearby supplies for ordinary placement and Builder's Line; preserve labor, access and canceled-placement accounting. Build a small home plus a modest road/embankment and compare personal/cart-assisted time and handling |
+| 2. Manual handling — next | One inexpensive stockpile and ground-pushed wheelbarrow, simple partial loading/unloading, visible stock/capacity and saved custody. No rail requirement; retain the coal minecart separately. Review actual visuals through the art workflow. Verify full targets, competing transfers, access loss, destruction and save/reload preserve exactly one stock balance |
+| 3. Local building | Explicitly selected nearby supplies for ordinary placement and Builder's Line; preserve labor, access and canceled-placement accounting. Build a small home plus a modest road/embankment and compare personal/wheelbarrow-assisted time and handling |
 | 4. Carrying/storage rollout | Tune personal allowance, audit recipe/automation/nesting/bulk-store adapters and implement explicit old-stock recovery before enforcing volume. Expand material coverage by audited family |
 | 5. Powered/regional loop | One powered extraction/loading upgrade and useful loaded voyage. Match handling to production; check a real scale-6 route, farming/deposits and bounded generation/streaming before broader machinery or world-distance promises |
 
-Use cached aggregate visuals and on-demand or stock-change accounting; no per-frame inventory scans, loose entity per item, recursive container expansion or forced world loading. Dynamic vehicle cargo mass remains a separately verified Sable integration. Stage 1 measures the problem; it does not claim the playable cart/building loop or balance is complete.
+Use cached aggregate visuals and on-demand or stock-change accounting; no per-frame inventory scans, loose entity per item, recursive container expansion or forced world loading. Dynamic vehicle cargo mass remains a separately verified Sable integration. Stage 1 measures the problem; it does not claim the playable wheelbarrow/building loop or balance is complete.
 
 ### First custom mob — modeling approach study
 
