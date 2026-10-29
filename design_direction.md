@@ -203,13 +203,21 @@ Each upgrade must enable larger useful projects while keeping small jobs conveni
 
 | Mode | Agreed position |
 | --- | --- |
-| Rivers | Early, cheapest freight |
+| Rivers | Primary network for routine long-distance passenger travel and bulk freight; early, cheapest freight |
 | Trains | Later ground freight; always more expensive than river transport |
 | Airships | Most expensive, fastest and greatest bulk capacity |
 
 Boats use the [freeform hull and engine direction](#bulk-freight-structures), superseding the earlier prefab platforms and fixed cabin bounds. Provide simple stable controls without mandatory linkages or manual balance engineering. Sable supplies motion; refined fuel and lubricant connect powered freight to industry. Existing chests, barrels, bunkers and tanks retain their current limits until physical-volume adapters and migration are implemented. [Vehicle controls and limits](civilization-mod/vehicle-physics.md) and [bulk storage](civilization-mod/industry.md#bulk-freight-storage) own shipped behavior; powered docking remains unfinished.
 
-World terrain must provide connected rivers wide/deep enough for useful routes, turning and landing opportunities. Not every tributary must be navigable. Train details, airship physics, precise speeds/capacities and comparative cost definitions remain open.
+### Rivers and ocean trade
+
+**Approved direction; not yet implemented as a complete world/economy loop.** Rivers are the backbone of long-distance passenger travel and bulk freight, connecting inland farms, mines, workshops and settlements to one another and to the sea. River mouths, confluences, navigable reaches and practical landings should create useful places for ports, warehouses, markets and towns. Their value comes from actual routes and deliveries, without assigned town bonuses. Walking, wheelbarrows and roads connect nearby sites to this network; later rail and exceptional airships extend its reach while rivers remain central to ordinary transport.
+
+The ocean must contain worthwhile destinations and productive opportunities that give players reasons to travel out and bring cargo inland through river systems. **Offshore oil is the first planned ocean-resource use case:** discover and develop finite offshore reserves, load physical crude cargo, and deliver it through a river mouth to inland storage, refining and industry. This extends the finite oil economy rather than introducing another fuel type. Preserve a reachable initial coal → oil bootstrap; offshore production does not silently replace existing onshore oil or become the sole route to the first refined fuel. Other ocean resources and destinations remain [proposals to select](open_decisions.md#river-network-and-ocean-opportunities).
+
+World terrain must provide connected sea-to-inland routes with useful channel width/depth, river-mouth access, turning room and landing opportunities. Evaluate loaded journeys in both directions, not just attractive river scenery. Not every tributary must be navigable, and not every settlement needs direct deep-water access; local handling and transfer points connect smaller sites. River elevations, waterfalls and other breaks must be understood before promising a route. Exact channel dimensions, navigation aids, port transfers and any engineering works remain to design; no full hydrology simulation is implied.
+
+Offshore deposit placement/discovery, extraction structures, acquisition, cargo transfer and balance are future work. The current land Derrick, dry-ground seep rules and deployed deposits are onshore implementations, not a working offshore system. [Route evaluation and open mechanics](open_decisions.md#river-network-and-ocean-opportunities) and the [freight package](development_plan.md#bulk-freight--planned-implementation-package) own the remaining work. Train details, airship physics, precise speeds/capacities and comparative cost definitions remain open.
 
 ### Controller-built antigravity airships
 
