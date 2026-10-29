@@ -40,3 +40,20 @@ Production currently observes Sable mass rather than overriding it. Dynamic per-
 ## Next integration
 
 [Work order and acceptance](../open_decisions.md#unified-physical-foundation--proposed-implementation-plan) govern domain-aware thermal state, capacity/energy migration, authoritative fuel/work transactions and optional physical consequences. Before using physical material mass for inventories, audit affected recipe quantity/mass transformations. Current calories, fractional fuel accounting and thermal credits remain authoritative until their explicit migration.
+
+## Stone cargo accounting
+
+The first [physical storage package](../development_plan.md#physical-storage-and-increasing-scale--active-package) adds a read-only stone/cobblestone cargo audit. `CargoVolume` stores exact integer eighth-m³ units and computes whole-piece capacity without rounding up; negative and overflowing quantities fail. `StoneCargo` recognizes full Stone/Cobblestone, their native slabs and custom saw-cut halves/quarters/eighths. Two halves, four quarters or eight eighths equal one full 1 m³ block. Malformed custom material IDs remain unknown rather than using cutting's legacy fallback.
+
+Material volume and packed storage volume are separate fields; both equal solid volume for these neatly packed construction pieces. This does not describe loose rubble or a pile packing factor. Estimated cargo mass uses the current shared material density, including datapack overrides; it is a game material estimate, not a measured rock specification. No mass/stock cache or second saved quantity is introduced.
+
+Operators can run:
+
+```text
+/civilization cargo
+/civilization cargo container <x> <y> <z>
+```
+
+The first command scans the issuing player's inventory, including hotbar, armor and offhand but not cursor-held stacks. The second scans one loaded block's direct `Container` inventory; double-chest halves are inspected separately. It refuses ungenerated loot containers rather than opening them and never loads target chunks. Bulk SavedData stores, tanks, capability-only inventories, nested contents and unsupported items need separate adapters. Reports show supported material/storage m³, estimated kg and supported/unknown occupied-stack counts. Totals are partial when unknown stacks exist; they must not be treated as complete vehicle loads.
+
+This is an operator diagnostic, not a Survival control. Existing carrying limits, chest capacities, recipes, automation, stock, saves and live Sable mass remain unchanged. Stockpiles, carts, supply-fed building, capacity enforcement and migration are the following stages. [Design](../design_direction.md#physical-material-storage-and-handling) owns the target rules; [open decisions](../open_decisions.md#physical-storage-and-increasing-scale) owns remaining tuning.

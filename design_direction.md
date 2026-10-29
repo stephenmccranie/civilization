@@ -187,9 +187,19 @@ A Smithy repair is one restoration job with a previewed material quote and resul
 
 ## 6. Carrying and transport
 
-Standard inventory slots represent carrying capacity. Ordinary 64-stacks become **32**, including building blocks. Bulky industrial goods stack lower, making large Tier 2 shipments impractical to carry personally. Existing 16-stack items stay unchanged in the first implementation; unstackable items remain unstackable.
+Progression expands the quantities, distances and areas a player can manipulate: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Develop extraction, storage, loading, construction and travel together. Larger terrain must contain useful local starting opportunities, connected routes and places worth developing; the selected Terra Diffusion scale-6 server world is the evaluation baseline, not proof of freight or farming compatibility.
 
-Warehouses and vehicles gain capacity through more slots. Ordinary chests can serve early warehouses. Containers must be empty to become portable inventory items; filled-container nesting cannot bypass capacity. Disable shared remote ender storage. An assembled cargo vehicle can physically move its inventory.
+### Physical material storage and handling
+
+**Approved direction; staged implementation.** Bulk construction materials have credible dimensions. Separate material volume (substance), storage volume (packed space) and mass (load). A full stone block represents 1 m³; two halves, four quarter beams or eight eighth cubes preserve that material. Processing must account for inputs, outputs and explicit losses. Packed cut pieces initially use their solid volume; loose-pile packing factors and other item families need their own policies.
+
+Containers gain bulk capacity through usable physical space. Ordinary chests serve tools, food, components and small supplies; substantial building stock belongs in substantial stockpiles, warehouses or cargo spaces. Use simple summed volume and readable capacity feedback, without mandatory inventory shape-packing. Volume and mass remain separate from energy value. Containers must be empty to become portable inventory items; filled-container nesting cannot bypass capacity. Disable shared remote ender storage. An assembled cargo vehicle can physically move its inventory.
+
+Keep a forgiving, bounded personal building allowance rather than imposing literal human lifting limits. Introduce inexpensive carts and stockpiles alongside restrictions. Placement tools should draw from explicitly selected nearby supplies with current access checks; material must reach the worksite physically. Easy matching-material deposits and batch loading reduce repetitive inventory handling. Exact allowance, ranges, capacities and controls remain [open](open_decisions.md#physical-storage-and-increasing-scale).
+
+The existing **32-item ordinary stack** rule, lower bulky-item limits, unchanged 16-stacks and slot-based inventories remain the deployed baseline during this transition. They are not the final physical-capacity model. Audit item volumes, recipe conversions, automation, nesting and existing stock before enforcing new limits; preserve saves through an explicit migration. Do not shrink existing inventories or discard their contents to adopt the new policy.
+
+Each upgrade must enable larger useful projects while keeping small jobs convenient. A first home should be achievable in an ordinary session, solo operations must remain viable, and ground settlements remain worthwhile after advanced transport. Loading throughput must grow with extraction and freight throughput. Evaluate local supply trips, regional routes and expeditions by experienced journey time before fixing distances or increasing terrain scale. Numerical journey targets and specific future machines remain proposals.
 
 | Mode | Agreed position |
 | --- | --- |
@@ -197,13 +207,7 @@ Warehouses and vehicles gain capacity through more slots. Ordinary chests can se
 | Trains | Later ground freight; always more expensive than river transport |
 | Airships | Most expensive, fastest and greatest bulk capacity |
 
-Boat design uses a **working prefab foundation with a customizable build above it**. Propulsion, controls and stable handling are provided by the vessel; players add walls, cabins, deck layouts and decoration to suit their taste. Modularity should not require wiring control mechanisms or solving realistic balance, lift or center-of-mass problems before the craft works. This prefab rule applies to boats. Airships follow the controller-built direction below; both use Sable as infrastructure rather than adopting Create Aeronautics gameplay.
-
-The current boat direction is **small and large platform foundations**, with the small implementation specified in the [vehicle reference](civilization-mod/vehicle-physics.md) and the large boat still open. The first functional powered boat requires refined fuel and lubricating oil, connecting it to metalworking and refining. Oil sustains efficiency; dry operation gradually slows the engine, adding oil restores it, and idle boats consume neither product or condition. Load, pilot and unload at a bank or simple landing. No required port machine, boiler-pressure system or water-management simulation. Fuel exhaustion stops propulsion and leaves cargo aboard. Compact steam launch/workboat is a visual starting point; player-built variations should remain possible.
-
-Boat controls are physical and simple: a two-block-wide period-style wheel/lever console with fast, slow, neutral and reverse. The throttle belongs to the vessel and holds when the pilot leaves; steering releases, and neutral is the way to stop. Players can build cabins and storage after launch inside a fixed size box. Exact small-boat bounds and tuning live in the [vehicle reference](civilization-mod/vehicle-physics.md).
-
-The initial boat uses ordinary manually loaded chests and barrels. Bespoke bulk cargo mechanics remain deferred. A principal future freight use is moving bulk tier-two oil as liquid. Its tanks, transfer and portable packaging need a separate simple design; do not assume the first boat must ship with fluid plumbing or that oil's currency form is settled.
+Boats use the [freeform hull and engine direction](#bulk-freight-structures), superseding the earlier prefab platforms and fixed cabin bounds. Provide simple stable controls without mandatory linkages or manual balance engineering. Sable supplies motion; refined fuel and lubricant connect powered freight to industry. Existing chests, barrels, bunkers and tanks retain their current limits until physical-volume adapters and migration are implemented. [Vehicle controls and limits](civilization-mod/vehicle-physics.md) and [bulk storage](civilization-mod/industry.md#bulk-freight-storage) own shipped behavior; powered docking remains unfinished.
 
 World terrain must provide connected rivers wide/deep enough for useful routes, turning and landing opportunities. Not every tributary must be navigable. Train details, airship physics, precise speeds/capacities and comparative cost definitions remain open.
 
