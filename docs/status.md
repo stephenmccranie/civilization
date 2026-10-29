@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-10**. Current build: **0.34.48-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `9c27577e09c3e94596df89d506c761387f699825199b2fe90ed562a48881f2d8`.
+Last reviewed: **2026-10-29**. Current build: **0.34.49-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `c0f412f56e257c9fc745f02ecf78fd7e17b944d94cba5c03b134f067d9ffc794`.
 
 ## Implemented
 
@@ -17,10 +17,12 @@ Last reviewed: **2026-10-10**. Current build: **0.34.48-dev**, verified for publ
 | Firearms | Creative/admin Colt Paterson with cocking, reload custody and server-side projectiles: [firearms](../civilization-mod/firearms.md) |
 | Heat | Persistent local heat, material exchange, finite waste heat, shelter/rain effects, felt temperature, comfort and survey helmet: [heat](../civilization-mod/heat.md) |
 | Vehicles | Freeform engine-powered boats and a development-power airship prototype with assembly/disassembly and terrain safety: [vehicles](../civilization-mod/vehicle-physics.md) |
-| Physical foundation | Shared material/geometry properties, inspector and static Sable integration; dynamic contents mass is still pending: [physics](../civilization-mod/physics.md) |
+| Physical foundation | Shared material/geometry properties, inspectors, exact stone/cut-piece cargo accounting and static Sable integration; capacity enforcement and dynamic contents mass remain pending: [physics](../civilization-mod/physics.md) |
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Physical storage foundation:** 0.34.49-dev build, all **76 fast tests**, all **299 required server GameTests** and documentation checks passed. New coverage verifies exact full/native/custom stone-piece accounting, mixed/unknown/malformed items, partial/full/overfull capacity arithmetic, overflow rejection, operator permission and real player/container commands, unchanged stock, unopened loot and unloaded-target refusal. The read-only cargo audit uses shared material density and keeps material/storage volume separate. It does not enforce inventory limits, change vehicle mass, add carts/stockpiles or establish Survival balance. No rendering changed, so no visual client was run. Civilization Dev deployment checksum matched; the dedicated terrain server was not changed. [Commands and scope](../civilization-mod/physics.md#stone-cargo-accounting), [next stages](../development_plan.md#physical-storage-and-increasing-scale--active-package).
 
 - **Lacertan modeling study:** the owner chose to stay with GeckoLib and try the researched modeling approach. The current body-treatment prototype rebuilds connected torso/shoulder/arm masses, replaces raised body scale grids with fitted painted anatomy/scutes, and simplifies cloth panels while retaining the neutral head, fingers and exposed dorsal plates. It has 332 cuboids, 18 bones and four inherited clips. All 1,992 face UVs were checked at 64px/block; native geometry and animation exports reopen unchanged. Representative clay/painted section proofs, full front/three-quarter/side/back views and four sampled inherited poses were inspected. Initial painted brickwork and an unwanted forearm spike were corrected. The owner accepted this native design baseline, and the art skill/shared creature procedure now preserve the method for reuse. Workflow documentation and skill validation passed. Full animation clearances and Minecraft lighting/performance remain unreviewed; no runtime publication or entity behavior is claimed. The unchanged modeling tools previously passed **37 tests**. No paid service or renderer/plugin change was used. [Remaining work](../development_plan.md#first-custom-mob--modeling-approach-study). Runtime build/deployment remain unchanged.
 
@@ -52,6 +54,6 @@ Last reviewed: **2026-10-10**. Current build: **0.34.48-dev**, verified for publ
 
 ## Work direction
 
-The [manual huge-vein prototype](../development_plan.md#manual-coal-mining--prototype-package) now provides the complete Creative/admin loop while preserving normal small-coal mining. Next: ordinary mining-feel review, broader custody/lifecycle checks, Survival tool/processor choices, regional vein presentation and final Coal Drill retirement/migration. Resolve the suite investigation before merging the prototype PR. Cooking retains ordinary gentle/strong-heat batches to judge cue recognition, carryover, throughput and warmth before adding dishes or stations. Flight optimization remains deferred. The [development plan](../development_plan.md) owns package order and acceptance.
+The active [physical storage package](../development_plan.md#physical-storage-and-increasing-scale--active-package) starts with verified stone-volume accounting and operator diagnostics. Next: an inexpensive stockpile/cart and supply-fed local building before enforcing carrying limits, followed by a powered handling/freight loop on representative scale-6 terrain. The [manual huge-vein prototype](../development_plan.md#manual-coal-mining--prototype-package) retains its unfinished Survival, custody, presentation and drill-migration work; cooking follow-ups remain queued and flight optimization remains deferred. The [development plan](../development_plan.md) owns package order and acceptance.
 
 Completed code/docs/runtime resources are committed and pushed under the [GitHub workflow](../AGENTS.md#github-workflow); original art and visual-review history remain local. Older release hashes, experiments and session observations are preserved in the [development record](history/releases/development-through-0.34.23.md) and [history index](history/README.md).
