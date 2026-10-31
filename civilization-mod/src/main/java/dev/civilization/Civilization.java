@@ -50,6 +50,7 @@ public final class Civilization {
         CuttingContent.register(modBus);
         BuilderLineContent.register(modBus);
         CoalMiningContent.register(modBus);
+        WheelbarrowContent.register(modBus);
         RoadContent.register(modBus);
         CivicContent.register(modBus);
         ArenaContent.register(modBus);

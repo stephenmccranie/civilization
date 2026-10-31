@@ -20,6 +20,8 @@ The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous
 
 Shared [physical properties and inspector](physics.md) expose material mass, heat capacity, geometry and the Sable boundary. The [Airship Controller prototype](vehicle-physics.md#airship-prototype) assembles player-built flying machines and accepts typed numeric test power. Optional [speed-adaptive DH detail](vehicle-physics.md#speed-adaptive-distant-horizons-detail) reduces distant rendering work during fast travel and restores quality after slowing down.
 
+The Creative/admin [empty Wheelbarrow prototype](physics.md#empty-wheelbarrow-handling-prototype) can be placed, pushed over the ground, steered and recovered. It is the first general material-handling carrier's movement stage; cargo, capacity and Survival acquisition remain unfinished.
+
 [JEI processing recipes](industry.md#jei-recipe-discovery) make machine production, repairs, refining, cutting and canister transfers discoverable alongside ordinary crafting.
 
 ## Development
