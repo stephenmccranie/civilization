@@ -5,7 +5,7 @@ import net.minecraft.world.entity.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.*;
 
-/** Empty handling prototype; acquisition and cargo follow the movement review. */
+/** Empty handling prototype; shared-parts assembly supplies acquisition, cargo remains separate. */
 public final class WheelbarrowContent {
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems("civilization");
     private static final DeferredRegister<EntityType<?>> ENTITIES=DeferredRegister.create(Registries.ENTITY_TYPE,"civilization");

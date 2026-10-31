@@ -1,26 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "CHC",
-    "IFI"
-  ],
-  "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "H": {
-      "item": "minecraft:iron_pickaxe"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "F": {
-      "item": "civilization:machine_parts"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:coal_drill",
-    "count": 1
-  }
+  ]
 }

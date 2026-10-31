@@ -1,20 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "P P",
-    "III"
-  ],
-  "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "P": {
-      "item": "civilization:machine_parts"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:engine_cylinder",
-    "count": 1
-  }
+  ]
 }

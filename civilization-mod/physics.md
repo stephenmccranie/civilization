@@ -60,7 +60,7 @@ This is an operator diagnostic, not a Survival control. Existing carrying limits
 
 ## Empty wheelbarrow handling prototype
 
-The Wheelbarrow is available in the Civilization Creative tab or `/give @s civilization:wheelbarrow`. Survival acquisition, cargo and stockpiles remain unfinished. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
+The Wheelbarrow is assembled from prepared stock at the [Assembly Bench](manufacturing.md#fixtures-and-carriers), and remains available in Creative or `/give @s civilization:wheelbarrow`. Cargo and stockpiles remain unfinished. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
 
 Empty-hand right-click takes the handles. The player stands behind the carrier with a pushing arm pose, rather than sitting in its tray. **W/S** push forward/backward, **A/D** turn, and **Sneak** releases. Looking remains independent of steering. Opening a screen releases the handles; missing input stops drive after half a second. A parked empty carrier can be recovered with **Sneak + empty-hand right-click**. It cannot currently be broken by attacking it. Unclaimed carriers are shared; claim permissions apply to taking/recovering and are rechecked during movement. Access loss, death and entering water release the handler. Only one player can handle a carrier at once.
 

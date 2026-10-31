@@ -23,7 +23,7 @@ public final class WorkshopJobs {
         public int ticks(){return ticks*materialMultiplier();}
         public int heatSpent(int completedTicks){return completedTicks/workTicksPerHeat;}
         public int materialMultiplier(){
-            var e=equipment(output);if(e==null)return 1;
+            var e=equipment(output);if(e==null)return ManufacturingContent.materialMultiplier(output);
             return e.material()==Items.NETHERITE_INGOT?8:e.material()==Items.DIAMOND?4:e.material()==Items.GOLD_INGOT?2:1;
         }
         public String coalNote(){return String.format(Locale.ROOT,"Base coal: %.2f per batch%s. Temperature and idle burn affect usage.",heatSpent(ticks())/(double)ProductionEnergy.HEAT_TICKS,workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
@@ -34,7 +34,8 @@ public final class WorkshopJobs {
     public static Need need(Item item,int count){return count==0?empty():new Need(Ingredient.of(item),count);}
     public static Need empty(){return new Need(Ingredient.EMPTY,0);}
     private static Item item(String name){return BuiltInRegistries.ITEM.get(ResourceLocation.parse(name));}
-    public static synchronized List<Job> smithy(){
+    public static List<Job> smithy(){return ManufacturingJobs.forging();}
+    static synchronized List<Job> equipmentJobs(){
         if(smithy!=null)return smithy;
         var a=new ArrayList<Job>();a.add(new Job("Repair",ItemStack.EMPTY,List.of(),400));
         String[] shapes={"pickaxe","axe","shovel","hoe","sword","helmet","chestplate","leggings","boots"};
@@ -68,13 +69,13 @@ public final class WorkshopJobs {
         EQUIPMENT.put(result,new Equipment(result,material,amount,armor));
         jobs.add(new Job(result.getDescriptionId(),new ItemStack(result),List.of(need(material,amount),need(Items.LEATHER,1),armor?need(WorkshopContent.CLOTH.get(),2):empty(),need(Items.STICK,sticks)),result==Items.SHEARS?400:armor?1200:600));
     }
-    public static Equipment equipment(ItemStack s){smithy();return EQUIPMENT.get(s.getItem());}
+    public static Equipment equipment(ItemStack s){equipmentJobs();return EQUIPMENT.get(s.getItem());}
     public static boolean gated(ItemStack s){return equipment(s)!=null;}
     public static int index(int kind,String id){var jobs=jobs(kind);for(int i=0;i<jobs.size();i++)if(jobs.get(i).id().equals(id))return i;return -1;}
     public static List<Job> jobs(int kind){return switch(kind){
         case 0->List.of(new Job("Tanning",new ItemStack(Items.LEATHER),List.of(need(WorkshopContent.HIDE.get(),1),empty(),empty(),empty()),200,2));
         case 1->List.of(new Job("Weaving",WorkshopContent.CLOTH.toStack(2),List.of(new Need(Ingredient.of(ItemTags.WOOL),1),empty(),empty(),empty()),200,2));
-        default->smithy();};}
+        case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){
         int base=stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE,stack.getMaxDamage());
         return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*EquipmentGrade.value(stack)/100.0)):base;
@@ -86,7 +87,9 @@ public final class WorkshopJobs {
         int count=Math.max(1,(int)Math.ceil(e.amount()*.5*stack.getDamageValue()/stack.getMaxDamage()));
         var result=stack.copy();EquipmentGrade.apply(result,repairedGrade);result.setDamageValue(0);
         result.remove(DataComponents.REPAIR_COST);
-        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(e.material(),count),need(e.armor()?WorkshopContent.CLOTH.get():Items.LEATHER,1),empty()),400);
+        Item material=e.material()==Items.IRON_INGOT||e.material()==Items.GOLD_INGOT?ManufacturingContent.part(ManufacturingJobs.metal(e.material()),"plate"):e.material();
+        Item fitting=e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;
+        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material,count),need(fitting,1),empty()),200);
     }
     public static ItemStack result(Job job,ItemStack first){
         var out=job.output().copy();

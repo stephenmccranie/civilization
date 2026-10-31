@@ -68,6 +68,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("chests")){ChestVisualCheck.tick(mc);return;}
         if(CHECK.equals("inventory")){InventoryVisualCheck.tick(mc);return;}
         if(CHECK.equals("workshops")){WorkshopVisualCheck.tick(mc);return;}
+        if(CHECK.equals("assembly")){AssemblyVisualCheck.tick(mc);return;}
         if(CHECK.equals("industry")){IndustryVisualCheck.tick(mc);return;}
         if(CHECK.equals("pipes")){PipeVisualCheck.tick(mc);return;}
         if(CHECK.equals("jei")){JeiVisualCheck.tick(mc);return;}

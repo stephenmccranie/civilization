@@ -8,12 +8,12 @@ Start with ordinary hand-mined Coal, build the Kiln/Foundry/Smithy, then obtain 
 
 | Item | Route | Materials |
 | --- | --- | --- |
-| Coal Mining Pick | Smithy, 30 seconds | 3 Iron Ingots, 2 Sticks, 1 Leather |
-| Coal Loading Shovel | Smithy, 30 seconds | 1 Iron Ingot, 2 Sticks, 1 Leather |
-| Coal Minecart | Shapeless crafting | 1 ordinary Minecart, 2 Planks, 1 Iron Ingot |
-| Coal Preparation Screen | Crafting: `PIP / S S / PIP` | 4 Planks, 2 Iron Ingots, 2 Sticks |
+| Coal Mining Pick | Forge + Assembly Bench | Iron Pickaxe Head + complete Tool Handle |
+| Coal Loading Shovel | Forge + Assembly Bench | Iron Shovel Head + complete Tool Handle |
+| Coal Minecart | Assembly Bench, 10 seconds | 4 Planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners |
+| Coal Preparation Screen | Assembly Bench, 10 seconds | 4 Planks + 2 Iron Plates + 2 Sticks |
 
-Each Smithy tool spends 1.5 Coal at base efficiency, receives an equipment grade, and uses the existing Smithy repair rules. Mixed plank species are accepted. The full kit costs 12 Iron Ingots (including the five in a normal cart), 2 Leather, 6 Sticks and 6 Planks, plus Smithy fuel and separate rails. No machine parts, steel or oil are needed for this manual upgrade. The hand screen retains its existing work/calorie costs.
+An iron head takes 25 seconds and 1.25 Coal at base efficiency (3 ingots for the pick, 1 for the shovel); final assembly takes five seconds by hand without Coal. A plank plus Leather makes four complete handles, so there is no separate grip charge per tool. Tools receive grade on completion and use Assembly Bench repairs. Mixed planks work for the handling infrastructure. Machine Parts require coal-era steel/copper preparation; oil is unnecessary. [Manufacturing](manufacturing.md) owns exact parts/batch costs and rails. The preparation screen's actual mining work/calorie costs remain unchanged.
 
 The pick starts manual excavation of naturally generated dense geological coal-seam blocks. Place ordinary rails and a screen beside the worksite, expose a seam, and follow the loop below. The Creative tab still supplies a **Huge Coal Vein** workface for demonstrations; the resource block itself has no Survival crafting recipe.
 

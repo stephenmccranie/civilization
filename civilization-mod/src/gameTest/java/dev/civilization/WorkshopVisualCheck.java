@@ -21,7 +21,7 @@ final class WorkshopVisualCheck {
                     var w=(WorkshopBlockEntity)l.getBlockEntity(at(kind));CoalFireFixture.light(w);w.setItem(4,KilnContent.MINERAL_COAL.toStack(8));
                     if(kind==0)w.setItem(0,WorkshopContent.HIDE.toStack(8));
                     if(kind==1)w.setItem(0,new ItemStack(Items.WHITE_WOOL,8));
-                    if(kind==2){var pick=new ItemStack(Items.IRON_PICKAXE);pick.setDamageValue(220);w.setItem(0,pick);w.setItem(1,new ItemStack(Items.IRON_INGOT,8));w.setItem(2,new ItemStack(Items.LEATHER,8));}
+                    if(kind==2){w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));w.setItem(0,new ItemStack(Items.IRON_INGOT,8));}
                 }
                 var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(l,44,109,-14,java.util.Set.of(),24,24);l.setDayTime(6000);ready=true;
             }catch(Throwable t){failure=t;}});
@@ -39,11 +39,11 @@ final class WorkshopVisualCheck {
             if(ticks==155+k*40){mc.options.hideGui=false;server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),at(kind).getX()+.5,101,-2,java.util.Set.of(),0,0);p.openMenu((WorkshopBlockEntity)server.overworld().getBlockEntity(at(kind)));});}
             if(ticks==185+k*40){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.kind()!=kind)throw new IllegalStateException("Menu kind did not synchronize: "+kind);shot(mc,"menu-"+kind);}
         }
-        if(ticks==270)server.execute(()->{var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(2));w.clearContent();w.select(1);var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.openMenu(w);});
+        if(ticks==270)server.execute(()->{var l=server.overworld();l.setBlockAndUpdate(at(2),WorkshopContent.BENCH.get().defaultBlockState());var w=(WorkshopBlockEntity)l.getBlockEntity(at(2));w.select(WorkshopJobs.index(3,"minecraft:iron_pickaxe"));var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.openMenu(w);});
         if(ticks==290){click(mc,"Tools");click(mc,"Iron");}
         if(ticks==300){
             long count=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button b&&b.visible&&b.getWidth()>80).count();
-            if(count!=6)throw new IllegalStateException("Tools / Iron must have six results, found "+count);
+            if(count!=8)throw new IllegalStateException("Tools / Iron must have eight results, found "+count);
             shot(mc,"recipe");
         }
 
@@ -61,7 +61,7 @@ final class WorkshopVisualCheck {
             if(!(mc.screen instanceof dev.civilization.client.WorkshopScreen))throw new IllegalStateException("Recipe search closed the menu");
         }
         if(ticks==315){var button=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button b&&b.visible&&b.getMessage().getString().equals("Diamond Pickaxe")).map(c->(net.minecraft.client.gui.components.Button)c).findFirst().orElseThrow();mc.screen.mouseClicked(button.getX()+4,button.getY()+4,0);mc.screen.mouseReleased(button.getX()+4,button.getY()+4,0);}
-        if(ticks==330){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.selection()!=19)throw new IllegalStateException("Filtered recipe selection did not synchronize");shot(mc,"search");}
+        if(ticks==330){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.selection()!=WorkshopJobs.index(3,"minecraft:diamond_pickaxe"))throw new IllegalStateException("Filtered recipe selection did not synchronize");shot(mc,"search");}
         if(ticks==332){click(mc,"Armor");click(mc,"Netherite");var field=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.EditBox).map(c->(net.minecraft.client.gui.components.EditBox)c).findFirst().orElseThrow();field.setValue("");}
         if(ticks==337){click(mc,"Netherite Helmet (upgrade)");shot(mc,"upgrade");}
         if(ticks==340){
@@ -71,7 +71,7 @@ final class WorkshopVisualCheck {
         if(ticks==343){click(mc,"Recipes");shot(mc,"collapsed");}
         if(ticks==346){click(mc,"Recipes");mc.options.guiScale().set(4);mc.resizeDisplay();}
         if(ticks==350)shot(mc,"scale-4");
-        if(ticks==355){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
+        if(ticks==355){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();server.overworld().setBlockAndUpdate(at(2),WorkshopContent.SMITHY.get().defaultBlockState());p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
         if(ticks==370)mc.options.hideGui=true;
         if(ticks==375)shot(mc,"smithy-rear");
         if(ticks==376)mc.options.hideGui=false;

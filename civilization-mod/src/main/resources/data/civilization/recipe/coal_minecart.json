@@ -1,10 +1,7 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "minecraft:minecart" },
-    { "tag": "minecraft:planks" },
-    { "tag": "minecraft:planks" },
-    { "item": "minecraft:iron_ingot" }
-  ],
-  "result": { "id": "civilization:coal_minecart", "count": 1 }
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
+    }
+  ]
 }
