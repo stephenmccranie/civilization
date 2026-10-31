@@ -266,6 +266,7 @@ public final class ThermalField extends SavedData {
     private Exchange scheduled;
     // A busy field slows its own simulation instead of borrowing an unbounded server tick.
     static final long SOLVER_BUDGET_NS=5_000_000;
+    static final int TIMED_STEP_TICKS=10;
     long completedExchanges;
     private long lastExchangeTick=Long.MIN_VALUE;
     boolean exchanging(){return scheduled!=null;}
@@ -305,9 +306,9 @@ public final class ThermalField extends SavedData {
         beginTick(now);
         if(scheduled==null){
             if(energy.isEmpty()&&timeline.empty()){timeline.commit(now);scratch.release();return;}
-            scheduledTarget=timeline.committed+5;
+            scheduledTarget=timeline.committed+TIMED_STEP_TICKS;
             if(now<scheduledTarget)return;
-            reserveHeadroom();scheduled=new Exchange(level,timeline.through(scheduledTarget));
+            reserveHeadroom();scheduled=new Exchange(level,timeline.through(scheduledTarget),TIMED_STEP_TICKS/5,true);
         }
         long deadline=System.nanoTime()+SOLVER_BUDGET_NS;
         scheduled.refreshChunks(); // Recheck loaded status across yielded server ticks.
@@ -330,8 +331,8 @@ public final class ThermalField extends SavedData {
             if(scheduled==null){
                 if(work>=workLimit||System.nanoTime()>=deadline)return;
                 if(energy.isEmpty()&&timeline.empty()){timeline.commit(now);scratch.release();return;}
-                scheduledTarget=timeline.committed+5;if(now<scheduledTarget)return;
-                reserveHeadroom();scheduled=new Exchange(level,timeline.through(scheduledTarget));scheduled.refreshChunks();
+                scheduledTarget=timeline.committed+TIMED_STEP_TICKS;if(now<scheduledTarget)return;
+                reserveHeadroom();scheduled=new Exchange(level,timeline.through(scheduledTarget),TIMED_STEP_TICKS/5,true);scheduled.refreshChunks();
             }
         }while(work<workLimit&&System.nanoTime()<deadline);
     }
@@ -344,10 +345,20 @@ public final class ThermalField extends SavedData {
             energy=exchange.result;atmosphereExchange+=exchange.atmosphereExchange;setDirty();
         }
     }
+    /** Synchronous coarse integration for controlled cadence experiments. */
+    void coarseStep(ServerLevel level,int quarters,boolean accelerateConduction){
+        if(quarters<1||quarters>8)throw new IllegalArgumentException("Coarse interval must be 1-8 quarters");
+        if(scheduled!=null)throw new IllegalStateException("Cannot synchronously step an active thermal exchange");
+        reserveHeadroom();var exchange=new Exchange(level,List.of(),quarters,accelerateConduction);
+        exchange.inputsReady=true;exchange.copy(Integer.MAX_VALUE);exchange.buildLayout(Integer.MAX_VALUE);exchange.read(Integer.MAX_VALUE);
+        while(!exchange.prepare(Integer.MAX_VALUE)){}
+        energy=exchange.result;atmosphereExchange+=exchange.atmosphereExchange;setDirty();
+    }
     /** Pending transfers never modify the source field until every pair has been read. */
     private final class Exchange {
         final ServerLevel level;
         final boolean directLevel;
+        final double coolingRate,conductionScale;
         // Copy the source field in bounded slices. Emissions arriving during the copy
         // stay in the live field and its journal, so they enter the published result once.
         final Long2DoubleOpenCustomHashMap snapshot=new Long2DoubleOpenCustomHashMap(Math.min(energy.size(),32768),HeatMaps.POSITIONS);
@@ -382,6 +393,11 @@ public final class ThermalField extends SavedData {
         int copyCursor,cursor;
         Exchange(ServerLevel level){this(level,List.of());inputsReady=true;}
         Exchange(ServerLevel level,List<Long2DoubleOpenCustomHashMap> inputs){
+            this(level,inputs,1,false);
+        }
+        Exchange(ServerLevel level,List<Long2DoubleOpenCustomHashMap> inputs,int quarters,boolean accelerateConduction){
+            coolingRate=quarters==1?ThermalRules.OUTDOOR_EXCHANGE:1-Math.pow(1-ThermalRules.OUTDOOR_EXCHANGE,quarters);
+            conductionScale=accelerateConduction?quarters:1;
             inputFrames=inputs;
             heights.defaultReturnValue(Integer.MIN_VALUE);
             rainCooling.defaultReturnValue(Double.NaN);
@@ -493,7 +509,7 @@ public final class ThermalField extends SavedData {
                 // here would create a second, contradictory heat-transfer path.
                 if(a.material.lava)continue;
                 double ta=a.ambient+initialEnergy[index]/a.material.capacity;
-                if(a.outside){double loss=(ta-a.ambient)*a.material.capacity*ThermalRules.OUTDOOR_EXCHANGE;transfer(index,-loss);atmosphereExchange+=loss;}
+                if(a.outside){double loss=(ta-a.ambient)*a.material.capacity*coolingRate;transfer(index,-loss);atmosphereExchange+=loss;}
                 if(a.outside&&p.getY()==level.getMaxBuildHeight()-1){
                     double outflow=ThermalRules.EXPOSED_BUOYANT_RISE*Math.max(0,ta-a.ambient);
                     transfer(index,-outflow);atmosphereExchange+=outflow;
@@ -528,6 +544,12 @@ public final class ThermalField extends SavedData {
                     // for upward convection instead of spreading equally sideways.
                     if(d.getAxis().isHorizontal()&&a.material.air&&b.material.air&&(a.outside||b.outside))
                         rate=ThermalRules.EXPOSED_AIR_MIXING;
+                    // Coarse air mixing keeps its stable original stencil. Material
+                    // interfaces can advance faster, but six faces must not spend
+                    // more than 90% of a solid cell's capacity per sweep. Air
+                    // interfaces reserve extra room for open-sky advection/loss.
+                    if(conductionScale!=1&&!(a.material.air&&b.material.air))
+                        rate=Math.min(rate*conductionScale,(a.material.air||b.material.air?.10:.15)*Math.min(a.material.capacity,b.material.capacity));
                     double flow=(ta-tb)*rate+openness*ThermalRules.buoyantFlux(a.material.air,b.material.air,a.outside,b.outside,
                             d,ta,tb,a.ambient,b.ambient);
                     transfer(index,-flow);transfer(other,flow);

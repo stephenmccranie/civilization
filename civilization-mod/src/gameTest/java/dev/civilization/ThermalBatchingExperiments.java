@@ -7,13 +7,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 
-/** Development-only cadence trial: fewer unchanged stable exchanges, not scaled explicit fluxes. */
+/** Development-only comparison of reference, skipped-step and bounded coarse integration. */
 final class ThermalBatchingExperiments {
-    private record Mode(String name,int quarters,boolean burst) {}
+    private record Mode(String name,int quarters,boolean burst,int passes,boolean cooling,boolean conduction) {
+        Mode(String name,int quarters,boolean burst){this(name,quarters,burst,burst?quarters:1,false,false);}
+    }
     private record Result(double warm,double cold,double centerWarm,double centerCold,double airWarm,double airCold,int cells,int steps,
                           double error,double wall,double cpu,long allocated,ThermalField field) {}
     private static final List<Mode> MODES=List.of(new Mode("quarter",1,false),new Mode("burst-four",4,true),
-        new Mode("half-second",2,false),new Mode("one-second",4,false),new Mode("two-second",8,false));
+        new Mode("half-second",2,false),new Mode("one-second",4,false),new Mode("two-second",8,false),
+        new Mode("one-cooled",4,false,1,true,false),new Mode("one-conductive",4,false,1,true,true),
+        new Mode("one-two-pass",4,false,2,true,true));
     private static final BlockPos SOURCE=new BlockPos(136,65,136);
     private static double energy(ThermalField field){return field.energy.values().doubleStream().sum();}
     private static double air(ServerLevel level,ThermalField field){
@@ -35,11 +39,13 @@ final class ThermalBatchingExperiments {
         var field=new ThermalField();double warm=0,centerWarm=0,airWarm=0,error=0;int steps=0;
         long bytes=bean.getCurrentThreadAllocatedBytes(),cpu=bean.getCurrentThreadCpuTime(),start=System.nanoTime();
         for(int tick=0;tick<totalQuarters;tick+=mode.quarters){
-            int passes=mode.burst?mode.quarters:1;
+            int passes=mode.passes;
             for(int sub=0;sub<passes;sub++){
-                int at=tick+(mode.burst?sub:0),duration=mode.burst?1:mode.quarters;
+                int duration=mode.quarters/passes,at=tick+sub*duration;
                 if(at<heatQuarters)field.add(level,SOURCE,6d*Math.min(duration,heatQuarters-at));
-                field.quarterStep(level,false);steps++;
+                if(mode.cooling)field.coarseStep(level,duration,mode.conduction);
+                else field.quarterStep(level,false);
+                steps++;
             }
             if(tick+mode.quarters==heatQuarters){warm=energy(field);centerWarm=field.excess(level,SOURCE);airWarm=air(level,field);}
         }

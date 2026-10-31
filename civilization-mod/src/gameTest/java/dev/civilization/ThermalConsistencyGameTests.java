@@ -7,6 +7,39 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class ThermalConsistencyGameTests {
+    @GameTest(template="industrial") public static void coarseMaterialInterfacesRemainStableAndConservative(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
+        for(var block:java.util.List.of(Blocks.BRICKS,Blocks.OAK_PLANKS,Blocks.IRON_BLOCK,Blocks.BRICK_SLAB)){
+            for(var at:BlockPos.betweenClosed(p.offset(-3,-3,-3),p.offset(3,3,3)))
+                l.setBlockAndUpdate(at,((at.getX()+at.getY()+at.getZ())&1)==0?block.defaultBlockState():Blocks.AIR.defaultBlockState());
+            l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());
+            for(int duration:new int[]{2,4,8})for(int sign:new int[]{-1,1}){
+                var field=new ThermalField();field.add(l,p,sign*100);
+                for(int step=0;step<8;step++)field.coarseStep(l,duration,true);
+                h.assertTrue(Math.abs(field.energy.values().doubleStream().sum()+field.atmosphereExchange-sign*100)<1e-6,
+                    "Coarse interfaces must conserve positive and negative pulses");
+                for(long key:field.energy.keySet()){
+                    double value=field.excess(l,BlockPos.of(key));
+                    h.assertTrue(Double.isFinite(value)&&value>=Math.min(0,sign*100)-.1&&value<=Math.max(0,sign*100)+.1,
+                        "Coarse interface scaling cannot create passive overshoot");
+                }
+            }
+        }
+        // Open-top conductive pocket: sky advection and loss must fit alongside
+        // five material interfaces, rather than over-spending the air cell.
+        for(var at:BlockPos.betweenClosed(p.offset(-3,-3,-3),p.offset(3,3,3)))l.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+        for(var direction:Direction.values())if(direction!=Direction.UP)l.setBlockAndUpdate(p.relative(direction),Blocks.IRON_BLOCK.defaultBlockState());
+        h.assertTrue(l.canSeeSky(p),"Exposed-pocket regression requires an open sky column");
+        for(int duration:new int[]{2,4,8}){
+            var field=new ThermalField();field.add(l,p,100);field.coarseStep(l,duration,true);
+            for(long key:field.energy.keySet()){
+                double value=field.excess(l,BlockPos.of(key));
+                h.assertTrue(Double.isFinite(value)&&value>=-.1&&value<=100.1,"Coarse sky pocket cannot overspend its warm air");
+            }
+            h.assertTrue(Math.abs(field.energy.values().doubleStream().sum()+field.atmosphereExchange-100)<1e-6,"Coarse sky pocket must conserve its pulse");
+        }
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void mixedCutGeometryStaysPositionSpecificAndFresh(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,4,6));var q=p.east(7);
         for(var at:BlockPos.betweenClosed(p.offset(-2,-2,-2),q.offset(2,2,2)))l.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
