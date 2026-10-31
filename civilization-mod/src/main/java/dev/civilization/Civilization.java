@@ -30,7 +30,7 @@ public final class Civilization {
         SoilChunk.register(modBus);
         OilRetrofitChunk.register(modBus);
         Accessories.register(modBus);
-        modBus.addListener(CaloriePayload::register);
+        modBus.addListener((net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) -> CaloriePayload.register(event, version));
         modBus.addListener(LandPayload::register);
         modBus.addListener(TradePayload::register);
         modBus.addListener(SurveyPayload::register);

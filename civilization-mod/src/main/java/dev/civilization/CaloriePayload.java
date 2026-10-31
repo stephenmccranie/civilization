@@ -18,8 +18,9 @@ public record CaloriePayload(double calories, double capacity, double sprintMini
         }
     };
     @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
-    public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("3").playToClient(TYPE, CODEC, (payload, context) ->
+    public static void register(RegisterPayloadHandlersEvent event, String modVersion) {
+        // Required by default: NeoForge rejects missing channels and unequal versions before play.
+        event.registrar("3/" + modVersion).playToClient(TYPE, CODEC, (payload, context) ->
                 CalorieFoodData.of(context.player()).receive(payload.calories, payload.capacity, payload.sprintMinimum, payload.depleted, payload.recovery));
     }
 }

@@ -14,6 +14,8 @@ Target up to 200 concurrent players, maintained by one human with assistant supp
 
 The baseline full day/night cycle is 60 minutes with vanilla phase proportions; gameplay simulation keeps its normal tick rate.
 
+Joining a Civilization server requires the owner's distributed Civilization mod at the same version as the server. Missing and unequal versions must be rejected before play through the normal mod handshake. This is a compatibility requirement, not authentication of an unmodified client; client-only graphics mods may differ. [Connection behavior](civilization-mod/README.md#server-connections) owns the implementation boundary.
+
 ### Setting and material style
 
 When Grassier Grass is installed, disable its automatic white blade tint from cold biome/altitude alone. Keep the normal biome grass color; actual snow cover and snow rules remain independent. [Client compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns the supported version and implementation boundary.

@@ -67,6 +67,8 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 ## 1. Implemented foundation
 
+Server admission requires the same Civilization version on both sides through NeoForge's required channel negotiation. [Connection behavior and limits](civilization-mod/README.md#server-connections), [validation](docs/status.md#validation-and-limits). This does not certify client integrity or complete the broader operational-readiness work.
+
 Optional Grassier Grass client compatibility disables automatic cold/altitude blade whitening; [supported version and behavior](civilization-mod/README.md#grassier-grass-compatibility), [validation](docs/status.md).
 
 | IDs | Completed scope |

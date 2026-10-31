@@ -6,6 +6,8 @@ The GameTest-only coal-fire fixture resets the reused test server's thermal Save
 
 Use the smallest check that covers the changed behavior. Do not run the whole battery after every edit, and do not repeat successful checks without a relevant code change or unresolved failure.
 
+`ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching, missing, legacy and unequal-version clients. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
+
 | Change | Check |
 | --- | --- |
 | Documentation or local configuration | Inspect the edit; no Minecraft launch |
