@@ -16,6 +16,7 @@
 | [Development plan](../development_plan.md) | Dependency order, checklist and implementation contracts |
 | [Open decisions](../open_decisions.md) | Unresolved choices and labeled proposals |
 | [Mod reference](../civilization-mod/README.md) | Current behavior, recipes, commands and configuration |
+| [Prism playtest client](../modpack/README.md) | Installation, pinned downloads, DH/Photon/Patrix settings and pack maintenance |
 | [Physical foundation](../civilization-mod/physics.md) | Shared materials, mass/capacity distinction, geometry inspector and Sable boundary |
 | [Cutting](../civilization-mod/cutting.md) | Geometry, placement, recombination and migration |
 | [Multiblocks](../civilization-mod/multiblock-builds.md) | Layouts, guides, hoppers and interruption behavior |

@@ -2,6 +2,12 @@
 
 A custom Minecraft civilization MMO: personal labor grows into industry, trade, concentrated power, and extraordinary sky settlements. Hierarchy and visible status are part of the competition. Target: up to 200 concurrent players, maintained by one human with assistant support.
 
+## Playtest client — Prism Launcher
+
+[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-1/Civilization-playtest-0.34.54-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
+
+Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Civilization must match the server's version; use the announced pack instead of independently updating its mods.
+
 ## Start here
 
 | Need | Document |
@@ -13,7 +19,7 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 | Recipes, controls and development commands | [Mod reference](civilization-mod/README.md) |
 | All references and historical material | [Documentation index](docs/README.md) |
 
-Java + NeoForge; Photon is the recommended shader. New Civilization artwork targets 64×64 pixels per standard block face/item, beginning with Street Pavers; existing 32×32 art will migrate by family. Faithful 32x remains the companion pack for vanilla assets. Exact runtime versions live in [gradle.properties](civilization-mod/gradle.properties). The concurrency target is a design goal, not verified capacity.
+Java + NeoForge; Photon is the recommended shader. New Civilization artwork targets 64×64 pixels per standard block face/item, beginning with Street Pavers; existing 32×32 art will migrate by family. The published playtest client uses Patrix 32x for vanilla assets; Faithful remains the development art-review companion. Exact runtime versions live in [gradle.properties](civilization-mod/gradle.properties). The concurrency target is a design goal, not verified capacity.
 
 ## Project layout
 
@@ -25,6 +31,7 @@ Java + NeoForge; Photon is the recommended shader. New Civilization artwork targ
 - `docs/history/`: old release notes and bounded playtest observations.
 - `docs/archive/`: frozen document snapshots.
 - `tools/`: small project-maintenance tools.
+- `modpack/`: public, download-only Prism client manifest and reviewed starting settings.
 - Ignored local state: `.tools/`, Gradle/build caches, mod `run/` and `runs/`, and `dev.local.json`. These are not additional source trees.
 
 Each rule has one home. Update the relevant reference with the code or decision; keep proposals separate from shipped behavior. [Contributor instructions](AGENTS.md) make this part of the normal workflow.

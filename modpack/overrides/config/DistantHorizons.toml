@@ -1,0 +1,29 @@
+# Multiplayer starting defaults for Distant Horizons 3.3.3.
+# Omit thread counts: DH's Balanced default scales to each player's CPU.
+_version = 5
+
+[server]
+generationRequestRateLimit = 64
+syncOnLoadRateLimit = 64
+# Per player, KB/s. The server can impose a lower limit.
+playerBandwidthLimit = 1024
+enableAdaptiveTransferSpeed = false
+
+[common.lodBuilding]
+databaseSyncMode = "NORMAL"
+
+[common.worldGenerator]
+generatorPlan = "CHUNKS_ONLY"
+chunkGeneratorMode = "PRE_EXISTING_ONLY"
+pauseIfMovingQuickly = false
+
+[client.advanced.autoUpdater]
+enableAutoUpdater = false
+enableSilentUpdates = false
+
+[client.advanced.graphics.quality]
+horizontalQuality = "LOW"
+verticalQuality = "MEDIUM"
+maxHorizontalResolution = "TWO_BLOCKS"
+lodChunkRenderDistanceRadius = 256
+lodBiomeBlending = 0
