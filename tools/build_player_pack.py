@@ -14,7 +14,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'modpack'
 OVERRIDES = {
-    'config/DistantHorizons.toml', 'config/iris.properties', 'options.txt',
+    'config/DistantHorizons.toml', 'config/iris.properties', 'config/grassiergrass-client.toml', 'options.txt',
     'shaderpacks/photon_v1.3b.zip.txt',
 }
 USER_AGENT = 'Civilization-playtest-pack/1 (github.com/stephenmccranie/civilization)'
