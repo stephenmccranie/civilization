@@ -8,6 +8,8 @@ Use the smallest check that covers the changed behavior. Do not run the whole ba
 
 Coal movement regressions query the real blockstate collision/suffocation/support paths, move a player through removed material, remove support without changing the workface blockstate, verify a chunk rolls off a narrow remnant, and resume gravity after a landed chunk loses its floor. Existing stock, cancellation and hauling checks remain. The guarded `coal-mining` client also receives a partial mask, stands inside the mined notch and checks that idle horizontal position remains stable.
 
+The focused `derrick-guide` scene also checks ambient-light sampling: the opaque controller reports zero skylight while exposed surroundings supply full skylight, without dropping local block light. Review the matched front/rear daylight views under Photon Medium, plus the night view, alongside the existing guide, animation, gallery and crown-culling checks. Native model/texture assets are unchanged for this renderer repair.
+
 `ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching, missing, legacy and unequal-version clients. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
 
 | Change | Check |
