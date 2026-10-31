@@ -6,6 +6,8 @@ Read this for shaped blocks, machines, vehicles and creatures. The asset pipelin
 
 Generated multi-view studies can disagree with themselves. Compare the same landmarks across views before modeling; resolve discrepancies in one measured native assembly rather than copying each silhouette independently. For carriers, measure usable interior separately from the outer envelope and check wheel contact, resting supports and grip reach before proposing capacity. Review moving parts over their full travel, including any body tilt that changes ground contact.
 
+Inspect load-bearing supports from inside an open carrier as well as underneath: a connected frame can still intrude through the cargo floor. Fit sloping tray corners in native geometry before disguising them with straps or textures. Include complete orthographic views alongside close-ups; a cropped wheel or handle cannot establish whole-object proportions or clearance.
+
 Use a small set of measured landmarks: overall envelope, primary mass ratios, shaft axes, contact heights and rotating clearances. Record them in the asset brief. A beautiful perspective image is not a dimensioned blueprint. Treat ambiguous hidden geometry as a design problem, not as something the generator has solved.
 
 Block out the **whole assembly** before detailing one component. Use a single neutral material to expose poor proportions; check front, back, both sides and two three-quarter views at the same scale. Then test the actual material palette. Keep the known-good runtime asset intact until the replacement passes review.
