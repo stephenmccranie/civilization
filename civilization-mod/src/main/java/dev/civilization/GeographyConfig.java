@@ -9,7 +9,7 @@ public final class GeographyConfig {
         var b = new ModConfigSpec.Builder();
         RIVER_RADIUS = b.comment("River biome band radius in blocks, evaluated on a four-block grid.")
                 .defineInRange("riverRadius", 48, 0, 64);
-        WATER_Y = b.comment("Natural river water surface Y; vanilla Overworld water is Y=62. Also anchors biome sampling.")
+        WATER_Y = b.comment("Fallback river water surface Y and biome sampling height; vanilla is Y=62. Supported Terrain Diffusion rivers use their own natural surface elevation.")
                 .defineInRange("riverWaterY", 62, -64, 319);
         BELOW = b.comment("Eligible soil blocks below the river water surface.")
                 .defineInRange("farmlandBelowWater", 4, 0, 16);

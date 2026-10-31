@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-30**. Current build: **0.34.50-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `2551611289f2438c36ea3d27f143250aca626652befd77f2d3c4eeb0775971bd`.
+Last reviewed: **2026-10-30**. Current build: **0.34.51-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `77e8c1d1c4faabd6634f39fc84208a5065e237b98260042b796645b74e9ee72a`.
 
 ## Implemented
 
@@ -21,6 +21,8 @@ Last reviewed: **2026-10-30**. Current build: **0.34.50-dev**, verified for publ
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Elevated river farming:** 0.34.51-dev build, all **78 fast tests**, all **299 required server GameTests**, and Civilization Dev deployment passed. Supported Alesrr Terrain Diffusion surface rivers supply their own water elevation; the 48-block band and four-below/eight-above soil allowance remain. High surface biomes are sampled above terrain rather than inside cave biomes. Dry/underground reaches and player water cannot create eligibility. Other generators retain the configured reference elevation. Tests cover high terraces, nearest-river selection, cache reconstruction and the unchanged real crop/fertilizer/forestry routes. The reused GameTest save had saturated its heat-source queue at old randomized fixture locations; a GameTest-server-only reset now isolates each suite without changing production heat behavior or assertions. The dedicated Candidate 5 scale-4 world has a private Terralith eligibility datapack for deposits, uranium, woodland and warm rivers; its previous world/map were preserved. Broad-world deposit abundance, elevated-river crop growth in the actual fork, climate restrictions and navigable freight remain unverified. No rendering changed, so no visual client was launched. [Rules and integration limits](../civilization-mod/geography.md).
 
 - **Grassier Grass tint compatibility:** build and all **76 fast tests** passed. The guarded hidden client with Grassier Grass 1.4.5 passed 54 actual transformed snow-blend calls and low/high taiga precipitation checks (Y=80 rain / Y=240 snow) in clear weather. Low/high blade views with Clean 1.21.1's Photon 1.4, shader settings and Faithful 64x inputs, plus the high platform with shaders disabled, were inspected and remained green. A separate absent-mod client run passed. Deployment checksum matched. The override disables blade snow tint entirely and applies only to verified Grassier Grass 1.4.5; it does not alter actual snow or biome rules. The full Clean modpack was not launched or modified, and that instance currently lacks Civilization. This client-only change did not rerun the unchanged server GameTests. [Behavior and compatibility](../civilization-mod/README.md#grassier-grass-compatibility), [focused check](../civilization-mod/testing.md#focused-visual-checks).
 

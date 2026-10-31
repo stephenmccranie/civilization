@@ -11,7 +11,7 @@ Inspection uses short, direct wording: **Can farm here | Trees grow fast**. Unsu
 | Property | Starting behavior |
 | --- | --- |
 | River farmland | Within 48 blocks of a river or frozen-river biome, measured on the four-block biome grid |
-| Height | Ground must be at Y58–70, inclusive: four blocks below to eight above the standard river water surface at Y62 |
+| Height | Four blocks below to eight above the nearest natural river's top water block. Supported Terrain Diffusion rivers use their local elevation, including high valleys; other generators retain the configured Y62 reference (Y58–70 soil) |
 | Eligible crops | Wheat, fertilized wheat, carrots, potatoes, beetroot, melon/pumpkin stems, torchflower/pitcher crops, sweet berries, sugar cane and cocoa |
 | Woodland | Forest, taiga and jungle biome families, cherry groves and mangrove swamps |
 | Trees | Saplings retain vanilla random-tick speed in woodland; outside woodland they receive one quarter as many attempts |
@@ -26,15 +26,17 @@ Placed water cannot create eligibility or give farmland the rain bonus. Non-farm
 
 `Geography.inspect(level, soilPos)` returns overlapping river-band, height and woodland properties plus a readable failure reason. `canFarm` accepts the **ground** position; growth checks use the block immediately below the ticking crop. For multi-block sugar cane, each ticking segment must remain within the height band. `woodland` is a cheap independent query for tree growth.
 
-The generator's biome source is sampled at the configured river water level, on four-block cells. Distance is circular between cell centers, so boundaries have four-block steps rather than exact block-level distance from a shoreline. The geographic query uses no block scans, chunk loads or background simulation. The separate weather/farming layer persists sparse soil and crop-production state in active farm chunks. Edits to water, trees or `/fillbiome` do not change the generator's geographic properties.
+The generator's biome source is sampled on four-block cells. Distance is circular between cell centers, so boundaries have four-block steps rather than exact block-level distance from a shoreline. The geographic query uses no placed-block scans, Minecraft chunk tickets or background simulation. The separate weather/farming layer persists sparse soil and crop-production state in active farm chunks. Edits to water, trees or `/fillbiome` do not change the generator's geographic properties.
 
-This first representation uses a **river-biome corridor**, not detection of naturally generated water blocks. Dry stretches within a river biome can qualify; oceans, lakes and player canals do not create bands. It assumes the standard Overworld water elevation rather than inferring local river heights. Natural, ceiling-free custom dimensions use the same rule and configuration. Tectonic's supplied Overworld noise settings retain sea level 63, but this alone does not establish that every generated river or underground stream is suitable farmland. Elevated/local river levels and navigable channel geometry still need a separate terrain survey before choosing a permanent generator.
+For Alesrr Terrain Diffusion's surface-water API (integration targets 1.4.1), river-tagged cells also require a generated surface-water column. The API supplies the nearest cell's local water elevation; underground reaches and dry corridors do not qualify. Biomes are sampled above the terrain to avoid treating a high river or forest as its underlying cave biome. Existing bounded caches retain each sampled water height, so neighboring farms reuse it. The query can populate the generator's terrain-model cache, as its biome lookup already does; it never generates Minecraft chunks or scans player-placed water. No hard altitude ceiling or new temperature gate is added: ordinary crop support/light and existing weather rules remain in effect.
+
+Other generators, or a Terrain Diffusion version without that API, retain the configured **river-biome corridor** and water elevation. Dry stretches in those river biomes can qualify. Oceans, lakes outside river tags and player canals do not create bands. Natural, ceiling-free custom dimensions use the same configuration. Local river elevations on other generators and navigable channel geometry remain separate integration work.
 
 Each active level has bounded access-ordered caches: up to 32,768 sampled biome cells and 8,192 derived columns. A cold 48-block query considers at most 625 candidate cells; neighboring fields reuse samples and repeated cells reuse the result. Tree checks sample only their own cell. Height-ineligible growth exits before the river scan. Cache entries are disposable and regenerated deterministically. Level unload/server stop clears them; server tag reloads and radius/water-height changes invalidate them. This is bounded implementation work, not a 200-player performance certification.
 
 ## Configuration and data
 
-World configuration: `serverconfig/civilization-geography.toml`. Stop the world before editing. Radius, water elevation, vertical allowance and outside-woodland divisor are tunable. Radius is capped at 64 blocks to bound query work. Configuration affects existing fields immediately on the next world load; it does not move crops or rewrite chunks.
+World configuration: `serverconfig/civilization-geography.toml`. Stop the world before editing. Radius, fallback water elevation, vertical allowance and outside-woodland divisor are tunable. Supported Terrain Diffusion rivers override the fallback with their local water surface; the same above/below allowance applies. Radius is capped at 64 blocks to bound query work. Configuration affects existing fields immediately on the next world load; it does not move crops or rewrite chunks.
 
 Data-pack tags in the `civilization` namespace:
 
@@ -55,6 +57,6 @@ The counter's shaped crafting recipe is glass pane above redstone between two co
 
 ## Verification
 
-Unit checks cover circular and negative-coordinate boundaries, vertical limits, overlapping properties, cache reuse, eviction and deterministic reconstruction. Server checks use isolated river/forest/plains dimensions to exercise real crop dispatch, fertilizer acceptance/refusal, natural wheat growth, sky exclusion, forestry gating and queries that do not load chunks. Existing fertilizer/industry tests now apply their manufactured fertilizer on eligible river ground.
+Unit checks cover circular and negative-coordinate boundaries, elevated river heights and nearest-river selection, vertical limits, overlapping properties, cache reuse, eviction and deterministic reconstruction. Server checks use isolated river/forest/plains dimensions to exercise real crop dispatch, fertilizer acceptance/refusal, natural wheat growth, sky exclusion, forestry gating and queries that do not load chunks. Existing fertilizer/industry tests now apply their manufactured fertilizer on eligible river ground.
 
 The isolated dimensions are embedded in the development-only flat preset because Minecraft's GameTest server discards standalone dimension definitions. They are excluded from the shipped mod JAR. The preset is a test fixture, not the planned navigable sample region. Current validation and deployment results live in [project status](../docs/status.md).

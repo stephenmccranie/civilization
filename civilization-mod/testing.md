@@ -1,5 +1,7 @@
 # Development checks
 
+The GameTest-only coal-fire fixture resets the reused test server's thermal SavedData before each suite. Old sources at unloaded randomized test locations otherwise fill the 4,096-source production queue and block later emission assertions. This does not run on ordinary servers or visual-client worlds; production persistence and test assertions are unchanged.
+
 Use the smallest check that covers the changed behavior. Do not run the whole battery after every edit, and do not repeat successful checks without a relevant code change or unresolved failure.
 
 | Change | Check |

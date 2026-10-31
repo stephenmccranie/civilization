@@ -4,6 +4,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GeographyGridTest {
+    @Test void elevatedRiverUsesLocalWaterAndPreservesTerraceLimits() {
+        var grid = new GeographyGrid((x,z) -> new GeographyGrid.Region(x==0 && z==0, true, 410),48);
+        var site = grid.column(32,0);
+        assertTrue(site.riverBand());
+        assertEquals(410,site.waterY());
+        assertTrue(GeographyGrid.heightEligible(406,site.waterY(),4,8));
+        assertTrue(GeographyGrid.heightEligible(418,site.waterY(),4,8));
+        assertFalse(GeographyGrid.heightEligible(419,site.waterY(),4,8));
+        assertFalse(GeographyGrid.heightEligible(64,site.waterY(),4,8));
+        assertFalse(grid.column(52,0).riverBand());
+        assertEquals(site,new GeographyGrid((x,z) -> new GeographyGrid.Region(x==0 && z==0,true,410),48).column(32,0));
+    }
+    @Test void nearestRiverOwnsTheLocalHeightAndDryCellsCannotSupplyWater() {
+        var grid=new GeographyGrid((x,z) -> new GeographyGrid.Region(z==0 && (x==0||x==8),false,x==0?300:62),48);
+        assertEquals(300,grid.column(4,0).waterY());
+        assertEquals(62,grid.column(28,0).waterY());
+        var dry=new GeographyGrid((x,z) -> new GeographyGrid.Region(false,true,300),48);
+        assertFalse(dry.column(0,0).riverBand());
+    }
     @Test void circularBandAndOverlappingWoodland() {
         var grid = new GeographyGrid((x, z) -> new GeographyGrid.Region(x == 0 && z == 0, x <= 0), 48);
         assertTrue(grid.column(48, 0).riverBand());

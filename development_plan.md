@@ -6,7 +6,7 @@ Current package: [physical storage and increasing scale](#physical-storage-and-i
 
 ### Physical storage and increasing scale — active package
 
-Develop the [approved direction](design_direction.md#physical-material-storage-and-handling) through complete player loops. [Unresolved controls and tuning](open_decisions.md#physical-storage-and-increasing-scale) remain separate from shipped rules. Use the selected Terra Diffusion scale-6 server terrain for eventual integration; do not regenerate user worlds or increase scale as part of the storage prototype.
+Develop the [approved direction](design_direction.md#physical-material-storage-and-handling) through complete player loops. [Unresolved controls and tuning](open_decisions.md#physical-storage-and-increasing-scale) remain separate from shipped rules. Use the selected Terra Diffusion scale-4 server terrain for eventual integration; do not regenerate user worlds or increase scale as part of the storage prototype. [Elevated river farming](civilization-mod/geography.md) follows local river elevation on the supported Terrain Diffusion fork; terrain and resource abundance still need broad-world review.
 
 | Stage | Deliverable and acceptance |
 | --- | --- |
