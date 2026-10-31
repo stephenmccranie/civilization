@@ -37,7 +37,9 @@ final class WheelbarrowVisualCheck {
         if(ticks==250){mc.options.keyUp.setDown(false);check(server,()->{var e=barrow(server);if(e.getZ()<3.5||e.getBoundingBox().maxZ>5.01)throw new IllegalStateException("Wall collision or push failed: "+e.position()+" / "+e.getBoundingBox());stopZ=e.getZ();});}
         if(ticks==260){check(server,()->{if(Math.abs(barrow(server).getZ()-stopZ)>.03)throw new IllegalStateException("Released forward key kept driving");});mc.options.keyDown.setDown(true);}
         if(ticks==280)mc.options.keyDown.setDown(false);
-        if(ticks==295){cameraBeforeTurn=mc.player.getYRot();mc.options.keyRight.setDown(true);}
+        if(ticks==295){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;cameraBeforeTurn=mc.player.getYRot();mc.options.keyRight.setDown(true);}
+        if(ticks==304){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);mc.player.setYRot(mc.player.getYRot()+37);mc.player.yRotO+=37;mc.player.setYHeadRot(mc.player.getYHeadRot()+37);mc.player.yHeadRotO+=37;}
+        if(ticks==310){mc.player.setYRot(mc.player.getYRot()-37);mc.player.yRotO-=37;mc.player.setYHeadRot(mc.player.getYHeadRot()-37);mc.player.yHeadRotO-=37;mc.options.setCameraType(CameraType.FIRST_PERSON);}
         if(ticks==315){mc.options.keyRight.setDown(false);check(server,()->{if(barrow(server).getYRot()<40)throw new IllegalStateException("Actual steering input did not turn");startX=barrow(server).getX();});}
         if(ticks==322){
             dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));
@@ -53,7 +55,11 @@ final class WheelbarrowVisualCheck {
             if(net.minecraft.util.Mth.wrapDegrees(barrow(mc).getYRot()-leftStartYaw)>-10)throw new IllegalStateException("A did not turn the carrier back to the left");
             dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));shot(mc,"left-turn");
         }
-        if(ticks==355){mc.options.keyShift.setDown(true);}
+        if(ticks==355){
+            dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=false;
+            if(dev.civilization.client.WheelbarrowRenderCheck.rightCameraSamples<5||dev.civilization.client.WheelbarrowRenderCheck.leftCameraSamples<3)throw new IllegalStateException("Insufficient left/right sub-tick camera samples");
+            mc.options.keyShift.setDown(true);
+        }
         if(ticks==360){mc.options.keyShift.setDown(false);mc.options.hideGui=true;mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);check(server,()->{var e=barrow(server);if(e.isVehicle())throw new IllegalStateException("Release did not end pushing");e.setYRot(0);e.setPos(.5,100,.5);verified=true;var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),-.9,100,.5,java.util.Set.of(),135,12);});}
         if(ticks==390){shot(mc,"standing-scale");shot(mc,"photon-front");}
         if(ticks==400){mc.options.setCameraType(CameraType.FIRST_PERSON);check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),3.7,102,4.2,java.util.Set.of(),140,18);});}

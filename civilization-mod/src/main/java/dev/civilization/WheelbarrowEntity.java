@@ -120,10 +120,6 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
             if(lerpSteps>0){
                 float previousYaw=getYRot();setYRot(previousYaw+Mth.wrapDegrees(targetYaw-previousYaw)/lerpSteps);
                 setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;
-                float delta=Mth.wrapDegrees(getYRot()-previousYaw);
-                for(var passenger:getPassengers())if(passenger instanceof Player player&&player.isLocalPlayer()){
-                    player.setYRot(player.getYRot()+delta);player.setYHeadRot(player.getYRot());
-                }
             }
             return;
         }
