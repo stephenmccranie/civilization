@@ -17,6 +17,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 /** Server-driven ground carrier. A standing passenger supplies input at the handles. */
 public final class WheelbarrowEntity extends Entity implements GeoEntity {
+    public static final float MODEL_SCALE=1.35f;
+    public static final float PUSH_TILT_DEGREES=4;
+    public static final float WHEEL_RADIUS=4.1411056f/16*MODEL_SCALE;
     private static final EntityDataAccessor<Boolean> HELD=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
@@ -34,7 +37,10 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
     @Override public boolean isPickable(){return !isRemoved();}
-    @Override public boolean canBeCollidedWith(){return isAlive();}
+    // The long handle envelope is a terrain/selection bound, never a wall for
+    // walking players. Otherwise diagonal grips collide with the barrow itself.
+    @Override public boolean canBeCollidedWith(){return false;}
+    @Override public boolean canCollideWith(Entity other){return other instanceof WheelbarrowEntity&&!other.isRemoved()&&!isPassengerOfSameVehicle(other);}
     @Override public boolean shouldRiderSit(){return false;}
     @Override public float maxUpStep(){return .6f;}
     @Override protected boolean canAddPassenger(Entity passenger){return passenger instanceof Player&&getPassengers().isEmpty();}
@@ -47,7 +53,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     }
     @Override public InteractionResult interact(Player p,InteractionHand hand){
         if(isRemoved())return InteractionResult.FAIL;
-        if(hand!=InteractionHand.MAIN_HAND||!p.getItemInHand(hand).isEmpty())return InteractionResult.PASS;
+        if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
+        if(p.isShiftKeyDown()&&!p.getItemInHand(hand).isEmpty())return InteractionResult.PASS;
         if(level().isClientSide)return InteractionResult.SUCCESS;
         if(!accessible(p,getBoundingBox())||!level().mayInteract(p,blockPosition()))return InteractionResult.FAIL;
         if(isVehicle())return InteractionResult.FAIL;
@@ -63,20 +70,20 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         }
         return InteractionResult.FAIL;
     }
-    public Vec3 gripPosition(Vec3 center,float yaw){return center.add(new Vec3(0,0,-1.4).yRot(-yaw*Mth.DEG_TO_RAD));}
+    public Vec3 gripPosition(Vec3 center,float yaw){return center.add(new Vec3(0,0,-1.4*MODEL_SCALE).yRot(-yaw*Mth.DEG_TO_RAD));}
     private AABB riderBox(Vec3 at,float yaw,Player p){var v=gripPosition(at,yaw);double r=p.getBbWidth()/2;return new AABB(v.x-r,v.y+.02,v.z-r,v.x+r,v.y+p.getBbHeight(),v.z+r);}
     @Override protected void positionRider(Entity passenger,MoveFunction move){if(hasPassenger(passenger)){var p=gripPosition(position(),getYRot());move.accept(passenger,p.x,p.y,p.z);}}
     @Override public Vec3 getDismountLocationForPassenger(LivingEntity passenger){
         for(double side:new double[]{1,-1,0}){
-            Vec3 at=position().add(new Vec3(side*.95,0,-1.4).yRot(-getYRot()*Mth.DEG_TO_RAD));
+            Vec3 at=position().add(new Vec3(side*.95*MODEL_SCALE,0,-1.4*MODEL_SCALE).yRot(-getYRot()*Mth.DEG_TO_RAD));
             var box=passenger.getBoundingBox().move(at.subtract(passenger.position()));
             if(level().hasChunkAt(BlockPos.containing(at))&&level().noCollision(passenger,box))return at;
         }
         return super.getDismountLocationForPassenger(passenger);
     }
     private AABB footprint(Vec3 at,float yaw){
-        double a=yaw*Mth.DEG_TO_RAD,x=Math.abs(Math.cos(a))*.4+Math.abs(Math.sin(a))*1.08,z=Math.abs(Math.sin(a))*.4+Math.abs(Math.cos(a))*1.08;
-        return new AABB(at.x-x,at.y,at.z-z,at.x+x,at.y+.95,at.z+z);
+        double a=yaw*Mth.DEG_TO_RAD,x=(Math.abs(Math.cos(a))*.4+Math.abs(Math.sin(a))*1.08)*MODEL_SCALE,z=(Math.abs(Math.sin(a))*.4+Math.abs(Math.cos(a))*1.08)*MODEL_SCALE;
+        return new AABB(at.x-x,at.y,at.z-z,at.x+x,at.y+.95*MODEL_SCALE,at.z+z);
     }
     @Override protected AABB makeBoundingBox(){return footprint(position(),getYRot());}
     /** Small bounded footprint query; neither movement nor placement loads chunks. */
@@ -92,7 +99,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         super.tick();previousTravel=level().isClientSide?sampledTravel:travel();previousTilt=tilt;tilt=Mth.approach(tilt,held()?1:0,.2f);
         if(level().isClientSide){
             sampledTravel=travel();if(tickCount<=1)previousTravel=sampledTravel;
-            if(lerpSteps>0){setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);setYRot(getYRot()+Mth.wrapDegrees(targetYaw-getYRot())/lerpSteps);lerpSteps--;}
+            if(lerpSteps>0){setYRot(getYRot()+Mth.wrapDegrees(targetYaw-getYRot())/lerpSteps);setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;}
             return;
         }
         Player p=getFirstPassenger() instanceof Player player?player:null;

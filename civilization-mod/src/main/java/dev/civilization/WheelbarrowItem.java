@@ -18,7 +18,7 @@ public final class WheelbarrowItem extends Item {
         return InteractionResult.CONSUME;
     }
     @Override public void appendHoverText(ItemStack s,TooltipContext c,java.util.List<Component> lines,TooltipFlag f){
-        lines.add(Component.literal("Place on clear ground; empty-hand right-click to take the handles."));
+        lines.add(Component.literal("Place on clear ground; right-click to take the handles."));
         lines.add(Component.literal("W/S: push/back up · A/D: turn · Sneak: release"));
         lines.add(Component.literal("Sneak + empty-hand right-click: recover when parked. Empty prototype."));
     }

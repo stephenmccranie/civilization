@@ -30,6 +30,25 @@ public final class WheelbarrowGameTests {
         var e=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());e.setPos(a.getX()+.5,a.getY(),a.getZ()+.5);h.getLevel().addFreshEntity(e);e.tick();return e;
     }
     private static void take(GameTestHelper h,WheelbarrowEntity e,net.minecraft.server.level.ServerPlayer p){p.setPos(e.gripPosition(e.position(),e.getYRot()));var result=e.interact(p,InteractionHand.MAIN_HAND);h.assertTrue(result.consumesAction()&&p.getVehicle()==e,"Empty-hand handler takes the handles: "+result+" vehicle="+p.getVehicle());}
+    @GameTest(template="industrial") public static void handlesWorkAtDiagonalAndCardinalHeadings(GameTestHelper h){
+        var e=barrow(h);
+        for(float yaw:new float[]{0,33,45,90,135,180,225,270,315}){
+            e.setYRot(yaw);e.setPos(e.position());var p=player(h);take(h,e,p);
+            h.assertTrue(p.position().distanceTo(e.gripPosition(e.position(),yaw))<.001,"Handler stands at the scaled grip offset at "+yaw);
+            p.stopRiding();
+        }
+        e.setYRot(45);e.setPos(e.position());var holding=player(h);holding.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());
+        take(h,e,holding);h.assertTrue(holding.getMainHandItem().getCount()==1,"Taking handles while holding the placement item does not consume it");holding.stopRiding();
+        h.succeed();
+    }
+    @GameTest(template="industrial") public static void walkingAcrossAndOutOfHandleEnvelopeDoesNotSnag(GameTestHelper h){
+        var e=barrow(h);e.setYRot(45);e.setPos(e.position());var p=player(h);
+        p.setPos(e.position().add(-2.5,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(5,0,0));
+        h.assertTrue(p.getX()>e.getX()+2.4,"Walking player can cross the carrier envelope without invisible collision");
+        p.setPos(e.position());p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(2.5,0,0));
+        h.assertTrue(p.getX()>e.getX()+2.4,"A player already inside the handle envelope can leave");
+        h.assertTrue(e.isPickable(),"Non-blocking carrier remains selectable for interaction");h.succeed();
+    }
     @GameTest(template="industrial") public static void serverInputMovesStopsTurnsAndKeepsOneHandler(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var other=player(h);
         e.input(other,new WheelbarrowPayload(1,1,false));var start=e.position();e.tick();

@@ -25,9 +25,9 @@ final class WheelbarrowVisualCheck {
             var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.getInventory().clearContent();p.getInventory().selected=0;p.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();p.teleportTo(l,.5,100,-2,java.util.Set.of(),0,20);
         });}
         if(ticks==130)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(.5,100,.5),Direction.UP,new BlockPos(0,99,0),false));
-        if(ticks==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.inventoryMenu.broadcastFullState();});}
-        if(ticks==165){mc.player.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);mc.gameMode.interact(mc.player,barrow(mc),InteractionHand.MAIN_HAND);}
-        if(ticks==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking wheelbarrow handles did not synchronize");mc.options.keyUp.setDown(true);}
+        if(ticks==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var b=barrow(server);b.setYRot(45);b.setPos(b.position());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();var at=b.gripPosition(b.position(),45);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),45,20);});}
+        if(ticks==165)mc.gameMode.interact(mc.player,barrow(mc),InteractionHand.MAIN_HAND);
+        if(ticks==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.gripPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,0,20);});mc.options.keyUp.setDown(true);}
         if(ticks==210)shot(mc,"pushing-first-person");
         if(ticks==215)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
         if(ticks==230)shot(mc,"pushing-player");
@@ -40,9 +40,9 @@ final class WheelbarrowVisualCheck {
         if(ticks==325)mc.options.keyUp.setDown(true);
         if(ticks==345){mc.options.keyUp.setDown(false);check(server,()->{if(barrow(server).getX()>startX-.7)throw new IllegalStateException("Turned carrier did not move along its heading");});}
         if(ticks==355){mc.options.keyShift.setDown(true);}
-        if(ticks==360){mc.options.keyShift.setDown(false);check(server,()->{var e=barrow(server);if(e.isVehicle())throw new IllegalStateException("Release did not end pushing");e.setYRot(0);e.setPos(.5,100,.5);verified=true;var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),-3,102,-3.7,java.util.Set.of(),-40,17);});}
-        if(ticks==390)shot(mc,"photon-front");
-        if(ticks==400)check(server,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),3.7,102,4.2,java.util.Set.of(),140,18));
+        if(ticks==360){mc.options.keyShift.setDown(false);mc.options.hideGui=true;mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);check(server,()->{var e=barrow(server);if(e.isVehicle())throw new IllegalStateException("Release did not end pushing");e.setYRot(0);e.setPos(.5,100,.5);verified=true;var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),-.9,100,.5,java.util.Set.of(),135,12);});}
+        if(ticks==390){shot(mc,"standing-scale");shot(mc,"photon-front");}
+        if(ticks==400){mc.options.setCameraType(CameraType.FIRST_PERSON);check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),3.7,102,4.2,java.util.Set.of(),140,18);});}
         if(ticks==430)shot(mc,"photon-rear");
         if(ticks==440){mc.options.hideGui=false;check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.teleportTo(server.overworld(),-3,101.5,-3.7,java.util.Set.of(),-40,10);p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());});}
         if(ticks==465){mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}

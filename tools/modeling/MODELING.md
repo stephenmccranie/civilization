@@ -8,6 +8,8 @@ Generated multi-view studies can disagree with themselves. Compare the same land
 
 Inspect load-bearing supports from inside an open carrier as well as underneath: a connected frame can still intrude through the cargo floor. Fit sloping tray corners in native geometry before disguising them with straps or textures. Include complete orthographic views alongside close-ups; a cropped wheel or handle cannot establish whole-object proportions or clearance.
 
+Judge small equipment beside a complete standing player in the same Minecraft view; a close-up, cropped pushing pose or editor dummy can hide a poor practical scale. When resizing, update actual source geometry, pivots, fitted UV spans, wheel radius and handler/collision offsets together. Check taking controls and brushing past at diagonal headings as well as cardinal ones: an axis-aligned handle envelope can obstruct its own handler even when a straight-on fixture passes.
+
 Use a small set of measured landmarks: overall envelope, primary mass ratios, shaft axes, contact heights and rotating clearances. Record them in the asset brief. A beautiful perspective image is not a dimensioned blueprint. Treat ambiguous hidden geometry as a design problem, not as something the generator has solved.
 
 Block out the **whole assembly** before detailing one component. Use a single neutral material to expose poor proportions; check front, back, both sides and two three-quarter views at the same scale. Then test the actual material palette. Keep the known-good runtime asset intact until the replacement passes review.
