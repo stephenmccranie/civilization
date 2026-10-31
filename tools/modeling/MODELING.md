@@ -34,6 +34,8 @@ Fix a weak silhouette with geometry. Fix unreadable materials with their value/c
 
 Every moving assembly needs a named pivot in **assembly coordinates**, not guessed local coordinates. Derive component export offsets from that same source. Inspect the complete swept shape, not only the stopped pose. Distinguish deliberate shaft/bearing contact from unwanted wheel/body interference. An animation bone is a visual transform, not a Sable physics joint.
 
+Check motion through actual native animation playback as well as static mesh poses. The pinned MCP animation tool supplies an `animation.` prefix; inspect the created name instead of adding it twice. GeckoLib export converts rotation conventions, so verify the visible direction of an asymmetric movement such as lifting handles before accepting numeric keyframes. Sample a spoked wheel between its symmetry angles; six views spaced by 60 degrees can conceal a stationary six-spoke wheel. Temporary player/scale geometry must be excluded from the saved source and export, and checked in the same raised pose as the handles.
+
 ## Use the native format's constraints
 
 Static Java 1.21.1 models allow cuboids and limited single-axis rotations. Do not design freeform meshes and assume a Java export will preserve them. GeckoLib can handle animated cuboids; it does not remove the need to keep static item/guide geometry compatible.
