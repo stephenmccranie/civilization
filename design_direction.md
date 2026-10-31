@@ -20,6 +20,8 @@ Joining a Civilization server requires the owner's distributed Civilization mod 
 
 When Grassier Grass is installed, disable its automatic white blade tint from cold biome/altitude alone. Keep the normal biome grass color; actual snow cover and snow rules remain independent. [Client compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns the supported version and implementation boundary.
 
+Grassier Grass blades should look like taller wild grass with restrained natural height variation. Cumulative grounded player footsteps shorten blades along traveled routes, shared between players and saved with the world. Wear is permanent: unused grass does not recover. Standing still, flying and teleporting do not add wear. This is visual ground cover; it does not turn blocks into paths or add a movement bonus. [Grass compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns current tuning and bounds.
+
 The visual and cultural reference is **Nikola Tesla's lifetime (1856–1943)**, interpreted as **a late nineteenth-century industrial foundation developing toward monumental electrical modernism**. This is a coherent alternate history, not a mixture of every style from that period. Later nuclear technology and extraordinary sky machinery retain physical materials and legible instruments.
 
 | World layer | Material and form language |

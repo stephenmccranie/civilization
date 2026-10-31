@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-31**. Current build: **0.34.55-dev**, validated locally and staged for a future grouped publication. The latest client build is installed in Civilization Dev; SHA-256: `b065ebc69aa82a0f70a814ca8a15bfd9c7fb6d77dc274fe981c3719a727b2f21`. The dedicated server retains the compatible coal-physics candidate (`ebb6a06f80e481481645bd3be642a7914ca3ac9d3d450a5706ae2e95f80c1ba8`); the renderer-only repair needs no server restart.
+Last reviewed: **2026-10-31**. Current build: **0.34.55-dev**, validated locally and staged for a future grouped publication. Civilization Dev and the dedicated server have the matching permanent-grass-wear candidate; SHA-256: `3db82d8484b61896b15d51fe8d22dff1ee7bb613910b39db453020511e61da89`. The local pack manifest pins this candidate; the public download remains unchanged.
 
 ## Implemented
 
@@ -21,6 +21,9 @@ Last reviewed: **2026-10-31**. Current build: **0.34.55-dev**, validated locally
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Permanent grass trampling:** build and all **83 fast tests**, **312 required server GameTests**, and the focused `grassier-grass` client scene passed. The pack/Dev blade height is 0.65 with height variation 0.35. Server-counted ground footsteps save permanent sparse chunk wear with no time-based recovery; snapshots/deltas synchronize visible stages. Native cached geometry shrank from a maximum 0.9425-block blade to 0.1885 blocks in the worn lane while the untouched control stayed 0.9425; Photon Medium before/after images were inspected. The fixture also verified intermediate stage synchronization, retained 54 snow-tint checks, and captured high-altitude grass with shaders disabled. Runtime JAR checksums match and previous server JAR/receipt were backed up; the current world is retained. The manifest plus five overrides passed local pack construction and all 21 pinned download checks. Wear density, stride tuning and a many-player contention/performance sample remain unreviewed; no separate-client multiplayer session was run. Source and candidate pack remain local, with no push, PR or release. [Behavior](../civilization-mod/README.md#grassier-grass-compatibility), [checks](../civilization-mod/testing.md).
+
 
 - **Derrick ambient-light repair:** build, all **79 fast tests** and the focused `derrick-guide` client passed under Photon v1.3b Medium. The native fixture confirmed zero skylight at the opaque controller versus full skylight in exposed air. The derrick alone now samples actual ambient world light outside its base/above its machinery, cached per visible instance every five ticks. Matched front/rear daylight images show readable shaded timber, and the inspected night view remains dark; global Photon settings and model/texture assets are unchanged. Native construction, partial/damaged guides, animation, gallery support and Sodium crown-culling checks still pass with Photon and shaders disabled. Installed Dev JAR matches the build. The unchanged server logic was not retested or redeployed; previous **309 server GameTests** remain the coal-physics checkpoint below. Indoor cave lighting and a crowded-machine performance sample remain unreviewed. No push, PR or release. [Behavior](../civilization-mod/industry.md#build-and-supply-machines), [checks](../civilization-mod/testing.md).
 

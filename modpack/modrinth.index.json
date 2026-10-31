@@ -27,8 +27,8 @@
     {
       "path": "mods/civilization-0.34.55-dev.jar",
       "hashes": {
-        "sha1": "6a40bc4765ef097e692d0448e9e8dfe34613830a",
-        "sha512": "4eb7db1056958728a46cc655ebce8f958c70a108468ec2951e98e5e3740b9c5f4a08981a60d094b5836812f52e6e3250894afa0c5285f07fc2662f13ea69daa9"
+        "sha1": "9ea11348e9594a1c0418a0e1ea13e9b72704beee",
+        "sha512": "11093c4343bdd283c25f6dd57e6035f0c037e14a7db6ab8fab22641a33647e0d90c74bed770aa41e3e0f0008e8c03a3ed8648dfc1d0de7e06a8402f9673792ef"
       },
       "env": {
         "client": "required",
@@ -37,7 +37,7 @@
       "downloads": [
         "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.55-1/civilization-0.34.55-dev.jar"
       ],
-      "fileSize": 4978267
+      "fileSize": 4996006
     },
     {
       "path": "mods/ContinuityNeoForge-3.0.8+1.21.1.jar",

@@ -4,5 +4,5 @@
   "package": "dev.civilization.mixin.compat",
   "plugin": "dev.civilization.mixin.compat.GrassierGrassPlugin",
   "compatibilityLevel": "JAVA_21",
-  "client": ["GrassierGrassSnowMixin"]
+  "client": ["GrassierGrassSnowMixin", "GrassierGrassWearMixin"]
 }

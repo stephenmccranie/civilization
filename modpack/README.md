@@ -23,6 +23,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 | --- | --- |
 | GUI scale / FOV | 4× / 90° |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
+| Grassier Grass blade height / height variation (local candidate) | 0.65 / 0.35; permanent server-saved trampling |
 | DH distance | 256 chunks |
 | DH finest horizontal resolution | Two Blocks |
 | DH horizontal / vertical quality | Low / Medium |
