@@ -246,7 +246,7 @@ public final class ThermalGameTests {
                 indoorRise,field.excess(l,p)*1.8);
         System.out.printf(java.util.Locale.ROOT,"FOUNDRY_BODY_F after=120s controller=%.2f otherAverage=%.2f%n",
                 field.excess(l,p)*1.8,otherBodyRise);
-        h.assertTrue(indoorRise>20&&indoorRise<45,"A roof opening lets some exhaust escape while the short unlined flue still warms the room: +"+indoorRise+"°F");
+        h.assertTrue(indoorRise>0,"Local outlet heat must reach occupied room air: +"+indoorRise+"°F");
         h.assertTrue(field.excess(l,outlet.above())>0,"Exhaust still rises through the open roof flue");
         l.setBlockAndUpdate(outlet.above(),Blocks.OAK_PLANKS.defaultBlockState());
         var closed=new ThermalField();
@@ -256,8 +256,10 @@ public final class ThermalGameTests {
         }
         double closedRise=closed.excess(l,room)*1.8;
         System.out.printf(java.util.Locale.ROOT,"FOUNDRY_CLOSED_ROOM_F after=120s rise=%.2f%n",closedRise);
-        h.assertTrue(closedRise>indoorRise+8,
-                "Capping the roof traps significantly more of the same fuel heat inside the room");
+        h.assertTrue(closedRise>indoorRise*1.15,
+                "Capping the roof must raise occupied heat by at least 15% for equal input: open="+indoorRise+", capped="+closedRise);
+        h.assertTrue(Math.abs(field.energy.values().doubleStream().sum()+field.atmosphereExchange-120*productiveHeatPerSecond())<.01,
+                "Open-flue temperatures must account for exactly the supplied heat");
         h.succeed();
     }
     static void buildFoundryWorkshop(net.minecraft.server.level.ServerLevel l,BlockPos p,boolean shaft){
@@ -304,13 +306,14 @@ public final class ThermalGameTests {
         for(int second=0;second<180;second++){unvented.pending.put(p.asLong(),productiveHeatPerSecond());unvented.step(l);}
         double closed=unvented.excess(l,room)*1.8;
         System.out.printf(java.util.Locale.ROOT,"FOUNDRY_WORKSHOP_F after=180s vented=%.2f unvented=%.2f%n",open,closed);
-        // Gradient-limited convection removes the old ceiling pump. Recalibrated
-        // against the independent laboratory: about +56F vented / +115F sealed.
-        // An industrial fire can overheat even a vented room; a flue is not a
-        // hidden comfort guarantee. Retain a narrow measured band and a larger
-        // required ventilation benefit instead of accepting arbitrary heat.
-        h.assertTrue(open>45&&open<65&&closed>95&&closed>open+40,
-                "Measured industrial ventilation must substantially reduce room heat: vented="+open+", closed="+closed);
+        // Absolute ranges fitted to the former eight-cell source scatter are not
+        // physical reference data. Require a useful ventilation effect and exact
+        // energy closure; keep reporting temperatures for later SI calibration.
+        h.assertTrue(open>0&&closed>0&&open<=closed*.75,
+                "A physical chimney must reduce occupied-air heating by at least 25% at equal input: vented="+open+", closed="+closed);
+        h.assertTrue(Math.abs(vented.energy.values().doubleStream().sum()+vented.atmosphereExchange-480*productiveHeatPerSecond())<.01
+                &&Math.abs(unvented.energy.values().doubleStream().sum()+unvented.atmosphereExchange-180*productiveHeatPerSecond())<.01,
+                "Both long-running ventilation fixtures must close their actual supplied-energy budgets");
         h.succeed();
     }
     @GameTest(template="industrial",timeoutTicks=200) public static void chimneyWarmsApproachingAirWithoutExtraFuel(GameTestHelper h){
@@ -350,11 +353,10 @@ public final class ThermalGameTests {
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
         double total=field.energy.values().stream().mapToDouble(Double::doubleValue).sum();
         var outlet=p.south(2).above(5);
-        double above=0;for(int i=0;i<ThermalRules.EXHAUST_RISE_CELLS;i++)
-            above+=field.energy.getOrDefault(outlet.above(i).asLong(),0d);
+        double above=field.energy.getOrDefault(outlet.asLong(),0d);
         h.assertTrue(Math.abs(total-80)<.001,"Exhaust distribution conserves purchased coal heat");
-        h.assertTrue(above>60&&field.energy.get(outlet.asLong())<20,
-                "Most exhaust moves through an open air column instead of overheating one cell");
+        h.assertTrue(Math.abs(above-64)<.001&&field.energy.getOrDefault(outlet.above().asLong(),0d)==0,
+                "The finite 80% exhaust share enters its outlet without being placed farther up the shaft");
         var body=ThermalField.body(l,p);
         int top=body.stream().mapToInt(BlockPos::getY).max().orElse(p.getY());
         double upperBody=body.stream().filter(at->at.getY()==top)
@@ -376,8 +378,8 @@ public final class ThermalGameTests {
             l.setBlockAndUpdate(outlet.above(y).relative(direction),Blocks.OAK_PLANKS.defaultBlockState());
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
         h.assertTrue(field.energy.getOrDefault(outlet.asLong(),0d)>0
-                &&field.energy.getOrDefault(outlet.above(2).asLong(),0d)>0,
-                "The Foundry carries exhaust through consecutive open air cells");
+                &&field.energy.getOrDefault(outlet.above(2).asLong(),0d)==0,
+                "Source release itself cannot jump over air cells in a chimney");
         for(int i=0;i<20;i++){field.pending.put(p.asLong(),80d);field.step(l);}
         h.assertTrue(field.excess(l,outlet.above())>2,
                 "Air rises through the roof shaft and warms the upper chimney");
@@ -405,10 +407,9 @@ public final class ThermalGameTests {
             if(!roof.equals(outlet))l.setBlockAndUpdate(roof,Blocks.OAK_PLANKS.defaultBlockState());
         }
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
-        double plume=0;for(int i=0;i<ThermalRules.EXHAUST_RISE_CELLS;i++)
-            plume+=field.energy.getOrDefault(outlet.above(i).asLong(),0d);
-        h.assertTrue(plume>60&&field.energy.getOrDefault(outlet.asLong(),0d)<20,
-                "The only open outlet receives the full top exhaust share across its air column");
+        double plume=field.energy.getOrDefault(outlet.asLong(),0d);
+        h.assertTrue(Math.abs(plume-64)<.001&&field.energy.getOrDefault(outlet.above().asLong(),0d)==0,
+                "The only open outlet receives the full top share locally, without remote heat placement");
         h.assertTrue(Math.abs(field.energy.values().stream().mapToDouble(Double::doubleValue).sum()-80)<.001,
                 "Prioritizing the outlet does not create extra heat");
         l.setBlockAndUpdate(outlet,Blocks.OAK_PLANKS.defaultBlockState());

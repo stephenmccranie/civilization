@@ -81,7 +81,8 @@ public final class ThermalLaboratory {
         if(PHASE.equals("reload")) {
             var tag=net.minecraft.nbt.NbtIo.readCompressed(output.resolve("thermal-check.nbt"),net.minecraft.nbt.NbtAccounter.unlimitedHeap());
             var expected=ThermalField.load(tag,l.registryAccess());var actual=ThermalField.get(l);
-            require(actual.energy.equals(expected.energy)&&actual.pending.equals(expected.pending),"Heat cells or pending fuel changed across server restart");
+            require(actual.energy.equals(expected.energy)&&actual.pending.equals(expected.pending)
+                &&actual.timeline.save().equals(expected.timeline.save()),"Heat cells, pending fuel or timed releases changed across server restart");
             require(l.getBlockEntity(STATIONS.getLast().source()) instanceof KilnBlockEntity,"Foundry lost across restart");
             System.out.println("THERMAL_LAB_RELOAD_PASS cells="+actual.activeCells());
             e.getServer().halt(false);
@@ -152,7 +153,7 @@ public final class ThermalLaboratory {
     private static double total(ThermalField f){return f.energy.values().doubleStream().sum();}
     private static void sample(ServerLevel l,String phase) throws Exception {
         var f=ThermalField.get(l);var rows=new StringBuilder();
-        double total=total(f),pending=f.pending.values().doubleStream().sum();
+        double total=total(f),pending=f.pending.values().doubleStream().sum()+f.queuedHeat();
         for(var s:STATIONS){
             int coal=-1,reserve=-1,out=-1;
             if(s.machine()){
@@ -186,7 +187,7 @@ public final class ThermalLaboratory {
         if(ticks%100==0)sample(l,ticks<=1600?"heating":"cooling");
         if(ticks==1600){
             var f=ThermalField.get(l);warmEnergy=total(f);
-            warmLedger=warmEnergy+f.pending.values().doubleStream().sum()+f.atmosphereExchange;
+            warmLedger=warmEnergy+f.pending.values().doubleStream().sum()+f.queuedHeat()+f.atmosphereExchange;
             for(var s:STATIONS)if(s.machine()){
                 var kiln=(KilnBlockEntity)l.getBlockEntity(s.source());
                 require(MachineInventory.count(kiln,MachineInventory.KILN_FUEL)<8,"Foundry must spend real coal");
@@ -202,7 +203,7 @@ public final class ThermalLaboratory {
         if(ticks==2400){
             var f=ThermalField.get(l);
             require(total(f)<warmEnergy,"Stored heat must cool after sources stop");
-            require(Math.abs(total(f)+f.pending.values().doubleStream().sum()+f.atmosphereExchange-warmLedger)<1e-6,
+            require(Math.abs(total(f)+f.pending.values().doubleStream().sum()+f.queuedHeat()+f.atmosphereExchange-warmLedger)<1e-6,
                 "Shutdown storage, queued heat and atmosphere must balance without new source energy");
             require(f.completedExchanges>0&&f.simulationAgeSeconds(l)<10,"Scheduled solver must make timely progress");
             net.minecraft.nbt.NbtIo.writeCompressed(f.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess()),output.resolve("thermal-check.nbt"));

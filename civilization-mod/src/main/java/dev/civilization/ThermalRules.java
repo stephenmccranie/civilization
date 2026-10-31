@@ -22,7 +22,6 @@ public final class ThermalRules {
     public static final double RAIN_COOLING_TICKS = 6000; // Five real minutes to approach wet equilibrium.
     public static final double RAIN_RECOVERY_TICKS = 48000; // Forty-minute thermal recovery after rain.
     public static final double MACHINE_TOP_SHARE = .80;
-    public static final int EXHAUST_RISE_CELLS = 8; // Distance a hot exhaust parcel can travel in one loaded second.
     public static final double PLAYER_RESPONSE_SECONDS = 2.5;
     private static final double COLD_MIN = 2, COLD_COMFORT = 18;
     // Per quarter-second exchange step. Sum of outward air fractions stays below one.
@@ -100,6 +99,13 @@ public final class ThermalRules {
                                      Direction direction,double from,double to,double fromBackground,double toBackground){
         if(!fromAir||!toAir)return 0;
         double rise=fromOutside&&toOutside?EXPOSED_BUOYANT_RISE:BUOYANT_RISE;
+        // Unobstructed sky columns have a continuous upward exit: equal inflow
+        // and outflow carry a warm parcel onward without accumulating it at a
+        // ceiling. Enclosed air has no such replacement-flow assumption.
+        if(fromOutside&&toOutside){
+            if(direction==Direction.UP)return rise*Math.max(0,from-fromBackground);
+            if(direction==Direction.DOWN)return -rise*Math.max(0,to-toBackground);
+        }
         // The lattice stores energy, not moving air mass. An unrestricted upward
         // pump concentrates uniform warmth at a ceiling without replacement air.
         // Limit this coarse convection to the warmer-lower temperature gradient.

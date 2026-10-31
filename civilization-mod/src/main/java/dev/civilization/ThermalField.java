@@ -20,6 +20,12 @@ public final class ThermalField extends SavedData {
     Long2DoubleOpenCustomHashMap energy = new Long2DoubleOpenCustomHashMap(HeatMaps.POSITIONS);
     final Long2DoubleOpenCustomHashMap pending = new Long2DoubleOpenCustomHashMap(HeatMaps.POSITIONS);
     double atmosphereExchange;
+    final ThermalTimeline timeline=new ThermalTimeline();
+    private boolean clocked;
+    private long scheduledTarget=Long.MIN_VALUE;
+    void beginTick(long now){if(!clocked){timeline.resume(now);clocked=true;}else timeline.observe(now);}
+    double queuedHeat(){return timeline.heat();}
+    int timedReleases(){return timeline.entries();}
     // V2 stores only climate-relative heat; regional climate supplies the background.
     // Biome identity is stable during normal play. Bound this transient cache and expire it
     // for /fillbiome and reload changes; sunlight and regional rain are never cached here.
@@ -118,6 +124,10 @@ public final class ThermalField extends SavedData {
         return cells;
     }
     void add(ServerLevel l,BlockPos p,double amount) {
+        if(clocked){
+            if(!timeline.add(p.asLong(),amount,scheduled==null?timeline.committed:scheduledTarget))atmosphereExchange+=amount;
+            setDirty();return;
+        }
         long k=p.asLong();
         if(!energy.containsKey(k)&&energy.size()>=maxCells){
             if(scheduled==null)reserveHeadroom();
@@ -171,6 +181,8 @@ public final class ThermalField extends SavedData {
         var openVents=new HashSet<BlockPos>();
         for(var at:vents)if(l.getBlockState(at).isAir())openVents.add(at);
         vents=openVents;
+        // Reserve the whole finite batch before spending its pending budget.
+        if(clocked&&timeline.headroom()<body.size()+vents.size())return;
         double topShare=vents.isEmpty()?0:ThermalRules.MACHINE_TOP_SHARE;
         // Fuel waste enters only the casing and the open exhaust; surrounding air
         // warms through ordinary face exchange rather than a special side shortcut.
@@ -178,39 +190,38 @@ public final class ThermalField extends SavedData {
         // The controller is one part of the hot machine shell, not a private
         // radiator. Every structural block receives a share of spent fuel heat.
         for(var at:body)add(l,at,bodyHeat/body.size());
-        // A one-second exhaust parcel travels through consecutive open air rather
-        // than depositing its entire budget in one stationary one-block cell.
-        // A roof stops the path, so a capped machine still heats the room below it.
-        for(var vent:vents){
-            var path=new ArrayList<BlockPos>(ThermalRules.EXHAUST_RISE_CELLS);
-            for(var at=vent;path.size()<ThermalRules.EXHAUST_RISE_CELLS
-                    &&supported(l,at)&&l.getBlockState(at).isAir();at=at.above())path.add(at);
-            double each=used*topShare/vents.size()/path.size();
-            for(var at:path)add(l,at,each);
-        }
+        // Exhaust enters at the physical outlet. The solver, not source placement,
+        // must transport it through every subsequent air cell and opening.
+        for(var vent:vents)add(l,vent,used*topShare/vents.size());
         if(available<=used)pending.remove(key);else pending.put(key,available-used);
         setDirty();
     }
-    private static boolean loaded(ServerLevel l,BlockPos p,Long2BooleanOpenCustomHashMap chunks) {
+    private static boolean loaded(ServerLevel l,BlockPos p,Long2ByteOpenCustomHashMap chunks) {
         if(!l.dimension().equals(Level.OVERWORLD)||p.getY()<l.getMinBuildHeight()||p.getY()>=l.getMaxBuildHeight())return false;
         long key=net.minecraft.world.level.ChunkPos.asLong(p.getX()>>4,p.getZ()>>4);
-        if(!chunks.containsKey(key))chunks.put(key,l.hasChunkAt(p));
-        return chunks.get(key);
+        byte value=chunks.get(key);
+        if(value==0){value=(byte)(l.hasChunkAt(p)?1:-1);chunks.put(key,value);}
+        return value==1;
     }
     private Exchange scheduled;
     // A busy field slows its own simulation instead of borrowing an unbounded server tick.
-    static final long SOLVER_BUDGET_NS=3_000_000;
+    static final long SOLVER_BUDGET_NS=5_000_000;
     long completedExchanges;
     private long lastExchangeTick=Long.MIN_VALUE;
     boolean exchanging(){return scheduled!=null;}
     int activeCells(){return energy.size();}
     int queuedSources(){return pending.size();}
     double simulationAgeSeconds(ServerLevel level){
+        if(clocked)return Math.max(0,level.getGameTime()-timeline.committed)/20d;
         return energy.isEmpty()?0:lastExchangeTick==Long.MIN_VALUE?Double.POSITIVE_INFINITY:
                 Math.max(0,level.getGameTime()-lastExchangeTick)/20d;
     }
     /** Snapshot, solve and prepare publication incrementally; never publish half an exchange. */
     void scheduledStep(ServerLevel l,int phase) {
+        // Snapshot copies and publication also consume operations. A 16k ceiling
+        // alone forces ordinary 30k-cell fields below four steps/second even on
+        // a fast CPU. The separate soft time deadline still limits each call.
+        if(clocked){advanceTimed(l,l.getGameTime(),65536);return;}
         if(!ThermalConfig.enabled()){scheduled=null;return;}
         long deadline=System.nanoTime()+SOLVER_BUDGET_NS;
         if(phase==0&&scheduled==null&&!energy.isEmpty()){reserveHeadroom();scheduled=new Exchange(l);}
@@ -226,6 +237,32 @@ public final class ThermalField extends SavedData {
             }
             work+=32;
         }while(work<16384&&System.nanoTime()<deadline);
+    }
+    /** Real-time inputs, fixed physical steps, bounded execution. Late work stays explicitly late. */
+    void advanceTimed(ServerLevel level,long now,int workLimit){
+        if(!ThermalConfig.enabled())return;
+        beginTick(now);
+        if(scheduled==null){
+            if(energy.isEmpty()&&timeline.empty()){timeline.commit(now);return;}
+            scheduledTarget=timeline.committed+5;
+            if(now<scheduledTarget)return;
+            reserveHeadroom();scheduled=new Exchange(level,timeline.through(scheduledTarget));
+        }
+        long deadline=System.nanoTime()+SOLVER_BUDGET_NS;
+        scheduled.chunks.clear(); // Recheck loaded status across yielded server ticks.
+        int work=0;
+        do{
+            int count=Math.min(32,workLimit-work);
+            if(count<=0)return;
+            if(scheduled.copyCursor<scheduled.copyKeys.length)scheduled.copy(count);
+            else if(!scheduled.inputsReady)scheduled.stageInputs(count);
+            else if(scheduled.cursor<scheduled.keys.length)scheduled.read(count);
+            else if(scheduled.prepare(count)){
+                energy=scheduled.result;atmosphereExchange+=scheduled.atmosphereExchange;
+                timeline.commit(scheduledTarget);scheduled=null;completedExchanges++;lastExchangeTick=now;setDirty();return;
+            }
+            work+=count;
+        }while(work<workLimit&&System.nanoTime()<deadline);
     }
     private void diffuse(ServerLevel l,int steps) {
         if(scheduled!=null)throw new IllegalStateException("Cannot synchronously step an active thermal exchange");
@@ -244,9 +281,14 @@ public final class ThermalField extends SavedData {
         final Long2DoubleOpenCustomHashMap snapshot=new Long2DoubleOpenCustomHashMap(Math.min(energy.size(),32768),HeatMaps.POSITIONS);
         final Long2DoubleOpenCustomHashMap result=snapshot;
         final Long2DoubleOpenCustomHashMap incoming=new Long2DoubleOpenCustomHashMap(HeatMaps.POSITIONS);
-        final long[] keys=energy.keySet().toLongArray();
+        final long[] copyKeys=energy.keySet().toLongArray();
+        long[] keys=copyKeys;
+        private final List<Long2DoubleOpenCustomHashMap> inputFrames;
+        private int inputFrame;
+        private it.unimi.dsi.fastutil.objects.ObjectIterator<Long2DoubleMap.Entry> inputIterator;
+        boolean inputsReady;
         final Long2ObjectOpenCustomHashMap<Cell> cache=new Long2ObjectOpenCustomHashMap<>(Math.max(16,Math.min(keys.length*7,65536)),HeatMaps.POSITIONS);
-        final Long2BooleanOpenCustomHashMap chunks=new Long2BooleanOpenCustomHashMap(HeatMaps.POSITIONS);
+        final Long2ByteOpenCustomHashMap chunks=new Long2ByteOpenCustomHashMap(HeatMaps.POSITIONS);
         final IdentityHashMap<BlockState,double[]> materials=new IdentityHashMap<>();
         final Long2DoubleOpenCustomHashMap delta=new Long2DoubleOpenCustomHashMap(Math.max(16,Math.min(keys.length*7,65536)),HeatMaps.POSITIONS);
         final Long2IntOpenCustomHashMap heights=new Long2IntOpenCustomHashMap(HeatMaps.POSITIONS);
@@ -255,7 +297,10 @@ public final class ThermalField extends SavedData {
         double atmosphereExchange;
         it.unimi.dsi.fastutil.objects.ObjectIterator<Long2DoubleMap.Entry> changes;
         int copyCursor,cursor;
-        Exchange(ServerLevel level){
+        Exchange(ServerLevel level){this(level,List.of());inputsReady=true;}
+        Exchange(ServerLevel level,List<Long2DoubleOpenCustomHashMap> inputs){
+            inputFrames=inputs;
+            heights.defaultReturnValue(Integer.MIN_VALUE);
             // The climate cache grows with cells actually read, not the whole field up front.
             this.level=level;sun=ThermalRules.daylightPhase(level.getDayTime());
             if(level.getGameTime()>=climateExpires||climateExpires==Long.MIN_VALUE){
@@ -263,10 +308,24 @@ public final class ThermalField extends SavedData {
             }
         }
         void copy(int limit){
-            int end=(int)Math.min(keys.length,(long)copyCursor+limit);
+            int end=(int)Math.min(copyKeys.length,(long)copyCursor+limit);
             while(copyCursor<end){
-                long key=keys[copyCursor++];
+                long key=copyKeys[copyCursor++];
                 snapshot.put(key,energy.get(key)-incoming.get(key));
+            }
+        }
+        void stageInputs(int limit){
+            int work=0;
+            while(work<limit){
+                if(inputIterator==null||!inputIterator.hasNext()){
+                    if(inputFrame==inputFrames.size()){
+                        keys=snapshot.keySet().toLongArray();inputsReady=true;return;
+                    }
+                    inputIterator=inputFrames.get(inputFrame++).long2DoubleEntrySet().fastIterator();continue;
+                }
+                var entry=inputIterator.next();long key=entry.getLongKey();
+                if(snapshot.containsKey(key)||snapshot.size()<maxCells)snapshot.addTo(key,entry.getDoubleValue());
+                else atmosphereExchange+=entry.getDoubleValue();work++;
             }
         }
         Cell cell(BlockPos p){
@@ -287,14 +346,15 @@ public final class ThermalField extends SavedData {
             if(!rainCooling.containsKey(district))rainCooling.put(district,RegionalWeather.cooling(level,p));
             double ambient=ThermalRules.climate(profile,p.getY(),sun,rainCooling.get(district));
             long column=net.minecraft.world.level.ChunkPos.asLong(p.getX(),p.getZ());
-            if(state.isAir()&&!heights.containsKey(column))heights.put(column,level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ()));
+            int height=heights.get(column);
+            if(state.isAir()&&height==Integer.MIN_VALUE){height=level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ());heights.put(column,height);}
             int[] faces;
             if(state.isAir())faces=OPEN_AIR;
             else if(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock || state.getBlock() instanceof DoorBlock || state.getBlock() instanceof TrapDoorBlock){
                 faces=new int[NEIGHBORS.length];
                 for(var direction:NEIGHBORS)faces[direction.ordinal()]=openFace(level,p,state,direction);
             }else faces=CLOSED;
-            var next=new Cell(p,state,material[0],material[1],ambient,state.isAir()&&heights.get(column)<=p.getY(),faces);
+            var next=new Cell(p,state,material[0],material[1],ambient,state.isAir()&&height<=p.getY(),faces);
             cache.put(key,next);return next;
         }
         void read(int limit){
@@ -309,12 +369,22 @@ public final class ThermalField extends SavedData {
                 if(a.state.getFluidState().is(net.minecraft.tags.FluidTags.LAVA))continue;
                 double ta=a.ambient+snapshot.get(key)/a.capacity;
                 if(a.outside){double loss=(ta-a.ambient)*a.capacity*ThermalRules.OUTDOOR_EXCHANGE;delta.addTo(key,-loss);atmosphereExchange+=loss;}
+                if(a.outside&&p.getY()==level.getMaxBuildHeight()-1){
+                    double outflow=ThermalRules.EXPOSED_BUOYANT_RISE*Math.max(0,ta-a.ambient);
+                    delta.addTo(key,-outflow);atmosphereExchange+=outflow;
+                }
                 for(var d:NEIGHBORS){
-                    var q=p.relative(d);if(!loaded(level,q,chunks))continue;long k=q.asLong();
-                    boolean exists=snapshot.containsKey(k);
+                    var q=p.relative(d);long k=q.asLong();
+                    double neighborEnergy=snapshot.get(k);
+                    boolean exists=neighborEnergy!=0||snapshot.containsKey(k);
                     if(exists&&Long.compare(key,k)>0)continue;
                     if(!exists&&Math.abs(ta-a.ambient)<.1)continue;
-                    var b=cell(q);double tb=b.ambient+snapshot.getOrDefault(k,0d)/b.capacity;
+                    if(q.getY()<level.getMinBuildHeight()||q.getY()>=level.getMaxBuildHeight())continue;
+                    // The center's chunk was checked above. Interior neighbors
+                    // share that loaded chunk; only boundary crossings need a lookup.
+                    if(((p.getX()^q.getX())>>4)!=0||((p.getZ()^q.getZ())>>4)!=0)
+                        if(!loaded(level,q,chunks))continue;
+                    var b=cell(q);double tb=b.ambient+neighborEnergy/b.capacity;
                     if(b.state.getFluidState().is(net.minecraft.tags.FluidTags.LAVA))continue;
                     double openness=Integer.bitCount(a.open[d.ordinal()]&b.open[d.getOpposite().ordinal()])/4d;
                     double base=ThermalRules.exchangeRate(a.state.isAir(),b.state.isAir(),d,ta,tb,a.conductance,b.conductance);
@@ -360,7 +430,7 @@ public final class ThermalField extends SavedData {
         var f=new ThermalField();
         // Old absolute-temperature references filled the field with stale nighttime ground.
         // Thermal state is transient; do not migrate those cells into the climate-relative model.
-        if(t.getInt("version")>=2){read(t,"cells",f.energy,ThermalRules.MAX_CELLS);read(t,"sources",f.pending,4096);f.atmosphereExchange=t.getDouble("atmosphereExchange");}
+        if(t.getInt("version")>=2){read(t,"cells",f.energy,ThermalRules.MAX_CELLS);read(t,"sources",f.pending,4096);f.atmosphereExchange=t.getDouble("atmosphereExchange");if(t.contains("timeline"))f.timeline.load(t.getCompound("timeline"));}
         else f.setDirty();
         return f;
     }
@@ -370,5 +440,5 @@ public final class ThermalField extends SavedData {
     private static ListTag write(Map<Long,Double> map) {
         var list=new ListTag();map.forEach((p,v)->{var t=new CompoundTag();t.putLong("pos",p);t.putDouble("energy",v);list.add(t);});return list;
     }
-    @Override public CompoundTag save(CompoundTag t,HolderLookup.Provider lookup){t.putInt("version",2);t.put("cells",write(energy));t.put("sources",write(pending));t.putDouble("atmosphereExchange",atmosphereExchange);return t;}
+    @Override public CompoundTag save(CompoundTag t,HolderLookup.Provider lookup){t.putInt("version",3);t.put("cells",write(energy));t.put("sources",write(pending));t.putDouble("atmosphereExchange",atmosphereExchange);t.put("timeline",timeline.save());return t;}
 }

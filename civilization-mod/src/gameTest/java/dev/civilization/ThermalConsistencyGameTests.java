@@ -7,6 +7,17 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class ThermalConsistencyGameTests {
+    @GameTest(template="industrial") public static void openSkyAdvectionCannotCreateHotterAir(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,3,6));
+        for(var q:BlockPos.betweenClosed(p.offset(-2,0,-2),p.offset(2,9,2)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
+        var f=new ThermalField();double maximum=Double.NEGATIVE_INFINITY;
+        for(int y=0;y<7;y++){f.add(l,p.above(y),20);maximum=Math.max(maximum,f.localTemperature(l,p.above(y)));}
+        for(int step=0;step<20;step++){
+            f.quarterStep(l,false);
+            for(long key:f.energy.keySet())h.assertTrue(f.localTemperature(l,BlockPos.of(key))<=maximum+1e-8,"Open-column flow cannot create a hotter parcel than the source column");
+        }
+        h.assertTrue(Math.abs(f.energy.values().doubleStream().sum()+f.atmosphereExchange-140)<1e-7,"Open-column transport conserves heat including atmosphere loss");h.succeed();
+    }
     @GameTest(template="industrial") public static void doubleSlabsHaveFullMaterialHeatCapacityAndConduction(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
         for(var slab:java.util.List.of(Blocks.BRICK_SLAB,Blocks.OAK_SLAB)){

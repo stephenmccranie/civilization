@@ -445,7 +445,7 @@ The [dedicated thermal laboratory](civilization-mod/heat.md#dedicated-thermal-la
 
 ### Thermal-field redesign — proposal, 2026-09-27
 
-The v2 field already implements heat above regional climate, partial-block airflow, buoyant transfer, finite casing/exhaust input, atmospheric loss, delayed felt temperature and diagnostic age. [Heat](civilization-mod/heat.md#initial-thermal-field) owns current coefficients, save migration and measured limits. The old emission-scatter replacement and initial v2 rollout are completed, not future work.
+The current field implements heat above regional climate, partial-block airflow, buoyant transfer, finite casing/exhaust input, atmospheric loss and delayed felt temperature. V3 adds a bounded timestamped release history and a physical-step clock; actual outlet deposition replaces the eight-cell emission scatter. [Heat](civilization-mod/heat.md#initial-thermal-field) owns coefficients, migration and measured limits. Prescribed-history worker comparisons do not establish accurate historical geometry/climate replay or real-time performance under representative city load.
 
 Remaining proposals:
 

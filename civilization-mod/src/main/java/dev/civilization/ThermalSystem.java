@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid="civilization")
 public final class ThermalSystem {
-    @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){e.getDispatcher().register(net.minecraft.commands.Commands.literal("civilization").then(net.minecraft.commands.Commands.literal("heat").executes(c->{if(!ThermalConfig.enabled()){c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal("Heat simulation is disabled for this instance."),false);return 1;}var l=c.getSource().getLevel();var p=BlockPos.containing(c.getSource().getPosition());double air=airTemperature(l,c.getSource().getPosition());var player=c.getSource().getPlayer();double felt=player==null?air:currentPlayerTemperature(player,air);var field=ThermalField.get(l);c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT,"Air %.1f °F | Feels %.1f °F | Comfort %.0f%% | Thermal efficiency %.0f%% | Heat cells %,d | Solver age %.1fs | Queued sources %d",ThermalDisplay.fahrenheit(air),ThermalDisplay.fahrenheit(felt),ThermalRules.comfort(felt)*100,ThermalField.efficiency(l,p)*100,field.activeCells(),field.simulationAgeSeconds(l),field.queuedSources())),false);return 1;})));}
+    @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){e.getDispatcher().register(net.minecraft.commands.Commands.literal("civilization").then(net.minecraft.commands.Commands.literal("heat").executes(c->{if(!ThermalConfig.enabled()){c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal("Heat simulation is disabled for this instance."),false);return 1;}var l=c.getSource().getLevel();var p=BlockPos.containing(c.getSource().getPosition());double air=airTemperature(l,c.getSource().getPosition());var player=c.getSource().getPlayer();double felt=player==null?air:currentPlayerTemperature(player,air);var field=ThermalField.get(l);c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT,"Air %.1f °F | Feels %.1f °F | Comfort %.0f%% | Thermal efficiency %.0f%% | Heat cells %,d | Solver age %.1fs | Queued sources %d | Timed releases %d",ThermalDisplay.fahrenheit(air),ThermalDisplay.fahrenheit(felt),ThermalRules.comfort(felt)*100,ThermalField.efficiency(l,p)*100,field.activeCells(),field.simulationAgeSeconds(l),field.queuedSources(),field.timedReleases())),false);return 1;})));}
     private static final ResourceLocation SPEED=ResourceLocation.parse("civilization:thermal_comfort");
     private record PlayerHeat(ServerLevel level,long tick,double temperature){}
     private static final WeakHashMap<Player,PlayerHeat> PLAYER_HEAT=new WeakHashMap<>();
@@ -40,6 +40,7 @@ public final class ThermalSystem {
         if(!(e.getLevel() instanceof ServerLevel l))return;
         if(ThermalConfig.enabled()&&l.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)){
             var field=ThermalField.get(l);
+            field.beginTick(l.getGameTime());
             BlockHeatSources.discover(l);
             BlockHeatSources.scheduledEmit(l,field);field.scheduledSources(l);
             field.scheduledStep(l,(int)(l.getGameTime()%5));
