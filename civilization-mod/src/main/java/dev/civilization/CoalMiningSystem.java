@@ -48,16 +48,20 @@ public final class CoalMiningSystem {
         // Listeners may change the target or permissions. Never pay from a stale snapshot.
         if(!l.getBlockState(pos).equals(state)||!CivicAccess.allowed(l,pos,p)||!l.mayInteract(p,pos))return false;
         if(l.getBlockEntity(pos) instanceof CoalWorkfaceEntity e&&e.mask()!=mask)return false;
-        // Expel stock toward the miner, outside this block's envelope. A deep notch
-        // can otherwise strand a carrier on an internal ledge with no pile cell.
-        var toward=eye.subtract(pos.getCenter());var outward=Direction.getNearest((float)toward.x,(float)toward.y,(float)toward.z);
-        var contact=hit.getLocation();double edge=outward.getAxisDirection()==Direction.AxisDirection.POSITIVE?1.17:-.17;
-        var at=switch(outward.getAxis()){
-            case X->new Vec3(pos.getX()+edge,contact.y,contact.z);
-            case Y->new Vec3(contact.x,pos.getY()+edge,contact.z);
-            case Z->new Vec3(contact.x,contact.y,pos.getZ()+edge);
-        };
+        // One physical chunk breaks away from the struck surface, including deep notches.
+        // Its gentle outward impulse, gravity and ledge rolling replace teleporting stock
+        // to the outside of the entire block.
+        var outward=Vec3.atLowerCornerOf(hit.getDirection().getNormal());
+        // Pick an actual removed cell nearest the hit. A point at the hit's edge
+        // can put the chunk's width into adjacent, uncut material in a deep notch.
+        Vec3 center=null;double nearest=Double.MAX_VALUE;
+        for(int i=0;i<64;i++)if((removed&(1L<<i))!=0){
+            var c=CoalGeometry.box(i).getCenter().add(Vec3.atLowerCornerOf(pos));double distance=c.distanceToSqr(hit.getLocation());
+            if(distance<nearest){nearest=distance;center=c;}
+        }
+        var at=center.add(0,-.11,0);
         var carrier=LooseCoalEntity.create(l,at,Long.bitCount(removed));if(carrier==null)return false;
+        carrier.setDeltaMovement(outward.scale(.07).add(0,.02,0));
         boolean committed;
         if(mask==removed)committed=l.removeBlock(pos,false);
         else {

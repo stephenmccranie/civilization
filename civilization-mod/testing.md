@@ -6,6 +6,8 @@ The GameTest-only coal-fire fixture resets the reused test server's thermal Save
 
 Use the smallest check that covers the changed behavior. Do not run the whole battery after every edit, and do not repeat successful checks without a relevant code change or unresolved failure.
 
+Coal movement regressions query the real blockstate collision/suffocation/support paths, move a player through removed material, remove support without changing the workface blockstate, verify a chunk rolls off a narrow remnant, and resume gravity after a landed chunk loses its floor. Existing stock, cancellation and hauling checks remain. The guarded `coal-mining` client also receives a partial mask, stands inside the mined notch and checks that idle horizontal position remains stable.
+
 `ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching, missing, legacy and unequal-version clients. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
 
 | Change | Check |

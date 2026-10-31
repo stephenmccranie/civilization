@@ -16,6 +16,7 @@ final class CoalMiningVisualCheck {
     private static double cameraShape;
     private static double idleLag;
     private static boolean windupShot,contactShot,followShot;
+    private static Vec3 notchPosition;
     private static int auditedContacts;
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException(failure);var server=mc.getSingleplayerServer();
@@ -91,7 +92,21 @@ final class CoalMiningVisualCheck {
         if(ticks==685){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);check(server,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),-1.5,100,-2,java.util.Set.of(),-40,5));}
         if(ticks==715)shot(mc,"player-scale");
         if(ticks==720){mc.options.setCameraType(CameraType.FIRST_PERSON);shaders(true);}
-        if(ticks>730){if(!verified)throw new IllegalStateException("Server loop acceptance missing");com.mojang.logging.LogUtils.getLogger().info("COAL MINING VISUAL VERIFIED: held repeat cadence, release/GUI guards, camera-only guard, overhead rendered arc, partial synchronized face, exact stock/wear/labor, visible shovel load, native rail push, paced screen, existing Coal consumption, inventory, Photon and shaders disabled");mc.stop();}
+        if(ticks==740)check(server,()->{
+            var l=server.overworld();long back=0;for(int x=0;x<4;x++)for(int y=0;y<4;y++)back|=1L<<CoalGeometry.index(x,y,3);
+            for(int y=100;y<=101;y++){var at=new BlockPos(6,y,-4);l.setBlockAndUpdate(at,CoalMiningContent.FACE.get().defaultBlockState());((CoalWorkfaceEntity)l.getBlockEntity(at)).mask(back);}
+            var p=server.getPlayerList().getPlayers().getFirst();p.setDeltaMovement(Vec3.ZERO);p.teleportTo(l,6.5,100,-3.65,java.util.Set.of(),0,10);
+        });
+        if(ticks==765){
+            var a=new BlockPos(6,100,-4);var s=mc.level.getBlockState(a);
+            if(s.isSuffocating(mc.level,a)||s.getCollisionShape(mc.level,a).min(Direction.Axis.Z)!=.75)throw new IllegalStateException("Client retained a full-block collision/suffocation shape for the partial face");
+            notchPosition=mc.player.position();
+        }
+        if(ticks==800){
+            if(notchPosition==null||mc.player.position().subtract(notchPosition).horizontalDistance()>.02)throw new IllegalStateException("Idle client was pushed out of the mined notch");
+            shot(mc,"notch-no-push");
+        }
+        if(ticks>810){if(!verified)throw new IllegalStateException("Server loop acceptance missing");com.mojang.logging.LogUtils.getLogger().info("COAL MINING VISUAL VERIFIED: held repeat cadence, release/GUI guards, camera-only guard, overhead rendered arc, partial synchronized face, exact stock/wear/labor, visible shovel load, native rail push, paced screen, existing Coal consumption, inventory, Photon and shaders disabled, synchronized notch collision without client push-out");mc.stop();}
     }
     private static void select(net.minecraft.server.level.ServerPlayer p,int slot){p.getInventory().selected=slot;p.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(slot));}
     private static void assertFace(net.minecraft.server.MinecraftServer s,int cells,int wear){var e=(CoalWorkfaceEntity)s.overworld().getBlockEntity(FACE);if(e==null||Long.bitCount(e.mask())!=cells||s.getPlayerList().getPlayers().getFirst().getMainHandItem().getDamageValue()!=wear)throw new IllegalStateException("Face/contact mismatch: "+(e==null?"missing":Long.bitCount(e.mask()))+" cells, expected "+cells);}
