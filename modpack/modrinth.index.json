@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "game": "minecraft",
-  "versionId": "playtest-0.34.54-1",
+  "versionId": "playtest-0.34.54-2",
   "name": "Civilization Playtest",
   "summary": "Civilization server client: Distant Horizons, Photon Medium and Patrix 32x. Server address supplied privately.",
   "dependencies": {
@@ -35,7 +35,7 @@
         "server": "unsupported"
       },
       "downloads": [
-        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-1/civilization-0.34.54-dev.jar"
+        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/civilization-0.34.54-dev.jar"
       ],
       "fileSize": 4977358
     },

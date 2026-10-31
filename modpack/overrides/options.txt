@@ -1,4 +1,6 @@
 renderDistance:12
+guiScale:4
+fov:0.5
 simulationDistance:5
 biomeBlendRadius:0
 renderClouds:"false"

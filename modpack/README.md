@@ -1,6 +1,6 @@
 # Civilization playtest client
 
-[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-1/Civilization-playtest-0.34.54-1.mrpack) · [Release and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.34.54-1)
+[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack) · [Release and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.34.54-2)
 
 This is a **client pack for the Civilization server**, pinned to Civilization **0.34.54-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The server rejects other Civilization versions. Ask the host privately for the server address; it is not included in this download or repository.
 
@@ -19,6 +19,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 
 | Setting | Pack default |
 | --- | --- |
+| GUI scale / FOV | 4× / 90° |
 | DH distance | 256 chunks |
 | DH finest horizontal resolution | Two Blocks |
 | DH horizontal / vertical quality | Low / Medium |
@@ -48,6 +49,8 @@ The [manifest](modrinth.index.json) is the authoritative list of all 21 pinned d
 This is a snapshot of the reviewed development client, not a minimal mandatory-mod list. The client-side performance and presentation mods can differ from the server; C2ME and Lithostitched are retained for parity with that instance, not required to join. Terrain Diffusion world generation remains on the server. The download contains no worlds, LOD caches, waypoints, saved servers, credentials, launcher account data or machine-specific Java settings.
 
 Keep this as its own playtest instance. Do not update every mod independently: DH/Iris/Sodium versions and the exact Civilization version are pinned together. When the host announces a new pack, import that release into a new instance and retain the old one until the replacement works. Personal controls and hardware choices are not overwritten by an automatic updater.
+
+Pack revision 2 adds GUI scale 4× and FOV 90°. Existing revision-1 installations can set these two values in Minecraft's Video Settings and Options menus without downloading mods again. Minecraft stores 90° as `fov:0.5` in `options.txt`.
 
 If the machine struggles, disable shaders first or reduce DH distance while keeping the other tuned settings. Photon supports Iris on NVIDIA/AMD/Intel; its author does not support Apple Metal GPUs. If LOD retrieval stops filling nearby terrain, reconnect once; this pack uses unmodified DH and does not include the experimental retrieval-queue patch. Do not delete caches as a first step.
 

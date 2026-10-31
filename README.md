@@ -4,7 +4,7 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 
 ## Playtest client — Prism Launcher
 
-[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-1/Civilization-playtest-0.34.54-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
+[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
 
 Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Civilization must match the server's version; use the announced pack instead of independently updating its mods.
 
