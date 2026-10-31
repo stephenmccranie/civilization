@@ -68,12 +68,22 @@ public final class CalorieFoodData extends FoodData {
         double distance = MovementCost.distance(dx, dy, dz, player.isInWater(), player.onClimbable());
         boolean sprint = player.isSprinting();
         double ascent = MovementCost.ascent(dx, dy, dz);
+        spendTravel(player,distance,ascent,sprint,sprint?"sprint":"walk",player.isInWater()?"swimming":player.onClimbable()?"climbing":"ground_or_air");
+    }
+
+    /** The server carrier supplies actual handle displacement, including turning. */
+    public void pushWheelbarrow(Player player,double dx,double dy,double dz){
+        if(!active(player)||!(player.getVehicle() instanceof WheelbarrowEntity e)||e.getFirstPassenger()!=player)return;
+        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),false,"push_wheelbarrow","empty_carrier");
+    }
+
+    private void spendTravel(Player player,double distance,double ascent,boolean sprint,String action,String detail){
         if (distance <= 0 && ascent <= 0) return;
         if (sprint) sprintDistance += distance; else walkDistance += distance;
         double cost = MovementCost.calories(distance, sprint, CalorieConfig.WALK.get(), CalorieConfig.SPRINT_MULTIPLIER.get()) * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
         double before = reserve.calories();
         travelSpent += reserve.spend(cost);
-        EnergyLog.record(player, sprint ? "sprint" : "walk", player.isInWater() ? "swimming" : player.onClimbable() ? "climbing" : "ground_or_air",
+        EnergyLog.record(player, action, detail,
                 -cost, before, reserve.calories(), distance, true);
         if (ascent > 0) {
             double ascentCost = ascent * CalorieConfig.ASCENT.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();

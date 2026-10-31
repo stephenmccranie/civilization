@@ -29,6 +29,7 @@ final class WheelbarrowVisualCheck {
         if(ticks==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var b=barrow(server);b.setYRot(45);b.setPos(b.position());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();var at=b.gripPosition(b.position(),45);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),45,20);});}
         if(ticks==165)mc.gameMode.interact(mc.player,barrow(mc),InteractionHand.MAIN_HAND);
         if(ticks==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.gripPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,0,20);});mc.options.keyUp.setDown(true);}
+        if(ticks==190)dev.civilization.client.WheelbarrowRenderCheck.gaitCheck=true;
         if(ticks==210)shot(mc,"pushing-first-person");
         if(ticks==200)mc.player.setYRot(barrow(mc).getYRot());
         if(ticks==215)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
@@ -36,7 +37,9 @@ final class WheelbarrowVisualCheck {
         if(ticks==235)mc.options.setCameraType(CameraType.FIRST_PERSON);
         if(ticks==250){mc.options.keyUp.setDown(false);check(server,()->{var e=barrow(server);if(e.getZ()<3.5||e.getBoundingBox().maxZ>5.01)throw new IllegalStateException("Wall collision or push failed: "+e.position()+" / "+e.getBoundingBox());stopZ=e.getZ();});}
         if(ticks==260){check(server,()->{if(Math.abs(barrow(server).getZ()-stopZ)>.03)throw new IllegalStateException("Released forward key kept driving");});mc.options.keyDown.setDown(true);}
-        if(ticks==280)mc.options.keyDown.setDown(false);
+        if(ticks==264){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);lookOffset(mc,55);}
+        if(ticks==269||ticks==272||ticks==275||ticks==278)shot(mc,"walking-side-"+ticks);
+        if(ticks==280){mc.options.keyDown.setDown(false);lookOffset(mc,-55);mc.options.setCameraType(CameraType.FIRST_PERSON);}
         if(ticks==295){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;cameraBeforeTurn=mc.player.getYRot();mc.options.keyRight.setDown(true);}
         if(ticks==304){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);mc.player.setYRot(mc.player.getYRot()+37);mc.player.yRotO+=37;mc.player.setYHeadRot(mc.player.getYHeadRot()+37);mc.player.yHeadRotO+=37;}
         if(ticks==310){mc.player.setYRot(mc.player.getYRot()-37);mc.player.yRotO-=37;mc.player.setYHeadRot(mc.player.getYHeadRot()-37);mc.player.yHeadRotO-=37;mc.options.setCameraType(CameraType.FIRST_PERSON);}
@@ -57,6 +60,8 @@ final class WheelbarrowVisualCheck {
         }
         if(ticks==355){
             dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=false;
+            dev.civilization.client.WheelbarrowRenderCheck.gaitCheck=false;
+            if(dev.civilization.client.WheelbarrowRenderCheck.gaitSamples<150)throw new IllegalStateException("Insufficient real walking pose samples");
             if(dev.civilization.client.WheelbarrowRenderCheck.rightCameraSamples<5||dev.civilization.client.WheelbarrowRenderCheck.leftCameraSamples<3)throw new IllegalStateException("Insufficient left/right sub-tick camera samples");
             mc.options.keyShift.setDown(true);
         }
@@ -77,5 +82,6 @@ final class WheelbarrowVisualCheck {
     private static WheelbarrowEntity barrow(net.minecraft.server.MinecraftServer s){return (WheelbarrowEntity)s.overworld().getEntity(entityId);}
     private static void check(net.minecraft.server.MinecraftServer s,Runnable action){s.execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"wheelbarrow-"+name+".png",mc.getMainRenderTarget(),m->{});}
+    private static void lookOffset(Minecraft mc,float degrees){mc.player.setYRot(mc.player.getYRot()+degrees);mc.player.yRotO+=degrees;mc.player.setYHeadRot(mc.player.getYHeadRot()+degrees);mc.player.yHeadRotO+=degrees;}
     private static void shaders(boolean enabled){try{var iris=Class.forName("net.irisshaders.iris.Iris");var config=iris.getMethod("getIrisConfig").invoke(null);config.getClass().getMethod("setShadersEnabled",boolean.class).invoke(config,enabled);config.getClass().getMethod("save").invoke(config);iris.getMethod("reload").invoke(null);}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}}
 }

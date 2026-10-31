@@ -18,8 +18,10 @@ public abstract class WheelbarrowPlayerModelMixin {
         model.leftArm.xRot=model.rightArm.xRot=-.8f;
         model.leftArm.yRot=-.05f;model.rightArm.yRot=.05f;
         model.leftArm.zRot=-.06f;model.rightArm.zRot=.06f;
-        float stride=(float)Math.min(1,Math.hypot(e.getX()-e.xo,e.getZ()-e.zo)*9);
-        model.leftLeg.xRot=Mth.cos(age*.65f)*stride*.65f;model.rightLeg.xRot=-model.leftLeg.xRot;
+        float partial=Mth.clamp(age-player.tickCount,0,1);
+        float stride=e.handlerWalkAnimation.speed(partial);
+        float phase=e.handlerWalkAnimation.position(partial)*.6662f;
+        model.rightLeg.xRot=Mth.cos(phase)*1.4f*stride;model.leftLeg.xRot=Mth.cos(phase+Mth.PI)*1.4f*stride;
         model.leftLeg.yRot=model.rightLeg.yRot=0;
         model.leftSleeve.copyFrom(model.leftArm);model.rightSleeve.copyFrom(model.rightArm);
         model.leftPants.copyFrom(model.leftLeg);model.rightPants.copyFrom(model.rightLeg);

@@ -59,12 +59,42 @@ public final class WheelbarrowGameTests {
         e.input(other,new WheelbarrowPayload(1,1,false));var start=e.position();e.tick();
         h.assertTrue(e.position().distanceTo(start)<.001,"Non-handler input cannot move a carrier");
         e.input(p,new WheelbarrowPayload(127,0,false));for(int i=0;i<10;i++)e.tick();
-        h.assertTrue(e.getZ()>start.z+.9&&e.getZ()<start.z+1.2,"Server clamps input and applies bounded forward speed");
+        h.assertTrue(Math.abs(e.getZ()-start.z-PlayerMovement.WALK/2)<.001,"Server clamps input and pushes at normal walking speed");
         float wheel=e.travel();e.input(p,new WheelbarrowPayload(0,1,false));e.tick();
         h.assertTrue(e.getYRot()>0&&e.travel()==wheel,"Stationary turning does not spin the wheel");
         h.assertTrue(!other.startRiding(e),"Two handlers cannot take one carrier");
         p.stopRiding();var parked=e.position();for(int i=0;i<5;i++)e.tick();
         h.assertTrue(e.position().distanceTo(parked)<.001&&!e.held(),"Released carrier stops instead of coasting");h.succeed();
+    }
+    @GameTest(template="industrial") public static void pushingCostsWalkingCaloriesForActualHandleTravel(GameTestHelper h){
+        var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
+        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<10;i++)e.tick();
+        double distance=e.position().subtract(start).horizontalDistance();
+        double factor=ThermalRules.calorieFactor(ThermalSystem.comfort(p))*data.workFactor();
+        h.assertTrue(Math.abs(data.reserve().calories()-(1000-distance*CalorieConfig.WALK.get()*factor))<1e-6,"Forward travel spends exactly walking calories, once");
+        double spent=data.travelSpent;var grip=e.gripPosition(e.position(),e.getYRot());
+        e.input(p,new WheelbarrowPayload(0,1,false));e.tick();
+        double arc=e.gripPosition(e.position(),e.getYRot()).subtract(grip).horizontalDistance();
+        h.assertTrue(arc>.1&&Math.abs(data.travelSpent-spent-arc*CalorieConfig.WALK.get()*factor)<1e-6,"Turning charges the handler's actual walk around the handles");
+        double before=data.reserve().calories();e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();
+        h.assertTrue(data.reserve().calories()==before,"Holding still spends no pushing calories");
+        p.setGameMode(GameType.CREATIVE);e.input(p,new WheelbarrowPayload(-1,0,false));e.tick();
+        h.assertTrue(data.reserve().calories()==before,"Creative handling is exempt");
+        p.setGameMode(GameType.SURVIVAL);data.reserve().set(.001);e.tick();
+        h.assertTrue(data.reserve().calories()==0&&data.isDepleted(),"Pushing uses shared depletion without calorie debt");h.succeed();
+    }
+    @GameTest(template="industrial") public static void blockedPushingCostsNothingAndReverseUsesActualDistance(GameTestHelper h){
+        var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
+        double wallZ=e.getZ()+2.5;
+        for(int x=-2;x<=2;x++)for(int y=0;y<3;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
+        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<30;i++)e.tick();
+        double stopped=data.reserve().calories();for(int i=0;i<5;i++)e.tick();
+        h.assertTrue(data.reserve().calories()==stopped,"Holding forward against a wall costs no travel calories");
+        var start=e.position();e.input(p,new WheelbarrowPayload(-1,0,false));for(int i=0;i<10;i++)e.tick();
+        double distance=e.position().subtract(start).horizontalDistance();
+        h.assertTrue(Math.abs(distance-PlayerMovement.WALK/4)<.001,"Backing up uses half walking speed");
+        h.assertTrue(data.reserve().calories()<stopped&&Math.abs(data.walkDistance-data.travelSpent/(CalorieConfig.WALK.get()*ThermalRules.calorieFactor(ThermalSystem.comfort(p))))<1e-5,"Reverse travel spends positive walking calories");
+        h.succeed();
     }
     @GameTest(template="industrial") public static void bodyAndHandlerCannotPassSolidWalls(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double wallZ=e.getZ()+2.5;

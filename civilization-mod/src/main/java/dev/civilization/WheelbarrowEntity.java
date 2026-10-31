@@ -29,6 +29,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     private float targetYaw;
     private float sampledTravel;
     public float previousTravel,previousTilt,tilt;
+    public final WalkAnimationState handlerWalkAnimation=new WalkAnimationState();
     public WheelbarrowEntity(EntityType<? extends WheelbarrowEntity> type,Level level){super(type,level);}
     @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);}
     public float travel(){return entityData.get(TRAVEL);}
@@ -116,30 +117,37 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     @Override public void tick(){
         super.tick();previousTravel=level().isClientSide?sampledTravel:travel();previousTilt=tilt;tilt=Mth.approach(tilt,held()?1:0,.2f);
         if(level().isClientSide){
+            Vec3 oldGrip=gripPosition(position(),getYRot());
             sampledTravel=travel();if(tickCount<=1)previousTravel=sampledTravel;
             if(lerpSteps>0){
                 float previousYaw=getYRot();setYRot(previousYaw+Mth.wrapDegrees(targetYaw-previousYaw)/lerpSteps);
                 setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;
             }
+            double distance=gripPosition(position(),getYRot()).subtract(oldGrip).horizontalDistance();
+            handlerWalkAnimation.update(held()?(float)Math.min(distance*4,1):0,.4f);
             return;
         }
         Player p=getFirstPassenger() instanceof Player player?player:null;
         if(p!=null&&(!p.isAlive()||p.isSpectator()||isInWater()||!accessible(p,terrainBounds())||!accessible(p,riderBox(position(),getYRot(),p)))){p.stopRiding();p=null;}
         entityData.set(HELD,p!=null);
         if(p==null||lastInput==Long.MIN_VALUE||level().getGameTime()-lastInput>10){forward=turn=0;}
-        Vec3 before=position();float oldYaw=getYRot();
+        Vec3 before=position();float oldYaw=getYRot();Vec3 oldGrip=gripPosition(before,oldYaw);
         float nextYaw=oldYaw+turn*3.5f;
         if(p!=null&&turn!=0){
             var rotated=footprint(position(),nextYaw);
             if(accessible(p,rotated)&&level().noCollision(this,rotated)&&clearOfPlayers(position(),nextYaw)&&accessible(p,riderBox(position(),nextYaw,p))&&level().noCollision(p,riderBox(position(),nextYaw,p))){setYRot(nextYaw);setBoundingBox(makeBoundingBox());}
         }
-        double speed=forward>0?.105:forward<0?-.055:0;
+        double speed=forward>0?PlayerMovement.WALK/20:forward<0?-PlayerMovement.WALK/40:0;
         Vec3 motion=new Vec3(0,Math.max(-.8,getDeltaMovement().y-.04),speed).yRot(-getYRot()*Mth.DEG_TO_RAD);
         var destination=terrainBounds().expandTowards(motion);
         if(!accessible(p,destination)||!clearOfPlayers(position().add(motion.x,0,motion.z),getYRot())||(p!=null&&(!accessible(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p))||!level().noCollision(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p)))))motion=new Vec3(0,motion.y,0);
         if(level().hasChunkAt(blockPosition())){setDeltaMovement(motion);move(MoverType.SELF,motion);setDeltaMovement(0,onGround()?0:getDeltaMovement().y,0);}
         double distance=position().subtract(before).horizontalDistance();
         if(distance>0)entityData.set(TRAVEL,(float)(travel()+Math.copySign(distance,forward==0?1:forward)));
+        if(p!=null){
+            Vec3 walked=gripPosition(position(),getYRot()).subtract(oldGrip);
+            CalorieFoodData.of(p).pushWheelbarrow(p,walked.x,walked.y,walked.z);
+        }
         if(p!=null)p.setYBodyRot(getYRot());
     }
     @Override protected void addAdditionalSaveData(CompoundTag tag){tag.putFloat("Travel",travel());}

@@ -16,10 +16,13 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class WheelbarrowRenderCheck {
     public static boolean cameraCheck;
+    public static boolean gaitCheck;
+    public static int gaitSamples;
     public static int rightCameraSamples,leftCameraSamples;
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void camera(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();
+        if(gaitCheck&&mc.player!=null&&mc.player.getVehicle() instanceof WheelbarrowEntity barrow)assertGait(mc,barrow);
         if(!cameraCheck||mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity e))return;
         float turn=Mth.wrapDegrees(e.getYRot()-e.yRotO);
         if(Math.abs(turn)<.1f)return;
@@ -37,6 +40,23 @@ public final class WheelbarrowRenderCheck {
             }
         }
         if(turn>0)rightCameraSamples++;else leftCameraSamples++;
+    }
+    @SuppressWarnings({"rawtypes","unchecked"})
+    private static void assertGait(Minecraft mc,WheelbarrowEntity e){
+        var renderer=(net.minecraft.client.renderer.entity.player.PlayerRenderer)mc.getEntityRenderDispatcher().getRenderer(mc.player);
+        net.minecraft.client.model.PlayerModel model=renderer.getModel();
+        var walker=new net.minecraft.world.entity.monster.Zombie(mc.level);
+        for(float partial:new float[]{0,.5f,1}){
+            // The same production player model with an ordinary non-riding
+            // entity gives vanilla's gait at this distance/stride amplitude.
+            model.riding=false;
+            model.setupAnim(walker,e.handlerWalkAnimation.position(partial),e.handlerWalkAnimation.speed(partial),mc.player.tickCount+partial,0,0);
+            float left=model.leftLeg.xRot,right=model.rightLeg.xRot;
+            model.setupAnim(mc.player,0,0,mc.player.tickCount+partial,0,0);
+            if(Math.abs(left-model.leftLeg.xRot)>.0001||Math.abs(right-model.rightLeg.xRot)>.0001)
+                throw new IllegalStateException("Wheelbarrow legs disagree with normal walking at partial="+partial);
+        }
+        gaitSamples++;
     }
     public static void assertHeading(WheelbarrowEntity e){
         var renderer=(WheelbarrowRenderer)Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(e);
