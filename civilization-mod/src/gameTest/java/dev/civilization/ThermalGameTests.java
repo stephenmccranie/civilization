@@ -260,7 +260,7 @@ public final class ThermalGameTests {
                 "Capping the roof traps significantly more of the same fuel heat inside the room");
         h.succeed();
     }
-    private static void buildFoundryWorkshop(net.minecraft.server.level.ServerLevel l,BlockPos p,boolean shaft){
+    static void buildFoundryWorkshop(net.minecraft.server.level.ServerLevel l,BlockPos p,boolean shaft){
         for(var q:BlockPos.betweenClosed(p.offset(-3,-1,-3),p.offset(3,9,3))){
             int dx=Math.abs(q.getX()-p.getX()),dz=Math.abs(q.getZ()-p.getZ()),dy=q.getY()-p.getY();
             boolean shell=dy==-1||dy==8||dx==3||dz==3;
@@ -304,8 +304,13 @@ public final class ThermalGameTests {
         for(int second=0;second<180;second++){unvented.pending.put(p.asLong(),productiveHeatPerSecond());unvented.step(l);}
         double closed=unvented.excess(l,room)*1.8;
         System.out.printf(java.util.Locale.ROOT,"FOUNDRY_WORKSHOP_F after=180s vented=%.2f unvented=%.2f%n",open,closed);
-        h.assertTrue(open>25&&open<45&&closed>55&&closed>open+20,
-                "An enclosed chimney keeps the workshop warm while an unvented room grows hot from the same fuel");
+        // Gradient-limited convection removes the old ceiling pump. Recalibrated
+        // against the independent laboratory: about +56F vented / +115F sealed.
+        // An industrial fire can overheat even a vented room; a flue is not a
+        // hidden comfort guarantee. Retain a narrow measured band and a larger
+        // required ventilation benefit instead of accepting arbitrary heat.
+        h.assertTrue(open>45&&open<65&&closed>95&&closed>open+40,
+                "Measured industrial ventilation must substantially reduce room heat: vented="+open+", closed="+closed);
         h.succeed();
     }
     @GameTest(template="industrial",timeoutTicks=200) public static void chimneyWarmsApproachingAirWithoutExtraFuel(GameTestHelper h){

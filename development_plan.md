@@ -121,7 +121,7 @@ Advance connected player loops. Basic operational readiness proceeds alongside d
 
 ### Shelter and heat — initial foundation
 
-[Heat](civilization-mod/heat.md) owns the field, comfort, rain/shelter, waste heat and diagnostics. The [dedicated thermal laboratory](civilization-mod/heat.md#dedicated-thermal-laboratory) provides isolated source, building and real-coal Foundry comparisons with fixed probes, cooling and restart checks. Next: address the ordinary-fire source gap, then review actual-world workshop equilibrium, doors/material thickness and roof/chimney layouts. Section-local scheduling and representative load remain open; clothing, moving-vessel heat, deliberate heat transport and internal machine temperatures need separate decisions.
+[Heat](civilization-mod/heat.md) owns the field, comfort, rain/shelter, waste heat and diagnostics. The [dedicated thermal laboratory](civilization-mod/heat.md#dedicated-thermal-laboratory) now measures source budgets, stable conservative transport, material/thermal-mass differences, room and chimney comparisons, real-coal Foundry output, cooling and restart behavior. Ordinary fire, trapdoor airflow, ceiling concentration and lava boundary inconsistencies are corrected locally. Next: longer actual-world equilibrium and dynamic door/chimney/material edits, rain/unload transitions, full fuel-to-work accounting and representative load. Section-local scheduling remains open; clothing, moving-vessel heat, deliberate heat transport and internal machine temperatures need separate decisions.
 
 ### Unified physical foundation — material/geometry stage implemented
 

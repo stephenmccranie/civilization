@@ -23,6 +23,7 @@ public final class ThermalLaboratory {
     private static int ticks;
     private static Path output;
     private static double warmEnergy;
+    private static double warmLedger;
     private record Station(String name, BlockPos source, boolean room, Block wall, boolean vent, boolean machine) {}
     private static final List<Station> STATIONS=List.of(
         station("torch",0,0,false,Blocks.STONE,false,false),
@@ -63,6 +64,7 @@ public final class ThermalLaboratory {
         require(ThermalConfig.enabled(),"Thermal lab requires enabled heat");
         output=e.getServer().getWorldPath(LevelResource.ROOT);
         var marker=output.resolve("thermal-lab-v1.txt");
+        if(PHASE.equals("physics"))require(!Files.exists(output.resolve("physics.csv")),"Preserve existing physics results; choose a fresh RunName");
         // Only this explicitly selected, isolated run is allowed to load the laboratory campus.
         for(int x=-1;x<=6;x++)for(int z=-1;z<=2;z++)l.setChunkForced(x,z,true);
         if(!Files.exists(marker)) {
@@ -171,6 +173,10 @@ public final class ThermalLaboratory {
         Files.writeString(output.resolve("measurements.csv"),rows,StandardOpenOption.APPEND);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) throws Exception {
+        if(PHASE.equals("physics")){
+            if(++ticks==20){ThermalPhysicsExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
+            return;
+        }
         if(PHASE.equals("seed")){
             if(++ticks==100){System.out.println("THERMAL_LAB_SEED_PASS");e.getServer().halt(false);}
             return;
@@ -180,6 +186,7 @@ public final class ThermalLaboratory {
         if(ticks%100==0)sample(l,ticks<=1600?"heating":"cooling");
         if(ticks==1600){
             var f=ThermalField.get(l);warmEnergy=total(f);
+            warmLedger=warmEnergy+f.pending.values().doubleStream().sum()+f.atmosphereExchange;
             for(var s:STATIONS)if(s.machine()){
                 var kiln=(KilnBlockEntity)l.getBlockEntity(s.source());
                 require(MachineInventory.count(kiln,MachineInventory.KILN_FUEL)<8,"Foundry must spend real coal");
@@ -187,6 +194,7 @@ public final class ThermalLaboratory {
             }
             require(f.excess(l,STATIONS.get(0).source().above())>0,"Scheduled torch emission must warm air");
             require(f.excess(l,STATIONS.get(1).source().above())>0,"Scheduled campfire emission must warm air");
+            require(f.excess(l,STATIONS.get(2).source().above())>0,"Scheduled ordinary fire emission must warm air");
             require(f.excess(l,STATIONS.get(3).source().above())>0,"Scheduled lava emission must warm air");
             System.out.println("THERMAL_LAB_FIRE_SUPPORTED="+BlockHeatSources.source(l.getBlockState(STATIONS.get(2).source())));
             sourcesOff(l);System.out.println("THERMAL_LAB_SOURCES_OFF energy="+warmEnergy);
@@ -194,6 +202,8 @@ public final class ThermalLaboratory {
         if(ticks==2400){
             var f=ThermalField.get(l);
             require(total(f)<warmEnergy,"Stored heat must cool after sources stop");
+            require(Math.abs(total(f)+f.pending.values().doubleStream().sum()+f.atmosphereExchange-warmLedger)<1e-6,
+                "Shutdown storage, queued heat and atmosphere must balance without new source energy");
             require(f.completedExchanges>0&&f.simulationAgeSeconds(l)<10,"Scheduled solver must make timely progress");
             net.minecraft.nbt.NbtIo.writeCompressed(f.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess()),output.resolve("thermal-check.nbt"));
             System.out.println("THERMAL_LAB_CHECK_PASS energy="+total(f)+" cells="+f.activeCells()+" age="+f.simulationAgeSeconds(l));

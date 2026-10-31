@@ -42,19 +42,25 @@ public final class ThermalField extends SavedData {
     public static double conductance(BlockState s) {return PhysicalMaterials.legacyConductance(s);}
     public static double capacity(BlockState s) {return PhysicalMaterials.legacyCapacity(s);}
     private static double cellCapacity(Level level,BlockPos pos,BlockState state){
+        if(state.getBlock() instanceof SlabBlock && state.getValue(SlabBlock.TYPE)==net.minecraft.world.level.block.state.properties.SlabType.DOUBLE)
+            return capacity(SlabIntegration.material(state));
         if(!(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock))return capacity(state);
         var pieces=CutCells.read(level,pos);double sum=0;
         for(var piece:pieces)sum+=piece==null?capacity(Blocks.AIR.defaultBlockState()):capacity(piece);
         return sum/8;
     }
     private static double cellConductance(Level level,BlockPos pos,BlockState state){
+        if(state.getBlock() instanceof SlabBlock && state.getValue(SlabBlock.TYPE)==net.minecraft.world.level.block.state.properties.SlabType.DOUBLE)
+            return conductance(SlabIntegration.material(state));
         if(!(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock))return conductance(state);
         var pieces=CutCells.read(level,pos);double sum=0;int occupied=0;
         for(var piece:pieces)if(piece!=null){sum+=conductance(piece);occupied++;}
         return occupied==0?conductance(state):sum/occupied;
     }
     private static int openFace(Level level,BlockPos pos,BlockState state,Direction face){
-        if(state.isAir() || (state.getBlock() instanceof DoorBlock && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.OPEN)))return 15;
+        if(state.getBlock() instanceof SlabBlock && state.getValue(SlabBlock.TYPE)==net.minecraft.world.level.block.state.properties.SlabType.DOUBLE)return 0;
+        if(state.isAir() || ((state.getBlock() instanceof DoorBlock || state.getBlock() instanceof TrapDoorBlock)
+                && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.OPEN)))return 15;
         if(!(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock))return 0;
         var pieces=CutCells.read(level,pos);int bits=0;
         for(int i=0;i<8;i++){
@@ -284,7 +290,7 @@ public final class ThermalField extends SavedData {
             if(state.isAir()&&!heights.containsKey(column))heights.put(column,level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ()));
             int[] faces;
             if(state.isAir())faces=OPEN_AIR;
-            else if(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock || state.getBlock() instanceof DoorBlock){
+            else if(state.getBlock() instanceof CutBlock || state.getBlock() instanceof SlabBlock || state.getBlock() instanceof DoorBlock || state.getBlock() instanceof TrapDoorBlock){
                 faces=new int[NEIGHBORS.length];
                 for(var direction:NEIGHBORS)faces[direction.ordinal()]=openFace(level,p,state,direction);
             }else faces=CLOSED;
@@ -297,6 +303,10 @@ public final class ThermalField extends SavedData {
             while(cursor<end){
                 long key=keys[cursor++];var p=BlockPos.of(key);if(!loaded(level,p,chunks))continue;
                 var a=cell(p);
+                // Lava is an externally maintained reservoir. BlockHeatSources owns
+                // its bounded surface exchange; treating its stored anomaly as cold
+                // here would create a second, contradictory heat-transfer path.
+                if(a.state.getFluidState().is(net.minecraft.tags.FluidTags.LAVA))continue;
                 double ta=a.ambient+snapshot.get(key)/a.capacity;
                 if(a.outside){double loss=(ta-a.ambient)*a.capacity*ThermalRules.OUTDOOR_EXCHANGE;delta.addTo(key,-loss);atmosphereExchange+=loss;}
                 for(var d:NEIGHBORS){
@@ -305,6 +315,7 @@ public final class ThermalField extends SavedData {
                     if(exists&&Long.compare(key,k)>0)continue;
                     if(!exists&&Math.abs(ta-a.ambient)<.1)continue;
                     var b=cell(q);double tb=b.ambient+snapshot.getOrDefault(k,0d)/b.capacity;
+                    if(b.state.getFluidState().is(net.minecraft.tags.FluidTags.LAVA))continue;
                     double openness=Integer.bitCount(a.open[d.ordinal()]&b.open[d.getOpposite().ordinal()])/4d;
                     double base=ThermalRules.exchangeRate(a.state.isAir(),b.state.isAir(),d,ta,tb,a.conductance,b.conductance);
                     double air=ThermalRules.exchangeRate(true,true,d,ta,tb,1,1);

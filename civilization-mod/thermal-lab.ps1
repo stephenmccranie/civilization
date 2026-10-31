@@ -1,5 +1,6 @@
 [CmdletBinding()]
-param([ValidateSet('Seed','Server','Check','Reload','Visual')][string]$Task='Seed')
+param([ValidateSet('Seed','Server','Check','Reload','Visual','Physics')][string]$Task='Seed',
+    [ValidatePattern('^[a-z0-9-]+$')][string]$RunName='physics')
 $ErrorActionPreference='Stop'
 $config=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'dev.local.json') -Raw | ConvertFrom-Json
 $previousJava=$env:JAVA_HOME
@@ -10,6 +11,8 @@ try {
     if(-not $?){throw 'Dependency preparation failed'}
     $labRoot=Join-Path $PSScriptRoot 'runs/thermal-lab'
     $directory=if($Task -in @('Check','Reload')){'runs/thermal-lab/check'}else{'runs/thermal-lab/server'}
+    if($Task -eq 'Physics'){$directory="runs/thermal-lab/$RunName"}
+    if($Task -in @('Check','Reload') -and $RunName -ne 'physics'){$directory="runs/thermal-lab/$RunName"}
     $serverPath=Join-Path $PSScriptRoot $directory
     New-Item -ItemType Directory -Force $serverPath | Out-Null
     $properties=Join-Path $serverPath 'server.properties'
@@ -36,6 +39,7 @@ try {
         $log=Join-Path $labRoot "$phase.log"
         & ./gradlew.bat --console=plain "-PthermalLabDirectory=$directory" "-PthermalLabPhase=$phase" runThermalLabServer | Tee-Object -FilePath $log
         if($LASTEXITCODE -ne 0){throw "Thermal laboratory failed: $phase"}
-        if($phase -ne 'manual' -and -not(Select-String -LiteralPath $log -Pattern "THERMAL_LAB_$($phase.ToUpper())_PASS" -Quiet)){throw "Missing explicit $phase pass"}
+        $pass=if($phase -eq 'physics'){'THERMAL_PHYSICS_PASS'}else{"THERMAL_LAB_$($phase.ToUpper())_PASS"}
+        if($phase -ne 'manual' -and -not(Select-String -LiteralPath $log -Pattern $pass -Quiet)){throw "Missing explicit $phase pass"}
     }
 }finally{$env:JAVA_HOME=$previousJava;Pop-Location}
