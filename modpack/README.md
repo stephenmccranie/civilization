@@ -2,6 +2,8 @@
 
 [Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack) · [Release and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.34.54-2)
 
+The published download below remains **0.34.54-dev**. The local manifest is an unpublished **0.34.55-dev candidate** for the next grouped release; its new Civilization asset URL becomes usable only when that batch is published. Existing local testers can replace just the Civilization JAR with the host-provided 0.34.55-dev build.
+
 This is a **client pack for the Civilization server**, pinned to Civilization **0.34.54-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The server rejects other Civilization versions. Ask the host privately for the server address; it is not included in this download or repository.
 
 ## Install in Prism Launcher
@@ -21,6 +23,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 | --- | --- |
 | GUI scale / FOV | 4× / 90° |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
+| Grassier Grass blade height / height variation (local candidate) | 0.65 / 0.35; permanent server-saved trampling |
 | DH distance | 256 chunks |
 | DH finest horizontal resolution | Two Blocks |
 | DH horizontal / vertical quality | Low / Medium |
@@ -67,4 +70,4 @@ python tools/build_player_pack.py --check-downloads
 
 This verifies downloaded file sizes, both hashes and ZIP integrity, then writes a deterministic `.mrpack` and SHA-256 sidecar under ignored `.tools/player-pack-build/`. Before publishing a new Civilization JAR, add `--local-civilization path/to/civilization-version.jar` to verify that candidate locally. After publishing, run without that argument using a fresh cache to verify the public GitHub asset too.
 
-For a new release, update the versioned manifest URLs/hashes and settings together, validate, merge the task, and publish the `.mrpack`, its checksum and our matching Civilization JAR as assets on that release tag. Upload no third-party archives. Source-only changes to this pack do not change the mod version. A real Prism import, remote join, shader appearance and performance still require a player check; hash/archive verification alone does not prove those behaviors.
+Keep small pack and gameplay adjustments local with the current development batch. When a substantial publication milestone is authorized, update the versioned manifest URLs/hashes and settings together, validate, merge the batch, and publish the `.mrpack`, its checksum and our matching Civilization JAR as assets on that release tag. Upload no third-party archives. Source-only changes to this pack do not change the mod version. A real Prism import, remote join, shader appearance and performance still require a player check; hash/archive verification alone does not prove those behaviors.

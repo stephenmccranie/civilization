@@ -28,6 +28,8 @@ public final class Civilization {
         ThermalContent.register(modBus);
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON,ThermalConfig.SPEC,"civilization-heat.toml");
         SoilChunk.register(modBus);
+        GrassWearChunk.register(modBus);
+        modBus.addListener(GrassWearPayload::register);
         OilRetrofitChunk.register(modBus);
         Accessories.register(modBus);
         modBus.addListener((net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) -> CaloriePayload.register(event, version));

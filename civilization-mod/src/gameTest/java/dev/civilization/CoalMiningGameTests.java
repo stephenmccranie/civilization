@@ -50,6 +50,51 @@ public final class CoalMiningGameTests {
     private static net.neoforged.neoforge.common.util.FakePlayer player(GameTestHelper h,BlockPos at){var p=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"coal-miner"));p.setGameMode(GameType.SURVIVAL);p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-2);p.setItemInHand(InteractionHand.MAIN_HAND,CoalMiningContent.PICK.toStack());EquipmentGrade.apply(p.getMainHandItem(),100,42);CalorieFoodData.of(p).reserve().set(2400);return p;}
     private static BlockPos face(GameTestHelper h){var a=h.absolutePos(new BlockPos(3,3,3));for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++){h.getLevel().setBlockAndUpdate(a.offset(x,-2,z),Blocks.STONE.defaultBlockState());for(int y=-1;y<=2;y++)h.getLevel().setBlockAndUpdate(a.offset(x,y,z),Blocks.AIR.defaultBlockState());}h.getLevel().setBlockAndUpdate(a,CoalMiningContent.FACE.get().defaultBlockState());return a;}
     private static void aim(net.minecraft.server.level.ServerPlayer p,Vec3 at){var d=at.subtract(p.getEyePosition());p.setYRot((float)Math.toDegrees(Math.atan2(-d.x,d.z)));p.setXRot((float)-Math.toDegrees(Math.atan2(d.y,Math.sqrt(d.x*d.x+d.z*d.z))));}
+    @GameTest(template="industrial") public static void partialCoalUsesRealCollisionAndCannotPushOutOfEmptySpace(GameTestHelper h){
+        var a=face(h);var l=h.getLevel();var e=(CoalWorkfaceEntity)l.getBlockEntity(a);e.mask(1L);
+        var state=l.getBlockState(a);
+        h.assertTrue(state.getCollisionShape(l,a).bounds().maxX==.25&&state.getCollisionShape(l,a).bounds().maxY==.25,"Block-state collision follows the saved remnant, not a cached full cube");
+        h.assertTrue(!state.isSuffocating(l,a)&&!state.isFaceSturdy(l,a,Direction.UP),"A remnant neither triggers client push-out nor supports a floating pile");
+        var p=player(h,a);p.setPos(a.getX()+.65,a.getY(),a.getZ()-.4);p.setDeltaMovement(Vec3.ZERO);
+        p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,0,1.2));
+        h.assertTrue(p.getZ()>a.getZ()+.79,"Player movement crosses the actual empty part of a worked block");h.succeed();
+    }
+    @GameTest(template="industrial",timeoutTicks=100) public static void miningSupportDropsThePileAboveTheSameBlockState(GameTestHelper h){
+        var a=face(h);var l=h.getLevel();var e=(CoalWorkfaceEntity)l.getBlockEntity(a);
+        h.assertTrue(RawCoalPileBlock.insert(l,a.above(),12)==12,"An intact face initially supports a pile");
+        e.mask(1L);
+        h.runAfterDelay(3,()->h.assertTrue(l.getBlockState(a.above()).isAir(),"Partial material cannot leave its former pile floating above it"));
+        h.runAfterDelay(65,()->{
+            int stock=0;for(var q:BlockPos.betweenClosed(a.offset(-2,-1,-2),a.offset(2,1,2))){var s=l.getBlockState(q);if(s.is(CoalMiningContent.PILE.get()))stock+=s.getValue(RawCoalPileBlock.UNITS);}
+            stock+=l.getEntitiesOfClass(LooseCoalEntity.class,new AABB(a).inflate(3)).stream().mapToInt(LooseCoalEntity::units).sum();
+            h.assertTrue(stock==12,"Falling and settled stock is conserved after the mask changes");h.succeed();
+        });
+    }
+    @GameTest(template="industrial",timeoutTicks=100) public static void looseChunkRollsOffASmallCoalRemnant(GameTestHelper h){
+        var a=face(h);var l=h.getLevel();long pillar=0;for(int y=0;y<4;y++)pillar|=1L<<CoalGeometry.index(1,y,1);
+        ((CoalWorkfaceEntity)l.getBlockEntity(a)).mask(pillar);
+        var chunk=LooseCoalEntity.create(l,new Vec3(a.getX()+.375,a.getY()+1,a.getZ()+.375),4);chunk.setOnGround(true);
+        h.runAfterDelay(75,()->{
+            int stock=0;for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++){var s=l.getBlockState(a.offset(x,-1,z));if(s.is(CoalMiningContent.PILE.get()))stock+=s.getValue(RawCoalPileBlock.UNITS);}
+            h.assertTrue(chunk.isRemoved()&&stock==4,"A coherent four-unit chunk rolls off the narrow support and settles on the lower floor");h.succeed();
+        });
+    }
+    @GameTest(template="industrial",timeoutTicks=30) public static void landedChunkResumesGravityWhenFloorDisappears(GameTestHelper h){
+        var a=face(h).north();var l=h.getLevel();l.setBlockAndUpdate(a,Blocks.STONE.defaultBlockState());
+        var chunk=LooseCoalEntity.create(l,new Vec3(a.getX()+.5,a.getY()+1,a.getZ()+.5),4);chunk.setOnGround(true);
+        l.removeBlock(a,false);
+        h.runAfterDelay(3,()->{h.assertTrue(chunk.getY()<a.getY()+.9&&chunk.units()==4,"Previously landed stock immediately resumes falling without loss");h.succeed();});
+    }
+    @GameTest(template="industrial") public static void edgeOfDeepNotchReleasesChunksIntoActuallyRemovedMaterial(GameTestHelper h){
+        var a=face(h);var l=h.getLevel();var p=player(h,a);
+        p.setPos(a.getX()+.49,a.getY()+.49-p.getEyeHeight(),a.getZ()-2);p.setYRot(0);p.setXRot(0);
+        for(int depth=0;depth<4;depth++){
+            h.assertTrue(CoalMiningSystem.strike(p),"The edge of every newly exposed layer can be chipped");
+            var chunk=l.getEntitiesOfClass(LooseCoalEntity.class,new AABB(a).inflate(3)).stream().max(java.util.Comparator.comparingInt(net.minecraft.world.entity.Entity::getId)).orElseThrow();
+            h.assertTrue(chunk.units()==4&&l.noCollision(chunk,chunk.getBoundingBox()),"The released chunk starts inside removed cells, clear of neighboring coal");
+        }
+        h.succeed();
+    }
     @GameTest(template="industrial",timeoutTicks=100) public static void strikeChipsPersistsAndPaysOnce(GameTestHelper h){
         var a=face(h);var p=player(h,a);aim(p,Vec3.atLowerCornerOf(a).add(.25,.25,0));h.assertTrue(CoalMiningSystem.strike(p),"An actual aimed strike chips the face");
         var e=(CoalWorkfaceEntity)h.getLevel().getBlockEntity(a);h.assertTrue(Long.bitCount(e.mask())==60&&p.getMainHandItem().getDamageValue()==1,"Four cells removed, one durability");
