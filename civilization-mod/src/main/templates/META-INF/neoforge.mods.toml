@@ -47,3 +47,6 @@ config="civilization.dh.mixins.json"
 
 [[mixins]]
 config="civilization.c2me.mixins.json"
+
+[[mixins]]
+config="civilization.grassiergrass.mixins.json"

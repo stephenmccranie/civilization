@@ -16,6 +16,8 @@ The baseline full day/night cycle is 60 minutes with vanilla phase proportions; 
 
 ### Setting and material style
 
+When Grassier Grass is installed, disable its automatic white blade tint from cold biome/altitude alone. Keep the normal biome grass color; actual snow cover and snow rules remain independent. [Client compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns the supported version and implementation boundary.
+
 The visual and cultural reference is **Nikola Tesla's lifetime (1856–1943)**, interpreted as **a late nineteenth-century industrial foundation developing toward monumental electrical modernism**. This is a coherent alternate history, not a mixture of every style from that period. Later nuclear technology and extraordinary sky machinery retain physical materials and legible instruments.
 
 | World layer | Material and form language |

@@ -24,6 +24,14 @@ Shared [physical properties and inspector](physics.md) expose material mass, hea
 
 ## Development
 
+### Grassier Grass compatibility
+
+With Grassier Grass **1.4.5** installed on the client, Civilization disables the mod's automatic white snow tint on generated blades, including cold/high-altitude areas in clear weather. Blades retain their normal biome tint. This disables that blade tint entirely, including when rendering through snow is enabled; snow blocks, snowfall, accumulation, biome temperature and the mod's blade visibility settings are unchanged.
+
+The optional client mixin checks the installed version and snow-blend method signature before applying. Grassier Grass is not required or bundled; absent installations are unaffected, and unverified versions retain their original behavior with a warning. Civilization must be installed on the client for this override to take effect; a server-only installation cannot change another client's blades. [Focused verification](testing.md#focused-visual-checks).
+
+### Development setup
+
 GeckoLib is now a required pinned runtime dependency alongside Sable. Gradle resolves it for development; Deploy copies the exact resolved JAR and verifies its hash, refusing a conflicting installed GeckoLib version. Blockbench and MCP are authoring-only tools: [setup and model workflow](../tools/modeling/README.md). Existing engine art remains unchanged while that workflow is established.
 
 JEI is an optional compile-only integration. Gradle resolves the version in `gradle.properties` from the JEI Maven repository, or uses the matching `.dev-libs/jei-<minecraft>-neoforge-<version>.jar` for offline development. Do not bundle this jar in Civilization. For the `jei` visual scene, put the matching JEI jar in ignored `run/mods`; the visual runtime copies it normally. Deployment leaves the user's installed JEI untouched.

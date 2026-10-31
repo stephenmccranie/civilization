@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-29**. Current build: **0.34.49-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `c0f412f56e257c9fc745f02ecf78fd7e17b944d94cba5c03b134f067d9ffc794`.
+Last reviewed: **2026-10-30**. Current build: **0.34.50-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `2551611289f2438c36ea3d27f143250aca626652befd77f2d3c4eeb0775971bd`.
 
 ## Implemented
 
@@ -21,6 +21,8 @@ Last reviewed: **2026-10-29**. Current build: **0.34.49-dev**, verified for publ
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Grassier Grass tint compatibility:** build and all **76 fast tests** passed. The guarded hidden client with Grassier Grass 1.4.5 passed 54 actual transformed snow-blend calls and low/high taiga precipitation checks (Y=80 rain / Y=240 snow) in clear weather. Low/high blade views with Clean 1.21.1's Photon 1.4, shader settings and Faithful 64x inputs, plus the high platform with shaders disabled, were inspected and remained green. A separate absent-mod client run passed. Deployment checksum matched. The override disables blade snow tint entirely and applies only to verified Grassier Grass 1.4.5; it does not alter actual snow or biome rules. The full Clean modpack was not launched or modified, and that instance currently lacks Civilization. This client-only change did not rerun the unchanged server GameTests. [Behavior and compatibility](../civilization-mod/README.md#grassier-grass-compatibility), [focused check](../civilization-mod/testing.md#focused-visual-checks).
 
 - **Physical storage foundation:** 0.34.49-dev build, all **76 fast tests**, all **299 required server GameTests** and documentation checks passed. New coverage verifies exact full/native/custom stone-piece accounting, mixed/unknown/malformed items, partial/full/overfull capacity arithmetic, overflow rejection, operator permission and real player/container commands, unchanged stock, unopened loot and unloaded-target refusal. The read-only cargo audit uses shared material density and keeps material/storage volume separate. It does not enforce inventory limits, change vehicle mass, add carts/stockpiles or establish Survival balance. No rendering changed, so no visual client was run. Civilization Dev deployment checksum matched; the dedicated terrain server was not changed. [Commands and scope](../civilization-mod/physics.md#stone-cargo-accounting), [next stages](../development_plan.md#physical-storage-and-increasing-scale--active-package).
 
