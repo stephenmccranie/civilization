@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-10-30**. Current build: **0.34.53-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `f61ca8ba2d58343b82d715e0eccb71c017a343cfbfee380ad9393cd98b83178a`.
+Last reviewed: **2026-10-31**. Current build: **0.34.53-dev**, verified for publication and installed for prototype testing in Civilization Dev. Deployment verified the installed JAR against the build; SHA-256: `f61ca8ba2d58343b82d715e0eccb71c017a343cfbfee380ad9393cd98b83178a`.
 
 ## Implemented
 
