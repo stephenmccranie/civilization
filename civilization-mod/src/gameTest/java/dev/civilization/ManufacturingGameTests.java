@@ -52,9 +52,9 @@ public final class ManufacturingGameTests {
         var w=WorkshopGameTests.build(h,3,Direction.NORTH);var job=job(3,ManufacturingContent.HANDLE.get());supply(w,job);var p=operator(w);
         w.process();h.assertTrue(w.progress==0,"Stock and hoppers alone cannot work");
         h.assertTrue(w.beginWork(p),"Present worker starts");w.process();double paid=2400-CalorieFoodData.of(p).reserve().calories();
-        h.assertTrue(paid>0&&w.progress==10,"Only performed labor costs calories");
+        h.assertTrue(Math.abs(paid-2.5*ThermalRules.calorieFactor(ThermalSystem.comfort(p)))<1e-6&&w.progress==10,"Performed half-second costs 2.5 kcal before comfort");
         p.setPos(w.getBlockPos().getX()+20,w.getBlockPos().getY(),w.getBlockPos().getZ());w.process();
-        h.assertTrue(w.progress==10&&w.getItem(5).isEmpty(),"Distance stops work without losing physical inputs");
+        h.assertTrue(w.progress==10&&w.getItem(5).isEmpty()&&Math.abs(CalorieFoodData.of(p).reserve().calories()-(2400-paid))<1e-6,"Distance stops work without charging calories or losing physical inputs");
         p.setPos(w.getBlockPos().getX()+.5,w.getBlockPos().getY(),w.getBlockPos().getZ()-1);CalorieFoodData.of(p).reserve().set(0);
         w.beginWork(p);w.process();h.assertTrue(w.status==MachineStatus.Workshop.NEEDS_FOOD&&w.progress==10,"Depleted labor cannot finish");
         CalorieFoodData.of(p).reserve().set(2400);w.beginWork(p);p.containerMenu=p.inventoryMenu;w.process();

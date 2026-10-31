@@ -59,7 +59,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         var result=WorkshopJobs.result(job,match.first());
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
         if(!MachineInventory.room(this,outputSlots(),result)){worker=null;pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
-        double labor=.25*ThermalRules.calorieFactor(ThermalSystem.comfort(worker));
+        double labor=2.5*ThermalRules.calorieFactor(ThermalSystem.comfort(worker));
         var food=CalorieFoodData.of(worker);
         if(CalorieFoodData.active(worker)&&(food.isDepleted()||!food.reserve().canAfford(labor))){worker=null;pause(MachineStatus.Workshop.NEEDS_FOOD,false);return;}
         // Charge only performed work. No fuel, stored power, offline catch-up or automatic repeat.
