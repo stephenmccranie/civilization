@@ -67,6 +67,8 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 ## 1. Implemented foundation
 
+Optional Grassier Grass client compatibility disables automatic cold/altitude blade whitening; [supported version and behavior](civilization-mod/README.md#grassier-grass-compatibility), [validation](docs/status.md).
+
 | IDs | Completed scope |
 | --- | --- |
 | F01 | Development build, test and Prism deployment loop |
