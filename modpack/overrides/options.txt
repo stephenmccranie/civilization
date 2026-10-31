@@ -1,0 +1,6 @@
+renderDistance:12
+simulationDistance:5
+biomeBlendRadius:0
+renderClouds:"false"
+resourcePacks:["vanilla","mod_resources","file/Patrix_1.21_32x_basic.zip"]
+incompatibleResourcePacks:[]

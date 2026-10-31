@@ -1,0 +1,24 @@
+# Photon v1.3b Medium profile, expanded to its actual option values.
+INFO=1
+shadowMapResolution=2048
+SHADOW_PCF=true
+SHADOW_COLOR=false
+SHADOW_VPS=true
+ENTITY_SHADOWS=false
+BLOCK_ENTITY_SHADOWS=false
+ENVIRONMENT_REFLECTIONS=false
+GTAO=false
+VL=true
+AIR_FOG_COLORED_LIGHT_SHAFTS=false
+WATER_CAUSTICS=false
+WATER_PARALLAX=false
+COLORED_LIGHTS=false
+SHADOW_SSRT=false
+# Patrix's normal/specular textures and the existing high-terrain cloud heights.
+NORMAL_MAPPING=true
+SPECULAR_MAPPING=true
+HANDHELD_LIGHTING=true
+CLOUDS_CUMULUS_ALTITUDE=2400.0
+CLOUDS_CUMULUS_CONGESTUS_ALTITUDE=800.0
+CLOUDS_ALTOCUMULUS_ALTITUDE=6400.0
+CLOUDS_CIRRUS_ALTITUDE=10000.0

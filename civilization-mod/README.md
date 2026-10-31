@@ -28,6 +28,8 @@ Shared [physical properties and inspector](physics.md) expose material mass, hea
 
 Clients and servers must run the same Civilization version. The required core network channel includes the version from the installed mod metadata; NeoForge rejects missing Civilization installations, legacy clients and unequal versions during connection setup, before entering the world. Distribute the server's Civilization JAR to players whenever updating it. Client-only graphics and quality-of-life mods can still differ.
 
+The published [Prism playtest client](../modpack/README.md) downloads the matching Civilization JAR and pinned dependencies, with tuned DH defaults, Photon Medium and Patrix 32x. The host supplies the server address privately.
+
 This is a compatibility gate, not JAR authentication or an anti-cheat: a deliberately modified client can imitate the channel/version. Minecraft account authentication and server access controls remain separate.
 
 ### Grassier Grass compatibility

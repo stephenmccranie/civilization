@@ -69,6 +69,8 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 Server admission requires the same Civilization version on both sides through NeoForge's required channel negotiation. [Connection behavior and limits](civilization-mod/README.md#server-connections), [validation](docs/status.md#validation-and-limits). This does not certify client integrity or complete the broader operational-readiness work.
 
+A download-only [Prism playtest client](modpack/README.md) supplies the pinned client stack and reviewed DH/Photon/Patrix defaults without publishing a server address or rehosting third-party files. Player import/join and hardware performance remain playtest checks.
+
 Optional Grassier Grass client compatibility disables automatic cold/altitude blade whitening; [supported version and behavior](civilization-mod/README.md#grassier-grass-compatibility), [validation](docs/status.md).
 
 | IDs | Completed scope |
