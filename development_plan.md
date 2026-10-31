@@ -67,6 +67,8 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 ## 1. Implemented foundation
 
+Uranium exploration uses rare tiny finds throughout suitable terrain, with no district gate; surface-relative cover is retained. Coal/oil retain their town-catchment rarity. [Generation and migration](civilization-mod/geography.md#frontier-uranium-and-accessories).
+
 Server admission requires the same Civilization version on both sides through NeoForge's required channel negotiation. [Connection behavior and limits](civilization-mod/README.md#server-connections), [validation](docs/status.md#validation-and-limits). This does not certify client integrity or complete the broader operational-readiness work.
 
 A download-only [Prism playtest client](modpack/README.md) supplies the pinned client stack and reviewed DH/Photon/Patrix defaults without publishing a server address or rehosting third-party files. Player import/join and hardware performance remain playtest checks.
