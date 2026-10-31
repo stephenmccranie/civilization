@@ -7,6 +7,25 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class ThermalConsistencyGameTests {
+    @GameTest(template="industrial") public static void mixedCutGeometryStaysPositionSpecificAndFresh(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,4,6));var q=p.east(7);
+        for(var at:BlockPos.betweenClosed(p.offset(-2,-2,-2),q.offset(2,2,2)))l.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
+        var cut=CutGeometry.state(CutGeometry.bounds(2,Direction.DOWN,0));
+        l.setBlockAndUpdate(p,cut);l.setBlockAndUpdate(q,cut);
+        ((CutBlockEntity)l.getBlockEntity(p)).material(Blocks.OAK_PLANKS.defaultBlockState());
+        ((CutBlockEntity)l.getBlockEntity(q)).material(Blocks.BRICKS.defaultBlockState());
+        var both=new ThermalField();both.add(l,p,20);both.add(l,q,20);both.quarterStep(l,false);
+        var left=new ThermalField();left.add(l,p,20);left.quarterStep(l,false);
+        var right=new ThermalField();right.add(l,q,20);right.quarterStep(l,false);
+        for(long key:both.energy.keySet())h.assertTrue(Math.abs(both.energy.get(key)-left.energy.get(key)-right.energy.get(key))<1e-10,
+            "Two cut blocks sharing a state must retain their individual materials");
+        var saved=both.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess());
+        ((CutBlockEntity)l.getBlockEntity(p)).material(Blocks.BRICKS.defaultBlockState());
+        var fresh=ThermalField.load(saved,l.registryAccess());both.quarterStep(l,false);fresh.quarterStep(l,false);
+        h.assertTrue(both.energy.keySet().equals(fresh.energy.keySet()),"Workspace reuse cannot retain old geometry after a material edit");
+        for(long key:both.energy.keySet())h.assertTrue(Math.abs(both.energy.get(key)-fresh.energy.get(key))<1e-10,
+            "Reused and fresh workspaces must observe the same edited cut material");h.succeed();
+    }
     @GameTest(template="industrial") public static void openSkyAdvectionCannotCreateHotterAir(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,3,6));
         for(var q:BlockPos.betweenClosed(p.offset(-2,0,-2),p.offset(2,9,2)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());

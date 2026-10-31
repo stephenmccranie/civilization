@@ -174,6 +174,10 @@ public final class ThermalLaboratory {
         Files.writeString(output.resolve("measurements.csv"),rows,StandardOpenOption.APPEND);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) throws Exception {
+        if(PHASE.equals("bench")){
+            if(++ticks==20){ThermalPerformanceExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
+            return;
+        }
         if(PHASE.equals("physics")){
             if(++ticks==20){ThermalPhysicsExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
             return;
