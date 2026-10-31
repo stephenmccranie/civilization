@@ -86,7 +86,7 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void blockedPushingCostsNothingAndReverseUsesActualDistance(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
         double wallZ=e.getZ()+2.5;
-        for(int x=-2;x<=2;x++)for(int y=0;y<3;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
+        for(int x=-2;x<=2;x++)for(int y=0;y<2;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
         e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<30;i++)e.tick();
         double stopped=data.reserve().calories();for(int i=0;i<5;i++)e.tick();
         h.assertTrue(data.reserve().calories()==stopped,"Holding forward against a wall costs no travel calories");
@@ -98,16 +98,38 @@ public final class WheelbarrowGameTests {
     }
     @GameTest(template="industrial") public static void bodyAndHandlerCannotPassSolidWalls(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double wallZ=e.getZ()+2.5;
-        for(int x=-2;x<=2;x++)for(int y=0;y<3;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
+        for(int x=-2;x<=2;x++)for(int y=0;y<2;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
         e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<35;i++)e.tick();
         h.assertTrue(e.getBoundingBox().maxZ<=Math.floor(wallZ)+.001,"Long carrier footprint stops at a wall");
         e.input(p,new WheelbarrowPayload(0,0,false));var pos=e.position();e.tick();h.assertTrue(e.position().distanceTo(pos)<.001,"Blocked carrier remains parked");h.succeed();
     }
-    @GameTest(template="industrial") public static void halfStepClimbsButFullBlockDoesNot(GameTestHelper h){
+    @GameTest(template="industrial") public static void halfStepStillClimbs(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int z=(int)Math.floor(e.getZ()+2);
         for(int x=-2;x<=2;x++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y,z),Blocks.STONE_SLAB.defaultBlockState());
         e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<20;i++)e.tick();
         h.assertTrue(e.getY()>y+.45&&e.getY()<y+.6,"Ordinary collision stepping climbs a slab");h.succeed();
+    }
+    @GameTest(template="industrial") public static void climbsSuccessiveOneBlockInclines(GameTestHelper h){
+        var e=barrow(h);
+        // Keep the three rises and standing handler inside the 12x6x12 fixture.
+        for(int x=1;x<=9;x++)for(int z=1;z<=10;z++)for(int height=0;height<=5;height++)
+            h.getLevel().setBlockAndUpdate(h.absolutePos(new BlockPos(x,height,z)),height==0?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
+        var base=h.absolutePos(new BlockPos(5,1,3));e.setPos(base.getX()+.5,base.getY(),base.getZ()+.5);e.tick();
+        var p=player(h);take(h,e,p);double y=e.getY();int first=(int)Math.floor(e.getZ()+2);
+        for(int x=-3;x<=3;x++)for(int z=first;z<=first+5;z++)for(int height=0;height<=Math.min(2,(z-first)/2);height++)
+            h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y+height,z),Blocks.STONE.defaultBlockState());
+        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<30;i++)e.tick();
+        e.positionRider(p);
+        h.assertTrue(e.getY()>y+2.9&&e.getY()<y+3.1,"Successive one-block rises climb without jumping");
+        h.assertTrue(Math.abs(p.getY()-e.getY())<.001&&h.getLevel().noCollision(p,p.getBoundingBox()),"Handler follows incline without colliding with terrain");h.succeed();
+    }
+    @GameTest(template="industrial") public static void oneBlockStepRequiresHandlerHeadroom(GameTestHelper h){
+        var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int first=(int)Math.floor(e.getZ()+2);
+        for(int x=-3;x<=3;x++)for(int z=first;z<=first+3;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y,z),Blocks.STONE.defaultBlockState());
+        var grip=e.gripPosition(e.position(),e.getYRot());
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=2;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(grip.x+x,y+2,grip.z+z),Blocks.STONE.defaultBlockState());
+        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<15;i++)e.tick();e.positionRider(p);
+        h.assertTrue(Math.abs(e.getY()-y)<.001&&h.getLevel().noCollision(p,p.getBoundingBox()),"Low handler ceiling prevents the step instead of embedding the player");h.succeed();
     }
     @GameTest(template="industrial") public static void pickupAndPlacementConserveOneEmptyCarrier(GameTestHelper h){
         var e=barrow(h);var p=player(h);p.setPos(e.position().add(2,0,0));p.setShiftKeyDown(true);

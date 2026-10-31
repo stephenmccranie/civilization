@@ -42,7 +42,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     @Override public boolean canBeCollidedWith(){return isAlive();}
     @Override public boolean canCollideWith(Entity other){return other instanceof WheelbarrowEntity&&!other.isRemoved()&&!isPassengerOfSameVehicle(other);}
     @Override public boolean shouldRiderSit(){return false;}
-    @Override public float maxUpStep(){return .6f;}
+    @Override public float maxUpStep(){return 1;}
     @Override protected boolean canAddPassenger(Entity passenger){return passenger instanceof Player&&getPassengers().isEmpty();}
     // Deliberately retain Entity's null controlling-passenger contract: physics
     // stays on the server rather than accepting vanilla client vehicle movement.
@@ -103,7 +103,17 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         // Native block stepping still sees the full carrier. Publish the smaller
         // solid body again before other entities move/query collision this tick.
         setBoundingBox(terrainBounds());
-        try{super.move(type,motion);}finally{setBoundingBox(makeBoundingBox());}
+        Vec3 before=position();boolean grounded=onGround();float fall=fallDistance;
+        try{
+            super.move(type,motion);
+            // Native stepping resolves the carrier first. Check the raised
+            // handler too, so a low ceiling cannot push their head into blocks.
+            if(getY()>before.y&&getFirstPassenger() instanceof Player p
+                    &&(!accessible(p,terrainBounds())||!clearOfPlayers(position(),getYRot())
+                    ||!accessible(p,riderBox(position(),getYRot(),p))||!level().noCollision(p,riderBox(position(),getYRot(),p)))){
+                setPos(before);setOnGround(grounded);fallDistance=fall;setDeltaMovement(Vec3.ZERO);
+            }
+        }finally{setBoundingBox(makeBoundingBox());}
     }
     /** Small bounded footprint query; neither movement nor placement loads chunks. */
     public boolean accessible(Player p,AABB box){
