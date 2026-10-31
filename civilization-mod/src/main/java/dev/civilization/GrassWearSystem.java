@@ -17,23 +17,41 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class GrassWearSystem {
     private static final Map<ServerPlayer,Stride> STRIDES=new WeakHashMap<>();
     private static final Map<LevelChunk,Long2ByteOpenHashMap> CHANGED=new HashMap<>();
-    private static final class Stride {ServerLevel level;Vec3 last;double distance;}
+    private static final class Stride {ServerLevel level;Vec3 last;double distance;int airTicks=21;double groundY;}
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event){if(event.getEntity() instanceof ServerPlayer p)step(p);}
     public static void step(ServerPlayer player){
         var stride=STRIDES.computeIfAbsent(player,p->new Stride());var level=player.serverLevel();var now=player.position();var last=stride.last;
         boolean same=stride.level==level;stride.level=level;stride.last=now;
-        if(last==null||!same||!player.onGround()||player.isSpectator()||player.getAbilities().flying||player.isFallFlying()||player.isPassenger()||player.isInWater()||player.onClimbable()){
-            stride.distance=0;return;
+        if(last==null||!same){stride.distance=0;stride.airTicks=player.onGround()&&!player.getAbilities().flying?0:21;stride.groundY=now.y;return;}
+        if(player.isSpectator()||player.getAbilities().flying||player.isFallFlying()||player.isPassenger()||player.isInWater()||player.onClimbable()){
+            stride.distance=0;stride.airTicks=21;return;
         }
+        if(player.onGround()){stride.airTicks=0;stride.groundY=now.y;}
+        else if(++stride.airTicks>20||now.y-stride.groundY>1.6){stride.distance=0;return;}
         double distance=now.subtract(last).horizontalDistance();
-        if(distance>2||Math.abs(now.y-last.y)>1.1){stride.distance=0;return;}
+        if(distance>2||Math.abs(now.y-last.y)>1.1){stride.distance=0;stride.airTicks=21;return;}
         if(distance<1e-6)return;
-        var foot=player.getOnPos();
-        if(!level.hasChunkAt(foot)||!level.getBlockState(foot).is(Blocks.GRASS_BLOCK)){stride.distance=0;return;}
-        stride.distance+=distance;
-        if(stride.distance+1e-8<.8)return;
-        stride.distance=Math.max(0,stride.distance-.8);
-        record(level,foot);
+        // Sample distance along the route, including ordinary hops, rather than counting landings.
+        double along=.8-stride.distance;
+        for(;along<=distance+1e-8;along+=.8){
+            var foot=grassBelow(level,last.lerp(now,Math.min(1,along/distance)));
+            if(foot==null){stride.distance=0;return;}
+            record(level,foot);
+        }
+        stride.distance=.8-(along-distance);
+    }
+    private static net.minecraft.core.BlockPos grassBelow(ServerLevel level,Vec3 position){
+        var top=net.minecraft.core.BlockPos.containing(position.x,position.y-1e-4,position.z);
+        // Normal jumps rise about 1.25 blocks. Stop at the first physical surface, never
+        // project through a roof/bridge or down a cliff, and never request unloaded terrain.
+        for(int dy=0;dy<3;dy++){
+            var at=top.below(dy);if(!level.hasChunkAt(at))return null;
+            var state=level.getBlockState(at);
+            if(!state.getFluidState().isEmpty())return null;
+            if(!state.getCollisionShape(level,at).isEmpty())
+                return state.is(Blocks.GRASS_BLOCK)&&position.y-(at.getY()+1)<=1.6?at:null;
+        }
+        return null;
     }
     public static boolean record(ServerLevel level,net.minecraft.core.BlockPos foot){
         if(!level.hasChunkAt(foot)||!level.getBlockState(foot).is(Blocks.GRASS_BLOCK))return false;

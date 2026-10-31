@@ -22,7 +22,24 @@ public final class GrassWearGameTests {
         p.getAbilities().flying=true;p.setPos(p.getX()+1,p.getY(),p.getZ());GrassWearSystem.step(p);
         p.getAbilities().flying=false;p.setOnGround(false);p.setPos(p.getX()+1,p.getY(),p.getZ());GrassWearSystem.step(p);
         p.setOnGround(true);p.setPos(p.getX()+200,p.getY(),p.getZ());GrassWearSystem.step(p);
-        h.assertTrue(total(chunk)==before+1,"Flight, airborne travel and large teleports do not trample");h.succeed();
+        h.assertTrue(total(chunk)==before+1,"Flight, unanchored airborne travel and large teleports do not trample");h.succeed();
+    }
+    @GameTest(template="industrial") public static void sprintJumpsTrampleContinuouslyBelowTheRoute(GameTestHelper h){
+        var level=h.getLevel();var start=h.absolutePos(new BlockPos(2,3,4));
+        for(int x=0;x<12;x++)for(int y=-1;y<4;y++)level.setBlockAndUpdate(start.offset(x,y,0),y==-1?Blocks.GRASS_BLOCK.defaultBlockState():Blocks.AIR.defaultBlockState());
+        var player=new net.neoforged.neoforge.common.util.FakePlayer(level,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"grass-hopper"));
+        player.setPos(start.getX()+.1,start.getY(),start.getZ()+.5);player.setOnGround(true);player.setSprinting(true);GrassWearSystem.step(player);
+        double[] heights={.42,.75,1,1.17,1.25,1.25,1.17,1.02,.8,.5,.13,0};
+        for(int hop=0;hop<2;hop++)for(double height:heights){player.setPos(player.getX()+.32,start.getY()+height,player.getZ());player.setOnGround(height==0);GrassWearSystem.step(player);}
+        int count=0,cells=0;
+        for(int x=0;x<9;x++){
+            var at=start.offset(x,-1,0);var chunk=level.getChunkAt(at);
+            int steps=chunk.getData(GrassWearChunk.TYPE).wear.steps(GrassWear.key(at.getX(),at.getY(),at.getZ()));count+=steps;if(steps>0)cells++;
+        }
+        h.assertTrue(count==9&&cells>=7,"Two sprint hops retain the same nine distance samples as ground travel, including grass under airborne portions: "+count+"/"+cells);
+        player.setPos(player.getX(),start.getY()+5,player.getZ());player.setOnGround(false);GrassWearSystem.step(player);
+        var below=level.getChunkAt(player.blockPosition());int before=total(below);player.setPos(player.getX()+.8,player.getY(),player.getZ());GrassWearSystem.step(player);
+        h.assertTrue(total(below)==before,"High airborne travel cannot project wear to distant ground");h.succeed();
     }
     @GameTest(template="industrial") public static void wornGrassPersistsAndSyncsOnlyVisibleStages(GameTestHelper h){
         var l=h.getLevel();var at=h.absolutePos(new BlockPos(4,2,4));l.setBlockAndUpdate(at,Blocks.GRASS_BLOCK.defaultBlockState());
