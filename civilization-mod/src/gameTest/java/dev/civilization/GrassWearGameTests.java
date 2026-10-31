@@ -27,14 +27,14 @@ public final class GrassWearGameTests {
     @GameTest(template="industrial") public static void wornGrassPersistsAndSyncsOnlyVisibleStages(GameTestHelper h){
         var l=h.getLevel();var at=h.absolutePos(new BlockPos(4,2,4));l.setBlockAndUpdate(at,Blocks.GRASS_BLOCK.defaultBlockState());
         var chunk=l.getChunkAt(at);long key=GrassWear.key(at.getX(),at.getY(),at.getZ());
-        for(int i=0;i<7;i++)GrassWearSystem.record(l,at);
+        for(int i=0;i<3;i++)GrassWearSystem.record(l,at);
         var snap=GrassWearSystem.snapshot(chunk);h.assertTrue(java.util.Arrays.stream(snap.cells()).noneMatch(c->c>>4==key),"Sub-threshold footfalls need no mesh update");
         GrassWearSystem.record(l,at);snap=GrassWearSystem.snapshot(chunk);
-        h.assertTrue(java.util.Arrays.stream(snap.cells()).anyMatch(c->c>>4==key&&(c&15)==1),"Crossing eight steps sends a visual stage");
+        h.assertTrue(java.util.Arrays.stream(snap.cells()).anyMatch(c->c>>4==key&&(c&15)==1),"Crossing four steps sends a visual stage");
         var original=chunk.getData(GrassWearChunk.TYPE);var restored=new GrassWearChunk();restored.deserializeNBT(l.registryAccess(),original.serializeNBT(l.registryAccess()));
-        h.assertTrue(restored.wear.steps(key)==8,"Actual attachment NBT keeps exact footfall counts");
+        h.assertTrue(restored.wear.steps(key)==4,"Actual attachment NBT keeps exact footfall counts");
         for(int i=0;i<100;i++)l.setDayTime(l.getDayTime()+24000);
-        h.assertTrue(original.wear.steps(key)==8,"Elapsed days do not restore unused grass");
+        h.assertTrue(original.wear.steps(key)==4,"Elapsed days do not restore unused grass");
         l.setBlockAndUpdate(at,Blocks.DIRT.defaultBlockState());h.assertTrue(!GrassWearSystem.record(l,at),"Ordinary dirt is not grass wear");h.succeed();
     }
     @GameTest(template="industrial") public static void grassSnapshotsRoundTripAndRejectOversizedPackets(GameTestHelper h){

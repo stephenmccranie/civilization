@@ -77,9 +77,9 @@ final class GrassierGrassVisualCheck {
             ticks--; return;
         }
         if (ticks == 180) { wildHeight = meshHeight(8.25F, 8.75F); shot(mc, "low"); }
-        if (ticks == 185) wear(mc, 16);
+        if (ticks == 185) wear(mc, 8);
         if (ticks == 245) checkWear(0.8F);
-        if (ticks == 250) wear(mc, 48);
+        if (ticks == 250) wear(mc, 24);
         if (ticks == 310) {
             checkWear(0.2F);
             if (net.neoforged.fml.ModList.get().isLoaded("grassiergrass")) {
