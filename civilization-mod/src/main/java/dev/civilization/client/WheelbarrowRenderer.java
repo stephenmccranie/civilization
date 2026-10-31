@@ -16,6 +16,12 @@ public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEnti
     public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.6f;}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerEntityRenderer(WheelbarrowContent.ENTITY.get(),WheelbarrowRenderer::new);}
     @Override public RenderType getRenderType(WheelbarrowEntity e,net.minecraft.resources.ResourceLocation t,MultiBufferSource b,float partial){return RenderType.entityCutoutNoCull(t);}
+    @Override public void render(WheelbarrowEntity e,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
+        super.render(e,yaw,partial,pose,buffers,light);
+        pose.pushPose();pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-Mth.rotLerp(partial,e.yRotO,e.getYRot())));
+        pose.translate(0,.3375,-.84375);pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-WheelbarrowEntity.PUSH_TILT_DEGREES*Mth.lerp(partial,e.previousTilt,e.tilt)));pose.translate(0,-.3375,.84375);
+        CargoVisuals.render(e.cargoIcon(),e.cargoFill(),true,pose,buffers,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);pose.popPose();
+    }
     @Override protected void applyRotations(WheelbarrowEntity e,PoseStack pose,float age,float ignoredYaw,float partial,float scale){
         // GeckoLib supplies zero body yaw for non-LivingEntity animatables.
         super.applyRotations(e,pose,age,Mth.rotLerp(partial,e.yRotO,e.getYRot()),partial,scale);

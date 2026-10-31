@@ -74,7 +74,7 @@ public final class CalorieFoodData extends FoodData {
     /** The server carrier supplies actual handle displacement, including turning. */
     public void pushWheelbarrow(Player player,double dx,double dy,double dz){
         if(!active(player)||!(player.getVehicle() instanceof WheelbarrowEntity e)||e.getFirstPassenger()!=player)return;
-        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),false,"push_wheelbarrow","empty_carrier");
+        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),false,"push_wheelbarrow","wheelbarrow");
     }
 
     private void spendTravel(Player player,double distance,double ascent,boolean sprint,String action,String detail){

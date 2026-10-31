@@ -15,7 +15,8 @@ final class WheelbarrowVisualCheck {
     private static volatile boolean verified;
     private static volatile int entityId;
     private static double stopZ,startX;
-    private static float cameraBeforeTurn,leftStartYaw;
+    private static float cameraBeforeTurn,headingBeforeTurn,leftStartYaw;
+    private static volatile boolean cargoVerified;
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException(failure);var server=mc.getSingleplayerServer();
         if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(65);mc.gui.getChat().clearMessages(true);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);check(server,()->{
@@ -40,13 +41,14 @@ final class WheelbarrowVisualCheck {
         if(ticks==264){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);lookOffset(mc,55);}
         if(ticks==269||ticks==272||ticks==275||ticks==278)shot(mc,"walking-side-"+ticks);
         if(ticks==280){mc.options.keyDown.setDown(false);lookOffset(mc,-55);mc.options.setCameraType(CameraType.FIRST_PERSON);}
-        if(ticks==295){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;cameraBeforeTurn=mc.player.getYRot();mc.options.keyRight.setDown(true);}
+        if(ticks==295){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;cameraBeforeTurn=mc.player.getYRot();headingBeforeTurn=barrow(mc).getYRot();mc.options.keyRight.setDown(true);}
         if(ticks==304){mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);mc.player.setYRot(mc.player.getYRot()+37);mc.player.yRotO+=37;mc.player.setYHeadRot(mc.player.getYHeadRot()+37);mc.player.yHeadRotO+=37;}
         if(ticks==310){mc.player.setYRot(mc.player.getYRot()-37);mc.player.yRotO-=37;mc.player.setYHeadRot(mc.player.getYHeadRot()-37);mc.player.yHeadRotO-=37;mc.options.setCameraType(CameraType.FIRST_PERSON);}
         if(ticks==315){mc.options.keyRight.setDown(false);check(server,()->{if(barrow(server).getYRot()<40)throw new IllegalStateException("Actual steering input did not turn");startX=barrow(server).getX();});}
         if(ticks==322){
             dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));
-            if(net.minecraft.util.Mth.wrapDegrees(mc.player.getYRot()-cameraBeforeTurn)<40)throw new IllegalStateException("Handler camera did not follow the turn");
+            float expected=cameraBeforeTurn+net.minecraft.util.Mth.wrapDegrees(barrow(mc).getYRot()-headingBeforeTurn);
+            if(Math.abs(net.minecraft.util.Mth.wrapDegrees(mc.player.getYRot()-expected))>1)throw new IllegalStateException("Handler camera did not follow actual synchronized steering: expected="+expected+" player="+mc.player.getYRot()+" barrow="+barrow(mc).getYRot());
             if(Math.abs(net.minecraft.util.Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>5)throw new IllegalStateException("Handler view and turned carrier heading diverged");
             shot(mc,"turned-heading");
         }
@@ -76,7 +78,41 @@ final class WheelbarrowVisualCheck {
         if(ticks==495)shaders(false);
         if(ticks==535)shot(mc,"shaders-disabled");
         if(ticks==545)shaders(true);
-        if(ticks>565){if(!verified)throw new IllegalStateException("Wheelbarrow server acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: real placement, empty-hand mount, server-authoritative forward/reverse/turn, wall collision, key-release stop, dismount, synchronized model, Photon front/rear, inventory and shaders-disabled views");mc.stop();}
+        if(ticks==560){check(server,()->{
+            var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.teleportTo(server.overworld(),2.5,100,-1,java.util.Set.of(),0,20);
+            p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(CargoContent.STOCKPILE.get()));p.inventoryMenu.broadcastFullState();
+        });}
+        if(ticks==575)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100,.5),Direction.UP,new BlockPos(2,99,0),false));
+        if(ticks==580)check(server,()->{
+            var s=(StockpileEntity)server.overworld().getBlockEntity(new BlockPos(2,100,0));if(s==null)throw new IllegalStateException("Real stockpile placement failed");
+            s.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),400);
+            var p=server.getPlayerList().getPlayers().getFirst();p.getInventory().setItem(9,new ItemStack(Blocks.STONE,32));p.inventoryMenu.broadcastFullState();
+        });
+        if(ticks==588){var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.8,0)),InteractionHand.MAIN_HAND);}
+        if(ticks==600){if(!(mc.player.containerMenu instanceof CargoMenu))throw new IllegalStateException("Tray hit did not open cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
+        if(ticks==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=256||Math.abs(m.mass()-64000)>1)throw new IllegalStateException("Cargo quantity or mass did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
+        if(ticks==620)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,1,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);
+        if(ticks==625){if(mc.player.containerMenu.getCarried().getCount()!=16)throw new IllegalStateException("Real cargo right-click cursor did not synchronize");mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);}
+        if(ticks==630)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,27,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
+        if(ticks==635)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getInventory().getItem(9).getCount()!=32||barrow(server).cargo().entry(0).count()!=256)throw new IllegalStateException("Full cargo accepted an oversized transfer");});
+        if(ticks==640)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,1);
+        if(ticks==644){if(((CargoMenu)mc.player.containerMenu).count(0)!=0)throw new IllegalStateException("Unload failed to clear synchronized cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
+        if(ticks==650){mc.player.closeContainer();check(server,()->{var e=barrow(server);var p=server.getPlayerList().getPlayers().getFirst();var grip=e.gripPosition(e.position(),0);p.teleportTo(server.overworld(),grip.x,grip.y,grip.z,java.util.Set.of(),0,20);});}
+        if(ticks==660){var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.95,-.83)),InteractionHand.MAIN_HAND);}
+        if(ticks==665){if(mc.player.getVehicle()!=barrow(mc))throw new IllegalStateException("Rear/handle hit did not take loaded handles");mc.options.keyUp.setDown(true);mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);lookOffset(mc,35);}
+        if(ticks==672)shot(mc,"loaded-pushing");
+        if(ticks==675){mc.options.keyUp.setDown(false);lookOffset(mc,-35);mc.options.keyShift.setDown(true);}
+        if(ticks==680){mc.options.keyShift.setDown(false);mc.options.setCameraType(CameraType.FIRST_PERSON);check(server,()->{
+            var e=barrow(server);e.setYRot(0);e.setPos(.5,100,.5);var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),2.5,100,-1,java.util.Set.of(),0,20);p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();
+        });}
+        if(ticks==695)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100.125,.5),Direction.UP,new BlockPos(2,100,0),false));
+        if(ticks==710){if(!(mc.player.containerMenu instanceof CargoMenu m)||m.count(0)!=144)throw new IllegalStateException("Stockpile remainder/menu failed to synchronize");shot(mc,"stockpile-menu");cargoVerified=true;}
+        if(ticks==715){mc.player.closeContainer();check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),3.7,102,4.2,java.util.Set.of(),140,18);});}
+        if(ticks==735)shot(mc,"loaded-world-photon");
+        if(ticks==745)shaders(false);
+        if(ticks==785)shot(mc,"loaded-world-no-shaders");
+        if(ticks==795)shaders(true);
+        if(ticks>815){if(!verified||!cargoVerified)throw new IllegalStateException("Wheelbarrow server/cargo acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: actual movement and camera/gait, tray/handle hit packets, stockpile placement, mass-limited loading, 256-item synchronization, cursor/shift-click conservation, direct unload/reload, loaded pushing, cargo menus and Photon/shaders-disabled views");mc.stop();}
     }
     private static WheelbarrowEntity barrow(Minecraft mc){if(entityId!=0&&mc.level.getEntity(entityId) instanceof WheelbarrowEntity e)return e;return mc.level.getEntitiesOfClass(WheelbarrowEntity.class,new AABB(-10,98,-10,10,108,10)).getFirst();}
     private static WheelbarrowEntity barrow(net.minecraft.server.MinecraftServer s){return (WheelbarrowEntity)s.overworld().getEntity(entityId);}

@@ -16,12 +16,15 @@ import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /** Server-driven ground carrier. A standing passenger supplies input at the handles. */
-public final class WheelbarrowEntity extends Entity implements GeoEntity {
+public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHolder,net.minecraft.world.MenuProvider {
     public static final float MODEL_SCALE=1.35f;
     public static final float PUSH_TILT_DEGREES=4;
     public static final float WHEEL_RADIUS=4.1411056f/16*MODEL_SCALE;
     private static final EntityDataAccessor<Boolean> HELD=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<net.minecraft.world.item.ItemStack> CARGO_ICON=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.ITEM_STACK);
+    private static final EntityDataAccessor<Float> CARGO_FILL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
+    private final MassCargo cargo=new MassCargo(()->CargoConfig.WHEELBARROW.get(),this::cargoChanged);
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
     private int forward,turn,lerpSteps;
     private long lastInput=Long.MIN_VALUE;
@@ -31,7 +34,28 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     public float previousTravel,previousTilt,tilt;
     public final WalkAnimationState handlerWalkAnimation=new WalkAnimationState();
     public WheelbarrowEntity(EntityType<? extends WheelbarrowEntity> type,Level level){super(type,level);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(CARGO_ICON,net.minecraft.world.item.ItemStack.EMPTY);b.define(CARGO_FILL,0f);}
+    private void cargoChanged(){
+        if(level().isClientSide)return;
+        entityData.set(CARGO_ICON,cargo.isEmpty()?net.minecraft.world.item.ItemStack.EMPTY:cargo.entry(0).item());
+        entityData.set(CARGO_FILL,(float)Math.min(1,cargo.mass()/cargo.capacity()));
+    }
+    public net.minecraft.world.item.ItemStack cargoIcon(){return entityData.get(CARGO_ICON);}
+    public float cargoFill(){return entityData.get(CARGO_FILL);}
+    @Override public MassCargo cargo(){return cargo;}
+    @Override public Level cargoLevel(){return level();}
+    @Override public Vec3 cargoPosition(){return position();}
+    @Override public boolean cargoValid(Player p){return isAlive()&&!isVehicle()&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<=36&&accessible(p,terrainBounds());}
+    @Override public Component cargoName(){return Component.translatable("entity.civilization.wheelbarrow");}
+    @Override public Component getDisplayName(){return cargoName();}
+    @Override public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id,net.minecraft.world.entity.player.Inventory inv,Player p){return new CargoMenu(id,inv,this);}
+    @Override public InteractionResult interactAt(Player p,Vec3 hit,InteractionHand hand){
+        if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
+        // Transform the actual hit into the entity's forward/back frame.
+        if(p.isShiftKeyDown()||hit.yRot(getYRot()*Mth.DEG_TO_RAD).z<-.4*MODEL_SCALE)return interact(p,hand);
+        if(!level().isClientSide&&cargoValid(p))p.openMenu(this);
+        return InteractionResult.sidedSuccess(level().isClientSide);
+    }
     public float travel(){return entityData.get(TRAVEL);}
     public float renderedTravel(){return level().isClientSide?sampledTravel:travel();}
     public boolean held(){return entityData.get(HELD);}
@@ -59,6 +83,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         if(!accessible(p,terrainBounds())||!level().mayInteract(p,blockPosition()))return InteractionResult.FAIL;
         if(isVehicle())return InteractionResult.FAIL;
         if(p.isShiftKeyDown()){
+            if(!cargo.isEmpty()){p.displayClientMessage(Component.literal("Empty the wheelbarrow before recovering it."),true);return InteractionResult.FAIL;}
             var stack=WheelbarrowContent.ITEM.toStack();if(!p.addItem(stack))spawnAtLocation(stack);
             discard();return InteractionResult.CONSUME;
         }
@@ -160,6 +185,6 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         }
         if(p!=null)p.setYBodyRot(getYRot());
     }
-    @Override protected void addAdditionalSaveData(CompoundTag tag){tag.putFloat("Travel",travel());}
-    @Override protected void readAdditionalSaveData(CompoundTag tag){float value=tag.getFloat("Travel");entityData.set(TRAVEL,Float.isFinite(value)?value:0f);forward=turn=0;lastInput=Long.MIN_VALUE;}
+    @Override protected void addAdditionalSaveData(CompoundTag tag){tag.putFloat("Travel",travel());tag.put("Cargo",cargo.save(registryAccess()));}
+    @Override protected void readAdditionalSaveData(CompoundTag tag){float value=tag.getFloat("Travel");entityData.set(TRAVEL,Float.isFinite(value)?value:0f);cargo.load(tag.getList("Cargo",10),registryAccess());forward=turn=0;lastInput=Long.MIN_VALUE;}
 }
