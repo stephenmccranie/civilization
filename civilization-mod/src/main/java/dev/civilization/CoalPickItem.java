@@ -19,5 +19,5 @@ public final class CoalPickItem extends Item {
     @Override public boolean canAttackBlock(BlockState b,Level l,BlockPos pos,Player p){return false;}
     @Override public boolean onLeftClickEntity(ItemStack s,Player p,Entity target){return true;}
     @Override public boolean shouldCauseReequipAnimation(ItemStack a,ItemStack b,boolean slot){return slot||!a.is(b.getItem());}
-    @Override public void appendHoverText(ItemStack s,TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Click to strike huge coal veins; aim through the swing."));lines.add(Component.literal("Creative prototype · loose coal needs the Loading Shovel."));}
+    @Override public void appendHoverText(ItemStack s,TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Click to strike huge coal veins; aim through the swing."));lines.add(Component.literal("Made and repaired in the Smithy; loose coal needs the Loading Shovel."));}
 }

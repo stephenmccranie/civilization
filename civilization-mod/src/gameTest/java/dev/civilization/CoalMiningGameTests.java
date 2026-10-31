@@ -12,6 +12,41 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class CoalMiningGameTests {
+    @GameTest(template="industrial")
+    public static void survivalSmithyMakesAndRepairsManualCoalTools(GameTestHelper h){
+        var w=WorkshopGameTests.build(h,2,Direction.NORTH);
+        for(var tool:java.util.List.of(CoalMiningContent.PICK.get(),CoalMiningContent.SHOVEL.get())){
+            w.clearContent();w.heat=0;
+            var id=net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(tool).toString();
+            int index=WorkshopJobs.index(2,id);h.assertTrue(index>=0,"Coal tool has a Smithy job");w.select(index);
+            var job=WorkshopJobs.smithy().get(index);
+            for(int i=0;i<4;i++)w.setItem(i,job.needs().get(i).icon());
+            w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));WorkshopGameTests.run(w,600);
+            var result=w.getItem(5).copy();
+            h.assertTrue(result.is(tool)&&EquipmentGrade.hasGrade(result),"Smithy produces a graded coal tool");
+            h.assertTrue(w.getItem(4).getCount()==2&&w.heat==200,"Thirty seconds spends 1.5 Coal at base efficiency");
+            for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Actual tool materials are consumed");
+            EquipmentGrade.apply(result,100); // Repairability here must not depend on the production grade roll.
+            result.setDamageValue(Math.max(1,result.getMaxDamage()/2));
+            h.assertTrue(WorkshopJobs.repair(result)!=null&&WorkshopJobs.gated(result),"Manual tools use Smithy repair and equipment gates");
+        }
+        h.succeed();
+    }
+    @GameTest(template="industrial")
+    public static void survivalCoalHandlingCraftsFromOrdinaryMaterials(GameTestHelper h){
+        var manager=h.getLevel().getRecipeManager();
+        var cart=net.minecraft.world.item.crafting.CraftingInput.of(2,2,java.util.List.of(
+                Items.MINECART.getDefaultInstance(),Items.BIRCH_PLANKS.getDefaultInstance(),Items.OAK_PLANKS.getDefaultInstance(),Items.IRON_INGOT.getDefaultInstance()));
+        var cartRecipe=manager.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING,cart,h.getLevel()).orElseThrow();
+        h.assertTrue(cartRecipe.value().assemble(cart,h.getLevel().registryAccess()).is(CoalMiningContent.CART_ITEM.get()),"Minecart conversion accepts mixed planks and yields a Coal Minecart");
+        var screen=net.minecraft.world.item.crafting.CraftingInput.of(3,3,java.util.List.of(
+                Items.OAK_PLANKS.getDefaultInstance(),Items.IRON_INGOT.getDefaultInstance(),Items.BIRCH_PLANKS.getDefaultInstance(),
+                Items.STICK.getDefaultInstance(),ItemStack.EMPTY,Items.STICK.getDefaultInstance(),
+                Items.BIRCH_PLANKS.getDefaultInstance(),Items.IRON_INGOT.getDefaultInstance(),Items.OAK_PLANKS.getDefaultInstance()));
+        var recipe=manager.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING,screen,h.getLevel()).orElseThrow();
+        h.assertTrue(recipe.value().assemble(screen,h.getLevel().registryAccess()).is(CoalMiningContent.SCREEN_ITEM.get()),"Ordinary iron, sticks and planks craft a preparation screen");
+        h.succeed();
+    }
     private static net.neoforged.neoforge.common.util.FakePlayer player(GameTestHelper h,BlockPos at){var p=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"coal-miner"));p.setGameMode(GameType.SURVIVAL);p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-2);p.setItemInHand(InteractionHand.MAIN_HAND,CoalMiningContent.PICK.toStack());EquipmentGrade.apply(p.getMainHandItem(),100,42);CalorieFoodData.of(p).reserve().set(2400);return p;}
     private static BlockPos face(GameTestHelper h){var a=h.absolutePos(new BlockPos(3,3,3));for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++){h.getLevel().setBlockAndUpdate(a.offset(x,-2,z),Blocks.STONE.defaultBlockState());for(int y=-1;y<=2;y++)h.getLevel().setBlockAndUpdate(a.offset(x,y,z),Blocks.AIR.defaultBlockState());}h.getLevel().setBlockAndUpdate(a,CoalMiningContent.FACE.get().defaultBlockState());return a;}
     private static void aim(net.minecraft.server.level.ServerPlayer p,Vec3 at){var d=at.subtract(p.getEyePosition());p.setYRot((float)Math.toDegrees(Math.atan2(-d.x,d.z)));p.setXRot((float)-Math.toDegrees(Math.atan2(d.y,Math.sqrt(d.x*d.x+d.z*d.z))));}

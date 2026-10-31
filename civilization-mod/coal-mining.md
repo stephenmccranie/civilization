@@ -1,10 +1,21 @@
 # Manual coal mining prototype
 
-The first Creative/admin loop implements pick → loose coal → shovel → rail cart → hand preparation → existing usable Coal. Ordinary coal ore still uses normal mining and yields usable Coal directly. Huge-vein work is richer: a complete prototype vein block prepares into **16 Coal**. These are trial values, not final Survival balance. The Coal Drill remains available until the replacement has Survival acquisition and migration.
+The playable manual loop implements pick → loose coal → shovel → rail cart → hand preparation → existing usable Coal. Ordinary coal ore still uses normal mining and yields usable Coal directly. Huge-vein work is richer: a complete prototype vein block prepares into **16 Coal**. These are trial values, not final Survival balance. Survival acquisition is available for playtesting; the Coal Drill remains during broader balance, custody and migration review.
 
 ## Try it
 
-Use the Civilization Creative tab to obtain **Coal Mining Pick**, **Coal Loading Shovel**, **Coal Minecart**, **Coal Preparation Screen** and **Huge Coal Vein**. Place a workface above a solid floor, ordinary rails beside it, and a screen beside the destination rail. Return to Survival to try paid work; these items have no Survival recipes yet. The special pick also starts manual excavation of existing dense geological coal-seam blocks.
+Start with ordinary hand-mined Coal, build the Kiln/Foundry/Smithy, then obtain the manual kit through Survival production:
+
+| Item | Route | Materials |
+| --- | --- | --- |
+| Coal Mining Pick | Smithy, 30 seconds | 3 Iron Ingots, 2 Sticks, 1 Leather |
+| Coal Loading Shovel | Smithy, 30 seconds | 1 Iron Ingot, 2 Sticks, 1 Leather |
+| Coal Minecart | Shapeless crafting | 1 ordinary Minecart, 2 Planks, 1 Iron Ingot |
+| Coal Preparation Screen | Crafting: `PIP / S S / PIP` | 4 Planks, 2 Iron Ingots, 2 Sticks |
+
+Each Smithy tool spends 1.5 Coal at base efficiency, receives an equipment grade, and uses the existing Smithy repair rules. Mixed plank species are accepted. The full kit costs 12 Iron Ingots (including the five in a normal cart), 2 Leather, 6 Sticks and 6 Planks, plus Smithy fuel and separate rails. No machine parts, steel or oil are needed for this manual upgrade. The hand screen retains its existing work/calorie costs.
+
+The pick starts manual excavation of naturally generated dense geological coal-seam blocks. Place ordinary rails and a screen beside the worksite, expose a seam, and follow the loop below. The Creative tab still supplies a **Huge Coal Vein** workface for demonstrations; the resource block itself has no Survival crafting recipe.
 
 1. Hold the pick and click the exposed coal. A click commits one swing; hold left-click to repeat after each full recovery. Releasing stops the next swing, while the committed stroke finishes. Menus and pause prevent new swings; camera movement alone never strikes. Turn your view to pull the pick around: the head follows camera yaw/pitch with bounded weighted carry, then settles back into alignment when you stop. It follows the turn rather than hanging behind the view. The grip stays close through both windup and contact; the close ready pose raises it beside the shoulder and draws the head back over the player, then brings the working point forward/down toward the aimed coal. The strike and downward follow-through stay in one plane; only camera movement changes the plane. The tool recovers into a forward-ready pose. The camera remains freely responsive; there is no forced shake or extra stock from faster turns. The inertial first-person pose also responds between strikes; looking alone never mines. The server resolves the actual current aim at contact, within normal reach capped at 4.5 blocks.
 2. Each successful contact removes an exposed 2×2 patch one quarter-cell deep in a 4×4×4 block grid. Collision, outline and chunk mesh follow the saved remaining material. Work through the notch to reach deeper layers. The final portion clears the block.

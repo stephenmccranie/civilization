@@ -89,11 +89,12 @@ public final class Deposits {
         var site=coal!=null?coal:oil!=null&&Math.floorDiv(oil.x(),256)==cellX&&Math.floorDiv(oil.z(),256)==cellZ?oil:null;
         cache.put(key,Optional.ofNullable(site));return site;
     }
-    /** One oil field per suitable 4x4-cell region; failed individual rolls cannot strand an entire plains belt. */
+    /** One oil field per selected suitable 4x4-cell region; search locally within that district. */
     private static Site oilRegion(ServerLevel l,int regionX,int regionZ){
         var cache=oilCache(l);long key=key(regionX,regionZ);var known=cache.get(key);if(known!=null)return known.orElse(null);
         var generator=l.getChunkSource().getGenerator();var random=l.getChunkSource().randomState();
         long order=mix(l.getSeed() ^ ((long)regionX*0x632be59bd9b4e019L) ^ ((long)regionZ*0x9e3779b97f4a7c15L));
+        if(!DepositDistribution.oil(order)){cache.put(key,Optional.empty());return null;}
         int start=(int)Math.floorMod(order,16),step=((int)(order>>>8)&7)*2+1;
         Site result=null;
         for(int n=0;n<16&&result==null;n++){
@@ -114,7 +115,7 @@ public final class Deposits {
     }
     private static Site sampleCoal(ServerLevel l,int cellX,int cellZ) {
         long hash=cellHash(l,cellX,cellZ);
-        if(Math.floorMod(hash,3)!=0) return null;
+        if(!DepositDistribution.coal(hash)) return null;
         var generator=l.getChunkSource().getGenerator(); var random=l.getChunkSource().randomState();
         // Try a few positions inside each selected region. A single point on a Tectonic cliff
         // must not make an otherwise suitable 256-block region permanently empty.
