@@ -111,6 +111,15 @@ Advance connected player loops. Basic operational readiness proceeds alongside d
 
 [Weather and farming](civilization-mod/weather.md) owns shipped rain, soil, crops, fertilizer and prototype Rain Caller behavior. Next: [non-farmland habitat and food-economy audit](open_decisions.md#regional-weather-and-farming-package), especially berries and supplied animal food. Tower construction, Survival energy/access and offline production remain unsettled.
 
+### Shared parts and assembly — planning package
+
+The [agreed upgrade](design_direction.md#shared-parts-and-final-assembly--planned-upgrade) introduces shared manufactured parts, hand assembly at a bench and component delivery to large build sites. No code or recipe changes are part of this planning step. Keep the current active package and other ongoing work in place; implementation order is not yet scheduled. [Open choices](open_decisions.md#shared-parts-and-assembly--remaining-design) own catalog, stations, costing, repairs and migration.
+
+1. Audit representative tools, armor, everyday fixtures/storage, wheelbarrows, minecarts, refinery equipment and engines. Draft ingredient lists together and keep only useful recurring parts or justified major assemblies.
+2. Map workshop dependencies from first raw supplies to finished goods. Resolve woodworking/assembly station roles and verify a non-circular bootstrap through the first oil industry.
+3. Define one complete first package: wooden/metal parts feeding tools, a wheelbarrow and a few everyday fixtures. Compare total raw material, fuel, labor, time and physical handling with current production; coordinate with the active storage package.
+4. Settle repairs/grade and old-stock/construction migration before implementation. Then implement the selected loop with appropriate recipe, conservation, persistence and focused interaction checks; expand by product family after ordinary-play review.
+
 ### Town workshops — initial package implemented
 
 [Industry](civilization-mod/industry.md#town-workshops) owns current station recipes, equipment grades/repairs, acquisition gates and shared cabinet behavior. Next: play repair/replacement economics and finish [special-equipment/acquisition coverage](open_decisions.md#town-workshop-implementation-details). Supplied husbandry, powered manufacturing and maker customization follow separately; settlement density still needs economic evidence.

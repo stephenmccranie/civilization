@@ -349,6 +349,18 @@ Remaining: non-farmland habitat/timing, berries and animal-food balance, any col
 
 Advanced animal husbandry remains future work ([E05](development_plan.md#3-checklist)). The newer sulfur + gravel-only fertilizer decision supersedes the earlier commitment to animal fertilizer ingredients and immediate removal of the clay route is implemented. Before adding husbandry, decide its products and whether the current fertilizer-only rule should change. No additional animal needs or continuous simulation are approved.
 
+## Shared parts and assembly — remaining design
+
+The [agreed direction](design_direction.md#shared-parts-and-final-assembly--planned-upgrade) separates workshop parts-making from hand assembly and in-world construction. This is a planned recipe-system upgrade, not an implemented change or a replacement for the current active package.
+
+- **Recipe coverage and catalog:** audit tools, armor, everyday wooden goods, storage, wheelbarrows, minecarts, refinery equipment and engines together. Select exact reusable parts, tool-head coverage, justified metal variants and batch yields from real repeated uses. Ingredient sketches are not locked recipes or quantities; avoid broadening into gears, springs, wire or rope without demand.
+- **Station layout and interaction:** decide whether woodworking and general assembly share one physical bench, its construction bill and how player labor is supplied/charged. Choose which goods fit the bench versus their in-world build site; do not assume every station needs a new multiblock or a minigame.
+- **Full cost and bootstrap:** compare raw stock, coal, calories, productive time and transport against current recipes. Trace first tools and every workshop through earlier supplies, including metal-free initial facilities and coal-era access to oil. Define part mass/volume and conversions consistently with the physical storage work; prevent crafting/uncrafting from multiplying stock or bypassing capacity.
+- **Repairs and grade:** decide handle/grip replacement versus metal repair, part costs, where final equipment grade is assigned, and how existing grade loss, identity, upgrades and repair pricing carry over. Do not silently grant grade resets through disassembly/reassembly or change shipped repair rules.
+- **Rollout and existing stock:** select one complete first loop before replacing recipes by family. Audit crafting, alternate acquisition, automation and recovery paths; explicitly handle existing parts, finished goods, placed construction and in-progress jobs. Do not invalidate saved stock or silently change paid construction refunds.
+
+[Development plan](development_plan.md#shared-parts-and-assembly--planning-package) owns the work sequence. Resolve these choices into the design before implementation; current recipes remain in the [industry reference](civilization-mod/industry.md).
+
 ## Town workshop implementation details
 
 The [workshop direction](design_direction.md#town-workshops-and-the-ruralurban-production-loop) is agreed; [industry](civilization-mod/industry.md#town-workshops) owns shipped recipes, grades, repairs, visuals and acquisition gates.
