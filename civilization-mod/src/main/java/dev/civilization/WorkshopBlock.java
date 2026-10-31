@@ -7,14 +7,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class WorkshopBlock extends KilnBlock {
+public class WorkshopBlock extends KilnBlock {
     public final int kind;
     public WorkshopBlock(Properties p,int kind){super(p);this.kind=kind;}
     private static final net.minecraft.world.phys.shapes.VoxelShape BENCH_SHAPE=net.minecraft.world.phys.shapes.Shapes.or(
         box(0,12,0,16,16,16),box(1,0,1,3,12,3),box(13,0,1,15,12,3),box(1,0,13,3,12,15),box(13,0,13,15,12,15));
     @Override protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return kind==ManufacturingJobs.BENCH?BENCH_SHAPE:super.getShape(state,level,pos,context);}
     @Override protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos){return kind==ManufacturingJobs.BENCH?net.minecraft.world.phys.shapes.Shapes.empty():super.getOcclusionShape(state,level,pos);}
-    @Override protected MapCodec<WorkshopBlock> codec(){return simpleCodec(p->new WorkshopBlock(p,kind));}
+    @Override protected MapCodec<? extends WorkshopBlock> codec(){return simpleCodec(p->new WorkshopBlock(p,kind));}
     @Override public BlockEntity newBlockEntity(BlockPos p,BlockState s){return new WorkshopBlockEntity(p,s);}
     @Override protected void onRemove(BlockState old,Level l,BlockPos p,BlockState next,boolean moved){
         if(!old.is(next.getBlock())&&l.getBlockEntity(p) instanceof WorkshopBlockEntity w){w.awardExperience(net.minecraft.world.phys.Vec3.atCenterOf(p));net.minecraft.world.Containers.dropContents(l,p,w);l.updateNeighbourForOutputSignal(p,this);}

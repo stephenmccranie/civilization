@@ -1,19 +1,51 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,wide=false": {
+      "model": "civilization:block/assembly_bench_legacy",
+      "y": 0
+    },
+    "facing=north,wide=true,part=false": {
       "model": "civilization:block/assembly_bench",
       "y": 0
     },
-    "facing=east": {
+    "facing=north,wide=true,part=true": {
+      "model": "civilization:block/assembly_bench_right",
+      "y": 0
+    },
+    "facing=east,wide=false": {
+      "model": "civilization:block/assembly_bench_legacy",
+      "y": 90
+    },
+    "facing=east,wide=true,part=false": {
       "model": "civilization:block/assembly_bench",
       "y": 90
     },
-    "facing=south": {
+    "facing=east,wide=true,part=true": {
+      "model": "civilization:block/assembly_bench_right",
+      "y": 90
+    },
+    "facing=south,wide=false": {
+      "model": "civilization:block/assembly_bench_legacy",
+      "y": 180
+    },
+    "facing=south,wide=true,part=false": {
       "model": "civilization:block/assembly_bench",
       "y": 180
     },
-    "facing=west": {
+    "facing=south,wide=true,part=true": {
+      "model": "civilization:block/assembly_bench_right",
+      "y": 180
+    },
+    "facing=west,wide=false": {
+      "model": "civilization:block/assembly_bench_legacy",
+      "y": 270
+    },
+    "facing=west,wide=true,part=false": {
       "model": "civilization:block/assembly_bench",
+      "y": 270
+    },
+    "facing=west,wide=true,part=true": {
+      "model": "civilization:block/assembly_bench_right",
       "y": 270
     }
   }

@@ -20,6 +20,6 @@ public final class WorkshopContent {
     public static final DeferredItem<Item> HIDE=ITEMS.registerSimpleItem("raw_hide"), CLOTH=ITEMS.registerSimpleItem("cloth");
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<WorkshopBlockEntity>> ENTITY=ENTITIES.register("workshop",()->BlockEntityType.Builder.of(WorkshopBlockEntity::new,TANNERY.get(),TEXTILE.get(),SMITHY.get(),BENCH.get()).build(null));
     public static final DeferredHolder<MenuType<?>,MenuType<WorkshopMenu>> MENU=MENUS.register("workshop",()->new MenuType<>(WorkshopMenu::new,FeatureFlags.DEFAULT_FLAGS));
-    private static DeferredBlock<WorkshopBlock> block(String name,int kind){var b=BLOCKS.register(name,()->new WorkshopBlock(kind==3?BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion():BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE),kind));ITEMS.registerSimpleBlockItem(b);return b;}
+    private static DeferredBlock<WorkshopBlock> block(String name,int kind){var b=BLOCKS.register(name,()->kind==3?new AssemblyBenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)):new WorkshopBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE),kind));ITEMS.registerSimpleBlockItem(b);return b;}
     public static void register(IEventBus bus){BLOCKS.register(bus);ITEMS.register(bus);ENTITIES.register(bus);MENUS.register(bus);}
 }

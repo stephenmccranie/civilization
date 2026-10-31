@@ -34,6 +34,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     public boolean handWorked(){return kind==ManufacturingJobs.BENCH;}
     public boolean beginWork(Player player){
         if(!handWorked()||!stillValid(player)||player.isSpectator()||worker!=null&&worker!=player)return false;
+        if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState()))return false;
         if(!(player.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this)return false;
         var quote=MachineWork.match(this,job());
         if(quote==null||!MachineInventory.room(this,outputSlots(),WorkshopJobs.result(quote.job(),quote.first())))return false;
@@ -51,6 +52,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     }
     private void processHandWork(){
         if(worker==null||!worker.isAlive()||worker.isSpectator()||!stillValid(worker)||!(worker.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this){worker=null;pause(MachineStatus.Workshop.HAND_READY,false);return;}
+        if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState())){worker=null;pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         ensureInputIdentity();
         var job=job();var match=MachineWork.match(this,job);
         if(match==null){worker=null;pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
@@ -134,7 +136,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     private void changedInput(int i){if(i<4){progress=0;workingResult=ItemStack.EMPTY;}setChanged();}
     private int[] outputSlots(){return kind>=2?MachineInventory.SMITHY_OUTPUT:MachineInventory.WORKSHOP_OUTPUT;}
     @Override public void clearContent(){items.clear();worker=null;progress=0;workingResult=ItemStack.EMPTY;setChanged();}
-    @Override public boolean stillValid(Player p){return !isRemoved()&&level!=null&&level.getBlockEntity(worldPosition)==this&&p.level()==level&&p.distanceToSqr(worldPosition.getCenter())<=64&&CivicAccess.allowed(level,worldPosition,p);}
+    @Override public boolean stillValid(Player p){return !isRemoved()&&level!=null&&level.getBlockEntity(worldPosition)==this&&p.level()==level&&p.distanceToSqr(worldPosition.getCenter())<=64&&CivicAccess.allowed(level,worldPosition,p)&&(!(getBlockState().getBlock() instanceof AssemblyBenchBlock)||AssemblyBenchBlock.allowed(level,worldPosition,getBlockState(),p));}
     @Override public boolean canPlaceItem(int i,ItemStack s){if(i==4||i==6)return !handWorked()&&s.is(KilnContent.MINERAL_COAL.get());return i>=0&&i<4&&(kind>=2||i<2)&&MachineWork.accepts(this,kind,selected,s);}
     @Override public int[] getSlotsForFace(Direction side){
         if(side==Direction.DOWN)return outputSlots();
