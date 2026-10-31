@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.*;
 
-/** Creative/admin prototype; acquisition and replacement of the drill come later. */
+/** Manual coal tools and handling; the retained drill remains during playtesting. */
 public final class CoalMiningContent {
     private static final DeferredRegister.Blocks BLOCKS=DeferredRegister.createBlocks("civilization");
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems("civilization");

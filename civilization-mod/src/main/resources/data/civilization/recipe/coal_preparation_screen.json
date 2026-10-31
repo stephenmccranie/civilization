@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [ "PIP", "S S", "PIP" ],
+  "key": {
+    "P": { "tag": "minecraft:planks" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "id": "civilization:coal_preparation_screen", "count": 1 }
+}

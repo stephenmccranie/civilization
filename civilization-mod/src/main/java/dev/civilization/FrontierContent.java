@@ -13,6 +13,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class FrontierContent {
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Civilization.MOD_ID);
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Civilization.MOD_ID);
+    private static final DeferredRegister<net.minecraft.world.level.levelgen.feature.Feature<?>> FEATURES =
+            DeferredRegister.create(net.minecraft.core.registries.Registries.FEATURE,Civilization.MOD_ID);
+    public static final net.neoforged.neoforge.registries.DeferredHolder<net.minecraft.world.level.levelgen.feature.Feature<?>,RegionalUraniumFeature>
+            URANIUM_FEATURE=FEATURES.register("uranium",RegionalUraniumFeature::new);
 
     public static final DeferredBlock<Block> URANIUM_ORE = BLOCKS.register("uranium_ore",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.EMERALD_ORE)));
@@ -24,6 +28,7 @@ public final class FrontierContent {
     private FrontierContent() {}
 
     public static void register(IEventBus bus) {
+        FEATURES.register(bus);
         BLOCKS.register(bus);
         ITEMS.registerSimpleBlockItem(URANIUM_ORE);
         ITEMS.register(bus);
