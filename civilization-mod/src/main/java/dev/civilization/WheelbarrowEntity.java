@@ -37,9 +37,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
     @Override public boolean isPickable(){return !isRemoved();}
-    // The long handle envelope is a terrain/selection bound, never a wall for
-    // walking players. Otherwise diagonal grips collide with the barrow itself.
-    @Override public boolean canBeCollidedWith(){return false;}
+    // Walking players collide with the tray/wheel body, not the handle corridor.
+    @Override public boolean canBeCollidedWith(){return isAlive();}
     @Override public boolean canCollideWith(Entity other){return other instanceof WheelbarrowEntity&&!other.isRemoved()&&!isPassengerOfSameVehicle(other);}
     @Override public boolean shouldRiderSit(){return false;}
     @Override public float maxUpStep(){return .6f;}
@@ -56,7 +55,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
         if(p.isShiftKeyDown()&&!p.getItemInHand(hand).isEmpty())return InteractionResult.PASS;
         if(level().isClientSide)return InteractionResult.SUCCESS;
-        if(!accessible(p,getBoundingBox())||!level().mayInteract(p,blockPosition()))return InteractionResult.FAIL;
+        if(!accessible(p,terrainBounds())||!level().mayInteract(p,blockPosition()))return InteractionResult.FAIL;
         if(isVehicle())return InteractionResult.FAIL;
         if(p.isShiftKeyDown()){
             var stack=WheelbarrowContent.ITEM.toStack();if(!p.addItem(stack))spawnAtLocation(stack);
@@ -85,7 +84,26 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         double a=yaw*Mth.DEG_TO_RAD,x=(Math.abs(Math.cos(a))*.4+Math.abs(Math.sin(a))*1.08)*MODEL_SCALE,z=(Math.abs(Math.sin(a))*.4+Math.abs(Math.cos(a))*1.08)*MODEL_SCALE;
         return new AABB(at.x-x,at.y,at.z-z,at.x+x,at.y+.95*MODEL_SCALE,at.z+z);
     }
-    @Override protected AABB makeBoundingBox(){return footprint(position(),getYRot());}
+    /** Whole-model terrain/access envelope, kept separate from player collision. */
+    public AABB terrainBounds(){return footprint(position(),getYRot());}
+    private AABB bodyBounds(Vec3 at,float yaw){
+        // Local forward range [-.62, .90] excludes the rear handle corridor.
+        double a=yaw*Mth.DEG_TO_RAD,s=Math.sin(a),c=Math.cos(a),center=.14*MODEL_SCALE;
+        double x=(Math.abs(c)*.4+Math.abs(s)*.76)*MODEL_SCALE,z=(Math.abs(s)*.4+Math.abs(c)*.76)*MODEL_SCALE;
+        double cx=at.x-s*center,cz=at.z+c*center;
+        return new AABB(cx-x,at.y,cz-z,cx+x,at.y+.95*MODEL_SCALE,cz+z);
+    }
+    @Override protected AABB makeBoundingBox(){return bodyBounds(position(),getYRot());}
+    @Override public AABB getBoundingBoxForCulling(){return terrainBounds();}
+    private boolean clearOfPlayers(Vec3 at,float yaw){
+        return level().getEntitiesOfClass(Player.class,bodyBounds(at,yaw),p->!p.isSpectator()&&!hasPassenger(p)).isEmpty();
+    }
+    @Override public void move(MoverType type,Vec3 motion){
+        // Native block stepping still sees the full carrier. Publish the smaller
+        // solid body again before other entities move/query collision this tick.
+        setBoundingBox(terrainBounds());
+        try{super.move(type,motion);}finally{setBoundingBox(makeBoundingBox());}
+    }
     /** Small bounded footprint query; neither movement nor placement loads chunks. */
     public boolean accessible(Player p,AABB box){
         for(int x=Mth.floor(box.minX);x<=Mth.floor(box.maxX);x++)for(int z=Mth.floor(box.minZ);z<=Mth.floor(box.maxZ);z++){
@@ -99,23 +117,30 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity {
         super.tick();previousTravel=level().isClientSide?sampledTravel:travel();previousTilt=tilt;tilt=Mth.approach(tilt,held()?1:0,.2f);
         if(level().isClientSide){
             sampledTravel=travel();if(tickCount<=1)previousTravel=sampledTravel;
-            if(lerpSteps>0){setYRot(getYRot()+Mth.wrapDegrees(targetYaw-getYRot())/lerpSteps);setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;}
+            if(lerpSteps>0){
+                float previousYaw=getYRot();setYRot(previousYaw+Mth.wrapDegrees(targetYaw-previousYaw)/lerpSteps);
+                setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;
+                float delta=Mth.wrapDegrees(getYRot()-previousYaw);
+                for(var passenger:getPassengers())if(passenger instanceof Player player&&player.isLocalPlayer()){
+                    player.setYRot(player.getYRot()+delta);player.setYHeadRot(player.getYRot());
+                }
+            }
             return;
         }
         Player p=getFirstPassenger() instanceof Player player?player:null;
-        if(p!=null&&(!p.isAlive()||p.isSpectator()||isInWater()||!accessible(p,getBoundingBox())||!accessible(p,riderBox(position(),getYRot(),p)))){p.stopRiding();p=null;}
+        if(p!=null&&(!p.isAlive()||p.isSpectator()||isInWater()||!accessible(p,terrainBounds())||!accessible(p,riderBox(position(),getYRot(),p)))){p.stopRiding();p=null;}
         entityData.set(HELD,p!=null);
         if(p==null||lastInput==Long.MIN_VALUE||level().getGameTime()-lastInput>10){forward=turn=0;}
         Vec3 before=position();float oldYaw=getYRot();
         float nextYaw=oldYaw+turn*3.5f;
         if(p!=null&&turn!=0){
             var rotated=footprint(position(),nextYaw);
-            if(accessible(p,rotated)&&level().noCollision(this,rotated)&&accessible(p,riderBox(position(),nextYaw,p))&&level().noCollision(p,riderBox(position(),nextYaw,p))){setYRot(nextYaw);setBoundingBox(rotated);}
+            if(accessible(p,rotated)&&level().noCollision(this,rotated)&&clearOfPlayers(position(),nextYaw)&&accessible(p,riderBox(position(),nextYaw,p))&&level().noCollision(p,riderBox(position(),nextYaw,p))){setYRot(nextYaw);setBoundingBox(makeBoundingBox());}
         }
         double speed=forward>0?.105:forward<0?-.055:0;
         Vec3 motion=new Vec3(0,Math.max(-.8,getDeltaMovement().y-.04),speed).yRot(-getYRot()*Mth.DEG_TO_RAD);
-        var destination=getBoundingBox().expandTowards(motion);
-        if(!accessible(p,destination)||(p!=null&&(!accessible(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p))||!level().noCollision(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p)))))motion=new Vec3(0,motion.y,0);
+        var destination=terrainBounds().expandTowards(motion);
+        if(!accessible(p,destination)||!clearOfPlayers(position().add(motion.x,0,motion.z),getYRot())||(p!=null&&(!accessible(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p))||!level().noCollision(p,riderBox(position().add(motion.x,0,motion.z),getYRot(),p)))))motion=new Vec3(0,motion.y,0);
         if(level().hasChunkAt(blockPosition())){setDeltaMovement(motion);move(MoverType.SELF,motion);setDeltaMovement(0,onGround()?0:getDeltaMovement().y,0);}
         double distance=position().subtract(before).horizontalDistance();
         if(distance>0)entityData.set(TRAVEL,(float)(travel()+Math.copySign(distance,forward==0?1:forward)));

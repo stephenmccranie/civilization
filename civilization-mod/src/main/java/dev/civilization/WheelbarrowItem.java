@@ -13,7 +13,7 @@ public final class WheelbarrowItem extends Item {
         var l=c.getLevel();if(l.isClientSide)return InteractionResult.SUCCESS;
         var hit=c.getClickLocation();var e=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),l);
         e.setYRot(p.getYRot());e.setPos(hit.x,hit.y+.01,hit.z);
-        if(!e.accessible(p,e.getBoundingBox())||!l.noCollision(e)||!l.addFreshEntity(e))return InteractionResult.FAIL;
+        if(!e.accessible(p,e.terrainBounds())||!l.noCollision(e,e.terrainBounds())||!l.addFreshEntity(e))return InteractionResult.FAIL;
         if(!p.isCreative())c.getItemInHand().shrink(1);
         return InteractionResult.CONSUME;
     }

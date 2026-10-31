@@ -16,6 +16,10 @@ public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEnti
     public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.6f;}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerEntityRenderer(WheelbarrowContent.ENTITY.get(),WheelbarrowRenderer::new);}
     @Override public RenderType getRenderType(WheelbarrowEntity e,net.minecraft.resources.ResourceLocation t,MultiBufferSource b,float partial){return RenderType.entityCutoutNoCull(t);}
+    @Override protected void applyRotations(WheelbarrowEntity e,PoseStack pose,float age,float ignoredYaw,float partial,float scale){
+        // GeckoLib supplies zero body yaw for non-LivingEntity animatables.
+        super.applyRotations(e,pose,age,Mth.rotLerp(partial,e.yRotO,e.getYRot()),partial,scale);
+    }
     @Override public void preRender(PoseStack pose,WheelbarrowEntity e,software.bernie.geckolib.cache.object.BakedGeoModel model,MultiBufferSource b,VertexConsumer v,boolean rerender,float partial,int light,int overlay,int color){
         super.preRender(pose,e,model,b,v,rerender,partial,light,overlay,color);
         getGeoModel().getBone("carriage").ifPresent(bone->bone.setRotX(-WheelbarrowEntity.PUSH_TILT_DEGREES*Mth.DEG_TO_RAD*Mth.lerp(partial,e.previousTilt,e.tilt)));

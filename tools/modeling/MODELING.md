@@ -38,6 +38,8 @@ Every moving assembly needs a named pivot in **assembly coordinates**, not guess
 
 Check motion through actual native animation playback as well as static mesh poses. The pinned MCP animation tool supplies an `animation.` prefix; inspect the created name instead of adding it twice. GeckoLib export converts rotation conventions, so verify the visible direction of an asymmetric movement such as lifting handles before accepting numeric keyframes. Sample a spoked wheel between its symmetry angles; six views spaced by 60 degrees can conceal a stationary six-spoke wheel. Temporary player/scale geometry must be excluded from the saved source and export, and checked in the same raised pose as the handles.
 
+For a non-living GeckoLib entity, the default GeoEntityRenderer supplies zero body yaw; explicitly apply interpolated entity yaw and test the production render transform against travel heading. A numeric steering assertion alone misses a model that never turns. Separate a carrier's compact solid body from its wider terrain/handle clearance envelope rather than removing player collision to make interaction pass.
+
 ## Use the native format's constraints
 
 Static Java 1.21.1 models allow cuboids and limited single-axis rotations. Do not design freeform meshes and assume a Java export will preserve them. GeckoLib can handle animated cuboids; it does not remove the need to keep static item/guide geometry compatible.

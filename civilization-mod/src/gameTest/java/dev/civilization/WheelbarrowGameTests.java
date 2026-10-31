@@ -41,13 +41,18 @@ public final class WheelbarrowGameTests {
         take(h,e,holding);h.assertTrue(holding.getMainHandItem().getCount()==1,"Taking handles while holding the placement item does not consume it");holding.stopRiding();
         h.succeed();
     }
-    @GameTest(template="industrial") public static void walkingAcrossAndOutOfHandleEnvelopeDoesNotSnag(GameTestHelper h){
-        var e=barrow(h);e.setYRot(45);e.setPos(e.position());var p=player(h);
+    @GameTest(template="industrial") public static void solidBodyBlocksWalkingButHandlesAndEscapeStayClear(GameTestHelper h){
+        var e=barrow(h);var p=player(h);
         p.setPos(e.position().add(-2.5,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(5,0,0));
-        h.assertTrue(p.getX()>e.getX()+2.4,"Walking player can cross the carrier envelope without invisible collision");
+        h.assertTrue(p.getX()<e.getX()-.8&&p.getX()>e.getX()-1,"Solid tray body blocks a walking player");
+        p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-1,0,0));
+        h.assertTrue(p.getX()<e.getX()-1.8,"Brushing the solid body does not prevent walking away");
         p.setPos(e.position());p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(2.5,0,0));
-        h.assertTrue(p.getX()>e.getX()+2.4,"A player already inside the handle envelope can leave");
-        h.assertTrue(e.isPickable(),"Non-blocking carrier remains selectable for interaction");h.succeed();
+        h.assertTrue(p.getX()>e.getX()+2.4,"A player already overlapping the body can leave");
+        e.setYRot(45);e.setPos(e.position());var grip=e.gripPosition(e.position(),45);
+        p.setPos(grip.add(1,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-1,0,0));
+        h.assertTrue(p.position().distanceTo(grip)<.001,"Player can approach diagonal handles without striking an invisible envelope");
+        h.assertTrue(e.canBeCollidedWith()&&e.isPickable(),"Carrier retains player collision and interaction");h.succeed();
     }
     @GameTest(template="industrial") public static void serverInputMovesStopsTurnsAndKeepsOneHandler(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var other=player(h);
