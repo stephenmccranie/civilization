@@ -83,6 +83,20 @@ neoForge {
             gameDirectory = project.file('runs/server')
             programArgument '--nogui'
         }
+        thermalLabServer {
+            server()
+            gameDirectory = project.file(providers.gradleProperty('thermalLabDirectory').getOrElse('runs/thermal-lab/server'))
+            programArgument '--nogui'
+            systemProperty 'civilization.thermalLab', providers.gradleProperty('thermalLabPhase').getOrElse('manual')
+        }
+        thermalLabClient {
+            client()
+            gameDirectory = project.file('runs/thermal-lab/client')
+            systemProperty 'civilization.previewCheck', 'thermal-lab'
+            systemProperty 'civilization.previewWorld', 'thermal-laboratory'
+            systemProperty 'civilization.visualHeadless', 'true'
+            programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--width', '1920', '--height', '1080')
+        }
         flightBenchmarkSeed {
             server()
             gameDirectory = project.file('runs/flight-benchmark/seed')
@@ -151,6 +165,8 @@ neoForge {
 tasks.named('runServer', JavaExec) {
     standardInput = System.in
 }
+tasks.named('runThermalLabServer', JavaExec) { standardInput = System.in }
+tasks.named('runThermalLabClient', JavaExec) { timeout = java.time.Duration.ofMinutes(3) }
 
 tasks.named('runVisualClient', JavaExec) {
     timeout = java.time.Duration.ofMinutes(providers.gradleProperty('visualScene').getOrElse('') == 'gladiator' ? 6 : 3)
