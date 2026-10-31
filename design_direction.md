@@ -88,11 +88,11 @@ Natural rain should last about **30 minutes** and supply a bonus sufficient for 
 
 Terrain must make productive opportunities understandable. Use a shared region/biome foundation for growth, natural spawning and deposit placement. Regions can overlap.
 
-The dedicated server uses [Alesrr's Terra Diffusion](https://github.com/Alesrr/terra-diffusion) at **world scale 6**, selected by the owner on 2026-10-27. Replace that server's existing world after backing it up; a separate test world is not required for this switch. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
+The dedicated server uses [Alesrr's Terra Diffusion](https://github.com/Alesrr/terra-diffusion) at **world scale 4**, with the owner selecting Candidate 5 from the fast seed atlas on 2026-10-30. Preserve the previous server world before switching; a separate test world is not required. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
 
 | Landscape/activity | Rule |
 | --- | --- |
-| River floodplain | Farming requires a natural river band with bounded vertical reach. Terraces can qualify; sky platforms do not inherit eligibility merely by being above a river |
+| River floodplain | Farming follows the local natural river elevation, including high valleys, with bounded vertical reach from its water surface. Terraces can qualify; sea level is not an altitude ceiling, and sky platforms do not inherit eligibility merely by being above a river |
 | Irrigation/fertilizer | Eligible river soil supplies baseline moisture; rain stores the growth bonus. Placed water cannot create eligibility or the rain bonus. Fertilizer improves harvest output |
 | Woodland | Trees grow on suitable ground elsewhere, but substantially faster in woodland |
 | Rocky mineral country | Mining/quarrying opportunities; exact deposit distribution remains open |
@@ -189,7 +189,7 @@ A Smithy repair is one restoration job with a previewed material quote and resul
 
 ## 6. Carrying and transport
 
-Progression expands the quantities, distances and areas a player can manipulate: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Develop extraction, storage, loading, construction and travel together. Larger terrain must contain useful local starting opportunities, connected routes and places worth developing; the selected Terra Diffusion scale-6 server world is the evaluation baseline, not proof of freight or farming compatibility.
+Progression expands the quantities, distances and areas a player can manipulate: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Develop extraction, storage, loading, construction and travel together. Larger terrain must contain useful local starting opportunities, connected routes and places worth developing; the selected Terra Diffusion scale-4 server world is the evaluation baseline, not proof of freight or farming compatibility.
 
 ### Physical material storage and handling
 

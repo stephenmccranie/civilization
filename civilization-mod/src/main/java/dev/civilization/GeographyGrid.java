@@ -5,8 +5,10 @@ import java.util.Map;
 
 /** Seed-derived, overlapping properties on Minecraft's four-block biome grid. No world reads. */
 public final class GeographyGrid {
-    public record Region(boolean river, boolean woodland) {}
-    public record Column(boolean woodland, int riverDistanceSquared) {
+    public record Region(boolean river, boolean woodland, int waterY) {
+        public Region(boolean river, boolean woodland) { this(river, woodland, 62); }
+    }
+    public record Column(boolean woodland, int riverDistanceSquared, int waterY) {
         public boolean riverBand() { return riverDistanceSquared >= 0; }
     }
     @FunctionalInterface public interface Sampler { Region sample(int quartX, int quartZ); }
@@ -36,13 +38,15 @@ public final class GeographyGrid {
     public Column column(int blockX, int blockZ) {
         int x = blockX >> 2, z = blockZ >> 2;
         return columns.computeIfAbsent(key(x, z), ignored -> {
-            int nearest = -1, reach = radius / 4;
+            int nearest = -1, waterY = 62, reach = radius / 4;
             for (int dx = -reach; dx <= reach; dx++) for (int dz = -reach; dz <= reach; dz++) {
                 int distance = 16 * (dx * dx + dz * dz);
-                if (distance <= radius * radius && (nearest < 0 || distance < nearest)
-                        && region(x + dx, z + dz).river()) nearest = distance;
+                if (distance <= radius * radius && (nearest < 0 || distance < nearest)) {
+                    var sample = region(x + dx, z + dz);
+                    if (sample.river()) { nearest = distance; waterY = sample.waterY(); }
+                }
             }
-            return new Column(region(x, z).woodland(), nearest);
+            return new Column(region(x, z).woodland(), nearest, waterY);
         });
     }
     public static boolean heightEligible(int soilY, int waterY, int below, int above) {

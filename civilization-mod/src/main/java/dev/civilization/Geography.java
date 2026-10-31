@@ -40,9 +40,13 @@ public final class Geography {
         if (cached == null || cached.radius != radius || cached.waterY != waterY || cached.tags != tagGeneration) {
             var source = level.getChunkSource().getGenerator().getBiomeSource();
             var sampler = level.getChunkSource().randomState().sampler();
+            boolean localRivers = TerrainRiver.supported(source);
             var grid = new GeographyGrid((x, z) -> {
-                var biome = source.getNoiseBiome(x, (waterY + 1) >> 2, z, sampler);
-                return new GeographyGrid.Region(biome.is(RIVERS), biome.is(WOODLAND));
+                // Above all terrain, TD returns its surface biome instead of a deep cave biome.
+                int sampleY = localRivers ? level.getMaxBuildHeight() - 1 : waterY + 1;
+                var biome = source.getNoiseBiome(x, sampleY >> 2, z, sampler);
+                int riverY = localRivers && biome.is(RIVERS) ? TerrainRiver.surfaceWaterY(x << 2, z << 2) : waterY;
+                return new GeographyGrid.Region(biome.is(RIVERS) && riverY != Integer.MIN_VALUE, biome.is(WOODLAND), riverY);
             }, radius);
             cached = new Cached(radius, waterY, tagGeneration, grid);
             CACHE.put(level, cached);
@@ -52,14 +56,19 @@ public final class Geography {
     public static Site inspect(ServerLevel level, BlockPos soil) {
         int water = GeographyConfig.WATER_Y.get(), below = GeographyConfig.BELOW.get(), above = GeographyConfig.ABOVE.get();
         boolean supported = supported(level);
-        var column = supported ? grid(level).column(soil.getX(), soil.getZ()) : new GeographyGrid.Column(false, -1);
+        var column = supported ? grid(level).column(soil.getX(), soil.getZ()) : new GeographyGrid.Column(false, -1, water);
+        if (column.riverBand()) water = column.waterY();
         return new Site(supported, column.riverBand(), GeographyGrid.heightEligible(soil.getY(), water, below, above),
                 column.woodland(), soil.getY(), water - below, water + above, column.riverDistanceSquared());
     }
     public static boolean canFarm(ServerLevel level, BlockPos soil) {
-        if (!supported(level) || !GeographyGrid.heightEligible(soil.getY(), GeographyConfig.WATER_Y.get(),
-                GeographyConfig.BELOW.get(), GeographyConfig.ABOVE.get())) return false;
-        return grid(level).column(soil.getX(), soil.getZ()).riverBand();
+        if (!supported(level)) return false;
+        if (!TerrainRiver.supported(level.getChunkSource().getGenerator().getBiomeSource())
+                && !GeographyGrid.heightEligible(soil.getY(), GeographyConfig.WATER_Y.get(),
+                        GeographyConfig.BELOW.get(), GeographyConfig.ABOVE.get())) return false;
+        var column = grid(level).column(soil.getX(), soil.getZ());
+        return column.riverBand() && GeographyGrid.heightEligible(soil.getY(), column.waterY(),
+                GeographyConfig.BELOW.get(), GeographyConfig.ABOVE.get());
     }
     public static boolean woodland(ServerLevel level, BlockPos pos) {
         return supported(level) && grid(level).woodland(pos.getX(), pos.getZ());
