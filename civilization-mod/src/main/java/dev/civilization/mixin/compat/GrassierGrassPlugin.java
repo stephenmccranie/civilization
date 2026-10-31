@@ -19,10 +19,19 @@ public final class GrassierGrassPlugin implements IMixinConfigPlugin {
         if (file == null) return false;
         if (file.getMods().stream().noneMatch(m -> m.getModId().equals("grassiergrass")
                 && m.getVersion().toString().equals("1.4.5"))) {
-            log.warn("Grass snow tint override inactive: unverified Grassier Grass version");
+            log.warn("Grass compatibility hooks inactive: unverified Grassier Grass version");
             return false;
         }
         try {
+            if(!mixin.endsWith("GrassierGrassSnowMixin")){
+                var builder=MixinService.getService().getBytecodeProvider().getClassNode("com.leonardoinc22.shortgrass.client.render.GrassSectionBuilder");
+                var cache=MixinService.getService().getBytecodeProvider().getClassNode("com.leonardoinc22.shortgrass.client.render.GrassSectionCache");
+                boolean emit=builder.methods.stream().filter(m->m.name.equals("emitSection")).flatMap(m->java.util.stream.StreamSupport.stream(m.instructions.spliterator(),false))
+                        .anyMatch(i->i instanceof org.objectweb.asm.tree.MethodInsnNode call&&call.name.equals("emitBlock")&&call.desc.equals("(Lcom/leonardoinc22/shortgrass/client/render/GrassSectionBuildBuffers;IIIIIIIFIILcom/leonardoinc22/shortgrass/config/GrassConfig$GrassStyle;IFIFFZ)V"));
+                boolean invalidate=cache.methods.stream().anyMatch(m->m.name.equals("markSectionDirty")&&m.desc.equals("(J)V")&&(m.access&Opcodes.ACC_STATIC)!=0);
+                if(emit&&invalidate){log.info("Grassier Grass 1.4.5 persistent wear hook enabled");return true;}
+                log.warn("Grass wear hooks inactive: incompatible mesh/cache signatures");return false;
+            }
             var node = MixinService.getService().getBytecodeProvider().getClassNode(target);
             if (node.methods.stream().anyMatch(m -> m.name.equals("snowBlend")
                     && m.desc.equals("(ZFFF)F") && (m.access & Opcodes.ACC_STATIC) != 0)) {
@@ -30,7 +39,7 @@ public final class GrassierGrassPlugin implements IMixinConfigPlugin {
                 return true;
             }
         } catch (Exception ex) {
-            log.warn("Cannot inspect Grassier Grass snow tint hook", ex);
+            log.warn("Cannot inspect Grassier Grass compatibility hooks", ex);
         }
         log.warn("Grass snow tint override inactive: incompatible hook signature");
         return false;

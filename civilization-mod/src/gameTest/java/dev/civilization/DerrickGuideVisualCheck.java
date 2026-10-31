@@ -33,6 +33,11 @@ final class DerrickGuideVisualCheck {
         if(ticks==220)shot(mc,"damaged-guide");
         if(ticks==240)check(mc,()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);var m=(IndustrialBlockEntity)l.getBlockEntity(AT);for(var stock:java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,6),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,60),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,29),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))ModeledDerrick.build(m,p,stock);});
         if(ticks==260)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);if(!m.derrickBuilt||!IndustrialStructure.bind(m))throw new IllegalStateException("Progressive completed construction failed");
+            var samples=new StringBuilder();for(int y:new int[]{0,4,12,20,28}){
+                var center=AT.above(y);samples.append(" y=").append(y).append(':').append(l.getBrightness(net.minecraft.world.level.LightLayer.SKY,center));
+                for(var side:net.minecraft.core.Direction.Plane.HORIZONTAL)samples.append('/').append(l.getBrightness(net.minecraft.world.level.LightLayer.SKY,center.relative(side,5)));
+            }
+            System.out.println("DERRICK_SKY_SAMPLES controllerPacked="+net.minecraft.client.renderer.LevelRenderer.getLightColor(l,AT)+samples);
             var site=new Deposits.Site(0,101,0,Deposits.Kind.OIL,2);int stock=0;for(int i=0;i<site.cells()&&stock<20;i++){var pos=site.cell(i);if(site.body(pos)){l.setBlockAndUpdate(pos,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());stock++;}}
             try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,site);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}
             m.setItem(0,KilnContent.MINERAL_COAL.toStack(16));CoalFireFixture.light(m);var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(l,8,114,-40,java.util.Set.of(),9.5f,0);
@@ -63,7 +68,15 @@ final class DerrickGuideVisualCheck {
         if(ticks==655)check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-30));
         if(ticks==680)shot(mc,"crown-level-sodium");
         if(ticks==685)shaders(true);
-        if(ticks>700){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: held-stack build, partial/damaged guides, working cycle, gallery support and crown look-up with Sodium, both Photon and shaders disabled");mc.stop();}
+        if(ticks==700){
+            int raw=net.minecraft.client.renderer.LevelRenderer.getLightColor(mc.level,AT),filled=dev.civilization.client.DerrickLighting.sample(mc.level,AT,raw);
+            if(net.minecraft.client.renderer.LightTexture.sky(raw)!=0||net.minecraft.client.renderer.LightTexture.sky(filled)!=15)throw new IllegalStateException("Exposed derrick must recover world skylight from outside its opaque controller");
+            if(net.minecraft.client.renderer.LightTexture.block(filled)<net.minecraft.client.renderer.LightTexture.block(raw))throw new IllegalStateException("Derrick fill discarded local block lighting");
+            System.out.println("DERRICK_MODEL_LIGHT raw="+raw+" filled="+filled);
+            check(mc,()->{server.overworld().setDayTime(18000);server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),7,104,-6,java.util.Set.of(),34,0);});
+        }
+        if(ticks==745)shot(mc,"night-photon");
+        if(ticks>760){if(!galleryChecked)throw new IllegalStateException("Gallery review incomplete");com.mojang.logging.LogUtils.getLogger().info("DERRICK GUIDE VERIFIED: held-stack build, partial/damaged guides, working cycle, gallery support and crown look-up with Sodium, both Photon and shaders disabled, exposed ambient skylight and night response");mc.stop();}
     }
     private static void verifyCrownRenderer(Minecraft mc){
         var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var renderer=mc.getBlockEntityRenderDispatcher().getRenderer(m);

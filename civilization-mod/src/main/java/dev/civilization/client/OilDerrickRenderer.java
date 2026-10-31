@@ -52,7 +52,7 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
     @Override public void render(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         if(m.kind!=IndustrialBlock.Kind.PUMP || m.getLevel()==null)return;
         var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.mask=m.derrickSections;a.guide=false;a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
-        renderer.render(a,partial,pose,buffers,light,overlay);
+        renderer.render(a,partial,pose,buffers,a.modelLight(light),overlay);
     }
 
     public void renderGuide(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers){
@@ -62,7 +62,13 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
     private static final class DerrickAnimation extends BlockEntity implements GeoBlockEntity {
         private static final RawAnimation CYCLE=RawAnimation.begin().thenLoop("animation.oil_derrick.cycle");
         private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);private boolean running,guide;private int mask;
+        private long lightTick=Long.MIN_VALUE;private int sampledLight;
         DerrickAnimation(IndustrialBlockEntity m){super(IndustrialContent.ENTITY.get(),m.getBlockPos(),m.getBlockState());}
+        private int modelLight(int controllerLight){
+            long tick=level.getGameTime()/5;
+            if(tick!=lightTick){sampledLight=DerrickLighting.sample(level,worldPosition,controllerLight);lightTick=tick;}
+            return sampledLight;
+        }
         @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
         @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers){controllers.add(new AnimationController<DerrickAnimation>(this,"work",0,state->{state.setControllerSpeed(running?1:0);return state.setAndContinue(CYCLE);}));}
     }
