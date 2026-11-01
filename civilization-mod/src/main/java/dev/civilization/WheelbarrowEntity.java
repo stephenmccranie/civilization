@@ -22,6 +22,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public static final float WHEEL_RADIUS=4.1411056f/16*MODEL_SCALE;
     private static final EntityDataAccessor<Boolean> HELD=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> HEADING=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
+    private final WheelbarrowCollision collision=new WheelbarrowCollision();
     private static final EntityDataAccessor<net.minecraft.world.item.ItemStack> CARGO_ICON=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<Float> CARGO_FILL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private final MassCargo cargo=new MassCargo(()->CargoConfig.WHEELBARROW.get(),this::cargoChanged);
@@ -29,12 +31,15 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private int forward,turn,lerpSteps;
     private long lastInput=Long.MIN_VALUE;
     private double targetX,targetY,targetZ;
-    private float targetYaw;
+    private float lastHeading=Float.NaN;
+    private int headingSteps;
     private float sampledTravel;
     public float previousTravel,previousTilt,tilt;
     public final WalkAnimationState handlerWalkAnimation=new WalkAnimationState();
     public WheelbarrowEntity(EntityType<? extends WheelbarrowEntity> type,Level level){super(type,level);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(CARGO_ICON,net.minecraft.world.item.ItemStack.EMPTY);b.define(CARGO_FILL,0f);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(HEADING,0f);b.define(CARGO_ICON,net.minecraft.world.item.ItemStack.EMPTY);b.define(CARGO_FILL,0f);}
+    public float steeringYaw(){return level().isClientSide?entityData.get(HEADING):getYRot();}
+    public net.minecraft.world.phys.shapes.VoxelShape playerCollisionShape(){return collision.at(position(),getYRot());}
     private void cargoChanged(){
         if(level().isClientSide)return;
         entityData.set(CARGO_ICON,cargo.isEmpty()?net.minecraft.world.item.ItemStack.EMPTY:cargo.entry(0).item());
@@ -62,7 +67,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
     @Override public boolean isPickable(){return !isRemoved();}
-    // Walking players collide with the tray/wheel body, not the handle corridor.
+    // The collision hook replaces these broad bounds with measured surfaces.
     @Override public boolean canBeCollidedWith(){return isAlive();}
     @Override public boolean canCollideWith(Entity other){return other instanceof WheelbarrowEntity&&!other.isRemoved()&&!isPassengerOfSameVehicle(other);}
     @Override public boolean shouldRiderSit(){return false;}
@@ -89,6 +94,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         }
         if(p.isPassenger()||p.isSpectator()||isInWater()||!level().noCollision(p,riderBox(position(),getYRot(),p)))return InteractionResult.FAIL;
         if(p.startRiding(this)){
+            entityData.set(HEADING,getYRot());
             forward=turn=0;lastInput=Long.MIN_VALUE;
             p.displayClientMessage(Component.literal("Wheelbarrow: W/S push/back up · A/D turn · Sneak to release"),true);
             return InteractionResult.CONSUME;
@@ -112,21 +118,15 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     }
     /** Whole-model terrain/access envelope, kept separate from player collision. */
     public AABB terrainBounds(){return footprint(position(),getYRot());}
-    private AABB bodyBounds(Vec3 at,float yaw){
-        // Local forward range [-.62, .90] excludes the rear handle corridor.
-        double a=yaw*Mth.DEG_TO_RAD,s=Math.sin(a),c=Math.cos(a),center=.14*MODEL_SCALE;
-        double x=(Math.abs(c)*.4+Math.abs(s)*.76)*MODEL_SCALE,z=(Math.abs(s)*.4+Math.abs(c)*.76)*MODEL_SCALE;
-        double cx=at.x-s*center,cz=at.z+c*center;
-        return new AABB(cx-x,at.y,cz-z,cx+x,at.y+.95*MODEL_SCALE,cz+z);
-    }
-    @Override protected AABB makeBoundingBox(){return bodyBounds(position(),getYRot());}
+    @Override protected AABB makeBoundingBox(){return WheelbarrowCollision.bounds(position(),getYRot());}
     @Override public AABB getBoundingBoxForCulling(){return terrainBounds();}
-    private boolean clearOfPlayers(Vec3 at,float yaw){
-        return level().getEntitiesOfClass(Player.class,bodyBounds(at,yaw),p->!p.isSpectator()&&!hasPassenger(p)).isEmpty();
+    public boolean clearOfPlayers(Vec3 at,float yaw){
+        var shape=collision.at(at,yaw);
+        return level().getEntitiesOfClass(Player.class,shape.bounds(),p->!p.isSpectator()&&!hasPassenger(p)&&net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(shape,net.minecraft.world.phys.shapes.Shapes.create(p.getBoundingBox()),net.minecraft.world.phys.shapes.BooleanOp.AND)).isEmpty();
     }
     @Override public void move(MoverType type,Vec3 motion){
-        // Native block stepping still sees the full carrier. Publish the smaller
-        // solid body again before other entities move/query collision this tick.
+        // Native block stepping sees the full carrier. Restore picking/broad
+        // bounds before other entities query the measured collision surfaces.
         setBoundingBox(terrainBounds());
         Vec3 before=position();boolean grounded=onGround();float fall=fallDistance;
         try{
@@ -148,14 +148,15 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         }
         return level().getWorldBorder().isWithinBounds(box);
     }
-    @Override public void lerpTo(double x,double y,double z,float yaw,float pitch,int steps){targetX=x;targetY=y;targetZ=z;targetYaw=yaw;lerpSteps=Math.max(1,steps);}
+    @Override public void lerpTo(double x,double y,double z,float yaw,float pitch,int steps){targetX=x;targetY=y;targetZ=z;lerpSteps=Math.max(1,steps);}
     @Override public void tick(){
         super.tick();previousTravel=level().isClientSide?sampledTravel:travel();previousTilt=tilt;tilt=Mth.approach(tilt,held()?1:0,.2f);
         if(level().isClientSide){
             Vec3 oldGrip=gripPosition(position(),getYRot());
             sampledTravel=travel();if(tickCount<=1)previousTravel=sampledTravel;
+            float heading=steeringYaw();if(Float.compare(heading,lastHeading)!=0){lastHeading=heading;headingSteps=3;}
+            if(headingSteps>0){setYRot(getYRot()+Mth.wrapDegrees(heading-getYRot())/headingSteps);headingSteps--;}
             if(lerpSteps>0){
-                float previousYaw=getYRot();setYRot(previousYaw+Mth.wrapDegrees(targetYaw-previousYaw)/lerpSteps);
                 setPos(getX()+(targetX-getX())/lerpSteps,getY()+(targetY-getY())/lerpSteps,getZ()+(targetZ-getZ())/lerpSteps);lerpSteps--;
             }
             double distance=gripPosition(position(),getYRot()).subtract(oldGrip).horizontalDistance();
@@ -184,6 +185,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
             CalorieFoodData.of(p).pushWheelbarrow(p,walked.x,walked.y,walked.z);
         }
         if(p!=null)p.setYBodyRot(getYRot());
+        entityData.set(HEADING,getYRot());
     }
     @Override protected void addAdditionalSaveData(CompoundTag tag){tag.putFloat("Travel",travel());tag.put("Cargo",cargo.save(registryAccess()));}
     @Override protected void readAdditionalSaveData(CompoundTag tag){float value=tag.getFloat("Travel");entityData.set(TRAVEL,Float.isFinite(value)?value:0f);cargo.load(tag.getList("Cargo",10),registryAccess());forward=turn=0;lastInput=Long.MIN_VALUE;}

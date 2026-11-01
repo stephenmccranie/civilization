@@ -29,13 +29,18 @@ final class WheelbarrowVisualCheck {
             var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.getInventory().clearContent();p.getInventory().selected=0;p.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();p.teleportTo(l,.5,100,-2,java.util.Set.of(),0,20);
         });}
         if(ticks==130)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(.5,100,.5),Direction.UP,new BlockPos(0,99,0),false));
-        if(ticks==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var b=barrow(server);b.setYRot(45);b.setPos(b.position());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();var at=b.gripPosition(b.position(),45);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),45,20);});}
+        if(ticks==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var b=barrow(server);b.setYRot(45.125f);b.setPos(b.position());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();var at=b.gripPosition(b.position(),45);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),45,20);});}
+        if(ticks==160&&Math.abs(barrow(mc).getYRot()-45.125f)>.002f)throw new IllegalStateException("Client heading was rounded to native angle bytes: "+barrow(mc).getYRot());
         if(ticks==165)mc.gameMode.interact(mc.player,barrow(mc),InteractionHand.MAIN_HAND);
+        if(ticks==175&&Math.abs(net.minecraft.util.Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>.01f)throw new IllegalStateException("Taking handles did not align the first-person heading");
         if(ticks==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.gripPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,0,20);});mc.options.keyUp.setDown(true);}
         if(ticks==190)dev.civilization.client.WheelbarrowRenderCheck.gaitCheck=true;
         if(ticks==210)shot(mc,"pushing-first-person");
+        if(ticks==211){mc.player.setXRot(38);mc.player.xRotO=38;}
+        if(ticks==222)shot(mc,"first-person-grips");
+        if(ticks==224){mc.player.setXRot(20);mc.player.xRotO=20;}
         if(ticks==200)mc.player.setYRot(barrow(mc).getYRot());
-        if(ticks==215)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+        if(ticks==225)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
         if(ticks==230)shot(mc,"pushing-player");
         if(ticks==235)mc.options.setCameraType(CameraType.FIRST_PERSON);
         if(ticks==250){mc.options.keyUp.setDown(false);check(server,()->{var e=barrow(server);if(e.getZ()<3.5||e.getBoundingBox().maxZ>5.01)throw new IllegalStateException("Wall collision or push failed: "+e.position()+" / "+e.getBoundingBox());stopZ=e.getZ();});}

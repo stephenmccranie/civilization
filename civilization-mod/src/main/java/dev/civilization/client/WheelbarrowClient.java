@@ -11,18 +11,22 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class WheelbarrowClient {
+    private static WheelbarrowEntity handling;
     @SubscribeEvent public static void pose(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre event){
         if(event.getEntity().getVehicle() instanceof WheelbarrowEntity e){event.getEntity().yBodyRot=e.getYRot();event.getEntity().yBodyRotO=e.yRotO;}
     }
     @SubscribeEvent public static void input(ClientTickEvent.Post event){
-        var mc=Minecraft.getInstance();if(mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity e))return;
+        var mc=Minecraft.getInstance();if(mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity e)){handling=null;return;}
         // Entity.tick resets the rider's previous yaw after the vehicle ticks.
         // Apply steering afterwards so vanilla camera interpolation retains the
         // whole turn between frames, including third-person free look.
         if(!mc.isPaused()){
-            float delta=Mth.wrapDegrees(e.getYRot()-e.yRotO);
-            mc.player.setYRot(mc.player.getYRot()+delta);
-            mc.player.setYHeadRot(mc.player.getYHeadRot()+delta);
+            if(handling!=e){
+                mc.player.setYRot(e.getYRot());mc.player.yRotO=e.yRotO;mc.player.setYHeadRot(e.getYRot());mc.player.yHeadRotO=e.yRotO;handling=e;
+            }else{
+                float delta=Mth.wrapDegrees(e.getYRot()-e.yRotO);
+                mc.player.setYRot(mc.player.getYRot()+delta);mc.player.setYHeadRot(mc.player.getYHeadRot()+delta);
+            }
         }
         boolean exit=mc.options.keyShift.isDown();boolean active=mc.screen==null&&!mc.isPaused();
         int forward=active?(mc.options.keyUp.isDown()?1:0)-(mc.options.keyDown.isDown()?1:0):0;

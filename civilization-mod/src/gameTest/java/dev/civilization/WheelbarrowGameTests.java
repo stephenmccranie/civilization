@@ -44,9 +44,9 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void solidBodyBlocksWalkingButHandlesAndEscapeStayClear(GameTestHelper h){
         var e=barrow(h);var p=player(h);
         p.setPos(e.position().add(-2.5,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(5,0,0));
-        h.assertTrue(p.getX()<e.getX()-.8&&p.getX()>e.getX()-1,"Solid tray body blocks a walking player");
+        h.assertTrue(p.getX()<e.getX()-.73&&p.getX()>e.getX()-.77,"Solid tray body blocks a walking player");
         p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-1,0,0));
-        h.assertTrue(p.getX()<e.getX()-1.8,"Brushing the solid body does not prevent walking away");
+        h.assertTrue(p.getX()<e.getX()-1.7,"Brushing the solid body does not prevent walking away");
         p.setPos(e.position());p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(2.5,0,0));
         h.assertTrue(p.getX()>e.getX()+2.4,"A player already overlapping the body can leave");
         e.setYRot(45);e.setPos(e.position());var grip=e.gripPosition(e.position(),45);
@@ -65,6 +65,34 @@ public final class WheelbarrowGameTests {
         h.assertTrue(!other.startRiding(e),"Two handlers cannot take one carrier");
         p.stopRiding();var parked=e.position();for(int i=0;i<5;i++)e.tick();
         h.assertTrue(e.position().distanceTo(parked)<.001&&!e.held(),"Released carrier stops instead of coasting");h.succeed();
+    }
+    @GameTest(template="industrial") public static void playerCanJumpOntoTrayStandAndWalkOff(GameTestHelper h){
+        var e=barrow(h);var p=player(h);double y=e.getY();p.setPos(e.position().add(-1.3,0,0));
+        double velocity=.42;
+        for(int i=0;i<35;i++){
+            double dx=p.getX()<e.getX()?.09:0;
+            p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(dx,velocity,0));velocity=p.onGround()?-.08:(velocity-.08)*.98;
+        }
+        h.assertTrue(Math.abs(p.getY()-y-WheelbarrowCollision.TRAY_TOP)<.002&&p.onGround(),"Ordinary jump lands on the visible rim-height tray: "+p.position());
+        for(int i=0;i<10;i++)p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,-.08,0));
+        h.assertTrue(Math.abs(p.getY()-y-WheelbarrowCollision.TRAY_TOP)<.002,"Standing on the carrier remains stable");
+        p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(1.5,0,0));for(int i=0;i<20;i++)p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,-.1,0));
+        h.assertTrue(Math.abs(p.getY()-y)<.002&&p.getX()>e.getX()+1,"Walking off the tray returns to ground without sticking");h.succeed();
+    }
+    @GameTest(template="industrial") public static void diagonalEmptyCornersAndBrushingRemainClear(GameTestHelper h){
+        var e=barrow(h);var p=player(h);e.setYRot(45);e.setPos(e.position());
+        p.setPos(e.position().add(.9,0,.8));
+        h.assertTrue(h.getLevel().noCollision(p,p.getBoundingBox()),"Empty diagonal bounding-box corner is not solid");
+        var before=p.position();p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,0,.5));
+        h.assertTrue(p.position().distanceTo(before.add(0,0,.5))<.001,"Brushing past a diagonal carrier does not catch on invisible box corners");h.succeed();
+    }
+    @GameTest(template="industrial") public static void forwardMotionKeepsExactFractionalHeadingWithoutSideDrift(GameTestHelper h){
+        var e=barrow(h);var p=player(h);take(h,e,p);var center=e.position();
+        for(float yaw:new float[]{0,17.125f,33.333f,89.875f,135.25f,225.125f,315.375f}){
+            e.setYRot(yaw);e.setPos(center);e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<10;i++)e.tick();
+            var delta=e.position().subtract(center);var forward=new Vec3(0,0,1).yRot(-yaw*net.minecraft.util.Mth.DEG_TO_RAD);
+            h.assertTrue(Math.abs(delta.x*forward.z-delta.z*forward.x)<1e-6&&Math.abs(delta.horizontalDistance()-PlayerMovement.WALK/2)<.001,"W follows its precise fractional heading without a lateral component: "+yaw);
+        }h.succeed();
     }
     @GameTest(template="industrial") public static void pushingCostsWalkingCaloriesForActualHandleTravel(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
