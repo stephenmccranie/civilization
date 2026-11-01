@@ -56,7 +56,20 @@ public final class BlockCarryGameTests {
         menu.handlePlacement(false,recipe,p);
         h.assertTrue(menu.getSlot(0).getItem().is(CargoContent.STOCKPILE.get().asItem())&&p.getOffhandItem().isEmpty(),"Native recipe book fills the grid from offhand blocks");
         menu.clicked(0,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(p.getOffhandItem().is(CargoContent.STOCKPILE.get().asItem())&&p.getOffhandItem().getCount()==1&&p.getInventory().countItem(Items.STICK)==0,"Crafting result enters the same offhand allowance and consumes real ingredients");h.succeed();
+        h.assertTrue(p.getOffhandItem().isEmpty()&&p.getInventory().countItem(CargoContent.STOCKPILE.get().asItem())==1&&p.getInventory().countItem(Items.STICK)==0,"Crafted pallets enter ordinary inventory and consume real offhand ingredients");h.succeed();
+    }
+    @GameTest(template="industrial") public static void palletsUseNormalPickupPocketsClicksSwapAndRecovery(GameTestHelper h){
+        var p=player(h);var pallet=CargoContent.STOCKPILE.get().asItem();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
+        var ground=drop(h,new ItemStack(pallet,6));ground.playerTouch(p);
+        h.assertTrue(ground.isRemoved()&&p.getInventory().countItem(pallet)==6&&p.getOffhandItem().is(Items.STONE),"Pallet pickup uses normal pockets even while carrying a full block stack");
+        var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(pallet,4));var menu=ChestMenu.threeRows(1,p.getInventory(),chest);menu.quickMoveStack(p,0);
+        h.assertTrue(chest.getItem(0).isEmpty()&&p.getInventory().countItem(pallet)==10,"Chest shift-click keeps pallets in ordinary inventory");
+        menu.setCarried(new ItemStack(pallet,2));menu.clicked(27,0,ClickType.PICKUP,p);
+        h.assertTrue(menu.getCarried().isEmpty()&&p.getInventory().getItem(9).is(pallet)&&BlockCarry.normalize(p)==0&&p.getOffhandItem().getCount()==32,"Ordinary pallet clicks are admitted and normalization preserves pockets");
+        p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);var swap=new net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent.Hands(p);BlockCarry.swap(swap);
+        h.assertTrue(!swap.isCanceled()&&p.inventoryMenu.getSlot(36).mayPlace(new ItemStack(pallet)),"Pallets retain normal hand swaps and hotbar admission");
+        var recovery=BlockCarryRecovery.get(p.server);recovery.store(p.getUUID(),new ItemStack(pallet,3));
+        h.assertTrue(recovery.recover(p)==3&&p.getOffhandItem().isEmpty()&&p.getInventory().countItem(pallet)==15,"Previously saved pallets recover into ordinary inventory");h.succeed();
     }
     @GameTest(template="industrial") public static void oldStockMigratesLosslesslyAndRecoversOneOffhandStack(GameTestHelper h){
         var p=player(h);p.getInventory().setItem(0,new ItemStack(Items.STONE,32));p.getInventory().setItem(1,new ItemStack(Items.DIRT,20));p.getInventory().setItem(2,new ItemStack(Items.STONE,12));

@@ -54,6 +54,20 @@ public final class WheelbarrowGameTests {
         h.assertTrue(p.position().distanceTo(grip)<.001,"Player can approach diagonal handles without striking an invisible envelope");
         h.assertTrue(e.canBeCollidedWith()&&e.isPickable(),"Carrier retains player collision and interaction");h.succeed();
     }
+    @GameTest(template="industrial") public static void entireHandleAreaIsWalkableAndStillPickableAtEveryHeading(GameTestHelper h){
+        var e=barrow(h);var p=player(h);
+        for(float yaw:new float[]{0,17.125f,45,90,135,180,225,270,315}){
+            e.setYRot(yaw);e.setPos(e.position());float angle=(180-yaw)*net.minecraft.util.Mth.DEG_TO_RAD;
+            var start=e.position().add(new Vec3(1.2,0,1.35).yRot(angle));var end=e.position().add(new Vec3(-1.2,0,1.35).yRot(angle));p.setPos(start);
+            var step=end.subtract(start).scale(1d/96);for(int i=0;i<96;i++)p.move(net.minecraft.world.entity.MoverType.SELF,step);
+            h.assertTrue(p.position().distanceTo(end)<.002,"Players can walk across both visual handles without hitting invisible extensions at "+yaw);
+            h.assertTrue(e.getBoundingBox().getZsize()<e.interactionBounds().getZsize()+1e-5,"Interaction reach is separate from physical body bounds");
+            p.setPos(e.gripPosition(e.position(),yaw));
+            var target=e.position().add(new Vec3(.3586,.8,1.4343).yRot(angle));var eye=p.getEyePosition();var ray=target.subtract(eye).normalize().scale(3);
+            var hit=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p,eye,eye.add(ray),p.getBoundingBox().expandTowards(ray).inflate(1),candidate->candidate==e,9);
+            h.assertTrue(hit!=null&&hit.getEntity()==e&&e.interactAt(p,hit.getLocation().subtract(e.position()),InteractionHand.MAIN_HAND).consumesAction()&&p.getVehicle()==e,"Non-solid handles remain targetable and grabbable through the native mouse-ray path at "+yaw);p.stopRiding();
+        }h.succeed();
+    }
     @GameTest(template="industrial") public static void serverInputMovesStopsTurnsAndKeepsOneHandler(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var other=player(h);
         e.input(other,new WheelbarrowPayload(1,1,false));var start=e.position();e.tick();

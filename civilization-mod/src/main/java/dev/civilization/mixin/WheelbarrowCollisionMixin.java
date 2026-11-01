@@ -19,7 +19,7 @@ public interface WheelbarrowCollisionMixin {
         Predicate<Entity> predicate=moving==null?EntitySelector.CAN_BE_COLLIDED_WITH:EntitySelector.NO_SPECTATORS.and(moving::canCollideWith);
         var entities=((EntityGetter)this).getEntities(moving,box.inflate(1e-7),predicate);
         // Preserve native entity collision behavior; only the carrier replaces
-        // its broad-phase/picking bounds with its actual solid surfaces.
+        // its broad-phase body bounds with its actual solid surfaces.
         var shapes=new ArrayList<VoxelShape>(entities.size());
         for(var entity:entities){
             if(entity instanceof WheelbarrowEntity e){

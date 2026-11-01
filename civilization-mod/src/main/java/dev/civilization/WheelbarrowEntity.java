@@ -113,19 +113,21 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         return super.getDismountLocationForPassenger(passenger);
     }
     private AABB footprint(Vec3 at,float yaw){
-        double a=yaw*Mth.DEG_TO_RAD,x=(Math.abs(Math.cos(a))*.4+Math.abs(Math.sin(a))*1.08)*MODEL_SCALE,z=(Math.abs(Math.sin(a))*.4+Math.abs(Math.cos(a))*1.08)*MODEL_SCALE;
-        return new AABB(at.x-x,at.y,at.z-z,at.x+x,at.y+.95*MODEL_SCALE,at.z+z);
+        // Centered main-body envelope keeps native movement's entity origin stable.
+        double a=yaw*Mth.DEG_TO_RAD,x=Math.abs(Math.cos(a))*.4471875+Math.abs(Math.sin(a))*1.195+1d/32,z=Math.abs(Math.sin(a))*.4471875+Math.abs(Math.cos(a))*1.195+1d/32;
+        return new AABB(at.x-x,at.y,at.z-z,at.x+x,at.y+WheelbarrowCollision.TRAY_TOP,at.z+z);
     }
-    /** Whole-model terrain/access envelope, kept separate from player collision. */
+    /** Centered main-body terrain/access envelope, separate from handle picking. */
     public AABB terrainBounds(){return footprint(position(),getYRot());}
     @Override protected AABB makeBoundingBox(){return WheelbarrowCollision.bounds(position(),getYRot());}
-    @Override public AABB getBoundingBoxForCulling(){return terrainBounds();}
+    public AABB interactionBounds(){return WheelbarrowCollision.pickBounds(position(),getYRot());}
+    @Override public AABB getBoundingBoxForCulling(){return interactionBounds().inflate(0,.15,0);}
     public boolean clearOfPlayers(Vec3 at,float yaw){
         var shape=collision.at(at,yaw);
         return level().getEntitiesOfClass(Player.class,shape.bounds(),p->!p.isSpectator()&&!hasPassenger(p)&&net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(shape,net.minecraft.world.phys.shapes.Shapes.create(p.getBoundingBox()),net.minecraft.world.phys.shapes.BooleanOp.AND)).isEmpty();
     }
     @Override public void move(MoverType type,Vec3 motion){
-        // Native block stepping sees the full carrier. Restore picking/broad
+        // Native block stepping sees the main body. Restore physical/broad
         // bounds before other entities query the measured collision surfaces.
         setBoundingBox(terrainBounds());
         Vec3 before=position();boolean grounded=onGround();float fall=fallDistance;

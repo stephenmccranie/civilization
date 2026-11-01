@@ -26,7 +26,7 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
         String mass=Double.isFinite(menu.mass())?String.format(java.util.Locale.ROOT,"%,.0f / %,.0f kg",menu.mass(),menu.capacity()):"Unknown load: unload to recover";
         g.drawString(font,mass,leftPos+8,topPos+26,MachineUi.INK,false);
         MachineUi.progress(g,leftPos+8,topPos+40,160,(float)(menu.mass()/Math.max(1,menu.capacity())));
-        String target=switch(menu.data.get(118)){case 1->"Stockpile";case 2->"Wheelbarrow";default->"No nearby store";};
+        String target=switch(menu.data.get(118)){case 1->"Pallet";case 2->"Wheelbarrow";default->"No nearby store";};
         String label=target+" · "+(menu.page()+1)+"/"+Math.max(1,menu.pageCount());
         g.drawString(font,label,leftPos+(imageWidth-font.width(label))/2,topPos+143,MachineUi.MUTED,false);
     }
@@ -42,7 +42,7 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
             g.renderComponentTooltip(font,java.util.List.of(hoveredSlot.getItem().getHoverName(),Component.literal(String.format(java.util.Locale.ROOT,"%,d items · click to take · Shift-click to move",menu.count(i)))),x,y);
         }
         if(menu.palletCount()>0&&x>=leftPos+8&&x<leftPos+168&&y>=topPos+25&&y<topPos+46)
-            g.renderTooltip(font,Component.literal("Shared stockpile: "+menu.palletCount()+" connected pallet"+(menu.palletCount()==1?"":"s")),x,y);
+            g.renderTooltip(font,Component.literal("Shared cargo: "+menu.palletCount()+" connected pallet"+(menu.palletCount()==1?"":"s")),x,y);
     }
     private static String quantity(long n){
         if(n<1000)return Long.toString(n);

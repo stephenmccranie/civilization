@@ -54,6 +54,15 @@ public final class CivilizationJei implements IModPlugin {
         });
     }
     @Override public void registerGuiHandlers(IGuiHandlerRegistration r){
+        r.addGlobalGuiHandler(new mezz.jei.api.gui.handlers.IGlobalGuiHandler(){
+            public Collection<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(){
+                var mc=Minecraft.getInstance();
+                if(mc.player==null||!BlockCarry.restricted(mc.player)||!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
+                for(var slot:screen.getMenu().slots)if(slot.x<0&&slot.container==mc.player.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND)
+                    return List.of(dev.civilization.client.MachineUi.handBounds(screen,slot));
+                return List.of();
+            }
+        });
         r.addGuiContainerHandler(dev.civilization.client.KilnScreen.class,new mezz.jei.api.gui.handlers.IGuiContainerHandler<dev.civilization.client.KilnScreen>(){
             public List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(dev.civilization.client.KilnScreen s){return List.of(s.recipeDrawerBounds());}
             public Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(dev.civilization.client.KilnScreen s,double x,double y){

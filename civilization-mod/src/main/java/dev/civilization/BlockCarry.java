@@ -14,9 +14,9 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 /** One physical building stack: the offhand. Other inventory goods retain native behavior. */
 @EventBusSubscriber(modid="civilization")
 public final class BlockCarry {
-    public static final int OFFHAND=40,LIMIT=32;
+    public static final int OFFHAND=40,LIMIT=32,HAND_SLOT_X=-36;
     private BlockCarry(){}
-    public static boolean block(ItemStack stack){return !stack.isEmpty()&&stack.getItem() instanceof BlockItem;}
+    public static boolean block(ItemStack stack){return !stack.isEmpty()&&stack.getItem() instanceof BlockItem&&!stack.is(CargoContent.STOCKPILE.get().asItem());}
     public static boolean filledContainer(ItemStack stack){
         if(stack.isEmpty())return false;
         var container=stack.get(net.minecraft.core.component.DataComponents.CONTAINER);
@@ -53,7 +53,7 @@ public final class BlockCarry {
         if(!restricted(inv.player))return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==OFFHAND)return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==0){
-            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new Slot(inv,OFFHAND,slot.x-33,slot.y));return;
+            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new Slot(inv,OFFHAND,HAND_SLOT_X,slot.y));return;
         }
     }
     /** Runs only between transactions; old/foreign misplaced stock is saved, never silently deleted. */

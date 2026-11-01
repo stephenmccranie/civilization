@@ -6,6 +6,7 @@
   "mixins": [
     "PlayerMixin",
     "WheelbarrowCollisionMixin",
+    "WheelbarrowPickingMixin",
     "BlockCarryInventoryMixin",
     "BlockCarrySlotMixin",
     "BlockCarryMenuMixin",
@@ -39,6 +40,8 @@
   "client": [
     "LocalPlayerMixin",
     "BlockCarryScreenMixin",
+    "SlotPositionAccess",
+    "CarryRecipeBookMixin",
     "WheelbarrowPlayerModelMixin",
     "WeatherClientMixin",
     "WeatherRenderMixin",

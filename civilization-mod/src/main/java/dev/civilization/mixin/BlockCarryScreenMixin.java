@@ -20,18 +20,23 @@ public abstract class BlockCarryScreenMixin {
         if((Object)this instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen)return;
         var p=Minecraft.getInstance().player;if(p!=null)BlockCarry.attachMenu(menu,p.getInventory());
     }
+    @Inject(method="render",at=@At("HEAD"))
+    private void civilization$handLayout(GuiGraphics g,int mouseX,int mouseY,float partial,CallbackInfo ci){
+        var p=Minecraft.getInstance().player;if(p==null||!BlockCarry.restricted(p))return;
+        int x=MachineUi.handSlotX((AbstractContainerScreen<?>)(Object)this);
+        for(var slot:menu.slots)if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0)((SlotPositionAccess)slot).civilization$setX(x);
+    }
     @Inject(method="renderSlot",at=@At("HEAD"))
     private void civilization$handPanel(GuiGraphics g,Slot slot,CallbackInfo ci){
         var p=Minecraft.getInstance().player;
         if(p!=null&&BlockCarry.restricted(p)&&slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0){
             // renderSlot already runs inside the screen's left/top translation.
-            MachineUi.panel(g,slot.x-5,slot.y-15,26,34);MachineUi.slot(g,slot.x,slot.y);
-            g.drawString(Minecraft.getInstance().font,"Hand",slot.x-3,slot.y-12,MachineUi.INK,false);
+            MachineUi.handPanel(g,slot.x,slot.y);
         }
     }
     @Inject(method="hasClickedOutside",at=@At("RETURN"),cancellable=true)
     private void civilization$handInside(double x,double y,int left,int top,int button,CallbackInfoReturnable<Boolean> result){
         var p=Minecraft.getInstance().player;if(p==null||!BlockCarry.restricted(p))return;
-        for(var slot:menu.slots)if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&x>=left+slot.x-1&&x<left+slot.x+17&&y>=top+slot.y-1&&y<top+slot.y+17)result.setReturnValue(false);
+        for(var slot:menu.slots)if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0&&x>=left+slot.x-MachineUi.HAND_LEFT&&x<left+slot.x-MachineUi.HAND_LEFT+MachineUi.HAND_WIDTH&&y>=top+slot.y-MachineUi.HAND_TOP&&y<top+slot.y-MachineUi.HAND_TOP+MachineUi.HAND_HEIGHT)result.setReturnValue(false);
     }
 }

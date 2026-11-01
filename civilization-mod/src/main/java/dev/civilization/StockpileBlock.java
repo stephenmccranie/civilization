@@ -32,7 +32,7 @@ public final class StockpileBlock extends Block implements EntityBlock {
     @Override protected ItemInteractionResult useItemOn(ItemStack stack,BlockState s,Level l,BlockPos pos,Player p,InteractionHand hand,BlockHitResult h){open(l,pos,p);return ItemInteractionResult.sidedSuccess(l.isClientSide);}
     @SubscribeEvent public static void breaking(BlockEvent.BreakEvent event){
         if(event.getLevel().getBlockEntity(event.getPos()) instanceof StockpileEntity e&&!e.cargo().isEmpty()){
-            event.setCanceled(true);event.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Empty the connected stockpile before removing a pallet."),true);
+            event.setCanceled(true);event.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Empty the connected pallets before removing one."),true);
         }
     }
 }

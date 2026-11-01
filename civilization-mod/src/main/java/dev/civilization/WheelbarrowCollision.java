@@ -17,11 +17,7 @@ public final class WheelbarrowCollision {
         for(int side:new int[]{-1,1}){
             double x0=side<0?-6.48/16:4.995/16,x1=side<0?-4.995/16:6.48/16;
             boxes.add(new AABB(x0,0,9.72/16,x1,9.045/16,11.205/16));
-            for(int i=0;i<3;i++){
-                double z=.8184+i*.616/3,end=z+.616/3,y=.5148+i*.2867/3,top=y+.2867/3;
-                double x=side*5.7375/16;
-                boxes.add(new AABB(x-.038,y-.038,z,x+.038,top+.038,end));
-            }
+            // Handles are visual/interaction targets, never solid obstacles.
         }
         boxes.add(new AABB(-.055,0,-1.065,.055,.12,-.625));
         boxes.add(new AABB(-.055,.12,-1.195,.055,.56,-.49));
@@ -29,7 +25,11 @@ public final class WheelbarrowCollision {
         return List.copyOf(boxes);
     }
     public static AABB bounds(Vec3 at,float yaw){
-        double a=Math.toRadians(180d-yaw),s=Math.sin(a),c=Math.cos(a),center=.1385,depth=1.3335;
+        return rotatedBounds(at,yaw,-1.195,12.69/16);
+    }
+    public static AABB pickBounds(Vec3 at,float yaw){return rotatedBounds(at,yaw,-1.195,1.472);}
+    private static AABB rotatedBounds(Vec3 at,float yaw,double minZ,double maxZ){
+        double a=Math.toRadians(180d-yaw),s=Math.sin(a),c=Math.cos(a),center=(minZ+maxZ)/2,depth=(maxZ-minZ)/2;
         double x=Math.abs(c)*.4471875+Math.abs(s)*depth,z=Math.abs(s)*.4471875+Math.abs(c)*depth;
         return new AABB(at.x+s*center-x,at.y,at.z+c*center-z,at.x+s*center+x,at.y+TRAY_TOP,at.z+c*center+z).inflate(1d/32,0,1d/32);
     }

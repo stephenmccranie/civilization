@@ -34,7 +34,7 @@ public final class CargoMenu extends AbstractContainerMenu {
             @Override public boolean mayPlace(ItemStack s){return false;}
             @Override public boolean mayPickup(Player p){return false;}
         });
-        MachineMenus.playerSlots(this::addSlot,inv,169);if(BlockCarry.restricted(inv.player))addSlot(new Slot(inv,BlockCarry.OFFHAND,-25,227));addDataSlots(data);refresh();
+        MachineMenus.playerSlots(this::addSlot,inv,169);if(BlockCarry.restricted(inv.player))addSlot(new Slot(inv,BlockCarry.OFFHAND,BlockCarry.HAND_SLOT_X,227));addDataSlots(data);refresh();
     }
     private static int part(long value,int index){return (int)(value>>>(index*16))&65535;}
     private long value(int base){long n=0;for(int i=0;i<4;i++)n|=(long)(data.get(base+i)&65535)<<(16*i);return n;}
