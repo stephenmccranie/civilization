@@ -4,9 +4,9 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 
 ## Playtest client — Prism Launcher
 
-An isolated local **0.35.0-dev** manufacturing candidate adds shared parts and hand assembly; it has not been deployed or published. Existing runtime testing remains on the separate **0.34.55-dev** batch. The download below remains the last published **0.34.54-dev** pack. For the current test server, use the matching test JAR supplied by the host; the older public pack alone cannot join a different Civilization version.
+The current playtest is **0.35.0-dev**, with shared parts and hand assembly, wheelbarrow/pallet hauling, permanent grass wear and thermal improvements. Clients and server must use the same Civilization version.
 
-[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
+[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/Civilization-playtest-0.35.0-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
 
 Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Civilization must match the server's version; use the announced pack instead of independently updating its mods.
 

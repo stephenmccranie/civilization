@@ -1,10 +1,10 @@
 # Civilization playtest client
 
-[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack) · [Release and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.34.54-2)
+[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/Civilization-playtest-0.35.0-1.mrpack) · [Release and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.0-1)
 
-The published download below remains **0.34.54-dev**. The local manifest is an unpublished **0.34.55-dev candidate** for the next grouped release; its new Civilization asset URL becomes usable only when that batch is published. Existing local testers can replace just the Civilization JAR with the host-provided 0.34.55-dev build.
+This release includes shared parts and hand assembly, wheelbarrow/pallet hauling, permanent grass wear and thermal improvements. Existing worlds are retained; see [manufacturing migration](../civilization-mod/manufacturing.md#existing-saves-and-limits) and [block recovery](../civilization-mod/physics.md#personal-block-carrying).
 
-This is a **client pack for the Civilization server**, pinned to Civilization **0.34.54-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The server rejects other Civilization versions. Ask the host privately for the server address; it is not included in this download or repository.
+This is a **client pack for the Civilization server**, pinned to Civilization **0.35.0-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The server rejects other Civilization versions. Ask the host privately for the server address; it is not included in this download or repository.
 
 ## Install in Prism Launcher
 
@@ -23,7 +23,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 | --- | --- |
 | GUI scale / FOV | 4× / 90° |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
-| Grassier Grass blade height / height variation (local candidate) | 0.65 / 0.35; permanent server-saved trampling |
+| Grassier Grass blade height / height variation | 0.65 / 0.35; permanent server-saved trampling |
 | DH distance | 256 chunks |
 | DH finest horizontal resolution | Two Blocks |
 | DH horizontal / vertical quality | Low / Medium |
@@ -54,7 +54,7 @@ This is a snapshot of the reviewed development client, not a minimal mandatory-m
 
 Keep this as its own playtest instance. Do not update every mod independently: DH/Iris/Sodium versions and the exact Civilization version are pinned together. When the host announces a new pack, import that release into a new instance and retain the old one until the replacement works. Personal controls and hardware choices are not overwritten by an automatic updater.
 
-Pack revision 2 adds GUI scale 4× and FOV 90°, and disables Grassier Grass's blade particles and “grass plants as blades.” Existing revision-1 installations can change those four settings in-game without downloading mods again. Minecraft stores 90° as `fov:0.5` in `options.txt`; Grassier Grass stores `bladeParticles=false` and `grassPlantsAsBlades=false` in the `[rendering]` section of `config/grassiergrass-client.toml`.
+The earlier 0.34.54 pack revision 2 added GUI scale 4× and FOV 90°, and disabled Grassier Grass's blade particles and “grass plants as blades.” Existing revision-1 installations can change those four settings in-game without downloading mods again. Minecraft stores 90° as `fov:0.5` in `options.txt`; Grassier Grass stores `bladeParticles=false` and `grassPlantsAsBlades=false` in the `[rendering]` section of `config/grassiergrass-client.toml`.
 
 If the machine struggles, disable shaders first or reduce DH distance while keeping the other tuned settings. Photon supports Iris on NVIDIA/AMD/Intel; its author does not support Apple Metal GPUs. If LOD retrieval stops filling nearby terrain, reconnect once; this pack uses unmodified DH and does not include the experimental retrieval-queue patch. Do not delete caches as a first step.
 
