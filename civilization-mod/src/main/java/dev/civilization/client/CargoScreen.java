@@ -41,6 +41,8 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
             int i=menu.slots.indexOf(hoveredSlot);
             g.renderComponentTooltip(font,java.util.List.of(hoveredSlot.getItem().getHoverName(),Component.literal(String.format(java.util.Locale.ROOT,"%,d items · click to take · Shift-click to move",menu.count(i)))),x,y);
         }
+        if(menu.palletCount()>0&&x>=leftPos+8&&x<leftPos+168&&y>=topPos+25&&y<topPos+46)
+            g.renderTooltip(font,Component.literal("Shared stockpile: "+menu.palletCount()+" connected pallet"+(menu.palletCount()==1?"":"s")),x,y);
     }
     private static String quantity(long n){
         if(n<1000)return Long.toString(n);

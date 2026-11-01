@@ -9,7 +9,7 @@ import net.minecraft.world.phys.AABB;
 
 /** Native player slots and paged cargo identities. Large quantities never enter a native slot/cursor. */
 public final class CargoMenu extends AbstractContainerMenu {
-    public static final int ROWS=27, DATA=120;
+    public static final int ROWS=27, DATA=121;
     public static final int OFFHAND_SLOT=63;
     private final CargoHolder holder,target;
     private final SimpleContainer icons=new SimpleContainer(ROWS);
@@ -17,6 +17,7 @@ public final class CargoMenu extends AbstractContainerMenu {
     private int page;
     private int renderedPage=-1;
     private long renderedRevision=-1;
+    private CargoInventory renderedCargo;
     public CargoMenu(int id,Inventory inv){this(id,inv,null);}
     public CargoMenu(int id,Inventory inv,CargoHolder holder){
         super(CargoContent.MENU.get(),id);this.holder=holder;target=holder==null?null:nearby(holder,inv.player);
@@ -26,7 +27,7 @@ public final class CargoMenu extends AbstractContainerMenu {
                 if(i<108){int row=i/4;return part(holder.cargo().count(page*ROWS+row),i%4);}
                 if(i<112)return part(Double.doubleToLongBits(holder.cargo().mass()),i-108);
                 if(i<116)return part(Double.doubleToLongBits(holder.cargo().capacity()),i-112);
-                return switch(i){case 116->page;case 117->pages();case 118->target==null?0:target instanceof StockpileEntity?1:2;default->0;};
+                return switch(i){case 116->page;case 117->pages();case 118->target==null?0:target instanceof StockpileEntity?1:2;case 119,120->holder instanceof StockpileEntity s?part(s.palletCount(),i-119):0;default->0;};
             }
         };
         for(int row=0;row<3;row++)for(int col=0;col<9;col++)addSlot(new Slot(icons,row*9+col,8+col*18,54+row*18){
@@ -42,12 +43,13 @@ public final class CargoMenu extends AbstractContainerMenu {
     public double capacity(){return Double.longBitsToDouble(value(112));}
     public int page(){return data.get(116);}
     public int pageCount(){return data.get(117);}
+    public int palletCount(){return (data.get(119)&65535)|((data.get(120)&65535)<<16);}
     private int pages(){return Math.max(1,(holder.cargo().size()+ROWS-1)/ROWS);}
     private void refresh(){
         if(holder==null)return;page=Math.min(page,pages()-1);
-        if(renderedPage==page&&renderedRevision==holder.cargo().revision())return;
-        renderedPage=page;renderedRevision=holder.cargo().revision();
-        for(int i=0;i<ROWS;i++){int at=page*ROWS+i;icons.setItem(i,at<holder.cargo().size()?holder.cargo().entry(at).item():ItemStack.EMPTY);}
+        var cargo=holder.cargo();if(renderedCargo==cargo&&renderedPage==page&&renderedRevision==cargo.revision())return;
+        renderedCargo=cargo;renderedPage=page;renderedRevision=cargo.revision();
+        for(int i=0;i<ROWS;i++){int at=page*ROWS+i;icons.setItem(i,at<cargo.size()?cargo.entry(at).item():ItemStack.EMPTY);}
     }
     @Override public void broadcastChanges(){refresh();super.broadcastChanges();}
     @Override public boolean stillValid(Player p){return holder==null||holder.cargoValid(p);}

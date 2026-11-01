@@ -19,6 +19,7 @@ final class WheelbarrowVisualCheck {
     private static volatile boolean cargoVerified;
     private static boolean handMenuVerified;
     private static volatile boolean creativeVerified;
+    private static volatile boolean connectedVerified;
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException(failure);var server=mc.getSingleplayerServer();
         if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(65);mc.gui.getChat().clearMessages(true);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);check(server,()->{
@@ -152,7 +153,29 @@ final class WheelbarrowVisualCheck {
         if(ticks==930)dev.civilization.client.CreativeInventoryCheck.click(mc,47,0);
         if(ticks==940){dev.civilization.client.CreativeInventoryCheck.verify(mc.player,true);check(server,()->{dev.civilization.client.CreativeInventoryCheck.verify(server.getPlayerList().getPlayers().getFirst(),true);creativeVerified=true;});shot(mc,"creative-hotbar");}
         if(ticks==950)mc.player.closeContainer();
-        if(ticks>960){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified)throw new IllegalStateException("Wheelbarrow server/cargo/hand/Creative acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: actual movement/camera/gait, stockpile placement, mined pickup to offhand, 2,560-piece cargo, native chest hand transfers, Creative native catalog slots and mouse-click hotbar placement/swap/split with server snapshots, Photon/shaders-disabled views");mc.stop();}
+        if(ticks==965)check(server,()->{
+            var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(CargoContent.STOCKPILE.get()));p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),3.5,100,-1,java.util.Set.of(),0,20);
+        });
+        if(ticks==980)mc.gameMode.useItemOn(mc.player,InteractionHand.OFF_HAND,new BlockHitResult(new Vec3(3.5,100,.5),Direction.UP,new BlockPos(3,99,0),false));
+        if(ticks==990)check(server,()->{
+            var b=(StockpileEntity)server.overworld().getBlockEntity(new BlockPos(3,100,0));
+            if(b==null||b.palletCount()!=2)throw new IllegalStateException("Side placement did not automatically join the stockpile");b.cargo().insert(new ItemStack(Blocks.COBBLESTONE),32);
+        });
+        if(ticks==1000)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(3.5,100.125,.5),Direction.UP,new BlockPos(3,100,0),false));
+        if(ticks==1015){
+            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.capacity()!=2048000||m.data.get(119)!=2||m.count(0)!=1440||m.count(1)!=32)throw new IllegalStateException("Connected stockpile capacity and combined entries did not synchronize");shot(mc,"connected-stockpile-menu");
+        }
+        if(ticks==1020)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,1,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
+        if(ticks==1030){if(!mc.player.getOffhandItem().is(Blocks.COBBLESTONE.asItem())||mc.player.getOffhandItem().getCount()!=32)throw new IllegalStateException("Shared inventory withdrawal did not reach the offhand");mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,CargoMenu.OFFHAND_SLOT,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);}
+        if(ticks==1040)mc.player.closeContainer();
+        if(ticks==1050)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100.125,.5),Direction.UP,new BlockPos(2,100,0),false));
+        // Fixture-only removal of the empty neighbor exercises topology changes
+        // while the surviving pallet's real network menu remains open.
+        if(ticks==1060)check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(3,100,0),Blocks.AIR.defaultBlockState()));
+        if(ticks==1070){if(!(mc.player.containerMenu instanceof CargoMenu m)||m.capacity()!=1024000||m.count(0)!=1440||m.count(1)!=32)throw new IllegalStateException("An open stockpile menu did not adopt its smaller connected footprint");}
+        if(ticks==1075)check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(3,100,0),CargoContent.STOCKPILE.get().defaultBlockState()));
+        if(ticks==1085){if(!(mc.player.containerMenu instanceof CargoMenu m)||m.capacity()!=2048000||m.data.get(119)!=2||m.count(0)!=1440||m.count(1)!=32)throw new IllegalStateException("An open menu duplicated or lost stock when reconnecting");connectedVerified=true;shot(mc,"reconnected-stockpile-menu");}
+        if(ticks>1100){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!connectedVerified)throw new IllegalStateException("Wheelbarrow server/cargo/hand/Creative/connected-stockpile acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: actual movement/camera/gait, stockpile placement, mined pickup to offhand, 2,560-piece cargo, native chest hand transfers, Creative mouse-click conservation, side-placed shared stockpile capacity/entries/withdrawal and live menu split/rejoin, Photon/shaders-disabled views");mc.stop();}
     }
     private static WheelbarrowEntity barrow(Minecraft mc){if(entityId!=0&&mc.level.getEntity(entityId) instanceof WheelbarrowEntity e)return e;return mc.level.getEntitiesOfClass(WheelbarrowEntity.class,new AABB(-10,98,-10,10,108,10)).getFirst();}
     private static WheelbarrowEntity barrow(net.minecraft.server.MinecraftServer s){return (WheelbarrowEntity)s.overworld().getEntity(entityId);}

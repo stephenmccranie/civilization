@@ -15,21 +15,28 @@ import net.minecraft.world.phys.Vec3;
 
 public final class StockpileEntity extends BlockEntity implements CargoHolder,MenuProvider {
     private final MassCargo cargo=new MassCargo(()->CargoConfig.STOCKPILE.get(),this::changed);
+    StockpileGroup group;
     private ItemStack icon=ItemStack.EMPTY;
     private float fill;
     private boolean networkDirty;
     public StockpileEntity(BlockPos p,BlockState s){super(CargoContent.ENTITY.get(),p,s);}
     private void changed(){
+        if(group!=null)group.changed();
         setChanged();icon=cargo.isEmpty()?ItemStack.EMPTY:cargo.entry(0).item();fill=(float)Math.min(1,cargo.mass()/cargo.capacity());
         networkDirty=true;
     }
     public void tick(){if(networkDirty){networkDirty=false;level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);}}
     public ItemStack cargoIcon(){return icon;}
     public float cargoFill(){return fill;}
-    @Override public MassCargo cargo(){return cargo;}
+    MassCargo localCargo(){return cargo;}
+    private StockpileGroup group(){if(group==null)group=StockpileGroup.find(this);return group;}
+    @Override public CargoInventory cargo(){return level==null||level.isClientSide||isRemoved()?cargo:group();}
+    public int palletCount(){return level==null||level.isClientSide||isRemoved()?1:group().pallets();}
+    @Override public void onLoad(){super.onLoad();if(group!=null)group.invalidate();StockpileGroup.invalidateAround(level,worldPosition);}
+    @Override public void setRemoved(){if(group!=null)group.invalidate();super.setRemoved();}
     @Override public Level cargoLevel(){return level;}
     @Override public Vec3 cargoPosition(){return worldPosition.getCenter();}
-    @Override public boolean cargoValid(Player p){return level!=null&&!isRemoved()&&level.getBlockEntity(worldPosition)==this&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(cargoPosition())<=36&&CivicAccess.allowed(level,worldPosition,p);}
+    @Override public boolean cargoValid(Player p){return level!=null&&p.level()==level&&!isRemoved()&&level.hasChunkAt(worldPosition)&&level.getBlockEntity(worldPosition)==this&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(cargoPosition())<=36&&group().allowed(p);}
     @Override public Component cargoName(){return Component.translatable("block.civilization.material_stockpile");}
     @Override public Component getDisplayName(){return cargoName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new CargoMenu(id,inv,this);}

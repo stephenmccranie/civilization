@@ -7,7 +7,7 @@ import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
 
 /** One authoritative ledger. ItemStack is a one-item identity, never an oversized saved stack. */
-public final class MassCargo {
+public final class MassCargo implements CargoInventory {
     public record Entry(ItemStack item,long count){}
     private final List<Entry> entries=new ArrayList<>();
     private final DoubleSupplier capacity;
@@ -37,7 +37,11 @@ public final class MassCargo {
         double free=Math.max(0,capacity()-mass());
         long n=Math.min(offered,(long)Math.floor(free/unit));
         while(n>0&&n*unit>free)n--; // Never round a mass boundary upward.
-        if(n==0)return 0;
+        return store(item,n);
+    }
+    /** Already admitted by a shared inventory's mass check; retain custody on this pallet. */
+    long store(ItemStack item,long n){
+        if(n<=0)return 0;
         for(int i=0;i<entries.size();i++)if(ItemStack.isSameItemSameComponents(entries.get(i).item,item)){
             var e=entries.get(i);n=Math.min(n,Long.MAX_VALUE-e.count);if(n==0)return 0;long total=e.count+n;
             entries.set(i,new Entry(e.item,total));dirty();return n;
@@ -49,12 +53,6 @@ public final class MassCargo {
         var e=entries.get(index);long n=Math.min(e.count,requested);
         if(n==e.count)entries.remove(index);else entries.set(index,new Entry(e.item,e.count-n));
         dirty();return n;
-    }
-    public long transferTo(MassCargo destination){
-        if(destination==this)return 0;
-        long moved=0;
-        for(int i=entries.size()-1;i>=0;i--){var e=entries.get(i);long n=destination.insert(e.item,e.count);if(n>0){remove(i,n);moved=moved>Long.MAX_VALUE-n?Long.MAX_VALUE:moved+n;}}
-        return moved;
     }
     public ListTag save(HolderLookup.Provider registry){
         var list=new ListTag();
