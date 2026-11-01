@@ -33,6 +33,7 @@ public final class CivicProtection {
     }
     @SubscribeEvent public static void breaking(BlockEvent.BreakEvent e) {
         if (e.getLevel() instanceof ServerLevel level && !CivicAccess.allowed(level, e.getPos(), e.getPlayer())) e.setCanceled(true);
+        if(e.getLevel() instanceof ServerLevel level&&e.getState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.allowed(level,e.getPos(),e.getState(),e.getPlayer()))e.setCanceled(true);
     }
     @SubscribeEvent(priority = EventPriority.HIGHEST) public static void placing(BlockEvent.EntityPlaceEvent e) {
         if (!(e.getLevel() instanceof ServerLevel level)) return;
@@ -52,6 +53,7 @@ public final class CivicProtection {
     }
     @SubscribeEvent public static void explosion(ExplosionEvent.Detonate e) {
         e.getAffectedBlocks().removeIf(pos -> CivicAccess.claim(e.getLevel(), pos) != null);
+        e.getAffectedBlocks().removeIf(pos->{var state=e.getLevel().getBlockState(pos);return state.getBlock() instanceof AssemblyBenchBlock&&state.getValue(AssemblyBenchBlock.WIDE)&&CivicAccess.claim(e.getLevel(),AssemblyBenchBlock.other(pos,state))!=null;});
         e.getAffectedEntities().removeIf(entity -> CivicAccess.claim(e.getLevel(), entity.blockPosition()) != null);
     }
     @SubscribeEvent public static void piston(PistonEvent.Pre e) {

@@ -20,6 +20,8 @@ public final class PhysicalMaterials {
     public record Profile(String id,double density,double specificHeat,double conductivity,double legacyCapacity,double legacyConductance) {}
     private record Rules(Map<String,Profile> profiles,Map<ResourceLocation,String> blocks,Map<ResourceLocation,String> tags) {}
     private static volatile Rules rules=builtin();
+    private static int revision;
+    public static int revision(){return revision;}
     private PhysicalMaterials() {}
     private static Rules builtin(){
         try(var in=PhysicalMaterials.class.getResourceAsStream("/data/civilization/physical_materials/defaults.json")){
@@ -64,7 +66,7 @@ public final class PhysicalMaterials {
         if(of(s).id.equals("wood"))return named("wood").legacyCapacity;
         return s.isSolidRender(net.minecraft.world.level.EmptyBlockGetter.INSTANCE,net.minecraft.core.BlockPos.ZERO)?named("masonry").legacyCapacity:named("partial").legacyCapacity;
     }
-    static void replace(JsonObject root){rules=parse(root);}
+    static void replace(JsonObject root){rules=parse(root);revision++;}
     @SubscribeEvent public static void reload(AddReloadListenerEvent e){e.addListener(new SimpleJsonResourceReloadListener(new Gson(),"physical_materials"){
         @Override protected void apply(Map<ResourceLocation,JsonElement> input,ResourceManager manager,ProfilerFiller profiler){
             var value=input.get(ResourceLocation.parse("civilization:defaults"));

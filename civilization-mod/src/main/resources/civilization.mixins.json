@@ -5,6 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "PlayerMixin",
+    "WheelbarrowCollisionMixin",
+    "WheelbarrowPickingMixin",
+    "BlockCarryInventoryMixin",
+    "BlockCarrySlotMixin",
+    "BlockCarryMenuMixin",
     "InventoryMenuMixin",
     "ServerPlayerMixin",
     "CakeMixin",
@@ -34,6 +39,10 @@
   ],
   "client": [
     "LocalPlayerMixin",
+    "BlockCarryScreenMixin",
+    "SlotPositionAccess",
+    "CarryRecipeBookMixin",
+    "WheelbarrowPlayerModelMixin",
     "WeatherClientMixin",
     "WeatherRenderMixin",
     "InventoryScreenMixin",

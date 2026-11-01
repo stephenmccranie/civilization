@@ -22,6 +22,11 @@ public final class BuilderLineGameTests {
         var a=BlockPos.ZERO;for(var d:Direction.values()){var line=BuilderLineSystem.line(a,a.relative(d,15));h.assertTrue(line.size()==16&&line.getFirst().equals(a)&&line.getLast().equals(a.relative(d,15)),"Inclusive maximum in all six directions");h.assertTrue(BuilderLineSystem.line(a,a.relative(d,16)).isEmpty(),"Reject over-limit line");}
         h.assertTrue(BuilderLineSystem.line(a,a.offset(1,1,0)).isEmpty()&&BuilderLineSystem.line(a,a.offset(1,1,1)).isEmpty(),"Reject diagonals");h.assertTrue(BuilderLineSystem.line(a,a).size()==1,"One cell valid");h.assertTrue(!BuilderLineSystem.supported(Items.CHEST.getDefaultInstance())&&!BuilderLineSystem.supported(Items.OAK_SLAB.getDefaultInstance())&&!BuilderLineSystem.supported(Items.SAND.getDefaultInstance())&&!BuilderLineSystem.supported(Items.TNT.getDefaultInstance()),"Exclude functional, shaped and unstable blocks");h.succeed();
     }
+    @GameTest(template="industrial") public static void buildsWithOffhandBlocksAndMainHandReel(GameTestHelper h){
+        var a=setup(h);var p=player(h,a,BuilderLineContent.LINE.toStack());p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE_BRICKS,4));
+        select(p,a,true);select(p,a.east(2),true);run(p,15);
+        h.assertTrue(h.getLevel().getBlockState(a.east(2)).is(Blocks.STONE_BRICKS)&&p.getOffhandItem().getCount()==1&&p.getMainHandItem().is(BuilderLineContent.LINE.get()),"The main-hand reel builds from the single permitted offhand stack");h.succeed();
+    }
     @GameTest(template="industrial") public static void secondMarkPlacesAndPaysOnce(GameTestHelper h){
         var a=setup(h);var p=player(h,a,new ItemStack(Items.STONE_BRICKS,4));var energy=CalorieFoodData.of(p);
         select(p,a,true);h.assertTrue(h.getLevel().getBlockState(a).isAir()&&p.getMainHandItem().getCount()==4,"First point performs no placement");
@@ -64,10 +69,10 @@ public final class BuilderLineGameTests {
         try{select(p,a,true);select(p,a.east(),true);c.whitelist.clear();run(p,10);h.assertTrue(h.getLevel().getBlockState(a).is(Blocks.STONE_BRICKS)&&h.getLevel().getBlockState(a.east()).isAir()&&p.getMainHandItem().getCount()==2&&!BuilderLineSystem.selected(p),"Revoke access mid-operation: retain paid prefix, reject remaining cell");}finally{data.claims.remove(c.at);data.rebuildIndex();BuilderLineSystem.finish(p,"");}h.succeed();
     }
     @GameTest(template="industrial") public static void smithyRecipeQuoteAndInputs(GameTestHelper h){
-        var job=WorkshopJobs.smithy().stream().filter(j->j.output().is(BuilderLineContent.LINE.get())).findFirst().orElseThrow();
-        h.assertTrue(job.ticks()==400&&job.output().getCount()==1&&job.needs().size()==4,"One line reel in 20 seconds of productive Smithy work");
-        h.assertTrue(job.needs().get(0).matches(new ItemStack(Items.IRON_INGOT,2))&&!job.needs().get(0).matches(new ItemStack(Items.IRON_INGOT,1))&&job.needs().get(1).matches(new ItemStack(Items.BIRCH_PLANKS))&&job.needs().get(2).matches(new ItemStack(Items.STRING,2))&&job.needs().get(3).matches(ItemStack.EMPTY),"Explicit metal, interchangeable planks and cord requirements");
-        var w=WorkshopGameTests.build(h,2,Direction.NORTH);w.select(WorkshopJobs.index(2,"civilization:builders_line"));w.setItem(0,new ItemStack(Items.IRON_INGOT,4));w.setItem(1,new ItemStack(Items.BIRCH_PLANKS,2));w.setItem(2,new ItemStack(Items.STRING,4));w.setItem(4,KilnContent.MINERAL_COAL.toStack(2));WorkshopGameTests.run(w,400);
-        h.assertTrue(w.getItem(5).is(BuilderLineContent.LINE.get())&&w.getItem(5).getCount()==1&&w.getItem(0).getCount()==2&&w.getItem(1).getCount()==1&&w.getItem(2).getCount()==2&&w.getItem(4).getCount()==1,"Actual supplied Smithy produces one reel and conserves all inputs/coal");WorkshopGameTests.run(w,100);h.assertTrue(w.getItem(0).getCount()==2&&w.getItem(2).getCount()==2,"Occupied output prevents paying for a second reel");h.succeed();
+        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(BuilderLineContent.LINE.get())).findFirst().orElseThrow();
+        h.assertTrue(job.ticks()==200&&job.output().getCount()==1&&job.needs().size()==4,"One line reel in ten seconds of hand assembly");
+        h.assertTrue(job.needs().get(0).matches(new ItemStack(ManufacturingContent.part("iron","plate"),2))&&!job.needs().get(0).matches(new ItemStack(ManufacturingContent.part("iron","plate"),1))&&job.needs().get(1).matches(new ItemStack(Items.BIRCH_PLANKS))&&job.needs().get(2).matches(new ItemStack(Items.STRING,2))&&job.needs().get(3).matches(ItemStack.EMPTY),"Explicit metal, interchangeable planks and cord requirements");
+        var w=WorkshopGameTests.build(h,3,Direction.NORTH);w.select(WorkshopJobs.index(3,"civilization:builders_line"));w.setItem(0,new ItemStack(ManufacturingContent.part("iron","plate"),4));w.setItem(1,new ItemStack(Items.BIRCH_PLANKS,2));w.setItem(2,new ItemStack(Items.STRING,4));WorkshopGameTests.run(w,200);
+        h.assertTrue(w.getItem(5).is(BuilderLineContent.LINE.get())&&w.getItem(5).getCount()==1&&w.getItem(0).getCount()==2&&w.getItem(1).getCount()==1&&w.getItem(2).getCount()==2&&w.getItem(4).isEmpty(),"Actual supplied bench produces one reel and conserves all stock without Coal");WorkshopGameTests.run(w,100);h.assertTrue(w.getItem(0).getCount()==2&&w.getItem(2).getCount()==2,"Occupied output prevents paying for a second reel");h.succeed();
     }
 }

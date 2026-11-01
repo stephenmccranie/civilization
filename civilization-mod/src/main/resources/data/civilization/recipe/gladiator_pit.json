@@ -1,23 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "SCS",
-    "CIC",
-    "SCS"
-  ],
-  "key": {
-    "S": {
-      "item": "minecraft:stone_bricks"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:gladiator_pit",
-    "count": 1
-  }
+  ]
 }

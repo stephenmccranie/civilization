@@ -14,7 +14,7 @@ public final class WorkshopGates {
         return enchants.keySet().stream().anyMatch(e->e.is(net.minecraft.world.item.enchantment.Enchantments.MENDING));
     }
     @SubscribeEvent public static void anvil(AnvilUpdateEvent e){
-        // Naming and enchanted books are still allowed; physical repair/combining belongs in the smithy.
+        // Naming and enchanted books are still allowed; physical repair/combining belongs at the Assembly Bench.
         if(WorkshopJobs.gated(e.getLeft())&&!e.getRight().isEmpty()&&!e.getRight().is(Items.ENCHANTED_BOOK))e.setCanceled(true);
     }
     @SubscribeEvent public static void grindstone(GrindstoneEvent.OnPlaceItem e){

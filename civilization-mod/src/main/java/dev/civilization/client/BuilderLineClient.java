@@ -25,28 +25,28 @@ public final class BuilderLineClient {
     public static void accept(BuilderLinePayload.State s){state=s.selected()?s:null;REFRESH.reset();}
     public static boolean selected(){return state!=null;}
     @SubscribeEvent public static void input(InputEvent.InteractionKeyMappingTriggered e){
-        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||!BuilderLineSystem.equipped(mc.player)||!BuilderLineSystem.supported(mc.player.getMainHandItem()))return;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||!BuilderLineSystem.equipped(mc.player)||!BuilderLineSystem.supported(BuilderLineSystem.working(mc.player)))return;
         if(!e.isUseItem())return;e.setCanceled(true);e.setSwingHand(false);
         if(e.getHand()!=InteractionHand.MAIN_HAND||pressed)return;
         pressed=true;PacketDistributor.sendToServer(new BuilderLinePayload.Mark(mc.options.keyShift.isDown(),mc.player.getYRot(),mc.player.getXRot()));
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         var mc=Minecraft.getInstance();if(!mc.options.keyUse.isDown())pressed=false;
-        if(mc.player==null||mc.level==null||!BuilderLineSystem.equipped(mc.player)||!BuilderLineSystem.supported(mc.player.getMainHandItem())){state=null;cells=List.of();boxes=List.of();REFRESH.reset();return;}
+        if(mc.player==null||mc.level==null||!BuilderLineSystem.equipped(mc.player)||!BuilderLineSystem.supported(BuilderLineSystem.working(mc.player))){state=null;cells=List.of();boxes=List.of();REFRESH.reset();return;}
         if(state==null){cells=List.of();boxes=List.of();return;}
         BlockPos b=state.active()?state.b():mc.hitResult instanceof BlockHitResult h&&h.getType()==HitResult.Type.BLOCK?BuilderLineSystem.target(mc.player,h):state.a();
-        if(!REFRESH.due(List.of(state,b,mc.player.getMainHandItem().getItem())))return;
+        if(!REFRESH.due(List.of(state,b,BuilderLineSystem.working(mc.player).getItem())))return;
         cells=BuilderLineSystem.line(state.a(),b);valid=!cells.isEmpty();
         if(!valid)cells=List.of(state.a(),b);
         if(state.active()&&valid)cells=cells.subList(Math.min(state.completed(),cells.size()),cells.size());
         boxes=cells.stream().map(p->new AABB(p).inflate(.002)).toList();
-        var bad=new HashSet<AABB>();boolean building=mc.player.getMainHandItem().getItem() instanceof BlockItem;
+        var bad=new HashSet<AABB>();boolean building=BuilderLineSystem.working(mc.player).getItem() instanceof BlockItem;
         for(int i=0;i<cells.size();i++){
             var pos=cells.get(i);var s=mc.level.getBlockState(pos);
             if(building?(!s.isAir()||!mc.level.getFluidState(pos).isEmpty()||!mc.level.isUnobstructed(null,net.minecraft.world.phys.shapes.Shapes.block().move(pos.getX(),pos.getY(),pos.getZ()))):(!BuilderLineSystem.plain(s)||!mc.player.hasCorrectToolForDrops(s)))bad.add(boxes.get(i));
         }
         blocked=Set.copyOf(bad);cordA=state.a().getCenter();cordB=b.getCenter();
-        if(!state.active())mc.player.displayClientMessage(net.minecraft.network.chat.Component.literal(valid?cells.size()+" blocks — right-click to "+(mc.player.getMainHandItem().getItem() instanceof BlockItem?"build":"mine"):"Align endpoints on one axis; maximum 16 blocks"),true);
+        if(!state.active())mc.player.displayClientMessage(net.minecraft.network.chat.Component.literal(valid?cells.size()+" blocks — right-click to "+(BuilderLineSystem.working(mc.player).getItem() instanceof BlockItem?"build":"mine"):"Align endpoints on one axis; maximum 16 blocks"),true);
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent e){
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL||boxes.isEmpty())return;
@@ -54,13 +54,13 @@ public final class BuilderLineClient {
         var camera=e.getCamera().getPosition();var visible=GuidePerformance.outlines(boxes,e.getFrustum()::isVisible,b->b.getCenter().distanceToSqr(camera),null);
         var pose=e.getPoseStack();var matrix=com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();matrix.pushMatrix();matrix.mul(e.getModelViewMatrix());com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();mc.getMainRenderTarget().bindWrite(false);pose.pushPose();
         try{
-            pose.translate(-camera.x,-camera.y,-camera.z);var buffers=mc.renderBuffers().bufferSource();boolean building=mc.player.getMainHandItem().getItem() instanceof BlockItem;
+            pose.translate(-camera.x,-camera.y,-camera.z);var buffers=mc.renderBuffers().bufferSource();boolean building=BuilderLineSystem.working(mc.player).getItem() instanceof BlockItem;
             for(var box:visible){
                 boolean clear=valid&&!blocked.contains(box);
                 if(clear&&building&&PreviewConfig.MODE.get()==PreviewConfig.Mode.TEXTURED){
                     pose.pushPose();pose.translate(box.minX+.002,box.minY+.002,box.minZ+.002);
                     var consumer=new TranslucentVertexConsumer(buffers.getBuffer(PreviewRenderTypes.TEXTURED),PreviewConfig.OPACITY.get().floatValue());
-                    mc.getBlockRenderer().renderSingleBlock(((BlockItem)mc.player.getMainHandItem().getItem()).getBlock().defaultBlockState(),pose,type->consumer,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,net.neoforged.neoforge.client.model.data.ModelData.EMPTY,PreviewRenderTypes.TEXTURED);pose.popPose();
+                    mc.getBlockRenderer().renderSingleBlock(((BlockItem)BuilderLineSystem.working(mc.player).getItem()).getBlock().defaultBlockState(),pose,type->consumer,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,net.neoforged.neoforge.client.model.data.ModelData.EMPTY,PreviewRenderTypes.TEXTURED);pose.popPose();
                 }
                 net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),box,clear?(building?.5f:1):1,clear?(building?1:.65f):.2f,clear?(building?1:.2f):.2f,.8f);
             }

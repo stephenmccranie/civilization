@@ -1,26 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "ICI",
-    "BHB",
-    "ICI"
-  ],
-  "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "B": {
-      "item": "minecraft:iron_bars"
-    },
-    "H": {
-      "item": "civilization:machine_parts"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:condenser",
-    "count": 1
-  }
+  ]
 }

@@ -29,11 +29,12 @@ public class FrontierGameTests {
     @GameTest(template="industrial")
     public static void tinyUraniumPocketsActuallyReplaceHostRock(GameTestHelper h){
         var level=h.getLevel();var p=h.absolutePos(new BlockPos(6,2,6));
-        long seed=0;while(!DepositDistribution.uranium(seed,p.getX(),p.getZ()))seed++;
-        final long selectedSeed=seed;
         var proxy=(net.minecraft.world.level.WorldGenLevel)java.lang.reflect.Proxy.newProxyInstance(
                 net.minecraft.world.level.WorldGenLevel.class.getClassLoader(),new Class<?>[]{net.minecraft.world.level.WorldGenLevel.class},
-                (object,method,args)->method.getName().equals("getSeed")?selectedSeed:method.invoke(level,args));
+                (object,method,args)->{
+                    if(method.getName().equals("getSeed"))throw new AssertionError("Uranium pockets must not read the world seed for district selection");
+                    return method.invoke(level,args);
+                });
         var configured=level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).get(ResourceLocation.parse("civilization:uranium_ore"));
         var config=(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration)configured.config();
         var random=net.minecraft.util.RandomSource.create(73291);int actual=0,old=0;
@@ -49,8 +50,8 @@ public class FrontierGameTests {
                 if(pass==0)old+=count;else actual+=count;
             }
         }
-        System.out.println("URANIUM_HOST_ROCK_SAMPLE oldEllipsoidBlocks="+old+" regionalPocketBlocks="+actual);
-        h.assertTrue(actual>=16,"Selected uranium districts must produce real, hand-minable ore");h.succeed();
+        System.out.println("URANIUM_HOST_ROCK_SAMPLE oldEllipsoidBlocks="+old+" scatteredPocketBlocks="+actual);
+        h.assertTrue(actual>=16,"Small finds must produce real, hand-minable ore without district selection");h.succeed();
     }
     @GameTest(template="industrial")
     public static void uraniumPlacementFollowsSurfaceAndKeepsVariedRockCover(GameTestHelper h){
@@ -58,13 +59,16 @@ public class FrontierGameTests {
         var feature=level.registryAccess().registryOrThrow(Registries.PLACED_FEATURE)
                 .get(ResourceLocation.parse("civilization:uranium_ore"));
         var mods=feature.placement();
-        h.assertTrue(feature.feature().value().feature() instanceof RegionalUraniumFeature,"Veins are gated by the registered regional feature");
+        h.assertTrue(feature.feature().value().feature() instanceof UraniumPocketFeature,"The stable feature ID places small scattered pockets");
         h.assertTrue(mods.size()==9&&mods.get(2) instanceof net.minecraft.world.level.levelgen.placement.HeightmapPlacement
                 &&mods.get(3) instanceof net.minecraft.world.level.levelgen.placement.BiomeFilter
                 &&mods.get(4) instanceof net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement,
                 "Classify the surface biome before entering rock; no absolute ore-height range");
         var context=new net.minecraft.world.level.levelgen.placement.PlacementContext(level,generator,java.util.Optional.of(feature));
         var pos=h.absolutePos(new BlockPos(2,1,2));var random=net.minecraft.util.RandomSource.create(29171);
+        int attempts=0;
+        for(int i=0;i<4096;i++)attempts+=mods.getFirst().getPositions(context,random,pos).count();
+        h.assertTrue(attempts>400&&attempts<650,"The native rarity filter keeps about one attempt per eight eligible chunks");
         var surface=mods.get(2).getPositions(context,random,pos).findFirst().orElseThrow();
         int shallow=999,deep=0;
         for(int i=0;i<200;i++){

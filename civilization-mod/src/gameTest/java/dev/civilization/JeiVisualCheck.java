@@ -16,7 +16,7 @@ final class JeiVisualCheck {
         var runtime=CivilizationJei.runtime();var manager=runtime.getRecipeManager();
         if(ticks==40){
             mc.options.hideGui=false;mc.options.guiScale().set(3);
-            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","oil_pump","heater","column","condenser","coal_drill","canisters","cutting","recombining");
+            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","assembly","oil_pump","heater","column","condenser","coal_drill","canisters","cutting","recombining");
             for(var type:types){
                 var recipeType=CivilizationJei.type(type);var category=manager.getRecipeCategory(recipeType);
                 if(category==null||manager.createRecipeLookup(recipeType).get().findAny().isEmpty())throw new IllegalStateException("Missing JEI recipes: "+type);
@@ -33,7 +33,7 @@ final class JeiVisualCheck {
             var pieces=CuttingContent.stack(net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultBlockState(),1,1);
             var cuts=manager.createRecipeLookup(CivilizationJei.type("cutting")).limitFocus(List.of(focus(RecipeIngredientRole.OUTPUT,pieces))).get().toList();
             if(cuts.isEmpty()||cuts.stream().anyMatch(r->r.slots().stream().filter(s->s.role()==RecipeIngredientRole.OUTPUT).flatMap(s->s.items().stream()).anyMatch(s->!ItemStack.isSameItemSameComponents(s,pieces))))throw new IllegalStateException("Cut-piece material/shape subtypes mixed together");
-            System.out.println("JEI check: all 15 categories, controller catalysts, iron recipes/uses, recipe parity and cut-piece identities passed.");
+            System.out.println("JEI check: all 16 categories, controller catalysts, iron recipes/uses, recipe parity and cut-piece identities passed.");
             runtime.getRecipesGui().show(iron);
         }
         if(ticks==50)showCategory("foundry",new ItemStack(Items.IRON_INGOT));
@@ -41,7 +41,7 @@ final class JeiVisualCheck {
         if(ticks==70)runtime.getRecipesGui().show(focus(RecipeIngredientRole.OUTPUT,IndustrialContent.SULFUR.toStack()));
         if(ticks==90)shot(mc,"sulfur-column");
         if(ticks==95)runtime.getRecipesGui().show(focus(RecipeIngredientRole.OUTPUT,new ItemStack(Items.IRON_PICKAXE)));
-        if(ticks==100)showCategory("smithy",new ItemStack(Items.IRON_PICKAXE));
+        if(ticks==100)showCategory("assembly",new ItemStack(Items.IRON_PICKAXE));
         if(ticks==115)shot(mc,"smithy");
         if(ticks==120)runtime.getRecipesGui().show(focus(RecipeIngredientRole.OUTPUT,IndustrialContent.FUEL_CAN.toStack()));
         if(ticks==140)shot(mc,"canister");

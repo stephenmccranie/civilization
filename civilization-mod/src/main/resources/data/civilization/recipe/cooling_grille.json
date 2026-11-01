@@ -1,20 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "III",
-    "CCC",
-    "III"
-  ],
-  "key": {
-    "I": {
-      "item": "minecraft:iron_nugget"
-    },
-    "C": {
-      "item": "civilization:industrial_casing"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:cooling_grille",
-    "count": 3
-  }
+  ]
 }

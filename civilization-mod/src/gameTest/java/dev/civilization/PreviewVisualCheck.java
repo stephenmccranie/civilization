@@ -38,7 +38,7 @@ public final class PreviewVisualCheck {
             opened = true;
             mc.createWorldOpenFlows().openWorld(System.getProperty("civilization.previewWorld","preview-compatibility"), mc::stop);
         }
-        if((CHECK.equals("campus")||CHECK.equals("flight-benchmark")) && opened && mc.level==null && mc.screen!=null) {
+        if((CHECK.equals("campus")||CHECK.equals("flight-benchmark")||CHECK.equals("thermal-lab")) && opened && mc.level==null && mc.screen!=null) {
             if(!campusScreen.equals(mc.screen.getClass().getName())){campusScreen=mc.screen.getClass().getName();System.out.println("Campus screen: "+campusScreen+" / "+mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button).map(c->((net.minecraft.client.gui.components.Button)c).getMessage().getString()).toList());}
             for(var child:mc.screen.children())if(child instanceof net.minecraft.client.gui.components.Button button) {
                 var label=button.getMessage().getString();
@@ -46,10 +46,12 @@ public final class PreviewVisualCheck {
             }
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
+        if(CHECK.equals("thermal-lab")){ThermalLaboratoryVisual.tick(mc);return;}
         if(CHECK.equals("grassier-grass")){GrassierGrassVisualCheck.tick(mc);return;}
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}
         if(CHECK.equals("coal-mining")){CoalMiningVisualCheck.tick(mc);return;}
+        if(CHECK.equals("wheelbarrow")){WheelbarrowVisualCheck.tick(mc);return;}
         if(CHECK.equals("gladiator")){ArenaVisualCheck.tick(mc);return;}
         if(CHECK.equals("uranium")){UraniumVisualCheck.tick(mc);return;}
         if(CHECK.equals("derrick-guide")){DerrickGuideVisualCheck.tick(mc);return;}
@@ -67,13 +69,14 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("chests")){ChestVisualCheck.tick(mc);return;}
         if(CHECK.equals("inventory")){InventoryVisualCheck.tick(mc);return;}
         if(CHECK.equals("workshops")){WorkshopVisualCheck.tick(mc);return;}
+        if(CHECK.equals("assembly")){AssemblyVisualCheck.tick(mc);return;}
         if(CHECK.equals("industry")){IndustryVisualCheck.tick(mc);return;}
         if(CHECK.equals("pipes")){PipeVisualCheck.tick(mc);return;}
         if(CHECK.equals("jei")){JeiVisualCheck.tick(mc);return;}
         if(CHECK.equals("storage")){StorageVisualCheck.tick(mc);return;}
         if(CHECK.equals("bulk")){BulkVisualCheck.tick(mc);return;}
         if(CHECK.equals("thermal")){ThermalVisualCheck.tick(mc);return;}
-        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")){ItemArtVisualCheck.tick(mc,CHECK);return;}
+        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")||CHECK.equals("components")){ItemArtVisualCheck.tick(mc,CHECK);return;}
         if(CHECK.equals("canisters")){CanisterVisualCheck.tick(mc);return;}
         if(CHECK.equals("paterson")){FirearmVisualCheck.tick(mc);return;}
         if(CHECK.equals("oven")){OvenVisualCheck.tick(mc);return;}

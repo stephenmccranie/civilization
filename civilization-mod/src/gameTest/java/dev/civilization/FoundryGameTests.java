@@ -19,9 +19,10 @@ public class FoundryGameTests {
         h.assertTrue(f.getItem(2).is(Items.IRON_INGOT),"Foundry smelts raw iron");
         f.setItem(0,f.removeItemNoUpdate(2));f.setItem(1,KilnContent.MINERAL_COAL.toStack(2));run(h,f,800);
         h.assertTrue(f.getItem(2).is(KilnContent.STEEL.get())&&f.getItem(2).getCount()==1,"Longer coal-fired batch makes one steel");
-        var input=CraftingInput.of(2,2,List.of(f.getItem(2).copy(),new ItemStack(Items.COPPER_INGOT),new ItemStack(Items.COPPER_INGOT),KilnContent.STEEL.toStack()));
-        var result=h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING,input,h.getLevel()).orElseThrow().value().assemble(input,h.getLevel().registryAccess());
-        h.assertTrue(result.is(KilnContent.MACHINE_PARTS.get())&&result.getCount()==2,"Steel and copper make shared parts");h.succeed();
+        var smithy=WorkshopGameTests.build(h,2,Direction.NORTH);var plate=ManufacturingGameTests.job(2,ManufacturingContent.part("steel","plate"));ManufacturingGameTests.supply(smithy,plate);smithy.setItem(4,KilnContent.MINERAL_COAL.toStack());WorkshopGameTests.run(smithy,plate.ticks());
+        h.assertTrue(smithy.getItem(5).is(ManufacturingContent.part("steel","plate")),"Steel is shaped at the Smithy");
+        var bench=WorkshopGameTests.build(h,3,Direction.NORTH);var parts=ManufacturingGameTests.job(3,KilnContent.MACHINE_PARTS.get());ManufacturingGameTests.supply(bench,parts);WorkshopGameTests.run(bench,parts.ticks());
+        h.assertTrue(bench.getItem(5).is(KilnContent.MACHINE_PARTS.get())&&bench.getItem(5).getCount()==2,"Prepared steel and copper assemble into two shared mechanisms");h.succeed();
     }
     @GameTest(template="industrial") public static void vanillaMetalSmeltingCannotBypassFoundry(GameTestHelper h) {
         for(var item:List.of(Items.RAW_IRON,Items.RAW_COPPER,Items.RAW_GOLD,Items.IRON_ORE,Items.DEEPSLATE_IRON_ORE,Items.COPPER_ORE,Items.DEEPSLATE_COPPER_ORE,Items.GOLD_ORE,Items.DEEPSLATE_GOLD_ORE,Items.NETHER_GOLD_ORE,Items.IRON_SWORD,Items.GOLDEN_SWORD))

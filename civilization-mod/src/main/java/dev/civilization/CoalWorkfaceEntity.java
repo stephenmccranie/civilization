@@ -15,7 +15,20 @@ public final class CoalWorkfaceEntity extends BlockEntity {
     public CoalWorkfaceEntity(BlockPos p,BlockState s){super(CoalMiningContent.FACE_ENTITY.get(),p,s);}
     public long mask(){return mask;}
     public VoxelShape shape(){return shape;}
-    public void mask(long value){mask=value;shape=CoalGeometry.shape(value);setChanged();requestModelDataUpdate();if(level!=null)level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);}
+    public void mask(long value){
+        if(mask==value)return;
+        mask=value;shape=CoalGeometry.shape(value);setChanged();requestModelDataUpdate();
+        if(level!=null){
+            level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);
+            if(!level.isClientSide)level.updateNeighborsAt(worldPosition,getBlockState().getBlock());
+        }
+    }
+    @Override public void onLoad(){
+        super.onLoad();
+        // Repair support for already-saved piles too, without adding a block-entity ticker.
+        if(level!=null&&!level.isClientSide&&level.getBlockState(worldPosition.above()).is(CoalMiningContent.PILE.get()))
+            level.scheduleTick(worldPosition.above(),CoalMiningContent.PILE.get(),1);
+    }
     @Override public ModelData getModelData(){return ModelData.builder().with(MASK,mask).build();}
     @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putLong("coalMask",mask);}
     @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);mask=t.contains("coalMask")?t.getLong("coalMask"):CoalGeometry.FULL;shape=CoalGeometry.shape(mask);requestModelDataUpdate();if(level!=null&&level.isClientSide)level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),2);}

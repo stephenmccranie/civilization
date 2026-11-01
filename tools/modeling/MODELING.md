@@ -4,6 +4,12 @@ Read this for shaped blocks, machines, vehicles and creatures. The asset pipelin
 
 ## Make the model easy to judge
 
+Generated multi-view studies can disagree with themselves. Compare the same landmarks across views before modeling; resolve discrepancies in one measured native assembly rather than copying each silhouette independently. For carriers, measure usable interior separately from the outer envelope and check wheel contact, resting supports and grip reach before proposing capacity. Review moving parts over their full travel, including any body tilt that changes ground contact.
+
+Inspect load-bearing supports from inside an open carrier as well as underneath: a connected frame can still intrude through the cargo floor. Fit sloping tray corners in native geometry before disguising them with straps or textures. Include complete orthographic views alongside close-ups; a cropped wheel or handle cannot establish whole-object proportions or clearance.
+
+Judge small equipment beside a complete standing player in the same Minecraft view; a close-up, cropped pushing pose or editor dummy can hide a poor practical scale. When resizing, update actual source geometry, pivots, fitted UV spans, wheel radius and handler/collision offsets together. Check taking controls and brushing past at diagonal headings as well as cardinal ones: an axis-aligned handle envelope can obstruct its own handler even when a straight-on fixture passes.
+
 Use a small set of measured landmarks: overall envelope, primary mass ratios, shaft axes, contact heights and rotating clearances. Record them in the asset brief. A beautiful perspective image is not a dimensioned blueprint. Treat ambiguous hidden geometry as a design problem, not as something the generator has solved.
 
 Block out the **whole assembly** before detailing one component. Use a single neutral material to expose poor proportions; check front, back, both sides and two three-quarter views at the same scale. Then test the actual material palette. Keep the known-good runtime asset intact until the replacement passes review.
@@ -30,7 +36,13 @@ Fix a weak silhouette with geometry. Fix unreadable materials with their value/c
 
 Every moving assembly needs a named pivot in **assembly coordinates**, not guessed local coordinates. Derive component export offsets from that same source. Inspect the complete swept shape, not only the stopped pose. Distinguish deliberate shaft/bearing contact from unwanted wheel/body interference. An animation bone is a visual transform, not a Sable physics joint.
 
+Check motion through actual native animation playback as well as static mesh poses. The pinned MCP animation tool supplies an `animation.` prefix; inspect the created name instead of adding it twice. GeckoLib export converts rotation conventions, so verify the visible direction of an asymmetric movement such as lifting handles before accepting numeric keyframes. Sample a spoked wheel between its symmetry angles; six views spaced by 60 degrees can conceal a stationary six-spoke wheel. Temporary player/scale geometry must be excluded from the saved source and export, and checked in the same raised pose as the handles.
+
+For a non-living GeckoLib entity, the default GeoEntityRenderer supplies zero body yaw; explicitly apply interpolated entity yaw and test the production render transform against travel heading. A numeric steering assertion alone misses a model that never turns. Apply rider steering after the player tick: applying it inside the vehicle tick lets the rider overwrite its previous yaw, causing a stepped camera despite correct heading. Verify actual Camera.setup at sub-tick times in first person and both third-person views with a look-around offset. Separate a carrier's compact solid body from its wider mouse-interaction bounds. Non-solid handles must be absent from both the physical shape and the entity's physical bounding box; extend only the mouse-ray target. Verify walking across the full handle span and grabbing through the native mouse-ray path at cardinal and diagonal angles, alongside ordinary jump/stand/brush checks on the body.
+
 ## Use the native format's constraints
+
+Thin placeable models need authored Java item display slots: review an oblique, centered GUI icon and both first-person/third-person hands. Inheriting the world model without display transforms can reduce a useful pallet or panel to a flat line. Preserve the world mesh and fitted pixels; correct display rotation, centering and scale before creating another sprite or changing world proportions.
 
 Static Java 1.21.1 models allow cuboids and limited single-axis rotations. Do not design freeform meshes and assume a Java export will preserve them. GeckoLib can handle animated cuboids; it does not remove the need to keep static item/guide geometry compatible.
 

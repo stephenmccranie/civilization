@@ -32,7 +32,10 @@ public final class BlockHeatSources {
                 && state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)
                 && !state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED);
     }
-    public static boolean flame(net.minecraft.world.level.block.state.BlockState state){return torch(state)||campfire(state);}
+    public static boolean fire(net.minecraft.world.level.block.state.BlockState state){
+        return state.getBlock() instanceof net.minecraft.world.level.block.BaseFireBlock;
+    }
+    public static boolean flame(net.minecraft.world.level.block.state.BlockState state){return torch(state)||campfire(state)||fire(state);}
     public static boolean source(net.minecraft.world.level.block.state.BlockState state){return flame(state)||state.getFluidState().is(FluidTags.LAVA);}
     private static final int LIMIT=4096;
     public static final double TEMPERATURE=1000; // Celsius internally; displays use Fahrenheit.
@@ -124,8 +127,10 @@ public final class BlockHeatSources {
                 double temperature=field.localTemperature(level,q);
                 var neighbor=level.getBlockState(q);
                 double rate=neighbor.isAir()?1:ThermalField.conductance(neighbor);
-                double heat=Math.min(ThermalRules.LAVA_FACE_HEAT*rate,Math.max(0,TEMPERATURE-temperature)*.08)*fraction;
-                if(heat>0)field.add(level,q,heat);
+                // A maintained reservoir heats colder material and absorbs heat
+                // from anything hotter, with the same bounded surface power.
+                double heat=Math.clamp((TEMPERATURE-temperature)*.08,-ThermalRules.LAVA_FACE_HEAT*rate,ThermalRules.LAVA_FACE_HEAT*rate)*fraction;
+                if(heat!=0)field.add(level,q,heat);
             }
         }else if(flame(state)&&sources.flames.contains(key)){
             var air=new ArrayList<BlockPos>(7);air.add(p);
@@ -133,7 +138,7 @@ public final class BlockHeatSources {
                 var q=p.relative(direction);
                 if(ThermalField.supported(level,q)&&level.getBlockState(q).isAir())air.add(q);
             }
-            double heat=(campfire(state)?ThermalRules.CAMPFIRE_HEAT:ThermalRules.TORCH_HEAT)/air.size();
+            double heat=(fire(state)?ThermalRules.FIRE_HEAT:campfire(state)?ThermalRules.CAMPFIRE_HEAT:ThermalRules.TORCH_HEAT)/air.size();
             for(var q:air)field.add(level,q,heat);
         }else changed(level,p);
     }

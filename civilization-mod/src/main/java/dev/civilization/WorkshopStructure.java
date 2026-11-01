@@ -8,7 +8,7 @@ import static dev.civilization.MachineStructure.Part;
 public final class WorkshopStructure {
     public static final int SMITHY_ANVIL_X=3;
     private static final List<List<Part>> PARTS=List.of(build(0),build(1),build(2));
-    public static List<Part> parts(int kind){return PARTS.get(kind);}
+    public static List<Part> parts(int kind){return kind==ManufacturingJobs.BENCH?List.of():PARTS.get(kind);}
     private static List<Part> build(int kind){
         if(kind==2)return smithy();
         return kind==0?tannery():textile();

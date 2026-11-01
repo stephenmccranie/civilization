@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 /** Cabinet skin shared by every controller. Slots and all interaction remain native. */
 public final class MachineUi {
     public static final int INK=0xff35332e, MUTED=0xff5c584e;
+    public static final int HAND_LEFT=12,HAND_TOP=24,HAND_WIDTH=40,HAND_HEIGHT=46;
     private static final ResourceLocation PANEL=ResourceLocation.fromNamespaceAndPath("civilization","textures/gui/cabinet.png");
     private MachineUi() {}
     public static void panel(GuiGraphics g,int x,int y,int w,int h) {
@@ -19,6 +20,19 @@ public final class MachineUi {
         int[] dx={x,x+b,x+w-b}, dy={y,y+b,y+h-b}, dw={b,w-2*b,b}, dh={b,h-2*b,b};
         for(int row=0;row<3;row++)for(int col=0;col<3;col++)
             g.blit(PANEL,dx[col],dy[row],dw[col],dh[row],sx[col],sy[row],sw[col],sw[row],512,512);
+    }
+    public static void handPanel(GuiGraphics g,int x,int y){
+        panel(g,x-HAND_LEFT+3,y-HAND_TOP+3,HAND_WIDTH-6,HAND_HEIGHT-6);
+        var font=Minecraft.getInstance().font;
+        g.drawString(font,"Hand",x+8-font.width("Hand")/2,y-12,INK,false);
+        slot(g,x,y);
+    }
+    public static net.minecraft.client.renderer.Rect2i handBounds(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen,net.minecraft.world.inventory.Slot slot){
+        return new net.minecraft.client.renderer.Rect2i(screen.getGuiLeft()+handSlotX(screen)-HAND_LEFT,screen.getGuiTop()+slot.y-HAND_TOP,HAND_WIDTH,HAND_HEIGHT);
+    }
+    public static int handSlotX(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen){
+        if(screen instanceof MachineScreen<?> machine)return machine.handSlotX();
+        return dev.civilization.BlockCarry.HAND_SLOT_X-(screen instanceof net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener book&&book.getRecipeBookComponent().isVisible()?177:0);
     }
     public static void slot(GuiGraphics g,int x,int y) {
         g.fill(x-1,y-1,x+17,y+17,0xffe0d8c6);

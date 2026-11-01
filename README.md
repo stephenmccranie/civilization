@@ -4,7 +4,9 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 
 ## Playtest client — Prism Launcher
 
-[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.34.54-2/Civilization-playtest-0.34.54-2.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
+The current playtest is **0.35.0-dev**, with shared parts and hand assembly, wheelbarrow/pallet hauling, permanent grass wear and thermal improvements. Clients and server must use the same Civilization version.
+
+[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/Civilization-playtest-0.35.0-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
 
 Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Civilization must match the server's version; use the announced pack instead of independently updating its mods.
 
@@ -38,6 +40,6 @@ Each rule has one home. Update the relevant reference with the code or decision;
 
 ## Source control
 
-The project is maintained in the public GitHub repository `stephenmccranie/civilization`. The [GitHub workflow](AGENTS.md#github-workflow) is the authoritative contributor policy: one focused task branch and PR, completed code/assets/docs, appropriate passing checks, automatic squash merge and safe cleanup of the finished branch. `main` stays the verified working version; development checkpoints remain in the PR history. Agents carry this through without routine confirmation unless the user asks to stop before merging. Historical commits already on `main` are preserved.
+The project is maintained in the public GitHub repository `stephenmccranie/civilization`. The [GitHub workflow](AGENTS.md#github-workflow) is the authoritative contributor policy: carefully stage and validate work locally, then group related changes into substantial published updates. A completed small change does not trigger a push, PR or release. Publish only on an explicit request or an agreed milestone; once authorized, carry the batch through PR checks, squash merge and safe cleanup without repeated confirmation. `main` stays the verified published version; pending development checkpoints stay on their local task/batch branch. Historical commits already on `main` are preserved.
 
 The repository contains code, runtime resources, documentation and reusable tools. Original art, editable art models and visual review history in `art/` and `concept_art/` stay local, along with worlds, authentication, machine-local configuration, downloaded dependencies and build caches. Documentation links to those local art sources require the local artwork folders. Full source archives use the separate [collaboration handoff](docs/collaboration.md); their artwork-containing baseline must not enter the public repository.

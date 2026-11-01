@@ -27,13 +27,15 @@ public final class BuilderLineSystem {
     private static final Map<UUID,Job> JOBS=new HashMap<>();
     private static final Map<UUID,Integer> LAST_MARK=new HashMap<>();
     private static final class Job {
-        final ServerLevel level; final BlockPos a; final Direction face; final boolean building; final int slot;
+        final ServerLevel level; final BlockPos a; final Direction face; final boolean building; final int slot; final InteractionHand hand;
         ItemStack working; final ItemStack reel; List<BlockPos> cells=List.of(); List<BlockState> original=List.of();
         int index,wait; float progress;
-        Job(ServerPlayer p,BlockPos a,Direction face){level=p.serverLevel();this.a=a;this.face=face;building=p.getMainHandItem().getItem() instanceof BlockItem;slot=p.getInventory().selected;working=p.getMainHandItem().copy();reel=p.getOffhandItem().copy();}
+        Job(ServerPlayer p,BlockPos a,Direction face){level=p.serverLevel();this.a=a;this.face=face;hand=workingHand(p);building=working(p).getItem() instanceof BlockItem;slot=p.getInventory().selected;working=working(p).copy();reel=p.getItemInHand(hand==InteractionHand.MAIN_HAND?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND).copy();}
         boolean active(){return !cells.isEmpty();}
     }
-    public static boolean equipped(Player p){return p.getOffhandItem().is(BuilderLineContent.LINE.get());}
+    public static boolean equipped(Player p){return p.getOffhandItem().is(BuilderLineContent.LINE.get())||p.getMainHandItem().is(BuilderLineContent.LINE.get());}
+    public static InteractionHand workingHand(Player p){return p.getMainHandItem().is(BuilderLineContent.LINE.get())?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND;}
+    public static ItemStack working(Player p){return p.getItemInHand(workingHand(p));}
     public static boolean supported(ItemStack s){
         if(s.getItem() instanceof BlockItem b)return plain(b.getBlock().defaultBlockState());
         return s.getItem() instanceof PickaxeItem || s.getItem() instanceof AxeItem || s.getItem() instanceof ShovelItem;
@@ -54,7 +56,7 @@ public final class BuilderLineSystem {
         var cells=new ArrayList<BlockPos>();for(int i=0;i<length;i++)cells.add(a.offset(Integer.signum(dx)*i,Integer.signum(dy)*i,Integer.signum(dz)*i));return List.copyOf(cells);
     }
     public static BlockPos target(Player p,BlockHitResult hit){
-        return p.getMainHandItem().getItem() instanceof BlockItem ? new BlockPlaceContext(p,InteractionHand.MAIN_HAND,p.getMainHandItem(),hit).getClickedPos().immutable() : hit.getBlockPos().immutable();
+        return working(p).getItem() instanceof BlockItem ? new BlockPlaceContext(p,workingHand(p),working(p),hit).getClickedPos().immutable() : hit.getBlockPos().immutable();
     }
     public static boolean active(ServerPlayer p){var j=JOBS.get(p.getUUID());return j!=null&&j.active();}
     public static boolean selected(ServerPlayer p){return JOBS.containsKey(p.getUUID());}
@@ -62,8 +64,8 @@ public final class BuilderLineSystem {
         if(!equipped(p)||p.isSpectator()||!p.isAlive())return;
         if(cancel){finish(p,"Line canceled");return;}
         var last=LAST_MARK.get(p.getUUID());if(last!=null&&p.tickCount-last<4)return;LAST_MARK.put(p.getUUID(),p.tickCount);
-        if(!supported(p.getMainHandItem())){message(p,"Hold full building blocks, a pickaxe, axe or shovel in your main hand");return;}
-        EquipmentGrade.ensure(p.getMainHandItem(),p.serverLevel().random,p.serverLevel().registryAccess());
+        if(!supported(working(p))){message(p,"Hold the reel in your main hand and blocks in offhand to build; reel offhand and tool main hand to mine");return;}
+        EquipmentGrade.ensure(working(p),p.serverLevel().random,p.serverLevel().registryAccess());
         var old=JOBS.get(p.getUUID());
         if(old!=null&&!matches(p,old)){finish(p,"Working item changed");old=null;}
         if(old!=null&&old.active()){message(p,"Line working — crouch-right-click to cancel");return;}
@@ -86,8 +88,8 @@ public final class BuilderLineSystem {
     }
     private static boolean matches(ServerPlayer p,Job j){
         return p.isAlive()&&!p.isSpectator()&&p.serverLevel()==j.level&&p.getInventory().selected==j.slot
-            && ItemStack.isSameItemSameComponents(p.getOffhandItem(),j.reel)
-            && ItemStack.isSameItemSameComponents(p.getMainHandItem(),j.working);
+            && workingHand(p)==j.hand && ItemStack.isSameItemSameComponents(p.getItemInHand(j.hand==InteractionHand.MAIN_HAND?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND),j.reel)
+            && ItemStack.isSameItemSameComponents(working(p),j.working);
     }
     private static boolean allowed(ServerPlayer p,BlockPos pos){
         var l=p.serverLevel();return l.hasChunkAt(pos)&&!l.isOutsideBuildHeight(pos)&&l.getWorldBorder().isWithinBounds(pos)
@@ -113,9 +115,9 @@ public final class BuilderLineSystem {
         if(j.wait>0){j.wait--;return;}
         if(j.building){
             if(!state.isAir()||!j.level.getFluidState(pos).isEmpty()){finish(p,"Line stopped: occupied cell");return;}
-            var block=((BlockItem)p.getMainHandItem().getItem()).getBlock();
+            var block=((BlockItem)working(p).getItem()).getBlock();
             var hit=new BlockHitResult(pos.getCenter(),j.face,pos,false);
-            var result=p.getMainHandItem().useOn(new UseOnContext(p,InteractionHand.MAIN_HAND,hit));
+            var result=working(p).useOn(new UseOnContext(p,j.hand,hit));
             if(!result.consumesAction()||!j.level.getBlockState(pos).is(block)){finish(p,"Line stopped: placement blocked");return;}
             j.wait=4;
         }else{
@@ -131,9 +133,9 @@ public final class BuilderLineSystem {
             if(!p.gameMode.destroyBlock(pos)||j.level.getBlockState(pos).equals(state)){finish(p,"Line stopped: mining denied");return;}
             j.level.destroyBlockProgress(p.getId(),pos,-1);j.progress=0;j.wait=4;
         }
-        j.index++;j.working=p.getMainHandItem().copy();p.swing(InteractionHand.MAIN_HAND,true);
+        j.index++;j.working=working(p).copy();p.swing(j.hand,true);
         if(j.index==j.cells.size()){finish(p,"Line complete");return;}
-        if(p.getMainHandItem().isEmpty()){finish(p,"Line stopped: blocks exhausted or tool broke");return;}
+        if(working(p).isEmpty()){finish(p,"Line stopped: blocks exhausted or tool broke");return;}
         sync(p,j);message(p,(j.building?"Building ":"Mining ")+j.index+" / "+j.cells.size());
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post e){
@@ -142,8 +144,8 @@ public final class BuilderLineSystem {
     @SubscribeEvent public static void logout(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e){if(e.getEntity() instanceof ServerPlayer p){finish(p,"Line canceled");LAST_MARK.remove(p.getUUID());}}
     @SubscribeEvent public static void stopped(ServerStoppedEvent e){JOBS.clear();LAST_MARK.clear();}
     // Vanilla use packets must not execute a second, ordinary block/item action.
-    @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGHEST) public static void use(PlayerInteractEvent.RightClickBlock e){if(equipped(e.getEntity())&&supported(e.getEntity().getMainHandItem())){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}}
-    @SubscribeEvent public static void useAir(PlayerInteractEvent.RightClickItem e){if(equipped(e.getEntity())&&supported(e.getEntity().getMainHandItem())){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}}
+    @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGHEST) public static void use(PlayerInteractEvent.RightClickBlock e){if(equipped(e.getEntity())&&supported(working(e.getEntity()))){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}}
+    @SubscribeEvent public static void useAir(PlayerInteractEvent.RightClickItem e){if(equipped(e.getEntity())&&supported(working(e.getEntity()))){e.setCanceled(true);e.setCancellationResult(InteractionResult.SUCCESS);}}
     private static void sync(ServerPlayer p,Job j){if(p.connection!=null)PacketDistributor.sendToPlayer(p,new BuilderLinePayload.State(j!=null,j==null?BlockPos.ZERO:j.a,j==null||!j.active()?BlockPos.ZERO:j.cells.getLast(),j!=null&&j.active(),j==null?0:j.index));}
     public static void finish(ServerPlayer p,String reason){var j=JOBS.remove(p.getUUID());if(j!=null&&j.active()&&j.index<j.cells.size())j.level.destroyBlockProgress(p.getId(),j.cells.get(j.index),-1);sync(p,null);message(p,reason);}
     private static void message(ServerPlayer p,String text){p.displayClientMessage(Component.literal(text),true);}

@@ -1,26 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "CBC",
-    "BFB",
-    "ICI"
-  ],
-  "key": {
-    "B": {
-      "item": "minecraft:brick"
-    },
-    "F": {
-      "item": "civilization:machine_parts"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:oil_refinery",
-    "count": 1
-  }
+  ]
 }

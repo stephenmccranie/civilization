@@ -1,18 +1,7 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
+  "neoforge:conditions": [
     {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:oak_slab"
-    },
-    {
-      "item": "minecraft:copper_ingot"
+      "type": "neoforge:false"
     }
-  ],
-  "result": {
-    "id": "civilization:survey_table_section",
-    "count": 1
-  }
+  ]
 }

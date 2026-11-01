@@ -28,6 +28,8 @@ public final class Civilization {
         ThermalContent.register(modBus);
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON,ThermalConfig.SPEC,"civilization-heat.toml");
         SoilChunk.register(modBus);
+        GrassWearChunk.register(modBus);
+        modBus.addListener(GrassWearPayload::register);
         OilRetrofitChunk.register(modBus);
         Accessories.register(modBus);
         modBus.addListener((net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) -> CaloriePayload.register(event, version));
@@ -40,6 +42,7 @@ public final class Civilization {
         FarmingContent.register(modBus);
         KilnContent.register(modBus);
         WorkshopContent.register(modBus);
+        ManufacturingContent.register(modBus);
         CookingContent.register(modBus);
         PrototypeStoveContent.register(modBus);
         BakingOvenContent.register(modBus);
@@ -48,6 +51,9 @@ public final class Civilization {
         CuttingContent.register(modBus);
         BuilderLineContent.register(modBus);
         CoalMiningContent.register(modBus);
+        WheelbarrowContent.register(modBus);
+        CargoContent.register(modBus);
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER,CargoConfig.SPEC,"civilization-cargo.toml");
         RoadContent.register(modBus);
         CivicContent.register(modBus);
         ArenaContent.register(modBus);
@@ -74,6 +80,10 @@ public final class Civilization {
     private void registerCommands(RegisterCommandsEvent event) {
         // Read-only and available without operator privileges, including survival worlds.
         event.getDispatcher().register(Commands.literal(MOD_ID)
+                .then(Commands.literal("recoverblocks").executes(context->{
+                    var p=context.getSource().getPlayerOrException();var data=BlockCarryRecovery.get(p.server);int n=data.recover(p);
+                    context.getSource().sendSuccess(()->Component.literal(n<0?"Unpacked a saved container layer safely; run /civilization recoverblocks again.":"Recovered "+n+" items; "+data.pending(p.getUUID())+" remain saved. Blocks need a free or matching offhand."),false);return Math.max(0,n);
+                }))
                 .then(Commands.literal("status").executes(context -> {
                     context.getSource().sendSuccess(
                             () -> Component.translatable("command.civilization.status", version), false);
