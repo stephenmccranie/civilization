@@ -22,6 +22,11 @@ public final class BuilderLineGameTests {
         var a=BlockPos.ZERO;for(var d:Direction.values()){var line=BuilderLineSystem.line(a,a.relative(d,15));h.assertTrue(line.size()==16&&line.getFirst().equals(a)&&line.getLast().equals(a.relative(d,15)),"Inclusive maximum in all six directions");h.assertTrue(BuilderLineSystem.line(a,a.relative(d,16)).isEmpty(),"Reject over-limit line");}
         h.assertTrue(BuilderLineSystem.line(a,a.offset(1,1,0)).isEmpty()&&BuilderLineSystem.line(a,a.offset(1,1,1)).isEmpty(),"Reject diagonals");h.assertTrue(BuilderLineSystem.line(a,a).size()==1,"One cell valid");h.assertTrue(!BuilderLineSystem.supported(Items.CHEST.getDefaultInstance())&&!BuilderLineSystem.supported(Items.OAK_SLAB.getDefaultInstance())&&!BuilderLineSystem.supported(Items.SAND.getDefaultInstance())&&!BuilderLineSystem.supported(Items.TNT.getDefaultInstance()),"Exclude functional, shaped and unstable blocks");h.succeed();
     }
+    @GameTest(template="industrial") public static void buildsWithOffhandBlocksAndMainHandReel(GameTestHelper h){
+        var a=setup(h);var p=player(h,a,BuilderLineContent.LINE.toStack());p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE_BRICKS,4));
+        select(p,a,true);select(p,a.east(2),true);run(p,15);
+        h.assertTrue(h.getLevel().getBlockState(a.east(2)).is(Blocks.STONE_BRICKS)&&p.getOffhandItem().getCount()==1&&p.getMainHandItem().is(BuilderLineContent.LINE.get()),"The main-hand reel builds from the single permitted offhand stack");h.succeed();
+    }
     @GameTest(template="industrial") public static void secondMarkPlacesAndPaysOnce(GameTestHelper h){
         var a=setup(h);var p=player(h,a,new ItemStack(Items.STONE_BRICKS,4));var energy=CalorieFoodData.of(p);
         select(p,a,true);h.assertTrue(h.getLevel().getBlockState(a).isAir()&&p.getMainHandItem().getCount()==4,"First point performs no placement");

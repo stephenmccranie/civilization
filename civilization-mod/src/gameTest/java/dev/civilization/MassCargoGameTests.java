@@ -66,7 +66,9 @@ public final class MassCargoGameTests {
         menu.clicked(0,0,ClickType.PICKUP,p);
         h.assertTrue(menu.getCarried().isEmpty()&&stock.cargo().entry(0).count()==32,"Click deposits cursor contents without cloning");
         stock.cargo().insert(new ItemStack(Items.STONE),100);menu.clicked(0,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(stock.cargo().isEmpty()&&p.getInventory().countItem(Items.STONE)==132,"Shift-click withdraws the whole aggregate into normal bounded inventory stacks");
+        h.assertTrue(stock.cargo().count(0)==100&&p.getOffhandItem().getCount()==32&&p.getInventory().countItem(Items.STONE)==32,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
+        menu.clicked(CargoMenu.OFFHAND_SLOT,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==132,"Visible offhand slot deposits directly back into cargo");
         for(int i=0;i<36;i++)h.assertTrue(p.getInventory().getItem(i).getCount()<=p.getInventory().getItem(i).getMaxStackSize(),"Player stack caps remain unchanged");h.succeed();
     }
     @GameTest(template="industrial") public static void menuPagesOrganizeTypesWithoutCappingThem(GameTestHelper h){
