@@ -32,7 +32,7 @@ Last reviewed: **2026-11-01**. Current build: **0.35.0-dev**. [Playtest release]
 
 ## Local runtime
 
-This publication does not upgrade the running server or Prism instance. Civilization Dev retains the preceding 0.34.55-dev pallet/handle/Hand build; the dedicated server retains the earlier grass-wear build. Both need the new matching JAR before using this release together. Existing worlds, backups and local settings are retained.
+Civilization Dev and the dedicated server now have the released **0.35.0-dev** JAR, matching the SHA-256 above. Previous JARs are backed up; the server also has a complete offline world/configuration backup. The server reached normal startup and answered the Minecraft status protocol. Existing worlds and settings are retained, and the previously stopped world-generation service remains stopped. Relaunch Civilization Dev to load the upgrade; a real player join remains untested.
 
 The dedicated terrain is the selected Alesrr Terrain Diffusion scale-4 Candidate 5 world. Elevated rivers and deposit integration still need broad-world playtesting. The separate Compact Campus and development fixtures remain local; the Lacertan modeling study is not a runtime feature. Original artwork, editable models and visual-review history stay outside GitHub.
 
