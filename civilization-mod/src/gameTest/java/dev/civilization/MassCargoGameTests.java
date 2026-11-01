@@ -47,14 +47,14 @@ public final class MassCargoGameTests {
     }
     @GameTest(template="industrial") public static void adjacentStockpileTransfersOnlyWhatFitsAndKeepsRemainder(GameTestHelper h){
         var stock=stockpile(h);var wheel=barrow(h);var p=player(h);
-        stock.cargo().insert(new ItemStack(Items.STONE),100);
+        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),400);
         var menu=new CargoMenu(1,p.getInventory(),wheel);
-        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==32&&stock.cargo().entry(0).count()==68,"Load fills by mass and leaves the rest in the stockpile");
+        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==80,"Ten 32-block cobblestone stacks fit; overflow stays in the stockpile");
         menu.clickMenuButton(p,0);
-        h.assertTrue(wheel.cargo().entry(0).count()==32&&stock.cargo().entry(0).count()==68,"Repeated load cannot duplicate stock");
-        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().isEmpty()&&stock.cargo().entry(0).count()==100,"Unload returns the complete aggregate stack directly");
+        h.assertTrue(wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==80,"Repeated load cannot duplicate stock");
+        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().isEmpty()&&stock.cargo().entry(0).count()==400,"Unload returns the complete aggregate stack directly");
         var tag=stock.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new StockpileEntity(stock.getBlockPos(),stock.getBlockState());restored.loadWithComponents(tag,h.getLevel().registryAccess());
-        h.assertTrue(restored.cargo().entry(0).count()==100,"Stockpile balance survives native persistence");h.succeed();
+        h.assertTrue(restored.cargo().entry(0).count()==400,"Stockpile balance survives native persistence");h.succeed();
     }
     @GameTest(template="industrial") public static void nativeMenuClicksConserveCargoCursorAndPlayerInventory(GameTestHelper h){
         var stock=stockpile(h);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),stock);

@@ -18,6 +18,7 @@ final class WheelbarrowVisualCheck {
     private static float cameraBeforeTurn,headingBeforeTurn,leftStartYaw;
     private static volatile boolean cargoVerified;
     private static boolean handMenuVerified;
+    private static volatile boolean creativeVerified;
     static void tick(Minecraft mc){
         ticks++;if(failure!=null)throw new IllegalStateException(failure);var server=mc.getSingleplayerServer();
         if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(65);mc.gui.getChat().clearMessages(true);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);check(server,()->{
@@ -86,16 +87,16 @@ final class WheelbarrowVisualCheck {
         if(ticks==575)mc.gameMode.useItemOn(mc.player,InteractionHand.OFF_HAND,new BlockHitResult(new Vec3(2.5,100,.5),Direction.UP,new BlockPos(2,99,0),false));
         if(ticks==580)check(server,()->{
             var s=(StockpileEntity)server.overworld().getBlockEntity(new BlockPos(2,100,0));if(s==null)throw new IllegalStateException("Real stockpile placement failed");
-            s.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),400);
+            s.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),4000);
             var p=server.getPlayerList().getPlayers().getFirst();var mined=new net.minecraft.world.entity.item.ItemEntity(server.overworld(),p.getX(),p.getY(),p.getZ(),new ItemStack(Blocks.STONE,32));mined.setNoPickUpDelay();server.overworld().addFreshEntity(mined);p.inventoryMenu.broadcastFullState();
         });
         if(ticks==588){if(mc.player.getOffhandItem().getCount()!=32||!mc.player.getOffhandItem().is(Blocks.STONE.asItem()))throw new IllegalStateException("Mined ground blocks did not synchronize into offhand");var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.8,0)),InteractionHand.MAIN_HAND);}
         if(ticks==600){if(!(mc.player.containerMenu instanceof CargoMenu))throw new IllegalStateException("Tray hit did not open cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
-        if(ticks==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=256||Math.abs(m.mass()-64000)>1)throw new IllegalStateException("Cargo quantity or mass did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
+        if(ticks==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=2560||Math.abs(m.mass()-640000)>1)throw new IllegalStateException("Cargo quantity or mass did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
         if(ticks==620)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,1,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);
         if(ticks==625){if(mc.player.containerMenu.getCarried().getCount()!=16)throw new IllegalStateException("Real cargo right-click cursor did not synchronize");mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);}
         if(ticks==630)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,CargoMenu.OFFHAND_SLOT,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
-        if(ticks==635)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getOffhandItem().getCount()!=32||barrow(server).cargo().entry(0).count()!=256)throw new IllegalStateException("Full cargo accepted an oversized transfer");});
+        if(ticks==635)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getOffhandItem().getCount()!=32||barrow(server).cargo().entry(0).count()!=2560)throw new IllegalStateException("Full cargo accepted an oversized transfer");});
         if(ticks==640)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,1);
         if(ticks==644){if(((CargoMenu)mc.player.containerMenu).count(0)!=0)throw new IllegalStateException("Unload failed to clear synchronized cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
         if(ticks==650){mc.player.closeContainer();check(server,()->{var e=barrow(server);var p=server.getPlayerList().getPlayers().getFirst();var grip=e.gripPosition(e.position(),0);p.teleportTo(server.overworld(),grip.x,grip.y,grip.z,java.util.Set.of(),0,20);});}
@@ -107,7 +108,7 @@ final class WheelbarrowVisualCheck {
             var e=barrow(server);e.setYRot(0);e.setPos(.5,100,.5);var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),2.5,100,-1,java.util.Set.of(),0,20);p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();
         });}
         if(ticks==695)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100.125,.5),Direction.UP,new BlockPos(2,100,0),false));
-        if(ticks==710){if(!(mc.player.containerMenu instanceof CargoMenu m)||m.count(0)!=144)throw new IllegalStateException("Stockpile remainder/menu failed to synchronize");shot(mc,"stockpile-menu");cargoVerified=true;}
+        if(ticks==710){if(!(mc.player.containerMenu instanceof CargoMenu m)||m.count(0)!=1440)throw new IllegalStateException("Stockpile remainder/menu failed to synchronize");shot(mc,"stockpile-menu");cargoVerified=true;}
         if(ticks==715){mc.player.closeContainer();check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),3.7,102,4.2,java.util.Set.of(),140,18);});}
         if(ticks==735)shot(mc,"loaded-world-photon");
         if(ticks==745)shaders(false);
@@ -134,7 +135,19 @@ final class WheelbarrowVisualCheck {
             shot(mc,"offhand-chest");handMenuVerified=true;
         }
         if(ticks==850)mc.player.closeContainer();
-        if(ticks>865){if(!verified||!cargoVerified||!handMenuVerified)throw new IllegalStateException("Wheelbarrow server/cargo/hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: actual movement/camera/gait, stockpile placement, mined ground pickup to offhand, 256-piece cargo, offhand-only cursor/shift-click transfers, direct load/unload, loaded pushing, native chest hand slot and both block-type transfers, Photon/shaders-disabled views");mc.stop();}
+        if(ticks==865)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);dev.civilization.client.CreativeInventoryCheck.seed(p);p.inventoryMenu.broadcastFullState();});
+        if(ticks==880)dev.civilization.client.CreativeInventoryCheck.open(mc);
+        if(ticks==885)dev.civilization.client.CreativeInventoryCheck.click(mc,45,0);
+        if(ticks==895){dev.civilization.client.CreativeInventoryCheck.verify(mc.player,false);check(server,()->dev.civilization.client.CreativeInventoryCheck.verify(server.getPlayerList().getPlayers().getFirst(),false));}
+        if(ticks==900)dev.civilization.client.CreativeInventoryCheck.click(mc,46,0);
+        if(ticks==905)dev.civilization.client.CreativeInventoryCheck.click(mc,48,0);
+        if(ticks==910)dev.civilization.client.CreativeInventoryCheck.click(mc,46,0);
+        if(ticks==920){dev.civilization.client.CreativeInventoryCheck.verify(mc.player,true);check(server,()->dev.civilization.client.CreativeInventoryCheck.verify(server.getPlayerList().getPlayers().getFirst(),true));}
+        if(ticks==925)dev.civilization.client.CreativeInventoryCheck.click(mc,47,1);
+        if(ticks==930)dev.civilization.client.CreativeInventoryCheck.click(mc,47,0);
+        if(ticks==940){dev.civilization.client.CreativeInventoryCheck.verify(mc.player,true);check(server,()->{dev.civilization.client.CreativeInventoryCheck.verify(server.getPlayerList().getPlayers().getFirst(),true);creativeVerified=true;});shot(mc,"creative-hotbar");}
+        if(ticks==950)mc.player.closeContainer();
+        if(ticks>960){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified)throw new IllegalStateException("Wheelbarrow server/cargo/hand/Creative acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: actual movement/camera/gait, stockpile placement, mined pickup to offhand, 2,560-piece cargo, native chest hand transfers, Creative native catalog slots and mouse-click hotbar placement/swap/split with server snapshots, Photon/shaders-disabled views");mc.stop();}
     }
     private static WheelbarrowEntity barrow(Minecraft mc){if(entityId!=0&&mc.level.getEntity(entityId) instanceof WheelbarrowEntity e)return e;return mc.level.getEntitiesOfClass(WheelbarrowEntity.class,new AABB(-10,98,-10,10,108,10)).getFirst();}
     private static WheelbarrowEntity barrow(net.minecraft.server.MinecraftServer s){return (WheelbarrowEntity)s.overworld().getEntity(entityId);}

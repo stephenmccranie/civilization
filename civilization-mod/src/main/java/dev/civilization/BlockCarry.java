@@ -50,6 +50,7 @@ public final class BlockCarry {
     }
     /** Expose the same hand slot in native chests, crafting and machine menus. */
     public static void attachMenu(AbstractContainerMenu menu,Inventory inv){
+        if(!restricted(inv.player))return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==OFFHAND)return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==0){
             ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new Slot(inv,OFFHAND,slot.x-33,slot.y));return;

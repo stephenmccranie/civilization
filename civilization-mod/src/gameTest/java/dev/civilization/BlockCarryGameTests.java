@@ -71,7 +71,11 @@ public final class BlockCarryGameTests {
         var p=player(h);var cut=CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,40);p.getInventory().add(cut);
         h.assertTrue(p.getOffhandItem().getCount()==32&&cut.getCount()==8,"Small cut pieces still use a 32-item hand allowance regardless of mass");
         p.setGameMode(GameType.CREATIVE);p.getInventory().setItem(0,ItemStack.EMPTY);var dirt=new ItemStack(Items.DIRT,32);p.getInventory().add(dirt);
-        h.assertTrue(dirt.isEmpty()&&p.getInventory().getItem(0).is(Items.DIRT),"Creative authoring stays unrestricted");h.succeed();
+        h.assertTrue(dirt.isEmpty()&&p.getInventory().getItem(0).is(Items.DIRT),"Creative authoring stays unrestricted");
+        var menu=ChestMenu.threeRows(1,p.getInventory());int size=menu.slots.size();BlockCarry.attachMenu(menu,p.getInventory());
+        h.assertTrue(menu.slots.size()==size&&p.inventoryMenu.getSlot(36).mayPlace(new ItemStack(Items.STONE)),"Creative keeps native menu slot counts and hotbar admission");
+        var swap=new net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent.Hands(p);BlockCarry.swap(swap);h.assertTrue(!swap.isCanceled(),"Creative hand swap is unrestricted");
+        h.assertTrue(BlockCarry.normalize(p)==0&&p.getInventory().getItem(0).is(Items.DIRT),"Creative inventory is not migrated to recovery");h.succeed();
     }
     @GameTest(template="industrial") public static void filledContainersCannotHideExtraBlocksAndOldContentsRecover(GameTestHelper h){
         var p=player(h);var box=new ItemStack(Items.SHULKER_BOX);box.set(net.minecraft.core.component.DataComponents.CONTAINER,net.minecraft.world.item.component.ItemContainerContents.fromItems(java.util.List.of(new ItemStack(Items.STONE,32),new ItemStack(Items.DIRT,8))));

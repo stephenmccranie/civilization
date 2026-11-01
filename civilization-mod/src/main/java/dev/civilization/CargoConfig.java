@@ -8,7 +8,7 @@ public final class CargoConfig {
     public static final ModConfigSpec.DoubleValue WHEELBARROW, STOCKPILE;
     static {
         var b=new ModConfigSpec.Builder();
-        WHEELBARROW=b.defineInRange("wheelbarrowMassKg",64000d,1,1e12);
+        WHEELBARROW=b.defineInRange("wheelbarrowMassKg",640000d,1,1e12);
         STOCKPILE=b.defineInRange("stockpileMassKg",1024000d,1,1e12);
         SPEC=b.build();
     }
