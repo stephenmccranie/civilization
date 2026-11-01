@@ -60,7 +60,11 @@ This is an operator diagnostic, not a Survival control. Existing carrying limits
 
 <a id="empty-wheelbarrow-handling-prototype"></a>
 
+<<<<<<< HEAD
 <a id="wheelbarrow-and-material-stockpile-prototype"></a>
+=======
+The Wheelbarrow is assembled from prepared stock at the [Assembly Bench](manufacturing.md#fixtures-and-carriers), and remains available in Creative or `/give @s civilization:wheelbarrow`. Cargo and stockpiles remain unfinished. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
+>>>>>>> codex/shared-parts-plan
 
 ## Wheelbarrow and pallet cargo prototype
 

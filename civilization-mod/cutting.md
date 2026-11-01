@@ -63,7 +63,7 @@ Existing custom halves remain usable and return vanilla slab items where availab
 
 ## Builder's Line
 
-Craft **Builder's Line** at the Smithy from **2 iron ingots + 1 plank of any wood + 2 string**: one reel in **20 seconds** of productive work. Base productive coal cost is one Coal; temperature, ignition and idle burn follow ordinary Smithy rules. It is also in the Civilization Creative tab or `/give @s civilization:builders_line`.
+Assemble **Builder's Line** at the Assembly Bench from **2 Iron Plates + 1 plank of any wood + 2 String**: one reel in **10 seconds** of hand work, with no Coal. [Manufacturing](manufacturing.md) owns the bench controls and material preparation. It is also in the Civilization Creative tab or `/give @s civilization:builders_line`.
 
 - For building, put the reel in the **main hand** and ordinary full building blocks in the **offhand**. For mining, put the reel in the **offhand** and hold a **pickaxe, axe or shovel** in the main hand.
 - **Right-click** a face to mark the start. For building, the mark is the cell normal placement would fill; for mining, it is the block hit. The first click performs no placement, mining or container action.

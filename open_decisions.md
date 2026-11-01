@@ -111,7 +111,7 @@ The [agreed direction](design_direction.md#4-regional-land-and-materials) preser
 
 ### Player loop and first playable slice
 
-**Ordinary coal → special equipment and mine infrastructure → chip a huge vein → shovel loose raw coal → loaded minecart → surface preparation → usable Coal.** Keep one raw-coal material and the existing `civilization:mineral_coal` output; avoid introducing coke, multiple coal grades or a washing chemistry chain. Ordinary coal remains a direct fuel source and funds the upgrade. The owner authorized Survival acquisition: [Smithy tools and craftable cart/screen](civilization-mod/coal-mining.md#try-it) now define the implemented starting recipes. Broader costs, processor power and regional balance remain open; prove the complete Survival loop before retiring the drill.
+**Ordinary coal → special equipment and mine infrastructure → chip a huge vein → shovel loose raw coal → loaded minecart → surface preparation → usable Coal.** Keep one raw-coal material and the existing `civilization:mineral_coal` output; avoid introducing coke, multiple coal grades or a washing chemistry chain. Ordinary coal remains a direct fuel source and funds the upgrade. The owner authorized Survival acquisition: [forged tools and bench-assembled cart/screen](civilization-mod/coal-mining.md#try-it) now define the implemented starting recipes. Broader costs, processor power and regional balance remain open; prove the complete Survival loop before retiring the drill.
 
 Start with a small placed vein face, a floor, one cart on a short accessible rail route and one preparation machine. Complete this entire loop before changing regional generation. Museum Wales documents [coal picks and shovels among its historical hand tools](https://museum.wales/curatorial/industry/coal-mining/) and a [reconstructed mid-nineteenth-century coal tram](https://amgueddfa.cymru/casgliadau/arlein/object/8f0a0c0e-00e7-352c-bdf6-528b18eb3c59/Tram/?field0=with_images&field1=string&index=0&value0=on). These support the material/transport reference, not exact game control or processing rules.
 
@@ -348,6 +348,17 @@ Remaining: non-farmland habitat/timing, berries and animal-food balance, any col
 ## Advanced animal husbandry and fertilizer
 
 Advanced animal husbandry remains future work ([E05](development_plan.md#3-checklist)). The newer sulfur + gravel-only fertilizer decision supersedes the earlier commitment to animal fertilizer ingredients and immediate removal of the clay route is implemented. Before adding husbandry, decide its products and whether the current fertilizer-only rule should change. No additional animal needs or continuous simulation are approved.
+
+## Shared parts and assembly — remaining design
+
+The [agreed direction](design_direction.md#shared-parts-and-final-assembly) now has a local [manufacturing implementation](civilization-mod/manufacturing.md): one combined hand woodworking/assembly bench, complete handles, shared fasteners/plates/rods, tool heads, wheels, existing Machine Parts, final goods and grade-preserving repairs. The former representative recipe draft is replaced by that authoritative reference. Separate Armor Lining is deferred because Leather and Cloth retain useful independent recipes.
+
+- Play a first-tool → fittings/handles → wheelbarrow → coal cart/screen → first refinery supply chain in ordinary Survival. Compare raw stock, labor, fuel, storage and deliveries; batch yields and hand-work durations are initial tuning.
+- Review additional manufactured families before extending the catalog. New parts need actual customers; avoid separate grips, wedges, hinges, wheel spokes/hubs or small internal mechanisms without a meaningful role.
+- Evaluate whether later scale justifies a separate woodworking multiblock, specialized assembly sites or powered machine works. The first coal-era chain is complete without oil; later powered machinery remains separate work.
+- Coordinate audited material/storage volumes and dynamic mass with physical storage. New components remain explicitly unknown in the current stone-only diagnostic; they are not certified weightless or exempt from future capacity rules.
+- Review repair/replacement economics and material duration multipliers through play. There is no separate head/handle damage meter or disassembly route; adding either needs an identity/grade-conservation design first.
+- Verify peer contention and the updated acquisition routes in an ordinary multi-client session. The native tests cover worker custody, access revocation, stock and saved work; they do not establish an economy or deployed-world play balance.
 
 ## Town workshop implementation details
 

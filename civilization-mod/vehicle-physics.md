@@ -40,7 +40,7 @@ Survival boats use **physical Hot-Bulb Engines**, refined fuel and lubricating o
 
 ### Build and launch
 
-Craft a **Small Boat Helm** with `SPS / PWP / S S`: S = Steel Ingot, P = Machine Parts, W = wooden planks. The item places a two-block-wide wood-and-brass console with an upright wheel and four-position engine lever. The wheel side is the assembly root and its facing determines the bow.
+Assemble a **Small Boat Helm** at the Assembly Bench from **4 Steel Plates + 3 Machine Parts + 1 plank**, in ten seconds of hand work. The item places a two-block-wide wood-and-brass console with an upright wheel and four-position engine lever. The wheel side is the assembly root and its facing determines the bow.
 
 Build any face-connected hull around it at the waterline. Empty-hand right-click the wheel to launch. The connected scan requires one complete Helm, at least eight supported blocks, at least four blocks with water two blocks deep below them, loaded chunks and land access. It refuses fluids/waterlogged blocks, falling blocks, pistons, TNT, bedrock, portals, extra helms, civic machinery and unsupported block entities. A **4,096-block safety cap** catches boats still touching terrain or docks. There is no hull template or rectangular size band.
 

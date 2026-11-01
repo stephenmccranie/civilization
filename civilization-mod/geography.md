@@ -55,7 +55,7 @@ Host blocks are stone-family ore-replaceable rock plus sandstone and red sandsto
 
 The three accessory slots occupy the previously empty right column beside the player portrait at menu coordinates `(77,8)`, `(77,26)` and `(77,44)`, with offhand unchanged at `(77,62)`. Only accessory items can be equipped there; the Geiger Counter is the first. It uses a loaded-section ore check once per second, within 48 blocks of the wearer. Its wearer alone hears a click every 1 second at the edge, rising to four per second at the ore. It does not reveal direction or coordinates, force-load chunks, spend a battery or detect raw uranium items. Standard survival death drops include equipped accessories; keep-inventory preserves them. Creative inventory does not show these slots, so switch to survival to equip during testing. No radiation effects are implemented.
 
-The counter's shaped crafting recipe is glass pane above redstone between two copper ingots, with Machine Parts beneath. Its T2 components make it a town-made instrument for frontier explorers. Other role-specific accessories are future content, not active bonuses.
+The counter is a ten-second Assembly Bench job using 1 Glass Pane, 2 Copper Plates, 1 Redstone and 1 Machine Parts; [manufacturing](manufacturing.md) owns its production route. Its T2 components make it a town-made instrument for frontier explorers. Other role-specific accessories are future content, not active bonuses.
 
 ## Verification
 

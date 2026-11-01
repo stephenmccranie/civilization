@@ -68,13 +68,14 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("chests")){ChestVisualCheck.tick(mc);return;}
         if(CHECK.equals("inventory")){InventoryVisualCheck.tick(mc);return;}
         if(CHECK.equals("workshops")){WorkshopVisualCheck.tick(mc);return;}
+        if(CHECK.equals("assembly")){AssemblyVisualCheck.tick(mc);return;}
         if(CHECK.equals("industry")){IndustryVisualCheck.tick(mc);return;}
         if(CHECK.equals("pipes")){PipeVisualCheck.tick(mc);return;}
         if(CHECK.equals("jei")){JeiVisualCheck.tick(mc);return;}
         if(CHECK.equals("storage")){StorageVisualCheck.tick(mc);return;}
         if(CHECK.equals("bulk")){BulkVisualCheck.tick(mc);return;}
         if(CHECK.equals("thermal")){ThermalVisualCheck.tick(mc);return;}
-        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")){ItemArtVisualCheck.tick(mc,CHECK);return;}
+        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")||CHECK.equals("components")){ItemArtVisualCheck.tick(mc,CHECK);return;}
         if(CHECK.equals("canisters")){CanisterVisualCheck.tick(mc);return;}
         if(CHECK.equals("paterson")){FirearmVisualCheck.tick(mc);return;}
         if(CHECK.equals("oven")){OvenVisualCheck.tick(mc);return;}

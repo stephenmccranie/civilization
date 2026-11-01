@@ -64,6 +64,7 @@
   "blocks": {
     "minecraft:iron_block": "metal",
     "minecraft:copper_block": "metal",
-    "civilization:industrial_casing": "metal"
+    "civilization:industrial_casing": "metal",
+    "civilization:assembly_bench": "wood"
   }
 }

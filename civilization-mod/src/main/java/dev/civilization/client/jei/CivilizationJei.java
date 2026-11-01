@@ -72,14 +72,14 @@ public final class CivilizationJei implements IModPlugin {
         });
         r.addGuiContainerHandler(dev.civilization.client.WorkshopScreen.class,new mezz.jei.api.gui.handlers.IGuiContainerHandler<dev.civilization.client.WorkshopScreen>(){
             public List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(dev.civilization.client.WorkshopScreen s){return List.of(s.recipeDrawerBounds());}
-            public Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(dev.civilization.client.WorkshopScreen s,double x,double y){return List.of(mezz.jei.api.gui.handlers.IGuiClickableArea.createBasic(94,49,23,12,type(new String[]{"tannery","textile","smithy"}[s.getMenu().kind()])));}
+            public Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(dev.civilization.client.WorkshopScreen s,double x,double y){return List.of(mezz.jei.api.gui.handlers.IGuiClickableArea.createBasic(94,49,23,12,type(new String[]{"tannery","textile","smithy","assembly"}[s.getMenu().kind()])));}
         });
     }
     @Override public void registerCategories(IRecipeCategoryRegistration r){
         categories.clear();
         category(r,"kiln",KilnContent.KILN.get());category(r,"foundry",KilnContent.FOUNDRY.get());
         category(r,"fertilizer",KilnContent.RETORT.get());category(r,"cooking",CookingContent.STATION.get());
-        category(r,"tannery",WorkshopContent.TANNERY.get());category(r,"textile",WorkshopContent.TEXTILE.get());category(r,"smithy",WorkshopContent.SMITHY.get());
+        category(r,"tannery",WorkshopContent.TANNERY.get());category(r,"textile",WorkshopContent.TEXTILE.get());category(r,"smithy",WorkshopContent.SMITHY.get());category(r,"assembly",WorkshopContent.BENCH.get());
         category(r,"oil_pump",IndustrialContent.PUMP.get());category(r,"heater",IndustrialContent.REFINERY.get());
         category(r,"column",IndustrialContent.COLUMN.get());category(r,"condenser",IndustrialContent.CONDENSER.get());category(r,"coal_drill",IndustrialContent.DRILL.get());
         category(r,"canisters",IndustrialContent.TANK.get(),"Canister filling / emptying");
@@ -106,27 +106,27 @@ public final class CivilizationJei implements IModPlugin {
         var mc=Minecraft.getInstance();if(mc.level==null)return;
         cooking(r,"kiln",KilnContent.RECIPE_TYPE.get());cooking(r,"foundry",KilnContent.FOUNDRY_RECIPE_TYPE.get());
         cooking(r,"fertilizer",KilnContent.RETORT_RECIPE_TYPE.get());cooking(r,"cooking",CookingContent.RECIPE_TYPE.get());
-        for(int kind=0;kind<3;kind++){
+        for(int kind=0;kind<4;kind++){
             var recipes=new ArrayList<Process>();
             for(var job:WorkshopJobs.jobs(kind)){
                 if(job.output().isEmpty())continue;
                 var slots=new ArrayList<Slot>();for(var need:job.needs())if(need.count()>0)slots.add(ingredient(need.ingredient(),need.count()));
-                slots.add(item(RecipeIngredientRole.OUTPUT,job.output().copy()));slots.add(coal());
+                slots.add(item(RecipeIngredientRole.OUTPUT,job.output().copy()));if(kind!=3)slots.add(coal());
                 boolean upgrade=BuiltInRegistries.ITEM.getKey(job.output().getItem()).getPath().startsWith("netherite_");
-                recipes.add(process("workshop_"+kind+"/"+job.id().replace(':','/'),slots,job.ticks(),job.coalNote()+(upgrade?" Upgrade keeps enchantments and existing wear.":" Light the fire in the controller.")));
+                recipes.add(process("workshop_"+kind+"/"+job.id().replace(':','/'),slots,job.ticks(),(kind==3?"Hand worked: press Work and remain at the Assembly Bench. No Coal.":job.coalNote()+" Light the fire in the controller.")+(upgrade?" Upgrade keeps enchantments and existing wear.":"")));
             }
-            if(kind==2)for(var item:BuiltInRegistries.ITEM){
+            if(kind==3)for(var item:BuiltInRegistries.ITEM){
                 var damaged=new ItemStack(item);if(!WorkshopJobs.gated(damaged))continue;
                 damaged.setDamageValue(Math.max(1,damaged.getMaxDamage()/2));var job=WorkshopJobs.repair(damaged);if(job==null)continue;
                 var slots=new ArrayList<Slot>();slots.add(item(RecipeIngredientRole.INPUT,damaged));
                 for(int i=1;i<job.needs().size();i++){var need=job.needs().get(i);if(need.count()>0)slots.add(ingredient(need.ingredient(),need.count()));}
-                slots.add(item(RecipeIngredientRole.OUTPUT,job.output()));slots.add(coal());
-                recipes.add(process("repair/"+BuiltInRegistries.ITEM.getKey(item).getPath(),slots,job.ticks(),job.coalNote()+" Repair example: 50% damaged. Materials scale with damage. 10% wear, 25% max-durability floor; no XP; enchants stay."));
+                slots.add(item(RecipeIngredientRole.OUTPUT,job.output()));
+                recipes.add(process("repair/"+BuiltInRegistries.ITEM.getKey(item).getPath(),slots,job.ticks(),"Hand repair: 50% damage example. Stock scales with damage; grade falls. Keeps identity. No Coal or XP."));
             }
-            add(r,new String[]{"tannery","textile","smithy"}[kind],recipes);
+            add(r,new String[]{"tannery","textile","smithy","assembly"}[kind],recipes);
         }
         industry(r);cutting(r);
-        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; its structure needs only brick pieces and a stone saw. Smelt iron/copper/gold here. The Smithy makes equipment from the ingots."));
+        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; its structure needs only brick pieces and a stone saw. Smelt iron/copper/gold here. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
         r.addItemStackInfo(KilnContent.MINERAL_COAL.toStack(),Component.literal("Coal machines require manual ignition and keep burning while idle. Consumption depends on work, idle time and temperature; JEI shows baseline processing times, not a fixed Coal charge per recipe."));
     }
     private <T extends AbstractCookingRecipe> void cooking(IRecipeRegistration r,String name,net.minecraft.world.item.crafting.RecipeType<T> recipeType){

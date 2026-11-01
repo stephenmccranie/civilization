@@ -11,8 +11,11 @@ import net.neoforged.fml.common.EventBusSubscriber;
 
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
+    private net.minecraft.client.gui.components.Button work;
     public WorkshopScreen(WorkshopMenu m,Inventory i,Component title){super(m,i,title);imageHeight=214;inventoryLabelY=120;}
     @SubscribeEvent public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent e){e.register(WorkshopContent.MENU.get(),WorkshopScreen::new);}
+    @Override protected void init(){super.init();work=null;if(menu.kind()==ManufacturingJobs.BENCH)work=addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal("Work"),b->minecraft.gameMode.handleInventoryButtonClick(menu.containerId,WorkshopBlockEntity.WORK_BUTTON)).bounds(leftPos+17,topPos+86,90,20).build());}
+    @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,new int[]{5},WorkshopJobs.result(match.job(),match.first()));}}
     @Override protected int recipeCatalogKey(){return menu.kind();}
     @Override protected List<RecipeEntry> recipes(){
         var list=new ArrayList<RecipeEntry>();var jobs=WorkshopJobs.jobs(menu.kind());
@@ -27,7 +30,7 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
     @Override protected int chosen(){return menu.selection();}
     @Override protected void choose(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
     private ItemStack ghost(int slot){
-        if(slot==4||slot==6)return KilnContent.MINERAL_COAL.toStack();
+        if(slot==4||slot==6)return menu.hasCoalFire()?KilnContent.MINERAL_COAL.toStack():ItemStack.EMPTY;
         var job=menu.job();if(job==null)return ItemStack.EMPTY;
         if(slot==5||slot==7)return WorkshopJobs.result(job,MachineWork.first(menu.inventory,job));
         var missing=new ArrayList<ItemStack>();
@@ -40,10 +43,10 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
         g.drawString(font,"Materials",leftPos+17,topPos+29,MachineUi.INK,false);g.drawString(font,"Output",leftPos+130,topPos+29,MachineUi.INK,false);
         for(int i=0;i<8;i++){var s=menu.getSlot(i);if(s.isActive()&&!s.hasItem())MachineUi.ghost(g,ghost(i),leftPos+s.x,topPos+s.y);}
         MachineUi.progress(g,leftPos+94,topPos+49,23,job==null?0:menu.data.get(3)/(float)job.ticks());
-        String state=switch(menu.data.get(4)){case MachineStatus.Workshop.INCOMPLETE->"Finish the structure";case MachineStatus.Workshop.NEEDS_MATERIALS->menu.kind()==2&&menu.selection()==0&&job==null?"Add damaged equipment":"Add materials";case MachineStatus.Workshop.OUTPUT_FULL->"Collect the output";case MachineStatus.Workshop.FIRE_UNLIT->(menu.fireState()&1)!=0?"Fire lit":"Add Coal and strike to light";case MachineStatus.Workshop.AMBIGUOUS->"Choose a matching recipe";case MachineStatus.Workshop.WET->"Shelter the work face from rain";default->"Working";};
+        String state=switch(menu.data.get(4)){case MachineStatus.Workshop.INCOMPLETE->"Finish the structure";case MachineStatus.Workshop.NEEDS_MATERIALS->menu.kind()==3&&menu.selection()==0&&job==null?"Add damaged equipment":"Add materials";case MachineStatus.Workshop.OUTPUT_FULL->"Collect the output";case MachineStatus.Workshop.FIRE_UNLIT->(menu.fireState()&1)!=0?"Fire lit":"Add Coal and strike to light";case MachineStatus.Workshop.AMBIGUOUS->"Choose a matching recipe";case MachineStatus.Workshop.WET->"Shelter the work face from rain";case MachineStatus.Workshop.HAND_READY->"Choose a job and press Work";case MachineStatus.Workshop.NEEDS_FOOD->"Eat before continuing work";default->"Working";};
         g.drawString(font,state,leftPos+9,topPos+64,MachineUi.MUTED,false);
-        g.drawString(font,"Coal",leftPos+17,topPos+76,MachineUi.INK,false);
-        MachineUi.fire(g,leftPos+66,topPos+85,44,23,(menu.fireState()&1)!=0);
+        if(menu.hasCoalFire()){g.drawString(font,"Coal",leftPos+17,topPos+76,MachineUi.INK,false);MachineUi.fire(g,leftPos+66,topPos+85,44,23,(menu.fireState()&1)!=0);}
+        else g.drawString(font,"Stay at the bench to work",leftPos+17,topPos+76,MachineUi.MUTED,false);
         if(job!=null&&job.name().equals("Repair"))g.drawString(font,"After repair: "+job.output().getMaxDamage()+" durability",leftPos+9,topPos+110,MachineUi.MUTED,false);
     }
     @Override public void render(GuiGraphics g,int x,int y,float dt){super.render(g,x,y,dt);

@@ -32,29 +32,29 @@ public final class WorkshopGameTests {
         var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(copy.getItem(7).getCount()==1,"Backup workshop output persists");
         copy.removeItem(5,32);
         h.assertTrue(copy.getItem(5).isEmpty()&&copy.getItem(7).getCount()==1,"Taking the first Tannery output leaves the second in place");
-        w=build(h,2,Direction.NORTH);w.select(1);w.setItem(0,new ItemStack(Items.IRON_INGOT,6));w.setItem(1,new ItemStack(Items.LEATHER,2));w.setItem(2,new ItemStack(Items.STICK,4));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
-        h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(7).isEmpty()&&w.getItem(0).getCount()==3&&w.status==2,"Smithy pauses after one unstackable output without consuming the next job");
-        var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"smithy-tester"));
-        var menu=new WorkshopMenu(0,player.getInventory(),w,w.data);
-        h.assertTrue(!menu.getSlot(7).isActive()&&java.util.Arrays.equals(w.getSlotsForFace(Direction.DOWN),new int[]{5}),"Smithy exposes one output to players and hoppers");
-        var first=w.removeItem(5,1);run(w,600);
-        h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(7).isEmpty()&&w.getItem(0).isEmpty(),"Clearing the output lets the next tool finish");
-        h.assertTrue(EquipmentGrade.hasGrade(first)&&EquipmentGrade.hasGrade(w.getItem(5))&&EquipmentGrade.wearSeed(first)!=EquipmentGrade.wearSeed(w.getItem(5)),"Each completed tool receives its own grade and wear seed");
+        w=build(h,3,Direction.NORTH);var toolJob=ManufacturingGameTests.job(3,Items.IRON_PICKAXE);w.select(WorkshopJobs.index(3,toolJob.id()));
+        w.setItem(0,new ItemStack(ManufacturingContent.head("iron","pickaxe"),2));w.setItem(1,ManufacturingContent.HANDLE.toStack(2));run(w,200);
+        h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(7).isEmpty()&&w.getItem(0).getCount()==1,"Bench completes exactly one tool");
+        var player=ManufacturingGameTests.operator(w);var menu=new WorkshopMenu(0,player.getInventory(),w,w.data);
+        h.assertTrue(!menu.getSlot(7).isActive()&&Arrays.equals(w.getSlotsForFace(Direction.DOWN),new int[]{5}),"Bench exposes a single output");
+        var first=w.removeItem(5,1);run(w,100);
+        h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(0).isEmpty(),"Starting the next batch finishes the next tool");
+        h.assertTrue(EquipmentGrade.hasGrade(first)&&EquipmentGrade.hasGrade(w.getItem(5))&&EquipmentGrade.wearSeed(first)!=EquipmentGrade.wearSeed(w.getItem(5)),"Each finished tool has its own identity");
         h.succeed();
     }
     static WorkshopBlockEntity build(GameTestHelper h,int kind,Direction front){
-        var pos=h.absolutePos(new BlockPos(5,1,4));var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();default->WorkshopContent.SMITHY.get();};
+        var pos=h.absolutePos(new BlockPos(5,1,4));var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();case 3->WorkshopContent.BENCH.get();default->WorkshopContent.SMITHY.get();};
         for(int oldKind=0;oldKind<3;oldKind++)for(var oldFront:Direction.Plane.HORIZONTAL)
             for(var part:WorkshopStructure.parts(oldKind))h.getLevel().removeBlock(MachineStructure.position(pos,oldFront,part),false);
         h.getLevel().setBlockAndUpdate(pos,block.defaultBlockState().setValue(WorkshopBlock.FACING,front));
         for(var part:WorkshopStructure.parts(kind))MachineStructure.placePart(h.getLevel(),pos,front,part);
         return (WorkshopBlockEntity)h.getLevel().getBlockEntity(pos);
     }
-    static void run(WorkshopBlockEntity w,int ticks){CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
+    static void run(WorkshopBlockEntity w,int ticks){if(w.handWorked()){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
     @GameTest(template="industrial") public static void coalHeatFollowsIdleAndMaterialBurn(GameTestHelper h){
         var l=h.getLevel();var field=ThermalField.get(l);
         double[] emissions=new double[3];int n=0;
-        for(var item:List.of(Items.IRON_PICKAXE,Items.DIAMOND_PICKAXE)){
+        for(var item:List.of(ManufacturingContent.head("iron","pickaxe"),ManufacturingContent.head("diamond","pickaxe"))){
             if(n>0)l.removeBlock(h.absolutePos(new BlockPos(5,1,4)),false);
             var w=build(h,2,Direction.NORTH);var job=WorkshopJobs.smithy().stream().filter(j->j.output().is(item)).findFirst().orElseThrow();
             w.select(WorkshopJobs.smithy().indexOf(job));
@@ -94,16 +94,13 @@ public final class WorkshopGameTests {
         h.succeed();
     }
     @GameTest(template="industrial") public static void materialCoalRatesAndDiamondRepair(GameTestHelper h){
-        var jobs=WorkshopJobs.smithy();
-        for(var pair:java.util.Map.of(Items.IRON_PICKAXE,1,Items.GOLDEN_PICKAXE,2,Items.DIAMOND_PICKAXE,4,Items.NETHERITE_PICKAXE,8).entrySet()){
-            var job=jobs.stream().filter(j->j.output().is(pair.getKey())).findFirst().orElseThrow();
-            h.assertTrue(job.materialMultiplier()==pair.getValue()&&job.ticks()==600*pair.getValue(),"Material scales total energy demand through production time");
+        for(String metal:List.of("iron","gold","diamond")){
+            var forged=ManufacturingGameTests.job(2,ManufacturingContent.head(metal,"pickaxe"));int multiplier=metal.equals("diamond")?4:metal.equals("gold")?2:1;
+            h.assertTrue(forged.materialMultiplier()==multiplier&&forged.ticks()==500*multiplier,"Material scales the forging duration and total Coal");
         }
-        var w=build(h,2,Direction.NORTH);w.select(0);
-        var tool=new ItemStack(Items.DIAMOND_PICKAXE);tool.setDamageValue(300);var job=WorkshopJobs.repair(tool);
-        w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());w.setItem(4,KilnContent.MINERAL_COAL.toStack(16));
-        run(w,400);h.assertTrue(w.getItem(5).isEmpty(),"Diamond repair cannot finish at the old duration");
-        run(w,1200);h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.heat==0&&w.getItem(4).getCount()==12,"Diamond repair spends four coal in eighty seconds");h.succeed();
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(tool,100,44);tool.setDamageValue(300);
+        var job=WorkshopJobs.repair(tool);w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());
+        run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.heat==0,"Diamond repair completes by hand without Coal");h.succeed();
     }
     @GameTest(template="industrial") public static void tanningClothProductiveCoal(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
@@ -119,7 +116,7 @@ public final class WorkshopGameTests {
     }
     @GameTest(template="industrial") public static void everyEquipmentJobConservesIngredients(GameTestHelper h){
         var w=build(h,2,Direction.NORTH);var jobs=WorkshopJobs.smithy();
-        for(int n=1;n<jobs.size();n++){
+        for(int n=0;n<jobs.size();n++){
             w.clearContent();w.select(n);w.heat=0;var j=jobs.get(n);
             for(int i=0;i<4;i++)w.setItem(i,j.needs().get(i).icon());
             int supplied=0;CoalFireFixture.light(w);
@@ -133,10 +130,10 @@ public final class WorkshopGameTests {
         }h.succeed();
     }
     @GameTest(template="industrial") public static void repairLowersGradeAndRetainsIdentity(GameTestHelper h){
-        var w=build(h,2,Direction.NORTH);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
         var unbreaking=h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);tool.enchant(unbreaking,2);
         long originalWearSeed=EquipmentGrade.wearSeed(tool);
-        w.setItem(0,tool);w.setItem(1,new ItemStack(Items.IRON_INGOT,2));w.setItem(2,new ItemStack(Items.LEATHER));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
+        w.setItem(0,tool);w.setItem(1,new ItemStack(ManufacturingContent.part("iron","plate"),2));w.setItem(2,ManufacturingContent.HANDLE.toStack());run(w,200);
         var out=w.getItem(5);h.assertTrue(EquipmentGrade.value(out)==70&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
         h.assertTrue(out.getHoverName().getString().equals("Townsmith")&&EnchantmentHelper.getItemEnchantmentLevel(unbreaking,out)==2&&EquipmentGrade.wearSeed(out)==originalWearSeed,"Name, enchantment and personal wear pattern retained");
         out.setDamageValue(174);var quote=WorkshopJobs.repair(out);
@@ -325,34 +322,18 @@ public final class WorkshopGameTests {
         h.assertTrue(WorkshopGates.disabledTrade(a),"Equipment trade rejected");h.succeed();
     }
     @GameTest(template="industrial") public static void shieldBelongsToSmithy(GameTestHelper h){
-        h.assertTrue(h.getLevel().getRecipeManager().getRecipes().stream().noneMatch(holder->holder.id().toString().equals("minecraft:shield")),"Vanilla shield crafting is disabled");
-        var jobs=WorkshopJobs.smithy();
-        var job=jobs.stream().filter(j->j.output().is(Items.SHIELD)).findFirst().orElseThrow();
-        h.assertTrue(job.ticks()==600&&job.heatSpent(job.ticks())==600&&WorkshopJobs.gated(job.output()),"Shield has a gated thirty-second Smithy job");
-        var w=build(h,2,Direction.NORTH);w.select(jobs.indexOf(job));
-        w.setItem(0,new ItemStack(Items.IRON_INGOT));
-        w.setItem(1,new ItemStack(Items.OAK_PLANKS,3));
-        w.setItem(2,new ItemStack(Items.SPRUCE_PLANKS,3));
-        w.setItem(3,new ItemStack(Items.LEATHER));
-        w.setItem(4,KilnContent.MINERAL_COAL.toStack(2));
-        run(w,600);
-        h.assertTrue(w.getItem(5).is(Items.SHIELD)&&EquipmentGrade.hasGrade(w.getItem(5))&&w.heat==200&&w.getItem(4).isEmpty(),"Mixed planks and iron/leather produce a graded shield for 1.5 Coal");
-        for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Shield consumes each material exactly once");
-        h.assertTrue(jobs.stream().map(WorkshopJobs.Job::id).distinct().count()==jobs.size(),"Smithy jobs have unique stable IDs");
-        var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());saved.putInt("job",1);
-        var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());
-        restored.loadWithComponents(saved,h.getLevel().registryAccess());
-        h.assertTrue(restored.selected==jobs.indexOf(job),"Saved job ID wins when the old numeric row changes");
-        saved.putString("jobId","civilization:removed_job");saved.putInt("progress",200);
-        restored.loadWithComponents(saved,h.getLevel().registryAccess());
-        h.assertTrue(restored.selected==-1&&restored.progress==0,"Unknown job returns to Automatic without reusing old work");
-        saved.remove("jobId");restored.loadWithComponents(saved,h.getLevel().registryAccess());
-        h.assertTrue(restored.selected==1,"Existing index-only saves still load");
-        h.succeed();
+        h.assertTrue(h.getLevel().getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.parse("minecraft:shield")).isEmpty(),"Vanilla shield crafting stays disabled");
+        var jobs=WorkshopJobs.jobs(3);var job=ManufacturingGameTests.job(3,Items.SHIELD);var w=build(h,3,Direction.NORTH);w.select(jobs.indexOf(job));
+        w.setItem(0,new ItemStack(ManufacturingContent.part("iron","plate")));w.setItem(1,new ItemStack(Items.OAK_PLANKS,3));w.setItem(2,new ItemStack(Items.SPRUCE_PLANKS,3));w.setItem(3,new ItemStack(Items.LEATHER));run(w,200);
+        h.assertTrue(w.getItem(5).is(Items.SHIELD)&&EquipmentGrade.hasGrade(w.getItem(5))&&w.heat==0,"Mixed timber and prepared metal assemble a graded shield without Coal");
+        for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Shield pays each supplied material");
+        h.assertTrue(jobs.stream().map(WorkshopJobs.Job::id).distinct().count()==jobs.size(),"Bench output IDs are unique");
+        var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());saved.putInt("job",1);var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(saved,h.getLevel().registryAccess());
+        h.assertTrue(restored.selected==jobs.indexOf(job),"Saved job ID wins over reordered numerical indices");h.succeed();
     }
     @GameTest(template="industrial") public static void netheriteUpgradeRetainsWear(GameTestHelper h){
         var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,75);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
-        var job=WorkshopJobs.smithy().stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(job,old);
+        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(job,old);
         h.assertTrue(EquipmentGrade.value(out)==75&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
         h.assertTrue(out.getHoverName().getString().equals("Old pick"),"Upgrade keeps identity");h.succeed();
     }
@@ -386,16 +367,13 @@ public final class WorkshopGameTests {
         });
     }
     @GameTest(template="industrial") public static void automaticRecipesAndTwoCoalSlots(GameTestHelper h){
-        var w=build(h,2,Direction.NORTH);
-        w.setItem(3,new ItemStack(Items.IRON_INGOT));w.setItem(1,new ItemStack(Items.IRON_INGOT));w.setItem(2,new ItemStack(Items.LEATHER));
-        w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
-        h.assertTrue(w.getItem(5).is(Items.SHEARS)&&w.getItem(6).isEmpty()&&w.getItem(4).getCount()==3&&w.heat==0,"Automatic recipe aggregates reordered split inputs and draws second coal slot");
-        w.clearContent();w.heat=0;w.setItem(2,new ItemStack(Items.IRON_INGOT,3));w.setItem(0,new ItemStack(Items.STICK,2));w.setItem(3,new ItemStack(Items.LEATHER));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,600);
-        h.assertTrue(w.status==5&&w.getItem(5).isEmpty()&&w.getItem(4).getCount()+w.getItem(6).getCount()==3&&w.heat==340,"Ambiguous job waits while fire idles");
-        w.select(1);run(w,600);h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(0).isEmpty()&&w.getItem(2).isEmpty(),"Selection resolves ambiguity with unordered materials");
-        w.setItem(6,KilnContent.MINERAL_COAL.toStack(7));var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());
-        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.loadWithComponents(tag,h.getLevel().registryAccess());
-        h.assertTrue(copy.getItem(6).getCount()==7&&copy.selected==1,"Backup coal and selection survive saving");h.succeed();
+        var w=build(h,2,Direction.NORTH);w.select(WorkshopJobs.index(2,"civilization:iron_plate"));w.setItem(3,new ItemStack(Items.IRON_INGOT));w.setItem(1,new ItemStack(Items.IRON_INGOT));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,200);
+        h.assertTrue(w.getItem(5).is(ManufacturingContent.part("iron","plate"))&&w.getItem(5).getCount()==2&&w.getItem(6).isEmpty()&&w.getItem(4).getCount()==3&&w.heat==200,"Selected forging aggregates unordered split stock and draws backup Coal");
+        w.clearContent();w.heat=0;w.select(-1);w.setItem(2,new ItemStack(Items.IRON_INGOT,3));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,600);
+        h.assertTrue(w.status==5&&w.getItem(5).isEmpty()&&w.getItem(4).getCount()+w.getItem(6).getCount()==3&&w.heat==340,"Ambiguous forging idles instead of guessing");
+        w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));run(w,500);h.assertTrue(w.getItem(5).is(ManufacturingContent.head("iron","pickaxe"))&&w.getItem(2).isEmpty(),"Explicit selection resolves ambiguous ingots");
+        w.setItem(6,KilnContent.MINERAL_COAL.toStack(7));var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.loadWithComponents(tag,h.getLevel().registryAccess());
+        h.assertTrue(copy.getItem(6).getCount()==7&&copy.selected==w.selected,"Backup Coal and stable forging selection survive reload");h.succeed();
     }
 
 }

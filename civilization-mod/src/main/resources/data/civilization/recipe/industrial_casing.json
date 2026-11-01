@@ -1,20 +1,7 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "SCS",
-    "C C",
-    "SCS"
-  ],
-  "key": {
-    "S": {
-      "item": "civilization:steel_ingot"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:false"
     }
-  },
-  "result": {
-    "id": "civilization:industrial_casing",
-    "count": 8
-  }
+  ]
 }
