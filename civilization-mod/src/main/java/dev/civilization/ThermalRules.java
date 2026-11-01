@@ -15,13 +15,13 @@ public final class ThermalRules {
     public static final double STOVE_WASTE_HEAT_FACTOR = .05;
     public static final double MAX_SOURCE_HEAT_PER_SECOND = 800;
     public static final double CAMPFIRE_HEAT = 24;
+    public static final double FIRE_HEAT = 24; // Vanilla flame maintained while its actual block exists.
     public static final double TORCH_HEAT = 6; // Heat units per loaded second, not machine work credit.
     public static final double LAVA_FACE_HEAT = 48; // Maximum per exposed face of a source block per loaded second.
     public static final double RAIN_COOLING_C = 6;
     public static final double RAIN_COOLING_TICKS = 6000; // Five real minutes to approach wet equilibrium.
     public static final double RAIN_RECOVERY_TICKS = 48000; // Forty-minute thermal recovery after rain.
     public static final double MACHINE_TOP_SHARE = .80;
-    public static final int EXHAUST_RISE_CELLS = 8; // Distance a hot exhaust parcel can travel in one loaded second.
     public static final double PLAYER_RESPONSE_SECONDS = 2.5;
     private static final double COLD_MIN = 2, COLD_COMFORT = 18;
     // Per quarter-second exchange step. Sum of outward air fractions stays below one.
@@ -99,8 +99,18 @@ public final class ThermalRules {
                                      Direction direction,double from,double to,double fromBackground,double toBackground){
         if(!fromAir||!toAir)return 0;
         double rise=fromOutside&&toOutside?EXPOSED_BUOYANT_RISE:BUOYANT_RISE;
-        if(direction==Direction.UP)return rise*Math.max(0,from-fromBackground);
-        if(direction==Direction.DOWN)return -rise*Math.max(0,to-toBackground);
+        // Unobstructed sky columns have a continuous upward exit: equal inflow
+        // and outflow carry a warm parcel onward without accumulating it at a
+        // ceiling. Enclosed air has no such replacement-flow assumption.
+        if(fromOutside&&toOutside){
+            if(direction==Direction.UP)return rise*Math.max(0,from-fromBackground);
+            if(direction==Direction.DOWN)return -rise*Math.max(0,to-toBackground);
+        }
+        // The lattice stores energy, not moving air mass. An unrestricted upward
+        // pump concentrates uniform warmth at a ceiling without replacement air.
+        // Limit this coarse convection to the warmer-lower temperature gradient.
+        if(direction==Direction.UP)return rise*Math.max(0,Math.min(from-fromBackground,from-to));
+        if(direction==Direction.DOWN)return -rise*Math.max(0,Math.min(to-toBackground,to-from));
         return 0;
     }
     public static double comfort(double c) {

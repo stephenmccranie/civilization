@@ -20,11 +20,7 @@ The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous
 
 Shared [physical properties and inspector](physics.md) expose material mass, heat capacity, geometry and the Sable boundary. The [Airship Controller prototype](vehicle-physics.md#airship-prototype) assembles player-built flying machines and accepts typed numeric test power. Optional [speed-adaptive DH detail](vehicle-physics.md#speed-adaptive-distant-horizons-detail) reduces distant rendering work during fast travel and restores quality after slowing down.
 
-<<<<<<< HEAD
-The Creative/admin [Wheelbarrow and craftable Pallet](physics.md#empty-wheelbarrow-handling-prototype) store building materials in unlimited-count cargo stacks, limited only by mass. Side-touching Pallets share inventory/capacity. Chest-style clicks and nearby Load/Unload buttons move real stock while personal building blocks use one offhand stack of up to 32 and ordinary chests retain their existing stack limits. Empty Pallets use normal pockets, hotbar and main-hand placement. The wheelbarrow pushes at walking pace, climbs one-block inclines and charges walking/ascent calories; Survival wheelbarrow acquisition and load-dependent handling remain unfinished.
-=======
-The [empty Wheelbarrow prototype](physics.md#empty-wheelbarrow-handling-prototype) can be placed, pushed over the ground, steered and recovered. It is the first general material-handling carrier's movement stage; Survival acquisition uses the Assembly Bench; cargo and capacity remain unfinished.
->>>>>>> codex/shared-parts-plan
+The [Wheelbarrow and craftable Pallet](physics.md#empty-wheelbarrow-handling-prototype) store building materials in unlimited-count cargo stacks, limited only by mass. Side-touching Pallets share inventory/capacity. Chest-style clicks and nearby Load/Unload buttons move real stock while personal building blocks use one offhand stack of up to 32 and ordinary chests retain their existing stack limits. Empty Pallets use normal pockets, hotbar and main-hand placement. The wheelbarrow pushes at walking pace, climbs one-block inclines and charges walking/ascent calories; The [Assembly Bench](manufacturing.md) supplies Survival wheelbarrows; load-dependent handling remains unfinished.
 
 [JEI processing recipes](industry.md#jei-recipe-discovery) make machine production, repairs, refining, cutting and canister transfers discoverable alongside ordinary crafting.
 

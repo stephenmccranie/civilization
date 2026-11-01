@@ -60,15 +60,11 @@ This is an operator diagnostic, not a Survival control. Existing carrying limits
 
 <a id="empty-wheelbarrow-handling-prototype"></a>
 
-<<<<<<< HEAD
 <a id="wheelbarrow-and-material-stockpile-prototype"></a>
-=======
-The Wheelbarrow is assembled from prepared stock at the [Assembly Bench](manufacturing.md#fixtures-and-carriers), and remains available in Creative or `/give @s civilization:wheelbarrow`. Cargo and stockpiles remain unfinished. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
->>>>>>> codex/shared-parts-plan
 
 ## Wheelbarrow and pallet cargo prototype
 
-The Wheelbarrow is available in the Civilization Creative tab or `/give @s civilization:wheelbarrow`. Cargo and a Survival-craftable pallet are implemented; wheelbarrow Survival acquisition remains pending. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
+The Wheelbarrow is available in the Civilization Creative tab or `/give @s civilization:wheelbarrow`. Cargo and a Survival-craftable pallet are implemented; the [Assembly Bench](manufacturing.md#fixtures-and-carriers) supplies wheelbarrows. Place it on the top of a solid surface with enough clear space for the whole carrier. Placement checks loaded terrain, world border, collision and current claim access before consuming one item outside Creative.
 
 Right-click the tray/front/side region to open cargo; right-click the rear/handle region to take the handles, including while holding the placement item or another item. Taking the handles does not consume the held item. The player stands behind the carrier with a pushing arm pose, rather than sitting in its tray. **W/S** push forward/backward, **A/D** turn the carrier, and **Sneak** releases. The visible model, handler position and movement use the same synchronized heading; the camera follows steering while preserving any deliberate look-around offset. Steering is applied after the player tick, retaining the previous yaw for frame interpolation in first person and both third-person views; the pushing body also interpolates its heading. Opening a screen releases the handles; cargo cannot be accessed while anyone is handling the carrier. Missing input stops drive after half a second. A parked empty carrier can be recovered with **Sneak + empty-hand right-click**. It cannot currently be broken by attacking it. Unclaimed carriers are shared; claim permissions apply to taking/recovering and are rechecked during movement. Access loss, death and entering water release the handler. Only one player can handle a carrier at once.
 

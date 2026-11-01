@@ -38,7 +38,7 @@ public final class PreviewVisualCheck {
             opened = true;
             mc.createWorldOpenFlows().openWorld(System.getProperty("civilization.previewWorld","preview-compatibility"), mc::stop);
         }
-        if((CHECK.equals("campus")||CHECK.equals("flight-benchmark")) && opened && mc.level==null && mc.screen!=null) {
+        if((CHECK.equals("campus")||CHECK.equals("flight-benchmark")||CHECK.equals("thermal-lab")) && opened && mc.level==null && mc.screen!=null) {
             if(!campusScreen.equals(mc.screen.getClass().getName())){campusScreen=mc.screen.getClass().getName();System.out.println("Campus screen: "+campusScreen+" / "+mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button).map(c->((net.minecraft.client.gui.components.Button)c).getMessage().getString()).toList());}
             for(var child:mc.screen.children())if(child instanceof net.minecraft.client.gui.components.Button button) {
                 var label=button.getMessage().getString();
@@ -46,6 +46,7 @@ public final class PreviewVisualCheck {
             }
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
+        if(CHECK.equals("thermal-lab")){ThermalLaboratoryVisual.tick(mc);return;}
         if(CHECK.equals("grassier-grass")){GrassierGrassVisualCheck.tick(mc);return;}
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}

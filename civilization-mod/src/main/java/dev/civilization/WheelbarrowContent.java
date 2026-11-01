@@ -5,11 +5,7 @@ import net.minecraft.world.entity.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.*;
 
-<<<<<<< HEAD
 /** Ground-pushed material carrier. */
-=======
-/** Empty handling prototype; shared-parts assembly supplies acquisition, cargo remains separate. */
->>>>>>> codex/shared-parts-plan
 public final class WheelbarrowContent {
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems("civilization");
     private static final DeferredRegister<EntityType<?>> ENTITIES=DeferredRegister.create(Registries.ENTITY_TYPE,"civilization");
