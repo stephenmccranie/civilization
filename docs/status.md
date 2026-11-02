@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-11-01**. Current build: **0.35.0-dev**. [Playtest release](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.0-1) includes the matching mod JAR and Prism client pack. Clients and server must use the same Civilization version.
+Last reviewed: **2026-11-01**. Current build: **0.35.1-dev** (local, unpublished). [Playtest release](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.0-1) remains on **0.35.0-dev** with its matching mod JAR and Prism client pack. Clients and server must use the same Civilization version.
 
 ## Implemented
 
@@ -21,6 +21,8 @@ Last reviewed: **2026-11-01**. Current build: **0.35.0-dev**. [Playtest release]
 | Presentation | Shared cabinet interfaces, JEI recipe guidance and native asset pipeline: [mod reference](../civilization-mod/README.md), [modeling](../tools/modeling/README.md) |
 
 ## Validation and limits
+
+- **Local climate generation:** 0.35.1-dev implements hard coal/oil climate boundaries, 2:1 favored/temperate district opportunities, whole-district search, host-rock suitability without the former flatness cutoff, and equally rare all-climate uranium. Build, **87 fast tests** and all **378 required server GameTests** passed. Fresh Terrain Diffusion site abundance/generation cost and existing natural-site migration remain unvalidated. The server and Prism remain on released 0.35.0-dev; this candidate has not been deployed or published. [Placement and migration limits](../civilization-mod/industry.md#find-a-site).
 
 - **Release checkpoint:** build, **83 fast tests** and all **377 required server GameTests** passed on the combined manufacturing, hauling and thermal sources. The guarded `wheelbarrow` client passed; loaded Photon/shaders-disabled views, pallet cargo and Hand UI were inspected. The guarded `assembly` client also passed; actual bench, component icons and working/finished menus were inspected. The 80-second heating/40-second shutdown thermal check and separate-process reload passed, retaining all 41,915 cells with 0.45-second peak recorded solver age.
 - **Distribution:** all **21 pinned downloads** passed hash, size and archive checks using the local release JAR. The deterministic pack contains only its manifest and five reviewed settings files. The distribution JAR excludes development fixtures. SHA-256: `636fcab9e21522a378a1064e706031b5eb1153045951f6f1de92fd3f7bc8ff93`.

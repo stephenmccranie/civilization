@@ -69,6 +69,10 @@ The implemented Creative/admin prototype uses a [local editable Paterson asset](
 
 Next: play the prototype to tune cadence, reload time and damage, then resolve [acquisition and production balance](open_decisions.md#guns--first-paterson-model). Chamber orientation and spent-round visibility persist between actions. The quality pass smooths the cylinder/rear shield and grip edges, refines the weathered steel/walnut materials from the supplied photographs and removes buried faces within each moving bone. Visible reload surfaces remain; the detailed cuboid model still carries a rendering cost documented in status. The agreed visual direction lives in [design](design_direction.md#setting-and-material-style).
 
+### Climate-based resource generation — local implementation
+
+Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate, then resolve existing natural-site migration before deploying over the current server world.
+
 ## 1. Implemented foundation
 
 Uranium exploration uses rare tiny finds throughout suitable terrain, with no district gate; surface-relative cover is retained. Coal/oil retain their town-catchment rarity. [Generation and migration](civilization-mod/geography.md#frontier-uranium-and-accessories).
