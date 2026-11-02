@@ -101,7 +101,7 @@ public final class Deposits {
         var cache=kind==Kind.COAL?coalCache(l):oilCache(l);long key=key(regionX,regionZ);
         var known=cache.get(key);if(known!=null)return known.orElse(null);
         long order=DepositDistribution.district(l.getSeed(),regionX,regionZ,kind==Kind.COAL);
-        if(!DepositDistribution.selected(order)){cache.put(key,Optional.empty());return null;}
+        if(!DepositDistribution.selected(order,kind==Kind.COAL)){cache.put(key,Optional.empty());return null;}
         var coal=kind==Kind.OIL?region(l,regionX,regionZ,Kind.COAL):null;
         Site result=DepositDistribution.search(order,index->{
             int cellX=regionX*4+(index&3),cellZ=regionZ*4+(index>>>2);

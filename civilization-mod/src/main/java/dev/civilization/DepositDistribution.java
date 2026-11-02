@@ -12,8 +12,12 @@ public final class DepositDistribution {
         return mix(seed ^ ((long)x*0x632be59bd9b4e019L) ^ ((long)z*0x9e3779b97f4a7c15L) ^ (coal?0x2a969f4cb37d518dL:0));
     }
     private static long roll(long district){return mix(district^0x6d487bb7581a72c9L);}
-    static boolean selected(long district){return Math.floorMod(roll(district),FAVORED_RARITY)==0;}
+    /** Thin whole oil districts independently, preserving the search order and every retained site. */
+    static boolean selected(long district,boolean coal){
+        return Math.floorMod(roll(district),FAVORED_RARITY)==0 && (coal || (mix(district^0x3c79ac492ba7b653L)&1)==0);
+    }
     static boolean allows(long district,boolean coal,Climate climate){
+        if(!selected(district,coal))return false;
         if(coal&&climate==Climate.HOT || !coal&&climate==Climate.COLD)return false;
         return Math.floorMod(roll(district),climate==Climate.TEMPERATE?TEMPERATE_RARITY:FAVORED_RARITY)==0;
     }

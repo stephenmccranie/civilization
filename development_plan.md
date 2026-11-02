@@ -71,7 +71,7 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 ### Climate-based resource generation — local implementation
 
-Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate on the authorized new-world baseline. Existing natural-site migration remains separate from this fresh-world deployment.
+Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; oil has been halved from the first climate implementation through a stable district subset, preserving retained sites. Both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate on the authorized new-world baseline. Existing natural-site migration remains separate from this fresh-world deployment.
 
 ## 1. Implemented foundation
 
