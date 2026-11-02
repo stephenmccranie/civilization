@@ -8,6 +8,8 @@ The current playtest is **0.35.0-dev**, with shared parts and hand assembly, whe
 
 [Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/Civilization-playtest-0.35.0-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
 
+The private development server may run a newer candidate; check [runtime status](docs/status.md#local-runtime) for its required client version before connecting.
+
 Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Civilization must match the server's version; use the announced pack instead of independently updating its mods.
 
 ## Start here

@@ -6,7 +6,7 @@ Current package: [physical storage and increasing scale](#physical-storage-and-i
 
 ### Physical storage and increasing scale — active package
 
-Develop the [approved direction](design_direction.md#physical-material-storage-and-handling) through complete player loops. [Unresolved controls and tuning](open_decisions.md#physical-storage-and-increasing-scale) remain separate from shipped rules. Use the selected Terra Diffusion scale-4 server terrain for eventual integration; do not regenerate user worlds or increase scale as part of the storage prototype. [Elevated river farming](civilization-mod/geography.md) follows local river elevation on the supported Terrain Diffusion fork; terrain and resource abundance still need broad-world review.
+Develop the [approved direction](design_direction.md#physical-material-storage-and-handling) through complete player loops. [Unresolved controls and tuning](open_decisions.md#physical-storage-and-increasing-scale) remain separate from shipped rules. Use the fresh random-seed Terrain Diffusion scale-4 server baseline with the merged performance/village patches; do not regenerate further user worlds or increase scale as part of the storage prototype. [Elevated river farming](civilization-mod/geography.md) follows local river elevation on the supported Terrain Diffusion fork; terrain and resource abundance still need broad-world review.
 
 | Stage | Deliverable and acceptance |
 | --- | --- |
@@ -71,7 +71,7 @@ Next: play the prototype to tune cadence, reload time and damage, then resolve [
 
 ### Climate-based resource generation — local implementation
 
-Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate, then resolve existing natural-site migration before deploying over the current server world.
+Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate on the authorized new-world baseline. Existing natural-site migration remains separate from this fresh-world deployment.
 
 ## 1. Implemented foundation
 

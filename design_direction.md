@@ -92,7 +92,7 @@ Natural rain should last about **30 minutes** and supply a bonus sufficient for 
 
 Terrain must make productive opportunities understandable. Use a shared region/biome foundation for growth, natural spawning and deposit placement. Regions can overlap.
 
-The dedicated server uses [Alesrr's Terra Diffusion](https://github.com/Alesrr/terra-diffusion) at **world scale 4**, with the owner selecting Candidate 5 from the fast seed atlas on 2026-10-30. Preserve the previous server world before switching; a separate test world is not required. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
+The dedicated server uses [the owner's Terrain Diffusion fork](https://github.com/stephenmccranie/terra-diffusion) at **world scale 4**, including the merged generation-performance and scale-aware village patches. On 2026-11-01 the owner replaced the Candidate 5 selection with a fresh random-seed world and explicitly requested permanent deletion of existing server worlds, maps and their backups, without another backup. This is a one-time authorized reset; further world replacement requires a new request. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
 
 | Landscape/activity | Rule |
 | --- | --- |
