@@ -77,8 +77,8 @@ public final class ThermalRules {
         if(COAST.contains(key))return new Climate(mean,3,.5);
         return new Climate(mean,5,1);
     }
-    public static double daylightPhase(long dayTime){
-        return Math.cos((dayTime%24000-6000)*Math.PI/12000);
+    public static double temperaturePhase(long dayTime){
+        return DailyTemperatureCycle.phase(dayTime);
     }
     public static double climate(Climate profile,int height,double daylight,double rainCooling){
         return profile.meanC+profile.dailySwingC*daylight-Math.max(0,height-80)*.045

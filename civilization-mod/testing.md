@@ -24,6 +24,8 @@ The focused `derrick-guide` scene also checks ambient-light sampling: the opaque
 
 `LatencyWindowTest` checks five-second expiry/averaging, waiting and overdue replies, duplicate/foreign IDs, delayed RTT, bounded lost probes and ID wraparound. `TabLatencyGameTests` exercises the real native pong mixin, per-connection isolation, custom/default tab names and logout cleanup without client UI automation.
 
+`DailyTemperatureCycleTest` samples a full 24,000-tick day for the afternoon peak/dawn low, gradual evening cooling, continuity, monotonic phases, preserved mean/range and day wrap. The native climate check retains biome extrema, altitude/rain adjustments and steady cave profiles; direct and cached field queries share the same temperature phase.
+
 | Change | Check |
 | --- | --- |
 | Documentation or local configuration | Inspect the edit; no Minecraft launch |

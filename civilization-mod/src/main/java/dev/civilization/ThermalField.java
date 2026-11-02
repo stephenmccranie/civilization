@@ -45,7 +45,7 @@ public final class ThermalField extends SavedData {
     public static double ambient(ServerLevel l, BlockPos p) {
         var biome=l.getBiome(p);
         var profile=ThermalRules.profile(biome.unwrapKey().orElse(null),biome.value().getBaseTemperature());
-        return ThermalRules.climate(profile,p.getY(),ThermalRules.daylightPhase(l.getDayTime()),RegionalWeather.cooling(l,p));
+        return ThermalRules.climate(profile,p.getY(),ThermalRules.temperaturePhase(l.getDayTime()),RegionalWeather.cooling(l,p));
     }
     public static double conductance(BlockState s) {return PhysicalMaterials.legacyConductance(s);}
     public static double capacity(BlockState s) {return PhysicalMaterials.legacyCapacity(s);}
@@ -387,7 +387,7 @@ public final class ThermalField extends SavedData {
         final Long2IntOpenCustomHashMap changed=changeOrder(Math.max(16,Math.min(keys.length*7,65536)));
         final Long2IntOpenCustomHashMap heights=new Long2IntOpenCustomHashMap(HeatMaps.POSITIONS);
         final Long2DoubleOpenCustomHashMap rainCooling=new Long2DoubleOpenCustomHashMap(HeatMaps.POSITIONS);
-        final double sun;
+        final double temperaturePhase;
         double atmosphereExchange;
         it.unimi.dsi.fastutil.objects.ObjectIterator<Long2IntMap.Entry> changes;
         int copyCursor,cursor;
@@ -403,7 +403,7 @@ public final class ThermalField extends SavedData {
             rainCooling.defaultReturnValue(Double.NaN);
             // The climate cache grows with cells actually read, not the whole field up front.
             this.level=level;directLevel=level.getClass()==ServerLevel.class&&!level.isDebug();
-            sun=ThermalRules.daylightPhase(level.getDayTime());
+            temperaturePhase=ThermalRules.temperaturePhase(level.getDayTime());
             if(level.getGameTime()>=climateExpires||climateExpires==Long.MIN_VALUE){
                 biomeClimates.clear();profiles.clear();climateExpires=level.getGameTime()+200;
             }
@@ -490,7 +490,7 @@ public final class ThermalField extends SavedData {
             long district=RegionalWeather.key(p.getX(),p.getZ());
             double cooling=rainCooling.get(district);
             if(Double.isNaN(cooling)){cooling=RegionalWeather.cooling(level,p);rainCooling.put(district,cooling);}
-            double ambient=ThermalRules.climate(profile,p.getY(),sun,cooling);
+            double ambient=ThermalRules.climate(profile,p.getY(),temperaturePhase,cooling);
             long column=net.minecraft.world.level.ChunkPos.asLong(p.getX(),p.getZ());
             int height=heights.get(column);
             if(material.air&&height==Integer.MIN_VALUE){height=level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ());heights.put(column,height);}

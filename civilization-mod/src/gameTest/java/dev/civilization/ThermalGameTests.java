@@ -489,6 +489,20 @@ public final class ThermalGameTests {
         h.assertTrue(fresh.energy.isEmpty()&&fresh.pending.isEmpty(),
                 "Legacy absolute-temperature history resets rather than filling the new climate-relative field");h.succeed();
     }
+    @GameTest(template="industrial") public static void afternoonClimateKeepsBiomeAltitudeRainAndCaveRules(GameTestHelper h){
+        for(var key:java.util.List.of(Biomes.RIVER,Biomes.FOREST,Biomes.DESERT,Biomes.SNOWY_PLAINS,Biomes.OCEAN,Biomes.LUSH_CAVES)){
+            var profile=ThermalRules.profile(key,.5);
+            double noon=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(6000),0);
+            double peak=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(9000),0);
+            double sunset=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(12000),0);
+            double dawn=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(0),0);
+            h.assertTrue(Math.abs(peak-profile.meanC()-profile.dailySwingC())<1e-9&&Math.abs(dawn-profile.meanC()+profile.dailySwingC())<1e-9,"Biome extrema stay unchanged: "+key);
+            h.assertTrue(peak>=sunset&&sunset>=noon&&noon>=dawn,"Warmth carries into evening for each profile: "+key);
+            double highWet=ThermalRules.climate(profile,180,ThermalRules.temperaturePhase(12000),.5);
+            h.assertTrue(Math.abs(sunset-highWet-(4.5+3*profile.rainFactor()))<1e-9,"Altitude and rain retain their independent corrections: "+key);
+            if(key==Biomes.LUSH_CAVES)h.assertTrue(peak==dawn&&peak==noon,"Cave climate has no surface daily swing");
+        }h.succeed();
+    }
     @GameTest(template="industrial") public static void comfortAndMachineEfficiencyHaveLimits(GameTestHelper h){
         double rising=ThermalRules.exchangeRate(true,true,Direction.UP,30,20,1,1);
         double sideways=ThermalRules.exchangeRate(true,true,Direction.EAST,30,20,1,1);
@@ -504,17 +518,17 @@ public final class ThermalGameTests {
         h.assertTrue(Math.abs(ThermalRules.comfort((60-32)/1.8)-ThermalRules.comfort((80-32)/1.8))<1e-9,
                 "Comfort falls symmetrically around 70°F");
         var river=ThermalRules.profile(Biomes.RIVER,.5);
-        double riverNoon=ThermalRules.climate(river,64,ThermalRules.daylightPhase(6000),0);
-        double riverMidnight=ThermalRules.climate(river,64,ThermalRules.daylightPhase(18000),0);
-        h.assertTrue(Math.abs(riverNoon*1.8+32-62.6)<.01&&Math.abs(riverMidnight*1.8+32-44.6)<.01,
+        double riverPeak=ThermalRules.climate(river,64,ThermalRules.temperaturePhase(9000),0);
+        double riverDawn=ThermalRules.climate(river,64,ThermalRules.temperaturePhase(0),0);
+        h.assertTrue(Math.abs(riverPeak*1.8+32-62.6)<.01&&Math.abs(riverDawn*1.8+32-44.6)<.01,
                 "A temperate river is mildly cold by day and distinctly colder at night");
-        double forestNoon=ThermalRules.climate(ThermalRules.profile(Biomes.FOREST,.7),64,1,0);
-        double plainsNoon=ThermalRules.climate(ThermalRules.profile(Biomes.PLAINS,.8),64,1,0);
-        h.assertTrue(ThermalRules.comfort(forestNoon)<.7&&ThermalRules.comfort(riverNoon)<.7
-                        &&ThermalRules.comfort(plainsNoon)<.7,
+        double forestPeak=ThermalRules.climate(ThermalRules.profile(Biomes.FOREST,.7),64,1,0);
+        double plainsPeak=ThermalRules.climate(ThermalRules.profile(Biomes.PLAINS,.8),64,1,0);
+        h.assertTrue(ThermalRules.comfort(forestPeak)<.7&&ThermalRules.comfort(riverPeak)<.7
+                        &&ThermalRules.comfort(plainsPeak)<.7,
                 "Common clear-weather daytime biomes reward building for comfort instead of granting a full outdoor bonus");
-        h.assertTrue(forestNoon<riverNoon&&plainsNoon>riverNoon
-                        &&ThermalRules.climate(ThermalRules.profile(Biomes.DESERT,2),64,1,0)>plainsNoon+20,
+        h.assertTrue(forestPeak<riverPeak&&plainsPeak>riverPeak
+                        &&ThermalRules.climate(ThermalRules.profile(Biomes.DESERT,2),64,1,0)>plainsPeak+20,
                 "Woodland, riverside and plains are mildly cool; arid land remains distinctly hot");
         h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.SNOWY_PLAINS,0),64,1,0)<0
                 &&ThermalRules.climate(ThermalRules.profile(Biomes.DESERT,2),64,1,0)>30,

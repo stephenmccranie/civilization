@@ -419,6 +419,8 @@ The first pass uses up to 16 ordinary full blocks, four placements per second an
 
 ## Shared heat and thermal comfort
 
+Outdoor air temperature peaks in mid-afternoon and reaches its daily low near dawn. Retain warmth through late afternoon and evening, with smooth slower overnight cooling; do not tie the air-temperature maximum directly to solar noon. Preserve biome mean temperatures and daily ranges while changing the cycle timing.
+
 Present local temperature in a compact brass/glass thermometer between health and calories. Color and a subtle breathing highlight imply comfort and its benefits; an integrated brick accent indicates road speed. Keep exact bonus numbers in an inventory inspection tooltip, not a permanent status panel.
 
 

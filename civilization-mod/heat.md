@@ -8,27 +8,43 @@
 
 ## Initial thermal field
 
-Overworld climate comes from biome, altitude, the 60-minute day and regional rain. Rain approaches up to a 6Ã‚Â°C cooler district baseline over five real minutes and recovers over forty minutes after it stops; the biome profile scales or excludes this direct rain response. The regional clock owns this background; no block-level temperature history is created merely by weather or daylight changing. The local field stores thermal energy relative to the current background, so an unheated cell immediately reads the current regional climate. At ordinary elevation, a river biome is about 63Ã‚Â°F at noon and 45Ã‚Â°F at midnight. This is a game-tuned boundary condition, not a simulation of ground thermal inertia.
+Overworld climate comes from biome, altitude, the 60-minute day and regional rain. Rain approaches up to a 6°C cooler district baseline over five real minutes and recovers over forty minutes after it stops; the biome profile scales or excludes this response. The regional clock owns the background, and the local field stores thermal energy relative to that current background.
+
+### Daily temperature cycle
+
+Air temperature reaches its daily low near dawn (Minecraft time 0, about 06:00), warms smoothly to a mid-afternoon high (time 9000, about 15:00), then cools gradually through the evening and overnight. This replaces the old noon peak and midnight low. The two smooth half-cosine curves retain each biome's existing daily high, low and full-day mean while giving the cooling part of the cycle more time. At the default 60-minute day, the warmest point is about 7.5 real minutes after noon.
+
+A clear river biome at ordinary elevation illustrates the timing:
+
+| In-game time | Outdoor temperature |
+| --- | --- |
+| Dawn, 06:00 | 44.6°F / 7°C |
+| Noon, 12:00 | 58.1°F / 14.5°C |
+| Afternoon peak, 15:00 | 62.6°F / 17°C |
+| Sunset, 18:00 | 60.9°F / 16°C |
+| Midnight, 00:00 | 50.8°F / 10.5°C |
+
+The shared background curve approximates daily heat lag without adding per-block weather history. Existing saved heat, regional rain schedules, altitude cooling, biome differences and the sky/day length are retained. Existing worlds use the revised curve at their current time; no world, clock or heat-file reset is needed. Time commands and sleeping continue to select the climate corresponding to the resulting world time.
 
 ### Biome climate profiles
 
-Vanilla's biome temperature is a gameplay index rather than an air temperature. For ordinary land, the index supplies a mean climate and the temperate day/night swing is Ã‚Â±5Ã‚Â°C. Negative indices stay distinct: frozen peaks are colder than snowy plains. Biome families adjust this small shared rule:
+Vanilla's biome temperature is a gameplay index rather than an air temperature. For ordinary land, the index supplies a mean climate and the temperate daily swing is ±5°C. Negative indices stay distinct: frozen peaks are colder than snowy plains. Biome families adjust this small shared rule:
 
-| Climate | Clear-weather behavior at Y=64 |
+| Climate | Clear-weather daily high / dawn low at Y=64 |
 | --- | --- |
-| Forests, birch woods, cherry groves and meadows | Cool shared woodland mean with a small vanilla-index distinction, Ã‚Â±5Ã‚Â°C. Ordinary forest: 62.4Ã‚Â°F noon / 44.4Ã‚Â°F midnight. |
-| Plains and sunflower plains | 12.2Ã‚Â°C mean, Ã‚Â±5Ã‚Â°C: 63.0Ã‚Â°F noon / 45.0Ã‚Â°F midnight. |
-| River | 12Ã‚Â°C mean, Ã‚Â±5Ã‚Â°C: 62.6Ã‚Â°F noon / 44.6Ã‚Â°F midnight. Frozen river keeps its cold profile. |
-| Other temperate land | Index-based mean, Ã‚Â±5Ã‚Â°C (18Ã‚Â°F peak to trough). |
-| Desert and badlands | Hot index-based mean, Ã‚Â±9Ã‚Â°C. Desert: 102.2Ã‚Â°F / 69.8Ã‚Â°F. |
-| Savanna | 25Ã‚Â°C mean, Ã‚Â±7Ã‚Â°C; windswept savanna has a 24Ã‚Â°C mean. Ordinary savanna: 89.6Ã‚Â°F / 64.4Ã‚Â°F. |
-| Non-snowy taiga | 12Ã‚Â°C mean, Ã‚Â±5Ã‚Â°C: 62.6Ã‚Â°F / 44.6Ã‚Â°F. Snowy taiga retains its colder index. |
-| Jungle and swamp | Index-based mean plus 4Ã‚Â°C, Ã‚Â±3Ã‚Â°C. Jungle: 81Ã‚Â°F / 70.2Ã‚Â°F. |
-| Oceans and coasts | Ã‚Â±3Ã‚Â°C. Ocean means are explicitly frozen Ã¢Ë†â€™8Ã‚Â°C, cold 8Ã‚Â°C, ordinary 16Ã‚Â°C, lukewarm 23Ã‚Â°C, warm 27Ã‚Â°C; beaches and mushroom fields keep their index-based mean. Deep variants follow the matching surface profile even though vanilla gives them nearly identical indices. |
-| Caves | Lush 16Ã‚Â°C, dripstone 14Ã‚Â°C, deep dark 10Ã‚Â°C, without a direct surface day/night or rain change. |
-| Stony peaks | Index-based mean minus 7Ã‚Â°C, then the ordinary altitude cooling. |
+| Forests, birch woods, cherry groves and meadows | Shared woodland mean with a small vanilla-index distinction, ±5°C. Ordinary forest: 62.4°F / 44.4°F. |
+| Plains and sunflower plains | 12.2°C mean, ±5°C: 63.0°F / 45.0°F. |
+| River | 12°C mean, ±5°C: 62.6°F / 44.6°F. Frozen river keeps its cold profile. |
+| Other temperate land | Index-based mean, ±5°C (18°F peak to trough). |
+| Desert and badlands | Hot index-based mean, ±9°C. Desert: 102.2°F / 69.8°F. |
+| Savanna | 25°C mean, ±7°C; windswept savanna has a 24°C mean. Ordinary savanna: 89.6°F / 64.4°F. |
+| Non-snowy taiga | 12°C mean, ±5°C: 62.6°F / 44.6°F. Snowy taiga retains its colder index. |
+| Jungle and swamp | Index-based mean plus 4°C, ±3°C. Jungle: 81°F / 70.2°F. |
+| Oceans and coasts | ±3°C. Ocean means: frozen −8°C, cold 8°C, ordinary 16°C, lukewarm 23°C, warm 27°C; beaches and mushroom fields keep their index-based mean. Deep variants follow the matching surface profile. |
+| Caves | Lush 16°C, dripstone 14°C, deep dark 10°C, without a direct surface daily or rain change. |
+| Stony peaks | Index-based mean minus 7°C, then ordinary altitude cooling. |
 
-Rain cooling is 80% of the district value in dry/savanna profiles, 60% in humid profiles, 50% along coasts and oceans, zero in cave profiles, and full strength elsewhere. Above Y=80, air cools 0.045Ã‚Â°C per block of elevation; this does not replace the biome's mountain profile. Unrecognized modded biomes use their own index and the temperate swing. The [earlier all-54-biome audit](../docs/history/biome-climate-audit-2026-09-27.md) records the prior climate tuning; the current woodland, plains and river values are in the table above. Local fires, buildings and heat transfer then alter those background values.
+Rain cooling is 80% of the district value in dry/savanna profiles, 60% in humid profiles, 50% along coasts and oceans, zero in cave profiles, and full strength elsewhere. Above Y=80, air cools 0.045°C per block of elevation; this does not replace the biome's mountain profile. Unrecognized modded biomes use their own index and the temperate swing. The [earlier all-54-biome audit](../docs/history/biome-climate-audit-2026-09-27.md) records prior climate tuning; the table above owns current daily extrema. Local fires, buildings and heat transfer then alter those background values.
 
 Each active block cell has energy and a material-dependent heat capacity; its displayed temperature is background plus energy divided by capacity. Sources, air, walls and player-built chimney pieces all occupy the same one-block lattice. Partial blocks use their actual eight cut-piece materials for capacity, and the occupied pieces on each 2Ãƒâ€”2 face determine how much air can pass through it. Closed full blocks conduct without airflow; open doors, open trapdoors and empty space let air mix. No room, duct or named chimney is detected. Placing or breaking a block changes that cell's capacity and interfaces, so it changes the resulting temperature and flow.
 
