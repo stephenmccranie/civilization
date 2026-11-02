@@ -28,7 +28,9 @@ The [Wheelbarrow and craftable Pallet](physics.md#empty-wheelbarrow-handling-pro
 
 ### Server connections
 
-Clients and servers must run the same Civilization version. The required core network channel includes the version from the installed mod metadata; NeoForge rejects missing Civilization installations, legacy clients and unequal versions during connection setup, before entering the world. Distribute the server's Civilization JAR to players whenever updating it. Client-only graphics and quality-of-life mods can still differ.
+Clients and servers must use compatible Civilization protocols; their release versions can differ. The required core channel uses the stable protocol ID `3/0.35.0-dev`, retaining the exact identity advertised by the published 0.35.0 client. The current server and later compatible builds keep that ID for server-only generation, balance and settings changes, so the published 0.35.0 pack connects without a Civilization update. NeoForge still rejects missing Civilization installations, older protocols and incompatible protocol IDs before play. Change the protocol ID only when packet formats or synchronized content become incompatible. Client-only graphics and quality-of-life mods can still differ.
+
+The private 0.35.1/0.35.2 intermediate builds still advertise their old exact-build IDs. Use the published 0.35.0 client or a build with the stable-protocol fix (0.35.3 onward) instead; this is not a wildcard accepting every 0.35.x client or future incompatible build.
 
 The published [Prism playtest client](../modpack/README.md) downloads the matching Civilization JAR and pinned dependencies, with tuned DH defaults, Photon Medium and Patrix 32x. The host supplies the server address privately.
 

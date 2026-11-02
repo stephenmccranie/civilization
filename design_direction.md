@@ -14,7 +14,7 @@ Target up to 200 concurrent players, maintained by one human with assistant supp
 
 The baseline full day/night cycle is 60 minutes with vanilla phase proportions; gameplay simulation keeps its normal tick rate.
 
-Joining a Civilization server requires the owner's distributed Civilization mod at the same version as the server. Missing and unequal versions must be rejected before play through the normal mod handshake. This is a compatibility requirement, not authentication of an unmodified client; client-only graphics mods may differ. [Connection behavior](civilization-mod/README.md#server-connections) owns the implementation boundary.
+Joining a Civilization server requires a compatible Civilization network protocol, not an identical release version. Server-only generation, balance and settings changes must not force a client update. Keep a stable protocol identity across compatible builds; change it when packet formats or synchronized content become incompatible. Missing Civilization installations and incompatible protocols must be rejected before play through the normal mod handshake. This is a compatibility requirement, not authentication of an unmodified client; client-only graphics mods may differ. [Connection behavior](civilization-mod/README.md#server-connections) owns the implementation boundary.
 
 ### Setting and material style
 

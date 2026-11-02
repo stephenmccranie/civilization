@@ -18,7 +18,7 @@ Coal movement regressions query the real blockstate collision/suffocation/suppor
 
 The focused `derrick-guide` scene also checks ambient-light sampling: the opaque controller reports zero skylight while exposed surroundings supply full skylight, without dropping local block light. Review the matched front/rear daylight views under Photon Medium, plus the night view, alongside the existing guide, animation, gallery and crown-culling checks. Native model/texture assets are unchanged for this renderer repair.
 
-`ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching, missing, legacy and unequal-version clients. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
+`ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching clients, the unchanged published 0.35.0 client, missing Civilization and incompatible protocol IDs. It verifies that release metadata no longer defines compatibility. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
 
 | Change | Check |
 | --- | --- |

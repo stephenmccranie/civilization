@@ -7,6 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public record CaloriePayload(double calories, double capacity, double sprintMinimum, boolean depleted, double recovery) implements CustomPacketPayload {
+    // Wire compatibility is independent of the release version. Retain 0.35.0's existing ID
+    // so its published clients work unchanged; bump only for incompatible network/content changes.
+    public static final String PROTOCOL_VERSION = "3/0.35.0-dev";
     public static final Type<CaloriePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("civilization", "calories"));
     public static final StreamCodec<RegistryFriendlyByteBuf, CaloriePayload> CODEC = new StreamCodec<>() {
         @Override public CaloriePayload decode(RegistryFriendlyByteBuf buf) {
@@ -18,9 +21,9 @@ public record CaloriePayload(double calories, double capacity, double sprintMini
         }
     };
     @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
-    public static void register(RegisterPayloadHandlersEvent event, String modVersion) {
-        // Required by default: NeoForge rejects missing channels and unequal versions before play.
-        event.registrar("3/" + modVersion).playToClient(TYPE, CODEC, (payload, context) ->
+    public static void register(RegisterPayloadHandlersEvent event) {
+        // Required by default: missing channels and incompatible protocols are rejected before play.
+        event.registrar(PROTOCOL_VERSION).playToClient(TYPE, CODEC, (payload, context) ->
                 CalorieFoodData.of(context.player()).receive(payload.calories, payload.capacity, payload.sprintMinimum, payload.depleted, payload.recovery));
     }
 }

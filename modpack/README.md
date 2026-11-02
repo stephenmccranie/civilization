@@ -4,7 +4,7 @@
 
 This release includes shared parts and hand assembly, wheelbarrow/pallet hauling, permanent grass wear and thermal improvements. Existing worlds are retained; see [manufacturing migration](../civilization-mod/manufacturing.md#existing-saves-and-limits) and [block recovery](../civilization-mod/physics.md#personal-block-carrying).
 
-This is a **client pack for the Civilization server**, pinned to Civilization **0.35.0-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The server rejects other Civilization versions. Ask the host privately for the server address; it is not included in this download or repository.
+This is a **client pack for the Civilization server**, pinned to Civilization **0.35.0-dev**, Minecraft **1.21.1** and NeoForge **21.1.250**. The current server accepts this 0.35.0 client through its stable network protocol; server-only balance updates do not require a client upgrade. [Compatibility details](../civilization-mod/README.md#server-connections). Ask the host privately for the server address; it is not included in this download or repository.
 
 ## Install in Prism Launcher
 
