@@ -60,13 +60,4 @@ $before=$script:downloads; Invoke-CivUpdate $fixture
 if ($script:downloads -ne $before) { throw 'Same version redownloaded' }
 $script:manifest.version='0.35.3-dev'; Invoke-CivUpdate $fixture
 if ($script:downloads -ne $before) { throw 'Downgrade attempted' }
-# Installer must preserve Java/personal settings, and reject another hook.
-@('[General]','ConfigVersion=1.3','name=Fixture','OverrideJavaArgs=true','JvmArgs=-Xmx8G','[UI]','value=keep') | Set-Content "$fixture/instance.cfg"
-& "$source/Install-CivilizationUpdater.ps1" -InstancePath $fixture
-$cfg=Get-Content "$fixture/instance.cfg" -Raw
-if ($cfg -notmatch 'JvmArgs=-Xmx8G' -or $cfg -notmatch '\[UI\]\r?\nvalue=keep' -or $cfg -notmatch 'OverrideCommands=true') { throw 'Installer changed unrelated settings' }
-& "$source/Install-CivilizationUpdater.ps1" -InstancePath $fixture
-$cfg=$cfg -replace 'PreLaunchCommand=.*','PreLaunchCommand=custom-hook'
-[IO.File]::WriteAllText("$fixture/instance.cfg",$cfg)
-try { & "$source/Install-CivilizationUpdater.ps1" -InstancePath $fixture; throw 'Existing hook overwritten' } catch { if ($_.Exception.Message -eq 'Existing hook overwritten') { throw } }
-Write-Host 'PASS: offline, corrupt download, protocol, loader, URL, locked JAR, concurrent updater, running game, duplicate, atomic update/rollback, same version, downgrade, settings preservation, idempotent install, existing hook.'
+Write-Host 'PASS: offline, corrupt download, protocol, loader, URL, locked JAR, concurrent updater, running game, duplicate, atomic update/rollback, same version, downgrade.'

@@ -4,13 +4,13 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 
 ## Playtest client — Prism Launcher
 
-The current playtest is **0.35.0-dev**, with shared parts and hand assembly, wheelbarrow/pallet hauling, permanent grass wear and thermal improvements. Server-only balance changes do not require matching client builds; see [connection compatibility](civilization-mod/README.md#server-connections).
+The next client distribution is a **Windows/Prism instance ZIP**, with the Civilization updater already enabled. The local candidate uses **0.35.4-dev**; publication is pending. [Published release history](https://github.com/stephenmccranie/civilization/releases) still contains the older 0.35.0 playtest. New releases use the native Prism ZIP format.
 
-[Download Civilization Playtest](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/Civilization-playtest-0.35.0-1.mrpack). In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the `.mrpack`. Use **Java 21** and start with **8 GB maximum memory** on a computer with at least 16 GB RAM. The pack downloads pinned mods from their original hosts and includes the tuned Distant Horizons settings, Photon **Medium**, Patrix **32x**, ETF and EMF. It does not bundle third-party mod/shader/texture archives.
+In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the announced `Civilization-...-Prism-Windows.zip`. Use **Java 21**. The instance starts with **8 GB maximum memory** on a computer with at least 16 GB RAM. Click Play: first launch downloads pinned third-party files from their original hosts, then starts Minecraft; later launches check approved Civilization updates automatically. No separate updater installation is needed.
 
-The private development server may run a newer candidate; check [runtime status](docs/status.md#local-runtime) for client compatibility before connecting.
+The pack includes tuned Distant Horizons settings (**100 KB/s per player**), Photon **Medium**, Patrix **32x**, ETF and EMF. Only our own Civilization JAR is bundled; third-party mod/shader/texture archives download from their authors' hosts. Personal settings are retained by routine Civilization updates. Server-only balance changes do not require matching client builds; see [connection compatibility](civilization-mod/README.md#server-connections).
 
-Launch the imported instance and add the server address supplied **privately by the host**. No server address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Use the announced compatible pack instead of independently updating its mods; the published 0.35.0 client remains compatible with the current server.
+Add the server address supplied **privately by the host**; no address is included. [Full installation, settings, versions and troubleshooting](modpack/README.md). Check [runtime status](docs/status.md#local-runtime) for the active server build. The published 0.35.0 client can still connect but keeps its old small-placeable inventory restrictions.
 
 ## Start here
 

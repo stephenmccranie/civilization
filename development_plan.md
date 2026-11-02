@@ -26,7 +26,7 @@ The owner approved the v4 Lacertan concept but rejected both the circular approx
 
 ### Client distribution — implemented locally
 
-Windows/Prism pre-launch Civilization updates and a local release-asset builder are implemented. Focused failure checks and all pinned pack downloads are verified; first public activation waits for an explicitly authorized substantial release. A real imported-pack launch/join remains a distribution acceptance check. [Setup and release procedure](modpack/README.md#automatic-civilization-updates), [validation](docs/status.md#validation-and-limits).
+Native Windows/Prism ZIP distribution includes the preconfigured launch hook, first-launch pinned downloads, Civilization updates and a local release-asset builder. The separate installer and `.mrpack` pipeline are retired. Focused bootstrap/update failure checks, archive structure and all pinned files are verified; first public activation waits for an explicitly authorized substantial release. A real Prism import/launch/join remains a player acceptance check. [Setup and release procedure](modpack/README.md#automatic-civilization-updates), [validation](docs/status.md#validation-and-limits).
 
 ### Manual coal mining — prototype package
 

@@ -1,4 +1,4 @@
-"""Build a download-only Prism/Modrinth pack from reviewed, public inputs (Python 3.11+)."""
+"""Build a Prism instance ZIP with pinned first-launch downloads (Python 3.11+)."""
 import argparse
 import concurrent.futures
 import hashlib
@@ -17,8 +17,7 @@ OVERRIDES = {
     'config/DistantHorizons.toml', 'config/iris.properties', 'config/grassiergrass-client.toml', 'options.txt',
     'shaderpacks/photon_v1.3b.zip.txt',
     'civilization-updater/Update-Civilization.ps1',
-    'civilization-updater/Install-CivilizationUpdater.ps1',
-    'civilization-updater/Install-Client-Updates.cmd',
+    'civilization-updater/Start-Civilization.ps1',
 }
 USER_AGENT = 'Civilization-playtest-pack/1 (github.com/stephenmccranie/civilization)'
 
@@ -42,7 +41,7 @@ def public_text(data):
 
 
 def inputs():
-    raw = (SOURCE / 'modrinth.index.json').read_bytes()
+    raw = (SOURCE / 'client-files.json').read_bytes()
     public_text(raw)
     index = json.loads(raw)
     if index['formatVersion'] != 1 or index['game'] != 'minecraft':
@@ -60,8 +59,6 @@ def inputs():
         if path in paths or path.split('/')[0] not in {'mods', 'shaderpacks', 'resourcepacks'}:
             raise ValueError(f'Unexpected or duplicate download: {path}')
         paths.add(path)
-        if item['env'] != {'client': 'required', 'server': 'unsupported'}:
-            raise ValueError('This is a client pack, not a dedicated server export')
         for kind, length in [('sha1', 40), ('sha512', 128)]:
             if not re.fullmatch('[0-9a-f]{' + str(length) + '}', item['hashes'][kind]):
                 raise ValueError(f'Invalid {kind}: {path}')
@@ -71,13 +68,24 @@ def inputs():
             parsed = urllib.parse.urlsplit(url)
             if parsed.scheme != 'https' or parsed.hostname not in {'cdn.modrinth.com', 'github.com'} or parsed.username or parsed.password:
                 raise ValueError(f'Unreviewed download host: {path}')
-    output = {'modrinth.index.json': raw}
+            if parsed.hostname == 'github.com' and not url.startswith(
+                    'https://github.com/stephenmccranie/civilization/releases/download/' + index['versionId'] + '/'):
+                raise ValueError('Civilization asset must belong to this release')
+    cfg = (SOURCE / 'instance.cfg').read_bytes()
+    public_text(cfg)
+    components = {'formatVersion': 1, 'components': [
+        {'uid': 'net.minecraft', 'version': index['dependencies']['minecraft'], 'important': True},
+        {'uid': 'net.neoforged', 'version': index['dependencies']['neoforge'], 'important': True},
+    ]}
+    output = {'minecraft/civilization-updater/client-files.json': raw,
+              'instance.cfg': cfg,
+              'mmc-pack.json': (json.dumps(components, indent=2) + '\n').encode()}
     for name in sorted(actual):
         content = (SOURCE / 'overrides' / name).read_bytes()
         public_text(content)
         if name.endswith('.toml'):
             tomllib.loads(content.decode('utf-8'))
-        output['overrides/' + name] = content
+        output['minecraft/' + name] = content
     return index, output
 
 
@@ -115,16 +123,24 @@ def check_downloads(index, cache, local_civilization):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=ROOT / '.tools/player-pack-build')
+    parser.add_argument('--output', type=Path, default=ROOT / '.tools/prism-pack-build')
     parser.add_argument('--check-downloads', action='store_true')
     parser.add_argument('--cache', type=Path, default=ROOT / '.tools/player-pack-cache')
     parser.add_argument('--local-civilization', type=Path, help='Validate an unpublished release candidate JAR locally')
     args = parser.parse_args()
     index, contents = inputs()
     if args.check_downloads:
-        check_downloads(index, args.cache, args.local_civilization)
+        downloads = check_downloads(index, args.cache, args.local_civilization)
+    else:
+        civic = [item for item in index['files'] if PurePosixPath(item['path']).name.startswith('civilization-')]
+        downloads = check_downloads({'files': civic}, args.cache, args.local_civilization)
+    civic = [item for item in index['files'] if PurePosixPath(item['path']).name.startswith('civilization-')]
+    if len(civic) != 1:
+        raise ValueError('Expected one Civilization JAR')
+    # Only our own mod is bundled. Third-party artifacts download from original hosts.
+    contents['minecraft/' + civic[0]['path']] = downloads[civic[0]['path']].read_bytes()
     args.output.mkdir(parents=True, exist_ok=True)
-    target = args.output / ('Civilization-' + index['versionId'] + '.mrpack')
+    target = args.output / ('Civilization-' + index['versionId'] + '-Prism-Windows.zip')
     with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for name, data in sorted(contents.items()):
             info = zipfile.ZipInfo(name, date_time=(2026, 10, 31, 0, 0, 0))
@@ -135,8 +151,8 @@ def main():
         if archive.testzip() is not None or set(archive.namelist()) != set(contents):
             raise ValueError('Pack archive verification failed')
     digest = hashlib.sha256(target.read_bytes()).hexdigest()
-    target.with_suffix('.mrpack.sha256').write_text(f'{digest}  {target.name}\n', encoding='utf-8')
-    print(f'Built {target.name}: {target.stat().st_size:,} bytes, {len(index["files"])} downloads; no bundled third-party archives')
+    target.with_suffix('.zip.sha256').write_text(f'{digest}  {target.name}\n', encoding='utf-8')
+    print(f'Built {target.name}: {target.stat().st_size:,} bytes; bundled Civilization plus {len(index["files"])-1} original-host downloads')
     print('SHA-256', digest)
 
 
