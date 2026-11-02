@@ -57,7 +57,9 @@ function Show-CivFailure([string]$Message) {
 }
 
 function Get-CivJson([string]$Url) {
-    Invoke-RestMethod -Uri $Url -Headers @{ 'User-Agent'='Civilization-updater/1' } -TimeoutSec 15
+    # PowerShell 5.1 streams a REST array as one object unless returned explicitly.
+    $result=Invoke-RestMethod -Uri $Url -Headers @{ 'User-Agent'='Civilization-updater/1' } -TimeoutSec 15
+    return $result
 }
 function Save-CivDownload([string]$Url, [string]$Path) {
     $client=[Net.WebClient]::new()

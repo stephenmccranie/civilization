@@ -4,7 +4,7 @@ A custom Minecraft civilization MMO: personal labor grows into industry, trade, 
 
 ## Playtest client — Prism Launcher
 
-The current playtest is **0.35.7-dev**, distributed as a **Windows/Prism instance ZIP** with automatic managed-pack updates enabled. [Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.7-1/Civilization-playtest-0.35.7-1-Prism-Windows.zip) or view the [release notes and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-1).
+The current playtest is **0.35.7-dev**, distributed as a **Windows/Prism instance ZIP** with automatic managed-pack updates enabled. [Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.7-2/Civilization-playtest-0.35.7-2-Prism-Windows.zip) or view the [release notes and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-2).
 
 In [Prism Launcher](https://prismlauncher.org/download/), choose **Add Instance → Import** and select the announced `Civilization-...-Prism-Windows.zip`. Use **Java 21**. The instance starts with **8 GB maximum memory** on a computer with at least 16 GB RAM. Click Play: first launch downloads pinned third-party files from their original hosts, then starts Minecraft; later launches automatically update the complete managed pack from approved releases, including third-party mods. No separate updater installation is needed.
 

@@ -2,6 +2,16 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 . "$root/modpack/overrides/civilization-updater/Start-Civilization.ps1"
+# Model Invoke-RestMethod's real Windows PowerShell 5.1 non-enumerated REST array.
+function Invoke-RestMethod {
+ param($Uri,$Headers,$TimeoutSec)
+ if ($Uri -eq 'fixture:array') { Write-Output -NoEnumerate @([pscustomobject]@{tag_name='first'},[pscustomobject]@{tag_name='second'}) }
+ else { [pscustomobject]@{versionId='fixture'} }
+}
+$jsonArray=@(Get-CivJson 'fixture:array')
+if ($jsonArray.Count -ne 2 -or $jsonArray[0].tag_name -ne 'first') { throw 'REST release arrays must enumerate into individual releases' }
+if ((Get-CivJson 'fixture:object').versionId -ne 'fixture') { throw 'REST manifest objects must remain scalar' }
+Remove-Item Function:Invoke-RestMethod
 $fixture=Join-Path $root ('.tools/pack-update-tests/'+[guid]::NewGuid().ToString('N'))
 $game=Join-Path $fixture 'minecraft'
 $homeDir=Join-Path $game 'civilization-updater'

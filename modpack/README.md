@@ -1,6 +1,6 @@
 # Civilization playtest client
 
-[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.7-1/Civilization-playtest-0.35.7-1-Prism-Windows.zip) · [Release notes and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-1)
+[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.7-2/Civilization-playtest-0.35.7-2-Prism-Windows.zip) · [Release notes and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-2)
 
 The playtest uses Civilization **0.35.7-dev**, Minecraft **1.21.1** and NeoForge **21.1.265**. It includes automatic managed-pack updates with visible progress, easier inventory handling, shared crafting-table ingredients, numeric player ping, improved daily temperature timing and resource tuning. DH starts at **128 chunks / 100 KB/s per player**. Distribution uses a Windows/Prism instance ZIP; new builds no longer produce `.mrpack` files or a separate updater installer.
 
@@ -14,7 +14,7 @@ Server-only balance updates do not require matching client versions; see [connec
 4. Click **Play**. On first launch the hook downloads pinned third-party files from their original hosts, verifies their sizes and SHA-1/SHA-512 hashes, then checks approved pack updates before Minecraft starts. A visible Civilization Launcher window shows the current file, download progress and verification; it closes automatically when setup finishes. A failed or corrupt initial download shows an error and stops launch; click Play again to retry.
 5. Photon and Patrix should already be selected. In **Multiplayer → Add Server**, enter the address the host gives you privately.
 
-For an older installation without this launcher hook, import the new ZIP once as a separate instance. Existing updater-enabled instances on the same Minecraft/NeoForge baseline can receive the release automatically. Settings migrations reduce only the former shipped DH defaults (256 chunks / 1024 KB/s); custom values are preserved.
+For an older installation without this launcher hook, import the new ZIP once as a separate instance. Earlier preview/revision-1 launcher scripts need this one-time import too. Starting with this revision, updater-enabled instances on the same Minecraft/NeoForge baseline receive future pack releases automatically. Settings migrations reduce only the former shipped DH defaults (256 chunks / 1024 KB/s); custom values are preserved.
 
 The ZIP contains Prism's `instance.cfg` and `mmc-pack.json`, our own Civilization JAR, the download manifest, three launch scripts and reviewed settings. Third-party mods, shader and resource-pack archives are **not bundled or rehosted**. Internet access is required for the first installation. Once installed, network failures during the update check leave the installed mod available. The scripts use built-in Windows PowerShell; Python is only a maintainer build dependency.
 

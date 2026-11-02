@@ -1,6 +1,6 @@
 # Current project status
 
-Last reviewed: **2026-11-02**. Current build: **0.35.7-dev**. [Playtest 0.35.7](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-1) distributes the matching mod JAR and native Windows/Prism ZIP with automatic managed-pack updates. The published 0.35.0 client remains protocol-compatible; corrected small-placeable inventory controls require the updated client.
+Last reviewed: **2026-11-02**. Current build: **0.35.7-dev**. [Playtest 0.35.7](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-2) distributes the matching mod JAR and native Windows/Prism ZIP with automatic managed-pack updates. The published 0.35.0 client remains protocol-compatible; corrected small-placeable inventory controls require the updated client.
 
 ## Implemented
 
@@ -22,7 +22,7 @@ Last reviewed: **2026-11-02**. Current build: **0.35.7-dev**. [Playtest 0.35.7](
 
 ## Validation and limits
 
-- **0.35.7 release checkpoint:** build, **100 fast tests**, all **390 required server GameTests** and the hidden native `crafting` client passed. Survival crafting output enters the Hand slot, closing/reopening retains the shared recipe inputs, and closed/recipe-book/reopened views were inspected. The production JAR hash still matches the deployed server. Offline bootstrap/pack-update fault checks and all 21 pinned archive downloads are revalidated for the release. No desktop automation is used. [Pack setup and update limits](../modpack/README.md).
+- **0.35.7 release checkpoint:** build, **100 fast tests**, all **390 required server GameTests** and the hidden native `crafting` client passed. Survival crafting output enters the Hand slot, closing/reopening retains the shared recipe inputs, and closed/recipe-book/reopened views were inspected. The production JAR hash still matches the deployed server. Offline bootstrap/pack-update fault checks and all 21 pinned archive downloads are revalidated for the release. The public-feed smoke test found and corrected Windows PowerShell 5.1 REST-array enumeration; revision 2 adds the exact REST-boundary regression alongside the transaction tests. Revision 1 remains available as superseded history. No desktop automation is used. [Pack setup and update limits](../modpack/README.md).
 
 - **Daily temperature timing:** 0.35.7-dev replaces the noon-high/midnight-low cosine with a smooth mid-afternoon high (time 9000) and dawn low (time 0), retaining each clear-weather biome's mean and daily range. Existing rain, altitude, cave profiles and stored heat are retained. Build, **100 fast tests** and all **390 required server GameTests** passed. Tests sample the complete 24,000-tick day for timing, continuity, monotonic phases, mean/range and wrapping, plus native biome/altitude/rain/cave checks. A before/after figure was generated from the compiled Java curve and visually inspected; a clear low-elevation river now reads about 60.9°F at sunset versus 53.6°F previously. No client update is required. [Cycle and examples](../civilization-mod/heat.md#daily-temperature-cycle). Ordinary player comfort across the revised day remains to be judged.
 
