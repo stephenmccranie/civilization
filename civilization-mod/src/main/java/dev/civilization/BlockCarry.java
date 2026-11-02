@@ -15,8 +15,17 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 @EventBusSubscriber(modid="civilization")
 public final class BlockCarry {
     public static final int OFFHAND=40,LIMIT=32,HAND_SLOT_X=-36;
+    public static final net.minecraft.tags.TagKey<Item> INVENTORY_PLACEABLES=net.minecraft.tags.TagKey.create(
+            net.minecraft.core.registries.Registries.ITEM,net.minecraft.resources.ResourceLocation.parse("civilization:inventory_placeables"));
     private BlockCarry(){}
-    public static boolean block(ItemStack stack){return !stack.isEmpty()&&stack.getItem() instanceof BlockItem&&!stack.is(CargoContent.STOCKPILE.get().asItem());}
+    /** Building cargo, not every item Minecraft happens to implement as a BlockItem. */
+    public static boolean block(ItemStack stack){
+        if(stack.isEmpty()||!(stack.getItem() instanceof BlockItem item)||stack.getItem() instanceof ItemNameBlockItem
+                ||stack.is(CargoContent.STOCKPILE.get().asItem())||stack.is(INVENTORY_PLACEABLES))return false;
+        var block=item.getBlock();
+        return !(block instanceof net.minecraft.world.level.block.BushBlock)
+                &&!(block instanceof net.minecraft.world.level.block.GrowingPlantBlock);
+    }
     public static boolean filledContainer(ItemStack stack){
         if(stack.isEmpty())return false;
         var container=stack.get(net.minecraft.core.component.DataComponents.CONTAINER);
