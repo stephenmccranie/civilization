@@ -6,7 +6,7 @@ _version = 5
 generationRequestRateLimit = 64
 syncOnLoadRateLimit = 64
 # Per player, KB/s. The server can impose a lower limit.
-playerBandwidthLimit = 1024
+playerBandwidthLimit = 100
 enableAdaptiveTransferSpeed = false
 
 [common.lodBuilding]

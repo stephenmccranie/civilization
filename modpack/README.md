@@ -30,7 +30,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 | DH LOD biome blending | 0 |
 | Vanilla biome blending | 0 |
 | DH generation / sync request limits | 64 each; the server may impose a lower limit |
-| DH per-player bandwidth | 1 MB/s (`1024` KB/s in DH) |
+| DH per-player bandwidth | 100 KB/s (per player; also enforced by the server) |
 | DH Pause If Moving Quickly | Off |
 | DH generation plan | Chunks Only; read pre-existing chunks rather than generating a local world |
 | DH CPU | Balanced defaults: half the logical processors, full thread runtime; no fixed count shipped |
@@ -42,7 +42,7 @@ These are client defaults, not forced server settings. Adjust them for your hard
 | Shader clouds | Existing high-terrain cloud altitudes retained; vanilla clouds off |
 | Resource pack | Patrix 32x Basic for Minecraft 1.21 / 1.21.1, release 72 |
 
-The current server separately caps generation requests at 64 and synchronization requests at 50; DH negotiates the smaller client/server limit. Bandwidth is per player, not a global server budget. Turning down **horizontal** quality does not mean selecting the overall Low quality preset: that would also change the Two Blocks / Medium values. DH's CPU preset is derived from hardware; the pack deliberately omits machine-specific thread counts.
+The current server separately caps generation requests at 64 and synchronization requests at 50; DH negotiates the smaller client/server limit. The server caps each player at 100 KB/s for outside-network playtesting, including existing clients with higher local settings. Clients can choose a lower limit. This is per player, not a global server budget; LOD downloads will take longer at this cap. Turning down **horizontal** quality does not mean selecting the overall Low quality preset: that would also change the Two Blocks / Medium values. DH's CPU preset is derived from hardware; the pack deliberately omits machine-specific thread counts.
 
 Photon's Medium profile is expanded into its actual shader option values so it applies on first launch. Patrix's material mapping and the existing high-altitude cloud settings are additional overrides. [Photon](https://modrinth.com/shader/photon-shader) and [Patrix](https://modrinth.com/resourcepack/patrix-32x) remain their authors' work and retain their original licenses. This includes only the freely available **32x Basic** pack, not paid resolutions or optional Patrix add-ons.
 
