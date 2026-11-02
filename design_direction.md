@@ -280,6 +280,8 @@ If power runs out during a funded takeover, protection ends immediately, the tak
 
 ## 9. Information and interface
 
+The Tab player list shows numeric in-game round-trip ping in milliseconds, sampled once per second and averaged over a rolling five-second window. Do not present missing replies as zero latency; show waiting or overdue status. Preserve existing player/team display names.
+
 Refinery vessels use simple readable silhouettes: a standalone distillation tower without required decks, rails or ladders, and a visibly supported horizontal condenser. Pipes have no manual valves. Substantial mostly-steel faceted tubes with narrow clear glass inspection strips show actual moving fluid by color and direction; empty interiors are see-through. Liquid tooltips name their contents.
 
 T1 machines use two input and two output slots, retaining ordinary 32-item stack limits for 64 items of storage per role. The Smithy and hand Assembly Bench are exceptions: four ingredient slots and one output slot each; the Smithy forms stock and the bench joins goods. Tannery and Textile Workshop keep two output slots. Output stacks stay in their slots when another output is collected; hoppers can clear finished work without moving the remaining stack. Coal-burning machines use two coal slots. T2 item outputs use four-slot banks. Civic claim reserves and trade stock keep their full chest inventories. Extra storage does not multiply production speed; keep batch processing and fluid storage separate from inventory capacity.

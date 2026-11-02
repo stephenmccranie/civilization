@@ -32,6 +32,8 @@ public final class ThermalConsistencyGameTests {
         // This probe must see sky even when fresh test terrain extends above the template.
         int roof=l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ());
         for(int y=p.getY()+1;y<roof;y++)l.setBlockAndUpdate(new BlockPos(p.getX(),y,p.getZ()),Blocks.AIR.defaultBlockState());
+        // Skylight is propagated asynchronously after the fixture changes blocks.
+        h.succeedWhen(()->{
         var sky=l.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p);
         h.assertTrue(l.canSeeSky(p),"Exposed-pocket regression requires an open sky column: probe="+p+", top="+sky+", obstruction="+l.getBlockState(sky.below()));
         for(int duration:new int[]{2,4,8}){
@@ -42,7 +44,7 @@ public final class ThermalConsistencyGameTests {
             }
             h.assertTrue(Math.abs(field.energy.values().doubleStream().sum()+field.atmosphereExchange-100)<1e-6,"Coarse sky pocket must conserve its pulse");
         }
-        h.succeed();
+        });
     }
     @GameTest(template="industrial") public static void mixedCutGeometryStaysPositionSpecificAndFresh(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,4,6));var q=p.east(7);

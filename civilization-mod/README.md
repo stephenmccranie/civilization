@@ -40,6 +40,14 @@ The published [Prism playtest client](../modpack/README.md) downloads the matchi
 
 This is a compatibility gate, not JAR authentication or an anti-cheat: a deliberately modified client can imitate the channel/version. Minecraft account authentication and server access controls remain separate.
 
+### Player-list ping
+
+Hold **Tab** to see each player's numeric in-game round-trip latency beside their name, such as `42 ms`. The server sends one native ping probe per second and displays the mean of completed replies received during the last five seconds. Client frame stalls and queued network traffic contribute to this game-protocol measurement.
+
+A new connection shows `-- ms` until a reply arrives. A probe still unanswered after five seconds shows a lower bound such as `≥ 6000 ms`, rather than an old healthy average. Samples and outstanding probes are bounded, expire automatically and are cleared on disconnect/server stop. Existing team formatting and custom tab names are retained.
+
+This uses Minecraft's existing ping/pong packets and tab display-name updates; protocol-compatible clients need no mod update. Native connection timeouts remain unchanged.
+
 ### Grassier Grass compatibility
 
 With Grassier Grass **1.4.5** installed on the client, Civilization disables the mod's automatic white snow tint on generated blades, including cold/high-altitude areas in clear weather. Blades retain their normal biome tint. This disables that blade tint entirely, including when rendering through snow is enabled; snow blocks, snowfall, accumulation, biome temperature and the mod's blade visibility settings are unchanged.
