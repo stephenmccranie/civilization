@@ -1,16 +1,20 @@
 # Civilization playtest client
 
-Distribution is now a **Windows/Prism instance ZIP** with automatic managed-pack updates already enabled. The local candidate is `Civilization-playtest-0.35.4-1-Prism-Windows.zip`; it has not been published yet. The [published release history](https://github.com/stephenmccranie/civilization/releases) still contains the earlier packs. New builds no longer produce `.mrpack` files or a separate updater installer.
+[Download the Prism pack](https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.7-1/Civilization-playtest-0.35.7-1-Prism-Windows.zip) · [Release notes and checksums](https://github.com/stephenmccranie/civilization/releases/tag/playtest-0.35.7-1)
 
-The candidate uses Civilization **0.35.4-dev**, Minecraft **1.21.1** and NeoForge **21.1.265**. It includes the corrected small-placeable inventory controls, the reviewed client settings and the 100 KB/s DH limit. Server-only balance updates do not require matching client versions; see [connection compatibility](../civilization-mod/README.md#server-connections). Ask the host privately for the server address; it is not included in the package.
+The playtest uses Civilization **0.35.7-dev**, Minecraft **1.21.1** and NeoForge **21.1.265**. It includes automatic managed-pack updates with visible progress, easier inventory handling, shared crafting-table ingredients, numeric player ping, improved daily temperature timing and resource tuning. DH starts at **128 chunks / 100 KB/s per player**. Distribution uses a Windows/Prism instance ZIP; new builds no longer produce `.mrpack` files or a separate updater installer.
+
+Server-only balance updates do not require matching client versions; see [connection compatibility](../civilization-mod/README.md#server-connections). Ask the host privately for the server address; it is not included in the package.
 
 ## Install in Prism Launcher
 
 1. Install [Prism Launcher](https://prismlauncher.org/download/) and add your Minecraft account. Use **Java 21**; Prism can manage the Java installation.
 2. Download the announced `Civilization-...-Prism-Windows.zip`. Choose **Add Instance → Import**, select the ZIP and finish the import. Import a new instance; do not merge it into a development instance. The launch hook is already configured, with no script to install or settings to enable manually.
 3. The instance starts with **8,192 MiB maximum memory**, suitable for a computer with at least 16 GB RAM. Adjust that in Prism if needed. Java arguments and Java selection inherit normal launcher settings; no Java agent or Terrain Diffusion model is needed to join.
-4. Click **Play**. On first launch the hook downloads pinned third-party files from their original hosts, verifies their sizes and SHA-1/SHA-512 hashes, then checks approved Civilization updates before Minecraft starts. A visible Civilization Launcher window shows the current file, download progress and verification; it closes automatically when setup finishes. A failed or corrupt initial download shows an error and stops launch; click Play again to retry.
+4. Click **Play**. On first launch the hook downloads pinned third-party files from their original hosts, verifies their sizes and SHA-1/SHA-512 hashes, then checks approved pack updates before Minecraft starts. A visible Civilization Launcher window shows the current file, download progress and verification; it closes automatically when setup finishes. A failed or corrupt initial download shows an error and stops launch; click Play again to retry.
 5. Photon and Patrix should already be selected. In **Multiplayer → Add Server**, enter the address the host gives you privately.
+
+For an older installation without this launcher hook, import the new ZIP once as a separate instance. Existing updater-enabled instances on the same Minecraft/NeoForge baseline can receive the release automatically. Settings migrations reduce only the former shipped DH defaults (256 chunks / 1024 KB/s); custom values are preserved.
 
 The ZIP contains Prism's `instance.cfg` and `mmc-pack.json`, our own Civilization JAR, the download manifest, three launch scripts and reviewed settings. Third-party mods, shader and resource-pack archives are **not bundled or rehosted**. Internet access is required for the first installation. Once installed, network failures during the update check leave the installed mod available. The scripts use built-in Windows PowerShell; Python is only a maintainer build dependency.
 

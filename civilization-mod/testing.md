@@ -26,6 +26,8 @@ The focused `derrick-guide` scene also checks ambient-light sampling: the opaque
 
 `DailyTemperatureCycleTest` samples a full 24,000-tick day for the afternoon peak/dawn low, gradual evening cooling, continuity, monotonic phases, preserved mean/range and day wrap. The native climate check retains biome extrema, altitude/rain adjustments and steady cave profiles; direct and cached field queries share the same temperature phase.
 
+The guarded `crafting` release scene explicitly uses Survival, collects the chest output into the Hand slot, then closes and reopens the same table to verify the saved shared inputs and live recipe preview. Inspect its closed, recipe-book and reopened screenshots.
+
 | Change | Check |
 | --- | --- |
 | Documentation or local configuration | Inspect the edit; no Minecraft launch |
