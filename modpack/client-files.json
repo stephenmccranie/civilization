@@ -18,7 +18,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/COlSi5iR/versions/yxOYFgnK/c2me-neoforge-mc1.21.1-0.4.0-alpha.0.122.jar"
       ],
-      "fileSize": 3717245
+      "fileSize": 3717245,
+      "id": "modrinth-COlSi5iR"
     },
     {
       "path": "mods/civilization-0.35.4-dev.jar",
@@ -29,7 +30,8 @@
       "downloads": [
         "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.4-1/civilization-0.35.4-dev.jar"
       ],
-      "fileSize": 5375231
+      "fileSize": 5375231,
+      "id": "civilization"
     },
     {
       "path": "mods/ContinuityNeoForge-3.0.8+1.21.1.jar",
@@ -40,7 +42,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/AOAMhINn/versions/Umymg8Lz/ContinuityNeoForge-3.0.8%2B1.21.1.jar"
       ],
-      "fileSize": 1031200
+      "fileSize": 1031200,
+      "id": "modrinth-AOAMhINn"
     },
     {
       "path": "mods/DistantHorizons-3.3.3-1.21.1-fabric-neoforge.jar",
@@ -51,7 +54,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/uCdwusMi/versions/9w34y8ai/DistantHorizons-3.3.3-1.21.1-fabric-neoforge.jar"
       ],
-      "fileSize": 28289212
+      "fileSize": 28289212,
+      "id": "modrinth-uCdwusMi"
     },
     {
       "path": "mods/entity_model_features-3.3.12-1.21-neoforge.jar",
@@ -62,7 +66,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/4I1XuqiY/versions/197m3VoU/entity_model_features-3.3.12-1.21-neoforge.jar"
       ],
-      "fileSize": 656382
+      "fileSize": 656382,
+      "id": "modrinth-4I1XuqiY"
     },
     {
       "path": "mods/entity_texture_features-7.2.6-1.21-neoforge.jar",
@@ -73,7 +78,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/BVzZfTc1/versions/lwNx1nD1/entity_texture_features-7.2.6-1.21-neoforge.jar"
       ],
-      "fileSize": 807089
+      "fileSize": 807089,
+      "id": "modrinth-BVzZfTc1"
     },
     {
       "path": "mods/ferritecore-7.0.3-neoforge.jar",
@@ -84,7 +90,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/uXXizFIs/versions/x7kQWVju/ferritecore-7.0.3-neoforge.jar"
       ],
-      "fileSize": 121559
+      "fileSize": 121559,
+      "id": "modrinth-uXXizFIs"
     },
     {
       "path": "mods/geckolib-neoforge-1.21.1-4.9.3.jar",
@@ -95,7 +102,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/8BmcQJ2H/versions/Grwn5rUB/geckolib-neoforge-1.21.1-4.9.3.jar"
       ],
-      "fileSize": 634531
+      "fileSize": 634531,
+      "id": "modrinth-8BmcQJ2H"
     },
     {
       "path": "mods/grassiergrass-neoforge-1.4.5+mc1.21.1.jar",
@@ -106,7 +114,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/3jCB9cn2/versions/hWKkBn3u/grassiergrass-neoforge-1.4.5%2Bmc1.21.1.jar"
       ],
-      "fileSize": 2350729
+      "fileSize": 2350729,
+      "id": "modrinth-3jCB9cn2"
     },
     {
       "path": "mods/iris-neoforge-1.8.14-beta.1+mc1.21.1.jar",
@@ -117,7 +126,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/YL57xq9U/versions/KduFYu4t/iris-neoforge-1.8.14-beta.1%2Bmc1.21.1.jar"
       ],
-      "fileSize": 2540723
+      "fileSize": 2540723,
+      "id": "modrinth-YL57xq9U"
     },
     {
       "path": "mods/Jade-1.21.1-NeoForge-15.10.6.jar",
@@ -128,7 +138,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/nvQzSEkH/versions/eYz2YBGT/Jade-1.21.1-NeoForge-15.10.6.jar"
       ],
-      "fileSize": 726853
+      "fileSize": 726853,
+      "id": "modrinth-nvQzSEkH"
     },
     {
       "path": "mods/jei-1.21.1-neoforge-19.56.0.441.jar",
@@ -139,7 +150,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/u6dRKJwZ/versions/ZWGz5dZX/jei-1.21.1-neoforge-19.56.0.441.jar"
       ],
-      "fileSize": 2156268
+      "fileSize": 2156268,
+      "id": "modrinth-u6dRKJwZ"
     },
     {
       "path": "mods/journeymap-neoforge-1.21.1-6.0.9.jar",
@@ -150,7 +162,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/lfHFW1mp/versions/CtFE7hwT/journeymap-neoforge-1.21.1-6.0.9.jar"
       ],
-      "fileSize": 4320499
+      "fileSize": 4320499,
+      "id": "modrinth-lfHFW1mp"
     },
     {
       "path": "mods/Kiwi-1.21.1-NeoForge-15.8.7.jar",
@@ -161,7 +174,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/ufdDoWPd/versions/tfwJWC8g/Kiwi-1.21.1-NeoForge-15.8.7.jar"
       ],
-      "fileSize": 1539578
+      "fileSize": 1539578,
+      "id": "modrinth-ufdDoWPd"
     },
     {
       "path": "mods/lithium-neoforge-0.15.4+mc1.21.1.jar",
@@ -172,7 +186,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/gvQqBUqZ/versions/DDUrRVCA/lithium-neoforge-0.15.4%2Bmc1.21.1.jar"
       ],
-      "fileSize": 774220
+      "fileSize": 774220,
+      "id": "modrinth-gvQqBUqZ"
     },
     {
       "path": "mods/lithostitched-1.8.0+beta6-neoforge-21.1.jar",
@@ -183,7 +198,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/XaDC71GB/versions/xDAotknu/lithostitched-1.8.0%2Bbeta6-neoforge-21.1.jar"
       ],
-      "fileSize": 978169
+      "fileSize": 978169,
+      "id": "modrinth-XaDC71GB"
     },
     {
       "path": "mods/sable-neoforge-1.21.1-2.0.5.jar",
@@ -194,7 +210,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/T9PomCSv/versions/U678xqle/sable-neoforge-1.21.1-2.0.5.jar"
       ],
-      "fileSize": 12986136
+      "fileSize": 12986136,
+      "id": "modrinth-T9PomCSv"
     },
     {
       "path": "mods/SnowRealMagic-1.21.1-NeoForge-12.2.2.jar",
@@ -205,7 +222,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/iJNje1E8/versions/CplQCHcl/SnowRealMagic-1.21.1-NeoForge-12.2.2.jar"
       ],
-      "fileSize": 3895550
+      "fileSize": 3895550,
+      "id": "modrinth-iJNje1E8"
     },
     {
       "path": "mods/sodium-neoforge-0.8.13+mc1.21.1.jar",
@@ -216,7 +234,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/AANobbMI/versions/uMOpc5uV/sodium-neoforge-0.8.13%2Bmc1.21.1.jar"
       ],
-      "fileSize": 1292934
+      "fileSize": 1292934,
+      "id": "modrinth-AANobbMI"
     },
     {
       "path": "shaderpacks/photon_v1.3b.zip",
@@ -227,7 +246,8 @@
       "downloads": [
         "https://cdn.modrinth.com/data/lLqFfGNs/versions/gUv7fBPN/photon_v1.3b.zip"
       ],
-      "fileSize": 3800987
+      "fileSize": 3800987,
+      "id": "modrinth-lLqFfGNs"
     },
     {
       "path": "resourcepacks/Patrix_1.21_32x_basic.zip",
@@ -238,7 +258,11 @@
       "downloads": [
         "https://cdn.modrinth.com/data/olO1TaXd/versions/iBo0eCWB/Patrix_1.21_32x_basic.zip"
       ],
-      "fileSize": 63380206
+      "fileSize": 63380206,
+      "id": "modrinth-olO1TaXd"
     }
-  ]
+  ],
+  "channel": "playtest",
+  "protocol": "3/0.35.0-dev",
+  "configMigrations": []
 }

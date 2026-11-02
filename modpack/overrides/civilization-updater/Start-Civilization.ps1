@@ -1,5 +1,6 @@
 param([string]$InstancePath = $env:INST_DIR)
 . "$PSScriptRoot/Update-Civilization.ps1" -InstancePath $InstancePath
+. "$PSScriptRoot/Update-Pack.ps1"
 
 function Test-CivPinnedFile([string]$Path, $Item) {
     if (!(Test-Path -LiteralPath $Path -PathType Leaf)) { return $false }
@@ -9,6 +10,7 @@ function Test-CivPinnedFile([string]$Path, $Item) {
 }
 function Initialize-CivClient([string]$Game) {
     $homeDir = Join-Path $Game 'civilization-updater'
+    if (Test-Path -LiteralPath (Join-Path $homeDir 'managed-pack.json')) { return }
     $manifestPath = Join-Path $homeDir 'client-files.json'
     $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
     if ($manifest.formatVersion -ne 1 -or $manifest.game -ne 'minecraft' -or $manifest.versionId -notmatch '^playtest-\d+\.\d+\.\d+-\d+$') { throw 'Unsupported client manifest' }
@@ -39,7 +41,10 @@ function Initialize-CivClient([string]$Game) {
     $stamp = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash
     $receipt = Join-Path $homeDir 'installed.txt'
     $missing = @($manifest.files | Where-Object { $_ -ne $civItems[0] -and !(Test-Path -LiteralPath (Join-Path $Game $_.path) -PathType Leaf) })
-    if ($keepCiv -and $missing.Count -eq 0 -and (Test-Path -LiteralPath $receipt) -and [IO.File]::ReadAllText($receipt) -eq $stamp) { return }
+    if ($keepCiv -and $missing.Count -eq 0 -and (Test-Path -LiteralPath $receipt) -and [IO.File]::ReadAllText($receipt) -eq $stamp) {
+        Save-CivInitialReceipt $homeDir $manifest
+        return
+    }
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $partial = Join-Path $homeDir 'bootstrap.partial'
     Open-CivProgress 'Setting up Civilization' 'Checking required client files...'
@@ -57,10 +62,11 @@ function Initialize-CivClient([string]$Game) {
             if (!(Test-CivPinnedFile $partial $item)) { throw "Download verification failed: $($item.path)" }
             $zip = [IO.Compression.ZipFile]::OpenRead($partial); $zip.Dispose()
             New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
-            if (Test-Path -LiteralPath $destination) { [IO.File]::Replace($partial, $destination, $null) }
+            if (Test-Path -LiteralPath $destination) { [IO.File]::Replace($partial, $destination, [NullString]::Value) }
             else { [IO.File]::Move($partial, $destination) }
         }
         [IO.File]::WriteAllText($receipt, $stamp)
+        Save-CivInitialReceipt $homeDir $manifest
         Write-Host 'Civilization client files are ready.'
     } finally { if (Test-Path -LiteralPath $partial) { Remove-Item -LiteralPath $partial }; Close-CivProgress }
 }
@@ -70,8 +76,9 @@ function Start-CivClient([string]$Instance) {
     Assert-CivStopped $game
     $guard = [IO.File]::Open((Join-Path $game 'civilization-updater/update.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
     try {
+        Restore-CivTransaction $game
         Initialize-CivClient $game
-        Invoke-CivUpdateLocked $Instance
+        Invoke-CivPackUpdate $Instance
     } finally { $guard.Dispose() }
 }
 if ($MyInvocation.InvocationName -ne '.') {

@@ -18,6 +18,7 @@ OVERRIDES = {
     'shaderpacks/photon_v1.3b.zip.txt',
     'civilization-updater/Update-Civilization.ps1',
     'civilization-updater/Start-Civilization.ps1',
+    'civilization-updater/Update-Pack.ps1',
 }
 USER_AGENT = 'Civilization-playtest-pack/1 (github.com/stephenmccranie/civilization)'
 
@@ -48,17 +49,23 @@ def inputs():
         raise ValueError('Unsupported pack format')
     if set(index['dependencies']) != {'minecraft', 'neoforge'}:
         raise ValueError('Expected Minecraft and NeoForge dependencies')
+    if index['channel'] != 'playtest' or index['protocol'] != '3/0.35.0-dev':
+        raise ValueError('Unsupported pack update channel/protocol')
     actual = {p.relative_to(SOURCE / 'overrides').as_posix()
               for p in (SOURCE / 'overrides').rglob('*') if p.is_file()}
     if actual != OVERRIDES:
         raise ValueError(f'Unreviewed or missing overrides: {actual ^ OVERRIDES}')
     paths = set()
+    identities = set()
     for item in index['files']:
         path = item['path']
         safe_path(path)
         if path in paths or path.split('/')[0] not in {'mods', 'shaderpacks', 'resourcepacks'}:
             raise ValueError(f'Unexpected or duplicate download: {path}')
         paths.add(path)
+        if not re.fullmatch(r'[a-zA-Z0-9_-]+', item['id']) or item['id'] in identities:
+            raise ValueError('Expected unique stable managed file identities')
+        identities.add(item['id'])
         for kind, length in [('sha1', 40), ('sha512', 128)]:
             if not re.fullmatch('[0-9a-f]{' + str(length) + '}', item['hashes'][kind]):
                 raise ValueError(f'Invalid {kind}: {path}')
@@ -71,6 +78,21 @@ def inputs():
             if parsed.hostname == 'github.com' and not url.startswith(
                     'https://github.com/stephenmccranie/civilization/releases/download/' + index['versionId'] + '/'):
                 raise ValueError('Civilization asset must belong to this release')
+    migrations = set()
+    for patch in index['configMigrations']:
+        key = (patch['path'], patch['section'], patch['key'])
+        if key in migrations or not (patch['path'] == 'options.txt' or re.fullmatch(r'config/[a-zA-Z0-9_-]+\.toml', patch['path'])):
+            raise ValueError('Unsafe or duplicate configuration migration')
+        if not re.fullmatch(r'[a-zA-Z0-9_]+', patch['key']) or not re.fullmatch(r'[a-zA-Z0-9_.]*', patch['section']):
+            raise ValueError('Unsafe configuration migration key')
+        if patch['path'] == 'options.txt' and patch['section']:
+            raise ValueError('options.txt has no sections')
+        for value in (patch['from'], patch['value']):
+            if not isinstance(value, str) or '\n' in value or '\r' in value:
+                raise ValueError('Configuration migrations need scalar strings')
+            if patch['path'] != 'options.txt' and not re.fullmatch(r'(true|false|-?\d+(\.\d+)?|"[^"\r\n]*")', value):
+                raise ValueError('Configuration migrations need scalar TOML values')
+        migrations.add(key)
     cfg = (SOURCE / 'instance.cfg').read_bytes()
     public_text(cfg)
     components = {'formatVersion': 1, 'components': [

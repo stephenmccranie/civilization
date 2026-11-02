@@ -44,12 +44,8 @@ def prepare(jar, output, check_downloads=False):
     destination = output / f'civilization-{version}.jar'
     if jar.resolve() != destination.resolve():
         shutil.copyfile(jar, destination)
-    manifest = dict(schemaVersion=1, channel='playtest', releaseTag=tag, version=version,
-                    protocol='3/0.35.0-dev', minecraftVersion=index['dependencies']['minecraft'],
-                    minimumNeoForgeVersion=index['dependencies']['neoforge'], downloadUrl=url,
-                    sha256=hashlib.sha256(jar.read_bytes()).hexdigest(), size=jar.stat().st_size)
-    (output / 'civilization-update.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-    for path in (destination, output / 'civilization-update.json'):
+    (output / 'civilization-pack.json').write_text(json.dumps(index, indent=2) + '\n', encoding='utf-8')
+    for path in (destination, output / 'civilization-pack.json'):
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         path.with_name(path.name + '.sha256').write_text(f'{digest}  {path.name}\n', encoding='utf-8')
     print(f'Prepared {tag} in {output}; nothing published')

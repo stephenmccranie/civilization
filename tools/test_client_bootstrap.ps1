@@ -16,12 +16,13 @@ function New-TestArchive([string]$Path,[string]$Content) {
 }
 $civ="$game/mods/civilization-0.35.4-dev.jar"
 New-TestArchive $civ "[[mods]]`nmodId=`"civilization`"`nversion=`"0.35.4-dev`"`n"
+Copy-Item -LiteralPath $civ -Destination "$fixture/baseline-civ.jar"
 $dependency="$fixture/dependency.jar"
 New-TestArchive $dependency 'fixture dependency'
 function New-Entry([string]$Path,[string]$File,[string]$Url) {
-    @{path=$Path; fileSize=(Get-Item $File).Length; hashes=@{sha1=(Get-FileHash $File -Algorithm SHA1).Hash.ToLowerInvariant();sha512=(Get-FileHash $File -Algorithm SHA512).Hash.ToLowerInvariant()};downloads=@($Url)}
+    @{id=$(if ($Path -like 'mods/civilization-*') {'civilization'} else {'dependency'});path=$Path; fileSize=(Get-Item $File).Length; hashes=@{sha1=(Get-FileHash $File -Algorithm SHA1).Hash.ToLowerInvariant();sha512=(Get-FileHash $File -Algorithm SHA512).Hash.ToLowerInvariant()};downloads=@($Url)}
 }
-$manifest=@{formatVersion=1;game='minecraft';versionId='playtest-0.35.4-1';files=@(
+$manifest=@{formatVersion=1;game='minecraft';channel='playtest';protocol='3/0.35.0-dev';configMigrations=@();versionId='playtest-0.35.4-1';files=@(
     (New-Entry 'mods/civilization-0.35.4-dev.jar' $civ 'https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.4-1/civilization-0.35.4-dev.jar'),
     (New-Entry 'mods/dependency.jar' $dependency 'https://cdn.modrinth.com/data/fixture.jar')
 )}
@@ -52,14 +53,15 @@ if ($script:downloads -ne $count) { throw 'Complete installation needed network 
 New-TestArchive $civ "[[mods]]`nmodId=`"civilization`"`nversion=`"0.35.5-dev`"`n"
 Initialize-CivClient $game
 if ((Get-CivJarVersion $civ) -ne '0.35.5-dev') { throw 'Bootstrap downgraded Civilization' }
+Copy-Item -LiteralPath "$fixture/baseline-civ.jar" -Destination $civ -Force
 $script:offline=$false
 Remove-Item -LiteralPath "$game/mods/dependency.jar"
-Initialize-CivClient $game
+Install-CivPack $game ([pscustomobject]$manifest) ([pscustomobject]$manifest)
 if (!(Test-Path "$game/mods/dependency.jar")) { throw 'Missing dependency not repaired' }
 $manifest.files[1].path='mods/../../escape.jar'; Write-Manifest
-Expect-Failure { Initialize-CivClient $game }
+Expect-Failure { Assert-CivPack ([pscustomobject]$manifest) }
 $manifest.files[1].path='mods/dependency.jar'; $manifest.files[1].downloads=@('https://example.com/evil.jar'); Write-Manifest
-Expect-Failure { Initialize-CivClient $game }
+Expect-Failure { Assert-CivPack ([pscustomobject]$manifest) }
 if ((Get-Content "$game/options.txt" -Raw).Trim() -ne 'personal setting') { throw 'Personal config changed' }
 if (!($script:progressEvents | Where-Object { $_ -match 'Setting up Civilization\|File 2 of 2: dependency.jar\|[1-9]' }) -or !($script:progressEvents | Where-Object { $_ -match 'Verifying dependency.jar' })) { throw 'Missing setup download/verification progress' }
 Write-Host 'PASS: first install, failed/corrupt download, retry, offline repeat launch, no downgrade, missing-file repair, traversal/host rejection, personal settings preservation.'
