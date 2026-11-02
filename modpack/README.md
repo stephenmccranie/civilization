@@ -23,7 +23,7 @@ These are starting client defaults; adjust them for your hardware. The server al
 | GUI scale / FOV | 4× / 90° |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
 | Grassier Grass blade height / height variation | 0.65 / 0.35; permanent server-saved trampling |
-| DH distance | 256 chunks |
+| DH distance | 128 chunks |
 | DH finest horizontal resolution | Two Blocks |
 | DH horizontal / vertical quality | Low / Medium |
 | DH LOD biome blending | 0 |
@@ -41,7 +41,7 @@ These are starting client defaults; adjust them for your hardware. The server al
 | Shader clouds | Existing high-terrain cloud altitudes retained; vanilla clouds off |
 | Resource pack | Patrix 32x Basic for Minecraft 1.21 / 1.21.1, release 72 |
 
-The current server separately caps generation requests at 64 and synchronization requests at 50; DH negotiates the smaller client/server limit. The server caps each player at 100 KB/s for outside-network playtesting, including existing clients with higher local settings. Clients can choose a lower limit. This is per player, not a global server budget; LOD downloads will take longer at this cap. Turning down **horizontal** quality does not mean selecting the overall Low quality preset: that would also change the Two Blocks / Medium values. DH's CPU preset is derived from hardware; the pack deliberately omits machine-specific thread counts.
+The server uses a 128-chunk real-time LOD update radius. DH 3.3.3 has a hard 256-chunk minimum for generation and synchronization request-distance caps; both server caps are set to that minimum (synchronization was previously 4096). Client rendering remains 128 chunks; the server does not render LODs or erase cached terrain. The current server separately caps generation requests at 64 and synchronization requests at 50; DH negotiates the smaller client/server limit. The server caps each player at 100 KB/s for outside-network playtesting, including existing clients with higher local settings. Clients can choose a lower limit. This is per player, not a global server budget; LOD downloads will take longer at this cap. Turning down **horizontal** quality does not mean selecting the overall Low quality preset: that would also change the Two Blocks / Medium values. DH's CPU preset is derived from hardware; the pack deliberately omits machine-specific thread counts.
 
 Photon's Medium profile is expanded into its actual shader option values so it applies on first launch. Patrix's material mapping and the existing high-altitude cloud settings are additional overrides. [Photon](https://modrinth.com/shader/photon-shader) and [Patrix](https://modrinth.com/resourcepack/patrix-32x) remain their authors' work and retain their original licenses. This includes only the freely available **32x Basic** pack, not paid resolutions or optional Patrix add-ons.
 

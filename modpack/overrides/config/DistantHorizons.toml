@@ -25,5 +25,5 @@ enableSilentUpdates = false
 horizontalQuality = "LOW"
 verticalQuality = "MEDIUM"
 maxHorizontalResolution = "TWO_BLOCKS"
-lodChunkRenderDistanceRadius = 256
+lodChunkRenderDistanceRadius = 128
 lodBiomeBlending = 0
