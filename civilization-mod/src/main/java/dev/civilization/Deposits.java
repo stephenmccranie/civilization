@@ -78,47 +78,41 @@ public final class Deposits {
     private static Map<Long,Optional<Site>> cache(ServerLevel level){synchronized(CACHES){return CACHES.computeIfAbsent(level,ignored->Collections.synchronizedMap(new LinkedHashMap<>(256,.75f,true){@Override protected boolean removeEldestEntry(Map.Entry<Long,Optional<Site>> entry){return size()>4096;}}));}}
     private static final Map<ServerLevel,Map<Long,Optional<Site>>> OIL_REGIONS=new WeakHashMap<>();
     private static Map<Long,Optional<Site>> oilCache(ServerLevel level){synchronized(OIL_REGIONS){return OIL_REGIONS.computeIfAbsent(level,ignored->Collections.synchronizedMap(new LinkedHashMap<>(64,.75f,true){@Override protected boolean removeEldestEntry(Map.Entry<Long,Optional<Site>> entry){return size()>1024;}}));}}
+    private static final Map<ServerLevel,Map<Long,Optional<Site>>> COAL_REGIONS=new WeakHashMap<>();
+    private static Map<Long,Optional<Site>> coalCache(ServerLevel level){synchronized(COAL_REGIONS){return COAL_REGIONS.computeIfAbsent(level,ignored->Collections.synchronizedMap(new LinkedHashMap<>(64,.75f,true){@Override protected boolean removeEldestEntry(Map.Entry<Long,Optional<Site>> entry){return size()>1024;}}));}}
     private static long mix(long x) { x=(x^(x>>>30))*0xbf58476d1ce4e5b9L;x=(x^(x>>>27))*0x94d049bb133111ebL;return x^(x>>>31); }
     private static long key(int x,int z){return ((long)x<<32)^(z&0xffffffffL);}
     private static long cellHash(ServerLevel l,int x,int z){return mix(l.getSeed() ^ ((long)x*341873128712L) ^ ((long)z*132897987541L));}
     public static Site candidate(ServerLevel l,int cellX,int cellZ) {
         var cache=cache(l);long key=key(cellX,cellZ);var known=cache.get(key);if(known!=null)return known.orElse(null);
         if(!Geography.supported(l)){cache.put(key,Optional.empty());return null;}
-        var coal=sampleCoal(l,cellX,cellZ);
+        var districtCoal=region(l,Math.floorDiv(cellX,4),Math.floorDiv(cellZ,4),Kind.COAL);
+        var coal=inCell(districtCoal,cellX,cellZ)?districtCoal:null;
         var oil=coal==null?oilRegion(l,Math.floorDiv(cellX,4),Math.floorDiv(cellZ,4)):null;
         var site=coal!=null?coal:oil!=null&&Math.floorDiv(oil.x(),256)==cellX&&Math.floorDiv(oil.z(),256)==cellZ?oil:null;
         cache.put(key,Optional.ofNullable(site));return site;
     }
-    /** One oil field per selected suitable 4x4-cell region; search locally within that district. */
+    private static boolean inCell(Site site,int x,int z){return site!=null&&Math.floorDiv(site.x(),256)==x&&Math.floorDiv(site.z(),256)==z;}
+    /** Coal wins its own cell; oil searches the remaining cells without recursive site queries. */
     private static Site oilRegion(ServerLevel l,int regionX,int regionZ){
-        var cache=oilCache(l);long key=key(regionX,regionZ);var known=cache.get(key);if(known!=null)return known.orElse(null);
-        var generator=l.getChunkSource().getGenerator();var random=l.getChunkSource().randomState();
-        long order=mix(l.getSeed() ^ ((long)regionX*0x632be59bd9b4e019L) ^ ((long)regionZ*0x9e3779b97f4a7c15L));
-        if(!DepositDistribution.oil(order)){cache.put(key,Optional.empty());return null;}
-        int start=(int)Math.floorMod(order,16),step=((int)(order>>>8)&7)*2+1;
-        Site result=null;
-        for(int n=0;n<16&&result==null;n++){
-            int index=(start+n*step)&15,cellX=regionX*4+(index&3),cellZ=regionZ*4+(index>>>2);
-            long hash=cellHash(l,cellX,cellZ);
-            for(int attempt=0;attempt<4;attempt++){
-                long choice=mix(hash+attempt*0x9e3779b97f4a7c15L);
-                int x=cellX*256+80+(int)Math.floorMod(choice,96),z=cellZ*256+80+(int)Math.floorMod(choice>>>24,96);
-                int y=generator.getBaseHeight(x,z,Heightmap.Types.WORLD_SURFACE_WG,l,random);
-                if(y>=l.getMaxBuildHeight()-8||y-40<l.getMinBuildHeight()+5)continue;
-                var biome=generator.getBiomeSource().getNoiseBiome(x>>2,(y-1)>>2,z>>2,random.sampler());
-                if(!biome.is(IndustrialContent.OIL_REGIONS))continue;
-                var site=new Site(x,y,z,Kind.OIL,34+(int)Math.floorMod(choice>>>40,3));
-                if(groundFits(l,site)&&sampleCoal(l,cellX,cellZ)==null){result=site;break;}
-            }
-        }
+        return region(l,regionX,regionZ,Kind.OIL);
+    }
+    private static Site region(ServerLevel l,int regionX,int regionZ,Kind kind){
+        var cache=kind==Kind.COAL?coalCache(l):oilCache(l);long key=key(regionX,regionZ);
+        var known=cache.get(key);if(known!=null)return known.orElse(null);
+        long order=DepositDistribution.district(l.getSeed(),regionX,regionZ,kind==Kind.COAL);
+        if(!DepositDistribution.selected(order,kind==Kind.COAL)){cache.put(key,Optional.empty());return null;}
+        var coal=kind==Kind.OIL?region(l,regionX,regionZ,Kind.COAL):null;
+        Site result=DepositDistribution.search(order,index->{
+            int cellX=regionX*4+(index&3),cellZ=regionZ*4+(index>>>2);
+            return inCell(coal,cellX,cellZ)?null:sample(l,cellX,cellZ,kind,order);
+        });
         cache.put(key,Optional.ofNullable(result));return result;
     }
-    private static Site sampleCoal(ServerLevel l,int cellX,int cellZ) {
+    private static Site sample(ServerLevel l,int cellX,int cellZ,Kind kind,long district) {
         long hash=cellHash(l,cellX,cellZ);
-        if(!DepositDistribution.coal(hash)) return null;
         var generator=l.getChunkSource().getGenerator(); var random=l.getChunkSource().randomState();
-        // Try a few positions inside each selected region. A single point on a Tectonic cliff
-        // must not make an otherwise suitable 256-block region permanently empty.
+        // Up to four positions per cell, then continue across the whole selected district.
         for(int attempt=0;attempt<4;attempt++) {
             long choice=mix(hash+attempt*0x9e3779b97f4a7c15L);
             int x=cellX*256+80+(int)Math.floorMod(choice,96);
@@ -127,11 +121,11 @@ public final class Deposits {
             if(y>=l.getMaxBuildHeight()-8 || y-40<l.getMinBuildHeight()+5)continue;
             // Biomes can change with altitude; classify the ground, not an arbitrary Y=64 slice.
             var biome=generator.getBiomeSource().getNoiseBiome(x>>2,(y-1)>>2,z>>2,random.sampler());
-            if(!biome.is(IndustrialContent.COAL_REGIONS))continue;
-            Site site=new Site(x,y,z,Kind.COAL,70+(int)Math.floorMod(choice>>>40,11));
+            if(!DepositDistribution.allows(district,kind==Kind.COAL,DepositDistribution.climate(biome.value().getBaseTemperature())))continue;
+            Site site=new Site(x,y,z,kind,kind==Kind.COAL?70+(int)Math.floorMod(choice>>>40,11):34+(int)Math.floorMod(choice>>>40,3));
             // Some seams crop out where natural rock meets air or river water.
             // The visible blocks are part of the same extractable body, not a clue.
-            if(Math.floorMod(choice,5)<3){
+            if(kind==Kind.COAL&&Math.floorMod(choice,5)<3){
                 int depth=outcropDepth(l,site);
                 if(depth>0){var exposed=new Site(x,y,z,Kind.COAL,site.radius(),depth);if(groundFits(l,exposed))return exposed;}
             }
@@ -166,7 +160,7 @@ public final class Deposits {
     }
     private static boolean groundFits(ServerLevel l,Site site) {
         var generator=l.getChunkSource().getGenerator();var random=l.getChunkSource().randomState();
-        int r=site.radius(),shortRadius=site.minorRadius(),limit=site.kind()==Kind.OIL?8:16;
+        int r=site.radius(),shortRadius=site.minorRadius();
         if(((site.x()^site.z())&1)!=0){int swap=r;r=shortRadius;shortRadius=swap;}
         int diagonalX=(int)Math.round(r/Math.sqrt(2)),diagonalZ=(int)Math.round(shortRadius/Math.sqrt(2));
         int[][] offsets={{0,0},{r,0},{-r,0},{0,shortRadius},{0,-shortRadius},{diagonalX,diagonalZ},{diagonalX,-diagonalZ},{-diagonalX,diagonalZ},{-diagonalX,-diagonalZ}};
@@ -174,7 +168,6 @@ public final class Deposits {
         for(var offset:offsets) {
             int x=site.x()+offset[0],z=site.z()+offset[1];
             int surface=generator.getBaseHeight(x,z,Heightmap.Types.WORLD_SURFACE_WG,l,random);
-            if(Math.abs(surface-site.y())>limit)return false;
             var column=generator.getBaseColumn(x,z,l,random);
             var top=column.getBlock(surface-1);
             // The center is a dry place for the extractor. A sampled bank or
@@ -185,7 +178,7 @@ public final class Deposits {
             // their test deposits below the shallow flat layers explicitly.
             if(!(generator instanceof FlatLevelSource)) {
                 var rock=column.getBlock(site.centerY());
-                boolean solid=!rock.isAir() && rock.getFluidState().isEmpty() && !rock.is(Blocks.BEDROCK);
+                boolean solid=naturalRock(rock);
                 if(site.kind()==Kind.OIL || offset[0]==0&&offset[1]==0){if(!solid)return false;}
                 if(solid)solidCoalSamples++;
             }

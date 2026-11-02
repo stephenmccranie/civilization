@@ -12,6 +12,8 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 The [Colt Paterson prototype](firearms.md) adds left-click firing, tap R to cock each shot or reload an empty gun, hold R for a partial reload from inventory .36 ammunition, slight recoil, the extracted firing sound and server-side bullets with drop, drag and damage.
 
+Vanilla [crafting tables keep a shared, saved input grid](physics.md#shared-crafting-tables). Leave ingredients on a table while fetching another hand-load; other permitted players can use the same supplies.
+
 Town manufacturing: [shared parts and Assembly Bench](manufacturing.md) connect Foundry/Smithy metals, hides, wool and timber to equipment, fixtures, vehicles, machinery and repairs. Final joining uses player labor; metal forming remains coal-fired.
 
 The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Load ingredients at the stove, then lift the skillet onto a solid counter to finish with residual heat and serve; it can return to the stove if underdone. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.
@@ -28,11 +30,23 @@ The [Wheelbarrow and craftable Pallet](physics.md#empty-wheelbarrow-handling-pro
 
 ### Server connections
 
-Clients and servers must run the same Civilization version. The required core network channel includes the version from the installed mod metadata; NeoForge rejects missing Civilization installations, legacy clients and unequal versions during connection setup, before entering the world. Distribute the server's Civilization JAR to players whenever updating it. Client-only graphics and quality-of-life mods can still differ.
+Clients and servers must use compatible Civilization protocols; their release versions can differ. The required core channel uses the stable protocol ID `3/0.35.0-dev`, retaining the exact identity advertised by the published 0.35.0 client. The current server and later compatible builds keep that ID for server-only generation, balance and settings changes, so the published 0.35.0 pack connects without a Civilization update. NeoForge still rejects missing Civilization installations, older protocols and incompatible protocol IDs before play. Change the protocol ID only when packet formats or synchronized content become incompatible. Client-only graphics and quality-of-life mods can still differ.
+
+Client-side fixes still require a client update to receive their new behavior. In particular, the 0.35.4 small-placeable inventory correction updates local slot checks as well as server enforcement: a 0.35.0 client can connect but retains its old seed/placeable slot restrictions.
+
+The private 0.35.1/0.35.2 intermediate builds still advertise their old exact-build IDs. Use the published 0.35.0 client or a build with the stable-protocol fix (0.35.3 onward) instead; this is not a wildcard accepting every 0.35.x client or future incompatible build.
 
 The published [Prism playtest client](../modpack/README.md) downloads the matching Civilization JAR and pinned dependencies, with tuned DH defaults, Photon Medium and Patrix 32x. The host supplies the server address privately.
 
 This is a compatibility gate, not JAR authentication or an anti-cheat: a deliberately modified client can imitate the channel/version. Minecraft account authentication and server access controls remain separate.
+
+### Player-list ping
+
+Hold **Tab** to see each player's numeric in-game round-trip latency beside their name, such as `42 ms`. The server sends one native ping probe per second and displays the mean of completed replies received during the last five seconds. Client frame stalls and queued network traffic contribute to this game-protocol measurement.
+
+A new connection shows `-- ms` until a reply arrives. A probe still unanswered after five seconds shows a lower bound such as `≥ 6000 ms`, rather than an old healthy average. Samples and outstanding probes are bounded, expire automatically and are cleared on disconnect/server stop. Existing team formatting and custom tab names are retained.
+
+This uses Minecraft's existing ping/pong packets and tab display-name updates; protocol-compatible clients need no mod update. Native connection timeouts remain unchanged.
 
 ### Grassier Grass compatibility
 

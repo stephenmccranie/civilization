@@ -1,8 +1,5 @@
 package dev.civilization;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -21,7 +18,6 @@ public final class IndustrialContent {
     private static final DeferredRegister<FluidType> TYPES=DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES,"civilization");
     private static final DeferredRegister<Fluid> FLUIDS=DeferredRegister.create(Registries.FLUID,"civilization");
     private static final DeferredRegister<net.minecraft.world.level.levelgen.feature.Feature<?>> FEATURES=DeferredRegister.create(Registries.FEATURE,"civilization");
-    public static final TagKey<Biome> COAL_REGIONS=TagKey.create(Registries.BIOME,ResourceLocation.parse("civilization:coal_regions")), OIL_REGIONS=TagKey.create(Registries.BIOME,ResourceLocation.parse("civilization:oil_regions"));
     public static final DeferredHolder<FluidType,FluidType> CRUDE_TYPE=TYPES.register("crude_oil",()->new FluidType(FluidType.Properties.create().density(900).viscosity(3000).canConvertToSource(false)){});
     public static final DeferredHolder<FluidType,FluidType> FUEL_TYPE=TYPES.register("refined_fuel",()->new FluidType(FluidType.Properties.create().density(800).viscosity(1500).canConvertToSource(false)){});
     public static final DeferredHolder<Fluid,BaseFlowingFluid.Source> CRUDE=FLUIDS.register("crude_oil",()->new ReservoirOil.Source(crude()));

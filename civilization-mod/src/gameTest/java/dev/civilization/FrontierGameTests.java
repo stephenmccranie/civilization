@@ -81,20 +81,33 @@ public class FrontierGameTests {
         h.succeed();
     }
     @GameTest(template = "empty", templateNamespace = "civilization")
-    public static void uraniumRegionsIncludeUplandsButNotFarmland(GameTestHelper helper) {
+    public static void uraniumRegionsCoverEveryOverworldClimate(GameTestHelper helper) {
         var biomes = helper.getLevel().registryAccess().registryOrThrow(Registries.BIOME);
         TagKey<Biome> uranium = TagKey.create(Registries.BIOME,
                 ResourceLocation.fromNamespaceAndPath("civilization", "uranium_regions"));
         for (String name : new String[] { "meadow", "grove", "snowy_slopes", "cherry_grove",
-                "windswept_savanna", "savanna_plateau", "old_growth_pine_taiga", "old_growth_spruce_taiga", "desert" }) {
+                "windswept_savanna", "savanna_plateau", "old_growth_pine_taiga", "old_growth_spruce_taiga", "desert", "plains", "river", "ocean", "jungle" }) {
             var key = ResourceKey.create(Registries.BIOME, ResourceLocation.withDefaultNamespace(name));
             helper.assertTrue(biomes.getHolderOrThrow(key).is(uranium), name + " permits uranium");
         }
-        for (String name : new String[] { "plains", "river", "ocean" }) {
+        for (String name : new String[] { "nether_wastes", "the_end" }) {
             var key = ResourceKey.create(Registries.BIOME, ResourceLocation.withDefaultNamespace(name));
-            helper.assertTrue(!biomes.getHolderOrThrow(key).is(uranium), name + " stays outside frontier uranium");
+            helper.assertTrue(!biomes.getHolderOrThrow(key).is(uranium), name + " stays outside overworld uranium");
         }
         helper.succeed();
+    }
+
+    @GameTest(template="empty")
+    public static void depositClimateUsesNativeBiomeTemperature(GameTestHelper h){
+        var biomes=h.getLevel().registryAccess().registryOrThrow(Registries.BIOME);
+        for(String name:new String[]{"desert","savanna","jungle","plains","forest","taiga","snowy_plains"}){
+            var biome=biomes.get(ResourceLocation.withDefaultNamespace(name));
+            var climate=DepositDistribution.climate(biome.getBaseTemperature());
+            var expected=name.equals("desert")||name.equals("savanna")||name.equals("jungle")?DepositDistribution.Climate.HOT
+                    :name.equals("taiga")||name.equals("snowy_plains")?DepositDistribution.Climate.COLD:DepositDistribution.Climate.TEMPERATE;
+            h.assertTrue(climate==expected,"Native climate classification: "+name);
+        }
+        h.succeed();
     }
 
     @GameTest(template = "empty", templateNamespace = "civilization")

@@ -17,6 +17,47 @@ import net.neoforged.neoforge.gametest.*;
 public final class BlockCarryGameTests {
     private static FakePlayer player(GameTestHelper h){var p=new FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"block-carry"));p.setGameMode(GameType.SURVIVAL);p.setPos(h.absolutePos(new BlockPos(4,2,4)).getCenter());return p;}
     private static ItemEntity drop(GameTestHelper h,ItemStack stack){var d=new ItemEntity(h.getLevel(),0,2,0,stack);d.setNoPickUpDelay();return d;}
+    @GameTest(template="industrial") public static void smallPlaceablesUseNormalPocketsAndHandControls(GameTestHelper h){
+        var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
+        for(var item:new Item[]{Items.WHEAT_SEEDS,Items.BEETROOT_SEEDS,Items.PUMPKIN_SEEDS,Items.MELON_SEEDS,Items.TORCHFLOWER_SEEDS,Items.PITCHER_POD,
+                Items.CARROT,Items.POTATO,Items.SWEET_BERRIES,Items.GLOW_BERRIES,Items.COCOA_BEANS,Items.NETHER_WART,
+                Items.OAK_SAPLING,Items.DANDELION,Items.RED_MUSHROOM,Items.SUGAR_CANE,Items.BAMBOO,Items.CACTUS,Items.KELP,Items.VINE,
+                Items.TORCH,Items.LANTERN,Items.RED_CANDLE,Items.RAIL,Items.LADDER,Items.CHAIN,Items.REDSTONE,Items.REPEATER,Items.COMPARATOR,
+                Items.STONE_BUTTON,Items.STONE_PRESSURE_PLATE,Items.POLISHED_BLACKSTONE_PRESSURE_PLATE,Items.OAK_SIGN,Items.OAK_HANGING_SIGN,Items.WHITE_CARPET,Items.FLOWER_POT,Items.TUBE_CORAL_FAN,
+                Items.CAKE,Items.AMETHYST_CLUSTER,Items.LIGHTNING_ROD}){
+            h.assertTrue(!BlockCarry.block(item.getDefaultInstance()),"Small supplies are ordinary inventory goods: "+item);
+            var entity=drop(h,new ItemStack(item,3));entity.playerTouch(p);
+            h.assertTrue(entity.isRemoved()&&p.getInventory().countItem(item)==3&&p.getOffhandItem().getCount()==32,"Real pickup admits small supplies beside a full building hand: "+item);
+            p.getInventory().clearContent();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
+        }
+        var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.WHEAT_SEEDS,32));
+        var menu=ChestMenu.threeRows(1,p.getInventory(),chest);menu.quickMoveStack(p,0);
+        h.assertTrue(chest.getItem(0).isEmpty()&&p.getInventory().countItem(Items.WHEAT_SEEDS)==32,"Seed shift-click enters normal pockets");
+        menu.setCarried(new ItemStack(Items.WHEAT_SEEDS,8));menu.clicked(27,0,ClickType.PICKUP,p);
+        h.assertTrue(menu.getCarried().isEmpty()&&p.getInventory().getItem(9).is(Items.WHEAT_SEEDS),"Seed cursor placement is admitted");
+        h.assertTrue(BlockCarry.normalize(p)==0&&p.getInventory().countItem(Items.WHEAT_SEEDS)==40,"Normalization preserves seeds instead of saving them as cargo");
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.WHEAT_SEEDS,8));
+        var swap=new net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent.Hands(p);BlockCarry.swap(swap);
+        h.assertTrue(!swap.isCanceled()&&p.inventoryMenu.getSlot(36).mayPlace(new ItemStack(Items.WHEAT_SEEDS)),"Seeds can enter the main hand and hotbar");
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
+        var recovery=BlockCarryRecovery.get(p.server);recovery.store(p.getUUID(),new ItemStack(Items.WHEAT_SEEDS,5));
+        h.assertTrue(recovery.recover(p)==5&&p.getInventory().countItem(Items.WHEAT_SEEDS)==45,"Seeds saved by older builds recover into ordinary pockets");h.succeed();
+    }
+    @GameTest(template="industrial") public static void reviewedCargoStillIncludesConstructionAndBulkyFixtures(GameTestHelper h){
+        for(var item:new Item[]{Items.STONE,Items.DIRT,Items.OAK_LOG,Items.OAK_PLANKS,Items.STONE_SLAB,Items.STONE_STAIRS,Items.COBBLESTONE_WALL,
+                Items.OAK_FENCE,Items.OAK_DOOR,Items.OAK_TRAPDOOR,Items.GLASS,Items.WHITE_WOOL,Items.REDSTONE_BLOCK,Items.HAY_BLOCK,Items.CHEST,
+                Items.FURNACE,Items.RED_BED,Items.SHULKER_BOX,Items.TUBE_CORAL_BLOCK,Items.CHERRY_LEAVES,Items.FLOWERING_AZALEA_LEAVES,IndustrialContent.PUMP.get().asItem()})
+            h.assertTrue(BlockCarry.block(item.getDefaultInstance()),"Bulky construction/fixtures retain the hand allowance: "+item);
+        h.assertTrue(BlockCarry.block(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1)),"Cut pieces retain the hand allowance");
+        // A complete registry receipt makes other unusual BlockItems reviewable without geometry heuristics.
+        try{
+            var rows=new java.util.ArrayList<String>();
+            for(var item:net.minecraft.core.registries.BuiltInRegistries.ITEM)if(item instanceof BlockItem)
+                rows.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item)+"\t"+(BlockCarry.block(item.getDefaultInstance())?"offhand":"inventory"));
+            java.nio.file.Files.write(java.nio.file.Path.of("block-carry-classification.tsv"),rows);
+        }catch(java.io.IOException e){throw new RuntimeException(e);}
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void realGroundPickupsFillOnlyOffhandAndLeaveRemainder(GameTestHelper h){
         var p=player(h);p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));
         var stone=drop(h,new ItemStack(Items.STONE,20));stone.playerTouch(p);
