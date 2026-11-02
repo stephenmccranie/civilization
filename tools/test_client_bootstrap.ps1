@@ -2,6 +2,8 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 . "$root/modpack/overrides/civilization-updater/Start-Civilization.ps1"
+$script:progressEvents=[Collections.Generic.List[string]]::new()
+function Open-CivProgress([string]$Title,[string]$Detail,[long]$ExpectedBytes=0) { $script:progressEvents.Add("$Title|$Detail|$ExpectedBytes") }
 $fixture=Join-Path $root ('.tools/bootstrap-tests/'+[guid]::NewGuid().ToString('N'))
 $game=Join-Path $fixture 'minecraft'
 $homeDir=Join-Path $game 'civilization-updater'
@@ -59,4 +61,5 @@ Expect-Failure { Initialize-CivClient $game }
 $manifest.files[1].path='mods/dependency.jar'; $manifest.files[1].downloads=@('https://example.com/evil.jar'); Write-Manifest
 Expect-Failure { Initialize-CivClient $game }
 if ((Get-Content "$game/options.txt" -Raw).Trim() -ne 'personal setting') { throw 'Personal config changed' }
+if (!($script:progressEvents | Where-Object { $_ -match 'Setting up Civilization\|File 2 of 2: dependency.jar\|[1-9]' }) -or !($script:progressEvents | Where-Object { $_ -match 'Verifying dependency.jar' })) { throw 'Missing setup download/verification progress' }
 Write-Host 'PASS: first install, failed/corrupt download, retry, offline repeat launch, no downgrade, missing-file repair, traversal/host rejection, personal settings preservation.'

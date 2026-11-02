@@ -3,6 +3,8 @@ $ErrorActionPreference='Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $source = Join-Path $root 'modpack/overrides/civilization-updater'
 . "$source/Update-Civilization.ps1"
+$script:progressEvents=[Collections.Generic.List[string]]::new()
+function Open-CivProgress([string]$Title,[string]$Detail,[long]$ExpectedBytes=0) { $script:progressEvents.Add("$Title|$Detail|$ExpectedBytes") }
 $fixture = Join-Path $root ('.tools/updater-tests/' + [guid]::NewGuid().ToString('N'))
 $game = Join-Path $fixture 'minecraft'
 New-Item -ItemType Directory -Path "$game/mods","$game/civilization-updater" -Force | Out-Null
@@ -60,4 +62,5 @@ $before=$script:downloads; Invoke-CivUpdate $fixture
 if ($script:downloads -ne $before) { throw 'Same version redownloaded' }
 $script:manifest.version='0.35.3-dev'; Invoke-CivUpdate $fixture
 if ($script:downloads -ne $before) { throw 'Downgrade attempted' }
-Write-Host 'PASS: offline, corrupt download, protocol, loader, URL, locked JAR, concurrent updater, running game, duplicate, atomic update/rollback, same version, downgrade.'
+if (!($script:progressEvents | Where-Object { $_ -match 'Updating Civilization\|0.35.0-dev -> 0.35.4-dev\|[1-9]' }) -or !($script:progressEvents | Where-Object { $_ -match 'Verifying the downloaded mod' })) { throw 'Missing mod update download/verification progress' }
+Write-Host 'PASS: offline, corrupt download, protocol, loader, URL, locked JAR, concurrent updater, running game, duplicate, atomic update/rollback, same version, downgrade, update progress.'

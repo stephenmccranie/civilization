@@ -42,13 +42,18 @@ function Initialize-CivClient([string]$Game) {
     if ($keepCiv -and $missing.Count -eq 0 -and (Test-Path -LiteralPath $receipt) -and [IO.File]::ReadAllText($receipt) -eq $stamp) { return }
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $partial = Join-Path $homeDir 'bootstrap.partial'
+    Open-CivProgress 'Setting up Civilization' 'Checking required client files...'
     try {
+        $position=0
         foreach ($item in $manifest.files) {
+            $position++
             if ($item -eq $civItems[0] -and $keepCiv) { continue }
             $destination = Join-Path $Game $item.path
             if (Test-CivPinnedFile $destination $item) { continue }
             Write-Host "Installing $($item.path)..."
+            Open-CivProgress 'Setting up Civilization' "File $position of $($manifest.files.Count): $(Split-Path $item.path -Leaf)" $item.fileSize
             Save-CivDownload $item.downloads[0] $partial
+            Open-CivProgress 'Setting up Civilization' "Verifying $(Split-Path $item.path -Leaf)..."
             if (!(Test-CivPinnedFile $partial $item)) { throw "Download verification failed: $($item.path)" }
             $zip = [IO.Compression.ZipFile]::OpenRead($partial); $zip.Dispose()
             New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
@@ -57,7 +62,7 @@ function Initialize-CivClient([string]$Game) {
         }
         [IO.File]::WriteAllText($receipt, $stamp)
         Write-Host 'Civilization client files are ready.'
-    } finally { if (Test-Path -LiteralPath $partial) { Remove-Item -LiteralPath $partial } }
+    } finally { if (Test-Path -LiteralPath $partial) { Remove-Item -LiteralPath $partial }; Close-CivProgress }
 }
 function Start-CivClient([string]$Instance) {
     if (!$Instance -or !(Test-Path -LiteralPath (Join-Path $Instance 'mmc-pack.json'))) { throw 'Expected a Prism instance directory' }
@@ -70,5 +75,6 @@ function Start-CivClient([string]$Instance) {
     } finally { $guard.Dispose() }
 }
 if ($MyInvocation.InvocationName -ne '.') {
-    try { Start-CivClient $InstancePath } catch { Write-Error $_; exit 1 }
+    $script:CivShowProgress=$true
+    try { Start-CivClient $InstancePath } catch { Show-CivFailure "Setup could not finish. Click Play in Prism to retry.`n`n$($_.Exception.Message)"; Write-Error $_; exit 1 } finally { Close-CivProgress }
 }

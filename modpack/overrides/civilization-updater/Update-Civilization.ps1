@@ -3,12 +3,83 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
+$script:CivShowProgress = $false
+$script:CivProgress = $null
+
+function New-CivProgressWindow {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+        $form = [Windows.Forms.Form]::new()
+        $form.Text = 'Civilization Launcher'
+        $form.ClientSize = [Drawing.Size]::new(520,160)
+        $form.StartPosition = 'CenterScreen'
+        $form.FormBorderStyle = 'FixedDialog'
+        $form.MaximizeBox = $false; $form.MinimizeBox = $false
+        $form.ControlBox = $false
+        $heading = [Windows.Forms.Label]::new(); $heading.SetBounds(20,16,480,28)
+        $heading.Font = [Drawing.Font]::new('Segoe UI',12,[Drawing.FontStyle]::Bold)
+        $label = [Windows.Forms.Label]::new(); $label.SetBounds(20,50,480,38)
+        $bar = [Windows.Forms.ProgressBar]::new(); $bar.SetBounds(20,94,480,22)
+        $status = [Windows.Forms.Label]::new(); $status.SetBounds(20,126,480,24)
+        $form.Controls.AddRange(@($heading,$label,$bar,$status))
+        return @{Form=$form;Heading=$heading;Label=$label;Bar=$bar;Status=$status;Expected=0L}
+}
+function Open-CivProgress([string]$Title, [string]$Detail, [long]$ExpectedBytes=0) {
+    if (!$script:CivShowProgress) { return }
+    if (!$script:CivProgress) {
+        $script:CivProgress=New-CivProgressWindow
+        $script:CivProgress.Form.Show(); $script:CivProgress.Form.Activate()
+    }
+    $script:CivProgress.Heading.Text = $Title
+    $script:CivProgress.Label.Text = $Detail
+    $script:CivProgress.Expected = $ExpectedBytes
+    $script:CivProgress.Status.Text = 'Please wait. Minecraft will start automatically.'
+    $script:CivProgress.Bar.Style = 'Marquee'
+    [Windows.Forms.Application]::DoEvents()
+}
+function Update-CivProgress([long]$Bytes) {
+    if (!$script:CivProgress) { return }
+    $expected=$script:CivProgress.Expected
+    if ($expected -gt 0) {
+        $script:CivProgress.Bar.Style='Continuous'
+        $script:CivProgress.Bar.Value=[int][Math]::Min(100,100.0*$Bytes/$expected)
+        $script:CivProgress.Status.Text=('{0:N1} / {1:N1} MB downloaded' -f ($Bytes/1MB),($expected/1MB))
+    }
+    [Windows.Forms.Application]::DoEvents()
+}
+function Close-CivProgress {
+    if ($script:CivProgress) { $script:CivProgress.Form.Close(); $script:CivProgress.Form.Dispose(); $script:CivProgress=$null }
+}
+function Show-CivFailure([string]$Message) {
+    if (!$script:CivShowProgress) { return }
+    Add-Type -AssemblyName System.Windows.Forms
+    [Windows.Forms.MessageBox]::Show($Message,'Civilization Launcher','OK','Error') | Out-Null
+}
 
 function Get-CivJson([string]$Url) {
     Invoke-RestMethod -Uri $Url -Headers @{ 'User-Agent'='Civilization-updater/1' } -TimeoutSec 15
 }
 function Save-CivDownload([string]$Url, [string]$Path) {
-    Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -TimeoutSec 90
+    $client=[Net.WebClient]::new()
+    $client.Headers['User-Agent']='Civilization-updater/1'
+    try {
+        # Complete on the thread pool, independently of the optional UI message loop.
+        $context=[Threading.SynchronizationContext]::Current
+        try {
+            [Threading.SynchronizationContext]::SetSynchronizationContext($null)
+            $task=$client.DownloadFileTaskAsync([uri]$Url,$Path)
+        } finally { [Threading.SynchronizationContext]::SetSynchronizationContext($context) }
+        $watch=[Diagnostics.Stopwatch]::StartNew(); $lastBytes=-1L
+        while (!$task.IsCompleted) {
+            $bytes=if (Test-Path -LiteralPath $Path) { (Get-Item -LiteralPath $Path).Length } else { 0L }
+            if ($bytes -ne $lastBytes) { $watch.Restart(); $lastBytes=$bytes }
+            Update-CivProgress $bytes
+            if ($watch.Elapsed.TotalSeconds -gt 90) { $client.CancelAsync(); throw 'Download stalled for 90 seconds' }
+            [Threading.Thread]::Sleep(100)
+        }
+        $task.GetAwaiter().GetResult()
+        if (Test-Path -LiteralPath $Path) { Update-CivProgress (Get-Item -LiteralPath $Path).Length }
+    } finally { $client.Dispose() }
 }
 function Assert-CivUrl([string]$Url, [string]$Tag) {
     $prefix = 'https://github.com/stephenmccranie/civilization/releases/download/' + $Tag + '/'
@@ -77,7 +148,9 @@ function Invoke-CivUpdateLocked([string]$Instance) {
         Assert-CivUrl $manifest.downloadUrl $release.tag_name
         if ($manifest.sha256 -notmatch '^[0-9a-f]{64}$' -or $manifest.size -le 0 -or $manifest.size -gt 67108864) { throw 'Invalid artifact metadata' }
         $partial = Join-Path $homeDir 'download.partial'
+        Open-CivProgress 'Updating Civilization' "$version -> $($manifest.version)" $manifest.size
         Save-CivDownload $manifest.downloadUrl $partial
+        Open-CivProgress 'Updating Civilization' 'Verifying the downloaded mod...'
         if ((Get-Item -LiteralPath $partial).Length -ne $manifest.size -or (Get-FileHash -LiteralPath $partial -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifest.sha256) { throw 'Update checksum or size mismatch' }
         if ((Get-CivJarVersion $partial) -ne $manifest.version) { throw 'Update version mismatch' }
         Assert-CivStopped $game
@@ -85,12 +158,17 @@ function Invoke-CivUpdateLocked([string]$Instance) {
         # Same-volume atomic replacement; the previous mod stays outside the mods folder.
         [IO.File]::Replace($partial, $current, (Join-Path $homeDir 'previous.jar'), $true)
         Write-Host "Civilization updated: $version -> $($manifest.version)"
-    } catch { Write-Warning "Civilization update skipped: $($_.Exception.Message). Keeping $version." }
+    } catch {
+        Write-Warning "Civilization update skipped: $($_.Exception.Message). Keeping $version."
+        if ($script:CivProgress) { Show-CivFailure "The update could not finish. Keeping $version and continuing launch.`n`n$($_.Exception.Message)" }
+    }
     finally {
+        Close-CivProgress
         $partial = Join-Path $homeDir 'download.partial'
         if (Test-Path -LiteralPath $partial) { Remove-Item -LiteralPath $partial }
     }
 }
 if ($MyInvocation.InvocationName -ne '.') {
-    try { Invoke-CivUpdate $InstancePath } catch { Write-Error $_; exit 1 }
+    $script:CivShowProgress=$true
+    try { Invoke-CivUpdate $InstancePath } catch { Show-CivFailure $_.Exception.Message; Write-Error $_; exit 1 } finally { Close-CivProgress }
 }
