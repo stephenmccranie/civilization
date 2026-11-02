@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "game": "minecraft",
-  "versionId": "playtest-0.35.0-1",
+  "versionId": "playtest-0.35.4-1",
   "name": "Civilization Playtest",
   "summary": "Civilization server client: Distant Horizons, Photon Medium and Patrix 32x. Server address supplied privately.",
   "dependencies": {
     "minecraft": "1.21.1",
-    "neoforge": "21.1.250"
+    "neoforge": "21.1.265"
   },
   "files": [
     {
@@ -25,19 +25,19 @@
       "fileSize": 3717245
     },
     {
-      "path": "mods/civilization-0.35.0-dev.jar",
+      "path": "mods/civilization-0.35.4-dev.jar",
       "hashes": {
-        "sha1": "3d578835a85dbed58a653e0b530b16d83364afc2",
-        "sha512": "128adabf37a510a6f1f9d786b6bf53506a8863edb252823a8a35c569f078bb7ae2f45d2b8a5c30d1b1381b795ef614984dad428b2af18225eb67dc831186bf3d"
+        "sha1": "134d5b60160fded0b10f83cbd2eaaee5c7bd7a22",
+        "sha512": "9353fa9499d569e571349590234d4aec1ca84df0d36c368c417521d8960dc6bdbdd50b47bb7c098a917b416e2747d75d92479c3e64f471e841bc0346d78b72b0"
       },
       "env": {
         "client": "required",
         "server": "unsupported"
       },
       "downloads": [
-        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.0-1/civilization-0.35.0-dev.jar"
+        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.4-1/civilization-0.35.4-dev.jar"
       ],
-      "fileSize": 5372582
+      "fileSize": 5375231
     },
     {
       "path": "mods/ContinuityNeoForge-3.0.8+1.21.1.jar",

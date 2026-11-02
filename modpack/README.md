@@ -46,13 +46,25 @@ The current server separately caps generation requests at 64 and synchronization
 
 Photon's Medium profile is expanded into its actual shader option values so it applies on first launch. Patrix's material mapping and the existing high-altitude cloud settings are additional overrides. [Photon](https://modrinth.com/shader/photon-shader) and [Patrix](https://modrinth.com/resourcepack/patrix-32x) remain their authors' work and retain their original licenses. This includes only the freely available **32x Basic** pack, not paid resolutions or optional Patrix add-ons.
 
+## Automatic Civilization updates
+
+The next **local, unpublished** pack candidate is `playtest-0.35.4-1`, with Civilization 0.35.4-dev, Minecraft 1.21.1 and NeoForge 21.1.265. The download at the top still points to the current published pack, which does not contain the updater.
+
+The updater is part of the pack, outside the mod. Windows/Prism players enable it once: close Minecraft and Prism, open the instance's Minecraft folder, and run `civilization-updater/Install-Client-Updates.cmd`. Then start Prism normally. For an existing instance, extract the Windows updater ZIP into its Minecraft folder first. Installation preserves Java arguments and personal settings; it refuses to replace an existing custom launch command. Other launchers/platforms still use manual installation.
+
+Before each game launch, the updater checks this repository's published `playtest-*` GitHub Releases, including prereleases. Only Releases with a `civilization-update.json` asset participate. It installs a strictly newer Civilization version after verifying the owned GitHub URL, file size, SHA-256 and embedded mod identity/version. The replacement is atomic; one previous JAR stays in `civilization-updater/previous.jar`, outside `mods`. The installed filename may retain its original version; the embedded mod version is authoritative. Duplicate Civilization JARs are rejected.
+
+Only the Civilization JAR changes. Personal controls, DH bandwidth/quality, other mods and saved data are preserved. Network/download failures retain the verified installed JAR and allow launch. An incompatible Minecraft/NeoForge baseline or protocol requires an announced full-pack upgrade; the updater does not change the loader. It never downgrades or replaces a same-version private build. GitHub is the release trust boundary; the public feed needs no account or token. API rate limits or offline access simply skip that check.
+
+To roll back, close Minecraft, turn off the instance pre-launch command, move the single Civilization JAR out of `mods`, and copy `previous.jar` into `mods` as `civilization-client.jar`. Leave only one Civilization JAR. A later automatic check would otherwise reinstall the newer approved version. Updater-script changes require a new one-time installer or full pack; scripts do not update themselves.
+
 ## Included files and updates
 
 The [manifest](modrinth.index.json) is the authoritative list of all 21 pinned downloads: Civilization, GeckoLib, Sable, Jade, JEI, JourneyMap, Kiwi, Snow! Real Magic!, DH, Sodium, Iris, Lithium, FerriteCore, C2ME, Lithostitched, Grassier Grass, Continuity, **Entity Texture Features** and **Entity Model Features**, plus Photon and Patrix. ETF 7.2.6 and EMF 3.3.12 match the development instance and support Patrix's entity textures/models. Dependencies embedded by their authors, such as JEI's MezzConfig, remain inside the original downloaded JARs.
 
 This is a snapshot of the reviewed development client, not a minimal mandatory-mod list. The client-side performance and presentation mods can differ from the server; C2ME and Lithostitched are retained for parity with that instance, not required to join. Terrain Diffusion world generation remains on the server. The download contains no worlds, LOD caches, waypoints, saved servers, credentials, launcher account data or machine-specific Java settings.
 
-Keep this as its own playtest instance. Do not update every mod independently: DH/Iris/Sodium versions and the exact Civilization version are pinned together. When the host announces a new pack, import that release into a new instance and retain the old one until the replacement works. Personal controls and hardware choices are not overwritten by an automatic updater.
+Keep this as its own playtest instance. Leave third-party mod versions pinned together. Approved compatible Civilization releases can update through the pre-launch hook above. When the host announces a new Minecraft/loader/dependency baseline, import the full pack into a new instance and retain the old one until the replacement works; enable its updater once.
 
 The earlier 0.34.54 pack revision 2 added GUI scale 4× and FOV 90°, and disabled Grassier Grass's blade particles and “grass plants as blades.” Existing revision-1 installations can change those four settings in-game without downloading mods again. Minecraft stores 90° as `fov:0.5` in `options.txt`; Grassier Grass stores `bladeParticles=false` and `grassPlantsAsBlades=false` in the `[rendering]` section of `config/grassiergrass-client.toml`.
 
@@ -60,7 +72,7 @@ If the machine struggles, disable shaders first or reduce DH distance while keep
 
 ## Maintaining the release
 
-Only reviewed public manifest/settings files live in this folder. Never export the whole development instance. The builder accepts exactly five override files and rejects IPv4 address literals, machine paths and unreviewed download hosts; it never reads a user's instance or saved-server list.
+Only reviewed public manifest/settings files live in this folder. Never export the whole development instance. The builder accepts exactly eight override files (five settings files and three updater/installer scripts) and rejects IPv4 address literals, machine paths and unreviewed download hosts; it never reads a user's instance or saved-server list.
 
 From the repository root, with Python 3.11 or later:
 
@@ -70,4 +82,14 @@ python tools/build_player_pack.py --check-downloads
 
 This verifies downloaded file sizes, both hashes and ZIP integrity, then writes a deterministic `.mrpack` and SHA-256 sidecar under ignored `.tools/player-pack-build/`. Before publishing a new Civilization JAR, add `--local-civilization path/to/civilization-version.jar` to verify that candidate locally. After publishing, run without that argument using a fresh cache to verify the public GitHub asset too.
 
-Keep small pack and gameplay adjustments local with the current development batch. When a substantial publication milestone is authorized, update the versioned manifest URLs/hashes and settings together, validate, merge the batch, and publish the `.mrpack`, its checksum and our matching Civilization JAR as assets on that release tag. Upload no third-party archives. Source-only changes to this pack do not change the mod version. A real Prism import, remote join, shader appearance and performance still require a player check; hash/archive verification alone does not prove those behaviors.
+Keep small pack and gameplay adjustments local with the current development batch. Tags identify source commits; **GitHub Releases distribute approved client updates**. Existing playtest Releases are prereleases, so the updater lists Releases explicitly instead of using GitHub's stable-only `latest` endpoint. Creating a tag alone never triggers an update.
+
+For an authorized substantial release:
+
+1. Finish local validation, merge the approved source batch, and choose `playtest-X.Y.Z-N` on the verified published commit. Increase the mod version for code changes; increase `N` for pack-only revisions.
+2. Update the manifest's versioned Civilization URL, hashes and loader baseline. Prepare assets locally with `python tools/prepare_client_release.py --jar path/to/civilization-version.jar --check-downloads`. This verifies all 21 downloads and creates the pack, Civilization JAR, Windows installer ZIP, update manifest and SHA-256 sidecars under ignored `.tools/client-release/`. The builder never publishes.
+3. Create a **draft prerelease** for the tag. Upload those assets, verify the asset set and checksums, and write release notes describing player changes, compatibility and any migration. Upload no third-party archives.
+4. Publish the draft last. The `civilization-update.json` asset makes that published Release eligible for automatic client updates. Server-only changes need no client Release/manifest. Do not delete or silently replace published binary assets; fix them with a new version.
+5. Verify the public downloads with a fresh builder cache, then update the public download links. Import the pack in Prism and check the hook, remote join and appearance before declaring the distribution proven. Archive/hash checks do not prove these player behaviors.
+
+Run focused offline Windows checks with `powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test_client_updater.ps1`. No gameplay source changes are involved in updater-only changes. Never publish a draft until its complete asset set has been reviewed.

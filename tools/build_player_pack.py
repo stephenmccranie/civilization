@@ -16,6 +16,9 @@ SOURCE = ROOT / 'modpack'
 OVERRIDES = {
     'config/DistantHorizons.toml', 'config/iris.properties', 'config/grassiergrass-client.toml', 'options.txt',
     'shaderpacks/photon_v1.3b.zip.txt',
+    'civilization-updater/Update-Civilization.ps1',
+    'civilization-updater/Install-CivilizationUpdater.ps1',
+    'civilization-updater/Install-Client-Updates.cmd',
 }
 USER_AGENT = 'Civilization-playtest-pack/1 (github.com/stephenmccranie/civilization)'
 
