@@ -86,6 +86,16 @@ For Survival/Adventure, a **Hand** slot appears beside the hotbar in cargo, ches
 
 Filled shulker boxes, bundles and other component-backed portable containers cannot be carried as hidden extra loads; empty shells retain normal item/block rules. On login and between server transactions, old or externally misplaced block stacks and filled portable containers move to a private saved recovery balance after filling the permitted hand stack. They are not deleted, discarded into despawning drops or made available as extra working inventory. Use **`/civilization recoverblocks`** with a free/matching offhand to withdraw the next permitted block stack. Recovery is owned by player UUID and persists across reload/death; it has no ordinary deposit action. A saved filled container is unpacked one layer per command, preserving its contents and empty shell in recovery without recursive inventory scans; repeat the command as instructed. Non-block contents return to ordinary inventory space.
 
+### Shared crafting tables
+
+Placed vanilla crafting tables keep their nine input slots in the world. Closing a table, walking away or disconnecting leaves those ingredients there; another player opening the same table sees and can use the same grid, subject to existing claim access. Open viewers receive input and recipe-result changes together. Each table has separate storage, and slot positions, stack counts and item components persist with the dimension's saved data across reloads.
+
+Stage logs in the table, close it to free your Hand, then return with planks or other supplies. Personal carrying limits remain unchanged. The 2×2 player crafting grid retains vanilla behavior. Existing placed tables gain shared storage when opened; no replacement block or recipe is needed.
+
+Breaking or replacing the table drops its remaining inputs exactly once and invalidates its open menus. Outputs are recipe previews, not extra saved stock: crafting consumes the shared ingredients through the normal recipe/remainder path. There is no ticking block entity, polling task or hopper inventory added. Moving/replacing the physical block spills its ingredients rather than transferring a second hidden inventory.
+
+This behavior is server-owned and uses the native crafting menu and packets, so existing protocol-compatible clients can use it without an update. Client carrying fixes still have their separate version requirement above.
+
 ### Cargo and transfers
 
 The classification runs in both client inventory controls and server enforcement. Use the updated client mod for the corrected small-item slots; older protocol-compatible clients can still join but retain their old slot restrictions. Seeds already in offhand can be moved normally. Small supplies saved by an older build's normalization recover into ordinary pockets through `/civilization recoverblocks`; no stored stock is deleted.

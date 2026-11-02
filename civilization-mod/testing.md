@@ -20,6 +20,8 @@ The focused `derrick-guide` scene also checks ambient-light sampling: the opaque
 
 `ConnectionGameTests` inspects the real required core-channel registration and runs NeoForge negotiation for matching clients, the unchanged published 0.35.0 client, missing Civilization and incompatible protocol IDs. It verifies that release metadata no longer defines compatibility. Use Gameplay verification for connection-version changes; no rendered scene changes. This checks the native negotiation path, not a real remote login or tamper resistance.
 
+`SharedCraftingGameTests` checks native offhand staging across close/reopen, two viewers and stale-output rejection, saved slots/counts/components, exact drops on table removal, separate tables, initial recipe refresh and revoked claim access. The coarse thermal interface fixture uses its own 12-block-high template to contain its geometry and explicitly opens the measured sky-probe column; it must not assume that short-template clearing removes all overhead terrain.
+
 | Change | Check |
 | --- | --- |
 | Documentation or local configuration | Inspect the edit; no Minecraft launch |

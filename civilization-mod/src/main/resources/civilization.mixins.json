@@ -11,6 +11,8 @@
     "BlockCarrySlotMixin",
     "BlockCarryMenuMixin",
     "InventoryMenuMixin",
+    "SharedCraftingMenuMixin",
+    "SharedCraftingTableRemovalMixin",
     "ServerPlayerMixin",
     "CakeMixin",
     "ItemStackMixin",

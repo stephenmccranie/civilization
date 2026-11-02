@@ -7,7 +7,7 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class ThermalConsistencyGameTests {
-    @GameTest(template="industrial") public static void coarseMaterialInterfacesRemainStableAndConservative(GameTestHelper h){
+    @GameTest(template="thermal_interface") public static void coarseMaterialInterfacesRemainStableAndConservative(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
         for(var block:java.util.List.of(Blocks.BRICKS,Blocks.OAK_PLANKS,Blocks.IRON_BLOCK,Blocks.BRICK_SLAB)){
             for(var at:BlockPos.betweenClosed(p.offset(-3,-3,-3),p.offset(3,3,3)))
@@ -29,7 +29,11 @@ public final class ThermalConsistencyGameTests {
         // five material interfaces, rather than over-spending the air cell.
         for(var at:BlockPos.betweenClosed(p.offset(-3,-3,-3),p.offset(3,3,3)))l.setBlockAndUpdate(at,Blocks.AIR.defaultBlockState());
         for(var direction:Direction.values())if(direction!=Direction.UP)l.setBlockAndUpdate(p.relative(direction),Blocks.IRON_BLOCK.defaultBlockState());
-        h.assertTrue(l.canSeeSky(p),"Exposed-pocket regression requires an open sky column");
+        // This probe must see sky even when fresh test terrain extends above the template.
+        int roof=l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ());
+        for(int y=p.getY()+1;y<roof;y++)l.setBlockAndUpdate(new BlockPos(p.getX(),y,p.getZ()),Blocks.AIR.defaultBlockState());
+        var sky=l.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p);
+        h.assertTrue(l.canSeeSky(p),"Exposed-pocket regression requires an open sky column: probe="+p+", top="+sky+", obstruction="+l.getBlockState(sky.below()));
         for(int duration:new int[]{2,4,8}){
             var field=new ThermalField();field.add(l,p,100);field.coarseStep(l,duration,true);
             for(long key:field.energy.keySet()){

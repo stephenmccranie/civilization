@@ -12,6 +12,8 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 The [Colt Paterson prototype](firearms.md) adds left-click firing, tap R to cock each shot or reload an empty gun, hold R for a partial reload from inventory .36 ammunition, slight recoil, the extracted firing sound and server-side bullets with drop, drag and damage.
 
+Vanilla [crafting tables keep a shared, saved input grid](physics.md#shared-crafting-tables). Leave ingredients on a table while fetching another hand-load; other permitted players can use the same supplies.
+
 Town manufacturing: [shared parts and Assembly Bench](manufacturing.md) connect Foundry/Smithy metals, hides, wool and timber to equipment, fixtures, vehicles, machinery and repairs. Final joining uses player labor; metal forming remains coal-fired.
 
 The [stove cooking prototype](cooking.md) adds one exposed skillet, a continuous heat dial, evolving color/sound cues, and quality-dependent calorie/work benefits. Load ingredients at the stove, then lift the skillet onto a solid counter to finish with residual heat and serve; it can return to the stove if underdone. Obtain **Prototype Stove** from Creative or `/give @s civilization:prototype_stove`; the full kitchen multiblocks remain future work.
