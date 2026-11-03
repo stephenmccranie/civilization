@@ -9,7 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
-import tempfile
+import uuid
 from pathlib import Path
 from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageStat
 import pipeline as legacy
@@ -251,10 +251,14 @@ def copy_bundle(asset, folder):
 def generate(prompt, references, dest):
     """Draw an image with Codex's image tool on the owner's ChatGPT sign-in; setup.py installs the pinned CLI."""
     codex = setup.DEST / 'codex'
-    with tempfile.TemporaryDirectory(dir=setup.DEST) as scratch:
-        out = Path(scratch) / 'image.png'
+    # A plain mkdir inherits the workspace ACL. tempfile's private directory grants only each file's owner,
+    # and the file's owner is Codex's sandbox user, so its image would be unreadable here.
+    scratch = setup.DEST / f'image-{uuid.uuid4().hex}'
+    scratch.mkdir()
+    try:
+        out = scratch / 'image.png'
         command = [str(codex / read(codex / 'codex-package.json')['entrypoint']), 'exec', '--skip-git-repo-check',
-                   '--sandbox', 'workspace-write', '--cd', scratch, *(a for p in references for a in ('--image', str(p)))]
+                   '--sandbox', 'workspace-write', '--cd', str(scratch), *(a for p in references for a in ('--image', str(p)))]
         request = ('Call your image generation tool once with exactly the prompt below, passing any attached images as references, '
                    f'and save the result as {out.name} in the current directory. Do nothing else.\n\n{prompt}')
         # The request goes on stdin because --image takes every following argument as another file.
@@ -262,6 +266,8 @@ def generate(prompt, references, dest):
         if not out.is_file(): raise ValueError('Codex saved no image')
         with Image.open(out) as opened: opened.verify()
         shutil.copyfile(out, dest)
+    finally:
+        shutil.rmtree(scratch)
 
 
 def record(asset, folder, stem, prompt, references, image=None):
