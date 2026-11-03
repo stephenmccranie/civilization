@@ -99,15 +99,24 @@ def inputs():
         {'uid': 'net.minecraft', 'version': index['dependencies']['minecraft'], 'important': True},
         {'uid': 'net.neoforged', 'version': index['dependencies']['neoforge'], 'important': True},
     ]}
-    output = {'minecraft/civilization-updater/client-files.json': raw,
-              'instance.cfg': cfg,
-              'mmc-pack.json': (json.dumps(components, indent=2) + '\n').encode()}
+    output = {'instance.cfg': cfg, 'mmc-pack.json': (json.dumps(components, indent=2) + '\n').encode()}
     for name in sorted(actual):
         content = (SOURCE / 'overrides' / name).read_bytes()
         public_text(content)
         if name.endswith('.toml'):
             tomllib.loads(content.decode('utf-8'))
         output['minecraft/' + name] = content
+    # The updater's scripts are managed like any other pack file, published as release assets, so installs update
+    # their own updater. Updaters from before this ignore the field.
+    index['updaterFiles'] = [{
+        'id': 'updater-' + PurePosixPath(name).stem.lower(),
+        'path': name,
+        'hashes': {kind: hashlib.new(kind, output['minecraft/' + name]).hexdigest() for kind in ('sha1', 'sha512')},
+        'fileSize': len(output['minecraft/' + name]),
+        'downloads': ['https://github.com/stephenmccranie/civilization/releases/download/'
+                      + index['versionId'] + '/' + PurePosixPath(name).name],
+    } for name in sorted(actual) if name.startswith('civilization-updater/')]
+    output['minecraft/civilization-updater/client-files.json'] = (json.dumps(index, indent=2) + '\n').encode()
     return index, output
 
 

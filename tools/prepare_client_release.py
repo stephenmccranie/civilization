@@ -45,6 +45,8 @@ def prepare(jar, output, check_downloads=False):
     if jar.resolve() != destination.resolve():
         shutil.copyfile(jar, destination)
     (output / 'civilization-pack.json').write_text(json.dumps(index, indent=2) + '\n', encoding='utf-8')
+    for item in index['updaterFiles']:
+        shutil.copyfile(pack.SOURCE / 'overrides' / item['path'], output / Path(item['path']).name)
     for path in (destination, output / 'civilization-pack.json'):
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         path.with_name(path.name + '.sha256').write_text(f'{digest}  {path.name}\n', encoding='utf-8')
