@@ -47,12 +47,13 @@ public final class CargoLedgerGameTests {
     }
     @GameTest(template="industrial") public static void adjacentStockpileTransfersOnlyWhatFitsAndKeepsRemainder(GameTestHelper h){
         var stock=stockpile(h);var wheel=barrow(h);var p=player(h);
-        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),64);wheel.cargo().insert(new ItemStack(Items.COBBLESTONE),300);
+        int tray=WheelbarrowEntity.GRID.capacity();
+        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),64);wheel.cargo().insert(new ItemStack(Items.COBBLESTONE),20);
         var menu=new CargoMenu(1,p.getInventory(),wheel);
-        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==WheelbarrowEntity.CAPACITY&&stock.cargo().entry(0).count()==40,"The wheelbarrow fills to its 324 blocks; the rest stays on the pallet");
+        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==64-(tray-20),"The wheelbarrow fills its tray; the rest stays on the pallet");
         menu.clickMenuButton(p,0);
-        h.assertTrue(wheel.cargo().entry(0).count()==WheelbarrowEntity.CAPACITY&&stock.cargo().entry(0).count()==40,"Repeated load cannot duplicate stock");
-        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().entry(0).count()==300&&stock.cargo().entry(0).count()==64,"Unload fills the pallet's stack and keeps the rest in the wheelbarrow");
+        h.assertTrue(wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==64-(tray-20),"Repeated load cannot duplicate stock");
+        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().entry(0).count()==20&&stock.cargo().entry(0).count()==64,"Unload fills the pallet's stack and keeps the rest in the wheelbarrow");
         var tag=stock.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new StockpileEntity(stock.getBlockPos(),stock.getBlockState());restored.loadWithComponents(tag,h.getLevel().registryAccess());
         h.assertTrue(restored.cargo().entry(0).count()==64,"Stockpile balance survives native persistence");h.succeed();
     }
@@ -66,7 +67,7 @@ public final class CargoLedgerGameTests {
         menu.clicked(0,0,ClickType.PICKUP,p);
         h.assertTrue(menu.getCarried().isEmpty()&&stock.cargo().entry(0).count()==32,"Click deposits cursor contents without cloning");
         stock.cargo().insert(new ItemStack(Items.STONE),100);menu.clicked(0,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(stock.cargo().count(0)==32&&p.getOffhandItem().getCount()==32&&p.getInventory().countItem(Items.STONE)==32,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
+        h.assertTrue(stock.cargo().count(0)==64-BlockCarry.LIMIT&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&p.getInventory().countItem(Items.STONE)==BlockCarry.LIMIT,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
         menu.clicked(CargoMenu.OFFHAND_SLOT,0,ClickType.QUICK_MOVE,p);
         h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==64,"Visible offhand slot deposits directly back into cargo");
         for(int i=0;i<36;i++)h.assertTrue(p.getInventory().getItem(i).getCount()<=p.getInventory().getItem(i).getMaxStackSize(),"Player stack caps remain unchanged");h.succeed();
@@ -80,22 +81,30 @@ public final class CargoLedgerGameTests {
         h.assertTrue(menu.getCarried().getHoverName().getString().equals("Stone 27")&&stock.cargo().size()==30,"A page withdraws its exact component identity");h.succeed();
     }
     @GameTest(template="industrial") public static void wheelbarrowHoldsTheVolumeItDraws(GameTestHelper h){
-        var e=barrow(h);
-        h.assertTrue(e.cargo().insert(new ItemStack(Items.STONE),400)==324&&e.cargo().insert(new ItemStack(Items.STONE),1)==0,"A wheelbarrow holds exactly the 324 blocks its tray draws");
-        e.cargo().remove(0,324);
-        h.assertTrue(e.cargo().insert(new ItemStack(Items.OAK_PLANKS),400)==324,"Volume, not mass, limits it: light planks fill the same tray");
-        e.cargo().remove(0,324);
-        h.assertTrue(e.cargo().insert(new ItemStack(Items.STONE_SLAB),1000)==648&&e.cargo().load()==324,"Slabs count as half a block");h.succeed();
+        var e=barrow(h);int tray=WheelbarrowEntity.GRID.capacity();
+        h.assertTrue(tray==36&&e.cargo().insert(new ItemStack(Items.STONE),400)==tray&&e.cargo().insert(new ItemStack(Items.STONE),1)==0,"A wheelbarrow holds exactly the 36 blocks its tray draws");
+        e.cargo().remove(0,tray);
+        h.assertTrue(e.cargo().insert(new ItemStack(Items.OAK_PLANKS),400)==tray,"Volume, not mass, limits it: light planks fill the same tray");
+        e.cargo().remove(0,tray);
+        h.assertTrue(e.cargo().insert(new ItemStack(Items.STONE_SLAB),1000)==2*tray&&e.cargo().load()==tray,"Slabs count as half a block");h.succeed();
+    }
+    @GameTest(template="industrial") public static void wheelbarrowsLoadedBeforeTheSmallerTrayKeepTheirLoad(GameTestHelper h){
+        // A barrow saved full under the old 324-block tray: nothing is removed, it draws full and takes nothing until under 36.
+        var wheel=barrow(h);var legacy=new CargoLedger(()->324,()->{});legacy.insert(new ItemStack(Items.STONE),324);
+        var tag=new CompoundTag();wheel.saveWithoutId(tag);tag.put("Cargo",legacy.save(h.getLevel().registryAccess()));
+        var loaded=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());loaded.load(tag);
+        h.assertTrue(loaded.cargo().count(0)==324&&loaded.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(loaded.cargo().load(),loaded.cargo().capacity()).equals("Overloaded: 324 / 36"),"An old full barrow keeps all 324 blocks and accepts nothing");
+        h.assertTrue(loaded.cargo().remove(0,290)==290&&loaded.cargo().insert(new ItemStack(Items.STONE),10)==2&&loaded.cargo().count(0)==36,"Once under 36 it takes goods again, up to its tray");h.succeed();
     }
     @GameTest(template="industrial") public static void overloadedWheelbarrowKeepsSavedStockAndSyncsLongCounts(GameTestHelper h){
         stockpile(h);var wheel=barrow(h);var p=player(h);
         // A barrow saved under the old mass limit can hold more than its tray; nothing is removed.
         var item=CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),3,1);long quantity=5_000_000_000L;
         var legacy=new CargoLedger(()->1e12,()->{});legacy.insert(item,quantity);wheel.cargo().load(legacy.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());
-        h.assertTrue(wheel.cargo().count(0)==quantity&&wheel.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(wheel.cargo().load(),wheel.cargo().capacity()).equals("Overloaded: 625,000,000 / 324"),"An overloaded wheelbarrow keeps its stock and accepts nothing");
+        h.assertTrue(wheel.cargo().count(0)==quantity&&wheel.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(wheel.cargo().load(),wheel.cargo().capacity()).equals("Overloaded: 625,000,000 / 36"),"An overloaded wheelbarrow keeps its stock and accepts nothing");
         var server=new CargoMenu(1,p.getInventory(),wheel);var client=new CargoMenu(1,p.getInventory());
         for(int i=0;i<CargoMenu.DATA;i++)client.data.set(i,(short)server.data.get(i));
-        h.assertTrue(client.count(0)==quantity&&client.load()==wheel.cargo().load()&&client.capacity()==WheelbarrowEntity.CAPACITY,"Signed-short menu synchronization retains full long counts and double loads");
+        h.assertTrue(client.count(0)==quantity&&client.load()==wheel.cargo().load()&&client.capacity()==WheelbarrowEntity.GRID.capacity(),"Signed-short menu synchronization retains full long counts and double loads");
         h.assertTrue(wheel.cargo().remove(0,32)==32,"Overloaded stock can still be taken off");h.succeed();
     }
     @GameTest(template="industrial") public static void loadedStockpileBreakAndRevokedClaimCannotRemoveStock(GameTestHelper h){

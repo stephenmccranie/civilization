@@ -42,7 +42,7 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
             g.renderComponentTooltip(font,java.util.List.of(hoveredSlot.getItem().getHoverName(),Component.literal(String.format(java.util.Locale.ROOT,"%,d items · click to take · Shift-click to move",menu.count(i)))),x,y);
         }
         if(menu.palletCount()>0&&x>=leftPos+8&&x<leftPos+168&&y>=topPos+25&&y<topPos+46){
-            var lines=new java.util.ArrayList<Component>();lines.add(Component.literal(menu.palletCount()==1?"One pallet holds "+StockpileEntity.CAPACITY+" blocks":"Shared by "+menu.palletCount()+" connected pallets, "+StockpileEntity.CAPACITY+" blocks each"));
+            var lines=new java.util.ArrayList<Component>();lines.add(Component.literal(menu.palletCount()==1?"One pallet holds "+StockpileEntity.GRID.capacity()+" blocks":"Shared by "+menu.palletCount()+" connected pallets, "+StockpileEntity.GRID.capacity()+" blocks each"));
             if(!(menu.load()<=menu.capacity()))lines.add(Component.literal("Accepts nothing until goods are taken off"));
             g.renderComponentTooltip(font,lines,x,y);
         }

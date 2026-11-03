@@ -18,9 +18,9 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 
 @EventBusSubscriber(modid="civilization")
 public final class StockpileBlock extends Block implements EntityBlock {
-    /** The 2-pixel timber base plus each started 3.5-pixel layer, so a full stack is a full block. */
-    private static final VoxelShape[] SHAPES=new VoxelShape[5];
-    static{for(int layers=0;layers<SHAPES.length;layers++)SHAPES[layers]=Block.box(0,0,0,16,2+layers*3.5,16);}
+    /** The 2-pixel timber base plus each started layer of the stack. */
+    private static final VoxelShape[] SHAPES=new VoxelShape[StockpileEntity.GRID.layers()+1];
+    static{for(int layers=0;layers<SHAPES.length;layers++)SHAPES[layers]=Block.box(0,0,0,16,2+layers*StockpileEntity.GRID.height()*16,16);}
     public StockpileBlock(){super(Properties.ofFullCopy(Blocks.OAK_PLANKS).strength(2,3600000).noOcclusion().dynamicShape().pushReaction(PushReaction.BLOCK));}
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){return SHAPES[l.getBlockEntity(p) instanceof StockpileEntity e?e.layers():0];}
     @Override public BlockEntity newBlockEntity(BlockPos p,BlockState s){return new StockpileEntity(p,s);}

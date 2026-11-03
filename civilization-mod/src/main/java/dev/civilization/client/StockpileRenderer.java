@@ -12,11 +12,10 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 /** A pallet's stack: each stored block is a quarter-size block, 4x4 per layer and four layers above the timber. */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class StockpileRenderer implements BlockEntityRenderer<StockpileEntity> {
-    private static final CargoVisuals.Grid GRID=new CargoVisuals.Grid(4,4,StockpileEntity.CAPACITY/StockpileEntity.LAYER,.25f,3.5f/16);
     private static final float BASE=2f/16;
     public StockpileRenderer(BlockEntityRendererProvider.Context c){}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(CargoContent.ENTITY.get(),StockpileRenderer::new);}
     @Override public void render(StockpileEntity e,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
-        pose.pushPose();pose.translate(0,BASE,0);CargoVisuals.render(e.stack(),GRID,pose,buffers,light,overlay);pose.popPose();
+        pose.pushPose();pose.translate(0,BASE,0);CargoVisuals.render(e.stack(),StockpileEntity.GRID,pose,buffers,light,overlay);pose.popPose();
     }
 }

@@ -14,9 +14,8 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEntity> {
-    // The load fills eighth-size blocks from the wheel end of the tray floor: its front-left corner in the model frame.
-    private static final CargoVisuals.Grid GRID=new CargoVisuals.Grid(6,9,WheelbarrowEntity.CAPACITY/(6*9),.125f,.125f*7/8);
-    private static final net.minecraft.world.phys.Vec3 TRAY=new net.minecraft.world.phys.Vec3(-.375,.616,-.38);
+    // The load fills quarter-size blocks from the wheel end, centred on the 0.75 x 1.125 tray floor: its front-left corner in the model frame.
+    private static final net.minecraft.world.phys.Vec3 TRAY=new net.minecraft.world.phys.Vec3(-.375,.616,-.3175);
     public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.6f;}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerEntityRenderer(WheelbarrowContent.ENTITY.get(),WheelbarrowRenderer::new);}
     @Override public RenderType getRenderType(WheelbarrowEntity e,net.minecraft.resources.ResourceLocation t,MultiBufferSource b,float partial){return RenderType.entityCutoutNoCull(t);}
@@ -27,7 +26,7 @@ public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEnti
         pose.mulPose(Axis.YP.rotationDegrees(180-Mth.rotLerp(partial,e.yRotO,e.getYRot())));
         var axle=WheelbarrowEntity.AXLE;
         pose.translate(axle.x,axle.y,axle.z);pose.mulPose(Axis.XP.rotationDegrees(e.carriagePitch(partial)));pose.translate(-axle.x,-axle.y,-axle.z);
-        pose.translate(TRAY.x,TRAY.y,TRAY.z);CargoVisuals.render(e.cargo(),GRID,pose,buffers,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);pose.popPose();
+        pose.translate(TRAY.x,TRAY.y,TRAY.z);CargoVisuals.render(e.cargo(),WheelbarrowEntity.GRID,pose,buffers,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);pose.popPose();
     }
     @Override protected void applyRotations(WheelbarrowEntity e,PoseStack pose,float age,float ignoredYaw,float partial,float scale){
         // GeckoLib supplies zero body yaw for non-LivingEntity animatables.
