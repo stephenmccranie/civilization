@@ -12,6 +12,10 @@ enableAdaptiveTransferSpeed = false
 [common.lodBuilding]
 databaseSyncMode = "NORMAL"
 
+[common.logging.warning]
+# The pack's Java uses G1; DH's startup chat warning about it only distracts players.
+showGarbageCollectorWarning = false
+
 [common.worldGenerator]
 generatorPlan = "CHUNKS_ONLY"
 chunkGeneratorMode = "PRE_EXISTING_ONLY"
