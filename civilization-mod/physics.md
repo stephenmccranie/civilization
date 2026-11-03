@@ -45,7 +45,7 @@ The server owns movement: clients send only bounded direction and release input.
 
 ## Pallets and cargo
 
-Craft a **Pallet** from three planks across the top row and two sticks beneath the outer planks. Place it from either hand and right-click its timber base to open cargo.
+Craft a **Pallet** from three planks across the top row with three sticks beneath them (`PPP / SSS`); any plank species works. Place it from either hand and right-click its timber base to open cargo.
 
 Cargo is limited **by mass only**: a wheelbarrow holds **640,000 kg** and each Pallet **1,024,000 kg**, set by `wheelbarrowMassKg` and `stockpileMassKg` in `serverconfig/civilization-cargo.toml`. There is no stack-count, volume or material-type cap. Matching items merge into long-count entries shown 27 per page, with exact quantities in tooltips. Accepted goods are ordinary solid full building blocks, mapped native slabs and valid saw-cut pieces, using their material density and actual volume; tools, food, containers, block entities, TNT and unsupported shapes are rejected. A wheelbarrow fits, for example, 320 stone blocks, 640 slabs or 2,560 eighth cubes.
 

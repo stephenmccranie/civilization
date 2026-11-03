@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -82,5 +83,23 @@ public final class SharedCraftingGameTests {
             menu.clicked(1,0,ClickType.PICKUP,p);
             h.assertTrue(menu.getCarried().isEmpty()&&menu.getSlot(1).getItem().getCount()==5,"Denied clicks leave shared ingredients on the table");
         }finally{data.claims.remove(c.at);data.rebuildIndex();}h.succeed();
+    }
+    /** A grid holding a Civilization recipe's own ingredients must craft that recipe, never another one that shares its shape. */
+    @GameTest(template="empty") public static void everyCraftingRecipeResolvesToItself(GameTestHelper h){
+        var manager=h.getLevel().getRecipeManager();
+        for(var holder:manager.getAllRecipesFor(RecipeType.CRAFTING)){
+            var recipe=holder.value();
+            if(!holder.id().getNamespace().equals("civilization"))continue;
+            int width;
+            if(recipe.getClass()==ShapedRecipe.class)width=((ShapedRecipe)recipe).getWidth();
+            else if(recipe.getClass()==ShapelessRecipe.class)width=Math.min(3,recipe.getIngredients().size());
+            else continue;
+            var items=new java.util.ArrayList<ItemStack>();
+            for(var ingredient:recipe.getIngredients())items.add(ingredient.isEmpty()?ItemStack.EMPTY:ingredient.getItems()[0].copyWithCount(1));
+            while(items.size()%width!=0)items.add(ItemStack.EMPTY);
+            var match=manager.getRecipeFor(RecipeType.CRAFTING,CraftingInput.of(width,items.size()/width,items),h.getLevel());
+            h.assertTrue(match.isPresent()&&match.get().id().equals(holder.id()),holder.id()+" crafts "+match.map(m->m.id().toString()).orElse("nothing"));
+        }
+        h.succeed();
     }
 }
