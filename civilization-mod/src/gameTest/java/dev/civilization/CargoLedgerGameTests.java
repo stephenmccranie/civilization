@@ -36,10 +36,23 @@ public final class CargoLedgerGameTests {
         h.assertTrue(loaded.entry(0).count()==n&&loaded.insert(item,1)==0,"A smaller capacity preserves old stock and refuses more");
         h.assertTrue(loaded.remove(0,32)==32&&loaded.entry(0).count()==n-32,"Overfull stock remains recoverable");h.succeed();
     }
+    @GameTest(template="industrial") public static void aHandCarriedMachineStacksOntoAPalletAndBack(GameTestHelper h){
+        var stock=stockpile(h);var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,CookingContent.STATION_ITEM.toStack());
+        h.assertTrue(stock.putHeld(p)&&p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==1&&stock.cargo().load()==1,"Right-click stacks a held Cooking Stove onto a pallet as one block");
+        new CargoMenu(1,p.getInventory(),stock).clicked(0,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(stock.cargo().isEmpty()&&p.getOffhandItem().is(CookingContent.STATION_ITEM.get()),"Shift-click takes it back to the hand");h.succeed();
+    }
     @GameTest(template="industrial") public static void unknownContainersAndMalformedPiecesCannotEnterAsWeightless(GameTestHelper h){
         var store=new CargoLedger(()->32,()->{});
-        for(var item:new ItemStack[]{new ItemStack(Items.DIAMOND),new ItemStack(Items.CHEST),new ItemStack(Items.SHULKER_BOX),new ItemStack(CuttingContent.ITEM.get())})
-            h.assertTrue(store.insert(item,100)==0,"Unsupported or container item is rejected");
+        var filled=new ItemStack(Items.SHULKER_BOX);filled.set(net.minecraft.core.component.DataComponents.CONTAINER,net.minecraft.world.item.component.ItemContainerContents.fromItems(java.util.List.of(new ItemStack(Items.STONE))));
+        var saved=new ItemStack(Items.CHEST);saved.set(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA,net.minecraft.world.item.component.CustomData.of(new CompoundTag()));
+        for(var item:new ItemStack[]{new ItemStack(Items.DIAMOND),new ItemStack(Items.WHEAT_SEEDS),new ItemStack(CargoContent.STOCKPILE.get()),filled,saved,new ItemStack(CuttingContent.ITEM.get())})
+            h.assertTrue(store.insert(item,100)==0,"Goods the hand does not carry, filled containers, saved block data and malformed pieces are refused: "+item);
+        // Every block the hand carries goes on a store too, one block of space each unless it is a slab or piece.
+        for(var item:new ItemStack[]{CookingContent.STATION_ITEM.toStack(),new ItemStack(Items.CHEST),new ItemStack(Items.SHULKER_BOX),new ItemStack(Items.OAK_STAIRS),new ItemStack(Items.OAK_DOOR),new ItemStack(Items.OAK_FENCE),new ItemStack(Items.TNT),new ItemStack(Items.RED_BED)}){
+            h.assertTrue(BlockCarry.block(item)&&store.insert(item,1)==1&&store.load()==1,"A hand-carried block goes on a store as one block: "+item);
+            store.remove(0,1);
+        }
         h.assertTrue(store.insert(new ItemStack(Items.STONE),100)==32,"Only volume limits a full stone load");
         h.assertTrue(store.insert(new ItemStack(Items.STONE),1)==0,"A full store accepts nothing");
         store.remove(0,32);
