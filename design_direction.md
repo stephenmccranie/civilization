@@ -34,7 +34,7 @@ The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-ce
 
 These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim. Beautiful ground settlements stay possible at every stage.
 
-- **Black steel** is the signature industrial material: blackened and blued iron and steel, never flat black. Its shadows carry colour, its edges wear to bright steel only where hands and tools touch, and rust appears only through neglect.
+- **Black steel** is the signature industrial material: blackened iron and steel in charcoal with a faint cool cast, never flat black. Its edges wear to bright, scratched steel only where hands and tools touch, and rust appears only through neglect.
 - Brass for bearings, fittings, instruments and contacts — things touched or read; copper where heat or electricity explains it; porcelain for insulation; blue-white light only for electrical energy. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
 - Textures are dark, hand-painted pixel art, more distinctive than vanilla: deep values, large deliberate colour clusters, few tones per material and worn-edge highlights that articulate dark metal.
 - Material behaviour stays distinct — wool weave, timber grain, fractured minerals, cast-metal wear — never one generic surface.
@@ -44,7 +44,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Grassier Grass (optional client mod) never whitens blades from cold or altitude alone. Blades look like taller wild grass with restrained height variation. Cumulative footsteps permanently shorten blades along travelled routes, shared and saved with the world; standing, flying and teleporting add no wear. Visual only.
 
 **Open**
-- Black steel's temperature and contrast — warm stove black, cool blued steel or dramatic chiaroscuro — then the material, item-sprite and machine-face reference sheets the texture pass draws from.
+- The material, item-sprite and machine-face reference sheets the texture pass draws from.
 
 ## People: calories, movement and recovery
 
