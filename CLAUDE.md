@@ -34,13 +34,15 @@ A feature is ready to build when it has a concrete interaction, agreed rules, da
 
 Pick the shortest check from `civilization-mod/testing.md`; be thorough but efficient. Documentation or configuration changes need no game launch. `dev.ps1 Deploy` already builds, and a passing check is not repeated unless relevant code changed.
 
-Visual checks run hidden at 1920x1080 with mouse capture disabled. Never launch a visible client or touch the owner's Prism game. When appearance changes, look at the screenshots. Diagnose unexplained failures, including flaky fixtures; never retry until green or weaken an assertion.
+Visual checks run hidden at 1920x1080 with mouse capture disabled. Never launch a visible client. The owner's Prism instances are touched only by `.\dev.ps1 Deploy`, which installs into Civilization Dev. When appearance changes, look at the screenshots. Diagnose unexplained failures, including flaky fixtures; never retry until green or weaken an assertion.
 
 Run directories under `civilization-mod/runs/` are rebuilt by each run, except `runs/server` (the owner's development world). `civilization-mod/run/` holds the client setup that visual checks copy. Scratch goes in `.tools/`, which is ignored and may be wiped at any time. Never delete user worlds, `art/`, `concept_art/` or local configuration, and preserve uncommitted work.
 
 ## Git and publishing
 
 Start each task on a short-lived branch from current `origin/main` with a plain topic name, and continue that branch for follow-ups to the same task. Use a separate worktree when needed to protect concurrent or uncommitted work. Commit focused local checkpoints and stage explicit paths; never commit to `main`.
+
+Civilization Dev is the owner's test instance and carries the newest build under test; their other Prism instance is the published GitHub pack. Once a change passes its checks, run `.\dev.ps1 Deploy` from its checkout and tell the owner what to try. A later deploy replaces the jar, so name the installed branch. The owner normally tests there before asking to publish.
 
 Publish only when the owner asks or agrees to a milestone, grouping related work into one PR. Once publication is authorized, carry it through without asking again: push, open a PR to `main` describing behaviour, validation and limits, get required checks green, squash-merge, fast-forward local `main` and delete the merged branch. A modpack release happens only at an agreed distribution milestone. `main` is always the verified published version.
 
