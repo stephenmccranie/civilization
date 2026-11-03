@@ -28,7 +28,7 @@ public final class StockpileGroupGameTests {
     private static void use(StockpileEntity e,net.minecraft.server.level.ServerPlayer p){e.getBlockState().useItemOn(p.getMainHandItem(),e.getLevel(),p,InteractionHand.MAIN_HAND,new BlockHitResult(e.getBlockPos().getCenter(),Direction.UP,e.getBlockPos(),false));}
     /** The native tag an older mass-limited pallet saved, with no volume limit applied. */
     private static CompoundTag legacy(GameTestHelper h,Object... goods){
-        var cargo=new MassCargo(()->1e12,()->{});for(int i=0;i<goods.length;i+=2)cargo.insert((ItemStack)goods[i],(int)goods[i+1]);
+        var cargo=new CargoLedger(()->1e12,()->{});for(int i=0;i<goods.length;i+=2)cargo.insert((ItemStack)goods[i],(int)goods[i+1]);
         var tag=new CompoundTag();tag.put("Cargo",cargo.save(h.getLevel().registryAccess()));return tag;
     }
     @GameTest(template="industrial") public static void palletHoldsTheSixtyFourBlocksItDrawsAndItsShapeGrows(GameTestHelper h){
@@ -54,7 +54,7 @@ public final class StockpileGroupGameTests {
         floor(h);var a=pallet(h,3,1,3);var c=pallet(h,5,1,3);a.cargo().insert(STONE,10);c.cargo().insert(COBBLE,20);
         var p=player(h);var menu=new CargoMenu(1,p.getInventory(),a);var stale=a.cargo();var bridge=pallet(h,4,1,3);menu.broadcastChanges();
         h.assertTrue(menu.count(0)+menu.count(1)==30&&a.cargo()==c.cargo()&&a.palletCount()==3,"An already-open menu adopts both stacks after a bridge joins them");
-        h.assertTrue(stale.insert(STONE,1)==0&&stale.remove(0,1)==0&&stale.transferTo(new MassCargo(()->1e9,()->{}))==0,"Retained stale group views cannot mutate or export stock");
+        h.assertTrue(stale.insert(STONE,1)==0&&stale.remove(0,1)==0&&stale.transferTo(new CargoLedger(()->1e9,()->{}))==0,"Retained stale group views cannot mutate or export stock");
         var loaded=new BlockEvent.BreakEvent(h.getLevel(),a.getBlockPos(),a.getBlockState(),p);StockpileBlock.breaking(loaded);
         var empty=new BlockEvent.BreakEvent(h.getLevel(),bridge.getBlockPos(),bridge.getBlockState(),p);StockpileBlock.breaking(empty);
         h.assertTrue(loaded.isCanceled()&&!empty.isCanceled(),"A pallet with goods on it refuses breaking; an empty one can leave its group");
@@ -74,7 +74,7 @@ public final class StockpileGroupGameTests {
     @GameTest(template="industrial") public static void overloadedPalletsFromBeforeTheLimitKeepEveryItemAndDrainFirst(GameTestHelper h){
         floor(h);var registry=h.getLevel().registryAccess();var a=pallet(h,3,1,3);a.loadWithComponents(legacy(h,STONE,700,PLANKS,1000),registry);
         h.assertTrue(a.cargo().count(0)==700&&a.cargo().count(1)==1000&&a.cargo().load()==1700&&a.layers()==4,"A pallet saved over the limit keeps every item and draws as a full stack");
-        h.assertTrue(a.cargo().insert(STONE,1)==0&&StockpileEntity.blocks(a.cargo().load(),a.cargo().capacity()).equals("Overloaded: 1,700 / 64"),"An overloaded pallet accepts nothing and says so");
+        h.assertTrue(a.cargo().insert(STONE,1)==0&&CargoInventory.blocks(a.cargo().load(),a.cargo().capacity()).equals("Overloaded: 1,700 / 64"),"An overloaded pallet accepts nothing and says so");
         var restored=pallet(h,8,1,8);restored.loadWithComponents(a.saveWithoutMetadata(registry),registry);
         h.assertTrue(restored.stack().count(0)==700&&restored.stack().count(1)==1000,"Overloaded stock saves unchanged");
         var b=pallet(h,4,1,3);
@@ -82,7 +82,7 @@ public final class StockpileGroupGameTests {
         h.assertTrue(a.cargo().remove(0,650)==650&&a.stack().count(0)==50&&a.cargo().remove(1,1000)==1000&&a.stack().load()==50,"Taking goods drains the overloaded pallet first");
         h.assertTrue(a.cargo().insert(STONE,20)==20&&a.stack().count(0)==64&&b.stack().count(1)==6,"Back under the limit, the pallet fills like any other");
         var c=pallet(h,3,1,6);var d=pallet(h,4,1,6);c.loadWithComponents(legacy(h,STONE,512),registry);d.loadWithComponents(legacy(h,STONE,188),registry);
-        h.assertTrue(c.cargo().count(0)==700&&StockpileEntity.blocks(c.cargo().load(),c.cargo().capacity()).equals("Overloaded: 700 / 128"),"An old mass-shared group keeps both saved shares");
+        h.assertTrue(c.cargo().count(0)==700&&CargoInventory.blocks(c.cargo().load(),c.cargo().capacity()).equals("Overloaded: 700 / 128"),"An old mass-shared group keeps both saved shares");
         h.assertTrue(c.cargo().remove(0,100)==100&&c.stack().count(0)+d.stack().count(0)==600,"Withdrawing from an overloaded group conserves every item");h.succeed();
     }
     @GameTest(template="industrial") public static void sharedCapacityAllowsPartialWheelbarrowTransfersAndCompetingMenus(GameTestHelper h){

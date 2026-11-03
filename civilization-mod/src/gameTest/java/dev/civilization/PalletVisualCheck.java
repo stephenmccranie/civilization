@@ -30,7 +30,7 @@ final class PalletVisualCheck {
             var mixed=pallet(l,MIXED).cargo();mixed.insert(new ItemStack(Items.STONE),16);mixed.insert(new ItemStack(Items.OAK_PLANKS),20);mixed.insert(new ItemStack(Items.BRICKS),10);
             var pieces=pallet(l,PIECES).cargo();pieces.insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),2,1),7);pieces.insert(CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),1,1),6);pieces.insert(CuttingContent.stack(Blocks.BRICKS.defaultBlockState(),3,1),21);
             pallet(l,GLASS).cargo().insert(new ItemStack(Items.GLASS),24);
-            var legacy=new MassCargo(()->1e12,()->{});legacy.insert(new ItemStack(Items.STONE),700);legacy.insert(new ItemStack(Items.OAK_PLANKS),1000);
+            var legacy=new CargoLedger(()->1e12,()->{});legacy.insert(new ItemStack(Items.STONE),700);legacy.insert(new ItemStack(Items.OAK_PLANKS),1000);
             var tag=new CompoundTag();tag.put("Cargo",legacy.save(l.registryAccess()));pallet(l,OVERLOADED).loadWithComponents(tag,l.registryAccess());
             pallet(l,EMPTY);
             for(var at:BlockPos.betweenClosed(YARD,LAST))pallet(l,at.immutable());

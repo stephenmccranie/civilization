@@ -26,8 +26,4 @@ public final class CargoMass {
                 ||!state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE,BlockPos.ZERO))return Double.NaN;
         return CuttingContent.piece(stack)?CuttingContent.volume(CuttingContent.units(stack)):1;
     }
-    public static double unitKg(ItemStack stack){
-        double volume=volume(stack);
-        return Double.isNaN(volume)?volume:PhysicalMaterials.of(material(stack)).density()*volume;
-    }
 }

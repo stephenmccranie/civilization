@@ -23,7 +23,7 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
     private void send(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
     @Override protected void containerTick(){super.containerTick();load.active=unload.active=menu.data.get(118)>0;previous.active=menu.page()>0;next.active=menu.page()+1<menu.pageCount();}
     @Override protected void drawMachine(GuiGraphics g,float partial,int mouseX,int mouseY){
-        String load=menu.palletCount()>0?StockpileEntity.blocks(menu.load(),menu.capacity()):Double.isFinite(menu.load())?String.format(java.util.Locale.ROOT,"%,.0f / %,.0f kg",menu.load(),menu.capacity()):"Unknown load: unload to recover";
+        String load=CargoInventory.blocks(menu.load(),menu.capacity());
         g.drawString(font,load,leftPos+8,topPos+26,MachineUi.INK,false);
         MachineUi.progress(g,leftPos+8,topPos+40,160,(float)(menu.load()/Math.max(1,menu.capacity())));
         String target=switch(menu.data.get(118)){case 1->"Pallet";case 2->"Wheelbarrow";default->"No nearby store";};

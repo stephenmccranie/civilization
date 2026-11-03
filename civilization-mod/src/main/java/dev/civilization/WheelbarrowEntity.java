@@ -20,8 +20,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 /**
  * Server-driven ground carrier pushed by a handler who walks behind it. The carrier pivots toward the
  * handler's facing and W/S drive it along its heading. Its measured body steps at most one block up or
- * down, and the handler stands on their own ground within a block of it. The carriage pivots on the wheel
- * axle between the wheel's ground and its rear support: the parked legs, or the handler's hands.
+ * down, and the handler walks behind on their own ground, a block at a time. The carriage pivots on the
+ * wheel axle between the wheel's ground and its rear support: the parked legs, or the handler's hands.
+ * Its tray holds a fixed volume of goods that clients draw one for one.
  */
 public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHolder,net.minecraft.world.MenuProvider {
     public static final float MODEL_SCALE=1.35f;
@@ -31,6 +32,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public static final float TURN=3.5f;
     /** The handler's head turns at most this far from the handles. */
     public static final float LOOK=75;
+    /** Blocks of solid volume the tray holds: six layers of 6x9, three to the rim and three heaped above it. */
+    public static final int CAPACITY=324;
     // Model frame: x right, y up, z rear.
     public static final Vec3 AXLE=new Vec3(0,.3375,-.84375);
     private static final Vec3 GRIP=new Vec3(5.7375/16,.8015,1.4343);
@@ -41,9 +44,9 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HEADING=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private final WheelbarrowCollision collision=new WheelbarrowCollision();
-    private static final EntityDataAccessor<net.minecraft.world.item.ItemStack> CARGO_ICON=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<Float> CARGO_FILL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
-    private final MassCargo cargo=new MassCargo(()->CargoConfig.WHEELBARROW.get(),this::cargoChanged);
+    // The whole ledger in its saved form, so clients draw the load one for one.
+    private static final EntityDataAccessor<CompoundTag> CARGO=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.COMPOUND_TAG);
+    private final CargoLedger cargo=new CargoLedger(()->CAPACITY,this::cargoChanged);
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
     private int forward,lerpSteps;
     private long lastInput=Long.MIN_VALUE;
@@ -56,16 +59,17 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private double front,frontO,rear,rearO;
     public final WalkAnimationState handlerWalkAnimation=new WalkAnimationState();
     public WheelbarrowEntity(EntityType<? extends WheelbarrowEntity> type,Level level){super(type,level);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(HEADING,0f);b.define(CARGO_ICON,net.minecraft.world.item.ItemStack.EMPTY);b.define(CARGO_FILL,0f);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(HEADING,0f);b.define(CARGO,new CompoundTag());}
     public VoxelShape playerCollisionShape(){return collision.at(position(),getYRot());}
     private void cargoChanged(){
         if(level().isClientSide)return;
-        entityData.set(CARGO_ICON,cargo.isEmpty()?net.minecraft.world.item.ItemStack.EMPTY:cargo.entry(0).item());
-        entityData.set(CARGO_FILL,(float)Math.min(1,cargo.load()/cargo.capacity()));
+        var tag=new CompoundTag();tag.put("Cargo",cargo.save(registryAccess()));entityData.set(CARGO,tag);
     }
-    public net.minecraft.world.item.ItemStack cargoIcon(){return entityData.get(CARGO_ICON);}
-    public float cargoFill(){return entityData.get(CARGO_FILL);}
-    @Override public MassCargo cargo(){return cargo;}
+    @Override public void onSyncedDataUpdated(EntityDataAccessor<?> key){
+        super.onSyncedDataUpdated(key);
+        if(level().isClientSide&&CARGO.equals(key))cargo.load(entityData.get(CARGO).getList("Cargo",10),registryAccess());
+    }
+    @Override public CargoLedger cargo(){return cargo;}
     @Override public Level cargoLevel(){return level();}
     @Override public Vec3 cargoPosition(){return position();}
     @Override public boolean cargoValid(Player p){return isAlive()&&!isVehicle()&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<=36&&accessible(p,getBoundingBox());}
