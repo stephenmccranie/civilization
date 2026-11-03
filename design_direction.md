@@ -23,18 +23,21 @@ The agreed rules and setting, one section per system. "Agreed" means settled, no
 
 ## Setting and material style
 
-The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-century industrial foundation developing toward monumental electrical modernism, as one coherent alternate history. Nuclear technology and sky machinery keep physical materials and legible instruments.
+The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-century industrial foundation developing toward monumental electrical modernism, as one coherent alternate history. The fantastic is Tesla's physics made real — wireless power, resonance, radiant energy, antigravity — built from the same materials as everything else: wonder shows in what machines do, never in ornament, runes or magic. Nuclear technology and sky machinery keep physical materials and legible instruments.
 
 | World layer | Material and form language |
 | --- | --- |
-| Farms and frontier | Timber, wool, leather, ceramics, rough masonry; practical, repairable, visibly hand-assembled |
-| Town industry | Brick, dark cast iron, steel, enamel, restrained brass; substantial mechanisms and readable physical controls |
-| Advanced infrastructure | Porcelain insulators, copper conductors, coils, glass instruments; precise functional connections |
+| Farms and frontier | American Western: sun-weathered timber, saddle leather, wool, ceramics, rough masonry, hand-forged iron; practical, repairable, visibly hand-assembled |
+| Town industry | Black steel, brick, enamel, restrained brass; substantial mechanisms and readable physical controls |
+| Advanced infrastructure | Black steel frames, porcelain insulators, copper conductors, coils, glass instruments; precise functional connections |
 | Sky civilization | Pale stone and metal, ivory and turquoise accents, monumental symmetry, restrained Art Deco; enormous electrical apparatus |
 
-These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim. Beautiful ground settlements stay possible at every stage.
+These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim beyond livery pinstripes. Beautiful ground settlements stay possible at every stage.
 
-- Brass for bearings, fittings, instruments and contacts; copper where heat or electricity explains it. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
+- **Black steel** is the signature industrial material: blackened iron and steel in charcoal with a faint cool cast, never flat black. Its edges wear to bright, scratched steel only where hands and tools touch, and rust appears only through neglect. Iron stays bare, forged gray so it always reads apart from steel.
+- Brass for bearings, fittings, instruments and contacts — things touched or read; copper where heat or electricity explains it; porcelain for insulation; blue-white light only for electrical energy. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
+- Textures are dark, clean pixel art: deep values, large deliberate colour clusters, few tones per material and worn-edge highlights that articulate dark metal.
+- **Livery** is the signature, after nineteenth-century sewing machines, locomotives and safes. Finished machines and devices are japanned black steel with a fine pale-gold pinstripe along their main panel edges and at most one small painted decal without lettering. Frontier goods carry simple geometric brands and occasional painted colour, while wheels stay natural timber and iron; sacks and crates carry one stencilled mark. Raw materials, metal stock, plain panels, sides and tops stay undecorated.
 - Material behaviour stays distinct — wool weave, timber grain, fractured minerals, cast-metal wear — never one generic surface.
 - New block and item art is **64 pixels per block face**, starting with Street Pavers. Existing 32px families stay valid until migrated family by family; Faithful 32x may supply vanilla materials without being copied into the mod.
 - Models are editable Blockbench sources, animated with GeckoLib 4 where they move. Production follows the `civilization-art` skill and [tools/modeling/README.md](tools/modeling/README.md).
