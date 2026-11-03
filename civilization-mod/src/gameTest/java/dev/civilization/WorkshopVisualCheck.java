@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Blocks;
 
 final class WorkshopVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
+    private static final java.util.Set<String> dragTops=new java.util.LinkedHashSet<>();private static int dragSelection;
     private static BlockPos at(int kind){return new BlockPos(30+kind*7,101,0);}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Workshop visual failed",failure);
@@ -42,8 +43,10 @@ final class WorkshopVisualCheck {
         if(ticks==270)server.execute(()->{var l=server.overworld();l.setBlockAndUpdate(at(2),WorkshopContent.BENCH.get().defaultBlockState());var w=(WorkshopBlockEntity)l.getBlockEntity(at(2));w.select(WorkshopJobs.index(3,"minecraft:iron_pickaxe"));var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.openMenu(w);});
         if(ticks==290){click(mc,"Tools");click(mc,"Iron");}
         if(ticks==300){
-            long count=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button b&&b.visible&&b.getWidth()>80).count();
-            if(count!=8)throw new IllegalStateException("Tools / Iron must have eight results, found "+count);
+            // Six rows fit, so read the whole filtered list a page at a time, then return to its top.
+            var seen=new java.util.LinkedHashSet<String>();
+            for(int key:new int[]{org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN,org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP}){for(var row:recipeRows(mc))if(row.visible)seen.add(row.getMessage().getString());mc.screen.keyPressed(key,0,0);}
+            if(seen.size()!=8)throw new IllegalStateException("Tools / Iron must have eight results, found "+seen);
             shot(mc,"recipe");
         }
 
@@ -68,36 +71,55 @@ final class WorkshopVisualCheck {
             click(mc,"All");click(mc,"All materials");mc.screen.mouseScrolled(100,150,0,-1);
             shot(mc,"scroll");
         }
-        if(ticks==343){click(mc,"Recipes");shot(mc,"collapsed");}
-        if(ticks==346){click(mc,"Recipes");mc.options.guiScale().set(4);mc.resizeDisplay();}
-        if(ticks==350)shot(mc,"scale-4");
-        if(ticks==355){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();server.overworld().setBlockAndUpdate(at(2),WorkshopContent.SMITHY.get().defaultBlockState());p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
-        if(ticks==370)mc.options.hideGui=true;
-        if(ticks==375)shot(mc,"smithy-rear");
-        if(ticks==376)mc.options.hideGui=false;
-        if(ticks==377)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);server.overworld().removeBlock(at(2).east(WorkshopStructure.SMITHY_ANVIL_X),false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
-        if(ticks==389)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
-        if(ticks==395)shot(mc,"smithy-guide");
-        if(ticks==405){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
+        // Track clicks jump to either end, where the wheel has nowhere further to go.
+        if(ticks==342||ticks==345){
+            var rows=recipeRows(mc);int x=rows.getFirst().getRight()+4,y=ticks==342?rows.getLast().getBottom()-1:rows.getFirst().getY();String before=topRecipe(mc);
+            mc.screen.mouseClicked(x,y,0);mc.screen.mouseReleased(x,y,0);String after=topRecipe(mc);mc.screen.mouseScrolled(x,y,0,ticks==342?-1:1);
+            if(after.equals(before)||!topRecipe(mc).equals(after))throw new IllegalStateException("A track click must jump to the end of the list: "+before+" -> "+after);
+        }
+        if(ticks==344)shot(mc,"scroll-track");
+        // A thumb drag held across ticks: the pointer moves six pixels a tick and the list follows every step.
+        if(ticks>=346&&ticks<=357){
+            var rows=recipeRows(mc);int x=rows.getFirst().getRight()+4,y=rows.getFirst().getY()+2+6*(ticks-346);
+            if(ticks==346){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||!mc.screen.mouseClicked(x,y,0))throw new IllegalStateException("The scrollbar thumb ignored a press");dragSelection=m.selection();}
+            else if(ticks<357)mc.screen.mouseDragged(x,y,0,0,6);
+            else if(!mc.screen.mouseReleased(x,y,0)||dragTops.size()!=11||!(mc.player.containerMenu instanceof WorkshopMenu m)||m.selection()!=dragSelection)throw new IllegalStateException("A thumb drag must move the list every step without choosing a recipe: "+dragTops);
+            dragTops.add(topRecipe(mc));
+        }
+        if(ticks==352)shot(mc,"scroll-drag");
+        if(ticks==363){click(mc,"Recipes");shot(mc,"collapsed");}
+        if(ticks==366){click(mc,"Recipes");mc.options.guiScale().set(4);mc.resizeDisplay();}
+        if(ticks==370)shot(mc,"scale-4");
+        if(ticks==375){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();server.overworld().setBlockAndUpdate(at(2),WorkshopContent.SMITHY.get().defaultBlockState());p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
+        if(ticks==390)mc.options.hideGui=true;
+        if(ticks==395)shot(mc,"smithy-rear");
+        if(ticks==396)mc.options.hideGui=false;
+        if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);server.overworld().removeBlock(at(2).east(WorkshopStructure.SMITHY_ANVIL_X),false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
+        if(ticks==409)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
+        if(ticks==415)shot(mc,"smithy-guide");
+        if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
             var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(0));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
             var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,30.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);
         });}
-        if(ticks==425)shot(mc,"ignition-rest");
-        if(ticks==426)click(mc,"Strike to light");
-        if(ticks==427)shot(mc,"ignition-strike");
+        if(ticks==445)shot(mc,"ignition-rest");
+        if(ticks==446)click(mc,"Strike to light");
+        if(ticks==447)shot(mc,"ignition-strike");
         // Exercise the real button first; a paced seeded menu strike makes the final art capture repeatable.
-        if(ticks==450)server.execute(()->{
+        if(ticks==470)server.execute(()->{
             var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(0));
             if(!w.fire.lit()){
                 for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if(r.nextInt(3)==0){server.overworld().random.setSeed(seed);break;}}
                 p.containerMenu.clickMenuButton(p,CoalFire.BUTTON);
             }
         });
-        if(ticks==465){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||(m.fireState()&1)==0)throw new IllegalStateException("Seeded menu ignition failed to synchronize");shot(mc,"ignition-lit");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
+        if(ticks==485){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||(m.fireState()&1)==0)throw new IllegalStateException("Seeded menu ignition failed to synchronize");shot(mc,"ignition-lit");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
     }
     private static void click(Minecraft mc,String name){
         var b=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button button&&button.visible&&button.getMessage().getString().equals(name)).map(c->(net.minecraft.client.gui.components.Button)c).findFirst().orElseThrow(()->new IllegalStateException("Missing control: "+name));
         mc.screen.mouseClicked(b.getX()+4,b.getY()+4,0);mc.screen.mouseReleased(b.getX()+4,b.getY()+4,0);
     }
+    /** The recipe drawer's rows, top to bottom: the wide buttons left of the cabinet. Its scrollbar runs four pixels right of them. */
+    private static java.util.List<net.minecraft.client.gui.components.Button> recipeRows(Minecraft mc){int left=((net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>)mc.screen).getGuiLeft();return mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button b&&b.getWidth()>80&&b.getX()<left).map(c->(net.minecraft.client.gui.components.Button)c).toList();}
+    private static String topRecipe(Minecraft mc){return recipeRows(mc).getFirst().getMessage().getString();}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"workshop-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }
