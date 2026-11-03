@@ -11,15 +11,15 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.*;
 
-/** Pallet stacks at each fill level, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard and loaded wheelbarrows, through real clicks and menus. */
+/** Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard and loaded wheelbarrows, through real clicks and menus. */
 final class PalletVisualCheck {
     private static int ticks;
     private static volatile boolean ready;
     private static volatile Throwable failure;
     private static final int Y=101;
-    private static final int[] FILLS={0,1,8,16,33,64};
+    private static final int[] FILLS={0,1,16,64,100,128};
     private static final BlockPos MIXED=new BlockPos(142,Y,3),PIECES=new BlockPos(144,Y,3),GLASS=new BlockPos(146,Y,3),OVERLOADED=new BlockPos(148,Y,3),
-            EMPTY=new BlockPos(150,Y,3),FULL=new BlockPos(152,Y,0),YARD=new BlockPos(142,Y,6),LAST=YARD.offset(2,0,2),BESIDE=new BlockPos(153,Y,10);
+            EMPTY=new BlockPos(150,Y,3),FULL=new BlockPos(152,Y,0),YARD=new BlockPos(142,Y,6),LAST=YARD.offset(2,0,2),BESIDE=new BlockPos(153,Y,10),UNDER=new BlockPos(152,Y,3);
     private static final Vec3 HALF_BARROW=new Vec3(150.5,Y,10.5),FULL_BARROW=new Vec3(155.5,Y,10.5);
     private static final int HAND=BlockCarry.LIMIT;
     private static BlockPos fill(int i){return new BlockPos(142+2*i,Y,0);}
@@ -35,9 +35,10 @@ final class PalletVisualCheck {
             var legacy=new CargoLedger(()->1e12,()->{});legacy.insert(new ItemStack(Items.STONE),700);legacy.insert(new ItemStack(Items.OAK_PLANKS),1000);
             var tag=new CompoundTag();tag.put("Cargo",legacy.save(l.registryAccess()));pallet(l,OVERLOADED).loadWithComponents(tag,l.registryAccess());
             pallet(l,EMPTY);
+            var under=pallet(l,UNDER);l.setBlockAndUpdate(UNDER.above(),Blocks.STONE_BRICKS.defaultBlockState());under.cargo().insert(new ItemStack(Items.STONE),100);
             for(var at:BlockPos.betweenClosed(YARD,LAST))pallet(l,at.immutable());
             var yard=((StockpileEntity)l.getBlockEntity(YARD)).cargo();yard.insert(new ItemStack(Items.COBBLESTONE),300);yard.insert(new ItemStack(Items.OAK_PLANKS),100);
-            pallet(l,BESIDE).cargo().insert(new ItemStack(Items.STONE),64);
+            pallet(l,BESIDE).cargo().insert(new ItemStack(Items.STONE),128);
             barrow(l,HALF_BARROW).insert(new ItemStack(Items.STONE),18);
             var full=barrow(l,FULL_BARROW);full.insert(new ItemStack(Items.STONE),24);full.insert(new ItemStack(Items.OAK_PLANKS),8);full.insert(new ItemStack(Items.OAK_SLAB),8);
             var p=player(server);p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.getInventory().clearContent();
@@ -46,13 +47,16 @@ final class PalletVisualCheck {
         if(ticks>80&&!ready){ticks=81;return;}
         if(ticks==140){
             for(int i=0;i<FILLS.length;i++)if(!(mc.level.getBlockEntity(fill(i)) instanceof StockpileEntity e)||e.layers()!=(FILLS[i]+15)/16||e.stack().load()!=FILLS[i])throw new IllegalStateException("Fill level "+FILLS[i]+" did not reach the client stack");
-            if(mc.level.getBlockState(FULL).getShape(mc.level,FULL).max(Direction.Axis.Y)!=1)throw new IllegalStateException("A full stack is not a full block on the client");
+            var top=mc.level.getBlockState(FULL.above());
+            if(mc.level.getBlockState(FULL).getShape(mc.level,FULL).max(Direction.Axis.Y)!=1||!top.is(CargoContent.STOCKPILE.get())||!top.getValue(StockpileBlock.TOP)||top.getShape(mc.level,FULL.above()).max(Direction.Axis.Y)!=14/16d)
+                throw new IllegalStateException("A full stack is not two blocks high on the client");
+            if(!(mc.level.getBlockEntity(UNDER) instanceof StockpileEntity u)||u.stack().load()!=64||u.layers()!=4||!mc.level.getBlockState(UNDER.above()).is(Blocks.STONE_BRICKS))throw new IllegalStateException("A pallet under a block did not stay one block high");
             shot(mc,"fill-levels");
         }
         if(ticks==145)check(server,()->player(server).teleportTo(server.overworld(),139.2,104.2,10.6,java.util.Set.of(),-128,32));
         if(ticks==170){
-            int full=0;for(var at:BlockPos.betweenClosed(YARD,LAST))if(mc.level.getBlockEntity(at) instanceof StockpileEntity e&&e.stack().load()==StockpileEntity.GRID.capacity())full++;
-            if(full!=5)throw new IllegalStateException("The yard did not fill one pallet at a time: "+full+" full");
+            int full=0;for(var at:BlockPos.betweenClosed(YARD,LAST))if(mc.level.getBlockEntity(at) instanceof StockpileEntity e&&e.stack().load()==StockpileEntity.TWO_HIGH.capacity())full++;
+            if(full!=2)throw new IllegalStateException("The yard did not fill one pallet at a time: "+full+" full");
             shot(mc,"yard");
         }
         if(ticks==175)check(server,()->player(server).teleportTo(server.overworld(),145.5,103.4,0.6,java.util.Set.of(),0,38));
@@ -78,17 +82,18 @@ final class PalletVisualCheck {
         if(ticks==335)check(server,()->{var p=player(server);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,HAND));p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),152.5,Y,-1.6,java.util.Set.of(),0,40);});
         if(ticks==345)click(mc,FULL);
         if(ticks==360){
-            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.count(0)!=64||m.load()!=64||m.capacity()!=64||mc.player.getOffhandItem().getCount()!=HAND)throw new IllegalStateException("A full pallet did not open its menu and leave the hand stack alone");
+            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.count(0)!=128||m.load()!=128||m.capacity()!=128||mc.player.getOffhandItem().getCount()!=HAND)throw new IllegalStateException("A full pallet did not open its menu and leave the hand stack alone");
             shot(mc,"full-menu");
         }
         if(ticks==365){mc.player.closeContainer();check(server,()->player(server).teleportTo(server.overworld(),143.5,Y,4.6,java.util.Set.of(),0,40));}
         if(ticks==375)click(mc,YARD);
         if(ticks==385){
-            if(!mc.player.getOffhandItem().isEmpty()||!(mc.level.getBlockEntity(YARD.offset(1,0,2)) instanceof StockpileEntity e)||e.stack().count(0)!=HAND)throw new IllegalStateException("Yard stone did not start the first empty pallet");
+            int stone=0;for(var at:BlockPos.betweenClosed(YARD,LAST))if(mc.level.getBlockEntity(at) instanceof StockpileEntity e&&e.stack().size()==1&&e.stack().entry(0).item().is(Items.STONE)&&e.stack().count(0)==HAND)stone++;
+            if(!mc.player.getOffhandItem().isEmpty()||stone!=1)throw new IllegalStateException("Yard stone did not start an empty pallet of its own");
             click(mc,YARD);
         }
         if(ticks==400){
-            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=9||m.capacity()!=576||m.count(0)!=300||m.count(1)!=100||m.count(2)!=HAND)throw new IllegalStateException("The yard menu did not combine its nine stacks");
+            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=9||m.capacity()!=1152||m.count(0)!=300||m.count(1)!=100||m.count(2)!=HAND)throw new IllegalStateException("The yard menu did not combine its nine stacks");
             shot(mc,"yard-menu");
             mc.gameMode.handleInventoryMouseClick(m.containerId,0,0,ClickType.QUICK_MOVE,mc.player);
         }
@@ -98,18 +103,18 @@ final class PalletVisualCheck {
         }
         // Fixture-only removal of the empty last pallet changes the topology under the open menu.
         if(ticks==420){if(!mc.player.getOffhandItem().isEmpty()||((CargoMenu)mc.player.containerMenu).count(0)!=300)throw new IllegalStateException("The Hand slot did not return the cobblestone");check(server,()->server.overworld().setBlockAndUpdate(LAST,Blocks.AIR.defaultBlockState()));}
-        if(ticks==430&&(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=8||m.capacity()!=512||m.load()!=400+HAND))throw new IllegalStateException("An open menu did not adopt its smaller yard");
+        if(ticks==430&&(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=8||m.capacity()!=1024||m.load()!=400+HAND))throw new IllegalStateException("An open menu did not adopt its smaller yard");
         if(ticks==435)check(server,()->server.overworld().setBlockAndUpdate(LAST,CargoContent.STOCKPILE.get().defaultBlockState()));
-        if(ticks==445&&(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=9||m.capacity()!=576||m.load()!=400+HAND))throw new IllegalStateException("An open menu duplicated or lost stock when the yard rejoined");
+        if(ticks==445&&(!(mc.player.containerMenu instanceof CargoMenu m)||m.palletCount()!=9||m.capacity()!=1152||m.load()!=400+HAND))throw new IllegalStateException("An open menu duplicated or lost stock when the yard rejoined");
         if(ticks==450){mc.player.closeContainer();check(server,()->player(server).teleportTo(server.overworld(),148.5,Y,1.6,java.util.Set.of(),0,40));}
         if(ticks==460)click(mc,OVERLOADED);
         if(ticks==475){
-            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.load()!=1700||m.capacity()!=64||m.count(0)!=700||m.count(1)!=1000)throw new IllegalStateException("The overloaded pallet lost or hid pre-limit stock");
+            if(!(mc.player.containerMenu instanceof CargoMenu m)||m.load()!=1700||m.capacity()!=128||m.count(0)!=700||m.count(1)!=1000)throw new IllegalStateException("The overloaded pallet lost or hid pre-limit stock");
             shot(mc,"overloaded-menu");
         }
         if(ticks==480){mc.player.closeContainer();mc.options.hideGui=true;check(server,()->{var p=player(server);p.setGameMode(GameType.SPECTATOR);p.teleportTo(server.overworld(),148.5,105,12.5,java.util.Set.of(),170,30);});}
         if(ticks==505)shot(mc,"after");
-        if(ticks>510){com.mojang.logging.LogUtils.getLogger().info("PALLET VISUAL VERIFIED: fill levels, mixed goods and pieces, overloaded pre-limit stock, yard fill order, right-click stacking, full-pallet and shared menus, Hand-slot transfers, topology changes under an open menu, loaded wheelbarrows");mc.stop();}
+        if(ticks>510){com.mojang.logging.LogUtils.getLogger().info("PALLET VISUAL VERIFIED: fill levels up to two high, a pallet under a block, mixed goods and pieces, overloaded pre-limit stock, yard fill order, right-click stacking, full-pallet and shared menus, Hand-slot transfers, topology changes under an open menu, loaded wheelbarrows");mc.stop();}
     }
     private static StockpileEntity pallet(net.minecraft.server.level.ServerLevel l,BlockPos at){l.setBlockAndUpdate(at,CargoContent.STOCKPILE.get().defaultBlockState());return (StockpileEntity)l.getBlockEntity(at);}
     private static CargoInventory barrow(net.minecraft.server.level.ServerLevel l,Vec3 at){var e=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),l);e.setYRot(0);e.setPos(at);l.addFreshEntity(e);return e.cargo();}

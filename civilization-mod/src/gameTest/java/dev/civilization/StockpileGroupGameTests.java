@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -25,29 +26,55 @@ public final class StockpileGroupGameTests {
         p.connection=new FakePlayer(h.getLevel(),profile).connection;p.setGameMode(GameType.SURVIVAL);p.setPos(h.absolutePos(new BlockPos(3,1,4)).getCenter());return p;
     }
     private static double top(StockpileEntity e){return e.getBlockState().getShape(e.getLevel(),e.getBlockPos()).max(Direction.Axis.Y);}
+    /** The cell above a pallet: its stack's top when it holds one. */
+    private static BlockState above(StockpileEntity e){return e.getLevel().getBlockState(e.getBlockPos().above());}
+    private static double aboveTop(StockpileEntity e){var at=e.getBlockPos().above();return above(e).getShape(e.getLevel(),at).max(Direction.Axis.Y);}
+    private static boolean holdsTop(StockpileEntity e){return above(e).is(CargoContent.STOCKPILE.get())&&above(e).getValue(StockpileBlock.TOP);}
     private static void use(StockpileEntity e,net.minecraft.server.level.ServerPlayer p){e.getBlockState().useItemOn(p.getMainHandItem(),e.getLevel(),p,InteractionHand.MAIN_HAND,new BlockHitResult(e.getBlockPos().getCenter(),Direction.UP,e.getBlockPos(),false));}
     /** The native tag an older mass-limited pallet saved, with no volume limit applied. */
     private static CompoundTag legacy(GameTestHelper h,Object... goods){
         var cargo=new CargoLedger(()->1e12,()->{});for(int i=0;i<goods.length;i+=2)cargo.insert((ItemStack)goods[i],(int)goods[i+1]);
         var tag=new CompoundTag();tag.put("Cargo",cargo.save(h.getLevel().registryAccess()));return tag;
     }
-    @GameTest(template="industrial") public static void palletHoldsTheSixtyFourBlocksItDrawsAndItsShapeGrows(GameTestHelper h){
+    @GameTest(template="industrial") public static void palletStacksTwoBlocksHighIntoTheFreeBlockAbove(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);
-        h.assertTrue(top(a)==2/16d&&a.cargo().capacity()==64,"An empty pallet is its timber base");
-        h.assertTrue(a.cargo().insert(STONE,100)==64&&a.cargo().load()==64&&top(a)==1,"A pallet holds exactly one full block-sized stack, and its shape fills the block");
+        h.assertTrue(top(a)==2/16d&&a.cargo().capacity()==128,"An empty pallet is its timber base and holds two blocks of stack");
+        h.assertTrue(a.cargo().insert(STONE,64)==64&&top(a)==1&&a.layers()==4,"The first 64 blocks fill the pallet's own block");
+        a.tick();h.assertTrue(above(a).isAir(),"A stack within its own block leaves the block above alone");
+        a.cargo().insert(STONE,1);a.tick();
+        h.assertTrue(holdsTop(a)&&aboveTop(a)==3.5/16&&!above(a).canBeReplaced(),"The 65th block rises into the block above, which the stack then holds solid");
+        h.assertTrue(a.cargo().insert(STONE,100)==63&&a.cargo().load()==128&&a.layers()==8&&top(a)==1&&aboveTop(a)==14/16d,"A full pallet is a stack two blocks high");
         h.assertTrue(a.cargo().insert(PLANKS,1)==0,"Volume, not mass, limits a pallet: lighter goods do not fit either");
+        a.cargo().remove(0,64);a.tick();h.assertTrue(above(a).isAir()&&top(a)==1,"Back within one block, the stack gives the block above back");
         a.cargo().remove(0,47);h.assertTrue(top(a)==(2+2*3.5)/16,"Seventeen blocks start a second layer");
         a.cargo().remove(0,17);
-        h.assertTrue(a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),2,3),3)==3&&a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),600)==500&&a.cargo().load()==64,"Slabs and saw-cut pieces count by their volume");
+        h.assertTrue(a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),2,3),3)==3&&a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),2000)==1012&&a.cargo().load()==128,"Slabs and saw-cut pieces count by their volume");
         h.assertTrue(a.cargo().insert(new ItemStack(Items.DIAMOND),1)==0&&a.cargo().insert(new ItemStack(Items.CHEST),1)==0,"Only solid building goods go on a pallet");h.succeed();
+    }
+    @GameTest(template="industrial") public static void theStackOnlyRisesIntoFreeSpaceAndTheTopBelongsToItsPallet(GameTestHelper h){
+        floor(h);var a=pallet(h,3,1,3);h.setBlock(new BlockPos(3,2,3),Blocks.STONE);
+        h.assertTrue(a.cargo().capacity()==64&&a.cargo().insert(STONE,100)==64,"A pallet with a block above it holds one block of stack");
+        a.tick();h.assertTrue(above(a).is(Blocks.STONE)&&a.layers()==4,"The stack never replaces what is above it");
+        h.setBlock(new BlockPos(3,2,3),Blocks.AIR);a.tick();
+        h.assertTrue(a.cargo().capacity()==128&&a.cargo().insert(STONE,10)==10,"Clearing the block above lets the stack rise");
+        a.tick();var top=h.absolutePos(new BlockPos(3,2,3));var p=player(h);
+        var breaking=new BlockEvent.BreakEvent(h.getLevel(),top,above(a),p);StockpileBlock.breaking(breaking);
+        h.assertTrue(holdsTop(a)&&breaking.isCanceled(),"The top of a loaded stack refuses breaking like its pallet");
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
+        above(a).useItemOn(p.getMainHandItem(),h.getLevel(),p,InteractionHand.MAIN_HAND,new BlockHitResult(top.getCenter(),Direction.UP,top,false));
+        h.assertTrue(a.stack().count(0)==74+BlockCarry.LIMIT&&p.getOffhandItem().isEmpty(),"Right-clicking the top stacks goods onto its pallet");
+        var b=pallet(h,5,1,3);h.spawn(net.minecraft.world.entity.EntityType.ARMOR_STAND,new BlockPos(5,2,3));
+        h.assertTrue(b.cargo().capacity()==64,"Nobody is buried: the stack does not rise where someone stands");
+        h.setBlock(new BlockPos(3,1,3),Blocks.AIR);
+        h.assertTrue(h.getBlockState(new BlockPos(3,2,3)).isAir(),"A top without its pallet vanishes");h.succeed();
     }
     @GameTest(template="industrial") public static void sidePalletsShareOneMenuButFillOneStackAtATime(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);var c=pallet(h,5,1,3);var corner=pallet(h,6,1,4);var above=pallet(h,3,2,3);
-        h.assertTrue(a.cargo()==c.cargo()&&a.palletCount()==3&&a.cargo().capacity()==192&&corner.palletCount()==1&&above.palletCount()==1,"Side contact shares one menu and sums capacity; corners and vertical stacking stay separate");
+        h.assertTrue(a.cargo()==c.cargo()&&a.palletCount()==3&&a.cargo().capacity()==64+128+128&&corner.palletCount()==1&&above.palletCount()==1,"Side contact shares one menu and sums capacity, where a pallet under another holds one block; corners and vertical stacking stay separate");
         h.assertTrue(a.cargo().insert(STONE,100)==100&&a.stack().count(0)==64&&b.stack().count(0)==36&&c.stack().isEmpty(),"Goods fill one pallet to a full stack before starting the next");
         h.assertTrue(b.cargo().insert(PLANKS,20)==20&&c.stack().count(0)==20&&b.stack().size()==1,"A new item starts an empty pallet instead of topping another item's stack");
-        h.assertTrue(c.cargo().insert(STONE,30)==30&&b.stack().count(0)==64&&c.stack().count(1)==2,"More stone tops up the stone pallet first, then goes on top of other goods");
-        h.assertTrue(a.cargo().count(0)==130&&a.cargo().remove(0,10)==10&&c.stack().size()==1&&b.stack().count(0)==56&&a.stack().count(0)==64,"Taking goods empties the last pallet holding them first");
+        h.assertTrue(c.cargo().insert(STONE,100)==100&&b.stack().count(0)==128&&c.stack().count(1)==8,"More stone tops up the stone pallets first, then goes on top of other goods");
+        h.assertTrue(a.cargo().count(0)==200&&a.cargo().remove(0,10)==10&&c.stack().size()==1&&b.stack().count(0)==126&&a.stack().count(0)==64,"Taking goods empties the last pallet holding them first");
         h.assertTrue(a.cargo().transferTo(c.cargo())==0,"Transfers between aliases of one group cannot duplicate stock");h.succeed();
     }
     @GameTest(template="industrial") public static void emptyPalletsLeaveAGroupFreelyAndOpenMenusFollow(GameTestHelper h){
@@ -68,50 +95,52 @@ public final class StockpileGroupGameTests {
         p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));use(a,p);
         h.assertTrue(a.stack().count(0)==2*hand&&p.getOffhandItem().isEmpty()&&p.getMainHandItem().is(Items.IRON_PICKAXE),"A tool in the main hand does not stop the offhand blocks going on");
         // Opening the menu needs a real client connection; the pallet visual scene clicks a full pallet for that half.
-        a.cargo().insert(new ItemStack(Items.STONE),64);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));
-        h.assertTrue(!a.putHeld(p)&&p.getOffhandItem().getCount()==hand&&a.stack().count(0)==64,"With no room left, right-click falls through to the menu and the hand keeps its blocks");h.succeed();
+        a.cargo().insert(new ItemStack(Items.STONE),128);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));
+        h.assertTrue(!a.putHeld(p)&&p.getOffhandItem().getCount()==hand&&a.stack().count(0)==128,"With no room left, right-click falls through to the menu and the hand keeps its blocks");h.succeed();
     }
     @GameTest(template="industrial") public static void overloadedPalletsFromBeforeTheLimitKeepEveryItemAndDrainFirst(GameTestHelper h){
         floor(h);var registry=h.getLevel().registryAccess();var a=pallet(h,3,1,3);a.loadWithComponents(legacy(h,STONE,700,PLANKS,1000),registry);
-        h.assertTrue(a.cargo().count(0)==700&&a.cargo().count(1)==1000&&a.cargo().load()==1700&&a.layers()==4,"A pallet saved over the limit keeps every item and draws as a full stack");
-        h.assertTrue(a.cargo().insert(STONE,1)==0&&CargoInventory.blocks(a.cargo().load(),a.cargo().capacity()).equals("Overloaded: 1,700 / 64"),"An overloaded pallet accepts nothing and says so");
+        a.tick();h.assertTrue(a.cargo().count(0)==700&&a.cargo().count(1)==1000&&a.cargo().load()==1700&&a.layers()==8&&holdsTop(a),"A pallet saved over the limit keeps every item and draws as a full two-high stack in the free space above");
+        h.assertTrue(a.cargo().insert(STONE,1)==0&&CargoInventory.blocks(a.cargo().load(),a.cargo().capacity()).equals("Overloaded: 1,700 / 128"),"An overloaded pallet accepts nothing and says so");
+        var under=pallet(h,7,1,3);h.setBlock(new BlockPos(7,2,3),Blocks.STONE);under.loadWithComponents(legacy(h,STONE,90),registry);under.tick();
+        h.assertTrue(under.layers()==4&&above(under).is(Blocks.STONE)&&CargoInventory.blocks(under.cargo().load(),under.cargo().capacity()).equals("Overloaded: 90 / 64"),"Old stock under a block stays one block high and never displaces it");
         var restored=pallet(h,8,1,8);restored.loadWithComponents(a.saveWithoutMetadata(registry),registry);
         h.assertTrue(restored.stack().count(0)==700&&restored.stack().count(1)==1000,"Overloaded stock saves unchanged");
         var b=pallet(h,4,1,3);
         h.assertTrue(a.cargo().insert(COBBLE,10)==10&&b.stack().count(0)==10,"An overloaded pallet does not block its neighbour");
         h.assertTrue(a.cargo().remove(0,650)==650&&a.stack().count(0)==50&&a.cargo().remove(1,1000)==1000&&a.stack().load()==50,"Taking goods drains the overloaded pallet first");
-        h.assertTrue(a.cargo().insert(STONE,20)==20&&a.stack().count(0)==64&&b.stack().count(1)==6,"Back under the limit, the pallet fills like any other");
+        h.assertTrue(a.cargo().insert(STONE,20)==20&&a.stack().count(0)==70&&b.stack().size()==1,"Back under the limit, the pallet fills like any other");
         var c=pallet(h,3,1,6);var d=pallet(h,4,1,6);c.loadWithComponents(legacy(h,STONE,512),registry);d.loadWithComponents(legacy(h,STONE,188),registry);
-        h.assertTrue(c.cargo().count(0)==700&&CargoInventory.blocks(c.cargo().load(),c.cargo().capacity()).equals("Overloaded: 700 / 128"),"An old mass-shared group keeps both saved shares");
+        h.assertTrue(c.cargo().count(0)==700&&CargoInventory.blocks(c.cargo().load(),c.cargo().capacity()).equals("Overloaded: 700 / 256"),"An old mass-shared group keeps both saved shares");
         h.assertTrue(c.cargo().remove(0,100)==100&&c.stack().count(0)+d.stack().count(0)==600,"Withdrawing from an overloaded group conserves every item");h.succeed();
     }
     @GameTest(template="industrial") public static void sharedCapacityAllowsPartialWheelbarrowTransfersAndCompetingMenus(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);
-        h.assertTrue(a.cargo().insert(COBBLE,200)==128&&b.stack().count(0)==64,"Two pallets accept exactly their two stacks, with no native stack cap");
+        h.assertTrue(a.cargo().insert(COBBLE,300)==256&&a.stack().count(0)==128&&b.stack().count(0)==128,"Two pallets accept exactly their two stacks, with no native stack cap");
         var p=player(h);var q=player(h);var first=new CargoMenu(1,p.getInventory(),a);var second=new CargoMenu(2,q.getInventory(),b);
         first.clicked(0,0,ClickType.QUICK_MOVE,p);second.clicked(0,0,ClickType.QUICK_MOVE,q);
         int hand=BlockCarry.LIMIT,tray=WheelbarrowEntity.GRID.capacity();
-        h.assertTrue(a.cargo().count(0)==128-2*hand&&b.stack().count(0)==64-2*hand&&p.getOffhandItem().getCount()==hand&&q.getOffhandItem().getCount()==hand,"Two menus withdraw from the same authoritative stacks");
+        h.assertTrue(a.cargo().count(0)==256-2*hand&&b.stack().count(0)==128-2*hand&&p.getOffhandItem().getCount()==hand&&q.getOffhandItem().getCount()==hand,"Two menus withdraw from the same authoritative stacks");
         var wheel=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());wheel.setPos(a.cargoPosition().add(0,0,2));h.getLevel().addFreshEntity(wheel);
         h.assertTrue(wheel.cargo().insert(COBBLE,100)==tray,"The tray takes only what it holds");
         var carrier=new CargoMenu(3,p.getInventory(),wheel);
-        h.assertTrue(carrier.clickMenuButton(p,1)&&wheel.cargo().count(0)==tray-2*hand&&b.stack().count(0)==64,"Unloading fills the free stack and keeps the rest in the wheelbarrow");
-        a.cargo().remove(0,60);
-        h.assertTrue(carrier.clickMenuButton(p,0)&&wheel.cargo().count(0)==tray&&b.stack().isEmpty()&&a.stack().count(0)==64-(2*hand-4),"Loading takes from the whole group, last pallet first");h.succeed();
+        h.assertTrue(carrier.clickMenuButton(p,1)&&wheel.cargo().count(0)==tray-2*hand&&b.stack().count(0)==128,"Unloading fills the free stack and keeps the rest in the wheelbarrow");
+        a.cargo().remove(0,124);
+        h.assertTrue(carrier.clickMenuButton(p,0)&&wheel.cargo().count(0)==tray&&b.stack().isEmpty()&&a.stack().count(0)==128-(2*hand-4),"Loading takes from the whole group, last pallet first");h.succeed();
     }
     @GameTest(template="industrial") public static void nativePalletSavesKeepOnlyTheirOwnStack(GameTestHelper h){
-        floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);a.cargo().insert(STONE,100);
+        floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);a.cargo().insert(STONE,150);
         var registry=h.getLevel().registryAccess();var ta=a.saveWithoutMetadata(registry);var tb=b.saveWithoutMetadata(registry);
-        h.assertTrue(ta.getList("Cargo",10).getCompound(0).getLong("count")==64&&tb.getList("Cargo",10).getCompound(0).getLong("count")==36,"Each pallet saves only its own stack, never the shared menu");
+        h.assertTrue(ta.getList("Cargo",10).getCompound(0).getLong("count")==128&&tb.getList("Cargo",10).getCompound(0).getLong("count")==22,"Each pallet saves only its own stack, never the shared menu");
         var stale=a.cargo();b.setRemoved();b.clearRemoved();b.onLoad();
-        h.assertTrue(a.palletCount()==2&&a.cargo().count(0)==100&&stale.insert(STONE,1)==0,"Removal/reload hooks invalidate cached views without copying stock");
+        h.assertTrue(a.palletCount()==2&&a.cargo().count(0)==150&&stale.insert(STONE,1)==0,"Removal/reload hooks invalidate cached views without copying stock");
         // A removed BE in a still-loaded chunk is recreated by vanilla while
         // its block remains. Remove the block too to model an absent member.
-        h.setBlock(new BlockPos(4,1,3),Blocks.AIR);h.assertTrue(a.palletCount()==1&&a.cargo().count(0)==64,"Absent members contribute neither capacity nor stock");
-        b=pallet(h,4,1,3);b.loadWithComponents(tb,registry);h.assertTrue(a.palletCount()==2&&a.cargo().count(0)==100,"Restoring a member reconnects its saved stack once");
+        h.setBlock(new BlockPos(4,1,3),Blocks.AIR);h.assertTrue(a.palletCount()==1&&a.cargo().count(0)==128,"Absent members contribute neither capacity nor stock");
+        b=pallet(h,4,1,3);b.loadWithComponents(tb,registry);h.assertTrue(a.palletCount()==2&&a.cargo().count(0)==150,"Restoring a member reconnects its saved stack once");
         h.setBlock(new BlockPos(3,1,3),Blocks.AIR);h.setBlock(new BlockPos(4,1,3),Blocks.AIR);
         var rb=pallet(h,4,1,3);rb.loadWithComponents(tb,registry);var ra=pallet(h,3,1,3);ra.loadWithComponents(ta,registry);
-        h.assertTrue(ra.cargo().count(0)==100&&rb.cargo().count(0)==100,"Restoring native tags in reverse order rebuilds one shared menu");h.succeed();
+        h.assertTrue(ra.cargo().count(0)==150&&rb.cargo().count(0)==150,"Restoring native tags in reverse order rebuilds one shared menu");h.succeed();
     }
     @GameTest(template="industrial") public static void everyConnectedClaimIsCheckedBeforeUsingAnOpenMenu(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);a.cargo().insert(STONE,10);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),a);
