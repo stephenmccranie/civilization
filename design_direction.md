@@ -34,7 +34,7 @@ The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-ce
 
 These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim. Beautiful ground settlements stay possible at every stage.
 
-- **Black steel** is the signature industrial material: blackened iron and steel in charcoal with a faint cool cast, never flat black. Its edges wear to bright, scratched steel only where hands and tools touch, and rust appears only through neglect.
+- **Black steel** is the signature industrial material: blackened iron and steel in charcoal with a faint cool cast, never flat black. Its edges wear to bright, scratched steel only where hands and tools touch, and rust appears only through neglect. Iron stays bare, forged gray so it always reads apart from steel.
 - Brass for bearings, fittings, instruments and contacts — things touched or read; copper where heat or electricity explains it; porcelain for insulation; blue-white light only for electrical energy. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
 - Textures are dark, hand-painted pixel art, more distinctive than vanilla: deep values, large deliberate colour clusters, few tones per material and worn-edge highlights that articulate dark metal.
 - Material behaviour stays distinct — wool weave, timber grain, fractured minerals, cast-metal wear — never one generic surface.
