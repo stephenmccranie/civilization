@@ -35,6 +35,7 @@ These are starting defaults; adjust them for your hardware.
 | DH CPU | Balanced defaults (half the logical processors); no fixed thread count |
 | DH database synchronization | Normal |
 | DH automatic updates | Off, to keep the tested version |
+| DH garbage-collector chat warning | Off |
 | Vanilla render / simulation distance | 12 / 5 chunks |
 | Shader | Photon v1.3b, Medium profile |
 | Shader materials | Normal and specular mapping on for Patrix; handheld lighting on |
