@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.ChatScreen;
 
-/** The join welcome as players see it at the pack's GUI scale, closed and open, received from the integrated server's real login. */
+/** The join welcome as players see it at the pack's GUI and chat scale, closed and open, received from the integrated server's real login. */
 final class WelcomeVisualCheck {
     private static int ticks;
     static void tick(Minecraft mc) {
@@ -12,6 +12,7 @@ final class WelcomeVisualCheck {
         if (ticks == 10) {
             mc.options.hideGui = false;
             mc.options.guiScale().set(4);
+            mc.options.chatScale().set(0.5);
             mc.resizeDisplay();
             mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
         }

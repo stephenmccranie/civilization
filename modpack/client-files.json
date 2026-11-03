@@ -278,6 +278,13 @@
       "key": "lodChunkRenderDistanceRadius",
       "from": "256",
       "value": "128"
+    },
+    {
+      "path": "options.txt",
+      "section": "",
+      "key": "chatScale",
+      "from": "1.0",
+      "value": "0.5"
     }
   ]
 }
