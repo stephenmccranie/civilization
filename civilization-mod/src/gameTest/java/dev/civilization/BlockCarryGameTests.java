@@ -89,7 +89,7 @@ public final class BlockCarryGameTests {
         var swap=new net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent.Hands(p);BlockCarry.swap(swap);h.assertTrue(swap.isCanceled(),"F cannot move carried blocks into the main hand");h.succeed();
     }
     @GameTest(template="industrial") public static void recipeBookCraftsFromOffhandAndCannotSelfDuplicate(GameTestHelper h){
-        var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OAK_PLANKS,3));p.getInventory().setItem(1,new ItemStack(Items.STICK,2));
+        var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OAK_PLANKS,3));p.getInventory().setItem(1,new ItemStack(Items.STICK,3));
         h.assertTrue(BlockCarry.insert(p.getInventory(),p.getOffhandItem())==0&&p.getOffhandItem().getCount()==3,"Moving the hand stack to itself cannot duplicate or report a transfer");
         var table=h.absolutePos(new BlockPos(5,2,5));h.getLevel().setBlockAndUpdate(table,Blocks.CRAFTING_TABLE.defaultBlockState());
         var menu=new CraftingMenu(1,p.getInventory(),ContainerLevelAccess.create(h.getLevel(),table));p.containerMenu=menu;BlockCarry.attachMenu(menu,p.getInventory());
