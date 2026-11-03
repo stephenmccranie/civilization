@@ -305,7 +305,7 @@ public final class IndustryGameTests {
 
     private static BlockPos port(IndustrialBlockEntity m,String role){return IndustrialStructure.parts(m.kind).stream().filter(p->p.material().equals(role)).map(p->MachineStructure.position(m.getBlockPos(),m.front(),p)).findFirst().orElseThrow();}
     private static void pipe(GameTestHelper h,BlockPos p){h.getLevel().setBlockAndUpdate(p,IndustrialContent.PIPE.get().defaultBlockState());}
-    @GameTest(template="empty",timeoutTicks=460,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
+    @GameTest(template="empty",timeoutTicks=1000,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
         var l=h.getLevel();var origin=h.absolutePos(new BlockPos(0,67,0));
         // This 60-block pipeline extends beyond the tiny empty template's ticking area.
         for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
@@ -324,9 +324,11 @@ public final class IndustryGameTests {
         pipe(h,h.absolutePos(new BlockPos(56,69,4)));
         var tankPos=h.absolutePos(new BlockPos(57,69,4));l.setBlockAndUpdate(tankPos,IndustrialContent.TANK.get().defaultBlockState());
         var tank=(IndustrialBlockEntity)l.getBlockEntity(tankPos);
-        // Let newly placed block-entity tickers/ports settle before the fixed 400-tick measurement.
-        h.runAfterDelay(20,()->{
-        for(var m:java.util.List.of(pump,heater,column,condenser))
+        // Forced chunks reach entity-ticking on the chunk system's own clock, which catch-up ticks can outrun, so wait for that state;
+        // then let newly placed block-entity tickers/ports settle before the fixed 400-tick measurement.
+        var stages=java.util.List.of(pump,heater,column,condenser);
+        h.startSequence().thenWaitUntil(()->{for(var m:stages)h.assertTrue(l.isPositionEntityTicking(m.getBlockPos()),"Every stage's chunk becomes entity-ticking: "+m.kind);}).thenIdle(20).thenExecute(()->{
+        for(var m:stages)
             h.assertTrue(l.isPositionEntityTicking(m.getBlockPos())&&m.formed&&m.progress==0,"Every stage is loaded and idle before priming: "+m.kind);
         pump.setItem(0,KilnContent.MINERAL_COAL.toStack(32));heater.setItem(0,KilnContent.MINERAL_COAL.toStack(32));
         CoalFireFixture.light(pump);CoalFireFixture.light(heater);
