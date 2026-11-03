@@ -44,9 +44,6 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - The first firearm, the Colt Paterson (1836), is an explicit earlier addition to the setting.
 - Grassier Grass (optional client mod) never whitens blades from cold or altitude alone. Blades look like taller wild grass with restrained height variation. Cumulative footsteps permanently shorten blades along travelled routes, shared and saved with the world; standing, flying and teleporting add no wear. Visual only.
 
-**Open**
-- The material, item-sprite and machine-face reference sheets the texture pass draws from.
-
 ## People: calories, movement and recovery
 
 - One calorie reserve replaces hunger, saturation and exhaustion. Work, movement, healing and sleep have explicit costs; cut-piece placement scales with volume, and sleep pays for elapsed in-game time. No idle or offline drain; cold adds a bounded passive cost while an active Survival player is online.
