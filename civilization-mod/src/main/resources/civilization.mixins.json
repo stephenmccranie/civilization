@@ -52,7 +52,8 @@
     "CreativeInventoryAccessoriesMixin",
     "InventoryRecipeBookMixin",
     "ContainerScreenMixin",
-    "CraftingScreenMixin"
+    "CraftingScreenMixin",
+    "AutoGuiScaleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

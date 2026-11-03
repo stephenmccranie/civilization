@@ -20,8 +20,8 @@ These are starting defaults; adjust them for your hardware.
 
 | Setting | Pack default |
 | --- | --- |
-| GUI scale / FOV | 4× / 90° |
-| Chat text size / width / closed height | 50% / 180 px (about 38% of a 1080p screen) / 20 lines; the rest of the GUI stays 4× |
+| GUI scale / FOV | Auto: one step per 360 px of window height (3× at 1080p, 4× at 1440p, 6× at 4K) / 90° |
+| Chat text size / width / closed height | 75% / 264 GUI px (about 41% of the screen width at any resolution) / 20 lines |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
 | Grassier Grass blade height / height variation | 0.65 / 0.35 |
 | DH distance | 128 chunks |

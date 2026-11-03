@@ -1,7 +1,7 @@
 renderDistance:12
-guiScale:4
-chatScale:0.5
-chatWidth:0.5
+guiScale:0
+chatScale:0.75
+chatWidth:0.8
 chatHeightUnfocused:1.0
 fov:0.5
 simulationDistance:5
