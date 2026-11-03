@@ -47,6 +47,7 @@ public final class PreviewVisualCheck {
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
 
+        if(CHECK.equals("welcome")){WelcomeVisualCheck.tick(mc);return;}
         if(CHECK.equals("grassier-grass")){GrassierGrassVisualCheck.tick(mc);return;}
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}
