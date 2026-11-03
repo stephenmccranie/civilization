@@ -75,7 +75,7 @@ Survival and Adventure players carry **one stack of at most 32 placeable blocks 
 
 Filled shulker boxes, bundles and other component-backed containers cannot be carried as hidden loads. On login and between server transactions, misplaced block stacks and filled portable containers move into a private saved recovery balance after the hand stack is filled; nothing is deleted. Use **`/civilization recoverblocks`** with a free or matching offhand to withdraw the next permitted stack. Recovery is keyed by player UUID and survives reload and death; a saved filled container unpacks one layer per command, and non-block contents return to ordinary inventory.
 
-The slot classification runs in both the client and the server; clients older than the classification keep their old slot rules ([server connections](README.md#server-connections)).
+The slot classification runs in both the client and the server.
 
 ## Shared crafting tables
 

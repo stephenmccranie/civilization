@@ -42,7 +42,7 @@ Photon is the primary shader target; Bliss and Complementary are secondary check
 
 ### Server connections
 
-Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `3/0.35.0-dev`, the identity advertised by the published 0.35.0 client. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update: a 0.35.0 client can connect but keeps its old small-placeable inventory restrictions.
+Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `4/0.35.14-dev`, the identity advertised by the published 0.35.14 client, which changed the wheelbarrow's input packet and synchronized cargo. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update. The pack manifest's own `protocol` field is the updater's format and stays `3/0.35.0-dev`, so installed updaters keep accepting new releases.
 
 This is a compatibility gate, not authentication or anti-cheat: a modified client can imitate the channel. Account authentication and server access controls are separate. Players install the [Prism playtest client](../modpack/README.md); the host supplies the server address privately.
 
