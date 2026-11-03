@@ -101,6 +101,12 @@ final class WheelbarrowVisualCheck {
         if(t==470){mc.getEntityRenderDispatcher().setRenderHitBoxes(false);observe(mc,null,0,0);check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(-21,100,-4),Blocks.AIR.defaultBlockState()));}
         // The tray draws every block it holds: one 6x9 layer, three layers to the rim, then a mixed heap.
         if(t==472){check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(-21.5,100,-4.5);e.cargo().insert(new ItemStack(Blocks.STONE),54);});observe(mc,new Vec3(-19.6,101.9,-2.3),139,30);}
+        if(t==483){
+            // Walk past the wheel through ground its broad bounds cover; with the pack's Lithium installed this takes Lithium's collision path.
+            var e=barrow(mc);if(Math.abs(Mth.wrapDegrees(e.getYRot()))>.01f)throw new IllegalStateException("The parked barrow had not settled facing south: "+e.getYRot());
+            var start=new Vec3(e.getX()+.45,e.getY(),e.getZ()+2);mc.player.setPos(start);mc.player.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,0,-1.2));
+            if(start.z-mc.player.getZ()<1.19)throw new IllegalStateException("Broad bounds blocked a player walking past the wheel at "+mc.player.position()+" beside "+e.position());
+        }
         if(t==478)shot(mc,"tray-layer");
         if(t==479)check(server,()->barrow(server).cargo().insert(new ItemStack(Blocks.OAK_PLANKS),108));
         if(t==485)shot(mc,"tray-rim");
