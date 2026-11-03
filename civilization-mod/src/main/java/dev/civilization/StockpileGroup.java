@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
  */
 final class StockpileGroup implements CargoInventory {
     private final List<StockpileEntity> members;
-    private final List<MassCargo.Entry> entries=new ArrayList<>();
+    private final List<CargoLedger.Entry> entries=new ArrayList<>();
     private boolean valid=true,dirty=true;
     private long revision;
     private StockpileGroup(List<StockpileEntity> members){this.members=members;}
@@ -57,10 +57,10 @@ final class StockpileGroup implements CargoInventory {
                 var existing=entries.get(j);
                 if(ItemStack.isSameItemSameComponents(existing.item(),e.item())){
                     long n=Math.min(left,Long.MAX_VALUE-existing.count());
-                    if(n>0){entries.set(j,new MassCargo.Entry(existing.item(),existing.count()+n));left-=n;}
+                    if(n>0){entries.set(j,new CargoLedger.Entry(existing.item(),existing.count()+n));left-=n;}
                 }
             }
-            if(left>0)entries.add(new MassCargo.Entry(e.item(),left));
+            if(left>0)entries.add(new CargoLedger.Entry(e.item(),left));
         }
         dirty=false;
     }
@@ -69,7 +69,7 @@ final class StockpileGroup implements CargoInventory {
     @Override public int size(){refresh();return entries.size();}
     @Override public long revision(){return revision;}
     @Override public long count(int index){refresh();return index>=0&&index<entries.size()?entries.get(index).count():0;}
-    @Override public MassCargo.Entry entry(int index){refresh();var e=entries.get(index);return new MassCargo.Entry(e.item().copy(),e.count());}
+    @Override public CargoLedger.Entry entry(int index){refresh();var e=entries.get(index);return new CargoLedger.Entry(e.item().copy(),e.count());}
     /** Pallets already holding the item, then empty pallets, then on top of other goods; each fills to a full stack before the next. */
     @Override public long insert(ItemStack item,long offered){
         if(!valid||offered<=0)return 0;

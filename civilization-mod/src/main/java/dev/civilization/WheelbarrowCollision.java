@@ -4,10 +4,15 @@ import java.util.*;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.*;
 
-/** Measured native model surfaces. Rotation is voxelized once per heading, never per frame. */
+/**
+ * Measured native model surfaces in the model frame (x right, y up, z rear). The same boxes collide,
+ * take mouse hits and show as the debug hitbox. Rotation is voxelized once per heading, never per frame.
+ */
 public final class WheelbarrowCollision {
     public static final double TRAY_TOP=15.525/16;
-    private static final List<AABB> PARTS=parts();
+    public static final List<AABB> BODY=parts();
+    // Handles are interaction targets, never solid obstacles; the wide box makes them easy to grab.
+    private static final AABB HANDLES=new AABB(-.48,.45,12.69/16,.48,1.05,1.472);
     private float yawA=Float.NaN,yawB=Float.NaN;
     private VoxelShape shapeA,shapeB;
     private static List<AABB> parts(){
@@ -17,22 +22,32 @@ public final class WheelbarrowCollision {
         for(int side:new int[]{-1,1}){
             double x0=side<0?-6.48/16:4.995/16,x1=side<0?-4.995/16:6.48/16;
             boxes.add(new AABB(x0,0,9.72/16,x1,9.045/16,11.205/16));
-            // Handles are visual/interaction targets, never solid obstacles.
         }
         boxes.add(new AABB(-.055,0,-1.065,.055,.12,-.625));
         boxes.add(new AABB(-.055,.12,-1.195,.055,.56,-.49));
         boxes.add(new AABB(-.055,.56,-1.065,.055,.69,-.625));
         return List.copyOf(boxes);
     }
-    public static AABB bounds(Vec3 at,float yaw){
-        return rotatedBounds(at,yaw,-1.195,12.69/16);
+    /** World point of a model-frame point on a carrier at `at` facing `yaw`. */
+    public static Vec3 place(Vec3 at,float yaw,Vec3 model){return at.add(model.yRot((float)Math.toRadians(180d-yaw)));}
+    /** World bounds of a model-frame box on a carrier at `at` facing `yaw`. */
+    public static AABB place(Vec3 at,float yaw,AABB model){
+        double a=Math.toRadians(180d-yaw),s=Math.abs(Math.sin(a)),c=Math.abs(Math.cos(a));
+        var center=place(at,yaw,model.getCenter());double x=c*model.getXsize()/2+s*model.getZsize()/2,z=s*model.getXsize()/2+c*model.getZsize()/2;
+        return new AABB(center.x-x,at.y+model.minY,center.z-z,center.x+x,at.y+model.maxY,center.z+z);
     }
-    public static AABB pickBounds(Vec3 at,float yaw){return rotatedBounds(at,yaw,-1.195,1.472);}
-    private static AABB rotatedBounds(Vec3 at,float yaw,double minZ,double maxZ){
-        double a=Math.toRadians(180d-yaw),s=Math.sin(a),c=Math.cos(a),center=(minZ+maxZ)/2,depth=(maxZ-minZ)/2;
-        double x=Math.abs(c)*.4471875+Math.abs(s)*depth,z=Math.abs(s)*.4471875+Math.abs(c)*depth;
-        return new AABB(at.x+s*center-x,at.y,at.z+c*center-z,at.x+s*center+x,at.y+TRAY_TOP,at.z+c*center+z).inflate(1d/32,0,1d/32);
+    /** Physical body bounds, padded for the voxel grid's rounding. */
+    public static AABB bounds(Vec3 at,float yaw){return place(at,yaw,new AABB(-.4471875,0,-1.195,.4471875,TRAY_TOP,12.69/16)).inflate(1d/32,0,1d/32);}
+    public static AABB pickBounds(Vec3 at,float yaw){return bounds(at,yaw).minmax(place(at,yaw,HANDLES));}
+    /** Nearest point where a ray meets the body or handles, tested in the model frame. */
+    public static Optional<Vec3> pick(Vec3 at,float yaw,Vec3 from,Vec3 to){
+        float back=(float)Math.toRadians(yaw-180d);
+        Vec3 a=from.subtract(at).yRot(back),b=to.subtract(at).yRot(back),best=null;
+        for(var box:BODY)best=nearer(a,best,box.clip(a,b));
+        best=nearer(a,best,HANDLES.clip(a,b));
+        return Optional.ofNullable(best).map(hit->place(at,yaw,hit));
     }
+    private static Vec3 nearer(Vec3 from,Vec3 best,Optional<Vec3> hit){return hit.filter(h->best==null||from.distanceToSqr(h)<from.distanceToSqr(best)).orElse(best);}
     public VoxelShape at(Vec3 position,float yaw){return local(yaw).move(position.x,position.y,position.z);}
     private VoxelShape local(float yaw){
         if(Float.compare(yaw,yawA)==0)return shapeA;
@@ -42,13 +57,13 @@ public final class WheelbarrowCollision {
     private static VoxelShape build(float yaw){
         // One shared horizontal grid avoids expensive unions of hundreds of
         // independently rotated boxes. Vertical coordinates remain exact.
-        double[] ys=PARTS.stream().flatMapToDouble(b->java.util.stream.DoubleStream.of(b.minY,b.maxY)).distinct().sorted().toArray();
+        double[] ys=BODY.stream().flatMapToDouble(b->java.util.stream.DoubleStream.of(b.minY,b.maxY)).distinct().sorted().toArray();
         int cells=96;double step=1d/32,origin=-1.5;
         double[] horizontal=new double[cells+1];for(int i=0;i<=cells;i++)horizontal[i]=origin+i*step;
         var grid=new BitSetDiscreteVoxelShape(cells,ys.length-1,cells);
         double a=Math.toRadians(180d-yaw),s=Math.sin(a),c=Math.cos(a);
         if(Math.abs(s)<1e-12)s=0;if(Math.abs(c)<1e-12)c=0;
-        for(var box:PARTS){
+        for(var box:BODY){
             double[] xs=new double[4],zs=new double[4];double minX=Double.POSITIVE_INFINITY,maxX=Double.NEGATIVE_INFINITY;
             for(int i=0;i<4;i++){
                 double x=(i==0||i==3)?box.minX:box.maxX,z=i<2?box.minZ:box.maxZ;

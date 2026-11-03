@@ -1,7 +1,5 @@
 package dev.civilization;
 
-import java.text.*;
-import java.util.Locale;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -17,14 +15,14 @@ import net.minecraft.world.phys.Vec3;
 /** One pallet's own stack: 64 blocks of solid volume, drawn one for one. Side-connected pallets share a menu through StockpileGroup. */
 public final class StockpileEntity extends BlockEntity implements CargoHolder,MenuProvider {
     public static final int CAPACITY=64,LAYER=16;
-    private final MassCargo stack=new MassCargo(CargoMass::volume,()->CAPACITY,this::changed);
+    private final CargoLedger stack=new CargoLedger(()->CAPACITY,this::changed);
     StockpileGroup group;
     private boolean networkDirty;
     public StockpileEntity(BlockPos p,BlockState s){super(CargoContent.ENTITY.get(),p,s);}
     private void changed(){if(group!=null)group.changed();setChanged();networkDirty=true;}
     public void tick(){if(networkDirty){networkDirty=false;level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);}}
     /** This pallet's own goods, bottom of the stack first. Clients receive it to draw and shape the stack. */
-    public MassCargo stack(){return stack;}
+    public CargoLedger stack(){return stack;}
     /** Started layers; an overloaded pallet draws as full. */
     public int layers(){return (int)Math.ceil(Math.min(stack.load(),CAPACITY)/LAYER);}
     private StockpileGroup group(){if(group==null)group=StockpileGroup.find(this);return group;}
@@ -35,14 +33,9 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
         for(var hand:InteractionHand.values()){
             var held=p.getItemInHand(hand);var name=held.getHoverName();
             int n=(int)cargo().insert(held,held.getCount());
-            if(n>0){held.shrink(n);p.displayClientMessage(Component.literal("Stacked "+n+" ").append(name).append(" · "+blocks(cargo().load(),cargo().capacity())),true);return true;}
+            if(n>0){held.shrink(n);p.displayClientMessage(Component.literal("Stacked "+n+" ").append(name).append(" · "+CargoInventory.blocks(cargo().load(),cargo().capacity())),true);return true;}
         }
         return false;
-    }
-    public static String blocks(double load,double capacity){
-        if(!Double.isFinite(load))return "Unknown goods: take them off";
-        var format=new DecimalFormat("#,##0.###",DecimalFormatSymbols.getInstance(Locale.ROOT));
-        return load>capacity?"Overloaded: "+format.format(load)+" / "+format.format(capacity):format.format(load)+" / "+format.format(capacity)+" blocks";
     }
     @Override public void onLoad(){super.onLoad();if(group!=null)group.invalidate();StockpileGroup.invalidateAround(level,worldPosition);}
     @Override public void setRemoved(){if(group!=null)group.invalidate();super.setRemoved();}

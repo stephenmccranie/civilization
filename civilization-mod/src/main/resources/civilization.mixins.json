@@ -46,6 +46,7 @@
     "SlotPositionAccess",
     "CarryRecipeBookMixin",
     "WheelbarrowPlayerModelMixin",
+    "WheelbarrowHitboxMixin",
     "WeatherClientMixin",
     "WeatherRenderMixin",
     "InventoryScreenMixin",

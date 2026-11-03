@@ -6,18 +6,15 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
 
-/** One authoritative ledger, limited by mass or, on pallets, by solid volume. ItemStack is a one-item identity, never an oversized saved stack. */
-public final class MassCargo implements CargoInventory {
+/** One authoritative ledger limited by solid volume in blocks. ItemStack is a one-item identity, never an oversized saved stack. */
+public final class CargoLedger implements CargoInventory {
     public record Entry(ItemStack item,long count){}
     private final List<Entry> entries=new ArrayList<>();
-    private final ToDoubleFunction<ItemStack> unit;
     private final DoubleSupplier capacity;
     private final Runnable changed;
-    private double cachedLoad;
-    private int materialRevision=-1;
+    private double cachedLoad=Double.NaN;
     private long revision;
-    public MassCargo(DoubleSupplier capacity,Runnable changed){this(CargoMass::unitKg,capacity,changed);}
-    public MassCargo(ToDoubleFunction<ItemStack> unit,DoubleSupplier capacity,Runnable changed){this.unit=unit;this.capacity=capacity;this.changed=changed;}
+    public CargoLedger(DoubleSupplier capacity,Runnable changed){this.capacity=capacity;this.changed=changed;}
     public double capacity(){return capacity.getAsDouble();}
     public boolean isEmpty(){return entries.isEmpty();}
     public int size(){return entries.size();}
@@ -30,16 +27,15 @@ public final class MassCargo implements CargoInventory {
     }
     /** Unknown goods count as infinite, so a store holding them accepts nothing until they are unloaded. */
     public double load(){
-        if(materialRevision!=PhysicalMaterials.revision()){
+        if(Double.isNaN(cachedLoad)){
             cachedLoad=0;
-            for(var e:entries){double u=unit.applyAsDouble(e.item);cachedLoad+=Double.isFinite(u)?u*e.count:Double.POSITIVE_INFINITY;}
-            materialRevision=PhysicalMaterials.revision();
+            for(var e:entries){double u=CargoMass.volume(e.item);cachedLoad+=Double.isFinite(u)?u*e.count:Double.POSITIVE_INFINITY;}
         }
         return cachedLoad;
     }
-    private void dirty(){materialRevision=-1;revision++;changed.run();}
+    private void dirty(){cachedLoad=Double.NaN;revision++;changed.run();}
     public long insert(ItemStack item,long offered){
-        double u=unit.applyAsDouble(item);
+        double u=CargoMass.volume(item);
         if(offered<=0||!Double.isFinite(u)||u<=0)return 0;
         double free=Math.max(0,capacity()-load());
         long n=Math.min(offered,(long)Math.floor(free/u));

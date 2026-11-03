@@ -9,7 +9,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public record CaloriePayload(double calories, double capacity, double sprintMinimum, boolean depleted, double recovery) implements CustomPacketPayload {
     // Wire compatibility is independent of the release version. Retain 0.35.0's existing ID
     // so its published clients work unchanged; bump only for incompatible network/content changes.
-    public static final String PROTOCOL_VERSION = "3/0.35.0-dev";
+    public static final String PROTOCOL_VERSION = "4/0.35.14-dev";
     public static final Type<CaloriePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("civilization", "calories"));
     public static final StreamCodec<RegistryFriendlyByteBuf, CaloriePayload> CODEC = new StreamCodec<>() {
         @Override public CaloriePayload decode(RegistryFriendlyByteBuf buf) {

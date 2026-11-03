@@ -53,7 +53,6 @@ public final class Civilization {
         CoalMiningContent.register(modBus);
         WheelbarrowContent.register(modBus);
         CargoContent.register(modBus);
-        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER,CargoConfig.SPEC,"civilization-cargo.toml");
         RoadContent.register(modBus);
         CivicContent.register(modBus);
         ArenaContent.register(modBus);

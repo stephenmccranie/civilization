@@ -2,7 +2,7 @@ package dev.civilization.client;
 
 import dev.civilization.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -12,25 +12,28 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class WheelbarrowClient {
     private static WheelbarrowEntity handling;
+    // The handler's walk bob; riding decays and zeroes the player's own each tick.
+    private static float bob;
     @SubscribeEvent public static void pose(net.neoforged.neoforge.client.event.RenderPlayerEvent.Pre event){
         if(event.getEntity().getVehicle() instanceof WheelbarrowEntity e){event.getEntity().yBodyRot=e.getYRot();event.getEntity().yBodyRotO=e.yRotO;}
     }
     @SubscribeEvent public static void input(ClientTickEvent.Post event){
-        var mc=Minecraft.getInstance();if(mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity e)){handling=null;return;}
-        // Entity.tick resets the rider's previous yaw after the vehicle ticks.
-        // Apply steering afterwards so vanilla camera interpolation retains the
-        // whole turn between frames, including third-person free look.
+        var mc=Minecraft.getInstance();var p=mc.player;if(p==null||!(p.getVehicle() instanceof WheelbarrowEntity e)){handling=null;return;}
+        boolean active=mc.screen==null&&!mc.isPaused();
         if(!mc.isPaused()){
-            if(handling!=e){
-                mc.player.setYRot(e.getYRot());mc.player.yRotO=e.yRotO;mc.player.setYHeadRot(e.getYRot());mc.player.yHeadRotO=e.yRotO;handling=e;
-            }else{
-                float delta=Mth.wrapDegrees(e.getYRot()-e.yRotO);
-                mc.player.setYRot(mc.player.getYRot()+delta);mc.player.setYHeadRot(mc.player.getYHeadRot()+delta);
-            }
+            if(handling!=e){p.setYRot(e.getYRot());p.yRotO=e.getYRot();p.setYHeadRot(e.getYRot());p.yHeadRotO=e.getYRot();handling=e;bob=0;}
+            // A/D turn the handler like the mouse does and the carrier follows their facing. The
+            // previous yaw is untouched, so vanilla interpolates the whole turn between frames.
+            int turn=active?(mc.options.keyRight.isDown()?1:0)-(mc.options.keyLeft.isDown()?1:0):0;
+            if(turn!=0){p.setYRot(p.getYRot()+turn*WheelbarrowEntity.TURN);e.onPassengerTurned(p);}
+            walk(p);
         }
-        boolean exit=mc.options.keyShift.isDown();boolean active=mc.screen==null&&!mc.isPaused();
         int forward=active?(mc.options.keyUp.isDown()?1:0)-(mc.options.keyDown.isDown()?1:0):0;
-        int turn=active?(mc.options.keyRight.isDown()?1:0)-(mc.options.keyLeft.isDown()?1:0):0;
-        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,turn,exit||!active));
+        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,mc.options.keyShift.isDown()||!active));
+    }
+    /** The handler walks, so their actual travel drives vanilla's walk distance and bob exactly as walking does. */
+    private static void walk(Player p){
+        float stride=(float)Math.hypot(p.getX()-p.xo,p.getZ()-p.zo);
+        p.walkDist+=stride*.6f;p.oBob=bob;bob+=(Math.min(.1f,stride)-bob)*.4f;p.bob=bob;
     }
 }
