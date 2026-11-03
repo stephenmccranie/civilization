@@ -104,7 +104,7 @@ public final class MassCargoGameTests {
         p.setShiftKeyDown(true);e.interact(p,InteractionHand.MAIN_HAND);
         h.assertTrue(!e.isRemoved()&&e.cargo().entry(0).count()==1,"Loaded barrow cannot become a portable inventory item");
         p.setShiftKeyDown(false);var menu=new CargoMenu(1,p.getInventory(),e);
-        p.setPos(e.gripPosition(e.position(),0));e.interact(p,InteractionHand.MAIN_HAND);
+        p.setPos(e.handlerPosition(e.position(),0));e.interact(p,InteractionHand.MAIN_HAND);
         h.assertTrue(p.isPassenger()&&!menu.clickMenuButton(p,1)&&e.cargo().entry(0).count()==1,"Taking handles invalidates open cargo transfers");p.stopRiding();
         var stockMenu=new CargoMenu(2,p.getInventory(),stock);h.setBlock(new BlockPos(5,1,5),Blocks.AIR);
         stockMenu.setCarried(new ItemStack(Items.STONE,1));stockMenu.clicked(0,0,ClickType.PICKUP,p);

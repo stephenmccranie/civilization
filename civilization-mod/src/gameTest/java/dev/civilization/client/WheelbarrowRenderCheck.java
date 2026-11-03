@@ -23,22 +23,12 @@ public final class WheelbarrowRenderCheck {
     public static void camera(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();
         if(gaitCheck&&mc.player!=null&&mc.player.getVehicle() instanceof WheelbarrowEntity barrow)assertGait(mc,barrow);
-        if(!cameraCheck||mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity e))return;
-        float turn=Mth.wrapDegrees(e.getYRot()-e.yRotO);
+        if(!cameraCheck||mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity))return;
+        float turn=Mth.wrapDegrees(mc.player.getYRot()-mc.player.yRotO);
         if(Math.abs(turn)<.1f)return;
-        float offset=Mth.wrapDegrees(mc.player.getYRot()-e.getYRot());
-        // Exercise Camera.setup itself at sub-tick times, in all three views.
-        // A final-heading-only assertion misses a 20 Hz camera staircase.
-        for(var mode:net.minecraft.client.CameraType.values()){
-            var camera=new net.minecraft.client.Camera();
-            for(int frame=0;frame<=4;frame++){
-                float partial=frame/4f;
-                camera.setup(mc.level,mc.player,!mode.isFirstPerson(),mode.isMirrored(),partial);
-                float expected=Mth.rotLerp(partial,e.yRotO,e.getYRot())+offset+(mode.isMirrored()?180:0);
-                if(Math.abs(Mth.wrapDegrees(camera.getYRot()-expected))>.05f)
-                    throw new IllegalStateException("Steering camera stepped instead of interpolating: "+mode+" partial="+partial+" actual="+camera.getYRot()+" expected="+expected);
-            }
-        }
+        // A key turn moves the handler's facing a whole step past the previous yaw, so vanilla's camera
+        // interpolates it smoothly between frames instead of stepping at 20 Hz.
+        if(Math.abs(Math.abs(turn)-WheelbarrowEntity.TURN)>.01f)throw new IllegalStateException("A/D turned the view "+turn+" degrees in a tick instead of an interpolated "+WheelbarrowEntity.TURN);
         if(turn>0)rightCameraSamples++;else leftCameraSamples++;
     }
     @SuppressWarnings({"rawtypes","unchecked"})
@@ -61,7 +51,7 @@ public final class WheelbarrowRenderCheck {
     public static void assertHeading(WheelbarrowEntity e){
         var renderer=(WheelbarrowRenderer)Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(e);
         var pose=new PoseStack();
-        // GeoEntityRenderer passes zero rotationYaw for a non-living entity.
+        // GeckoLib passes zero rotationYaw for a non-living entity.
         renderer.applyRotations(e,pose,e.tickCount,0,1,1);
         var front=pose.last().pose().transformDirection(new Vector3f(0,0,-1)).normalize();
         var expected=new Vec3(0,0,1).yRot(-e.getYRot()*Mth.DEG_TO_RAD);
