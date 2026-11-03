@@ -23,23 +23,28 @@ The agreed rules and setting, one section per system. "Agreed" means settled, no
 
 ## Setting and material style
 
-The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-century industrial foundation developing toward monumental electrical modernism, as one coherent alternate history. Nuclear technology and sky machinery keep physical materials and legible instruments.
+The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-century industrial foundation developing toward monumental electrical modernism, as one coherent alternate history. The fantastic is Tesla's physics made real — wireless power, resonance, radiant energy, antigravity — built from the same materials as everything else: wonder shows in what machines do, never in ornament, runes or magic. Nuclear technology and sky machinery keep physical materials and legible instruments.
 
 | World layer | Material and form language |
 | --- | --- |
-| Farms and frontier | Timber, wool, leather, ceramics, rough masonry; practical, repairable, visibly hand-assembled |
-| Town industry | Brick, dark cast iron, steel, enamel, restrained brass; substantial mechanisms and readable physical controls |
-| Advanced infrastructure | Porcelain insulators, copper conductors, coils, glass instruments; precise functional connections |
+| Farms and frontier | American Western: sun-weathered timber, saddle leather, wool, ceramics, rough masonry, hand-forged iron; practical, repairable, visibly hand-assembled |
+| Town industry | Black steel, brick, enamel, restrained brass; substantial mechanisms and readable physical controls |
+| Advanced infrastructure | Black steel frames, porcelain insulators, copper conductors, coils, glass instruments; precise functional connections |
 | Sky civilization | Pale stone and metal, ivory and turquoise accents, monumental symmetry, restrained Art Deco; enormous electrical apparatus |
 
 These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim. Beautiful ground settlements stay possible at every stage.
 
-- Brass for bearings, fittings, instruments and contacts; copper where heat or electricity explains it. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
+- **Black steel** is the signature industrial material: blackened and blued iron and steel, never flat black. Its shadows carry colour, its edges wear to bright steel only where hands and tools touch, and rust appears only through neglect.
+- Brass for bearings, fittings, instruments and contacts — things touched or read; copper where heat or electricity explains it; porcelain for insulation; blue-white light only for electrical energy. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
+- Textures are dark, hand-painted pixel art, more distinctive than vanilla: deep values, large deliberate colour clusters, few tones per material and worn-edge highlights that articulate dark metal.
 - Material behaviour stays distinct — wool weave, timber grain, fractured minerals, cast-metal wear — never one generic surface.
 - New block and item art is **64 pixels per block face**, starting with Street Pavers. Existing 32px families stay valid until migrated family by family; Faithful 32x may supply vanilla materials without being copied into the mod.
 - Models are editable Blockbench sources, animated with GeckoLib 4 where they move. Production follows the `civilization-art` skill and [tools/modeling/README.md](tools/modeling/README.md).
 - The first firearm, the Colt Paterson (1836), is an explicit earlier addition to the setting.
 - Grassier Grass (optional client mod) never whitens blades from cold or altitude alone. Blades look like taller wild grass with restrained height variation. Cumulative footsteps permanently shorten blades along travelled routes, shared and saved with the world; standing, flying and teleporting add no wear. Visual only.
+
+**Open**
+- Black steel's temperature and contrast — warm stove black, cool blued steel or dramatic chiaroscuro — then the material, item-sprite and machine-face reference sheets the texture pass draws from.
 
 ## People: calories, movement and recovery
 
