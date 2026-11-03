@@ -20,7 +20,7 @@ final class BackpackVisualCheck {
     private static volatile boolean ready;
     private static volatile Throwable failure;
     private static final int Y=101;
-    private static final BlockPos PALLET=new BlockPos(174,Y,4),BESIDE=PALLET.east();
+    private static final BlockPos PALLET=new BlockPos(174,Y,4),BESIDE=PALLET.east(),CHEST=new BlockPos(172,Y,0),MACHINES=new BlockPos(177,Y,3);
     private static final Vec3 BUILDER=new Vec3(174.5,Y,0.5),AWAY=new Vec3(195.5,Y,0.5);
     /** Stone in the pallets, the pack and the hand at the start. */
     private static final int STORED=100,PACKED=6,HAND=BlockCarry.LIMIT;
@@ -31,6 +31,11 @@ final class BackpackVisualCheck {
             for(int x=166;x<=200;x++)for(int z=-6;z<=10;z++){l.setBlockAndUpdate(new BlockPos(x,Y-1,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=Y;y<=Y+6;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
             for(var at:new BlockPos[]{PALLET,BESIDE})l.setBlockAndUpdate(at,CargoContent.STOCKPILE.get().defaultBlockState());
             var store=((StockpileEntity)l.getBlockEntity(PALLET)).cargo();store.insert(new ItemStack(Items.STONE),STORED);store.insert(new ItemStack(Items.GLASS),20);
+            // Machines and other hand-carried blocks go on a store too, one cell each; the oven draws as its item.
+            l.setBlockAndUpdate(MACHINES,CargoContent.STOCKPILE.get().defaultBlockState());var machines=((StockpileEntity)l.getBlockEntity(MACHINES)).cargo();
+            machines.insert(CookingContent.STATION_ITEM.toStack(),2);machines.insert(new ItemStack(Items.CHEST),1);machines.insert(new ItemStack(Items.OAK_STAIRS),3);
+            machines.insert(new ItemStack(Items.OAK_DOOR),1);machines.insert(BakingOvenContent.ITEM.toStack(),1);
+            l.setBlockAndUpdate(CHEST,Blocks.CHEST.defaultBlockState());((net.minecraft.world.level.block.entity.ChestBlockEntity)l.getBlockEntity(CHEST)).setItem(0,new ItemStack(Items.APPLE,12));
             var p=player(server);p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();
             var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,100,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
             var contents=Backpack.worn(p);contents.setItem(0,new ItemStack(Items.STONE,PACKED));contents.setItem(1,new ItemStack(Items.OAK_PLANKS,4));
@@ -38,6 +43,9 @@ final class BackpackVisualCheck {
             p.teleportTo(l,174.5,Y,1.5,java.util.Set.of(),0,35);ready=true;
         });}
         if(ticks>80&&!ready){ticks=81;return;}
+        if(ticks==90){mc.options.hideGui=true;check(server,()->player(server).teleportTo(server.overworld(),174.5,Y,1.5,java.util.Set.of(),-56,40));}
+        if(ticks==104)shot(mc,"pallet-goods");
+        if(ticks==106){mc.options.hideGui=false;check(server,()->player(server).teleportTo(server.overworld(),174.5,Y,1.5,java.util.Set.of(),0,35));}
         if(ticks==110)mc.setScreen(new InventoryScreen(mc.player));
         if(ticks==125){
             if(Backpack.worn(mc.player)==null)throw new IllegalStateException("The worn backpack did not reach the client's accessory slot");
@@ -102,7 +110,14 @@ final class BackpackVisualCheck {
             var p=player(server);p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),90,0);
         });}
         if(ticks==443)shot(mc,"held-third");
-        if(ticks>445){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, its menu and Supply switch, the pack alone beyond reach, held item");mc.stop();}
+        // Any other menu shows the pack beside the Hand, here a chest.
+        if(ticks==446){mc.options.setCameraType(CameraType.FIRST_PERSON);mc.options.hideGui=false;check(server,()->player(server).teleportTo(server.overworld(),BUILDER.x,BUILDER.y,BUILDER.z,java.util.Set.of(),90,20));}
+        if(ticks==456)click(mc,CHEST);
+        if(ticks==470){
+            if(!(mc.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu m)||m.slots.stream().filter(s->s instanceof Backpack.PackSlot).count()!=Backpack.SLOTS)throw new IllegalStateException("A chest menu did not show the worn pack");
+            shot(mc,"chest-menu");
+        }
+        if(ticks>472){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: hand-carried machines on a Pallet, worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, its menu and Supply switch, the pack alone beyond reach, held item, the pack beside a chest menu");mc.stop();}
     }
     private static ServerPlayer player(MinecraftServer s){return s.getPlayerList().getPlayers().getFirst();}
     private static void click(Minecraft mc,BlockPos at){mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(at),Direction.UP,at,false));}

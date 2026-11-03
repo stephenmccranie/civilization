@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 /** Cabinet skin shared by every controller. Slots and all interaction remain native. */
 public final class MachineUi {
     public static final int INK=0xff35332e, MUTED=0xff5c584e;
-    public static final int HAND_LEFT=12,HAND_TOP=24,HAND_WIDTH=40,HAND_HEIGHT=46;
+    public static final int HAND_LEFT=12,HAND_TOP=24,HAND_WIDTH=40,HAND_HEIGHT=46,PACK_COLUMNS=3;
     private static final ResourceLocation PANEL=ResourceLocation.fromNamespaceAndPath("civilization","textures/gui/cabinet.png");
     private MachineUi() {}
     public static void panel(GuiGraphics g,int x,int y,int w,int h) {
@@ -20,6 +20,25 @@ public final class MachineUi {
         int[] dx={x,x+b,x+w-b}, dy={y,y+b,y+h-b}, dw={b,w-2*b,b}, dh={b,h-2*b,b};
         for(int row=0;row<3;row++)for(int col=0;col<3;col++)
             g.blit(PANEL,dx[col],dy[row],dw[col],dh[row],sx[col],sy[row],sw[col],sw[row],512,512);
+    }
+    /**
+     * Lays the worn pack's slots out above the Hand panel, three across under a "Pack" label, and returns the panel,
+     * or null when no pack is shown beside this menu.
+     */
+    public static net.minecraft.client.renderer.Rect2i packLayout(AbstractContainerMenu menu){
+        net.minecraft.world.inventory.Slot hand=null;int n=0;
+        for(var s:menu.slots){if(s instanceof dev.civilization.Backpack.PackSlot)n++;else if(s.container instanceof net.minecraft.world.entity.player.Inventory&&s.getContainerSlot()==dev.civilization.BlockCarry.OFFHAND&&s.x<0)hand=s;}
+        if(hand==null||n==0)return null;
+        int rows=(n+PACK_COLUMNS-1)/PACK_COLUMNS,width=PACK_COLUMNS*18+12,height=rows*18+20,left=hand.x-HAND_LEFT+HAND_WIDTH-width,top=hand.y-HAND_TOP-4-height,i=0;
+        for(var s:menu.slots)if(s instanceof dev.civilization.Backpack.PackSlot){
+            ((dev.civilization.mixin.SlotPositionAccess)s).civilization$setX(left+7+i%PACK_COLUMNS*18);((dev.civilization.mixin.SlotPositionAccess)s).civilization$setY(top+15+i/PACK_COLUMNS*18);i++;
+        }
+        return new net.minecraft.client.renderer.Rect2i(left,top,width,height);
+    }
+    public static void packPanel(GuiGraphics g,net.minecraft.client.renderer.Rect2i r){
+        panel(g,r.getX()+3,r.getY()+3,r.getWidth()-6,r.getHeight()-6);
+        var font=Minecraft.getInstance().font;
+        g.drawString(font,"Pack",r.getX()+(r.getWidth()-font.width("Pack"))/2,r.getY()+5,INK,false);
     }
     public static void handPanel(GuiGraphics g,int x,int y){
         panel(g,x-HAND_LEFT+3,y-HAND_TOP+3,HAND_WIDTH-6,HAND_HEIGHT-6);

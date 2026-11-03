@@ -145,6 +145,30 @@ public final class BackpackGameTests {
         h.succeed();
     }
 
+    private static long packSlots(net.minecraft.world.inventory.AbstractContainerMenu menu){return menu.slots.stream().filter(s->s instanceof Backpack.PackSlot).count();}
+    @GameTest(template="industrial") public static void thePackShowsBesideEveryMenuAndFillsAfterThePockets(GameTestHelper h){
+        var store=pallet(h);var p=player(h);var pack=wear(p,100);var chest=new net.minecraft.world.SimpleContainer(27);
+        p.openMenu(new net.minecraft.world.SimpleMenuProvider((id,inv,player)->net.minecraft.world.inventory.ChestMenu.threeRows(id,inv,chest),net.minecraft.network.chat.Component.literal("Chest")));
+        var menu=p.containerMenu;p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
+        h.assertTrue(menu instanceof net.minecraft.world.inventory.ChestMenu&&packSlots(menu)==Backpack.SLOTS,"A chest menu shows the worn pack's nine slots");
+        chest.setItem(0,new ItemStack(Items.APPLE,32));menu.clicked(0,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(p.getInventory().countItem(Items.APPLE)==32&&held(pack,Items.APPLE)==0,"Shift-clicked goods fill the pockets first");
+        for(int i=0;i<36;i++)p.getInventory().setItem(i,new ItemStack(Items.STICK,32));
+        chest.setItem(0,new ItemStack(Items.APPLE,32));menu.clicked(0,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(chest.getItem(0).isEmpty()&&held(pack,Items.APPLE)==32,"With the pockets full they go into the pack");
+        chest.setItem(1,new ItemStack(Items.STONE,32));menu.clicked(1,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(chest.getItem(1).getCount()==32-Backpack.BLOCKS&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==Backpack.BLOCKS,"With the hand full, blocks go into the pack up to its cap and the rest stays: chest "+chest.getItem(1)+", hand "+p.getOffhandItem()+", pack "+held(pack,Items.STONE));
+        // As the server's menu opening does: the Hand, then the pack.
+        menu=new CargoMenu(2,p.getInventory(),store);BlockCarry.attachMenu(menu,p.getInventory());Backpack.attachMenu(menu,p);int first=-1;
+        for(int i=0;i<menu.slots.size();i++)if(menu.slots.get(i) instanceof Backpack.PackSlot s&&s.getItem().is(Items.STONE)){first=i;break;}
+        h.assertTrue(menu instanceof CargoMenu&&packSlots(menu)==Backpack.SLOTS&&first>=0,"A Pallet menu shows the pack too");
+        menu.clicked(first,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(held(pack,Items.STONE)==0&&stored(store.cargo(),Items.STONE)==Backpack.BLOCKS,"Shift-clicking a pack stack puts it on the Pallet");
+        var own=new BackpackMenu(2,p.getInventory(),pack,new net.minecraft.world.inventory.SimpleContainerData(3));Backpack.attachMenu(own,p);
+        h.assertTrue(packSlots(own)==Backpack.SLOTS,"The pack's own menu shows its slots once");
+        h.succeed();
+    }
+
     @GameTest(template="industrial") public static void deathDropsThePackAndItsContentsSeparately(GameTestHelper h){
         var p=player(h);var pack=wear(p,100);pack.setItem(0,new ItemStack(Items.STONE,10));pack.setItem(1,new ItemStack(Items.APPLE,3));
         var drops=new ArrayList<ItemEntity>();NeoForge.EVENT_BUS.post(new LivingDropsEvent(p,h.getLevel().damageSources().generic(),drops,false));

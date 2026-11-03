@@ -15,10 +15,7 @@ public final class BackpackMenu extends AbstractContainerMenu {
     public BackpackMenu(int id,Inventory inv,RegistryFriendlyByteBuf buf){this(id,inv,new SimpleContainer(buf.readVarInt()),new SimpleContainerData(3));}
     BackpackMenu(int id,Inventory inv,Container pack,ContainerData data){
         super(Backpack.MENU.get(),id);this.pack=pack;this.data=data;
-        for(int i=0;i<pack.getContainerSize();i++)addSlot(new Slot(pack,i,8+i%9*18,PACK_Y+i/9*18){
-            @Override public boolean mayPlace(ItemStack stack){return container.canPlaceItem(getContainerSlot(),stack);}
-            @Override public int getMaxStackSize(ItemStack stack){return container instanceof Backpack.Contents c?c.limit(getContainerSlot(),stack):super.getMaxStackSize(stack);}
-        });
+        for(int i=0;i<pack.getContainerSize();i++)addSlot(new Backpack.PackSlot(pack,i,8+i%9*18,PACK_Y+i/9*18));
         int y=playerY(pack.getContainerSize());
         MachineMenus.playerSlots(this::addSlot,inv,y);
         if(BlockCarry.restricted(inv.player))addSlot(new Slot(inv,BlockCarry.OFFHAND,BlockCarry.HAND_SLOT_X,y+58));

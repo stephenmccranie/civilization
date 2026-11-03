@@ -8,4 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Slot.class)
 public interface SlotPositionAccess {
     @Mutable @Accessor("x") void civilization$setX(int x);
+    @Mutable @Accessor("y") void civilization$setY(int y);
 }

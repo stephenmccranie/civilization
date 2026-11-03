@@ -102,6 +102,25 @@ public final class Backpack {
         }
     }
 
+    /** A slot of the worn pack, in its own menu or beside any other; building blocks stay within its cap. */
+    public static final class PackSlot extends Slot {
+        PackSlot(Container pack,int index,int x,int y){super(pack,index,x,y);}
+        @Override public boolean mayPlace(ItemStack stack){return container.canPlaceItem(getContainerSlot(),stack);}
+        @Override public int getMaxStackSize(ItemStack stack){return container instanceof Contents c?c.limit(getContainerSlot(),stack):super.getMaxStackSize(stack);}
+    }
+    /**
+     * Every other menu that shows the Hand also shows the worn pack: its slots follow the Hand on server and client
+     * alike, so packet indices match. The client's copy is filled by the menu's own synchronization.
+     */
+    public static void attachMenu(AbstractContainerMenu menu,Player p){
+        if(menu instanceof InventoryMenu||menu instanceof BackpackMenu)return;
+        var pack=worn(p);if(pack==null)return;Slot hand=null;
+        for(var slot:menu.slots){if(slot instanceof PackSlot)return;if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND)hand=slot;}
+        if(hand==null)return;
+        Container view=p.level().isClientSide?new SimpleContainer(pack.getContainerSize()):pack;
+        for(int i=0;i<view.getContainerSize();i++)((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new PackSlot(view,i,hand.x,hand.y));
+    }
+
     /** The bound store, if it is in the player's dimension and loaded: a Pallet by its position, a wheelbarrow among loaded entities. */
     static CargoHolder store(ServerPlayer p,Supply s){
         if(s==null||p.level().dimension()!=s.dimension())return null;
