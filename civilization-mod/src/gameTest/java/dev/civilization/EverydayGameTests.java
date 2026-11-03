@@ -57,8 +57,8 @@ public class EverydayGameTests {
         h.assertTrue(Items.IRON_PICKAXE.getDefaultInstance().getMaxStackSize() == 1, "Tools stay unstackable");
         var p = player(h);
         var blocks=new ItemStack(Items.COBBLESTONE,64);p.getInventory().add(blocks);
-        h.assertTrue(p.getOffhandItem().getCount()==32&&blocks.getCount()==32&&p.getInventory().items.stream().noneMatch(s->s.is(Items.COBBLESTONE)),
-                "Only 32 building blocks enter offhand; remainder stays with the source");
+        h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&blocks.getCount()==64-BlockCarry.LIMIT&&p.getInventory().items.stream().noneMatch(s->s.is(Items.COBBLESTONE)),
+                "Only a hand of building blocks enters offhand; remainder stays with the source");
         h.assertTrue(p.getInventory().items.stream().allMatch(s -> s.getCount() <= s.getMaxStackSize()), "Inventory respects item limit");
         var stove = stove(h);
         var menu = (KilnMenu) stove.createMenu(0, p.getInventory(), p);

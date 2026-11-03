@@ -32,8 +32,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public static final float TURN=3.5f;
     /** The handler's head turns at most this far from the handles. */
     public static final float LOOK=75;
-    /** Blocks of solid volume the tray holds: six layers of 6x9, three to the rim and three heaped above it. */
-    public static final int CAPACITY=324;
+    /** Three 3x4 layers of quarter-size blocks: one below the rim, one rising past it and one heaped above. */
+    public static final CargoGrid GRID=new CargoGrid(3,4,3,CargoGrid.CELL);
     // Model frame: x right, y up, z rear.
     public static final Vec3 AXLE=new Vec3(0,.3375,-.84375);
     private static final Vec3 GRIP=new Vec3(5.7375/16,.8015,1.4343);
@@ -46,7 +46,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private final WheelbarrowCollision collision=new WheelbarrowCollision();
     // The whole ledger in its saved form, so clients draw the load one for one.
     private static final EntityDataAccessor<CompoundTag> CARGO=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.COMPOUND_TAG);
-    private final CargoLedger cargo=new CargoLedger(()->CAPACITY,this::cargoChanged);
+    private final CargoLedger cargo=new CargoLedger(GRID::capacity,this::cargoChanged);
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
     private int forward,lerpSteps;
     private long lastInput=Long.MIN_VALUE;

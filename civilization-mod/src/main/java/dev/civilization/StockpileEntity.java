@@ -14,8 +14,9 @@ import net.minecraft.world.phys.Vec3;
 
 /** One pallet's own stack: 64 blocks of solid volume, drawn one for one. Side-connected pallets share a menu through StockpileGroup. */
 public final class StockpileEntity extends BlockEntity implements CargoHolder,MenuProvider {
-    public static final int CAPACITY=64,LAYER=16;
-    private final CargoLedger stack=new CargoLedger(()->CAPACITY,this::changed);
+    /** Four layers of 4x4 quarter-size blocks above the 2-pixel timber, so a full stack is a full block. */
+    public static final CargoGrid GRID=new CargoGrid(4,4,4,7f/32);
+    private final CargoLedger stack=new CargoLedger(GRID::capacity,this::changed);
     StockpileGroup group;
     private boolean networkDirty;
     public StockpileEntity(BlockPos p,BlockState s){super(CargoContent.ENTITY.get(),p,s);}
@@ -24,7 +25,7 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
     /** This pallet's own goods, bottom of the stack first. Clients receive it to draw and shape the stack. */
     public CargoLedger stack(){return stack;}
     /** Started layers; an overloaded pallet draws as full. */
-    public int layers(){return (int)Math.ceil(Math.min(stack.load(),CAPACITY)/LAYER);}
+    public int layers(){return (int)Math.ceil(Math.min(stack.load(),GRID.capacity())/GRID.layer());}
     private StockpileGroup group(){if(group==null)group=StockpileGroup.find(this);return group;}
     @Override public CargoInventory cargo(){return level==null||level.isClientSide||isRemoved()?stack:group();}
     public int palletCount(){return level==null||level.isClientSide||isRemoved()?1:group().pallets();}

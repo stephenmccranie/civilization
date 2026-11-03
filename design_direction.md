@@ -204,10 +204,11 @@ Towns concentrate production, customers and services: rural farms, mines and for
 Progression expands the quantities, distances and areas a player handles: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Each step enables bigger projects while small jobs stay convenient; a first home still fits in an ordinary session.
 
 - Material volume, storage volume and mass are distinct and separate from energy value. A stone block is 1 m³; its cut pieces preserve it.
-- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one, with unlimited-count matching stacks. A wheelbarrow holds 324 blocks, drawn as eighth-size blocks heaped in its tray. A pallet holds 64 blocks, drawn as a stack of quarter-size blocks, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
-- **Personal carrying.** Building material travels as one offhand stack of up to 32 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
+- **One packing density.** Carried and stored building goods pack 64 to a block of space, so every capacity is the carrier's real interior at that density: a hand holds an armful of 8, a wheelbarrow 36 and a pallet 64.
+- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one as quarter-size blocks, with unlimited-count matching stacks. A wheelbarrow's load heaps above its tray rim. A pallet's stack fills its block, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
+- **Personal carrying.** Building material travels as one offhand stack of up to 8 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
 - Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
-- The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, carrying about ten 32-block offhand stacks. The coal minecart keeps its separate rail role.
+- The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, carrying four and a half hands. The coal minecart keeps its separate rail role.
 - Placement draws only from explicitly selected nearby supplies; material reaches the worksite physically.
 - New limits follow an audit and explicit migration; inventories are never shrunk or discarded.
 

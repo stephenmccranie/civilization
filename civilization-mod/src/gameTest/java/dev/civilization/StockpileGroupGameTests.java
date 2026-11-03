@@ -63,13 +63,13 @@ public final class StockpileGroupGameTests {
         pallet(h,4,1,3);h.assertTrue(a.cargo().load()==30&&c.cargo().size()==2,"Rejoining adds the original stacks once");h.succeed();
     }
     @GameTest(template="industrial") public static void rightClickStacksHeldBlocksAndOpensWhenNothingFits(GameTestHelper h){
-        floor(h);var a=pallet(h,3,1,3);var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));use(a,p);
-        h.assertTrue(a.stack().count(0)==32&&p.getOffhandItem().isEmpty()&&!(p.containerMenu instanceof CargoMenu),"Right-click stacks the offhand blocks onto the pallet");
-        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));use(a,p);
-        h.assertTrue(a.stack().count(0)==64&&p.getOffhandItem().isEmpty()&&p.getMainHandItem().is(Items.IRON_PICKAXE),"A tool in the main hand does not stop the offhand blocks going on");
+        floor(h);var a=pallet(h,3,1,3);var p=player(h);int hand=BlockCarry.LIMIT;p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));use(a,p);
+        h.assertTrue(a.stack().count(0)==hand&&p.getOffhandItem().isEmpty()&&!(p.containerMenu instanceof CargoMenu),"Right-click stacks the offhand blocks onto the pallet");
+        p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));use(a,p);
+        h.assertTrue(a.stack().count(0)==2*hand&&p.getOffhandItem().isEmpty()&&p.getMainHandItem().is(Items.IRON_PICKAXE),"A tool in the main hand does not stop the offhand blocks going on");
         // Opening the menu needs a real client connection; the pallet visual scene clicks a full pallet for that half.
-        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));
-        h.assertTrue(!a.putHeld(p)&&p.getOffhandItem().getCount()==32&&a.stack().count(0)==64,"With no room left, right-click falls through to the menu and the hand keeps its blocks");h.succeed();
+        a.cargo().insert(new ItemStack(Items.STONE),64);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,hand));
+        h.assertTrue(!a.putHeld(p)&&p.getOffhandItem().getCount()==hand&&a.stack().count(0)==64,"With no room left, right-click falls through to the menu and the hand keeps its blocks");h.succeed();
     }
     @GameTest(template="industrial") public static void overloadedPalletsFromBeforeTheLimitKeepEveryItemAndDrainFirst(GameTestHelper h){
         floor(h);var registry=h.getLevel().registryAccess();var a=pallet(h,3,1,3);a.loadWithComponents(legacy(h,STONE,700,PLANKS,1000),registry);
@@ -90,11 +90,14 @@ public final class StockpileGroupGameTests {
         h.assertTrue(a.cargo().insert(COBBLE,200)==128&&b.stack().count(0)==64,"Two pallets accept exactly their two stacks, with no native stack cap");
         var p=player(h);var q=player(h);var first=new CargoMenu(1,p.getInventory(),a);var second=new CargoMenu(2,q.getInventory(),b);
         first.clicked(0,0,ClickType.QUICK_MOVE,p);second.clicked(0,0,ClickType.QUICK_MOVE,q);
-        h.assertTrue(a.cargo().count(0)==64&&b.stack().isEmpty()&&p.getOffhandItem().getCount()==32&&q.getOffhandItem().getCount()==32,"Two menus withdraw from the same authoritative stacks");
-        var wheel=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());wheel.setPos(a.cargoPosition().add(0,0,2));h.getLevel().addFreshEntity(wheel);wheel.cargo().insert(COBBLE,100);
+        int hand=BlockCarry.LIMIT,tray=WheelbarrowEntity.GRID.capacity();
+        h.assertTrue(a.cargo().count(0)==128-2*hand&&b.stack().count(0)==64-2*hand&&p.getOffhandItem().getCount()==hand&&q.getOffhandItem().getCount()==hand,"Two menus withdraw from the same authoritative stacks");
+        var wheel=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());wheel.setPos(a.cargoPosition().add(0,0,2));h.getLevel().addFreshEntity(wheel);
+        h.assertTrue(wheel.cargo().insert(COBBLE,100)==tray,"The tray takes only what it holds");
         var carrier=new CargoMenu(3,p.getInventory(),wheel);
-        h.assertTrue(carrier.clickMenuButton(p,1)&&wheel.cargo().count(0)==36&&b.stack().count(0)==64,"Unloading fills the free stack and keeps the rest in the wheelbarrow");
-        h.assertTrue(carrier.clickMenuButton(p,0)&&wheel.cargo().count(0)==164&&a.cargo().isEmpty(),"Loading takes from the whole group");h.succeed();
+        h.assertTrue(carrier.clickMenuButton(p,1)&&wheel.cargo().count(0)==tray-2*hand&&b.stack().count(0)==64,"Unloading fills the free stack and keeps the rest in the wheelbarrow");
+        a.cargo().remove(0,60);
+        h.assertTrue(carrier.clickMenuButton(p,0)&&wheel.cargo().count(0)==tray&&b.stack().isEmpty()&&a.stack().count(0)==64-(2*hand-4),"Loading takes from the whole group, last pallet first");h.succeed();
     }
     @GameTest(template="industrial") public static void nativePalletSavesKeepOnlyTheirOwnStack(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);var b=pallet(h,4,1,3);a.cargo().insert(STONE,100);
@@ -117,8 +120,8 @@ public final class StockpileGroupGameTests {
             h.assertTrue(CivicAccess.allowed(h.getLevel(),a.getBlockPos(),p)&&!CivicAccess.allowed(h.getLevel(),b.getBlockPos(),p),"The entry pallet is accessible while a connected member is denied");
             h.assertTrue(!menu.stillValid(p),"Connected protected cargo cannot be reached through an unclaimed neighbor");menu.clicked(0,0,ClickType.QUICK_MOVE,p);
             h.assertTrue(a.cargo().count(0)==10&&p.getOffhandItem().isEmpty(),"Revocation prevents an already-open menu from withdrawing shared stock");
-            p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,32));use(a,p);
-            h.assertTrue(a.cargo().count(0)==10&&p.getOffhandItem().getCount()==32,"Right-click cannot stack goods onto a group with a denied member");
+            p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));use(a,p);
+            h.assertTrue(a.cargo().count(0)==10&&p.getOffhandItem().getCount()==BlockCarry.LIMIT,"Right-click cannot stack goods onto a group with a denied member");
         }finally{data.claims.remove(claim.at);data.rebuildIndex();}h.succeed();
     }
 }

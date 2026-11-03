@@ -19,6 +19,6 @@ public abstract class BlockCarrySlotMixin {
     @Inject(method="getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I",at=@At("RETURN"),cancellable=true)
     private void civilization$handLimit(ItemStack stack,CallbackInfoReturnable<Integer> result){
         var slot=(Slot)(Object)this;
-        if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.block(stack))result.setReturnValue(Math.min(32,result.getReturnValue()));
+        if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.block(stack))result.setReturnValue(Math.min(BlockCarry.LIMIT,result.getReturnValue()));
     }
 }
