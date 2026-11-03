@@ -9,7 +9,7 @@ Make Civilization art in three stages: **Define → Build and refine → Verify 
 
 - Write the brief: purpose, recognisable target and functional constraints. Choose one authoritative source — a Blockbench project or a Python recipe — and give each reference a role (shape, material or style).
 - Keep proposed dimensions and capacities separate from agreed gameplay. Decide routine choices yourself; ask the owner only about decisions that change gameplay or scope.
-- You cannot generate images. When a concept would help, the owner supplies one or it comes from an external tool; record its prompt and references with `art.py record`. Established directions and routine repairs proceed from existing references. Competing concepts are opt-in. A concept is a visual target, not a dimensioned blueprint, and a good-looking concept proves nothing about the model.
+- When a concept would help, generate it with `art.py record --prompt` (Codex image generation; `--references` passes reference images), or record one the owner supplies with `--image`. Each generation spends the owner's ChatGPT plan usage. Established directions and routine repairs proceed from existing references. Competing concepts are opt-in. A concept is a visual target, not a dimensioned blueprint, and a good-looking concept proves nothing about the model.
 
 ## Build and refine
 

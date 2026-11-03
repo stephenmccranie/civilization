@@ -11,7 +11,7 @@ python tools/modeling/setup.py
 .\tools\modeling\start.ps1
 ```
 
-The portable editor, plugins and a separate profile live in ignored `.tools/modeling`. In Blockbench use **File → Plugins → Load Plugin from File** for `.tools/modeling/mcp.js` and `.tools/modeling/geckolib.js`, permit MCP network access and leave the editor open. The launcher reuses a ready editor, waits up to 45 seconds for MCP to initialise and never opens a duplicate of this profile; new launches log to `.tools/modeling/startup.log`. Save projects before restarting an unresponsive editor. Rerun setup to verify the pinned downloads.
+The portable editor, plugins, a separate profile and the pinned [Codex CLI](https://github.com/openai/codex) live in ignored `.tools/modeling`. Codex draws concept images on the owner's ChatGPT plan and shares the Codex app's sign-in; without the app, run `.tools\modeling\codex\codex-x86_64-pc-windows-msvc.exe login` once. In Blockbench use **File → Plugins → Load Plugin from File** for `.tools/modeling/mcp.js` and `.tools/modeling/geckolib.js`, permit MCP network access and leave the editor open. The launcher reuses a ready editor, waits up to 45 seconds for MCP to initialise and never opens a duplicate of this profile; new launches log to `.tools/modeling/startup.log`. Save projects before restarting an unresponsive editor. Rerun setup to verify the pinned downloads.
 
 Setup patches the pinned MCP plugin to bind `127.0.0.1` instead of all interfaces and records the original and patched hashes. It remains [Jason Gardner's plugin](https://github.com/jasonjgardner/blockbench-mcp-plugin/tree/b187b4b056f0efafcc573335400ecbb21ad26ecc) under its upstream license; authoring tools never go into the Minecraft JAR.
 
@@ -46,7 +46,7 @@ python tools/modeling/art.py check art/assets/example --complete
 ```
 
 - `prepare` runs the recipe or exports the saved project (never an arbitrary open tab) to `export/`, then checks the whole bundle and UV density. Large native exports compile once in Blockbench and transfer in bounded text chunks; incomplete transfers are rejected.
-- `views` captures native Blockbench views; `compare --images` maintains the single reference-versus-actual comparison sheet; `record` keeps the prompts and references of any supplied concept.
+- `views` captures native Blockbench views; `compare --images` maintains the single reference-versus-actual comparison sheet; `record --prompt prompt.txt` generates a concept with Codex's image tool, passing any `--references` images to it, or records a supplied concept given `--image`; either way the asset keeps the concept with its exact prompt and references.
 - `preview` needs a current build review and copies validated candidates into runtime resources for the focused scene, keeping replaced files in local content-addressed history (`preview-backup.json`). `publish` needs a current verify review; `check --complete` confirms fresh review hashes, exports and the runtime receipt. Source, export and evidence hashes are recorded automatically and history is immutable.
 - A model-only deliverable without runtime targets validates its paired manifest with `assets.validate` and `art.definition`/`art.uv_density` from its own verification script; it is not "published" until it passes a Minecraft scene.
 - Older schema-1 records keep `pipeline.py`; `assets.py` and the item/family reducers remain export backends. Preserve their history rather than migrating them.

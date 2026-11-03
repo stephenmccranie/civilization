@@ -2,7 +2,9 @@
 import hashlib
 import json
 from pathlib import Path
+import shutil
 from urllib.request import urlopen
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 DEST = ROOT / '.tools/modeling'
@@ -24,6 +26,14 @@ def main():
         if not target.exists():
             target.write_bytes(data)
         receipt[name] = {'file': str(target), 'sha256': sha(data)}
+        if target.suffix == '.zip' and not (DEST / name).exists():
+            # Archives unpack into a folder named after their pin; the rename keeps an interrupted unpack from looking installed.
+            partial = DEST / (name + '.partial')
+            if partial.exists():
+                shutil.rmtree(partial)
+            with zipfile.ZipFile(target) as archive:
+                archive.extractall(partial)
+            partial.rename(DEST / name)
     # Upstream binds all interfaces despite logging localhost. Keep this developer tool local.
     source = (DEST / 'mcp.upstream.js').read_text(encoding='utf-8')
     old = 'a.listen(t,()=>{console.log(`[MCP] Server listening'
@@ -35,7 +45,7 @@ def main():
     receipt['mcp']['local_patch'] = 'Bind listener to 127.0.0.1 instead of all interfaces'
     receipt['mcp']['patched_sha256'] = sha(patched.encode())
     (DEST / 'setup-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
-    print('Pinned Blockbench, MCP and GeckoLib editor tools ready:', DEST)
+    print('Pinned Blockbench, MCP, GeckoLib editor and Codex tools ready:', DEST)
 
 if __name__ == '__main__':
     main()
