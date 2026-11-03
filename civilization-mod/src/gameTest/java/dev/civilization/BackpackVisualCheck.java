@@ -73,27 +73,36 @@ final class BackpackVisualCheck {
         if(ticks==300)shot(mc,"worn-quarter");
         if(ticks==322)shot(mc,"worn-side");
         if(ticks==326){mc.options.setCameraType(CameraType.FIRST_PERSON);mc.options.hideGui=false;check(server,()->player(server).teleportTo(server.overworld(),BUILDER.x,BUILDER.y,BUILDER.z,java.util.Set.of(),-90,40));}
-        if(ticks==332)PacketDistributor.sendToServer(new Backpack.Action(0));
+        if(ticks==332)PacketDistributor.sendToServer(new Backpack.Open());
         if(ticks==345){
             if(!(mc.player.containerMenu instanceof BackpackMenu m)||m.size()!=Backpack.SLOTS||!m.getSlot(2).getItem().is(Items.APPLE))throw new IllegalStateException("The backpack key did not open its nine slots");
             shot(mc,"menu");
         }
-        if(ticks==350){mc.player.closeContainer();check(server,()->player(server).teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),-90,40));}
-        if(ticks==365)place(mc,new BlockPos(197,Y-1,0));
-        if(ticks==380)check(server,()->{
+        // The menu's Supply switch is the only one: off, then back on.
+        if(ticks==347)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);
+        if(ticks==357){
+            if(!(mc.player.containerMenu instanceof BackpackMenu m)||m.data.get(1)!=0)throw new IllegalStateException("The Supply switch did not turn supply off");
+            check(server,()->{if(Backpack.worn(player(server)).pack().get(Backpack.SUPPLY.get()).on())throw new IllegalStateException("Supply stayed on in the server's pack");});
+            shot(mc,"menu-supply-off");
+        }
+        if(ticks==360)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);
+        if(ticks==367&&(!(mc.player.containerMenu instanceof BackpackMenu m)||m.data.get(1)!=1))throw new IllegalStateException("The Supply switch did not turn supply back on");
+        if(ticks==370){mc.player.closeContainer();check(server,()->player(server).teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),-90,40));}
+        if(ticks==385)place(mc,new BlockPos(197,Y-1,0));
+        if(ticks==400)check(server,()->{
             var p=player(server);var store=((StockpileEntity)server.overworld().getBlockEntity(PALLET)).cargo();
             if(p.getOffhandItem().getCount()!=HAND||Backpack.worn(p).getItem(0).getCount()!=Backpack.BLOCKS-5)throw new IllegalStateException("Beyond reach the hand did not refill from the pack alone");
             if(store.count(store.indexOf(new ItemStack(Items.STONE)))!=STORED-HAND-(Backpack.BLOCKS-4-PACKED))throw new IllegalStateException("The store supplied a builder beyond its reach");
         });
-        if(ticks==385)shot(mc,"beyond-reach");
-        if(ticks==390)check(server,()->{var p=player(server);p.setItemInHand(InteractionHand.MAIN_HAND,Backpack.ITEM.toStack());p.inventoryMenu.broadcastFullState();});
-        if(ticks==405)shot(mc,"held");
+        if(ticks==405)shot(mc,"beyond-reach");
+        if(ticks==410)check(server,()->{var p=player(server);p.setItemInHand(InteractionHand.MAIN_HAND,Backpack.ITEM.toStack());p.inventoryMenu.broadcastFullState();});
+        if(ticks==425)shot(mc,"held");
         // Facing open floor with an empty offhand, so nothing hides the right hand's pack.
-        if(ticks==408){mc.options.hideGui=true;mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);check(server,()->{
+        if(ticks==428){mc.options.hideGui=true;mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);check(server,()->{
             var p=player(server);p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),90,0);
         });}
-        if(ticks==423)shot(mc,"held-third");
-        if(ticks>425){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, its menu, the pack alone beyond reach, held item");mc.stop();}
+        if(ticks==443)shot(mc,"held-third");
+        if(ticks>445){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, its menu and Supply switch, the pack alone beyond reach, held item");mc.stop();}
     }
     private static ServerPlayer player(MinecraftServer s){return s.getPlayerList().getPlayers().getFirst();}
     private static void click(Minecraft mc,BlockPos at){mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(at),Direction.UP,at,false));}

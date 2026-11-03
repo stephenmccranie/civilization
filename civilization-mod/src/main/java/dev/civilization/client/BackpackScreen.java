@@ -13,9 +13,9 @@ public final class BackpackScreen extends MachineScreen<BackpackMenu> {
     }
     @Override protected void init(){
         super.init();
-        supply=addRenderableWidget(new CivicWidget("Supply on",leftPos+8,topPos+36,52,20,()->send(0)));
-        unbind=addRenderableWidget(new CivicWidget("Unbind",leftPos+62,topPos+36,52,20,()->send(1)));
-        unload=addRenderableWidget(new CivicWidget("Unload",leftPos+116,topPos+36,52,20,()->send(2)));
+        supply=addRenderableWidget(new CivicWidget("Supply on",leftPos+8,topPos+36,62,20,()->send(0)));
+        unbind=addRenderableWidget(new CivicWidget("Unbind",leftPos+72,topPos+36,46,20,()->send(1)));
+        unload=addRenderableWidget(new CivicWidget("Unload",leftPos+120,topPos+36,48,20,()->send(2)));
         unload.setTooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("Put the pack's blocks onto the bound store")));
     }
     private void send(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}

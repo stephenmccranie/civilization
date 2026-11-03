@@ -59,7 +59,7 @@ public final class Backpack {
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<Supply>> SUPPLY=COMPONENTS.registerComponentType("backpack_supply",b->b.persistent(Supply.CODEC).networkSynchronized(Supply.STREAM));
     public static final DeferredHolder<MenuType<?>,MenuType<BackpackMenu>> MENU=MENUS.register("backpack",()->IMenuTypeExtension.create(BackpackMenu::new));
     private Backpack(){}
-    public static void register(IEventBus bus){ITEMS.register(bus);COMPONENTS.register(bus);MENUS.register(bus);bus.addListener(Action::register);}
+    public static void register(IEventBus bus){ITEMS.register(bus);COMPONENTS.register(bus);MENUS.register(bus);bus.addListener(Open::register);}
 
     public static int slots(ItemStack pack){return scaled(SLOTS,pack);}
     public static int blocks(ItemStack pack){return scaled(BLOCKS,pack);}
@@ -130,10 +130,9 @@ public final class Backpack {
         var pack=worn(p);if(pack==null||pack.pack().remove(SUPPLY)==null)return;
         p.displayClientMessage(Component.literal("Backpack unbound"),true);
     }
+    /** The pack menu's Supply switch; an unbound pack has nothing to switch. */
     static void toggle(ServerPlayer p){
-        var pack=worn(p);if(pack==null){p.displayClientMessage(Component.literal("Wear a backpack to draw supplies"),true);return;}
-        var s=pack.pack().get(SUPPLY);
-        if(s==null){p.displayClientMessage(Component.literal("Bind the backpack first: open a wheelbarrow or Pallet and press Bind"),true);return;}
+        var pack=worn(p);var s=pack==null?null:pack.pack().get(SUPPLY);if(s==null)return;
         pack.pack().set(SUPPLY,new Supply(s.dimension(),s.store(),!s.on()));
         p.displayClientMessage(Component.literal("Backpack supply "+(s.on()?"off":"on")),true);
     }
@@ -206,11 +205,10 @@ public final class Backpack {
         public int getCount(){return 3;}
     };}
 
-    /** Client keys: open the pack, or switch supply on and off. */
-    public record Action(int id) implements CustomPacketPayload {
-        public static final Type<Action> TYPE=new Type<>(ResourceLocation.parse("civilization:backpack"));
+    /** The B key: open the worn pack. */
+    public record Open() implements CustomPacketPayload {
+        public static final Type<Open> TYPE=new Type<>(ResourceLocation.parse("civilization:backpack"));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
-        static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,StreamCodec.composite(ByteBufCodecs.VAR_INT,Action::id,Action::new),
-                (action,context)->{if(context.player() instanceof ServerPlayer p){if(action.id==0)open(p);else toggle(p);}});}
+        static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,StreamCodec.unit(new Open()),(payload,context)->{if(context.player() instanceof ServerPlayer p)open(p);});}
     }
 }

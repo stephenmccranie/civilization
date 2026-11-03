@@ -27,11 +27,10 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
-/** Backpack keys, the supply badge beside the Hand, the pack drawn on the wearer's back and its tooltip. */
+/** The backpack key, the supply badge beside the Hand, the pack drawn on the wearer's back and its tooltip. */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class BackpackClient {
     public static final KeyMapping OPEN=new KeyMapping("key.civilization.backpack",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_B,"key.categories.civilization");
-    public static final KeyMapping SUPPLY=new KeyMapping("key.civilization.backpack_supply",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_N,"key.categories.civilization");
     /** The worn pack and the badge's text, refreshed each tick rather than each frame. */
     private static ItemStack badgePack=ItemStack.EMPTY;
     private static Component badge;
@@ -39,8 +38,7 @@ public final class BackpackClient {
 
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         var mc=Minecraft.getInstance();
-        while(OPEN.consumeClick())if(mc.screen==null&&mc.player!=null)PacketDistributor.sendToServer(new Backpack.Action(0));
-        while(SUPPLY.consumeClick())if(mc.screen==null&&mc.player!=null)PacketDistributor.sendToServer(new Backpack.Action(1));
+        while(OPEN.consumeClick())if(mc.screen==null&&mc.player!=null)PacketDistributor.sendToServer(new Backpack.Open());
         var pack=mc.player==null?null:Backpack.worn(mc.player);
         badgePack=pack==null?ItemStack.EMPTY:pack.pack();badge=pack==null?null:badge(mc.player,pack);
     }
@@ -70,7 +68,7 @@ public final class BackpackClient {
 
     @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
     public static final class Setup {
-        @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(OPEN);e.register(SUPPLY);}
+        @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(OPEN);}
         @SubscribeEvent public static void screens(RegisterMenuScreensEvent e){e.register(Backpack.MENU.get(),BackpackScreen::new);}
         /** Left of the Hand slot beside the hotbar. */
         @SubscribeEvent public static void hud(RegisterGuiLayersEvent e){
