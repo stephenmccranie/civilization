@@ -1,41 +1,98 @@
-# Shared parts and assembly
+# Manufacturing
 
-The first manufacturing package separates **Foundry materials → Smithy parts → hand assembly → installed goods**. Existing finished items keep their IDs and behavior. Oil is unnecessary for establishing this chain. Foods, chemical processing, ordinary block placement and the existing saw-cut construction system keep their own routes.
+Town manufacturing runs **Foundry metals + hides and wool → Tannery, Textile Workshop and Smithy parts → Assembly Bench goods and repairs**. It needs Coal and labor, not oil. Forming metal is coal-fired; final assembly, upgrades and repairs are player labor at the Assembly Bench. Guides, the cabinet interface, coal fires and XP are shared [machine rules](machines.md).
+
+## Foundry
+
+Craft the **Foundry** controller from **8 brick blocks around cobblestone**. Its three-wide brick body has a hollow hearth, cut-brick shoulders and a raised rear chimney; a stone saw makes every cut, and neither the Kiln nor the Foundry needs metal to build. It has two ingredient slots, two Coal slots and two outputs, and runs one recipe at a time.
+
+| Input | Output | Time |
+| --- | --- | --- |
+| Raw iron, copper or gold, or their ores | 1 ingot | 10 seconds |
+| 1 iron ingot | 1 Steel Ingot | 40 seconds |
+| Silk-touched coal, diamond, emerald, lapis, redstone and quartz ores | Their usual drop | 10 seconds |
+| Ancient debris | Netherite scrap | 10 seconds |
+
+Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbon source; there is no coke. Vanilla metal smelting and equipment-to-nugget recycling are disabled.
+
+## Town workshops
+
+| Controller | Crafting pattern (top / middle / bottom) |
+| --- | --- |
+| Tannery | plank–brick block–plank / plank–barrel–plank / three cobblestone |
+| Textile Workshop | three brick blocks / plank–copper ingot–plank / three iron ingots |
+| Smithy | three brick blocks / plank–cobblestone–plank / three iron ingots |
+
+Controller crafting needs no leather, cloth, shears, anvil or oil; the assembled Smithy includes an anvil. Shells use vanilla or resource-pack materials and saw-cut pieces:
+
+- **Tannery** (3×3, four high): **2 brick blocks, 6 cobblestone or stone-brick blocks, 8 plank slabs, 5 plank quarter beams, 2 plank eighth cubes**. A stone plinth with two front brick accents carries a half-height oak rim around an open vat; the eighth cubes share the rear rim cells and join the rim to two narrow posts, and a three-piece crossbar completes the drying rack. No water or loose hide is placed.
+- **Textile Workshop** (3×3, four high): **5 plank slabs, 9 plank quarter beams, 4 plank eighth cubes, 1 copper quarter beam**. A two-deep upper-slab bench stands on four shared-cell feet; two rear posts and a crossbar frame an open center, with the copper roller in the supported central cell.
+- **Smithy** (6×3, 4.5 high): **9 brick blocks, 14 brick slabs, 8 brick quarter beams, 4 brick eighth cubes, 2 plank slabs, 2 plank quarter beams, 4 plank eighth cubes, 1 cobblestone or stone-brick footing and 1 anvil**. The controller sits at the front center of the forge base; a 2-wide, 1.5-deep, one-high workbench on four eighth-cube feet and a floor-level anvil (its footing one block below ground) stand to its local right. Any anvil damage state and orientation work. The open hearth is two blocks wide and deep; a recessed slab back wall, quarter-beam piers, eighth-cube shoulders and paired chimney slabs narrow the silhouette toward the top. The hearth's coal bed, fire and chimney smoke are visual only — no inventory, free fuel or real fire.
+
+| Workshop | Job | Productive time |
+| --- | --- | --- |
+| Tannery | 1 Raw Hide → 1 Leather | 10 seconds at half heat rate (0.25 Coal) |
+| Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
+| Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
+
+Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire idles. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
+
+Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 
 ## Assembly Bench
 
-Craft one Assembly Bench with three planks across the top row and a stick under each end (`PPP / S S`). Any plank species works. It is a **2-wide × 1-deep × 1-high** timber workbench, placed as one item into two adjacent block spaces. Its continuous plank top has pegged joinery, a lower shelf, restrained wear/markings, a wooden mallet, chisel and marking square. These small tools and shelf offcuts are decorative, not extractable inventory. It needs no surrounding multiblock, metal, leather or fuel. Either half opens the same shared cabinet interface. It combines woodworking, assembly, upgrades and repairs. Placement reserves the adjacent space across the bench width; both spaces must be loaded, clear, inside the world border and accessible to the builder. Placement spends one bench item and canceled placement restores both cells. Both halves have the actual tabletop/leg/shelf collision rather than full invisible cubes. Dismantling either half returns one bench item and the single inventory once; Creative does not mint a bench item. Pistons cannot move either half.
+Craft one with three planks across the top row and a stick under each end (`PPP / S S`); any plank species works. It is a **2-wide × 1-deep × 1-high** timber workbench, placed as one item into two adjacent spaces that must be loaded, clear, inside the world border and accessible; canceled placement restores both cells. Both halves have real tabletop, leg and shelf collision, open the same screen and inventory, and resist pistons. Dismantling either half returns one bench and the inventory once; Creative mints no bench item. It needs no multiblock, metal, leather or fuel.
 
-Choose a recipe, insert its materials in any of four input slots and press **Work**. Automatic recognizes only a unique complete match; ambiguous ingredients need a selection. The recipe drawer and JEI show actual counts. Ghost requirements are guidance, never stock. The bench has one output and no coal slots or ignition controls. Work is one batch per press, not an unattended queue.
+Choose a recipe, insert its materials in any of the four input slots and press **Work**. Automatic recognizes only a unique complete match. The drawer and JEI show actual counts; ghosts are guidance, never stock. Each press runs one batch; there is no unattended queue.
 
-Remain alive, within the ordinary eight-block interaction distance, with this bench menu open and current claim access to both halves. Work advances ten ticks every half second, charging **2.5 kcal per work step before the existing comfort factor** (5 kcal/second at neutral comfort). A five-second job costs 25 kcal and a ten-second job costs 50 kcal before comfort; material-scaled equipment takes proportionally more labor. Creative pays no calories; Spectator cannot work. Depleted players stop. Closing the menu, leaving, losing access or unloading pauses work; shutdown/reload never supplies elapsed work. Only one worker can operate a bench at a time. Inputs/output/work save, while the worker session does not. Press Work to resume a saved job. Changing the recipe or any input resets its progress. Spent labor is not refunded.
+Stay alive, within eight blocks, with the bench menu open and claim access to both halves. Work advances ten ticks every half second and charges **2.5 kcal per step before the comfort factor** (5 kcal/second at neutral comfort): a five-second job costs 25 kcal and a ten-second job 50 kcal. Creative pays nothing; Spectators cannot work; depleted players stop. Closing the menu, leaving, losing access or unloading pauses work, and shutdown never supplies elapsed work. One worker at a time. Inputs, output and progress save, but the worker session does not: press Work again to resume. Changing the recipe or any input resets progress, and spent labor is not refunded.
 
-Inputs are consumed only when the complete output fits. Missing/changed materials or blocked output cannot spend stock. Hoppers may supply the four inputs from above the root/first half and collect its output below, but cannot provide labor. Hand work creates no coal heat or production XP. Large engines/vessels still assemble at their actual sites using their existing guides; the bench makes their component items, not portable completed structures.
+Inputs are consumed only when the whole output fits. Hoppers may supply inputs from above the first half and collect output below, but cannot provide labor. The bench makes no heat or XP. Large engines and vessels are built at their sites with guides; the bench makes their component items.
 
 ## Shared stock
 
-| Product | Input | Output | Base productive time | Workplace |
+| Product | Input | Output | Base time | Workplace |
 | --- | --- | --- | --- | --- |
-| Complete Tool Handle | 1 plank + 1 Leather | 4 handles | 5 seconds | Assembly Bench |
-| Wooden Wheel | 1 plank + 2 Iron Fasteners | 1 wheel | 10 seconds | Assembly Bench |
-| Metal Plate | 1 corresponding ingot | 1 plate | 5 seconds | Smithy |
-| Metal Rod | 1 corresponding ingot | 2 rods | 5 seconds | Smithy |
-| Iron Fasteners | 1 Iron Ingot | 8 fasteners | 5 seconds | Smithy |
-| Machine Parts | 2 Steel Plates + 4 Copper Rods | 2 assemblies | 10 seconds | Assembly Bench |
+| Tool Handle | 1 plank + 1 Leather | 4 | 5 seconds | Assembly Bench |
+| Wooden Wheel | 1 plank + 2 Iron Fasteners | 1 | 10 seconds | Assembly Bench |
+| Metal Plate | 1 matching ingot | 1 | 5 seconds | Smithy |
+| Metal Rod | 1 matching ingot | 2 | 5 seconds | Smithy |
+| Iron Fasteners | 1 iron ingot | 8 | 5 seconds | Smithy |
+| Machine Parts | 2 Steel Plates + 4 Copper Rods | 2 | 10 seconds | Assembly Bench |
 
-Plate/Rod metals are iron, copper, steel and gold. Gold forming takes twice the base duration. Fasteners include ordinary nails, rivets, bolts, hinges and latches. Complete handles include the wood, leather grip and binding: final tools never require extra leather for that grip. A Wheel includes hub, spokes and rim; its axle is supplied separately. Machine Parts retain their existing ID and abstract internal bearings/gears/fittings. Do not make individual versions of those details.
+Plates and Rods come in iron, copper, steel and gold; gold takes twice as long. Fasteners stand for nails, rivets, bolts, hinges and latches. A Tool Handle includes the wood, leather grip and binding, so tools never need extra leather. A Wheel includes hub, spokes and rim. Machine Parts abstract bearings, gears and fittings. At neutral efficiency a Plate, Rod or Fasteners batch uses 0.25 Coal before ignition, idle burn and temperature.
 
-The Smithy remains the existing coal-fired multiblock with its current ignition, weather, thermal efficiency, idle burn and four-input/single-output rules. It now makes parts rather than complete equipment. At neutral base efficiency one Coal supplies 400 productive ticks (20 seconds); a basic Plate/Rod/Fasteners batch uses 0.25 Coal before ignition/idle/thermal effects.
+## Equipment
 
-## Equipment and repairs
+The Smithy forges heads and blades for the pickaxe, axe, shovel, hoe, sword and saw, each in a base **25 seconds**, consuming **3, 3, 1, 2, 2 and 3** primary material respectively. Iron and diamond cover all six; gold covers the first five (there is no gold saw). Gold takes 2× and diamond 4× the time and coal.
 
-Smithy head/blade forms are pickaxe, axe, shovel, hoe, sword and saw. Each takes a base **25 seconds**, consuming respectively **3, 3, 1, 2, 2, 3** primary material. Iron and diamond cover all six forms; gold covers the first five because no gold saw exists. Gold takes 2× and diamond 4× duration/fuel. A coal mining pick reuses the iron pick head; its loading shovel reuses the iron shovel head.
+At the Assembly Bench:
 
-Final tools/swords/saws take **one matching head/blade + one complete Tool Handle**, in a base **5 seconds** at the bench. Shears take **2 Iron Plates + 1 Fasteners**, also five seconds. Metal armor takes its familiar primary quantity (helmet/chest/legs/boots: **5/8/7/4**) as iron/gold Plates or Diamonds, plus **1 Leather + 2 Cloth**, in ten seconds. Chainmail uses Iron Plates. A Shield takes **6 planks + 1 Iron Plate + 1 Leather**, in ten seconds. Cloth remains wool-only from the Textile Workshop.
+- **Tools, swords and saws:** one matching head or blade + one Tool Handle, 5 seconds.
+- **Shears:** 2 Iron Plates + 1 Iron Fasteners, 5 seconds.
+- **Metal armor:** helmet/chestplate/leggings/boots take **5/8/7/4** Iron or Gold Plates or Diamonds, plus 1 Leather + 2 Cloth, 10 seconds. Chainmail uses Iron Plates.
+- **Shield:** 6 planks + 1 Iron Plate + 1 Leather, 10 seconds.
+- **Netherite upgrades:** the diamond item + 1 netherite ingot + the upgrade template + 1 Leather (tools) or 2 Cloth (armor). Upgrades keep grade, wear seed, name, enchantments and proportional damage.
 
-Hand equipment duration scales iron/chainmail 1×, gold 2×, diamond 4×, netherite 8×. New finished equipment rolls grade once on completion; raw parts do not roll grade. Netherite upgrades are bench jobs using the existing diamond base, ingot, template and existing fitting/Cloth requirement; they retain grade, wear seed, name, enchantments and proportional damage. There is no disassembly route or free grade reset.
+Hand durations scale iron/chainmail 1×, gold 2×, diamond 4×, netherite 8×. The Coal Mining Pick and Loading Shovel reuse the iron pickaxe and shovel heads ([coal mining](coal-mining.md)).
 
-Choose **Repair** and supply one damaged catalog item. The quote charges `ceil(primary fresh amount × 0.5 × damage/maxDamage)`, minimum one, plus **one complete Tool Handle** for headed tools, **one Cloth** for armor, or **one Leather** for other covered gear. Iron/gold primary stock is Plates; other materials retain their existing primary input. The base hand duration is ten seconds, with the same material multiplier. Repairs preserve identity/enchantments, remove prior-work penalty, restore damage to zero, and lower grade using the existing exponential restored-fraction rule. A repair whose resulting grade is zero or below is unavailable. No Coal or XP is charged. The actual damaged stack is consumed even when another pristine copy appears earlier in the inputs.
+The catalog covers iron, gold and diamond pickaxes, axes, shovels, hoes, swords and armor; iron and diamond saws; shears; shields; chainmail armor; and all nine netherite upgrades. Gold tools have 600 base durability, mining speed 7, iron-level harvesting and melee damage halfway between iron and diamond; gold armor has 264/384/360/312 base durability (helmet/chestplate/leggings/boots), 17.5 protection for a full set and 1 toughness per piece, with vanilla enchantability. Wooden and stone equipment stays craftable. Bows, crossbows, flint and steel, horse armor, tridents, maces and other special equipment are outside the catalog.
+
+### Grade
+
+Every damageable item entering a player's inventory without a grade receives one persistent whole-percent roll (normal distribution, mean 75%, standard deviation 20 points, no floor or ceiling); finished products roll on completion, parts never. At 100% an item has its base stats. The grade multiplies maximum durability, mining speed, armor, toughness and knockback resistance (including vanilla armor's default attributes), melee damage and attack speed, and the pre-mitigation damage of projectiles from graded bows, crossbows and thrown tridents. An iron pickaxe's mining speed 6 becomes 3 at 50% and 7.5 at 125%. Enchantments are separate. Minecraft requires durability of at least one and positive mining speed, so nonpositive grades keep their true value in data while those two engine values use the smallest legal amount. Special behaviors and discrete harvest levels are not scaled.
+
+The tooltip prints the grade. The 13-pixel durability bar shows remaining durability in green, durability spent since repair in black and capacity unavailable at the item's grade in gray. Above 100%, one or two cyan pixels at the right end show bonus capacity (about the first 10% of exceptional grade); it drains first. Each item has a saved wear seed choosing up to eight of 16 generated scuff and corrosion layers for its type as grade falls, so equal items can wear differently; repairs and upgrades keep the pattern. Layers follow the Faithful 32× item silhouette and leave the base art visible; at 100% or above the icon is pristine, and worn armor on the player model is unchanged. At 100% or above, trimmable armor (leather included) gets one seed-chosen vanilla trim pattern and material; below 100% it has none, so a repair that drops grade below 100% removes the trim.
+
+### Repairs
+
+Choose **Repair** at the Assembly Bench and supply one damaged catalog item. The quote charges `ceil(0.5 × fresh primary amount × damage / current maximum)` primary material, minimum one (Plates for iron and gold, otherwise the original material, netherite ingots for netherite), plus one Tool Handle for headed tools, one Cloth for armor or one Leather for other gear, in a base 10 seconds with the material multiplier. The item returns fully repaired with its identity and enchantments, prior-work cost cleared, and grade reduced by `max(1, ceil(2 × damage / current maximum × exp((100 − grade) / 25)))` points; weak equipment loses grade faster. A repair that would leave grade at zero or below is unavailable. No Coal or XP is charged. The actual damaged stack is consumed even if a pristine copy sits earlier in the inputs.
+
+Example: a 100% iron pickaxe with 250 maximum and 220 damage costs 2 Iron Plates + 1 Tool Handle and returns at **98% grade, 245 maximum**. The one-unit minimum means some cheap repairs cost as much primary material as a new tool.
+
+### Acquisition limits
+
+Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithing Table trim recipes are disabled. Anvils cannot material-repair or combine catalog equipment; crafting-grid combining and two-item grindstone repairs are disabled for it. Naming, enchanted-book application and single-item disenchanting remain, with ordinary XP rules, and restore no durability. Mending has no effect and no supported items; existing copies are labeled disabled. Villager offers for damageable equipment or Mending books are filtered, including saved ones. Naturally spawned catalog gear does not drop from mobs; gear players supplied or mobs picked up remains recoverable. Exploration loot is kept.
 
 ## Fixtures and carriers
 
@@ -44,9 +101,9 @@ Choose **Repair** and supply one damaged catalog item. The quote charges `ceil(p
 | Wooden doors | 6 matching species planks + 3 Fasteners | 3 / 5 seconds |
 | Wooden trapdoors | 6 matching species planks + 2 Fasteners | 2 / 5 seconds |
 | Wooden fence gate | 2 matching species planks + 4 Sticks + 2 Fasteners | 1 / 5 seconds |
-| Chest / Barrel | 8 / 7 mixed planks respectively | 1 / 5 seconds |
+| Chest / Barrel | 8 / 7 mixed planks | 1 / 5 seconds |
 | Wheelbarrow | 3 mixed planks + 1 Wooden Wheel + 1 Iron Rod + 4 Fasteners | 1 / 10 seconds |
-| Ordinary Minecart | 4 Iron Plates + 2 Iron Rods + 1 Machine Parts | 1 / 10 seconds |
+| Minecart | 4 Iron Plates + 2 Iron Rods + 1 Machine Parts | 1 / 10 seconds |
 | Coal Minecart | 4 mixed planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners | 1 / 10 seconds |
 | Coal Preparation Screen | 4 mixed planks + 2 Iron Plates + 2 Sticks | 1 / 10 seconds |
 | Iron Bars | 12 Iron Rods | 16 / 5 seconds |
@@ -55,16 +112,12 @@ Choose **Repair** and supply one damaged catalog item. The quote charges `ceil(p
 | Rail | 12 Iron Rods + 1 Stick | 16 / 5 seconds |
 | Powered Rail | 12 Gold Rods + 1 Stick + 1 Redstone | 6 / 5 seconds |
 
-Wood variants cover oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. The cheap existing crafting-table Chest/Barrel routes remain for early storage. Their bench recipes are additional routes. Primitive tools, the initial Kiln/Foundry/Tannery/Textile/Smithy controllers and anvil crafting remain available so construction never requires a workshop's own unavailable output. A stone saw still supplies initial structural cuts.
+Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. Crafting-table chests and barrels stay available for early storage. Primitive tools, the Kiln, Foundry, Tannery, Textile Workshop and Smithy controllers and the anvil stay craftable, so no workshop needs its own output to be built.
 
-## Industrial and civic assembly
+## Other bench jobs
 
-All jobs in this paragraph take **ten seconds by hand**. Existing industrial controller/part bills replace Iron/Copper/Steel Ingots with corresponding Plates; their structural shells and existing saved construction payments are unchanged. The [industry recipe table](industry.md#recipes-and-controls) lists the refinery family. Engine/bulk controller bills use Plates in place of their former ingots. Engine Cylinder uses **6 Iron Plates + 2 Machine Parts**; Engine Flywheel uses **8 Steel Rods + 1 Machine Parts**. Small Boat Helm uses **4 Steel Plates + 3 Machine Parts + 1 plank**. Builder's Line uses **2 Iron Plates + 1 plank + 2 String**. Prospecting Rod uses **1 Iron Rod + 2 Sticks**.
+Every other Assembly Bench job takes **ten seconds** and is listed with its feature: the refinery family, Hot-Bulb Engine parts and bulk stores in [industry](industry.md#recipes), the Small Boat Helm in [vehicles](vehicle-physics.md#boats), the Builder's Line in [cutting](cutting.md#builders-line), the Geiger Counter in [geography](geography.md#frontier-uranium), the Prospecting Rod in [industry](industry.md#prospecting), civic controllers in [ownership and trade](ownership-trade.md), and the Gladiator Pit controller in its [reference](gladiator-pit.md#build-and-materials). `ManufacturingJobs` and `AssemblyRecipes` are the authoritative catalog.
 
-The bench also assembles the Geiger Counter, Land Controller, Trade Counter, Survey Table section and Gladiator Pit controller. Their former ingot inputs become Plates; other actual ingredients stay. Cooling Grilles and Fluid Pipes use Fasteners in place of their former iron nuggets. Industrial Guardrails use **6 Copper Rods + 10 Iron Rods → 16 rails**. Ordinary structural blocks/cuts remain actual building stock; decorative block shaping and non-manufactured recipes are not globally rewritten. The complete authoritative catalog is `ManufacturingJobs`/`AssemblyRecipes`, exposed in the bench and JEI.
+## Save compatibility
 
-## Existing saves and limits
-
-No world regeneration, inventory sweep, item-ID replacement or existing machine-body conversion occurs. Existing tools, controllers, installed structures, output stacks, fuel and stored materials remain. Old Smithy recipe selection/work resets because it no longer produces complete goods; actual input/output stacks remain available to collect and reroute. Existing narrow one-block benches retain their old visual, inventory and operation; they do not overwrite neighboring terrain to expand. Pick up and replace a narrow bench to adopt the two-block version. New wide benches store one inventory in the root/first half; the extension has no second item bank. Current catalog selections save by output ID. Tannery/Textile production remains unchanged. No crafting/uncrafting conversion can turn parts back into a larger raw stock balance.
-
-This package supplies wheelbarrow acquisition, not cargo capacity or a new vehicle controller. Component physical mass/volume remains explicitly unknown in the current stone-only inspector, consistent with other unaudited item families; no new capacity exemption is implemented. Later powered machine works, separate part durability and an economy/ordinary multiplayer playtest remain follow-up work. [Validation and deployment](../docs/status.md) records the actual local checkpoint.
+Narrow one-block Assembly Benches from older saves keep their shape, inventory and operation and never expand into neighboring terrain; pick one up and place it again to get the two-block bench.

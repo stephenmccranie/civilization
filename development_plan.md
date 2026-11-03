@@ -1,244 +1,47 @@
-# Civilization — implementation backlog
-
-[Status](docs/status.md) owns the current build and validation; [design](design_direction.md) owns agreed rules; [open decisions](open_decisions.md) owns unresolved choices. This file owns work order and remaining deliverables. Original checklist IDs are retained.
-
-Current package: [physical storage and increasing scale](#physical-storage-and-increasing-scale--active-package), beginning with stone accounting and a small handling/building loop. The manual-coal loop now has Survival tool/infrastructure acquisition; regional balance, custody checks and drill retirement remain unfinished below. Cooking and mob follow-ups remain queued. The Oil Derrick redesign and client ambient-light sampling repair are implemented; [industry](civilization-mod/industry.md#build-and-supply-machines) owns construction and migration. Persistent shared grass trampling and taller, less varied wild blades are implemented; [grass compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns tuning and persistence. The server-owned [Tab ping display](civilization-mod/README.md#player-list-ping) is implemented with five-second RTT averaging and existing-client support. The [daily temperature cycle](civilization-mod/heat.md#daily-temperature-cycle) now retains evening warmth with a mid-afternoon peak and dawn low. Flight optimization remains deferred.
-
-### Physical storage and increasing scale — active package
-
-Develop the [approved direction](design_direction.md#physical-material-storage-and-handling) through complete player loops. [Unresolved controls and tuning](open_decisions.md#physical-storage-and-increasing-scale) remain separate from shipped rules. Use the fresh random-seed Terrain Diffusion scale-4 server baseline with the merged performance/village patches; do not regenerate further user worlds or increase scale as part of the storage prototype. [Elevated river farming](civilization-mod/geography.md) follows local river elevation on the supported Terrain Diffusion fork; terrain and resource abundance still need broad-world review.
-
-| Stage | Deliverable and acceptance |
-| --- | --- |
-| 1. Exact accounting — implemented foundation | Shared integer eighth-m³ quantities; stone/cobblestone full and saw-cut item accounting; separate material/storage volume and shared-material estimated mass; on-demand operator inventory/container audit with explicit unknowns. [Implemented boundary](civilization-mod/physics.md#stone-cargo-accounting). Personal blocks now use the offhand count allowance; ordinary chest migration remains later |
-| 2. Manual handling — active | Ground-pushed [wheelbarrow/stockpile prototype](civilization-mod/physics.md#empty-wheelbarrow-handling-prototype): placement/recovery, standing handler, authoritative movement, main-body player collision with a jumpable tray and non-solid grabbable handles, precise heading and first-person handle grips, bounded terrain/access, walking-paced pushing/leg animation, walking-rate handling calories and distance-driven wheel art. Mass-only unlimited-count cargo, craftable, normally carried Pallets that automatically share inventory/capacity across touching horizontal sides, partial click/Shift-click transfers, nearby Load/Unload and bounded visible stock are implemented. Survival wheelbarrow acquisition is implemented at the Assembly Bench. Next: loaded handling review. No rail requirement; retain the coal minecart separately. Verify full targets, competing transfers, access loss, destruction and save/reload preserve exactly one stock balance |
-| 3. Local building | Explicitly selected nearby supplies for ordinary placement and Builder's Line; preserve labor, access and canceled-placement accounting. Build a small home plus a modest road/embankment and compare personal/wheelbarrow-assisted time and handling |
-| 4. Carrying/storage rollout | One offhand stack of 32 blocks, automatic mined pickup, inventory/menu/recipe-book handling, padded Hand UI, a Pallet carry exemption and saved legacy recovery are implemented. Review actual personal/wheelbarrow hauling; audit remaining automation/bulk-store adapters before changing ordinary chests. Shared persistent vanilla crafting-table grids now let players stage multiple hand-loads and cooperate; [table rules](civilization-mod/physics.md#shared-crafting-tables) own lifecycle and access. Personal carrying is count-limited; cargo is mass-limited. Small planting/placeable supplies now use normal inventory; [classification](civilization-mod/physics.md#personal-block-carrying) owns the reviewed scope and client-update requirement |
-| 5. Powered/regional loop | One powered extraction/loading upgrade and useful loaded river voyage. Match handling to production; check a real scale-6 sea-to-inland connection, farming/deposits and bounded generation/streaming before broader machinery or world-distance promises. Follow the [river/ocean direction](design_direction.md#rivers-and-ocean-trade) |
-
-Wheelbarrow **model, movement and mass-limited cargo/stockpile loop implemented**: the [local source and review](art/assets/wheelbarrow/brief.md) retain the concept, accepted clay study and finished timber/iron model. [Physics](civilization-mod/physics.md#empty-wheelbarrow-handling-prototype) owns trial controls and limits; [status](docs/status.md#validation-and-limits) records checks and deployment. Wider item adapters and loaded handling balance remain unfinished; broader terrain/multiplayer feel needs playtesting before restrictions.
-
-Use cached aggregate visuals and on-demand or stock-change accounting; no per-frame inventory scans, loose entity per item, recursive container expansion or forced world loading. Dynamic vehicle cargo mass remains a separately verified Sable integration. Stage 1 measures the problem; it does not claim the playable wheelbarrow/building loop or balance is complete.
-
-### First custom mob — modeling approach study
-
-The owner approved the v4 Lacertan concept but rejected both the circular approximation and the subsequent full angular model. The agreed [Minecraft cuboid direction](design_direction.md#first-custom-mob--lacertan-visual-direction) remains. After the neutral-head and width refinements, the owner chose to stay with GeckoLib and try the researched body treatment. The [current local study](art/assets/lacertan/head-study/README.md) refines a representative torso/shoulder/arm section, then extends connected tapered shapes, fitted painted scutes/shading and simpler cloth panels across the body. Neutral head, useful fingers and exposed dorsal plates are retained. Actual clay/painted multi-angle views, a matching-camera comparison and four sampled inherited poses are saved. The owner accepted this native treatment as the better baseline; the [art skill](.agents/skills/civilization-art/SKILL.md) now routes future creatures through the [shared modeling procedure](tools/modeling/MODELING.md#creature-modeling). Earlier sources remain provenance. Next: inspect Minecraft lighting, readability, full animation clearances and performance before runtime publication. [Open decisions](open_decisions.md#first-mob--lacertan-scout-proposal) owns unresolved encounter rules. The remaining manual-coal prototype work stays queued behind the active physical-storage package.
-
-### Client distribution — implemented locally
-
-Native Windows/Prism ZIP distribution includes the preconfigured launch hook, first-launch pinned downloads, complete managed-pack updates and a local release-asset builder. Pack-only revisions update third-party dependencies without a Civilization version bump; targeted config migrations preserve personal values. Durable transaction tests cover apply failure and interrupted-update recovery. The separate installer and `.mrpack` pipeline are retired. Focused bootstrap/update failure checks, archive structure and all pinned files are verified; the 0.35.7 playtest publishes the first updater-enabled pack. A real Prism import/launch/join remains a player acceptance check. [Setup and release procedure](modpack/README.md#automatic-civilization-updates), [validation](docs/status.md#validation-and-limits).
-
-### Manual coal mining — prototype package
-
-**Agreed:** ordinary small coal remains normally mineable; special equipment unlocks richer huge veins. Click/hold-triggered, camera-shaped pick swings chip visible portions loose, a special shovel loads raw coal into minecarts, and surface preparation produces usable Coal. This replaces the Coal Drill, rather than redesigning its model. [Design](design_direction.md#4-regional-land-and-materials) owns those rules; [proposed mechanics and unresolved choices](open_decisions.md#manual-coal-mining--proposed-implementation-plan) own controls, geometry, custody, power and balance. The [first prototype](civilization-mod/coal-mining.md) implements the placed-face and short rail loop with trial values. The drill remains during the transition.
-
-| Stage | Deliverable and acceptance |
-| --- | --- |
-| 1. Mining feel — implemented prototype | One small placed huge-vein face and special pick. Real click input shapes one swing from camera movement; still-camera clicks work, looking alone never strikes, and local notches agree with collision/raycast. Judge timing, impacts and readability in game before expanding |
-| 2. First complete loop — implemented prototype | Exact loosened stock settles into a pile; scoop a visible saved shovel load, fill one cart, move it along a short accessible route and feed one preparation machine. Produce existing Coal and consume it in an existing machine. A complete vein block yields more than ordinary small ore; ordinary mining is unchanged |
-| 3. Custody and lifecycle | Targeted server checks cover two miners on one face/pile/cart, repeat requests, access revocation, full/blocked destinations, lost support, falling stock, tool/cart destruction, death, chunk unload and restart. Exact quantities survive each case; presentation cannot grant stock |
-| 4. Survival and regional veins | Forged-head/Assembly Bench pick/shovel and cart/screen acquisition are implemented for playtesting. Resolve remaining processor power, hauling and work costs; prove small coal → special tools/infrastructure → richer vein → prepared fuel without Creative/legacy supplies. Adapt current seam generation only after the loop works; fresh-world geometry is finite, useful to excavate and correctly revealed. Tune per-block yield, labor and route throughput together |
-| 5. Presentation and bounded work | Refine actual pick/shovel, vein fracture, piles, cart and processor through the [asset workflow](tools/modeling/README.md#complete-asset-pipeline). Inspect held/third-person and working-face views with Photon and shaders disabled; review mining/loading audio. Sample a bounded busy face; cache geometry and keep settled piles idle |
-| 6. Replace and publish | Retire drill recipe/operation and update JEI, prospecting, tooltips, fixtures and industry progression. Apply an explicit legacy-ID/stock recovery policy; preserve saves and local old art. Complete change-specific checks, deploy and update authoritative references before declaring the replacement shipped |
-
-Coal collision/drop refinement fixes cached full-block collision on partial faces, rechecks pile support when masks change or load, and lets persistent chunks fall/roll from their actual strike location. [Current behavior](civilization-mod/coal-mining.md), [validation](docs/status.md#validation-and-limits). Larger structural-fracture rules remain later work.
-
-Mining-feel refinement remains active: the user rejected the initial fixed wrist swing and requested a big windup with the tool somewhat detached from, and pulled around by, camera motion. The second revision was also rejected: it dipped the head during windup and spun sideways at contact. The current revision follows the supplied motion sequence with a close overhead backswing, a forward/downward strike and recovery in one plane, using weighted camera following rather than a trailing head; the grip stays close during contact as well as windup. Held left-click repeats after recovery; release/menu guards stop further swings; ordinary play must judge the revised feel. Stages 1–2 pass the guarded client loop: four real contacts, exact stock/wear/labor, scoop/load, native rail travel, preparation and consumption in an existing cooking station. Pick/shovel/screen native views, held/inventory, notches without shaders and player scale were inspected. Art and rates remain provisional; ordinary play must judge mining feel. Eight targeted server checks already cover core conservation, cancellation, partial transfers, support loss, saved masks/cart stock and access/tool revocation. Stage 3 precedes broader content; repeat its relevant checks after later changes. Stage 6 waits for a working Survival replacement. Use [testing](civilization-mod/testing.md#development-checks) for the smallest relevant checks: use `coal-mining` for this prototype. The movement-fixture interference that held publication is resolved; [status](docs/status.md#validation-and-limits) records the final checks. Mine hazards, elaborate rail/haulage machinery and coal-site sieges are outside this package.
-
-### Gladiator pit — first playable package
-
-The owner authorized resolving the first-pass choices and implementation. [Design](design_direction.md#gladiator-pit) owns the settled rules; [Gladiator Pit](civilization-mod/gladiator-pit.md) owns actual materials, controls, knockout and item custody. The earlier inspected isometric/layer study remains local provenance; ArenaLayout owns runtime geometry. This package does not mark remaining manual-coal work complete.
-
-Implemented scope: material-paid oval walls and two prep rooms with one-block rear exits and customizable interior terrain/blocks independent of validation, using the shared contextual guide; flush exactly centered controller, survival recipe and public cabinet menu; mutual fighter terms/readiness, gate countdown, bounded pair-only combat and nonlethal knockout; matched spectator item offers, saved credits/refunds, stale-action rejection and conservative interruption/restart recovery. [Status](docs/status.md#validation-and-limits) records actual checks rather than treating code presence as verified multiplayer capacity.
-
-Next: ordinary-play review, broader spectator/claim lifecycle and crash/load audits from [open decisions](open_decisions.md#gladiator-pit--follow-up-review). No new currency, NPC fighters, ranking system, mandatory stands or arena fuel is introduced.
-
-### Tier 2 cooking — first prototype plan
-
-**Implemented:** one Creative/admin stove with continuous heat, sensory quality, portioned work meals, removable skillet and paid carryover. Three imported audio loops retain a frying bed throughout, with plateau crackle and overcooking sputter; cue recognition still needs ordinary play. The preparation table is deferred; full kitchen multiblocks remain later work. [Cooking](civilization-mod/cooking.md) owns controls, recipes, timing, fuel and persistence; [testing](civilization-mod/testing.md) owns checks.
-
-**Oven physical pass implemented:** the native cast-iron model is Creative-placeable with a 2x2x2 body envelope, player-height casing, a flue above that envelope and chimney clearance, opening main door, transparent window and continuous draft dial. [Cooking](civilization-mod/cooking.md#baking-oven-physical-first-pass) owns placement, controls and collision limits; the [local asset](art/assets/baking_oven/asset.json) owns native sources and visual evidence. Fuel, heat, trays, recipes and Survival construction remain deferred.
-
-**Next:** try the physical oven in an ordinary kitchen, then choose its first baking batch. Continue ordinary stove play to assess sensory timing, carryover, warmth and rewards. Preparation remains deferred; there is no cooking XP or chopping mechanic.
-
-### Builder's Line — implemented package
-
-The reel marks two endpoints with right-click (main-hand reel/offhand blocks for building, offhand reel/main-hand tool for mining) and immediately starts axis-aligned building or held-tool demolition on the second click. The first pass includes cached previews, cancellation, server-authoritative hits and work, normal stock/labor/tool/drop accounting, conservative full-block coverage and a Smithy recipe. [Construction](civilization-mod/cutting.md#builders-line) owns controls, costs and limits; [status](docs/status.md) owns actual validation/deployment; the [asset](art/assets/builders_line/asset.json) owns original sources and inspected visual receipts.
-
-Next: ordinary Survival building/demolition play to judge length, pace and reach. Cut pieces, functional blocks and vessels remain [follow-up choices](open_decisions.md#builders-line--follow-up-choices), rather than silently broadening this item. Huge-vein mining must define its special-tool boundary explicitly; Builder's Line must not bypass it.
-
-### Colt Paterson — implemented prototype
-
-The implemented Creative/admin prototype uses a [local editable Paterson asset](art/assets/colt_paterson/asset.json). The detailed Blockbench model, chamber noses, native cock/release/index/disassembly and reload previews are implemented, with held/inventory rendering, left-click firing, tap R to cock each shot/empty reload and hold R for partial reload, extracted sound, slight recoil and server-side projectile physics/damage. [Firearms](civilization-mod/firearms.md) owns shipped controls and prototype tuning. The user's rear-frame correction adds a domed recoil shield, filled shaped cheeks meeting the grip and a curved hammer. The latest proportion correction lengthens the barrel and reduces the rear cylinder gap to a narrow visible seam and corrects the handle and rear frame cheek from a hand-traced reference silhouette, verified with uniformly aligned before/after overlays. The wood/frame interface shares one boundary and row grid, and a solid saddle seats the rear shield; close side, rear and underside joint views were checked. Native geometry/animation round-trip, UV density, whole-model views and actual revised animation playback were checked; [status](docs/status.md) owns validation limits. Original references, editable source and visual history stay local under the GitHub policy.
-
-Next: play the prototype to tune cadence, reload time and damage, then resolve [acquisition and production balance](open_decisions.md#guns--first-paterson-model). Chamber orientation and spent-round visibility persist between actions. The quality pass smooths the cylinder/rear shield and grip edges, refines the weathered steel/walnut materials from the supplied photographs and removes buried faces within each moving bone. Visible reload surfaces remain; the detailed cuboid model still carries a rendering cost documented in status. The agreed visual direction lives in [design](design_direction.md#setting-and-material-style).
-
-### Climate-based resource generation — local implementation
-
-Coal is cold/temperate, oil hot/temperate, and uranium all-climate. Favored-climate district opportunities are twice temperate frequency; oil has been halved from the first climate implementation through a stable district subset, preserving retained sites. Both large resources search a whole district using physical host-rock checks. [Industry](civilization-mod/industry.md#find-a-site) owns placement and migration limits; [status](docs/status.md) owns validation. Next: review fresh Terrain Diffusion abundance and generation cost by climate on the authorized new-world baseline. Existing natural-site migration remains separate from this fresh-world deployment.
-
-## 1. Implemented foundation
-
-Uranium exploration uses rare tiny finds throughout suitable terrain, with no district gate; surface-relative cover is retained. Coal/oil retain their town-catchment rarity. [Generation and migration](civilization-mod/geography.md#frontier-uranium-and-accessories).
-
-Server admission requires compatible Civilization protocols through NeoForge's required channel negotiation. The published 0.35.0 client is accepted by later stable-protocol builds; server-only tuning does not require client updates. [Connection behavior and limits](civilization-mod/README.md#server-connections), [validation](docs/status.md#validation-and-limits). This does not certify client integrity or complete the broader operational-readiness work.
-
-A download-only [Prism playtest client](modpack/README.md) supplies the pinned client stack and reviewed DH/Photon/Patrix defaults without publishing a server address or rehosting third-party files. Player import/join and hardware performance remain playtest checks.
-
-Optional Grassier Grass client compatibility disables automatic cold/altitude blade whitening; [supported version and behavior](civilization-mod/README.md#grassier-grass-compatibility), [validation](docs/status.md).
-
-| IDs | Completed scope |
-| --- | --- |
-| F01 | Development build, test and Prism deployment loop |
-| F02–F04 | Persistent calorie reserve/HUD, explicit work costs and depleted recovery |
-| F05 | Food catalog, calorie-neutral field rations, regional rain/soil storage and two-hour farmland cycles with shared fertilizer yields; [coverage and exceptions](civilization-mod/weather.md) |
-| F06 | Unified Coal from finite ore/salvage; vanilla coal conversion, charcoal and coal-block production retired |
-| F07–F08 | Kiln bricks, vanilla brick production gate and Fertilizer Furnace |
-| F09–F11 | Physical multiblocks, contextual textured build guides with a [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract), [tier-appropriate machine storage](civilization-mod/README.md#machine-item-storage), hoppers and interruption/save behavior |
-| F12 | Bounded asynchronous player/production and machine event logs |
-| F13 | Automated gameplay/unit tests and focused rendering checks; current results in project status |
-| F14 | User play evidence for gathering, building, calorie recovery, farming, fertilizer manufacture and multiblock assembly |
-| F15 | Everyday material rules, cooking gates, machine feedback and dedicated Street Paver movement bonus |
-| F16 | Unified half-grid cutting, mixed-cell placement, volume-based calorie charge and crafting recombination; vanilla and Street Pavers slab crafting plus vanilla slab stonecutting retired in favor of the saw |
-| F17 | Original texture pipeline and compact [asset workflow](tools/modeling/README.md#complete-asset-pipeline), with reusable materials, declared density, visual proofs and retained legacy families |
-| F18 | Native 60-minute day/night default with saved admin overrides |
-| F19 | Shared biome geography, river crop eligibility, woodland growth and hoe inspection |
-| F20 | Three-tier powered claims, chest-style coal storage, per-claim whitelists, held takeovers/refunds and local trade counters |
-| F21 | 2×2 Survey Table, automatic local terrain survey, public claim/counter markers and inspection |
-| F23 | Pipe-connected fired heater, tall distillation column and air-cooled condenser, rebuilt with original reference-driven textures, rounded cut-block shells, supported condenser, cooling grilles, narrow flues and animated sight-glass pipes; fuel/oil/sulfur outputs, drill lubrication and sulfur-enriched fertilizer |
-| F22 | Physical regional coal/oil deposits, block-removing drills, visibly draining reservoirs, flowing oil-seep surface clues, vertically flexible derrick siting, prospecting, shared liquids/tanks/canisters and the coal → crude → refined fuel → industrial coal loop |
-
-## 2. Proposed coherent packages
-
-Advance connected player loops. Basic operational readiness proceeds alongside development and before persistent player investment.
-
-| Package | Remaining deliverable / dependency |
-| --- | --- |
-| Regional foundation | Evaluate a connected ocean → river mouth → inland route on scale-6 terrain, representative reserves and useful settlement/landing sites; resolve travel, river elevation and world lifespan (D03/D04/D12) |
-| Ownership and recovery | Real multi-client/protection audit plus owner-only death recovery; settle inaccessible-claim and vehicle custody rules (D08–D10) |
-| Trade and discovery | External storage, item search/pins and actual competing-client transactions (D05/D11) |
-| River freight | Primary long-distance passenger/freight network: powered docking, practical sea-to-inland routes and vessel lifecycle. Plan finite offshore oil after route feasibility; [remaining choices](open_decisions.md#river-network-and-ocean-opportunities) |
-| Economy evidence | Repeat voluntary farm/forest/mine → carrier → buyer exchanges; measure labor, food, fuel, stock, travel and useful demand |
-| Later scale | Broader oil/uranium industry, rail, large construction and sky/weather services after useful ground demand |
-
-### Regional weather and farming — implemented package
-
-[Weather and farming](civilization-mod/weather.md) owns shipped rain, soil, crops, fertilizer and prototype Rain Caller behavior. Next: [non-farmland habitat and food-economy audit](open_decisions.md#regional-weather-and-farming-package), especially berries and supplied animal food. Tower construction, Survival energy/access and offline production remain unsettled.
-
-### Shared parts and assembly — first package implemented
-
-[Manufacturing](civilization-mod/manufacturing.md) owns the complete first catalog, hand bench, forging/assembly split, equipment/fixture/industrial acquisition, repairs and saved-stock migration. The combined timber-only bench and component-combining rule follow the [agreed design](design_direction.md#shared-parts-and-final-assembly). The grouped 0.35.0 release includes this package; runtime deployment is recorded in status. This does not reorder the separate active physical-storage package.
-
-**Implemented:** the 2×1×1 timber Assembly Bench with tabletop tools and one shared inventory; complete handles, Fasteners, Plates/Rods, forged heads, Wheels, Machine Parts assembly, catalog equipment/repairs/upgrades, wooden/metal doors and gates, storage, wheelbarrow/rail-cart acquisition, rails and industrial/civic assemblies; shared recipe drawer, JEI and saved-job reset preserving stock. Existing large machine bodies still assemble at their build sites from actual structural stock and components.
-
-**Next:** ordinary Survival/peer review of the whole first tool → carrier → mining/refinery supply loop, batch/labor economics, broader manufactured families and audited component mass/volume. Powered machine works and more detailed equipment-part wear remain deferred; [open choices](open_decisions.md#shared-parts-and-assembly--remaining-design) owns those decisions. [Status](docs/status.md) records actual validation and deployment.
-
-### Town workshops — initial package implemented
-
-[Industry](civilization-mod/industry.md#town-workshops) owns current station recipes, equipment grades/repairs, acquisition gates and shared cabinet behavior. Next: play repair/replacement economics and finish [special-equipment/acquisition coverage](open_decisions.md#town-workshop-implementation-details). Supplied husbandry, powered manufacturing and maker customization follow separately; settlement density still needs economic evidence.
-
-### Shelter and heat — initial foundation
-
-**Coarse cadence implemented locally:** scheduled heat now uses two half-second exchanges per second, with elapsed-time atmospheric cooling and bounded stronger material conduction. This retained better room curves than one transport pass per second while reducing measured work. [Heat](civilization-mod/heat.md#initial-thermal-field) owns the numerical approximation. [Regional scheduling and sleeping](open_decisions.md#thermal-field-redesign--proposal-2026-09-27), slower settled areas and edit/source wake-ups remain proposals.
-
-[Heat](civilization-mod/heat.md) owns the field, comfort, rain/shelter, waste heat and diagnostics. The [dedicated thermal laboratory](civilization-mod/heat.md#dedicated-thermal-laboratory) measures source budgets, stable transport, material/thermal-mass differences, room/chimney comparisons, real-coal output, cooling and restart behavior. The local candidate also records timestamped releases, advances a fixed physical clock, reports true lag and deposits exhaust at actual outlets. Enclosed hotspot protection and open-sky transport are separate. The exchange kernel now reuses dense work arrays, indexes neighbors within sections and resolves native material geometry once per exchange; saved-reference benchmarks measure CPU/allocation savings without changing physical output. Next: section-local scheduling beyond the current whole-field exchange; coherent capacity/energy scales, independent calibration, dynamic geometry/weather/unload transitions and longer equilibrium. Full fuel-to-work accounting, radiation, clothing, moving-vessel heat, deliberate heat transport and internal machine temperatures remain separate work.
-
-### Unified physical foundation — material/geometry stage implemented
-
-[Physics](civilization-mod/physics.md) implements shared material/geometry properties, the inspector and a pinned-Sable static-property proof. Next: dynamic per-position mass hooks and domain-aware thermal state on moving vessels, then explicit fuel/work accounting and individually approved physical consequences. Inventory/tank mass requires contents policies. [Architecture and acceptance](open_decisions.md#unified-physical-foundation--proposed-implementation-plan).
-
-### Bulk freight — planned implementation package
-
-**Implemented:** land Coal Bunker/Cargo Tank, freeform hulls, physical Hot-Bulb Engines and vessel-mounted bulk stores. [Industry](civilization-mod/industry.md#bulk-freight-storage) and [vehicles](civilization-mod/vehicle-physics.md#freeform-motor-vessels) own their rules.
-
-**Remaining sequence:**
-
-1. Stationary mooring and engine-driven loading on land, with explicit port-to-port transfers. Verify disconnect/movement, full target, lost access, chunk unload and competing transfers preserve stock.
-2. One extraction → loaded voyage → unloading loop on a representative river, with an evaluated connection to the ocean. Demonstrate useful freight capacity, credible fuel cost and graceful reload; test peer docking/access before claiming multiplayer readiness. After route feasibility, design the offshore reserve/extraction stage and extend this loop to ocean crude → river transport → inland storage/refining. Preserve the initial onshore bootstrap; the current land Derrick is not an offshore implementation.
-3. Finish the relevant assembly/feedback review through the [asset pipeline](tools/modeling/README.md).
-
-Reuse existing guides, cabinet controls, fluid/stock adapters, claim checks and engine accounting. Capability access must obey the same stock bounds. Keep the coal-fired oil bootstrap; no universal grid, shaft simulation, boilers, new fuel grades, automatic trade or crew framework is part of this package. [Unresolved dock and lifecycle rules](open_decisions.md#bulk-freight-implementation-details).
-
-### Airships — active planning package
-
-The [controller flight prototype](civilization-mod/vehicle-physics.md#airship-prototype) is implemented; Survival nuclear flight remains unfinished. Flight performance tuning is deferred. [Agreed scope](design_direction.md#controller-built-antigravity-airships); [remaining mechanics](open_decisions.md#controller-built-airships--proposed-implementation-plan).
-
-| Stage | Remaining acceptance |
-| --- | --- |
-| 1. Flight/custody proof | Broader landing/contact coverage; retain exact hull, cargo and identity through assembly, disassembly and reload |
-| 2. Dynamic mass/control | Per-position material/cargo mass, center of mass/inertia and finite stabilization; load/edit/reload invalidation |
-| 3. Aerodynamics/wind | Calibrate exterior geometry, drag and regional wind using equal-mass hulls, load changes and head/tail/crosswinds |
-| 4. Survival nuclear loop | Resolve processing, fuel packaging, power limits and recovery; verify explorer → processing → flight → refuel with exact finite consumption and visible lift margin |
-| 5. Travel/presentation | Real-peer access/reconnect, walking aboard, safe terrain crossings/braking, bounded load, refined controls and controller art |
-
-Use targeted conservation/lifecycle checks and focused flight scenes; long voyages do not substitute for explicit acceptance. No custom vessel model is required.
-
-## 3. Checklist
-
-Entries remain open at their full scope unless explicitly marked complete. Partial implementations are described rather than treated as finished systems.
-
-| ID | Remaining deliverable |
-| --- | --- |
-| E00 | Current drill bootstrap implemented; replace its refined-fuel → coal dependency with the [manual huge-vein loop](#manual-coal-mining--prototype-package), then extend non-circular progression to later industry/uranium |
-| E01 | Initial coal/oil geography, discovery and physical block/fluid depletion implemented; adapt huge veins to manual partial-block work, preserve ordinary small-coal mining, then balance distribution/lifespan and add later resources |
-| E02 | Live-world lifespan and reserve/expansion/reset policy |
-| E03 | Three-stage oil refinery, basic pipes, lubrication and sulfur fertilizer implemented in [industry](civilization-mod/industry.md); tune labor, freight and permanent-world throughput with play evidence |
-| E04 | Cooking, bone-meal growth and ordinary material rules implemented. [Thermal/coal consolidation](civilization-mod/industry.md#thermal-processing-and-retired-vanilla-systems) implemented; finish the [remaining vanilla audit](open_decisions.md#vanilla-replacement-audit) |
-| E05 | Advanced animal husbandry remains deferred. Current fertilizer is sulfur + gravel only; the clay route is removed. Revisit any animal-derived fertilizer role before implementation |
-| E06 | Production coal costs raised 4× through a shared budget; [rates](civilization-mod/industry.md#production-coal-balance). Evaluate town demand against extraction before further tuning; identify useful outputs and customers before adding machines |
-| E07 | Finish passenger/dimension/flight rules; enforce already-agreed storage/freight restrictions |
-| E08 | Initial metalworking bridge implemented: kiln bricks → Foundry → ingots/steel → Machine Parts and steel casings for T2 controllers. See [industry](civilization-mod/industry.md). Initial [town workshops](civilization-mod/industry.md#town-workshops), wool/hide inputs, manufactured equipment/repairs and catalog acquisition gates are implemented; extend special-equipment and alternate-resource coverage |
-| E09 | Later maker customization: selectable equipment color accents and pixel-drawn marks/signatures; grid size around 6×6 remains a candidate. Resolve representation and UI before implementation |
-| C01 | Owner/whitelist lifecycle, chest-style coal inventory, attached native-style controls, and three claim tiers with switching fees/cooldown implemented |
-| C02 | Full-access claim whitelists, owner-only list administration and operator land bypass implemented; production administration policy remains |
-| C03 | Common block/container/environmental and vanilla automation protection implemented; broader vanilla/mod/vehicle audit remains |
-| C04 | Local item-for-item counter with typed batch quantities, shared chest storage and original block textures implemented; initial physical map discovery implemented; item search, destination pins and external storage attachment remain |
-| C05 | Current ownership, escrow and stock persist in SavedData; historical transaction audit and crash recovery remain |
-| C06 | Initial takeover, no-grace loss/refund, anchored obligations and whitelist revocation implemented; private death recovery remains |
-| W01 | Sample navigable region and coherent production/settlement opportunities |
-| W02 | Regional crop/forestry growth and coal/oil deposits with finite accounting implemented; new worlds are the development target, broader world generation remains |
-| W03 | Agreed production changes and later useful industrial machines; explore [powered work at increasing scale](design_direction.md#emergent-construction-and-increasing-scale) |
-| W04 | Initial small refined-fuel/oil boat implemented with stable handling, bounded construction and chest/barrel cargo; large hulls, crew custody, decommissioning and broader shore/multiplayer checks remain |
-| W05 | Understandable solo and trusted-group arrival path without basic actions requiring a claim |
-| W06 | Economic scenario measuring actual voluntary exchange and supplier interruption |
-| T01 | Completed: local Git repository and pre-update checkpoint; retain checkpoints during development |
-| T02 | Separate local development server configuration and startup verified; production EULA/hosting setup remains |
-| T03 | Real multi-client verification of state, permissions, transfers and reconnect/restart |
-| T04 | Consistent backups and a demonstrated restore before public investment |
-| T05 | Compact diagnostics for energy, production, transfer failures and server performance |
-| T06 | Hosting/maintenance budget and active-chunk, entity and machine limits |
-| T07 | Representative growing-load tests: exploration, crowded hubs, factories, freight, saving and backups |
-| T08 | Pin dependencies; keep versions, saves, configuration and implementation docs aligned |
-| V01 | Short original setting statement, name and tone |
-| V02 | Immersive daily life and useful architecture: shelter/exposure, heat and physical access. Begin with the [heat design discussion](open_decisions.md#emergent-architecture-and-heat); broader opportunities remain deferred |
-| V03 | Reusable architecture, signage, materials, lighting and sound/effect vocabulary; begin by treating existing farming and machines before adding bespoke atmosphere systems |
-| V04 | One compelling prestige destination and the experience of owning/visiting/supplying it |
-| V05 | Visible working sides of beautiful places, a single great sky transmitter and majestic regional receiving towers; one active beam target at a time |
-| V06 | Plain player-facing names and contextual interfaces |
-| L01 | Advanced-capability dependencies: central sky machine, one receiver at a time, monumental rain towers, and explicit switching/buffer rules |
-| L02 | One sky asset's construction, access, energy clock and shortage behavior |
-| L03 | Later airship/distant-rendering integration, including extremely fast prestige airships, their energy demand and safe high-speed travel limits |
-| L04 | Optional organized PvP participation, stakes and protection boundary; implement the deferred [pickpocketing / wearable PvP flag](design_direction.md#pickpocketing-and-wearable-pvp-flag--planned) system after resolving its interaction rules |
-| L06 | The [Oil Derrick](civilization-mod/industry.md#build-and-supply-machines) is a complete native timber tower with progressive held-material construction, two walkable galleries, an animated crosshead and local section repair. Every guided multiblock accepts held structural stacks and shows remaining materials; all guides follow the [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract). Replace the Coal Drill through the [manual huge-vein package](#manual-coal-mining--prototype-package), review derrick construction cost and load, then resolve [resource-site sieges and the new coal control point](open_decisions.md#extraction-installation-sieges) |
-| L05 | Public access staged by operational and performance evidence |
-
-Keep the original distinction: a successful functional test does not prove an economy, and a small economy test does not prove 200-player capacity.
-
-## 4. Common implementation contracts
-
-Apply these once across features, not as a repeated warning in every design document:
-
-- **Conservation:** actual stock, fuel and reserved payments cannot be spent twice; transformations explicitly consume inputs.
-- **Authority:** the server resolves owner/whitelist access at action time, including automation and already-open menus.
-- **Persistence:** claims, inventories, reservations and deadlines commit consistently and survive retries/restart. Diagnostic JSONL is not their source of truth.
-- **Bounded work:** region inspection, map listings and claims do not force-load the world. Define active/unloaded/offline behavior per consumer. Do not make every object share an unsuitable universal clock.
-- **Migration:** future live-world changes need an explicit migration policy. Use a fresh-world baseline only when explicitly selected by the user.
-- **Feedback:** show the useful requirement, state and failure reason; keep implementation identifiers out of ordinary play.
-
-A ready package has a concrete interaction, agreed rules, data ownership, lifecycle, bounded work and observable acceptance cases. Prices and rates can stay tunable; unresolved ownership or conservation cannot.
-
-## 5. Scope discipline
-
-Keep advanced industry, global power networks, elaborate contracts, NPC labor, detailed ecology/chemistry and universal wear outside the current cooking slice. Sable is the chosen vehicle backend; [remaining dependency questions](open_decisions.md#vehicle-physics-dependency-research--2026-09-10) and Survival mass/flight rules remain separate work.
-
-A functional test does not prove an economy or 200-player capacity. Advance by whole player loops, keep decisions in their owning documents, and mark completion only with evidence.
+# Civilization — development plan
+
+What is deployed, what is known to be missing, and what gets built next. Agreed rules live in [design_direction.md](design_direction.md); shipped behaviour lives in the system docs indexed by [civilization-mod/README.md](civilization-mod/README.md).
+
+## Now
+
+**Deployed.** The dedicated server and the owner's development instance run the current build (version in `civilization-mod/gradle.properties`). Players install the playtest 0.35.7 revision 2 Prism pack, whose updater follows approved GitHub releases. Older clients back to 0.35.0 still join but keep the old small-placeable inventory restrictions. Server-owned features such as the daily temperature cycle, Tab ping and shared crafting tables need no client update.
+
+**World.** A fresh random-seed Terrain Diffusion world at scale 4, from the owner's fork with its performance and village patches, with climate-based deposits and Survival as the default game mode. Full-chunk and Distant Horizons pregeneration were running at last check; automatic generator startup is disabled.
+
+**Built.** Calories, movement and recovery; the Tier 2 stove and a Creative baking-oven model; regional weather, soil water and crop cycles; finite coal and oil deposits, prospecting and the three-stage refinery; the manual coal prototype with Survival tools; town workshops, shared parts, graded equipment and repairs; half-grid cutting, Builder's Line and controller-fed multiblock guides; claims, whitelists, takeovers, trade counters and the Survey Table; the heat field and comfort; freeform engine boats, Coal Bunker and Cargo Tank; a development-power airship; the physical material foundation with exact stone accounting; wheelbarrows, pallets and offhand carrying; shared crafting tables; the Gladiator Pit; a Creative Colt Paterson; the shared cabinet interface with JEI.
+
+**Known limits.**
+- Not yet confirmed by real players: a fresh Prism import and in-launcher pack update, a remote join, the Tab ping view, shared crafting tables and the newer inventory controls in ordinary use, and comfort across the revised daily temperature cycle.
+- Ordinary Survival and economy balance, crash recovery, multi-client contention and 200-player load are unverified; automated fixtures do not establish them.
+- On the server world, pregeneration completion, elevated-river farming and deposit abundance still need broad-world play.
+- Hauling: loaded balance, large pallet groups, remote contention, cross-chunk restarts and broader container adapters are unverified; supply-fed building is not built; ordinary chests are not migrated; vessel cargo has no dynamic mass. Legacy extra blocks are recovered with `/civilization recoverblocks`.
+- The Coal Drill still ships alongside the manual coal prototype, whose swing feel and custody cases need review.
+- Heat uses an intentionally coarse air-transport approximation; regional sleeping and city-scale load are untested.
+- Flight optimisation is deferred: the owner considers about 1,000 blocks/s sufficient for now. Above that, readiness braking and frame stalls persist. Survival nuclear flight is not built.
+- The stove, oven and Paterson are Creative-only. The Lacertan is a native model study, not a runtime entity.
+- Art masters, editable models and review history live in the local `art/` and `concept_art/` folders, outside git.
+
+## Work queue
+
+Items 1–5 are in priority order; the rest are queued in rough dependency order. Each lists what "done" means.
+
+1. **Hauling and local building.** Review loaded wheelbarrow handling and acquisition on the server world, then build supply-fed placement for ordinary building and Builder's Line, then audit automation and bulk-store adapters before migrating ordinary chests.
+   *Done when:* a small home and a modest road or embankment are built with and without the wheelbarrow and compared for time, trips and inventory handling; full targets, competing transfers, lost access, destruction and save/reload each keep exactly one stock balance; nothing scans every frame or forces chunk loading.
+2. **Powered and regional loop.** One powered extraction or loading upgrade and a useful loaded river voyage on the scale-4 world: a real ocean → river mouth → inland route, representative reserves by climate, settlement and landing sites, and generation cost.
+   *Done when:* handling keeps pace with production on that route, and the evidence settles travel, river elevation and world-lifespan questions in the design.
+3. **Manual coal replaces the drill.**
+   - Custody: two miners on one face, pile and cart; repeated requests; access revocation; full or blocked targets; lost support; falling stock; tool or cart destruction; death; chunk unload; restart. *Done when* every case keeps exact quantities and presentation can never grant stock.
+   - Survival: settle preparation power, hauling and work costs; prove small coal → tools → huge vein → prepared fuel with no Creative supplies; then adapt seam generation and tune yield, labour and route throughput together.
+   - Presentation: refine pick, shovel, fracture, piles, cart and preparation machine in first and third person, with Photon and with shaders off; mining and loading audio; a bounded busy-face performance sample. The swing feel needs ordinary-play judgement.
+   - Retirement: remove the drill recipe and operation, update JEI, prospecting, tooltips and progression, and apply an explicit legacy-ID and stock recovery policy that preserves saves.
+4. **Cooking.** Try the oven in an ordinary kitchen and choose its first baking batch; continue stove play to judge cue timing, carryover, warmth and rewards.
+5. **Lacertan in game.** Check Minecraft lighting, readability, full animation clearances and performance before publishing the entity. Encounter rules wait for owner decisions.
+6. **Freight docking.** Stationary mooring and engine-driven port-to-port loading on land, then one extraction → loaded voyage → unloading loop. *Done when* disconnection, movement, full targets, lost access, chunk unload and competing transfers conserve stock, fuel cost and capacity are credible, and docking works between real peers. Offshore oil design follows route feasibility and keeps the onshore bootstrap.
+7. **Playtest reviews.** Builder's Line length, pace and reach; Paterson cadence, reload and damage, then acquisition; the full first tool → carrier → mining and refinery chain in Survival with peers, including batch, labour and repair economics; Gladiator Pit Survival construction, wager UX, four real clients and crash consistency.
+8. **Heat.** Section-local scheduling instead of the whole-field exchange, coherent capacity and energy scales, calibration, dynamic geometry, weather and unload transitions, longer equilibrium. *Done when* conservation, no overshoot, source-off cooling and insulation and ventilation ordering still hold.
+9. **Physical foundation.** Prove per-position mass hooks against the pinned Sable, add dynamic cargo mass and vessel thermal state, then explicit fuel → work accounting on one Foundry and one Hot-Bulb Engine. *Done when* input energy equals work plus stored and released heat plus losses within tolerance, with existing throughput preserved.
+10. **Airships.** Landing and contact coverage with exact hull, cargo and identity through assembly, disassembly and reload; dynamic mass and finite stabilisation; drag and wind calibration on equal-mass hulls; the Survival nuclear loop with exact finite consumption and visible lift margin; real-peer access, reconnects, walking aboard and controller art.
+11. **Food and farming audit.** Non-farmland habitats and the food economy, especially berries and supplied animal food.
+12. **Ownership, trade and recovery.** A real multi-client protection audit, owner-only death recovery edge cases, inaccessible claims and vehicle custody; external counter storage, item search and destination pins; competing-client transactions.
+13. **Operations before public investment.** Production hosting setup; multi-client verification of state, permissions, transfers and reconnects; consistent backups with a demonstrated restore; compact diagnostics for energy, production, transfer failures and performance; a hosting budget with chunk, entity and machine limits; growing-load tests across exploration, hubs, factories, freight, saves and backups; economy evidence from repeated voluntary farm, forest and mine → carrier → buyer exchanges. Public access is staged by that evidence.
+14. **Later.** Pickpocketing and the PvP flag; resource-site sieges and the coal control point; maker's marks; husbandry; broader oil and uranium industry, rail and large construction; sky power, regional towers and the Apogee Pyramid; immersion treatment for farming and boats.
