@@ -15,7 +15,7 @@ import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.*;
 
 /** One native oven, with bounded precomputed collision cells and one controller. */
-public final class BakingOvenBlock extends Block implements EntityBlock {
+public final class BakingOvenBlock extends Block implements EntityBlock, MultiCellBlock {
     public static final IntegerProperty CELL=IntegerProperty.create("cell",0,15);
     public static final BooleanProperty OPEN=BlockStateProperties.OPEN;
     private static final VoxelShape[][][] SHAPES=shapes();
@@ -24,8 +24,9 @@ public final class BakingOvenBlock extends Block implements EntityBlock {
     public static BlockPos offset(Direction front,int cell){int x=cell%2,z=cell/2%2,y=cell/4;return switch(front){case EAST->new BlockPos(-z,y,x);case SOUTH->new BlockPos(-x,y,-z);case WEST->new BlockPos(z,y,-x);default->new BlockPos(x,y,z);};}
     public static BakingOvenEntity owner(Level l,BlockPos p,BlockState s){if(!s.is(BakingOvenContent.OVEN.get()))return null;var at=p.subtract(offset(s.getValue(CivicBlock.FACING),s.getValue(CELL)));return l.hasChunkAt(at)&&l.getBlockEntity(at) instanceof BakingOvenEntity oven?oven:null;}
     @Override public BlockState getStateForPlacement(BlockPlaceContext c){var s=defaultBlockState().setValue(CivicBlock.FACING,c.getHorizontalDirection().getOpposite());return fits(c.getLevel(),c.getClickedPos(),s.getValue(CivicBlock.FACING),c)?s:null;}
+    @Override public java.util.List<Cell> cells(BlockPos p,BlockState s){var cells=new java.util.ArrayList<Cell>();for(int i=0;i<12;i++)cells.add(new Cell(p.offset(offset(s.getValue(CivicBlock.FACING),i)),s.setValue(CELL,i)));return cells;}
     public static boolean fits(Level l,BlockPos p,Direction front,BlockPlaceContext c){for(int i=0;i<12;i++){var at=p.offset(offset(front,i));if(!l.isInWorldBounds(at)||!l.hasChunkAt(at)||!l.getBlockState(at).canBeReplaced(c)||c.getPlayer()!=null&&!CivicAccess.allowed(l,at,c.getPlayer()))return false;}for(int i=0;i<4;i++){var under=p.offset(offset(front,i)).below();if(!l.getBlockState(under).isFaceSturdy(l,under,Direction.UP))return false;}return true;}
-    @Override public void setPlacedBy(Level l,BlockPos p,BlockState s,LivingEntity placer,ItemStack stack){if(!l.isClientSide)for(int i=1;i<12;i++)l.setBlock(p.offset(offset(s.getValue(CivicBlock.FACING),i)),s.setValue(CELL,i),3);}
+    @Override public void setPlacedBy(Level l,BlockPos p,BlockState s,LivingEntity placer,ItemStack stack){if(!l.isClientSide)for(var cell:cells(p,s).subList(1,12))l.setBlock(cell.pos(),cell.state(),3);}
     @Override public BlockEntity newBlockEntity(BlockPos p,BlockState s){return s.getValue(CELL)==0?new BakingOvenEntity(p,s):null;}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> type){return s.getValue(CELL)==0&&type==BakingOvenContent.ENTITY.get()?(w,p,b,e)->{if(w.isClientSide)((BakingOvenEntity)e).clientTick();else((BakingOvenEntity)e).serverTick();}:null;}
     @Override protected RenderShape getRenderShape(BlockState s){return RenderShape.INVISIBLE;}
