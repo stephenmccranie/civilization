@@ -11,6 +11,8 @@ import net.minecraft.world.phys.AABB;
 public final class CargoMenu extends AbstractContainerMenu {
     public static final int ROWS=27, DATA=121;
     public static final int OFFHAND_SLOT=63;
+    /** How far a wheelbarrow may stand from the pallet it loads from or unloads to: as far as a player reaches either. */
+    private static final int REACH=6;
     private final CargoHolder holder,target;
     private final SimpleContainer icons=new SimpleContainer(ROWS);
     public final ContainerData data;
@@ -90,21 +92,21 @@ public final class CargoMenu extends AbstractContainerMenu {
     @Override public boolean clickMenuButton(Player p,int id){
         if(!valid(p))return false;
         if(id==2||id==3){page=Math.clamp(page+(id==2?-1:1),0,pages()-1);refresh();return true;}
-        if(id<0||id>1||target==null||!target.cargoValid(p)||holder.cargoPosition().distanceToSqr(target.cargoPosition())>9)return false;
+        if(id<0||id>1||target==null||!target.cargoValid(p)||holder.cargoPosition().distanceToSqr(target.cargoPosition())>REACH*REACH)return false;
         if(id==0)target.cargo().transferTo(holder.cargo());else holder.cargo().transferTo(target.cargo());
         refresh();broadcastChanges();return true;
     }
     private static CargoHolder nearby(CargoHolder source,Player p){
         if(source instanceof WheelbarrowEntity){
-            var center=BlockPos.containing(source.cargoPosition());CargoHolder best=null;double distance=9;
-            for(var at:BlockPos.betweenClosed(center.offset(-3,-1,-3),center.offset(3,1,3))){
+            var center=BlockPos.containing(source.cargoPosition());CargoHolder best=null;double distance=REACH*REACH;
+            for(var at:BlockPos.betweenClosed(center.offset(-REACH,-REACH,-REACH),center.offset(REACH,REACH,REACH))){
                 if(!source.cargoLevel().hasChunkAt(at))continue;
                 if(source.cargoLevel().getBlockEntity(at) instanceof StockpileEntity s&&s.cargoValid(p)){
                     double d=s.cargoPosition().distanceToSqr(source.cargoPosition());if(d<distance){distance=d;best=s;}
                 }
             }return best;
         }
-        return source.cargoLevel().getEntitiesOfClass(WheelbarrowEntity.class,new AABB(source.cargoPosition(),source.cargoPosition()).inflate(3),e->e.cargoValid(p)&&e.cargoPosition().distanceToSqr(source.cargoPosition())<=9)
+        return source.cargoLevel().getEntitiesOfClass(WheelbarrowEntity.class,new AABB(source.cargoPosition(),source.cargoPosition()).inflate(REACH),e->e.cargoValid(p)&&e.cargoPosition().distanceToSqr(source.cargoPosition())<=REACH*REACH)
                 .stream().min(java.util.Comparator.comparingDouble(e->e.cargoPosition().distanceToSqr(source.cargoPosition()))).orElse(null);
     }
 }

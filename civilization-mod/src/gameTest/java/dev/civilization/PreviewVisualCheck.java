@@ -57,6 +57,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("gladiator")){ArenaVisualCheck.tick(mc);return;}
         if(CHECK.equals("uranium")){UraniumVisualCheck.tick(mc);return;}
         if(CHECK.equals("derrick-guide")){DerrickGuideVisualCheck.tick(mc);return;}
+        if(CHECK.equals("placement")){PlacementVisualCheck.tick(mc);return;}
         if(CHECK.equals("material-sync")){MaterialSyncVisualCheck.tick(mc);return;}
         if(CHECK.equals("thermal-art")){ThermalArtVisualCheck.tick(mc);return;}
         if(CHECK.equals("machine-lighting")){MachineLightingVisualCheck.tick(mc);return;}

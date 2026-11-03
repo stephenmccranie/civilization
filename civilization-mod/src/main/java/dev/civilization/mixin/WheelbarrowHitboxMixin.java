@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** The debug hitbox draws the carrier's turned, measured surfaces instead of its axis-aligned broad bounds. */
+/** The debug hitbox draws the carrier's turned body instead of its axis-aligned broad bounds. */
 @Mixin(EntityRenderDispatcher.class)
 public abstract class WheelbarrowHitboxMixin {
     @Inject(method="renderHitbox",at=@At("HEAD"),cancellable=true)

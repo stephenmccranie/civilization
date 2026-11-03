@@ -29,13 +29,14 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `machines` | Kiln, Fertilizer Furnace and Cooking Stove controllers and shells, and cut-block placement previews |
 | `textures` | Item and controller display |
 | `guide` | Textured multiblock build guide, including a wrong block and its removal |
+| `placement` | Held Kiln, Smithy, Oil Derrick, Assembly Bench and Baking Oven previews facing three ways, mostly from the offhand as survival carries them: a refused bench, an obstructed shell and a controller held up to a finished shell. Each real right-click must place exactly the previewed cells, or nothing |
 | `modular` | Mixed-material and irregular cut-block assemblies |
 | `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat) |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, and their icons |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip |
-| `workshops` | Tannery, Textile Workshop and Smithy, with manual ignition |
+| `workshops` | Tannery, Textile Workshop and Smithy, with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
@@ -48,8 +49,8 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `uranium` | Exposed ore, stocked chest and held Raw Uranium |
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |
 | `builders-line` | Builder's Line clicks, automatic building and mining, and cancel |
-| `wheelbarrow` | Wheelbarrow first-person view, walking bob, key and facing steering, a hill climb and descent, the measured hitbox, loading and rendering |
-| `pallet` | Pallet stacks at each fill level, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking and shared menus |
+| `wheelbarrow` | Wheelbarrow first-person view, walking bob, A/D steering with a free mouse look, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering |
+| `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
 | `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |

@@ -1,36 +1,29 @@
 package dev.civilization.mixin;
 
-import dev.civilization.WheelbarrowEntity;
-import java.util.*;
-import java.util.function.Predicate;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.level.EntityGetter;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.*;
+import com.llamalad7.mixinextras.injector.wrapoperation.*;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import dev.civilization.WheelbarrowCollision;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityGetter.class)
-public interface WheelbarrowCollisionMixin {
-    @Inject(method="getEntityCollisions",at=@At("HEAD"),cancellable=true)
-    private void civilization$carrierShapes(Entity moving,AABB box,CallbackInfoReturnable<List<VoxelShape>> result){
-        if(box.getSize()<1e-7)return;
-        Predicate<Entity> predicate=moving==null?EntitySelector.CAN_BE_COLLIDED_WITH:EntitySelector.NO_SPECTATORS.and(moving::canCollideWith);
-        var entities=((EntityGetter)this).getEntities(moving,box.inflate(1e-7),predicate);
-        // Preserve native entity collision behavior; only the carrier replaces
-        // its broad-phase body bounds with its actual solid surfaces.
-        var shapes=new ArrayList<VoxelShape>(entities.size());
-        for(var entity:entities){
-            if(entity instanceof WheelbarrowEntity e){
-                var shape=e.playerCollisionShape();
-                // A pre-existing overlap must be escapable. Complex voxel grids
-                // otherwise expose internal planes and can trap the player.
-                if(moving instanceof net.minecraft.world.entity.player.Player&&Shapes.joinIsNotEmpty(shape,Shapes.create(moving.getBoundingBox().deflate(1e-5)),BooleanOp.AND))continue;
-                if(Shapes.joinIsNotEmpty(shape,Shapes.create(box),BooleanOp.AND))shapes.add(shape);
-            }
-            else shapes.add(Shapes.create(entity.getBoundingBox()));
-        }
-        result.setReturnValue(shapes);
+/**
+ * Entities meet wheelbarrows as turned solids. Carriers stay out of native entity collision, so no mod's
+ * broad-phase path can stand their bounding boxes in for their bodies.
+ */
+@Mixin(Entity.class)
+public abstract class WheelbarrowCollisionMixin {
+    // Sliding along a turned face is the mover's own path, not a collision whose per-axis flags would zero
+    // its velocity, so it happens before whatever (vanilla or Sable) compares the move with its outcome.
+    @WrapOperation(method="move",at=@At(value="INVOKE",target="Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
+    private Vec3 civilization$slideAlongCarriers(Entity self,Vec3 motion,Operation<Vec3> collide,@Local(argsOnly=true) LocalRef<Vec3> requested){
+        var slid=WheelbarrowCollision.slide(self,motion);
+        if(slid!=motion)requested.set(slid);
+        return collide.call(self,slid);
     }
+    // Landing on a tray is a collision: it happens inside collide, so the outcome registers it as ground.
+    @ModifyVariable(method="collide",at=@At("HEAD"),argsOnly=true)
+    private Vec3 civilization$landOnCarriers(Vec3 motion){return WheelbarrowCollision.land((Entity)(Object)this,motion);}
 }

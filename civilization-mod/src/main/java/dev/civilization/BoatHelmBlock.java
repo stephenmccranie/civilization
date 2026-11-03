@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
-public final class BoatHelmBlock extends HorizontalDirectionalBlock {
+public final class BoatHelmBlock extends HorizontalDirectionalBlock implements MultiCellBlock {
     public static final BooleanProperty PANEL=BooleanProperty.create("panel");
     public static final IntegerProperty GEAR=IntegerProperty.create("gear",0,3);
     public BoatHelmBlock(Properties p){super(p);registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(PANEL,false).setValue(GEAR,1));}
@@ -22,8 +22,9 @@ public final class BoatHelmBlock extends HorizontalDirectionalBlock {
         var s=defaultBlockState().setValue(FACING,c.getHorizontalDirection().getOpposite());var second=other(c.getClickedPos(),s);
         return c.getLevel().getWorldBorder().isWithinBounds(second)&&c.getLevel().getBlockState(second).canBeReplaced(c)&&CivicAccess.allowed(c.getLevel(),second,c.getPlayer())?s:null;
     }
+    @Override public java.util.List<Cell> cells(BlockPos p,BlockState s){return java.util.List.of(new Cell(p,s),new Cell(other(p,s),s.setValue(PANEL,true)));}
     @Override public void setPlacedBy(Level l,BlockPos p,BlockState s,LivingEntity entity,ItemStack stack){
-        if(!l.isClientSide&&!s.getValue(PANEL))l.setBlock(other(p,s),s.setValue(PANEL,true),3);
+        if(!l.isClientSide&&!s.getValue(PANEL)){var panel=cells(p,s).get(1);l.setBlock(panel.pos(),panel.state(),3);}
     }
     @Override public BlockState playerWillDestroy(Level l,BlockPos p,BlockState s,Player player){
         var q=other(p,s);var mate=l.getBlockState(q);

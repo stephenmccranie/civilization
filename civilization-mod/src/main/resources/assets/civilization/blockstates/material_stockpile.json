@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "top=false": {
+      "model": "civilization:block/material_stockpile"
+    },
+    "top=true": {
       "model": "civilization:block/material_stockpile"
     }
   }

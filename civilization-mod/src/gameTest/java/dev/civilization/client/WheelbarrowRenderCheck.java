@@ -23,12 +23,13 @@ public final class WheelbarrowRenderCheck {
     public static void camera(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();
         if(gaitCheck&&mc.player!=null&&mc.player.getVehicle() instanceof WheelbarrowEntity barrow)assertGait(mc,barrow);
-        if(!cameraCheck||mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity))return;
+        if(!cameraCheck||mc.player==null||!(mc.player.getVehicle() instanceof WheelbarrowEntity barrow))return;
         float turn=Mth.wrapDegrees(mc.player.getYRot()-mc.player.yRotO);
         if(Math.abs(turn)<.1f)return;
-        // A key turn moves the handler's facing a whole step past the previous yaw, so vanilla's camera
-        // interpolates it smoothly between frames instead of stepping at 20 Hz.
-        if(Math.abs(Math.abs(turn)-WheelbarrowEntity.TURN)>.01f)throw new IllegalStateException("A/D turned the view "+turn+" degrees in a tick instead of an interpolated "+WheelbarrowEntity.TURN);
+        // A key turn carries the view round with the handles, a step past the previous yaw, so vanilla's
+        // camera interpolates it between frames instead of stepping at 20 Hz.
+        float look=Mth.wrapDegrees(mc.player.getYRot()-barrow.getYRot());
+        if(Math.abs(look)>.01f||Math.abs(turn)>2*WheelbarrowEntity.TURN)throw new IllegalStateException("A/D turned the view "+turn+" degrees in a tick, "+look+" off the handles");
         if(turn>0)rightCameraSamples++;else leftCameraSamples++;
     }
     @SuppressWarnings({"rawtypes","unchecked"})

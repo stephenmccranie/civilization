@@ -14,7 +14,9 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 /** One physical building stack: the offhand. Other inventory goods retain native behavior. */
 @EventBusSubscriber(modid="civilization")
 public final class BlockCarry {
-    public static final int OFFHAND=40,LIMIT=32,HAND_SLOT_X=-36;
+    public static final int OFFHAND=40,HAND_SLOT_X=-36;
+    /** An armful: an eighth of a block of space at cargo density (CargoGrid), so eight blocks or cut pieces. */
+    public static final int LIMIT=8;
     public static final net.minecraft.tags.TagKey<Item> INVENTORY_PLACEABLES=net.minecraft.tags.TagKey.create(
             net.minecraft.core.registries.Registries.ITEM,net.minecraft.resources.ResourceLocation.parse("civilization:inventory_placeables"));
     private BlockCarry(){}
@@ -81,7 +83,7 @@ public final class BlockCarry {
             if(!item.isEmpty()){recovered+=item.getCount();BlockCarryRecovery.get(player.server).store(player.getUUID(),item);}
         }
         if(changed){inv.setChanged();player.containerMenu.broadcastChanges();}
-        if(recovered>0)player.displayClientMessage(Component.literal("Blocks now travel in one offhand stack. Extra blocks were saved safely; free your offhand and use /civilization recoverblocks."),false);
+        if(recovered>0)player.displayClientMessage(Component.literal("Blocks travel in one offhand stack of up to "+LIMIT+". Extra blocks were saved safely; free your offhand and use /civilization recoverblocks."),false);
         return recovered;
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event){if(event.getEntity() instanceof ServerPlayer p)normalize(p);}

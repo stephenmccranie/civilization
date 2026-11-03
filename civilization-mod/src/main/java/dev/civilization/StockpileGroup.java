@@ -64,7 +64,7 @@ final class StockpileGroup implements CargoInventory {
         }
         dirty=false;
     }
-    @Override public double capacity(){return members.size()*(double)StockpileEntity.CAPACITY;}
+    @Override public double capacity(){double capacity=0;for(var member:members)capacity+=member.grid().capacity();return capacity;}
     @Override public double load(){double load=0;for(var member:members)load+=member.stack().load();return load;}
     @Override public int size(){refresh();return entries.size();}
     @Override public long revision(){return revision;}

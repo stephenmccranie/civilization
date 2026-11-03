@@ -8,7 +8,7 @@ Survival boats are freeform Sable vessels powered by physical [Hot-Bulb Engines]
 
 ### Build and launch
 
-Assemble a **Small Boat Helm** at the Assembly Bench from **4 Steel Plates + 3 Machine Parts + 1 plank** (ten seconds). It places a two-block-wide wood-and-brass console with an upright wheel and a four-position engine lever. The wheel side is the assembly root and its facing sets the bow.
+Assemble a **Small Boat Helm** at the Assembly Bench from **4 Steel Plates + 3 Machine Parts + 1 plank** (ten seconds). It places a two-block-wide wood-and-brass console with an upright wheel and a four-position engine lever; holding it previews both halves where they would go. The wheel side is the assembly root and its facing sets the bow.
 
 Build any face-connected hull around the Helm at the waterline and empty-hand right-click the wheel to launch. The scan needs one complete Helm, at least eight supported blocks, at least four blocks with water two blocks deep below them, loaded chunks and land access. It refuses fluids and waterlogged blocks, falling blocks, pistons, TNT, bedrock, portals, extra helms, civic machinery and unsupported block entities. A **4,096-block cap** catches hulls still touching terrain or docks. There is no hull template or size band.
 

@@ -21,6 +21,8 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     private RecipeWidget automatic,repair,toggle;
     private boolean drawer=true;
     private int offset,drawerWidth,drawerX,listY,rowCount,catalogKey;
+    /** Pointer height below the held scrollbar thumb's top, or -1 while the thumb is not held. */
+    private float grab=-1;
     private String category="All";
     private Item material=Items.AIR;
     protected int guide=-1;
@@ -96,7 +98,7 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
             String label=category.equals("All")?"Recipes":category;if(material!=Items.AIR)label+=" / "+materialName(material);
             g.drawString(font,font.plainSubstrByWidth(label,drawerWidth-18),drawerX+9,listY-12,MachineUi.MUTED,false);
             var list=filtered();if(list.isEmpty())g.drawString(font,"No recipes",drawerX+10,listY+5,MachineUi.MUTED,false);
-            if(list.size()>rowCount){int h=rowCount*18,x=leftPos-10;g.fill(x,listY,x+3,listY+h,0xff6b665a);int thumb=Math.max(8,h*rowCount/list.size()),y=listY+(h-thumb)*offset/(list.size()-rowCount);g.fill(x,y,x+3,y+thumb,0xffd2b77e);}
+            if(list.size()>rowCount){int x=leftPos-10,y=thumbTop(list.size());g.fill(x,listY,x+3,listY+rowCount*18,0xff6b665a);g.fill(x,y,x+3,y+thumbHeight(list.size()),0xffd2b77e);}
             g.drawString(font,list.size()+(drawerWidth<128?"":" recipes"),drawerX+61,topPos+imageHeight-21,MachineUi.MUTED,false);
         }
         MachineUi.panel(g,leftPos,topPos,imageWidth,imageHeight);MachineUi.title(g,title.getString(),leftPos,topPos,imageWidth);MachineUi.slots(g,menu,leftPos,topPos);drawMachine(g,partial,mx,my);
@@ -109,6 +111,17 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     protected abstract void drawMachine(GuiGraphics g,float partial,int mx,int my);
     @Override protected void renderLabels(GuiGraphics g,int mx,int my){g.drawString(font,playerInventoryTitle,inventoryLabelX,inventoryLabelY,MachineUi.INK,false);}
     @Override public void render(GuiGraphics g,int mx,int my,float dt){super.render(g,mx,my,dt);renderTooltip(g,mx,my);if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()&&isHovering(115,84,8,25,mx,my))g.renderTooltip(font,Component.literal("Burning coal: "+Math.round(fire.coalRemaining()/10f)+"% remaining"),mx,my);}
+    private int thumbHeight(int size){return Math.max(8,rowCount*18*rowCount/size);}
+    private int thumbTop(int size){return listY+Math.round((float)(rowCount*18-thumbHeight(size))*offset/(size-rowCount));}
+    private void dragThumb(double y){int size=filtered().size();if(size>rowCount)offset=Math.round((float)(y-grab-listY)*(size-rowCount)/(rowCount*18-thumbHeight(size)));updateDrawer();}
+    @Override public boolean mouseClicked(double x,double y,int button){
+        int size=filtered().size();
+        if(button!=0||!drawer||search==null||size<=rowCount||x<leftPos-12||x>=leftPos-6||y<listY||y>=listY+rowCount*18)return super.mouseClicked(x,y,button);
+        // A held thumb keeps its grab point; a track click centres the thumb on the pointer and holds it there.
+        int top=thumbTop(size),thumb=thumbHeight(size);grab=y>=top&&y<top+thumb?(float)(y-top):thumb/2f;dragThumb(y);return true;
+    }
+    @Override public boolean mouseDragged(double x,double y,int button,double dx,double dy){if(grab<0)return super.mouseDragged(x,y,button,dx,dy);dragThumb(y);return true;}
+    @Override public boolean mouseReleased(double x,double y,int button){if(button!=0||grab<0)return super.mouseReleased(x,y,button);grab=-1;return true;}
     @Override public boolean mouseScrolled(double x,double y,double horizontal,double vertical){if(drawer&&x>=drawerX&&x<leftPos&&y>=listY&&y<listY+rowCount*18){offset-= (int)Math.signum(vertical);updateDrawer();return true;}return super.mouseScrolled(x,y,horizontal,vertical);}
     @Override public boolean keyPressed(int key,int scan,int mods){
         if(search!=null&&search.visible&&search.isFocused()&&key!=org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE&&key!=org.lwjgl.glfw.GLFW.GLFW_KEY_TAB){search.keyPressed(key,scan,mods);return true;}

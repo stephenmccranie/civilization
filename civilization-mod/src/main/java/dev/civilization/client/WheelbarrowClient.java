@@ -2,6 +2,7 @@ package dev.civilization.client;
 
 import dev.civilization.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -22,14 +23,15 @@ public final class WheelbarrowClient {
         boolean active=mc.screen==null&&!mc.isPaused();
         if(!mc.isPaused()){
             if(handling!=e){p.setYRot(e.getYRot());p.yRotO=e.getYRot();p.setYHeadRot(e.getYRot());p.yHeadRotO=e.getYRot();handling=e;bob=0;}
-            // A/D turn the handler like the mouse does and the carrier follows their facing. The
-            // previous yaw is untouched, so vanilla interpolates the whole turn between frames.
-            int turn=active?(mc.options.keyRight.isDown()?1:0)-(mc.options.keyLeft.isDown()?1:0):0;
-            if(turn!=0){p.setYRot(p.getYRot()+turn*WheelbarrowEntity.TURN);e.onPassengerTurned(p);}
+            // The view turns with the handles, as a rider's does with a boat, so the mouse only looks
+            // around. The previous yaw is untouched, so vanilla interpolates the turn between frames.
+            float turned=Mth.wrapDegrees(e.getYRot()-e.yRotO);
+            if(turned!=0){p.setYRot(p.getYRot()+turned);p.setYHeadRot(p.getYHeadRot()+turned);}
             walk(p);
         }
         int forward=active?(mc.options.keyUp.isDown()?1:0)-(mc.options.keyDown.isDown()?1:0):0;
-        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,mc.options.keyShift.isDown()||!active));
+        int turn=active?(mc.options.keyRight.isDown()?1:0)-(mc.options.keyLeft.isDown()?1:0):0;
+        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,turn,mc.options.keyShift.isDown()||!active));
     }
     /** The handler walks, so their actual travel drives vanilla's walk distance and bob exactly as walking does. */
     private static void walk(Player p){
