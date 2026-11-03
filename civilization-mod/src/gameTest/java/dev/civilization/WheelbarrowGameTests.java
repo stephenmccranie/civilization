@@ -110,7 +110,9 @@ public final class WheelbarrowGameTests {
         var normal=model(1,0,yaw);var step=model(-.5,-1,yaw).normalize().scale(.1);var along=step.subtract(normal.scale(step.dot(normal)));
         var start=e.position().add(model(1,.5,yaw));p.setPos(start);
         for(int i=0;i<8;i++){p.move(net.minecraft.world.entity.MoverType.SELF,step);h.assertTrue(!e.body().overlaps(Solid.of(p.getBoundingBox())),"Sliding never enters the body");}
-        h.assertTrue(Math.abs(p.position().subtract(start).dot(along.normalize())-8*along.length())<1e-9&&e.body().overlaps(Solid.of(p.getBoundingBox().move(normal.scale(-1e-6)))),"A turned side keeps every step's motion along it and holds the player against it: "+p.position());
+        // Each step rounds to the world coordinate's precision, which the suite's random far-out position coarsens.
+        double lost=p.position().subtract(start).dot(along.normalize())-8*along.length(),precision=16*Math.ulp(Math.max(Math.abs(start.x),Math.abs(start.z)));
+        h.assertTrue(Math.abs(lost)<1e-9+precision&&e.body().overlaps(Solid.of(p.getBoundingBox().move(normal.scale(-1e-6)))),"A turned side keeps every step's motion along it and holds the player against it: "+lost+" at "+p.position());
         // Walking across the front rides around the tyre's point instead of stopping on it.
         p.setPos(e.position().add(model(-.9,-1.35,yaw)));var across=model(.1,0,yaw);
         for(int i=0;i<18;i++){
