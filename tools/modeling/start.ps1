@@ -29,7 +29,7 @@ $running = Get-CimInstance Win32_Process | Where-Object {
     $_.Name -like '*Blockbench*.exe' -and $_.CommandLine -and $_.CommandLine.IndexOf($profile, [StringComparison]::OrdinalIgnoreCase) -ge 0
 }
 if (-not $running) {
-    Start-Process -FilePath $editor -ArgumentList @('--userData', "`"$profile`"", '--enable-logging=file', "--log-file=`"$startupLog`"") -WindowStyle Hidden
+    Start-Process -FilePath $editor -ArgumentList @('--userData', "`"$profile`"", '--disable-gpu-sandbox', '--enable-logging=file', "--log-file=`"$startupLog`"") -WindowStyle Hidden
 } else {
     Write-Host 'Waiting for the existing project editor; open projects will be preserved.'
 }
