@@ -49,7 +49,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |
 | `builders-line` | Builder's Line clicks, automatic building and mining, and cancel |
 | `wheelbarrow` | Wheelbarrow first-person view, walking bob, key and facing steering, a hill climb and descent, the measured hitbox, loading and rendering |
-| `pallet` | Pallet stacks at each fill level, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
+| `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
 | `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |

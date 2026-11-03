@@ -48,14 +48,14 @@ public final class CargoLedgerGameTests {
     @GameTest(template="industrial") public static void adjacentStockpileTransfersOnlyWhatFitsAndKeepsRemainder(GameTestHelper h){
         var stock=stockpile(h);var wheel=barrow(h);var p=player(h);
         int tray=WheelbarrowEntity.GRID.capacity();
-        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),64);wheel.cargo().insert(new ItemStack(Items.COBBLESTONE),20);
+        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),120);wheel.cargo().insert(new ItemStack(Items.COBBLESTONE),20);
         var menu=new CargoMenu(1,p.getInventory(),wheel);
-        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==64-(tray-20),"The wheelbarrow fills its tray; the rest stays on the pallet");
+        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==120-(tray-20),"The wheelbarrow fills its tray; the rest stays on the pallet");
         menu.clickMenuButton(p,0);
-        h.assertTrue(wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==64-(tray-20),"Repeated load cannot duplicate stock");
-        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().entry(0).count()==20&&stock.cargo().entry(0).count()==64,"Unload fills the pallet's stack and keeps the rest in the wheelbarrow");
+        h.assertTrue(wheel.cargo().entry(0).count()==tray&&stock.cargo().entry(0).count()==120-(tray-20),"Repeated load cannot duplicate stock");
+        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().entry(0).count()==tray-(128-(120-(tray-20)))&&stock.cargo().entry(0).count()==128,"Unload fills the pallet's stack and keeps the rest in the wheelbarrow");
         var tag=stock.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new StockpileEntity(stock.getBlockPos(),stock.getBlockState());restored.loadWithComponents(tag,h.getLevel().registryAccess());
-        h.assertTrue(restored.cargo().entry(0).count()==64,"Stockpile balance survives native persistence");h.succeed();
+        h.assertTrue(restored.cargo().entry(0).count()==128,"Stockpile balance survives native persistence");h.succeed();
     }
     @GameTest(template="industrial") public static void nativeMenuClicksConserveCargoCursorAndPlayerInventory(GameTestHelper h){
         var stock=stockpile(h);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),stock);
@@ -67,9 +67,9 @@ public final class CargoLedgerGameTests {
         menu.clicked(0,0,ClickType.PICKUP,p);
         h.assertTrue(menu.getCarried().isEmpty()&&stock.cargo().entry(0).count()==32,"Click deposits cursor contents without cloning");
         stock.cargo().insert(new ItemStack(Items.STONE),100);menu.clicked(0,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(stock.cargo().count(0)==64-BlockCarry.LIMIT&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&p.getInventory().countItem(Items.STONE)==BlockCarry.LIMIT,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
+        h.assertTrue(stock.cargo().count(0)==128-BlockCarry.LIMIT&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&p.getInventory().countItem(Items.STONE)==BlockCarry.LIMIT,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
         menu.clicked(CargoMenu.OFFHAND_SLOT,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==64,"Visible offhand slot deposits directly back into cargo");
+        h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==128,"Visible offhand slot deposits directly back into cargo");
         for(int i=0;i<36;i++)h.assertTrue(p.getInventory().getItem(i).getCount()<=p.getInventory().getItem(i).getMaxStackSize(),"Player stack caps remain unchanged");h.succeed();
     }
     @GameTest(template="industrial") public static void menuPagesOrganizeTypesWithoutCappingThem(GameTestHelper h){
