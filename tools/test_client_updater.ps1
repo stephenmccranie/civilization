@@ -103,4 +103,41 @@ $script:releaseTag='playtest-0.35.4-2';Invoke-CivPackUpdate $fixture
 Assert-File "$game/mods/added.jar" $c2
 if ((Get-CivPackVersion 'playtest-0.35.4-3') -le (Get-CivPackVersion 'playtest-0.35.4-2')) { throw 'Pack-only revisions do not order correctly' }
 if (!($script:events | Where-Object { $_ -match 'Updating Civilization pack\|File' })) { throw 'Pack update progress missing' }
-Write-Host 'PASS: pack-only revisions, staged updates/additions/removals, config migration, personal mods/settings, bad download, partial-apply rollback, crash recovery, collisions, offline/no-downgrade, loader mismatch, visible progress stages.'
+# The updater updates its own scripts as managed files, with the same verification and rollback.
+function UpdaterEntry([string]$Tag) {
+ $source=Join-Path $fixture 'Fixture-Updater.ps1'
+ [pscustomobject]@{id='updater-fixture';path='civilization-updater/Fixture-Updater.ps1';fileSize=(Get-Item $source).Length;hashes=@{sha1=(Get-FileHash $source -Algorithm SHA1).Hash.ToLowerInvariant();sha512=(Get-CivHash $source)};downloads=@("https://github.com/stephenmccranie/civilization/releases/download/$Tag/Fixture-Updater.ps1")}
+}
+function Next-Pack($Previous,[int]$Revision) { $pack=Clone $Previous;$pack.versionId="playtest-0.35.4-$Revision";$pack.updaterFiles=@(UpdaterEntry $pack.versionId);return $pack }
+$current=Get-Content "$homeDir/managed-pack.json" -Raw | ConvertFrom-Json
+[IO.File]::WriteAllText("$fixture/Fixture-Updater.ps1",'# updater one')
+$self1=Clone $current;$self1.versionId='playtest-0.35.4-4';$self1 | Add-Member -NotePropertyName updaterFiles -NotePropertyValue @(UpdaterEntry 'playtest-0.35.4-4')
+Install-CivPack $game $current $self1
+if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater one') { throw 'Updater script was not installed' }
+[IO.File]::WriteAllText("$fixture/Fixture-Updater.ps1",'# updater two');$self2=Next-Pack $self1 5
+$script:applyCount=0;$script:failAt=2
+Must-Fail { Install-CivPack $game $self1 $self2 }
+if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater one') { throw 'Updater script did not roll back' }
+$script:failAt=-1;Install-CivPack $game $self1 $self2
+if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater two') { throw 'Updater script did not update itself' }
+$dropped=Clone $self2;$dropped.versionId='playtest-0.35.4-9';$dropped.PSObject.Properties.Remove('updaterFiles')
+Must-Fail { Install-CivPack $game $self2 $dropped }
+if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater two') { throw 'An update removed the updater' }
+$foreign=Clone $self2;$foreign.updaterFiles[0].downloads=@('https://cdn.modrinth.com/data/fixture/Fixture-Updater.ps1')
+Must-Fail { Assert-CivPack $foreign }
+# Each migration applies once: a missing setting waits until the game writes it, and a player who restores the old value keeps it.
+$chat=[pscustomobject]@{path='options.txt';section='';key='chatScale';from='1.0';value='0.75'}
+$once1=Next-Pack $self2 6;$once1.configMigrations=@($chat)
+$count=$script:downloads;Install-CivPack $game $self2 $once1
+if ($script:downloads -ne $count) { throw 'Unchanged updater scripts were downloaded again' }
+if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`n" -or (Get-CivAppliedMigrations $game) -contains (Get-CivMigrationId $chat)) { throw 'A missing setting must stay pending' }
+[IO.File]::WriteAllText("$game/options.txt","fov:0.75`r`nchatScale:1.0`r`n")
+$once2=Next-Pack $once1 7;Install-CivPack $game $once1 $once2
+if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`nchatScale:0.75`r`n") { throw 'A pending migration did not apply once its setting existed' }
+[IO.File]::WriteAllText("$game/options.txt","fov:0.75`r`nchatScale:1.0`r`n")
+$once3=Next-Pack $once2 8;Install-CivPack $game $once2 $once3
+if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`nchatScale:1.0`r`n") { throw 'An applied migration overrode the player''s later choice' }
+$fresh=Join-Path $fixture 'fresh';New-Item -ItemType Directory -Path "$fresh/civilization-updater" | Out-Null
+Save-CivInitialReceipt "$fresh/civilization-updater" $once3
+if (@(Get-CivAppliedMigrations $fresh) -notcontains (Get-CivMigrationId $chat)) { throw 'A fresh import must count the migrations its settings already hold' }
+Write-Host 'PASS: pack-only revisions, staged updates/additions/removals, config migration, personal mods/settings, bad download, partial-apply rollback, crash recovery, collisions, offline/no-downgrade, loader mismatch, visible progress stages, updater self-update and rollback, migrations applied once.'
