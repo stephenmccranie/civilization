@@ -120,6 +120,9 @@ Must-Fail { Install-CivPack $game $self1 $self2 }
 if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater one') { throw 'Updater script did not roll back' }
 $script:failAt=-1;Install-CivPack $game $self1 $self2
 if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater two') { throw 'Updater script did not update itself' }
+$dropped=Clone $self2;$dropped.versionId='playtest-0.35.4-9';$dropped.PSObject.Properties.Remove('updaterFiles')
+Must-Fail { Install-CivPack $game $self2 $dropped }
+if ([IO.File]::ReadAllText("$homeDir/Fixture-Updater.ps1") -ne '# updater two') { throw 'An update removed the updater' }
 $foreign=Clone $self2;$foreign.updaterFiles[0].downloads=@('https://cdn.modrinth.com/data/fixture/Fixture-Updater.ps1')
 Must-Fail { Assert-CivPack $foreign }
 # Each migration applies once: a missing setting waits until the game writes it, and a player who restores the old value keeps it.

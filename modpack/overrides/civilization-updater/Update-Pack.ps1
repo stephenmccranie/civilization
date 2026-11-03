@@ -160,6 +160,7 @@ function Install-CivPack([string]$Game,$Old,$Next) {
         }
         foreach ($item in $oldFiles) {
             if (!$nextPaths.ContainsKey($item.path) -and (Test-Path -LiteralPath (Join-Path $Game $item.path))) {
+                if ($item.path -like '*.ps1') { throw "A pack update cannot remove the updater: $($item.path)" }
                 if (!(Test-CivPinnedFile (Join-Path $Game $item.path) $item)) { throw "Retired managed file was changed locally: $($item.path)" }
                 Add-CivPlanEntry $plan $Game $folder $item.path ''
             }
