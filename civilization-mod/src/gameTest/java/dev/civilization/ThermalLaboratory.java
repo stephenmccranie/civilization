@@ -18,7 +18,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /** Opt-in development world. Uses actual source discovery, machine tickers and scheduled diffusion. */
 @EventBusSubscriber(modid="civilization")
 public final class ThermalLaboratory {
-    private static final String PHASE=System.getProperty("civilization.thermalLab", "");
+    private static final String PHASE=Fixture.phase("thermal");
     static final int Y=80;
     private static int ticks;
     private static Path output;
@@ -64,7 +64,7 @@ public final class ThermalLaboratory {
         require(ThermalConfig.enabled(),"Thermal lab requires enabled heat");
         output=e.getServer().getWorldPath(LevelResource.ROOT);
         var marker=output.resolve("thermal-lab-v1.txt");
-        if(PHASE.equals("physics"))require(!Files.exists(output.resolve("physics.csv")),"Preserve existing physics results; choose a fresh RunName");
+
         // Only this explicitly selected, isolated run is allowed to load the laboratory campus.
         for(int x=-1;x<=6;x++)for(int z=-1;z<=2;z++)l.setChunkForced(x,z,true);
         if(!Files.exists(marker)) {
@@ -84,7 +84,7 @@ public final class ThermalLaboratory {
             require(actual.energy.equals(expected.energy)&&actual.pending.equals(expected.pending)
                 &&actual.timeline.save().equals(expected.timeline.save()),"Heat cells, pending fuel or timed releases changed across server restart");
             require(l.getBlockEntity(STATIONS.getLast().source()) instanceof KilnBlockEntity,"Foundry lost across restart");
-            System.out.println("THERMAL_LAB_RELOAD_PASS cells="+actual.activeCells());
+            System.out.println("THERMAL_RELOAD_PASS cells="+actual.activeCells());
             e.getServer().halt(false);
         }
         System.out.println("THERMAL_LAB_READY world="+output.toAbsolutePath()+" phase="+PHASE);
@@ -174,20 +174,12 @@ public final class ThermalLaboratory {
         Files.writeString(output.resolve("measurements.csv"),rows,StandardOpenOption.APPEND);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) throws Exception {
-        if(PHASE.equals("batching")){
-            if(++ticks==20){ThermalBatchingExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
-            return;
-        }
-        if(PHASE.equals("bench")){
-            if(++ticks==20){ThermalPerformanceExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
-            return;
-        }
         if(PHASE.equals("physics")){
             if(++ticks==20){ThermalPhysicsExperiments.run(e.getServer().overworld(),output);e.getServer().halt(false);}
             return;
         }
         if(PHASE.equals("seed")){
-            if(++ticks==100){System.out.println("THERMAL_LAB_SEED_PASS");e.getServer().halt(false);}
+            if(++ticks==100){System.out.println("THERMAL_SEED_PASS");e.getServer().halt(false);}
             return;
         }
         if(!PHASE.equals("check"))return;
@@ -215,7 +207,7 @@ public final class ThermalLaboratory {
                 "Shutdown storage, queued heat and atmosphere must balance without new source energy");
             require(f.completedExchanges>0&&f.simulationAgeSeconds(l)<10,"Scheduled solver must make timely progress");
             net.minecraft.nbt.NbtIo.writeCompressed(f.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess()),output.resolve("thermal-check.nbt"));
-            System.out.println("THERMAL_LAB_CHECK_PASS energy="+total(f)+" cells="+f.activeCells()+" age="+f.simulationAgeSeconds(l));
+            System.out.println("THERMAL_CHECK_PASS energy="+total(f)+" cells="+f.activeCells()+" age="+f.simulationAgeSeconds(l));
             e.getServer().halt(false);
         }
     }

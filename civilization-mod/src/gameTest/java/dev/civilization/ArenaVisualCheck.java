@@ -18,7 +18,7 @@ final class ArenaVisualCheck {
     static volatile Throwable failure;
     static boolean connecting;
     static boolean peerSent;
-    static Path marker(Minecraft mc,String name){return mc.gameDirectory.toPath().toAbsolutePath().normalize().getParent().resolve("arena-peer/"+name+".txt");}
+    static Path marker(Minecraft mc,String name){return PreviewVisualCheck.peerFile(mc,name);}
     static void write(Minecraft mc,String name,String value){try{Files.createDirectories(marker(mc,name).getParent());Files.writeString(marker(mc,name),value);}catch(Exception e){throw new RuntimeException(e);}}
     static String read(Minecraft mc,String name){try{return Files.readString(marker(mc,name));}catch(Exception e){return "";}}
     static void send(Minecraft mc,int action){if(mc.player.containerMenu instanceof ArenaMenu m)net.neoforged.neoforge.network.PacketDistributor.sendToServer(new ArenaPayload(m.containerId,m.values.get(1),action,m.values.get(11)));else throw new IllegalStateException("Expected arena menu for action "+action);}
@@ -35,13 +35,13 @@ final class ArenaVisualCheck {
             level.removeBlock(AT.offset(5,0,2),false);level.setBlockAndUpdate(AT.offset(5,-1,2),Blocks.DIRT.defaultBlockState());
             level.setBlockAndUpdate(AT.offset(17,1,1),Blocks.CHEST.defaultBlockState());
             if(!ArenaStructure.problem(level,pit).isEmpty())throw new IllegalStateException("Custom interior invalidated the arena");
-            server.setUsesAuthentication(false);if(!server.publishServer(GameType.SURVIVAL,false,25570))throw new IllegalStateException("Cannot open arena test port");ready=true;write(mc,"ready","ready");
+            server.setUsesAuthentication(false);if(!server.publishServer(GameType.SURVIVAL,false,PreviewVisualCheck.PEER_PORT))throw new IllegalStateException("Cannot open arena test port");ready=true;write(mc,"ready","ready");
         }catch(Throwable t){failure=t;}});}
         if(!ready||ticks<150)return;
         if(ticks==150)shot(mc,"complete-oval");
         if(ticks==151)server.execute(()->{var host=server.getPlayerList().getPlayers().getFirst();host.teleportTo(server.overworld(),342.5,103,.5,Set.of(),90,10);});
         if(ticks==180)shot(mc,"rear-doorway");
-        if(step==0&&ticks>185&&!configured)server.execute(()->{try{var players=server.getPlayerList().getPlayers();if(players.size()<2)return;var host=players.stream().filter(p->!p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();var peer=players.stream().filter(p->p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();
+        if(step==0&&ticks>185&&!configured)server.execute(()->{try{var players=server.getPlayerList().getPlayers();if(players.size()<2)return;var host=players.stream().filter(p->!p.getGameProfile().getName().equals("Peer")).findFirst().orElseThrow();var peer=players.stream().filter(p->p.getGameProfile().getName().equals("Peer")).findFirst().orElseThrow();
             for(var p:List.of(host,peer)){p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setHealth(p.getMaxHealth());p.removeAllEffects();p.teleportTo(server.overworld(),320.5,101,p==host?2.5:-2.5,Set.of(),p==host?180:0,30);}
             host.getInventory().setItem(0,new ItemStack(Items.DIAMOND,4));peer.getInventory().setItem(0,new ItemStack(Items.IRON_INGOT,6));ArenaMenu.open(host,AT);ArenaMenu.open(peer,AT);configured=true;
         }catch(Throwable t){failure=t;}});
@@ -59,19 +59,19 @@ final class ArenaVisualCheck {
                 if(pit.stakes[0].getCount()!=4||pit.stakes[1].getCount()!=6||!host.getMainHandItem().isEmpty()||!peer.getMainHandItem().isEmpty())throw new IllegalStateException("Actual player stake conservation");
                 host.getInventory().setItem(0,Items.IRON_SWORD.getDefaultInstance());host.teleportTo(server.overworld(),320.5,101,2.5,Set.of(),180,0);peer.teleportTo(server.overworld(),320.5,101,.5,Set.of(),0,0);peer.setHealth(3);combatPrepared=true;
             }catch(Throwable t){failure=t;}});}
-            case 6->{var target=mc.level.players().stream().filter(p->p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElse(null);if(target!=null&&mc.player.distanceTo(target)<4){mc.gameMode.attack(mc.player,target);mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);next(mc,7);}}
+            case 6->{var target=mc.level.players().stream().filter(p->p.getGameProfile().getName().equals("Peer")).findFirst().orElse(null);if(target!=null&&mc.player.distanceTo(target)<4){mc.gameMode.attack(mc.player,target);mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);next(mc,7);}}
             case 7->{server.execute(()->{try{var d=ArenaData.get(server);var pit=d.pits.get(ArenaService.address(server.overworld(),AT));if(pit.phase!=ArenaData.RESULT||pit.winner!=0)throw new IllegalStateException("Real client melee did not resolve knockout");var host=server.getPlayerList().getPlayer(pit.fighters[0]);var peer=server.getPlayerList().getPlayer(pit.fighters[1]);if(!peer.isAlive()||peer.getHealth()<19||host.getHealth()<19)throw new IllegalStateException("Knockout recovery");if(d.credits.get(host.getUUID()).stream().mapToInt(ItemStack::getCount).sum()!=10)throw new IllegalStateException("Winner owns both fighter stakes");host.teleportTo(server.overworld(),320.5,101,2.5,Set.of(),180,35);ArenaMenu.open(host,AT);
                 // Mark inspection results independently of the peer's client acknowledgement.
                 System.out.println("ARENA REAL PEER KNOCKOUT AND ESCROW VERIFIED");
             }catch(Throwable t){failure=t;}});next(mc,8);}
             case 8->{if(mc.player.containerMenu instanceof ArenaMenu){shot(mc,"winner-collection");send(mc,12);next(mc,9);}}
-            case 9->{server.execute(()->{try{var host=server.getPlayerList().getPlayers().stream().filter(p->!p.getGameProfile().getName().equals("ArenaPeer")).findFirst().orElseThrow();if(CivicItems.count(host,Items.DIAMOND.getDefaultInstance())!=4||CivicItems.count(host,Items.IRON_INGOT.getDefaultInstance())!=6||ArenaData.get(server).credits.containsKey(host.getUUID()))throw new IllegalStateException("Actual winner collection");System.out.println("ARENA CLIENT COLLECTION VERIFIED");}catch(Throwable t){failure=t;}});next(mc,10);}
+            case 9->{server.execute(()->{try{var host=server.getPlayerList().getPlayers().stream().filter(p->!p.getGameProfile().getName().equals("Peer")).findFirst().orElseThrow();if(CivicItems.count(host,Items.DIAMOND.getDefaultInstance())!=4||CivicItems.count(host,Items.IRON_INGOT.getDefaultInstance())!=6||ArenaData.get(server).credits.containsKey(host.getUUID()))throw new IllegalStateException("Actual winner collection");System.out.println("ARENA CLIENT COLLECTION VERIFIED");}catch(Throwable t){failure=t;}});next(mc,10);}
             case 10->{if(read(mc,"done").equals("10")){shot(mc,"final");mc.stop();}}
         }
         if(ticks>3000)throw new IllegalStateException("Arena peer sequence timeout at "+step);
     }
     static void peer(Minecraft mc){
-        if(!connecting&&mc.screen instanceof TitleScreen&&read(mc,"ready").equals("ready")){connecting=true;net.minecraft.client.gui.screens.ConnectScreen.startConnecting(mc.screen,mc,net.minecraft.client.multiplayer.resolver.ServerAddress.parseString("127.0.0.1:25570"),new net.minecraft.client.multiplayer.ServerData("Arena test","127.0.0.1:25570",net.minecraft.client.multiplayer.ServerData.Type.OTHER),false,null);}
+        if(!connecting&&mc.screen instanceof TitleScreen&&read(mc,"ready").equals("ready")){connecting=true;net.minecraft.client.gui.screens.ConnectScreen.startConnecting(mc.screen,mc,net.minecraft.client.multiplayer.resolver.ServerAddress.parseString("127.0.0.1:"+PreviewVisualCheck.PEER_PORT),new net.minecraft.client.multiplayer.ServerData("Arena test","127.0.0.1:"+PreviewVisualCheck.PEER_PORT,net.minecraft.client.multiplayer.ServerData.Type.OTHER),false,null);}
         if(mc.screen instanceof net.minecraft.client.gui.screens.DisconnectedScreen)throw new IllegalStateException("Independent arena peer disconnected");
         if(mc.level==null||mc.player==null)return;mc.options.pauseOnLostFocus=false;mc.options.guiScale().set(2);String text=read(mc,"step");if(text.isEmpty())return;int step=Integer.parseInt(text);if(step!=peerStep){peerStep=step;peerWait=0;peerSent=false;}peerWait++;if(peerWait<30||peerSent)return;
         int action=switch(step){case 1->1;case 2->2;case 3->4;case 4->5;default->-1;};

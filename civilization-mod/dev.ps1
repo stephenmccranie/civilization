@@ -1,186 +1,183 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('Build', 'Deploy', 'Client', 'Server', 'GameTest', 'Visual', 'Verify')]
+    [ValidateSet('Build', 'GameTest', 'Visual', 'Fixture', 'Deploy', 'Client', 'Server')]
     [string]$Task = 'Build',
-    [ValidateSet('Quick', 'Gameplay', 'Visual', 'Full')]
-    [string]$Scope = 'Quick',
-    [ValidateSet('machines', 'machine-lighting', 'thermal-art', 'modular', 'material-sync', 'guide', 'textures', 'civic', 'industry', 'pipes', 'jei', 'bulk', 'storage', 'deposits', 'boat', 'airship', 'weather', 'workshops','assembly', 'inventory', 'chests', 'crafting', 'engine', 'models', 'canisters','cloth','sulfur','parts','supplies','foods','manufactured','components','thermal','road','uranium','derrick-guide','kitchen','oven','builders-line','paterson','coal-mining','wheelbarrow','gladiator','grassier-grass')]
     [string]$Scene = 'machines',
-    [switch]$FullVisual
+    [switch]$Full,
+    [ValidateSet('boat', 'airship', 'thermal')]
+    [string]$Name = 'boat',
+    [string]$Phase
 )
 
 $ErrorActionPreference = 'Stop'
-$configFile = Join-Path $PSScriptRoot 'dev.local.json'
+$root = $PSScriptRoot
+$configFile = Join-Path $root 'dev.local.json'
 if (-not (Test-Path -LiteralPath $configFile)) {
     throw 'Copy dev.local.example.json to dev.local.json and set your JDK and Prism instance paths.'
 }
 $devConfig = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
-$compiler = Join-Path $devConfig.javaHome 'bin/javac.exe'
-if (-not (Test-Path -LiteralPath $compiler)) {
-    throw "JDK compiler not found: $compiler"
+$compilerVersion = & (Join-Path $devConfig.javaHome 'bin/javac.exe') -version 2>&1
+if ("$compilerVersion" -notmatch '^javac 21(?:\.|$)') { throw "This project requires JDK 21; found: $compilerVersion" }
+$properties = ConvertFrom-StringData (Get-Content -LiteralPath (Join-Path $root 'gradle.properties') -Raw)
+$sableJarName = "sable-neoforge-$($properties.minecraft_version)-$($properties.sable_version).jar"
+$sableUrl = "https://cdn.modrinth.com/data/T9PomCSv/versions/U678xqle/$sableJarName"
+$sableSha512 = 'bf3d8c87bcc5efb99afffd50305fc978086ed48a63e106816e3a8a3901f8052f4480ea527dbd7d4003f7775ed4d020529098034f4e307aefac9cc42df2b4c19a'
+# Phases each fixture runs against one fresh world; -Phase runs a single phase instead (thermal: physics, manual).
+$fixturePhases = @{ boat = 'seed', 'reload'; airship = 'seed', 'reload'; thermal = 'check', 'reload' }
+$peerScenes = 'gladiator', 'weather'
+
+function Invoke-Gradle([string[]]$Arguments, [string]$Log) {
+    # Gradle and javac report warnings on stderr; only the exit code decides success.
+    $ErrorActionPreference = 'Continue'
+    if ($Log) { & (Join-Path $root 'gradlew.bat') @Arguments --console=plain 2>&1 | Tee-Object -FilePath $Log }
+    else { & (Join-Path $root 'gradlew.bat') @Arguments --console=plain }
+    if ($LASTEXITCODE -ne 0) { throw "Gradle $($Arguments -join ' ') failed ($LASTEXITCODE)." }
 }
-$compilerVersion = & $compiler -version 2>&1
-if ($LASTEXITCODE -ne 0 -or "$compilerVersion" -notmatch '^javac 21(?:\.|$)') {
-    throw "This project requires JDK 21; found: $compilerVersion"
+
+# Run directories are disposable: every run starts from a clean copy.
+function Reset-Directory([string]$path) {
+    if (Test-Path -LiteralPath $path) { cmd /c rd /s /q $path }
+    New-Item -ItemType Directory -Force $path | Out-Null
+}
+
+# The pinned Sable release and the libraries it bundles, downloaded once into .dev-libs.
+function Install-Sable {
+    $libs = Join-Path $root '.dev-libs'
+    $jar = Join-Path $libs $sableJarName
+    if (Test-Path -LiteralPath $jar) { return }
+    New-Item -ItemType Directory -Force $libs | Out-Null
+    $download = "$jar.download"
+    Invoke-WebRequest $sableUrl -OutFile $download
+    if ((Get-FileHash -LiteralPath $download -Algorithm SHA512).Hash -ne $sableSha512) {
+        Remove-Item -LiteralPath $download
+        throw 'Sable download does not match the pinned SHA-512.'
+    }
+    Move-Item -LiteralPath $download -Destination $jar
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [IO.Compression.ZipFile]::OpenRead($jar)
+    try {
+        foreach ($entry in $zip.Entries | Where-Object FullName -like 'META-INF/jarjar/*.jar') {
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $libs $entry.Name), $true)
+        }
+    }
+    finally { $zip.Dispose() }
+}
+
+# A hidden test client built from the development client in run/; never from the owner's Prism instance.
+function New-TestClient([string]$path) {
+    Reset-Directory $path
+    foreach ($dir in 'mods', 'shaderpacks', 'resourcepacks', 'config') {
+        New-Item -ItemType Directory -Force (Join-Path $path $dir) | Out-Null
+        $source = Join-Path $root "run/$dir"
+        if ($dir -ne 'config' -and (Test-Path -LiteralPath $source)) {
+            Get-ChildItem -LiteralPath $source -File | Copy-Item -Destination (Join-Path $path $dir)
+        }
+    }
+    $iris = Join-Path $root 'run/config/iris.properties'
+    if (Test-Path -LiteralPath $iris) { Copy-Item -LiteralPath $iris -Destination (Join-Path $path 'config') }
+    # Nobody can dismiss Distant Horizons' update prompt or NeoForge's separate splash window here.
+    [IO.File]::WriteAllText((Join-Path $path 'config/DistantHorizons.toml'), "[client.advanced.autoUpdater]`nenableAutoUpdater = false`n")
+    [IO.File]::WriteAllText((Join-Path $path 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 1920`nearlyWindowHeight = 1080`n")
+    $options = @(Get-Content -LiteralPath (Join-Path $root 'run/options.txt') | Where-Object { $_ -notmatch '^(fullscreen|overrideWidth|overrideHeight|pauseOnLostFocus):' })
+    $options += 'fullscreen:false', 'overrideWidth:1920', 'overrideHeight:1080', 'pauseOnLostFocus:false'
+    [IO.File]::WriteAllLines((Join-Path $path 'options.txt'), $options)
 }
 
 $previousJavaHome = $env:JAVA_HOME
-$arenaPeerProcess = $null
-Push-Location $PSScriptRoot
+$peer = $null
+Push-Location $root
 try {
     $env:JAVA_HOME = $devConfig.javaHome
-    & ./sable.ps1 Prepare
-    $gradleTasks = @(switch ($Task) {
-        'Client' { 'runClient' }
-        'Server' { 'runServer' }
-        'GameTest' { 'runGameTestServer' }
-        'Visual' { 'runVisualClient' }
-        'Verify' {
-            'build'
-            if ($Scope -in @('Gameplay', 'Full')) { 'runGameTestServer' }
-            if ($Scope -in @('Visual', 'Full')) { 'runVisualClient' }
+    Install-Sable
+    switch ($Task) {
+        'Build' { Invoke-Gradle build }
+        'Client' { Invoke-Gradle runClient }
+        'Server' {
+            $server = Join-Path $root 'runs/server'
+            New-Item -ItemType Directory -Force $server | Out-Null
+            $serverProperties = Join-Path $server 'server.properties'
+            if (-not (Test-Path -LiteralPath $serverProperties)) { Copy-Item -LiteralPath (Join-Path $root 'server.local.example.properties') -Destination $serverProperties }
+            Write-Host 'Development server on localhost:25566, saved in runs/server. Type stop to shut down.'
+            Invoke-Gradle runServer
         }
-        default { 'build' }
-    })
-    $needsVisual = $gradleTasks -contains 'runVisualClient'
-    if ($Task -eq 'Deploy') { $gradleTasks += 'prepareRuntimeMods' }
-    $gradleArguments = @('--console=plain')
-    if ($needsVisual) {
-        $gradleArguments += "-PvisualScene=$Scene"
-        $gradleArguments += "-PvisualFull=$($FullVisual.IsPresent.ToString().ToLowerInvariant())"
-    }
-
-    if ($needsVisual) {
-        $visualPath = Join-Path $PSScriptRoot 'runs/visual'
-        foreach ($subdir in @('config', 'mods', 'shaderpacks', 'resourcepacks', 'saves')) {
-            New-Item -ItemType Directory -Force (Join-Path $visualPath $subdir) | Out-Null
+        'GameTest' {
+            Reset-Directory (Join-Path $root 'runs/gametest')
+            Invoke-Gradle runGameTestServer
         }
-        $visualWorld = Join-Path $visualPath 'saves/preview-compatibility'
-        if (-not (Test-Path -LiteralPath $visualWorld)) {
-            $sourceWorld = Join-Path $PSScriptRoot 'run/saves/preview-compatibility'
-            if (-not (Test-Path -LiteralPath $sourceWorld)) { $sourceWorld = Join-Path $PSScriptRoot 'runs/server/development-world' }
-            if (-not (Test-Path -LiteralPath $sourceWorld)) { throw 'Visual tests need a disposable development world first.' }
-            Copy-Item -LiteralPath $sourceWorld -Destination $visualWorld -Recurse
+        'Visual' {
+            $visual = Join-Path $root 'runs/visual'
+            New-TestClient $visual
+            Copy-Item -LiteralPath (Join-Path $root 'run/saves/preview-compatibility') -Destination (Join-Path $visual 'saves/preview-compatibility') -Recurse
+            if ($Scene -in $peerScenes) {
+                New-TestClient (Join-Path $root 'runs/peer')
+                # The peer joins once the host has opened its test port and written runs/peer/ready.txt.
+                $peer = Start-Job -ArgumentList $root, $Scene -ScriptBlock {
+                    param($root, $scene)
+                    Set-Location -LiteralPath $root
+                    $deadline = (Get-Date).AddMinutes(3)
+                    while (-not (Test-Path -LiteralPath 'runs/peer/ready.txt')) {
+                        if ((Get-Date) -gt $deadline) { throw 'The host never opened its test port.' }
+                        Start-Sleep -Milliseconds 500
+                    }
+                    & ./gradlew.bat runPeerClient "-PpeerScene=$scene-peer" --console=plain *> 'runs/peer/peer.log'
+                    if ($LASTEXITCODE -ne 0) { throw "Peer client failed ($LASTEXITCODE); see runs/peer/peer.log." }
+                }
+            }
+            Write-Host "Hidden 1920x1080 visual check: $Scene. Screenshots: runs/visual/screenshots."
+            Invoke-Gradle runVisualClient, "-PvisualScene=$Scene", "-PvisualFull=$($Full.IsPresent.ToString().ToLowerInvariant())"
+            if ($peer) { Receive-Job $peer -Wait -ErrorAction Stop }
         }
-        # Copy development-only graphics inputs; never edit the user's Prism instance.
-        foreach ($subdir in @('mods', 'shaderpacks', 'resourcepacks')) {
-            $sourceDir = Join-Path $PSScriptRoot "run/$subdir"
-            if (Test-Path -LiteralPath $sourceDir) {
-                Get-ChildItem -LiteralPath $sourceDir -File | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $visualPath $subdir) }
+        'Fixture' {
+            $eula = Join-Path $root 'runs/server/eula.txt'
+            if (-not (Test-Path -LiteralPath $eula)) { throw 'Run dev.ps1 Server once and accept the Minecraft EULA first.' }
+            $fixture = Join-Path $root 'runs/fixture'
+            Reset-Directory $fixture
+            Copy-Item -LiteralPath $eula -Destination $fixture
+            $flat = '{"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:stone","height":2}]}'
+            [IO.File]::WriteAllText((Join-Path $fixture 'server.properties'), "level-name=fixture`nlevel-seed=54321987`nlevel-type=minecraft:flat`ngenerator-settings=$flat`nserver-ip=127.0.0.1`nserver-port=25567`nonline-mode=false`nview-distance=6`nsimulation-distance=6`nspawn-protection=0`ngamemode=creative`nforce-gamemode=true`ndifficulty=peaceful`n")
+            $phases = if ($Phase) { @($Phase) } else { $fixturePhases[$Name] }
+            foreach ($current in $phases) {
+                $log = Join-Path $fixture "$current.log"
+                Invoke-Gradle runFixtureServer, "-Pfixture=$Name", "-PfixturePhase=$current" -Log $log
+                $pass = "$($Name.ToUpperInvariant())_$($current.ToUpperInvariant())_PASS"
+                if ($current -ne 'manual' -and -not (Select-String -LiteralPath $log -Pattern $pass -SimpleMatch -Quiet)) { throw "Fixture $Name $current did not report $pass." }
             }
         }
-        $optionsSource = Join-Path $PSScriptRoot 'run/options.txt'
-        if (Test-Path -LiteralPath $optionsSource) {
-            $options = @(Get-Content -LiteralPath $optionsSource | Where-Object { $_ -notmatch '^(fullscreen|overrideWidth|overrideHeight|pauseOnLostFocus):' })
-            $options += @('fullscreen:false', 'overrideWidth:1920', 'overrideHeight:1080', 'pauseOnLostFocus:false')
-            [IO.File]::WriteAllLines((Join-Path $visualPath 'options.txt'), $options)
-        }
-        $irisSource = Join-Path $PSScriptRoot 'run/config/iris.properties'
-        if (Test-Path -LiteralPath $irisSource) { Copy-Item -LiteralPath $irisSource -Destination (Join-Path $visualPath 'config/iris.properties') }
-        # The disposable client has no one to dismiss a Distant Horizons update prompt.
-        # Its default auto-updater was blocking the title screen and looked like a Photon stall.
-        [IO.File]::WriteAllText((Join-Path $visualPath 'config/DistantHorizons.toml'), "[client.advanced.autoUpdater]`nenableAutoUpdater = false`n")
-        # Disable NeoForge's separate early splash window before any native window is created.
-        [IO.File]::WriteAllText((Join-Path $visualPath 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 1920`nearlyWindowHeight = 1080`n")
-        Write-Host "Hidden 1920x1080 visual check: $Scene (extended tour: $($FullVisual.IsPresent)). Mouse capture disabled. Output: runs/visual/screenshots."
-        if ($Scene -eq 'gladiator') {
-            $arenaPeerDirectory = Join-Path $PSScriptRoot 'runs/arena-peer'
-            foreach ($arenaSubdir in @('config','mods','resourcepacks','shaderpacks')) {
-                $arenaDestination = Join-Path $arenaPeerDirectory $arenaSubdir
-                New-Item -ItemType Directory -Force $arenaDestination | Out-Null
-                Get-ChildItem -LiteralPath (Join-Path $visualPath $arenaSubdir) -File | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $arenaDestination -Force }
+        'Deploy' {
+            $instancePath = (Resolve-Path -LiteralPath $devConfig.prismInstance).Path
+            $pack = Get-Content -LiteralPath (Join-Path $instancePath 'mmc-pack.json') -Raw | ConvertFrom-Json
+            $minecraft = $pack.components | Where-Object uid -eq 'net.minecraft'
+            $neoForge = $pack.components | Where-Object uid -eq 'net.neoforged'
+            if ($minecraft.version -ne $properties.minecraft_version -or $neoForge.version -ne $properties.neo_version) {
+                throw 'Prism Minecraft/NeoForge versions do not match gradle.properties.'
             }
-            Copy-Item -LiteralPath (Join-Path $visualPath 'options.txt') -Destination (Join-Path $arenaPeerDirectory 'options.txt') -Force
-            foreach ($arenaMarker in @('step.txt','done.txt','ready.txt','peer-exit.txt')) {
-                $arenaMarkerPath = Join-Path $arenaPeerDirectory $arenaMarker
-                if (Test-Path -LiteralPath $arenaMarkerPath) { Remove-Item -LiteralPath $arenaMarkerPath }
+            $modsPath = Join-Path $instancePath 'minecraft/mods'
+            if (-not (Test-Path -LiteralPath $modsPath)) { throw "Launch the Prism instance once first: $modsPath" }
+            $runningGame = Get-CimInstance Win32_Process -Filter "Name = 'javaw.exe' OR Name = 'java.exe'" |
+                Where-Object { $_.CommandLine -and $_.CommandLine.Replace('/', '\').IndexOf($instancePath, [StringComparison]::OrdinalIgnoreCase) -ge 0 }
+            if ($runningGame) { throw 'Close the Civilization Dev game before deploying. Prism itself may stay open.' }
+            Invoke-Gradle build, prepareRuntimeMods
+            $geckoName = "geckolib-neoforge-$($properties.minecraft_version)-$($properties.geckolib_version).jar"
+            if (Get-ChildItem -LiteralPath $modsPath -Filter 'geckolib-*.jar' -File | Where-Object Name -ne $geckoName) {
+                throw 'A different GeckoLib version is installed; resolve the duplicate before deploying.'
             }
-            $arenaShell = (Get-Process -Id $PID).Path
-            $arenaScript = Join-Path $PSScriptRoot 'arena-peer.ps1'
-            $arenaPeerProcess = Start-Process -FilePath $arenaShell -ArgumentList @('-NoProfile','-File',('"' + $arenaScript + '"')) -WindowStyle Hidden -PassThru
-        }
-    }
-
-    if ($Task -eq 'Server') {
-        $serverDirectory = Join-Path $PSScriptRoot 'runs/server'
-        New-Item -ItemType Directory -Path $serverDirectory -Force | Out-Null
-        $serverProperties = Join-Path $serverDirectory 'server.properties'
-        if (-not (Test-Path -LiteralPath $serverProperties)) {
-            Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'server.local.example.properties') -Destination $serverProperties
-        }
-        Write-Host 'Dedicated development server: localhost:25566; saves in runs/server. Type stop to shut down.'
-    }
-
-    if ($Task -eq 'Deploy') {
-        $instancePath = (Resolve-Path -LiteralPath $devConfig.prismInstance).Path
-        $pack = Get-Content -LiteralPath (Join-Path $instancePath 'mmc-pack.json') -Raw | ConvertFrom-Json
-        $mc = $pack.components | Where-Object uid -eq 'net.minecraft'
-        $neo = $pack.components | Where-Object uid -eq 'net.neoforged'
-        $properties = ConvertFrom-StringData (Get-Content -LiteralPath 'gradle.properties' -Raw)
-        if ($mc.version -ne $properties.minecraft_version -or $neo.version -ne $properties.neo_version) {
-            throw 'Prism Minecraft/NeoForge versions do not match gradle.properties.'
-        }
-        $gamePath = Join-Path $instancePath 'minecraft'
-        if (-not (Test-Path -LiteralPath $gamePath)) {
-            throw "Launch the Prism instance once first: $gamePath"
-        }
-        $runningGame = Get-CimInstance Win32_Process -Filter "Name = 'javaw.exe' OR Name = 'java.exe'" |
-            Where-Object {
-                $_.CommandLine -and
-                $_.CommandLine.Replace('/', '\').IndexOf($instancePath, [StringComparison]::OrdinalIgnoreCase) -ge 0
+            Copy-Item -LiteralPath (Join-Path $root "build/runtimeMods/$geckoName") -Destination $modsPath -Force
+            Copy-Item -LiteralPath (Join-Path $root ".dev-libs/$sableJarName") -Destination $modsPath -Force
+            # Replace only our own JAR, archiving previous builds outside the loaded mods folder.
+            $existing = @(Get-ChildItem -LiteralPath $modsPath -Filter "$($properties.mod_id)-*.jar" -File)
+            if ($existing.Count) {
+                $backupPath = Join-Path $instancePath ('mod-backups/' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
+                New-Item -ItemType Directory -Force $backupPath | Out-Null
+                $existing | Move-Item -Destination $backupPath
             }
-        if ($runningGame) {
-            throw 'Close the Civilization Dev game before deploying. Prism itself may stay open.'
+            $jarName = "$($properties.mod_id)-$($properties.mod_version).jar"
+            Copy-Item -LiteralPath (Join-Path $root "build/libs/$jarName") -Destination $modsPath
+            Write-Host "Installed $jarName. Launch Civilization Dev, open a world, and run /civilization status."
         }
-    }
-
-    $verificationTimer = [Diagnostics.Stopwatch]::StartNew()
-    & (Join-Path $PSScriptRoot 'gradlew.bat') @gradleTasks @gradleArguments
-    if ($LASTEXITCODE -ne 0) { throw "Gradle $($gradleTasks -join ', ') failed ($LASTEXITCODE)." }
-    if ($arenaPeerProcess) {
-        if (-not $arenaPeerProcess.WaitForExit(30000)) { throw 'Arena companion client did not exit after the host.' }
-        $arenaExitFile = Join-Path $PSScriptRoot 'runs/arena-peer/peer-exit.txt'
-        if (-not (Test-Path -LiteralPath $arenaExitFile) -or (Get-Content -LiteralPath $arenaExitFile -Raw) -ne '0') { throw 'Arena companion client failed; see .tools/arena-peer-auto.log.' }
-    }
-    Write-Host ("Completed {0} in {1:N1}s." -f ($gradleTasks -join ', '), $verificationTimer.Elapsed.TotalSeconds)
-
-    if ($Task -eq 'Deploy') {
-        $jarName = "$($properties.mod_id)-$($properties.mod_version).jar"
-        $artifact = Join-Path $PSScriptRoot "build/libs/$jarName"
-        if (-not (Test-Path -LiteralPath $artifact)) { throw "Missing artifact: $artifact" }
-        $modsPath = Join-Path $gamePath 'mods'
-        New-Item -ItemType Directory -Path $modsPath -Force | Out-Null
-        $geckoName = "geckolib-neoforge-$($properties.minecraft_version)-$($properties.geckolib_version).jar"
-        $geckoSource = Join-Path $PSScriptRoot "build/runtimeMods/$geckoName"
-        if (-not (Test-Path -LiteralPath $geckoSource)) { throw "Missing resolved GeckoLib artifact: $geckoSource" }
-        $otherGecko = @(Get-ChildItem -LiteralPath $modsPath -Filter 'geckolib-*.jar' -File | Where-Object Name -ne $geckoName)
-        if ($otherGecko.Count) { throw 'A different GeckoLib version is installed; resolve the duplicate before deployment.' }
-        $geckoDestination = Join-Path $modsPath $geckoName
-        Copy-Item -LiteralPath $geckoSource -Destination $geckoDestination -Force
-        if ((Get-FileHash -LiteralPath $geckoSource).Hash -ne (Get-FileHash -LiteralPath $geckoDestination).Hash) { throw 'GeckoLib deployment hash mismatch' }
-        $sableJar = Join-Path $PSScriptRoot ".dev-libs/sable-neoforge-1.21.1-2.0.5.jar"
-        $sableDestination = Join-Path $modsPath "sable-neoforge-1.21.1-2.0.5.jar"
-        Copy-Item -LiteralPath $sableJar -Destination $sableDestination -Force
-        if ((Get-FileHash -LiteralPath $sableJar -Algorithm SHA512).Hash -ne (Get-FileHash -LiteralPath $sableDestination -Algorithm SHA512).Hash) { throw "Sable deployment hash mismatch" }
-        # Only replace our own artifacts; archive previous builds outside the loaded mods folder.
-        $existing = @(Get-ChildItem -LiteralPath $modsPath -Filter "$($properties.mod_id)-*.jar" -File)
-        if ($existing.Count -gt 0) {
-            $backupPath = Join-Path $instancePath ('mod-backups/' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
-            New-Item -ItemType Directory -Path $backupPath -Force | Out-Null
-            foreach ($oldJar in $existing) {
-                Move-Item -LiteralPath $oldJar.FullName -Destination $backupPath
-            }
-        }
-        $destination = Join-Path $modsPath $jarName
-        Copy-Item -LiteralPath $artifact -Destination $destination
-        if ((Get-FileHash -LiteralPath $artifact).Hash -ne (Get-FileHash -LiteralPath $destination).Hash) {
-            throw 'Deployed JAR checksum does not match the build.'
-        }
-        Write-Host "Installed $destination"
-        Write-Host 'Launch Civilization Dev, open a world, and run /civilization status.'
     }
 }
 finally {
+    if ($peer) { Stop-Job $peer; Remove-Job $peer -Force }
     $env:JAVA_HOME = $previousJavaHome
     Pop-Location
 }

@@ -20,7 +20,14 @@ public final class PreviewVisualCheck {
     private static boolean opened, prepared, captured;
     private static int ticks;
     private static int setupTicks;
-    private static String campusScreen="";
+    /** Scenes handled by the shared kiln-guide fixture below; every other scene dispatches to its own check. */
+    private static final java.util.Set<String> GUIDE_SCENES = java.util.Set.of("machines", "textures", "guide", "modular");
+    static final int PEER_PORT = 25569;
+
+    /** Handshake file shared by a host scene and its peer client; both resolve it to runs/peer. */
+    static java.nio.file.Path peerFile(Minecraft mc, String name) {
+        return mc.gameDirectory.toPath().toAbsolutePath().normalize().getParent().resolve("peer/" + name + ".txt");
+    }
 
     @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
         if (CHECK.isEmpty()) return;
@@ -36,17 +43,10 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("gladiator-peer")){ArenaVisualCheck.peer(mc);return;}
         if (!opened && mc.screen instanceof TitleScreen) {
             opened = true;
-            mc.createWorldOpenFlows().openWorld(System.getProperty("civilization.previewWorld","preview-compatibility"), mc::stop);
-        }
-        if((CHECK.equals("campus")||CHECK.equals("flight-benchmark")||CHECK.equals("thermal-lab")) && opened && mc.level==null && mc.screen!=null) {
-            if(!campusScreen.equals(mc.screen.getClass().getName())){campusScreen=mc.screen.getClass().getName();System.out.println("Campus screen: "+campusScreen+" / "+mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button).map(c->((net.minecraft.client.gui.components.Button)c).getMessage().getString()).toList());}
-            for(var child:mc.screen.children())if(child instanceof net.minecraft.client.gui.components.Button button) {
-                var label=button.getMessage().getString();
-                if(label.equals("Proceed")||label.equals("I know what I'm doing!")||label.equals("Load Anyway")||label.equals("Yes")){System.out.println("Campus test confirmation: "+mc.screen.getClass().getSimpleName()+" / "+label);button.onPress();break;}
-            }
+            mc.createWorldOpenFlows().openWorld("preview-compatibility", mc::stop);
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
-        if(CHECK.equals("thermal-lab")){ThermalLaboratoryVisual.tick(mc);return;}
+
         if(CHECK.equals("grassier-grass")){GrassierGrassVisualCheck.tick(mc);return;}
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}
@@ -59,8 +59,8 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("thermal-art")){ThermalArtVisualCheck.tick(mc);return;}
         if(CHECK.equals("machine-lighting")){MachineLightingVisualCheck.tick(mc);return;}
         if(CHECK.equals("deposits")){PhysicalDepositVisualCheck.tick(mc);return;}
-        if(CHECK.equals("campus")){if(System.getProperty("civilization.previewWorld","").equals("compact-campus"))CompactCampusVisual.tick(mc);else CampusVisualCheck.tick(mc);return;}
-        if(CHECK.equals("flight-benchmark")){FlightBenchmarkClient.tick(mc);return;}
+
+
         if(CHECK.equals("airship")){AirshipVisualCheck.tick(mc);return;}
         if(CHECK.equals("boat")){BoatVisualCheck.tick(mc);return;}
         if(CHECK.equals("weather")){WeatherVisualCheck.tick(mc);return;}
@@ -82,6 +82,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("oven")){OvenVisualCheck.tick(mc);return;}
         if(CHECK.equals("kitchen")){KitchenVisualCheck.tick(mc);return;}
         if(CHECK.equals("civic")){CivicVisualCheck.tick(mc);return;}
+        if (!GUIDE_SCENES.contains(CHECK)) throw new IllegalStateException("Unknown visual scene: " + CHECK);
         if (!prepared && ++setupTicks < 100) return; // Let the initial chunk snapshot arrive before editing the display.
         if (!prepared) {
             prepared = true;

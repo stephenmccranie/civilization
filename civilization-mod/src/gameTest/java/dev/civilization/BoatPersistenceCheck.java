@@ -13,9 +13,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
 @EventBusSubscriber(modid="civilization")
 public final class BoatPersistenceCheck {
- private static final String PHASE=System.getProperty("civilization.boatPhase","manual");private static int ticks;
- @SubscribeEvent public static void start(ServerStartedEvent e){ticks=0;if(PHASE.equals("manual"))return;for(int x=0;x<3;x++)for(int z=0;z<3;z++)e.getServer().overworld().setChunkForced(x,z,true);}
- @SubscribeEvent public static void tick(ServerTickEvent.Post e){if(PHASE.equals("manual")||++ticks!=100)return;try{
+ private static final String PHASE=Fixture.phase("boat");private static int ticks;
+ @SubscribeEvent public static void start(ServerStartedEvent e){ticks=0;if(PHASE.isEmpty())return;for(int x=0;x<3;x++)for(int z=0;z<3;z++)e.getServer().overworld().setChunkForced(x,z,true);}
+ @SubscribeEvent public static void tick(ServerTickEvent.Post e){if(PHASE.isEmpty()||++ticks!=100)return;try{
   var server=e.getServer();var l=server.overworld();var path=server.getWorldPath(LevelResource.ROOT).resolve("boat-check.txt");
   if(PHASE.equals("seed")){
    var container=dev.ryanhcode.sable.api.sublevel.SubLevelContainer.getContainer(l);for(var old:java.util.List.copyOf(BoatSystem.boats(l)))container.removeSubLevel(old,dev.ryanhcode.sable.sublevel.storage.SubLevelRemovalReason.REMOVED);
