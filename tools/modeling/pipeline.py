@@ -18,7 +18,7 @@ CRITERIA = {
 
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 def read(path): return json.loads(path.read_text(encoding='utf-8'))
-def write(path, value): path.write_text(json.dumps(value, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+def write(path, value): path.write_text(json.dumps(value, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
 def fingerprint(asset):
     return hashlib.sha256(json.dumps({k: asset[k] for k in ('kind', 'brief', 'references')}, sort_keys=True).encode()).hexdigest()
 

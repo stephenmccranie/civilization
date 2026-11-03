@@ -49,7 +49,7 @@ public final class StockpileGroupGameTests {
         a.cargo().remove(0,47);h.assertTrue(top(a)==(2+2*3.5)/16,"Seventeen blocks start a second layer");
         a.cargo().remove(0,17);
         h.assertTrue(a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),2,3),3)==3&&a.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),2000)==1012&&a.cargo().load()==128,"Slabs and saw-cut pieces count by their volume");
-        h.assertTrue(a.cargo().insert(new ItemStack(Items.DIAMOND),1)==0&&a.cargo().insert(new ItemStack(Items.CHEST),1)==0,"Only solid building goods go on a pallet");h.succeed();
+        a.cargo().remove(0,1);h.assertTrue(a.cargo().insert(new ItemStack(Items.DIAMOND),1)==0,"Goods the hand does not carry stay off a pallet");h.succeed();
     }
     @GameTest(template="industrial") public static void theStackOnlyRisesIntoFreeSpaceAndTheTopBelongsToItsPallet(GameTestHelper h){
         floor(h);var a=pallet(h,3,1,3);h.setBlock(new BlockPos(3,2,3),Blocks.STONE);

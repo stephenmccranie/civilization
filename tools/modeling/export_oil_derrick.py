@@ -90,5 +90,5 @@ lines.append(",\n".join(entries))
 lines.extend(["    );", "}", ""])
 out = ROOT / ".tools/modeling/legacy-derrick/OilDerrickStructure.java"
 out.parent.mkdir(parents=True, exist_ok=True)
-out.write_text("\n".join(lines), encoding="utf-8")
+out.write_text("\n".join(lines), encoding="utf-8", newline='\n')
 print(f"Exported {len(entries)} parts to {out}")

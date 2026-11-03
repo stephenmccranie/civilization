@@ -87,9 +87,9 @@ def main():
         animation = evaluate(client, 'Animator.buildFile(null, Animation.all.map(a => a.name))')
         texture = evaluate(client, 'Texture.all[0].getDataURL()')
         ASSET.mkdir(parents=True, exist_ok=True)
-        (ASSET / 'engine_proof.bbmodel').write_text(project, encoding='utf-8')
-        (ASSET / 'engine_proof.geo.json').write_text(geometry, encoding='utf-8')
-        (ASSET / 'engine_proof.animation.json').write_text(json.dumps(animation, indent=2), encoding='utf-8')
+        (ASSET / 'engine_proof.bbmodel').write_text(project, encoding='utf-8', newline='\n')
+        (ASSET / 'engine_proof.geo.json').write_text(geometry, encoding='utf-8', newline='\n')
+        (ASSET / 'engine_proof.animation.json').write_text(json.dumps(animation, indent=2), encoding='utf-8', newline='\n')
         (ASSET / 'engine_proof.png').write_bytes(base64.b64decode(texture.split(',', 1)[1]))
         verify(client)
         print('Native model/animation exports and editor views saved:', ASSET)
@@ -112,7 +112,7 @@ def verify(client):
     (ASSET / 'manifest.json').write_text(json.dumps({'id': 'engine_proof', 'project': 'engine_proof.bbmodel',
         'geometry': 'engine_proof.geo.json', 'animation': 'engine_proof.animation.json', 'texture': 'engine_proof.png',
         'required_animations': ['animation.engine_proof.cycle'],
-        'purpose': 'Diagnostic toolchain fixture; not approved engine art', 'texels_per_block': 32}, indent=2) + '\n')
+        'purpose': 'Diagnostic toolchain fixture; not approved engine art', 'texels_per_block': 32}, indent=2) + '\n', newline='\n')
     for name, position in [('front', [0, 18, -65]), ('side', [-65, 18, 0]), ('isometric', [-55, 40, -55])]:
         result = client.call('set_camera_angle', {'position': position, 'target': [0, 10, 0], 'projection': 'orthographic'})
         for block in result.get('content', []):

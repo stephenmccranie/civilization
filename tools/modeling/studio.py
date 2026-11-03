@@ -128,14 +128,14 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
 
 def save(client,folder,name,gecko=True):
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
-    (folder/f'{name}.bbmodel').write_text(export(client,'project'),encoding='utf-8')
+    (folder/f'{name}.bbmodel').write_text(export(client,'project'),encoding='utf-8', newline='\n')
     data=json.loads(export(client,'bedrock' if gecko else 'java_block'))
     if not gecko:
         data['parent']='minecraft:block/block';data['textures']['particle']=next(iter(data['textures'].values()))
-    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(json.dumps(data,indent=2),encoding='utf-8')
+    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(json.dumps(data,indent=2),encoding='utf-8', newline='\n')
     if gecko:
         a=evaluate(client,'Animator.buildFile(null, Animation.all.map(a=>a.name))')
-        (folder/f'{name}.animation.json').write_text(json.dumps(a,indent=2),encoding='utf-8')
+        (folder/f'{name}.animation.json').write_text(json.dumps(a,indent=2),encoding='utf-8', newline='\n')
 
 
 def capture(client,path,position,target,span=70,size=1000):
@@ -157,7 +157,7 @@ def capture(client,path,position,target,span=70,size=1000):
     Path(path).parent.mkdir(parents=True,exist_ok=True)
     Path(path).write_bytes(base64.b64decode(data.split(',',1)[1]))
     Path(path).with_suffix('.view.json').write_text(json.dumps(dict(position=position,target=target,span=span,size=size,
-        renderer='Blockbench offscreen Preview',sha256=hashlib.sha256(Path(path).read_bytes()).hexdigest()),indent=2),encoding='utf-8')
+        renderer='Blockbench offscreen Preview',sha256=hashlib.sha256(Path(path).read_bytes()).hexdigest()),indent=2),encoding='utf-8', newline='\n')
 
 
 def contact_sheet(paths,output,labels=None,cell=420):

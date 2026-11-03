@@ -33,7 +33,7 @@ def main():
             capture(c,path,[a+b for a,b in zip(args.target,delta)],args.target,args.span,args.size);paths.append(path)
         contact_sheet(paths,args.output/'views.png')
         (args.output/'source.json').write_text(json.dumps({'model':str(args.model.resolve()),
-            'sha256':hashlib.sha256(args.model.read_bytes()).hexdigest(),'format':fmt},indent=2),encoding='utf-8')
+            'sha256':hashlib.sha256(args.model.read_bytes()).hexdigest(),'format':fmt},indent=2),encoding='utf-8', newline='\n')
         print(args.output/'views.png')
     finally:c.close()
 

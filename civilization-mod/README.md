@@ -15,7 +15,7 @@ This folder holds the working mod. [Game rules](../design_direction.md) describe
 - [Cooking](cooking.md): Cooking Stove, Prototype Stove and Baking Oven.
 - [Heat](heat.md): climate, the thermal field, comfort and cold, and the Thermal Survey Helmet.
 - [Geography and weather](geography.md): farmland and woodland, regional weather, crops and frontier uranium.
-- [Physical materials and cargo](physics.md): materials, inspectors, wheelbarrow, pallets, block carrying and shared crafting tables.
+- [Physical materials and cargo](physics.md): materials, inspectors, wheelbarrow, pallets, block carrying, the backpack and shared crafting tables.
 - [Vehicles](vehicle-physics.md): boats, the airship prototype and fast-flight integrations.
 - [Ownership and trade](ownership-trade.md): land claims, takeovers, whitelists, Trade Counters and the Survey Table.
 - [Gladiator Pit](gladiator-pit.md): the arena, knockout fights and wagers.
@@ -42,7 +42,7 @@ Photon is the primary shader target; Bliss and Complementary are secondary check
 
 ### Server connections
 
-Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `5/0.35.15-dev`, the identity advertised by the 0.35.15 client, which added A/D steering to the wheelbarrow's input packet. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update. The pack manifest's own `protocol` field is the updater's format and stays `3/0.35.0-dev`, so installed updaters keep accepting new releases.
+Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `6/0.35.16-dev`, the identity advertised by the 0.35.16 client, which added the backpack's item, menu and supply messages. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update. The pack manifest's own `protocol` field is the updater's format and stays `3/0.35.0-dev`, so installed updaters keep accepting new releases.
 
 This is a compatibility gate, not authentication or anti-cheat: a modified client can imitate the channel. Account authentication and server access controls are separate. Players install the [Prism playtest client](../modpack/README.md); the host supplies the server address privately.
 

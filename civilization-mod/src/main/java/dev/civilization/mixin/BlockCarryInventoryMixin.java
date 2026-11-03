@@ -25,6 +25,13 @@ public abstract class BlockCarryInventoryMixin {
         if(BlockCarry.restricted(inv.player)&&BlockCarry.filledContainer(stack)){result.setReturnValue(false);return;}
         if(BlockCarry.restricted(inv.player)&&BlockCarry.block(stack))result.setReturnValue(BlockCarry.insert(inv,stack)>0);
     }
+    /** Ordinary goods the pockets cannot take go into the worn backpack. */
+    @Inject(method="add(ILnet/minecraft/world/item/ItemStack;)Z",at=@At("RETURN"),cancellable=true)
+    private void civilization$backpack(int slot,ItemStack stack,CallbackInfoReturnable<Boolean> result){
+        var inv=(Inventory)(Object)this;
+        if(stack.isEmpty()||!(inv.player instanceof net.minecraft.server.level.ServerPlayer p)||!(dev.civilization.Backpack.worn(p) instanceof dev.civilization.Backpack.Contents pack))return;
+        int before=stack.getCount();pack.insert(stack);if(stack.getCount()<before)result.setReturnValue(true);
+    }
     @Inject(method="placeItemBackInInventory(Lnet/minecraft/world/item/ItemStack;Z)V",at=@At("HEAD"),cancellable=true)
     private void civilization$return(ItemStack stack,boolean packet,CallbackInfo ci){
         var inv=(Inventory)(Object)this;

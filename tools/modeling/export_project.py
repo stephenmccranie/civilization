@@ -10,8 +10,7 @@ from pathlib import Path
 import re
 from mcp import Client
 from proof import evaluate, export, load_project
-
-ROOT = Path(__file__).resolve().parents[2]
+from setup import ROOT
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -20,13 +19,13 @@ def main():
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--project', type=Path, help='Open this saved project before exporting; source is preserved')
     args = parser.parse_args()
-    folder = args.directory.resolve()
+    folder = (ROOT / args.directory).resolve()
     if not folder.is_relative_to(ROOT) or not re.fullmatch('[a-z0-9_]+', args.name):
         raise ValueError('Use a project directory and lowercase resource name')
     client = Client()
     try:
         if args.project:
-            project = args.project.resolve()
+            project = (ROOT / args.project).resolve()
             if not project.is_relative_to(ROOT): raise ValueError('Keep project source in the workspace')
             source = json.loads(project.read_text(encoding='utf-8'))
             fmt = source['meta']['model_format']

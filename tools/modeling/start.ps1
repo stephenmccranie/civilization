@@ -1,6 +1,7 @@
 # User-startable editor; development profile is separate from personal Blockbench settings.
 $ErrorActionPreference = 'Stop'
-$root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+# The main checkout owns .tools; its git worktrees share one editor and profile.
+$root = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath((git -C $PSScriptRoot rev-parse --path-format=absolute --git-common-dir)))
 $editor = Join-Path $root '.tools/modeling/Blockbench_5.1.6_portable.exe'
 if (-not (Test-Path -LiteralPath $editor)) { throw 'Run tools/modeling/setup.py first.' }
 $profile = Join-Path $root '.tools/modeling/profile'
@@ -29,7 +30,7 @@ $running = Get-CimInstance Win32_Process | Where-Object {
     $_.Name -like '*Blockbench*.exe' -and $_.CommandLine -and $_.CommandLine.IndexOf($profile, [StringComparison]::OrdinalIgnoreCase) -ge 0
 }
 if (-not $running) {
-    Start-Process -FilePath $editor -ArgumentList @('--userData', "`"$profile`"", '--enable-logging=file', "--log-file=`"$startupLog`"") -WindowStyle Hidden
+    Start-Process -FilePath $editor -ArgumentList @('--userData', "`"$profile`"", '--disable-gpu-sandbox', '--enable-logging=file', "--log-file=`"$startupLog`"") -WindowStyle Hidden
 } else {
     Write-Host 'Waiting for the existing project editor; open projects will be preserved.'
 }

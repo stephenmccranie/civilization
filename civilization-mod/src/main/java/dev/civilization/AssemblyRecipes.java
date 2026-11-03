@@ -19,6 +19,7 @@ final class AssemblyRecipes {
         jobs.add(new WorkshopJobs.Job(item(id).getDescriptionId(),new ItemStack(item(id),count),List.copyOf(list),200));
     }
     static void add(List<WorkshopJobs.Job> jobs){
+        add(jobs,"civilization:backpack",1,item("minecraft:leather",8),item("minecraft:string",4),item("minecraft:stick",4));
         add(jobs,"civilization:boat_helm",1,item("civilization:steel_plate",4),item("civilization:machine_parts",3),tag("minecraft:planks",1));
         add(jobs,"civilization:coal_preparation_screen",1,tag("minecraft:planks",4),item("civilization:iron_plate",2),item("minecraft:stick",2));
         add(jobs,"civilization:condenser",1,item("civilization:iron_plate",4),item("civilization:copper_plate",2),item("minecraft:iron_bars",2),item("civilization:machine_parts",1));

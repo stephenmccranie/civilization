@@ -50,6 +50,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |
 | `builders-line` | Builder's Line clicks, automatic building and mining, and cancel |
 | `wheelbarrow` | Wheelbarrow first-person view, walking bob, A/D steering with a free mouse look, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering |
+| `backpack` | Cooking Stoves, a chest and stairs on a Pallet, a backpack in its accessory slot, binding it in a Pallet menu, building that tops up the hand and pack from the store with stone conserved, the pack worn from behind, three-quarters and the side, its menu and Supply switch, building beyond reach from the pack alone, the held item, and the Pack panel beside a chest menu |
 | `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |

@@ -35,7 +35,7 @@ def main():
         records.append({'source': str(path.resolve()), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'crop': crop, 'label': label})
     args.output.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(args.output)
-    args.output.with_suffix('.json').write_text(json.dumps({'images': records}, indent=2)+'\n', encoding='utf8')
+    args.output.with_suffix('.json').write_text(json.dumps({'images': records}, indent=2)+'\n', encoding='utf8', newline='\n')
     print(args.output)
 
 

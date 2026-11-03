@@ -39,7 +39,8 @@ public final class EquipmentGrade {
 
     private EquipmentGrade() {}
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
-    public static boolean eligible(ItemStack stack) { return !stack.isEmpty() && stack.isDamageableItem(); }
+    /** Damageable equipment, and the backpack, whose grade sets its capacity. */
+    public static boolean eligible(ItemStack stack) { return !stack.isEmpty() && (stack.isDamageableItem() || stack.is(Backpack.ITEM)); }
     public static int value(ItemStack stack) { return stack.getOrDefault(GRADE.get(), 100); }
     public static boolean hasGrade(ItemStack stack) { return stack.has(GRADE.get()); }
     public static long wearSeed(ItemStack stack) { return stack.getOrDefault(WEAR_SEED.get(), 0L); }
@@ -82,15 +83,17 @@ public final class EquipmentGrade {
     public static void apply(ItemStack stack, int grade, long newWearSeed) {
         if (!eligible(stack)) return;
         double factor = grade / 100.0;
-        int oldMax = stack.getMaxDamage();
-        int oldDamage = stack.getDamageValue();
-        int baseMax = stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE, oldMax);
-        int max = Math.max(1, (int)Math.round(baseMax * factor));
         stack.set(GRADE.get(), grade);
         if (grade < 100 && stack.is(ItemTags.TRIMMABLE_ARMOR)) stack.remove(DataComponents.TRIM);
         if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), newWearSeed);
-        stack.set(DataComponents.MAX_DAMAGE, max);
-        stack.setDamageValue(Math.min(max - 1, (int)Math.round(oldDamage * max / (double)Math.max(1, oldMax))));
+        if (stack.isDamageableItem()) {
+            int oldMax = stack.getMaxDamage();
+            int oldDamage = stack.getDamageValue();
+            int baseMax = stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE, oldMax);
+            int max = Math.max(1, (int)Math.round(baseMax * factor));
+            stack.set(DataComponents.MAX_DAMAGE, max);
+            stack.setDamageValue(Math.min(max - 1, (int)Math.round(oldDamage * max / (double)Math.max(1, oldMax))));
+        }
 
         Tool baseTool = stack.getItem().components().get(DataComponents.TOOL);
         if (baseTool != null) {

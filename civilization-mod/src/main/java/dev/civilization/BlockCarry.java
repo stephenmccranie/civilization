@@ -36,7 +36,14 @@ public final class BlockCarry {
         return bundle!=null&&!bundle.isEmpty();
     }
     public static boolean restricted(Player player){return !player.isCreative()&&!player.isSpectator();}
+    /** Into the hand, then on the server into the worn backpack. */
     public static int insert(Inventory inv,ItemStack offered){
+        int n=hold(inv,offered);
+        if(!offered.isEmpty()&&inv.player instanceof ServerPlayer p&&Backpack.worn(p) instanceof Backpack.Contents pack){int before=offered.getCount();pack.insert(offered);n+=before-offered.getCount();}
+        return n;
+    }
+    /** Into the hand alone. */
+    public static int hold(Inventory inv,ItemStack offered){
         if(!block(offered)||filledContainer(offered))return 0;
         var hand=inv.getItem(OFFHAND);
         if(offered==hand)return 0;

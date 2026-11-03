@@ -9,7 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * Draws a store's goods one for one: each stored block is one quarter-size block in the store's grid, filling
  * a layer row by row from its first row, then the next layer up, in the order the goods arrived. Slabs
- * and saw-cut pieces fill eighth cells by volume. Stock beyond the grid draws as a full grid.
+ * and saw-cut pieces fill eighth cells by volume; any other block, such as stairs or a machine, fills a cell.
+ * Stock beyond the grid draws as a full grid.
  */
 public final class CargoVisuals {
     private static BlockState[] eighths=new BlockState[0];
@@ -42,6 +43,11 @@ public final class CargoVisuals {
     }
     private static void block(BlockState state,float x,float y,float z,float width,float height,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         pose.pushPose();pose.translate(x,y,z);pose.scale(width,height,width);
-        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state,pose,buffers,light,overlay);pose.popPose();
+        // A block drawn only by its block entity, such as the Baking Oven, draws as its item instead.
+        if(state.getRenderShape()==net.minecraft.world.level.block.RenderShape.INVISIBLE){
+            pose.translate(.5f,.5f,.5f);
+            Minecraft.getInstance().getItemRenderer().renderStatic(new net.minecraft.world.item.ItemStack(state.getBlock()),net.minecraft.world.item.ItemDisplayContext.NONE,light,overlay,pose,buffers,null,0);
+        }else Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state,pose,buffers,light,overlay);
+        pose.popPose();
     }
 }

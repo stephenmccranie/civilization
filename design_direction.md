@@ -104,7 +104,7 @@ Terrain makes opportunity understandable. One shared region/biome foundation dri
 - **Physical deposits.** Mining removes real coal and pumping lowers real oil. An oil seep above the centre reveals it but holds no reserve. Coal has no clue block: river cuts, cliffs and caves expose some seams. Derricks may stand anywhere above the oil footprint.
 - Ordinary small coal stays hand-mineable for usable Coal; huge veins use [manual mining](#manual-coal-mining).
 - **Uranium** is rare, small, hand-mined ore scattered through suitable frontier rock. Explorers wear a Geiger counter that clicks faster nearby and carry finds personally; value comes after processing. Exposed ore, uranium in hand and chests holding it show sparse silver radiation tracks — a visual cue only.
-- Three accessory slots beside the player portrait hold wearable role tools, not storage or a power ladder.
+- Three accessory slots beside the player portrait hold wearable role tools and one backpack, never a power ladder.
 - Deposit geography is developed against fresh worlds; existing natural sites need no migration during development.
 
 **Open**
@@ -177,7 +177,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 - Gold is a real tier between iron and diamond, keeping its enchantability.
 - Coal-era workshops make iron equipment and everything for the first oil chain; later powered works use fuel and lubricant for throughput. Lubricant services machines; it is never a recipe ingredient.
 - **Density** comes from shared landings and warehouses, short transfers and concentrated customers — no city designation, proximity buff or forced residence.
-- **Grade.** Every damageable item gets a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits) that scales its base stats; 100% equals vanilla. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
+- **Grade.** Every damageable item gets a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits) that scales its base stats; 100% equals vanilla. A backpack's grade scales its capacity instead. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
 - **Repairs** at the Assembly Bench consume materials and lower grade, keeping names and enchantments, with no XP or prior-work penalty. No idle decay.
 - Mending and villager equipment trades are disabled. Completed production grants modest XP; hand assembly and repairs grant none. Crafting, repair and other acquisition routes may not bypass workshop production, though finite exploration finds stay usable.
 - **Maker's marks** (approved, deferred): colour accents and player-drawn pixel signatures on equipment.
@@ -205,16 +205,17 @@ Progression expands the quantities, distances and areas a player handles: person
 
 - Material volume, storage volume and mass are distinct and separate from energy value. A stone block is 1 m³; its cut pieces preserve it.
 - **One packing density.** Carried and stored building goods pack 64 to a block of space, so every capacity is the carrier's real interior at that density: a hand holds an armful of 8, a wheelbarrow 36 and a pallet 128 in a stack two blocks high.
-- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one as quarter-size blocks, with unlimited-count matching stacks. A wheelbarrow's load heaps above its tray rim. A pallet's stack fills its block, then rises into the block above while that block is empty, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
+- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one as quarter-size blocks, with unlimited-count matching stacks. Stores take everything the hand carries: pieces by volume, any other block as one block of space. A wheelbarrow's load heaps above its tray rim. A pallet's stack fills its block, then rises into the block above while that block is empty, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
 - **Personal carrying.** Building material travels as one offhand stack of up to 8 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
+- **Backpack.** An early leather pack worn in an accessory slot adds grade-scaled room for goods and building blocks: 9 slots and 24 blocks at 100% grade. It comes off only empty.
 - Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
 - The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, carrying four and a half hands. The coal minecart keeps its separate rail role.
-- Placement draws only from explicitly selected nearby supplies; material reaches the worksite physically.
+- **Supply-fed building.** Placement draws only from explicitly selected nearby supplies: a backpack bound to one wheelbarrow or Pallet group keeps the hand, and the block stacks already in the pack, topped up from it while the wearer builds within 16 blocks. It never adds new kinds of block. Supply is switched by the player, shown beside the hotbar, and checks access at every pull; out of reach, the pack alone refills the hand.
 - New limits follow an audit and explicit migration; inventories are never shrunk or discarded.
 
 **Open**
 - Wheelbarrow acquisition and loaded handling.
-- Supply-fed building: selection, reach, access loss, competing builders.
+- Supply-fed building in play: the 16-block reach, competing builders on one store and backpack size.
 - Universal enforcement across containers, machines, hoppers and recipes; unknown goods are never weightless.
 - The first powered loading upgrade; hoists, cranes and rail are examples only.
 - Journey times (proposal): everyday supplies minutes away, early resource trips 5–10 minutes, regional freight 10–20 minutes.
