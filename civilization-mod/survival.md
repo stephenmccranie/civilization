@@ -84,6 +84,10 @@ Ordinary 64-item stacks hold **32**, including custom items; 16-item stacks and 
 
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace join it automatically and remain in creative search. Item tooltips give short purpose, control and safety hints; construction bills and processing details belong to the placed guides, machine screens and [JEI](machines.md#jei).
 
+### Interface scale
+
+With GUI Scale set to **Auto**, Civilization picks one scale step per 360 pixels of window height (3× at 1080p, 4× at 1440p, 6× at 4K, never more than fits), so the interface keeps the same share of the screen at every resolution; vanilla Auto would take the largest scale that fits. Explicit GUI scales and the slider's range are unchanged. This is client-only.
+
 ### Welcome message
 
 On every join the server sends an 18-line framed getting-started card in chat: offhand block carrying, calories, retired furnaces and campfires; six numbered steps from the Stone Saw through building and lighting the [Kiln](machines.md#kiln) to the Foundry; then food, foraging, where iron tools come from, Land Controller claims and JEI's **R**/**U** lookups; and an invitation to give feedback in ordinary chat. It fits the pack's closed chat (20 lines) without wrapping at the pack's chat size and width. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.

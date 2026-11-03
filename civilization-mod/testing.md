@@ -30,7 +30,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `textures` | Item and controller display |
 | `guide` | Textured multiblock build guide, including a wrong block and its removal |
 | `modular` | Mixed-material and irregular cut-block assemblies |
-| `welcome` | The join welcome card in closed and open chat at the pack's GUI scale and chat size, width and height |
+| `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat) |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, and their icons |
