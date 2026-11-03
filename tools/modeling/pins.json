@@ -18,5 +18,11 @@
     "file": "geckolib.js",
     "sha256": "55d29fb29a888bcc60a8f1250c945e2835883add69f1aa4007ff7c7bf994b30f"
   },
+  "codex": {
+    "version": "0.166.0",
+    "url": "https://github.com/openai/codex/releases/download/rust-v0.166.0/codex-x86_64-pc-windows-msvc.exe.zip",
+    "file": "codex-x86_64-pc-windows-msvc.exe.zip",
+    "sha256": "bf67d9662ed539f305849b74ad6420cc7b23aa2be07753710ca3db9134a0246d"
+  },
   "geckolib_runtime": "4.9.3"
 }

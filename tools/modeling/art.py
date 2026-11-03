@@ -163,6 +163,21 @@ def copy_bundle(asset, folder):
         raise
 
 
+def generate(prompt, references):
+    """Draw a concept with Codex's image tool on the owner's ChatGPT sign-in; setup.py installs the pinned CLI."""
+    codex = ROOT / '.tools/modeling/codex'
+    out = ROOT / '.tools/modeling/concept/concept.png'
+    out.parent.mkdir(exist_ok=True); out.unlink(missing_ok=True)
+    command = [str(codex / read(codex / 'codex-package.json')['entrypoint']), 'exec', '--skip-git-repo-check',
+               '--sandbox', 'workspace-write', '--cd', str(out.parent), *(a for p in references for a in ('--image', str(p.resolve())))]
+    request = ('Call your image generation tool once with exactly the prompt below, passing any attached images as references, '
+               f'and save the result as {out.name} in the current directory. Do nothing else.\n\n{prompt}')
+    # The request goes on stdin because --image takes every following argument as another file.
+    subprocess.run(command, input=request, text=True, encoding='utf-8', check=True)
+    if not out.is_file(): raise ValueError('Codex saved no concept image')
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('init', 'prepare', 'views', 'compare', 'record', 'review', 'preview', 'publish', 'check', 'materials'))
@@ -226,13 +241,14 @@ def main():
         if sheet.exists(): preserve(folder, sheet)
         subprocess.run([sys.executable, str(Path(__file__).with_name('compare.py')), str(sheet), *images], check=True)
     elif args.command == 'record':
-        if not args.image or not args.prompt: parser.error('record needs --image and exact --prompt')
-        with Image.open(args.image) as image: image.verify()
-        dest = folder / f'concept-{len(asset["generations"])+1:02}{args.image.suffix.lower()}'
+        if not args.prompt: parser.error('record needs the exact --prompt, and --image for a supplied concept')
+        prompt = args.prompt.read_text(encoding='utf-8')
+        image = args.image or generate(prompt, args.references)
+        with Image.open(image) as opened: opened.verify()
+        dest = folder / f'concept-{len(asset["generations"])+1:02}{image.suffix.lower()}'
         if dest.exists(): raise ValueError('Concept exists')
-        shutil.copyfile(args.image, dest)
-        asset['generations'].append({'file': dest.name, 'sha256': sha(dest),
-            'prompt': args.prompt.read_text(encoding='utf-8'),
+        shutil.copyfile(image, dest)
+        asset['generations'].append({'file': dest.name, 'sha256': sha(dest), 'prompt': prompt,
             'references': {str(p.resolve()): sha(p) for p in args.references}})
         write(file, asset)
     elif args.command == 'review':
