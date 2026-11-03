@@ -1,5 +1,7 @@
 package dev.civilization;
 
+import static dev.civilization.CargoHolder.REACH;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.*;
@@ -9,10 +11,8 @@ import net.minecraft.world.phys.AABB;
 
 /** Native player slots and paged cargo identities. Large quantities never enter a native slot/cursor. */
 public final class CargoMenu extends AbstractContainerMenu {
-    public static final int ROWS=27, DATA=121;
+    public static final int ROWS=27, DATA=122;
     public static final int OFFHAND_SLOT=63;
-    /** How far a wheelbarrow may stand from the pallet it loads from or unloads to: as far as a player reaches either. */
-    private static final int REACH=6;
     private final CargoHolder holder,target;
     private final SimpleContainer icons=new SimpleContainer(ROWS);
     public final ContainerData data;
@@ -29,7 +29,7 @@ public final class CargoMenu extends AbstractContainerMenu {
                 if(i<108){int row=i/4;return part(holder.cargo().count(page*ROWS+row),i%4);}
                 if(i<112)return part(Double.doubleToLongBits(holder.cargo().load()),i-108);
                 if(i<116)return part(Double.doubleToLongBits(holder.cargo().capacity()),i-112);
-                return switch(i){case 116->page;case 117->pages();case 118->target==null?0:target instanceof StockpileEntity?1:2;case 119,120->holder instanceof StockpileEntity s?part(s.palletCount(),i-119):0;default->0;};
+                return switch(i){case 116->page;case 117->pages();case 118->target==null?0:target instanceof StockpileEntity?1:2;case 119,120->holder instanceof StockpileEntity s?part(s.palletCount(),i-119):0;case 121->Backpack.binding(inv.player,holder);default->0;};
             }
         };
         for(int row=0;row<3;row++)for(int col=0;col<9;col++)addSlot(new Slot(icons,row*9+col,8+col*18,54+row*18){
@@ -46,6 +46,8 @@ public final class CargoMenu extends AbstractContainerMenu {
     public int page(){return data.get(116);}
     public int pageCount(){return data.get(117);}
     public int palletCount(){return (data.get(119)&65535)|((data.get(120)&65535)<<16);}
+    /** The worn backpack: 0 none, 1 not bound here, 2 bound here. */
+    public int binding(){return data.get(121);}
     private int pages(){return Math.max(1,(holder.cargo().size()+ROWS-1)/ROWS);}
     private void refresh(){
         if(holder==null)return;page=Math.min(page,pages()-1);
@@ -92,6 +94,7 @@ public final class CargoMenu extends AbstractContainerMenu {
     @Override public boolean clickMenuButton(Player p,int id){
         if(!valid(p))return false;
         if(id==2||id==3){page=Math.clamp(page+(id==2?-1:1),0,pages()-1);refresh();return true;}
+        if(id==4){if(p instanceof net.minecraft.server.level.ServerPlayer sp)Backpack.bind(sp,holder);return true;}
         if(id<0||id>1||target==null||!target.cargoValid(p)||holder.cargoPosition().distanceToSqr(target.cargoPosition())>REACH*REACH)return false;
         if(id==0)target.cargo().transferTo(holder.cargo());else holder.cargo().transferTo(target.cargo());
         refresh();broadcastChanges();return true;

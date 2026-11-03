@@ -72,7 +72,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     @Override public CargoLedger cargo(){return cargo;}
     @Override public Level cargoLevel(){return level();}
     @Override public Vec3 cargoPosition(){return position();}
-    @Override public boolean cargoValid(Player p){return isAlive()&&!isVehicle()&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<=36&&accessible(p,getBoundingBox());}
+    @Override public boolean cargoValid(Player p,double reach){return isAlive()&&!isVehicle()&&p.level()==level()&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<=reach*reach&&accessible(p,getBoundingBox());}
     @Override public Component cargoName(){return Component.translatable("entity.civilization.wheelbarrow");}
     @Override public Component getDisplayName(){return cargoName();}
     @Override public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id,net.minecraft.world.entity.player.Inventory inv,Player p){return new CargoMenu(id,inv,this);}

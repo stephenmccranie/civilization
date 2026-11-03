@@ -62,7 +62,7 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
     @Override public void setRemoved(){if(group!=null)group.invalidate();super.setRemoved();}
     @Override public Level cargoLevel(){return level;}
     @Override public Vec3 cargoPosition(){return worldPosition.getCenter();}
-    @Override public boolean cargoValid(Player p){return level!=null&&p.level()==level&&!isRemoved()&&level.hasChunkAt(worldPosition)&&level.getBlockEntity(worldPosition)==this&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(cargoPosition())<=36&&group().allowed(p);}
+    @Override public boolean cargoValid(Player p,double reach){return level!=null&&p.level()==level&&!isRemoved()&&level.hasChunkAt(worldPosition)&&level.getBlockEntity(worldPosition)==this&&p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(cargoPosition())<=reach*reach&&group().allowed(p);}
     @Override public Component cargoName(){return Component.translatable("block.civilization.material_stockpile");}
     @Override public Component getDisplayName(){return cargoName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new CargoMenu(id,inv,this);}

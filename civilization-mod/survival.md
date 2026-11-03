@@ -78,7 +78,7 @@ Cows, mooshrooms, pigs, hoglins, sheep, chickens and rabbits drop one raw meat e
 
 ## Inventory
 
-Ordinary 64-item stacks hold **32**, including custom items; 16-item stacks and unstackable items keep their limits. Building blocks are carried in a single offhand stack ([personal block carrying](physics.md#personal-block-carrying)). One log, wood, stem or hyphae block (stripped or not) makes one plank, as does one bamboo block.
+Ordinary 64-item stacks hold **32**, including custom items; 16-item stacks and unstackable items keep their limits. Building blocks are carried in a single offhand stack ([personal block carrying](physics.md#personal-block-carrying)) and in a worn [backpack](physics.md#backpack). One log, wood, stem or hyphae block (stripped or not) makes one plank, as does one bamboo block.
 
 ## Interface
 

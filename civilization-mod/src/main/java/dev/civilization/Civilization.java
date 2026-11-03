@@ -53,6 +53,7 @@ public final class Civilization {
         CoalMiningContent.register(modBus);
         WheelbarrowContent.register(modBus);
         CargoContent.register(modBus);
+        Backpack.register(modBus);
         RoadContent.register(modBus);
         CivicContent.register(modBus);
         ArenaContent.register(modBus);

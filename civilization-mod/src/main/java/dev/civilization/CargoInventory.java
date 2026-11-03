@@ -15,6 +15,10 @@ public interface CargoInventory {
     long insert(ItemStack item,long offered);
     long remove(int index,long requested);
     default boolean isEmpty(){return size()==0;}
+    default int indexOf(ItemStack item){
+        for(int i=0;i<size();i++)if(ItemStack.isSameItemSameComponents(entry(i).item(),item))return i;
+        return -1;
+    }
     /** Load against capacity as players read it. */
     static String blocks(double load,double capacity){
         if(!Double.isFinite(load))return "Unknown goods: take them off";

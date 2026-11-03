@@ -22,7 +22,8 @@ public final class AccessorySlot extends Slot {
     @Override public void set(ItemStack stack) { inventory().setStackInSlot(index, stack); }
     @Override public ItemStack remove(int amount) { return inventory().extractItem(index, amount, false); }
     @Override public boolean mayPlace(ItemStack stack) { return inventory().isItemValid(index, stack); }
-    @Override public boolean mayPickup(Player player) { return !getItem().isEmpty(); }
+    /** A worn container comes off only empty, so nothing is carried hidden inside it. */
+    @Override public boolean mayPickup(Player player) { return !getItem().isEmpty() && !BlockCarry.filledContainer(getItem()); }
     @Override public int getMaxStackSize() { return 1; }
     @Override public int getMaxStackSize(ItemStack stack) { return 1; }
 }

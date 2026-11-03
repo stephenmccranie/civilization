@@ -1,6 +1,6 @@
 # Physical materials and cargo
 
-Shared material data and block geometry, the operator inspectors, the wheelbarrow and pallets, personal block carrying and shared crafting tables. Sable owns vessel motion, collision and inertia; physical mass here is separate from thermal capacity and machine work credit.
+Shared material data and block geometry, the operator inspectors, the wheelbarrow and pallets, personal block carrying, the backpack and shared crafting tables. Sable owns vessel motion, collision and inertia; physical mass here is separate from thermal capacity and machine work credit.
 
 ## Materials
 
@@ -77,6 +77,21 @@ Survival and Adventure players carry **one stack of at most 8 placeable blocks o
 Filled shulker boxes, bundles and other component-backed containers cannot be carried as hidden loads. On login and between server transactions, misplaced block stacks and filled portable containers move into a private saved recovery balance after the hand stack is filled; nothing is deleted. Use **`/civilization recoverblocks`** with a free or matching offhand to withdraw the next permitted stack. Recovery is keyed by player UUID and survives reload and death; a saved filled container unpacks one layer per command, and non-block contents return to ordinary inventory.
 
 The slot classification runs in both the client and the server.
+
+## Backpack
+
+Assemble a **Backpack** at the [Assembly Bench](manufacturing.md#fixtures-and-carriers) and wear it in any of the three accessory slots beside the player portrait, one at a time. It rolls a [grade](manufacturing.md#grade) on completion like equipment but has no durability; the grade sets its size: **9 slots and 24 building blocks at 100%**, each rounded (7 slots and 18 blocks at the 75% average, 11 and 30 at 125%). The slots hold ordinary goods at their native stack sizes and building blocks, which count against the block cap the way the hand counts them, each block or cut piece as one. A backpack holding anything cannot be taken off, and it never holds another backpack or a filled container.
+
+- **Filling.** Picked-up and shift-click-extracted building blocks fill the hand to 8, then the pack; other goods fill the pockets, then the pack.
+- **Building.** After every placement, by hand, saw cut, controller feed or Builder's Line, the hand is topped back up to 8 with the block it held, from the bound store while it supplies and otherwise from the pack. The pack's own block stacks are then topped up from the store in slot order, up to the cap. The pack never takes on a block it does not already hold, so stock what you want to carry first (shift-click a store's entry fills the hand, then the pack).
+- **Binding.** Open a wheelbarrow or Pallet while wearing a backpack and press **Bind backpack**: the pack binds to that store and its supply turns on; the same button reads **Unbind backpack** once bound there. A Pallet binding covers its connected pallets; binding elsewhere replaces it.
+- **Supply** works while the player stands within **16 blocks** of the bound store in the same dimension, with the store loaded, a wheelbarrow parked rather than pushed, and claim access, checked at every pull. Out of reach, the hand refills from the pack alone. When the hand runs out, the action bar says why: supply off, out of reach, not nearby, being pushed, no access or nothing left of that block.
+- **Controls.** **B** opens the pack: its slots, the binding and distance, **Supply on/off**, **Unbind** and **Unload**, which puts the pack's building blocks onto the bound store. **N** switches supply on and off. Both keys are under Controls → Civilization. Shift-click moves pack blocks to the Hand and the Hand's blocks into the pack.
+- **Badge.** Beside the Hand slot left of the hotbar, the pack's icon shows its blocks against its cap and, when bound, the store and its distance: green while building draws from it, gray otherwise. The badge is the client's own estimate; the server decides.
+
+Other players see a worn backpack on the wearer's back; only the worn items are sent to them, never the pack's contents. On death the pack drops empty with its contents beside it, unless `keepInventory` is on.
+
+The contents are the backpack item's own container contents, and its binding (a Pallet's position or a wheelbarrow's identity, with the dimension) and supply switch are saved on the item too, so all of it survives logout and restarts. A store that is gone leaves the binding in place until it is unbound or replaced. Supply checks run only after a placement and touch only the bound store: a Pallet by its position in a loaded chunk, a wheelbarrow by its identity among loaded entities; nothing is scanned or force-loaded.
 
 ## Shared crafting tables
 
