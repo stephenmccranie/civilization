@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -62,6 +63,19 @@ public class EverydayGameTests {
         var stove = stove(h);
         var menu = (KilnMenu) stove.createMenu(0, p.getInventory(), p);
         h.assertTrue(menu.getSlot(0).getMaxStackSize(new ItemStack(Items.BEEF)) == 32, "Input slot limit follows component");
+        h.succeed();
+    }
+
+    /** A breakable block that needs the correct tool must name that tool, or breaking it in Survival drops nothing. */
+    @GameTest(template = "empty")
+    public static void toolGatedBlocksNameTheirTool(GameTestHelper h) {
+        for (var block : BuiltInRegistries.BLOCK) {
+            var id = BuiltInRegistries.BLOCK.getKey(block);
+            var state = block.defaultBlockState();
+            if (!id.getNamespace().equals("civilization") || !state.requiresCorrectToolForDrops() || state.getDestroySpeed(h.getLevel(), BlockPos.ZERO) < 0) continue;
+            h.assertTrue(state.is(BlockTags.MINEABLE_WITH_PICKAXE) || state.is(BlockTags.MINEABLE_WITH_AXE)
+                    || state.is(BlockTags.MINEABLE_WITH_SHOVEL) || state.is(BlockTags.MINEABLE_WITH_HOE), id + " drops nothing: no tool can harvest it");
+        }
         h.succeed();
     }
 
