@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "game": "minecraft",
-  "versionId": "playtest-0.35.10-1",
+  "versionId": "playtest-0.35.11-1",
   "name": "Civilization Playtest",
   "summary": "Civilization playtest for Prism with automatic managed-pack updates.",
   "dependencies": {
@@ -22,15 +22,15 @@
       "id": "modrinth-COlSi5iR"
     },
     {
-      "path": "mods/civilization-0.35.10-dev.jar",
+      "path": "mods/civilization-0.35.11-dev.jar",
       "hashes": {
-        "sha1": "bbc26e672e20ff4ae245c7cdbb41c7d1116ab5e3",
-        "sha512": "2845781ba189929639774596a5e0833575330abf9ae257e9b9eee82a85fa2f9bab72f37beaa7924850f7186745b8ffa3a55ae175c1888a6a5a4fa30104e8f41b"
+        "sha1": "7a8c0b47d7b0527aa929ea9df768b5c49f073a36",
+        "sha512": "db982ecb82afc77f7e2f16a67dd2226ebfe712fdebdea44bb366a460d97c5075173a34a12b0bbd8a604a10a1c9f40a0ca8d8c535eef6fb5b04177f4531af1779"
       },
       "downloads": [
-        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.10-1/civilization-0.35.10-dev.jar"
+        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.11-1/civilization-0.35.11-dev.jar"
       ],
-      "fileSize": 5395890,
+      "fileSize": 5396330,
       "id": "civilization"
     },
     {
@@ -285,6 +285,20 @@
       "key": "chatScale",
       "from": "1.0",
       "value": "0.5"
+    },
+    {
+      "path": "options.txt",
+      "section": "",
+      "key": "chatWidth",
+      "from": "1.0",
+      "value": "0.5"
+    },
+    {
+      "path": "options.txt",
+      "section": "",
+      "key": "chatHeightUnfocused",
+      "from": "0.4375",
+      "value": "1.0"
     }
   ]
 }
