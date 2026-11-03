@@ -103,7 +103,7 @@ Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithin
 | Wooden fence gate | 2 matching species planks + 4 Sticks + 2 Fasteners | 1 / 5 seconds |
 | Chest / Barrel | 8 / 7 mixed planks | 1 / 5 seconds |
 | Wheelbarrow | 3 mixed planks + 1 Wooden Wheel + 1 Iron Rod + 4 Fasteners | 1 / 10 seconds |
-| [Backpack](physics.md#backpack) | 4 Leather + 2 String + 2 Sticks | 1 / 10 seconds |
+| [Backpack](physics.md#backpack) | 8 Leather + 4 String + 4 Sticks | 1 / 10 seconds |
 | Minecart | 4 Iron Plates + 2 Iron Rods + 1 Machine Parts | 1 / 10 seconds |
 | Coal Minecart | 4 mixed planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners | 1 / 10 seconds |
 | Coal Preparation Screen | 4 mixed planks + 2 Iron Plates + 2 Sticks | 1 / 10 seconds |
