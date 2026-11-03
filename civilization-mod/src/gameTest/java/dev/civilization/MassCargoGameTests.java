@@ -47,14 +47,14 @@ public final class MassCargoGameTests {
     }
     @GameTest(template="industrial") public static void adjacentStockpileTransfersOnlyWhatFitsAndKeepsRemainder(GameTestHelper h){
         var stock=stockpile(h);var wheel=barrow(h);var p=player(h);
-        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),400);
+        stock.cargo().insert(new ItemStack(Items.COBBLESTONE),64);wheel.cargo().insert(new ItemStack(Items.COBBLESTONE),300);
         var menu=new CargoMenu(1,p.getInventory(),wheel);
-        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==80,"Ten 32-block cobblestone stacks fit; overflow stays in the stockpile");
+        h.assertTrue(menu.clickMenuButton(p,0)&&wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==44,"Ten 32-block cobblestone stacks fit; the rest stays on the pallet");
         menu.clickMenuButton(p,0);
-        h.assertTrue(wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==80,"Repeated load cannot duplicate stock");
-        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().isEmpty()&&stock.cargo().entry(0).count()==400,"Unload returns the complete aggregate stack directly");
+        h.assertTrue(wheel.cargo().entry(0).count()==320&&stock.cargo().entry(0).count()==44,"Repeated load cannot duplicate stock");
+        h.assertTrue(menu.clickMenuButton(p,1)&&wheel.cargo().entry(0).count()==300&&stock.cargo().entry(0).count()==64,"Unload fills the pallet's stack and keeps the rest in the wheelbarrow");
         var tag=stock.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new StockpileEntity(stock.getBlockPos(),stock.getBlockState());restored.loadWithComponents(tag,h.getLevel().registryAccess());
-        h.assertTrue(restored.cargo().entry(0).count()==400,"Stockpile balance survives native persistence");h.succeed();
+        h.assertTrue(restored.cargo().entry(0).count()==64,"Stockpile balance survives native persistence");h.succeed();
     }
     @GameTest(template="industrial") public static void nativeMenuClicksConserveCargoCursorAndPlayerInventory(GameTestHelper h){
         var stock=stockpile(h);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),stock);
@@ -66,9 +66,9 @@ public final class MassCargoGameTests {
         menu.clicked(0,0,ClickType.PICKUP,p);
         h.assertTrue(menu.getCarried().isEmpty()&&stock.cargo().entry(0).count()==32,"Click deposits cursor contents without cloning");
         stock.cargo().insert(new ItemStack(Items.STONE),100);menu.clicked(0,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(stock.cargo().count(0)==100&&p.getOffhandItem().getCount()==32&&p.getInventory().countItem(Items.STONE)==32,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
+        h.assertTrue(stock.cargo().count(0)==32&&p.getOffhandItem().getCount()==32&&p.getInventory().countItem(Items.STONE)==32,"Shift-click withdraws only the offhand allowance, leaving cargo remainder");
         menu.clicked(CargoMenu.OFFHAND_SLOT,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==132,"Visible offhand slot deposits directly back into cargo");
+        h.assertTrue(p.getOffhandItem().isEmpty()&&stock.cargo().count(0)==64,"Visible offhand slot deposits directly back into cargo");
         for(int i=0;i<36;i++)h.assertTrue(p.getInventory().getItem(i).getCount()<=p.getInventory().getItem(i).getMaxStackSize(),"Player stack caps remain unchanged");h.succeed();
     }
     @GameTest(template="industrial") public static void menuPagesOrganizeTypesWithoutCappingThem(GameTestHelper h){
@@ -80,15 +80,15 @@ public final class MassCargoGameTests {
         h.assertTrue(menu.getCarried().getHoverName().getString().equals("Stone 27")&&stock.cargo().size()==30,"A page withdraws its exact component identity");h.succeed();
     }
     @GameTest(template="industrial") public static void menuTransportsFullLongQuantitiesAndMass(GameTestHelper h){
-        double old=CargoConfig.STOCKPILE.get();
+        double old=CargoConfig.WHEELBARROW.get();
         try{
-            CargoConfig.STOCKPILE.set(1e12);var stock=stockpile(h);var p=player(h);
+            CargoConfig.WHEELBARROW.set(1e12);stockpile(h);var wheel=barrow(h);var p=player(h);
             var item=CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),3,1);long quantity=5_000_000_000L;
-            h.assertTrue(stock.cargo().insert(item,quantity)==quantity,"Large cargo fits a tuned mass allowance");
-            var server=new CargoMenu(1,p.getInventory(),stock);var client=new CargoMenu(1,p.getInventory());
+            h.assertTrue(wheel.cargo().insert(item,quantity)==quantity,"Large cargo fits a tuned mass allowance");
+            var server=new CargoMenu(1,p.getInventory(),wheel);var client=new CargoMenu(1,p.getInventory());
             for(int i=0;i<CargoMenu.DATA;i++)client.data.set(i,(short)server.data.get(i));
-            h.assertTrue(client.count(0)==quantity&&client.mass()==stock.cargo().mass()&&client.capacity()==1e12,"Signed-short menu synchronization retains full long counts and double mass");
-        }finally{CargoConfig.STOCKPILE.set(old);}h.succeed();
+            h.assertTrue(client.count(0)==quantity&&client.load()==wheel.cargo().load()&&client.capacity()==1e12,"Signed-short menu synchronization retains full long counts and double mass");
+        }finally{CargoConfig.WHEELBARROW.set(old);}h.succeed();
     }
     @GameTest(template="industrial") public static void loadedStockpileBreakAndRevokedClaimCannotRemoveStock(GameTestHelper h){
         var stock=stockpile(h);var p=player(h);stock.cargo().insert(new ItemStack(Items.STONE),10);var menu=new CargoMenu(1,p.getInventory(),stock);

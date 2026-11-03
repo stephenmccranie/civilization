@@ -2,10 +2,10 @@ package dev.civilization;
 
 import net.minecraft.world.item.ItemStack;
 
-/** Server-side aggregate cargo; quantities never become oversized ItemStacks. */
+/** Server-side aggregate cargo; quantities never become oversized ItemStacks. Load and capacity share the store's measure. */
 public interface CargoInventory {
     double capacity();
-    double mass();
+    double load();
     int size();
     long revision();
     long count(int index);

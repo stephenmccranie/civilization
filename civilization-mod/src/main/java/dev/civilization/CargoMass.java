@@ -9,11 +9,12 @@ import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Plain solid building blocks and audited cut pieces. Unknown goods cannot enter as zero mass. */
+/** Plain solid building blocks and audited cut pieces. Unknown goods cannot enter as zero mass or volume. */
 public final class CargoMass {
     private CargoMass(){}
     public static BlockState material(ItemStack stack){return CuttingContent.material(stack);}
-    public static double unitKg(ItemStack stack){
+    /** Solid volume in blocks (m³): 1 for a full block, its share for slabs and saw-cut pieces, NaN for goods cargo refuses. */
+    public static double volume(ItemStack stack){
         if(stack.isEmpty()||stack.has(DataComponents.BLOCK_ENTITY_DATA)||stack.has(DataComponents.CONTAINER))return Double.NaN;
         if(stack.is(CuttingContent.ITEM.get())){
             var tag=stack.getOrDefault(DataComponents.CUSTOM_DATA,net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
@@ -23,7 +24,10 @@ public final class CargoMass {
         var state=material(stack);
         if(state.isAir()||state.hasBlockEntity()||state.getBlock() instanceof TntBlock
                 ||!state.isCollisionShapeFullBlock(EmptyBlockGetter.INSTANCE,BlockPos.ZERO))return Double.NaN;
-        double volume=CuttingContent.piece(stack)?CuttingContent.volume(CuttingContent.units(stack)):1;
-        return PhysicalMaterials.of(state).density()*volume;
+        return CuttingContent.piece(stack)?CuttingContent.volume(CuttingContent.units(stack)):1;
+    }
+    public static double unitKg(ItemStack stack){
+        double volume=volume(stack);
+        return Double.isNaN(volume)?volume:PhysicalMaterials.of(material(stack)).density()*volume;
     }
 }

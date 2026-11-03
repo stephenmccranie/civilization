@@ -25,7 +25,7 @@ public final class CargoMenu extends AbstractContainerMenu {
             public int getCount(){return DATA;}public void set(int i,int value){}
             public int get(int i){
                 if(i<108){int row=i/4;return part(holder.cargo().count(page*ROWS+row),i%4);}
-                if(i<112)return part(Double.doubleToLongBits(holder.cargo().mass()),i-108);
+                if(i<112)return part(Double.doubleToLongBits(holder.cargo().load()),i-108);
                 if(i<116)return part(Double.doubleToLongBits(holder.cargo().capacity()),i-112);
                 return switch(i){case 116->page;case 117->pages();case 118->target==null?0:target instanceof StockpileEntity?1:2;case 119,120->holder instanceof StockpileEntity s?part(s.palletCount(),i-119):0;default->0;};
             }
@@ -39,7 +39,7 @@ public final class CargoMenu extends AbstractContainerMenu {
     private static int part(long value,int index){return (int)(value>>>(index*16))&65535;}
     private long value(int base){long n=0;for(int i=0;i<4;i++)n|=(long)(data.get(base+i)&65535)<<(16*i);return n;}
     public long count(int row){return value(row*4);}
-    public double mass(){return Double.longBitsToDouble(value(108));}
+    public double load(){return Double.longBitsToDouble(value(108));}
     public double capacity(){return Double.longBitsToDouble(value(112));}
     public int page(){return data.get(116);}
     public int pageCount(){return data.get(117);}
