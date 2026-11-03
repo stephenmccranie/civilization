@@ -20,7 +20,7 @@ public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEnti
         super.render(e,yaw,partial,pose,buffers,light);
         pose.pushPose();pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-Mth.rotLerp(partial,e.yRotO,e.getYRot())));
         pose.translate(0,.3375,-.84375);pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-WheelbarrowEntity.PUSH_TILT_DEGREES*Mth.lerp(partial,e.previousTilt,e.tilt)));pose.translate(0,-.3375,.84375);
-        CargoVisuals.render(e.cargoIcon(),e.cargoFill(),true,pose,buffers,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);pose.popPose();
+        CargoVisuals.render(e.cargoIcon(),e.cargoFill(),pose,buffers,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);pose.popPose();
     }
     @Override protected void applyRotations(WheelbarrowEntity e,PoseStack pose,float age,float ignoredYaw,float partial,float scale){
         // GeckoLib supplies zero body yaw for non-LivingEntity animatables.

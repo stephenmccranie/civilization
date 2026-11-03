@@ -6,14 +6,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-/** One cached view over independently saved pallets. Merging never copies stored stock. */
+/**
+ * One cached menu over side-connected pallets. Every pallet keeps its own saved stack; the group only
+ * chooses which stack goods go to or come from, so merging and splitting never copy stock.
+ */
 final class StockpileGroup implements CargoInventory {
     private final List<StockpileEntity> members;
     private final List<MassCargo.Entry> entries=new ArrayList<>();
     private boolean valid=true,dirty=true;
     private long revision;
-    private int materialRevision=-1;
-    private double mass;
     private StockpileGroup(List<StockpileEntity> members){this.members=members;}
     static StockpileGroup find(StockpileEntity start){
         var found=new HashMap<BlockPos,StockpileEntity>();var pending=new ArrayDeque<StockpileEntity>();pending.add(start);found.put(start.getBlockPos(),start);
@@ -48,51 +49,45 @@ final class StockpileGroup implements CargoInventory {
     boolean allowed(Player p){return valid&&members.stream().allMatch(s->!s.isRemoved()&&CivicAccess.allowed(s.getLevel(),s.getBlockPos(),p));}
     int pallets(){return members.size();}
     private void refresh(){
-        if(dirty){
-            entries.clear();
-            for(var member:members)for(int i=0;i<member.localCargo().size();i++){
-                var e=member.localCargo().entry(i);long left=e.count();
-                for(int j=0;j<entries.size()&&left>0;j++){
-                    var existing=entries.get(j);
-                    if(ItemStack.isSameItemSameComponents(existing.item(),e.item())){
-                        long n=Math.min(left,Long.MAX_VALUE-existing.count());
-                        if(n>0){entries.set(j,new MassCargo.Entry(existing.item(),existing.count()+n));left-=n;}
-                    }
+        if(!dirty)return;
+        entries.clear();
+        for(var member:members)for(int i=0;i<member.stack().size();i++){
+            var e=member.stack().entry(i);long left=e.count();
+            for(int j=0;j<entries.size()&&left>0;j++){
+                var existing=entries.get(j);
+                if(ItemStack.isSameItemSameComponents(existing.item(),e.item())){
+                    long n=Math.min(left,Long.MAX_VALUE-existing.count());
+                    if(n>0){entries.set(j,new MassCargo.Entry(existing.item(),existing.count()+n));left-=n;}
                 }
-                if(left>0)entries.add(new MassCargo.Entry(e.item(),left));
             }
-        }
-        if(dirty||materialRevision!=PhysicalMaterials.revision()){
-            mass=0;for(var member:members)mass+=member.localCargo().mass();
-            materialRevision=PhysicalMaterials.revision();
+            if(left>0)entries.add(new MassCargo.Entry(e.item(),left));
         }
         dirty=false;
     }
-    @Override public double capacity(){return members.size()*CargoConfig.STOCKPILE.get();}
-    @Override public double mass(){refresh();return mass;}
+    @Override public double capacity(){return members.size()*(double)StockpileEntity.CAPACITY;}
+    @Override public double load(){double load=0;for(var member:members)load+=member.stack().load();return load;}
     @Override public int size(){refresh();return entries.size();}
     @Override public long revision(){return revision;}
     @Override public long count(int index){refresh();return index>=0&&index<entries.size()?entries.get(index).count():0;}
     @Override public MassCargo.Entry entry(int index){refresh();var e=entries.get(index);return new MassCargo.Entry(e.item().copy(),e.count());}
+    /** Pallets already holding the item, then empty pallets, then on top of other goods; each fills to a full stack before the next. */
     @Override public long insert(ItemStack item,long offered){
         if(!valid||offered<=0)return 0;
-        double unit=CargoMass.unitKg(item);if(!Double.isFinite(unit)||unit<=0)return 0;
-        double free=Math.max(0,capacity()-mass());long accepted=Math.min(offered,(long)Math.floor(free/unit));
-        while(accepted>0&&accepted*unit>free)accepted--;
-        long left=accepted;
-        for(var member:members){left-=member.localCargo().insert(item,left);if(left==0)break;}
-        // Capacity is shared, including small remainders across pallets. One
-        // indivisible item may straddle those mass allowances; never add a
-        // hidden per-pallet packing limit. A later split preserves overfull stock.
-        if(left>0)for(var member:members){left-=member.localCargo().store(item,left);if(left==0)break;}
-        return accepted-left;
+        var order=new ArrayList<>(members);
+        order.sort(Comparator.comparingInt(s->s.stack().indexOf(item)>=0?0:s.stack().isEmpty()?1:2));
+        long left=offered;
+        for(var member:order){left-=member.stack().insert(item,left);if(left==0)break;}
+        return offered-left;
     }
+    /** Overloaded pallets give up goods first, so pre-limit stock drains; otherwise the last pallet empties first. */
     @Override public long remove(int index,long requested){
         if(!valid||requested<=0||index<0||index>=size())return 0;
-        var e=entry(index);long left=Math.min(requested,e.count()),wanted=left;
-        for(var member:members){
-            var local=member.localCargo();
-            for(int i=local.size()-1;i>=0&&left>0;i--)if(ItemStack.isSameItemSameComponents(local.entry(i).item(),e.item()))left-=local.remove(i,left);
+        var item=entries.get(index).item();long left=Math.min(requested,entries.get(index).count()),wanted=left;
+        var order=new ArrayList<>(members.reversed());
+        order.sort(Comparator.comparing(s->s.stack().load()<=s.stack().capacity()));
+        for(var member:order){
+            int at=member.stack().indexOf(item);
+            if(at>=0)left-=member.stack().remove(at,left);
             if(left==0)break;
         }
         return wanted-left;

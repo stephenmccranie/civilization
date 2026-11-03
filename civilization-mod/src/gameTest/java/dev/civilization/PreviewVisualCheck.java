@@ -53,6 +53,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("builders-line")){BuilderLineVisualCheck.tick(mc);return;}
         if(CHECK.equals("coal-mining")){CoalMiningVisualCheck.tick(mc);return;}
         if(CHECK.equals("wheelbarrow")){WheelbarrowVisualCheck.tick(mc);return;}
+        if(CHECK.equals("pallet")){PalletVisualCheck.tick(mc);return;}
         if(CHECK.equals("gladiator")){ArenaVisualCheck.tick(mc);return;}
         if(CHECK.equals("uranium")){UraniumVisualCheck.tick(mc);return;}
         if(CHECK.equals("derrick-guide")){DerrickGuideVisualCheck.tick(mc);return;}

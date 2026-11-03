@@ -43,7 +43,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private void cargoChanged(){
         if(level().isClientSide)return;
         entityData.set(CARGO_ICON,cargo.isEmpty()?net.minecraft.world.item.ItemStack.EMPTY:cargo.entry(0).item());
-        entityData.set(CARGO_FILL,(float)Math.min(1,cargo.mass()/cargo.capacity()));
+        entityData.set(CARGO_FILL,(float)Math.min(1,cargo.load()/cargo.capacity()));
     }
     public net.minecraft.world.item.ItemStack cargoIcon(){return entityData.get(CARGO_ICON);}
     public float cargoFill(){return entityData.get(CARGO_FILL);}

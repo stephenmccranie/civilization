@@ -45,18 +45,23 @@ The server owns movement: clients send only bounded direction and release input.
 
 ## Pallets and cargo
 
-Craft a **Pallet** from three planks across the top row with three sticks beneath them (`PPP / SSS`); any plank species works. Place it from either hand and right-click its timber base to open cargo.
+Craft a **Pallet** from three planks across the top row with three sticks beneath them (`PPP / SSS`); any plank species works. Place it from either hand.
 
-Cargo is limited **by mass only**: a wheelbarrow holds **640,000 kg** and each Pallet **1,024,000 kg**, set by `wheelbarrowMassKg` and `stockpileMassKg` in `serverconfig/civilization-cargo.toml`. There is no stack-count, volume or material-type cap. Matching items merge into long-count entries shown 27 per page, with exact quantities in tooltips. Accepted goods are ordinary solid full building blocks, mapped native slabs and valid saw-cut pieces, using their material density and actual volume; tools, food, containers, block entities, TNT and unsupported shapes are rejected. A wheelbarrow fits, for example, 320 stone blocks, 640 slabs or 2,560 eighth cubes.
+Wheelbarrows and Pallets accept the same goods: ordinary solid full building blocks, mapped native slabs and valid saw-cut pieces. Tools, food, containers, block entities, TNT and unsupported shapes are rejected. Matching items merge into long-count entries shown 27 per page, with exact quantities in tooltips.
 
-**Pallets touching horizontal sides at the same height share one inventory and capacity**, in any side-connected shape; diagonal-only contact and vertical stacking stay separate. Open any member to use the combined stock; the mass bar's tooltip shows the pallet count. Claim access must permit every connected member on each transaction.
+- A **wheelbarrow** is limited **by mass**: **640,000 kg**, set by `wheelbarrowMassKg` in `serverconfig/civilization-cargo.toml`, using each material's density and actual volume. It fits, for example, 320 stone blocks, 640 slabs or 2,560 eighth cubes, and shows up to 12 representative blocks with no collision.
+- A **Pallet** holds **64 blocks of solid volume**, whatever their mass; a slab counts as half a block and saw-cut pieces by their volume. The stack is drawn one for one: each stored block is a quarter-size block, 16 to a layer in a 4×4 grid and four layers above the timber, filled row by row from the bottom in the order the goods arrived, with pieces filling eighth cells. A full Pallet is one block-sized cube. The stack is solid: you can stand on it and click any part of it, and its collision grows by layer.
 
-- Click an entry to take a normal stack onto the cursor (right-click for half); click with matching cursor items to deposit what fits (right-click deposits one). Shift-click moves the offhand block stack into cargo or fills the free/matching offhand from one entry. Cursor and inventories always keep native stack limits. Mass-bound partial transfers leave the remainder in the source.
+**Right-click a Pallet** to stack the goods in your hand onto it, main hand first, then offhand; the action bar shows what was stacked and the new total. When neither hand holds goods that fit, right-click opens the menu. Sneak to place blocks against a Pallet as usual.
+
+**Pallets touching horizontal sides at the same height share one menu**, in any side-connected shape, with 64 blocks of capacity per pallet; diagonal-only contact and vertical stacking stay separate. Each Pallet still holds its own stack. Goods go first onto Pallets already holding the same item, then onto empty Pallets, then on top of other goods, each filled to a full stack before the next, so a yard fills one pallet at a time and sorts itself by item. Taking goods empties the last Pallet holding them first. The capacity bar's tooltip shows the pallet count. Claim access must permit every connected member on each transaction.
+
+- Click an entry to take a normal stack onto the cursor (right-click for half); click with matching cursor items to deposit what fits (right-click deposits one). Shift-click moves the offhand block stack into cargo or fills the free/matching offhand from one entry. Cursor and inventories always keep native stack limits. Capacity-bound partial transfers leave the remainder in the source.
 - Park a wheelbarrow within **three blocks** of a pallet group and open either: **Load nearby** pulls from the other store and **Unload nearby** pushes to it. The nearest accessible partner is chosen when the menu opens; both ends must still be loaded, parked, in range and accessible on each click. Goods never pass through pockets.
 
-Each pallet shows its share of the stock with at most 18 representative blocks (12 on a wheelbarrow); cargo visuals have no collision. **Empty the whole shared inventory before breaking any of its pallets.** Pallets resist explosions. Administrator removal can erase a pallet's local share.
+**A Pallet with goods on it cannot be broken**; an empty one can, even in the middle of a group. Pallets resist explosions. Administrator removal can erase a pallet's stack.
 
-Each wheelbarrow saves one balance and each pallet only its local share, in the native cargo format; counts are saved separately from item identities and may exceed 32-bit integers. The shared inventory is a cached view rebuilt from loaded neighbors on placement, removal and load/unload, never loading chunks; unavailable pallets contribute neither stock nor capacity until they return. Splitting a group or lowering a mass limit never truncates stock: overfull loads can be withdrawn but not added to. Caches invalidate on cargo or material changes and visuals update at most once per tick.
+Each wheelbarrow saves one balance and each pallet only its own stack, in the native cargo format; counts are saved separately from item identities and may exceed 32-bit integers. Clients receive each pallet's stack to draw and shape it. The shared menu is a cached view rebuilt from loaded neighbors on placement, removal and load/unload, never loading chunks; unavailable pallets contribute neither stock nor capacity until they return. A smaller limit never truncates stock: a store over its capacity can be withdrawn from but not added to, and a pallet group takes goods from overloaded pallets first. Caches invalidate on cargo or material changes and visuals update at most once per tick.
 
 ## Personal block carrying
 
@@ -80,4 +85,5 @@ Breaking or replacing the table drops its inputs once and invalidates open menus
 ## Save compatibility
 
 - The Pallet keeps the block/item ID `civilization:material_stockpile`; older individual stockpiles join groups without conversion.
+- Pallets saved under the old mass limit keep every item. One holding more than 64 blocks draws as a full stack, reads **Overloaded** in its menu and accepts nothing until it is back under 64. A group takes goods from its overloaded pallets first. Old `stockpileMassKg` settings are ignored.
 - Older saves' surplus block stacks, filled containers and misplaced small supplies are held for `/civilization recoverblocks`; no stock is deleted.

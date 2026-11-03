@@ -204,7 +204,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 Progression expands the quantities, distances and areas a player handles: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Each step enables bigger projects while small jobs stay convenient; a first home still fits in an ordinary session.
 
 - Material volume, storage volume and mass are distinct and separate from energy value. A stone block is 1 m³; its cut pieces preserve it.
-- **Cargo stores** — wheelbarrows and pallets — limit cargo by mass only, with unlimited-count matching stacks. Pallets touching horizontally share one inventory and summed capacity.
+- **Cargo stores.** Wheelbarrows limit cargo by mass, with unlimited-count matching stacks. A pallet holds 64 blocks of volume, drawn one for one as a stack of quarter-size blocks, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
 - **Personal carrying.** Building material travels as one offhand stack of up to 32 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
 - Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
 - The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, with an initial target of ten stacks of 32 cobblestone. The coal minecart keeps its separate rail role.
