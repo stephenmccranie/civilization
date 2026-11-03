@@ -44,7 +44,8 @@ final class WheelbarrowVisualCheck {
         if(t==160&&Math.abs(barrow(mc).getYRot()-45.125f)>.002f)throw new IllegalStateException("Client heading was rounded to native angle bytes: "+barrow(mc).getYRot());
         if(t==165){var e=barrow(mc);var point=e.position().add(new Vec3(.3586,.8,1.4343).yRot((180-e.getYRot())*Mth.DEG_TO_RAD));mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,point),InteractionHand.MAIN_HAND);}
         if(t==175&&Math.abs(Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>.01f)throw new IllegalStateException("Taking handles did not align the first-person heading");
-        if(t==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.handlerPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,0,20);});}
+        // Handler teleports turn the view by nothing (a relative turn to their own yaw): it comes round with the handles.
+        if(t==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.handlerPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,p.getYRot(),20,java.util.Set.of(net.minecraft.world.entity.RelativeMovement.Y_ROT));});}
         if(t==192)shot(mc,"start");
         if(t==193)pitch(mc,40);
         if(t==197)shot(mc,"start-grips");
@@ -62,20 +63,23 @@ final class WheelbarrowVisualCheck {
         if(t==228){mc.options.keyUp.setDown(false);check(server,()->{var e=barrow(server);if(e.getZ()<3.5||e.getBoundingBox().maxZ>5.01)throw new IllegalStateException("Wall collision or push failed: "+e.position()+" / "+e.getBoundingBox());stopZ=e.getZ();});}
         if(t==236){check(server,()->{if(Math.abs(barrow(server).getZ()-stopZ)>.03)throw new IllegalStateException("Released forward key kept driving");});mc.options.keyDown.setDown(true);}
         if(t==246){mc.options.keyDown.setDown(false);check(server,()->{if(barrow(server).getZ()>stopZ-.6)throw new IllegalStateException("S did not back the carrier up");});}
-        if(t==250){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;headingBefore=barrow(mc).getYRot();mc.options.keyRight.setDown(true);}
-        if(t==262){mc.options.keyRight.setDown(false);mc.options.keyLeft.setDown(true);}
-        if(t==268){
-            mc.options.keyLeft.setDown(false);dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=false;
+        if(t==247){dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=true;headingBefore=barrow(mc).getYRot();mc.options.keyRight.setDown(true);}
+        // The server turns once per its own tick, a tick or two out of step with the keys; the view comes round
+        // with the handles a couple of ticks behind them and eases out after them.
+        if(t==263){mc.options.keyRight.setDown(false);mc.options.keyLeft.setDown(true);}
+        if(t==269)mc.options.keyLeft.setDown(false);
+        if(t==275){
+            dev.civilization.client.WheelbarrowRenderCheck.cameraCheck=false;
             if(dev.civilization.client.WheelbarrowRenderCheck.rightCameraSamples<10||dev.civilization.client.WheelbarrowRenderCheck.leftCameraSamples<5)throw new IllegalStateException("Insufficient right/left key-turn samples");
         }
-        if(t==280){followed(mc,"A/D");if(Mth.wrapDegrees(barrow(mc).getYRot()-headingBefore)<15)throw new IllegalStateException("A/D did not steer the carrier");dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));shot(mc,"keys-turned");}
+        if(t==280){followed(mc,"A/D");float steered=Mth.wrapDegrees(barrow(mc).getYRot()-headingBefore);if(steered<15)throw new IllegalStateException("A/D steered the carrier only "+steered+" degrees");dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));shot(mc,"keys-turned");}
         if(t==281){headingBefore=barrow(mc).getYRot();mc.player.turn(-70/.15,0);}
-        if(t==284)shot(mc,"mouse-turning");
-        if(t==314){followed(mc,"a mouse turn");if(Mth.wrapDegrees(barrow(mc).getYRot()-headingBefore)>-60)throw new IllegalStateException("The carrier did not follow a mouse turn");dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));}
+        if(t==284)shot(mc,"mouse-look");
+        if(t==314){lookedAway(mc,-70,"a mouse turn");dev.civilization.client.WheelbarrowRenderCheck.assertHeading(barrow(mc));}
         if(t==315){mc.player.turn(160/.15,0);float offset=Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot());if(Math.abs(offset)>WheelbarrowEntity.LOOK+.01f)throw new IllegalStateException("The handler looked "+offset+" degrees away from the handles");}
         if(t==317)shot(mc,"look-limit");
-        if(t==342)followed(mc,"the look limit");
-        if(t==344)check(server,()->{var e=barrow(server);e.setYRot(90);e.setPos(-4.5,100,-4.5);var p=server.getPlayerList().getPlayers().getFirst();var at=e.handlerPosition(e.position(),90);p.connection.teleport(at.x,at.y,at.z,90,20);});
+        if(t==342){lookedAway(mc,WheelbarrowEntity.LOOK,"the look limit");mc.player.turn(-WheelbarrowEntity.LOOK/.15f,0);}
+        if(t==344)check(server,()->{var e=barrow(server);e.setYRot(90);e.setPos(-4.5,100,-4.5);var p=server.getPlayerList().getPlayers().getFirst();var at=e.handlerPosition(e.position(),90);p.connection.teleport(at.x,at.y,at.z,p.getYRot(),20,java.util.Set.of(net.minecraft.world.entity.RelativeMovement.Y_ROT));});
         if(t==350)mc.options.keyUp.setDown(true);
         if(t==368){if(barrow(mc).carriagePitch(1)<10)throw new IllegalStateException("Climbing did not tip the carriage up: "+barrow(mc).carriagePitch(1));shot(mc,"climb");}
         if(t==369)observe(mc,new Vec3(barrow(mc).getX()-.5,102.6,1.5),180,15);
@@ -102,10 +106,14 @@ final class WheelbarrowVisualCheck {
         // The tray draws every block it holds: one 3x4 layer below the rim, a second rising past it, then a mixed heap.
         if(t==472){check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(-21.5,100,-4.5);e.cargo().insert(new ItemStack(Blocks.STONE),12);});observe(mc,new Vec3(-19.6,101.9,-2.3),139,30);}
         if(t==483){
-            // Walk past the wheel through ground its broad bounds cover; with the pack's Lithium installed this takes Lithium's collision path.
+            // Walk across the front, through the tyre's point: the real client, with the pack's Lithium, rides around the taper onto the tread line.
             var e=barrow(mc);if(Math.abs(Mth.wrapDegrees(e.getYRot()))>.01f)throw new IllegalStateException("The parked barrow had not settled facing south: "+e.getYRot());
-            var start=new Vec3(e.getX()+.45,e.getY(),e.getZ()+2);mc.player.setPos(start);mc.player.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,0,-1.2));
-            if(start.z-mc.player.getZ()<1.19)throw new IllegalStateException("Broad bounds blocked a player walking past the wheel at "+mc.player.position()+" beside "+e.position());
+            // A step that rounds the point keeps its motion along the taper, so it may end up to one step's rise beyond the tread line.
+            var back=mc.player.position();mc.player.setPos(e.getX()+.9,e.getY(),e.getZ()+1.3);
+            for(int i=0;i<18;i++){mc.player.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-.1,0,0));if(e.body().overlaps(Solid.of(mc.player.getBoundingBox())))throw new IllegalStateException("Walking across the wheel entered its body at "+mc.player.position());}
+            double beyond=mc.player.getZ()-mc.player.getBbWidth()/2-e.body().bounds().maxZ;
+            if(beyond<-1e-6||beyond>.05||mc.player.getX()>e.getX()-.4)throw new IllegalStateException("Walking across the wheel did not ride around its point: "+mc.player.position()+" beside "+e.position());
+            mc.player.setPos(back);
         }
         if(t==478)shot(mc,"tray-layer");
         if(t==479)check(server,()->barrow(server).cargo().insert(new ItemStack(Blocks.OAK_PLANKS),12));
@@ -228,7 +236,12 @@ final class WheelbarrowVisualCheck {
         if(t==1250){if(!(mc.player.containerMenu instanceof KilnMenu))throw new IllegalStateException("Native machine menu did not open for Hand-layout review");dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,"hand-machine-recipes");handLayoutsVerified=true;}
         if(t>1260){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!palletViewsVerified||!handLayoutsVerified)throw new IllegalStateException("Wheelbarrow/pallet/Hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: handle hits, movement/camera/gait, normal main-hand pallet placement and icon/held views, mined offhand pickup, cargo/chest/Creative conservation, full Hand frame cursor safety, crafting and machine recipe clearance, Photon/shaders-disabled views");mc.stop();}
     }
-    private static void followed(Minecraft mc,String turn){if(Math.abs(Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>1)throw new IllegalStateException("The carrier did not come round to the handler's facing after "+turn+": player="+mc.player.getYRot()+" carrier="+barrow(mc).getYRot());}
+    private static void followed(Minecraft mc,String turn){if(Math.abs(Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>1)throw new IllegalStateException("The view did not stay on the handles after "+turn+": player="+mc.player.getYRot()+" carrier="+barrow(mc).getYRot());}
+    /** The mouse only looks: the carrier keeps its heading and the view stays `look` degrees off the handles. */
+    private static void lookedAway(Minecraft mc,float look,String turn){
+        float heading=Mth.wrapDegrees(barrow(mc).getYRot()-headingBefore),offset=Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot());
+        if(Math.abs(heading)>.01f||Math.abs(offset-look)>.5f)throw new IllegalStateException("After "+turn+" the carrier turned "+heading+" degrees and the view sits "+offset+" off the handles");
+    }
     private static void pitch(Minecraft mc,float degrees){mc.player.setXRot(degrees);mc.player.xRotO=degrees;}
     /** Views the scene from a fixed eye, or returns the view to the player. */
     private static void observe(Minecraft mc,Vec3 eye,float yaw,float pitch){

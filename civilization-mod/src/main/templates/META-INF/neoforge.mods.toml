@@ -5,13 +5,6 @@ license="All Rights Reserved"
 [[mixins]]
 config="civilization.mixins.json"
 
-# Lithium treats every collidable entity as its bounding box when it gathers entity collisions for
-# movement and intersection checks, so wheelbarrows would block far beyond their body. Its supported
-# per-mod override keeps both on the vanilla path, where carriers supply their measured surfaces.
-["lithium:options"]
-"mixin.entity.collisions.movement"=false
-"mixin.entity.collisions.intersection"=false
-
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"

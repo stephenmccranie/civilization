@@ -36,15 +36,13 @@ Civilization runs without these. Each version-gated integration activates only f
 | C2ME (`c2me_notickvd` module) | 0.4.0-alpha.0.122+1.21.1 | Server | [Directional chunk loading](vehicle-physics.md#directional-chunk-loading) |
 | Terrain Diffusion | Surface-water API, built against 1.4.1 (detected, not version-gated) | Server | [Local river elevations](geography.md#generator-integration) |
 
-Lithium's two entity-collision shortcuts (`mixin.entity.collisions.movement` and `mixin.entity.collisions.intersection`) are switched off through Lithium's per-mod override in `neoforge.mods.toml`. They collide every entity as its bounding box, which would make wheelbarrows block far beyond their body; the rest of Lithium stays active.
-
 Photon is the primary shader target; Bliss and Complementary are secondary checks.
 
 ## Development
 
 ### Server connections
 
-Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `4/0.35.14-dev`, the identity advertised by the published 0.35.14 client, which changed the wheelbarrow's input packet and synchronized cargo. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update. The pack manifest's own `protocol` field is the updater's format and stays `3/0.35.0-dev`, so installed updaters keep accepting new releases.
+Clients and servers need compatible Civilization protocols, not identical builds. The required core channel uses the protocol ID `5/0.35.15-dev`, the identity advertised by the 0.35.15 client, which added A/D steering to the wheelbarrow's input packet. Server-only generation, balance and settings changes keep that ID, so existing clients connect without an update. Change it only when packet formats or synchronized content become incompatible; NeoForge then rejects older protocols before play. Client-side fixes still reach players only through a client update. The pack manifest's own `protocol` field is the updater's format and stays `3/0.35.0-dev`, so installed updaters keep accepting new releases.
 
 This is a compatibility gate, not authentication or anti-cheat: a modified client can imitate the channel. Account authentication and server access controls are separate. Players install the [Prism playtest client](../modpack/README.md); the host supplies the server address privately.
 
