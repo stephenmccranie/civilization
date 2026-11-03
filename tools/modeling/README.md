@@ -4,7 +4,7 @@ Civilization models are made in Blockbench, driven through Jason Gardner's MCP p
 
 ## Setup
 
-From the repository root:
+From the repository root, with [Pillow](https://pypi.org/project/pillow/) installed (`python -m pip install --user pillow`; setup checks it):
 
 ```powershell
 python tools/modeling/setup.py
@@ -14,6 +14,8 @@ python tools/modeling/setup.py
 The portable editor, plugins, a separate profile and the pinned [Codex CLI](https://github.com/openai/codex) live in ignored `.tools/modeling`. Codex draws concept images on the owner's ChatGPT plan and shares the Codex app's sign-in; without the app, run `.tools\modeling\codex\codex-x86_64-pc-windows-msvc.exe login` once. In Blockbench use **File → Plugins → Load Plugin from File** for `.tools/modeling/mcp.js` and `.tools/modeling/geckolib.js`, permit MCP network access and leave the editor open. The launcher reuses a ready editor, waits up to 45 seconds for MCP to initialise and never opens a duplicate of this profile; new launches log to `.tools/modeling/startup.log`. It disables Chromium's GPU sandbox, whose GPU process cannot start when the editor is launched from the Claude desktop app. Save projects before restarting an unresponsive editor. Rerun setup to verify the pinned downloads.
 
 Setup patches the pinned MCP plugin to bind `127.0.0.1` instead of all interfaces and records the original and patched hashes. It remains [Jason Gardner's plugin](https://github.com/jasonjgardner/blockbench-mcp-plugin/tree/b187b4b056f0efafcc573335400ecbb21ad26ecc) under its upstream license; authoring tools never go into the Minecraft JAR.
+
+The ignored `art/` and `.tools/` folders live only in the main checkout, and its git worktrees share them: `setup.py`, the launcher and `art.py` find the main checkout with `git rev-parse --git-common-dir`, `art.py` reads command-line paths relative to it, and `preview` and `publish` write the runtime resources of the checkout that runs them. Keep asset folders in the main checkout's `art/assets/`; an `art/` folder inside a worktree is deleted with the worktree.
 
 The repository's `.mcp.json` registers the server (`http://127.0.0.1:3000/bb-mcp`) for Claude Code; a session started before the editor was running may need a restart to see the tools. The direct client works regardless:
 
@@ -28,12 +30,15 @@ Read returned tool schemas before using a new operation. `--out` saves responses
 
 ## Asset records and commands
 
-Each asset has one compact schema-2 `asset.json`, managed by `art.py`, in its own folder under the local `art/assets/`. Its brief has three short fields: `purpose`, `target` (recognisable features and material treatment) and `constraints` (bounds, interfaces, motion, construction and gameplay invariants). Name inspected references by role — shape, material or project style. Choose one authoritative `source`: a hand-edited Blockbench `project` or a Python `recipe`. A recipe owns its generated models, a project owns its derived exports, and a recipe never silently overwrites manual edits. Declare extra source dependencies, native `models`, output mappings and GeckoLib manifests. Use `--kind entity` for character models.
+Each asset has one compact schema-2 `asset.json`, managed by `art.py`, in its own folder under the local `art/assets/`. Its brief has three short fields: `purpose`, `target` (recognisable features and material treatment) and `constraints` (bounds, interfaces, motion, construction and gameplay invariants). Name inspected references by role — shape, material or project style. Choose one authoritative `source`: a hand-edited Blockbench `project` or a Python `recipe`. A recipe owns its generated models, a project owns its derived exports, and a recipe never silently overwrites manual edits. Declare extra source dependencies, native `models`, output mappings, GeckoLib manifests and, for a model painted from a generated master, its `texture` layout. Use `--kind entity` for character models.
 
 ```powershell
-python tools/modeling/art.py init art/assets/example --kind block
+python tools/modeling/art.py init art/assets/example --kind item
 # Fill asset.json; author the source and declare output paths.
 python tools/modeling/art.py materials
+python tools/modeling/art.py record art/assets/example --prompt art/assets/example/concept-prompt.txt --references art/assets/example/references/style.png
+# Declare the texture layout, then draw and reduce the texture master.
+python tools/modeling/art.py texture art/assets/example --prompt art/assets/example/texture-prompt.txt --references art/assets/example/concept-01.png
 python tools/modeling/art.py prepare art/assets/example
 python tools/modeling/art.py views art/assets/example --model model.bbmodel --target 8 8 8 --span 24
 # Inspect the images; review.json holds decision, criteria (the four questions), defects and optional limits.
@@ -45,8 +50,9 @@ python tools/modeling/art.py publish art/assets/example
 python tools/modeling/art.py check art/assets/example --complete
 ```
 
-- `prepare` runs the recipe or exports the saved project (never an arbitrary open tab) to `export/`, then checks the whole bundle and UV density. Large native exports compile once in Blockbench and transfer in bounded text chunks; incomplete transfers are rejected.
-- `views` captures native Blockbench views; `compare --images` maintains the single reference-versus-actual comparison sheet; `record --prompt prompt.txt` generates a concept with Codex's image tool, passing any `--references` images to it, or records a supplied concept given `--image`; either way the asset keeps the concept with its exact prompt and references.
+- `record --prompt` draws a concept with Codex's image tool, passing any `--references` images to it, or records a supplied concept given `--image`; `texture --prompt` does the same for a texture master. Either way the asset keeps the image as a numbered generation with its exact prompt and references. Each generation spends the owner's ChatGPT plan usage.
+- `prepare` builds the texture atlas, then runs the recipe or exports the saved project (never an arbitrary open tab) to `export/`, and checks the whole bundle and UV density. Recipes run in their asset folder with the running checkout's `tools/modeling` on `PYTHONPATH`, so they import `studio`, `mcp` and `proof` directly. Large native exports compile once in Blockbench and transfer in bounded text chunks; incomplete transfers are rejected.
+- `views` captures native Blockbench views; `compare --images` maintains the single reference-versus-actual comparison sheet.
 - `preview` needs a current build review and copies validated candidates into runtime resources for the focused scene, keeping replaced files in local content-addressed history (`preview-backup.json`). `publish` needs a current verify review; `check --complete` confirms fresh review hashes, exports and the runtime receipt. Source, export and evidence hashes are recorded automatically and history is immutable.
 - A model-only deliverable without runtime targets validates its paired manifest with `assets.validate` and `art.definition`/`art.uv_density` from its own verification script; it is not "published" until it passes a Minecraft scene.
 - Older schema-1 records keep `pipeline.py`; `assets.py` and the item/family reducers remain export backends. Preserve their history rather than migrating them.
@@ -55,7 +61,34 @@ Runtime GeckoLib files follow `geo/<id>.geo.json`, `animations/<id>.animation.js
 
 Native export details: `export_model` with codec `project` saves the source and `bedrock` invokes the GeckoLib geometry hooks; discover codecs rather than guessing. `Animator.buildFile(null, Animation.all.map(a => a.name))` exports animations where no codec is exposed.
 
+The tools write UTF-8 text with LF line endings; recipes write theirs with `newline='\n'`, so an export has the same bytes on every platform.
+
 Fast checks need no Minecraft launch: `python -m unittest discover -s tools/modeling -p "test_*.py"`.
+
+### Textured models
+
+Image generation paints the materials; the native geometry and its UVs stay in the recipe. Items and machines follow one route: **concept → texture master → atlas → model**.
+
+1. **Concept.** `record` draws the visual target from the brief and style references. It settles character, proportions and materials, not dimensions.
+2. **Layout.** Plan the faces at four texels per model unit, then declare the layout:
+
+   ```json
+   "texture": {
+     "grid": [3, 2], "ground": "#808080", "atlas": "model/backpack.png", "size": [128, 128], "colors": 32,
+     "regions": {
+       "front": {"cell": [0, 0], "rect": [0, 0, 32, 40]},
+       "plain": {"cell": [0, 1], "rect": [0, 40, 64, 64]},
+       "strap": {"cell": [1, 1], "rect": [92, 0, 6, 38]}
+     }
+   }
+   ```
+
+   Each region is an atlas rectangle `[x, y, width, height]` in pixels and the master `cell` `[column, row]` reduced into it. Regions may share a cell but never overlap. Give a material one region large enough for every face that takes it, so faces take parts of one reduction rather than each squashing the whole panel. `colors` sizes the shared palette. The `ground` must contrast with every panel: mid gray suits leather and timber, but gray steel or cast iron would merge into it, so give those a saturated key such as `#ff00ff`.
+3. **Master.** `texture --prompt texture-prompt.txt --references <concept>` sends the layout's sheet contract — the grid and ground, one flat unlit panel per used cell inside a plain margin, and the pixel sizes each cell is reduced to — followed by your prompt, which describes each panel by row and column: material, seams, stitches, fasteners and wear, drawn bold enough to survive those sizes. The image is recorded as `master-NN.png` and becomes `texture.master`; `--image` records a supplied master with the prompt that made it. To go back to an earlier master, set `texture.master` to its file.
+4. **Atlas.** The same command, and every `prepare`, reduces the master. It finds each used cell's panel by its edge against the ground and fails when a panel touches its cell edge, crops inside the antialiased rim and area-averages the panel into each of its regions. One palette taken from the panels applies without dithering, and unused atlas space takes their mean colour. Inspect `review/texture.png`, which shows the panels found on the master beside the labelled atlas. After a layout change, `texture` without `--prompt` rebuilds the atlas. Every `prepare` rebuilds it, so fix a weak panel with a new master or layout, not by painting the atlas.
+5. **Model.** The recipe reads `texture.regions` from `asset.json`, maps each face to a part of its region at four texels per unit and embeds the atlas in the native project; `studio.uv_faces` and `studio.create` take the same region shape. Declare the atlas as a PNG output: the prepare receipt and the reviews then cover master, layout and atlas, so the asset needs no texture receipt of its own. A hand-edited project instead loads the atlas as its texture, reloads it after a new master and declares it a source.
+
+The local Backpack asset (`art/assets/backpack`) shows an item recipe's geometry, face rectangles inside shared regions, and display transforms; its recipe predates the shared reduction and still reduces its master itself.
 
 ### Isometric block plans
 
@@ -101,8 +134,15 @@ Fix a weak silhouette with geometry and unreadable materials with value, contras
 ### Native format constraints
 
 - Static Java 1.21.1 models allow cuboids with limited single-axis rotation; never design freeform meshes and expect them to survive export. GeckoLib animates cuboids but static item and guide geometry must stay compatible.
-- Thin placeable models need authored item display transforms: review an oblique centred GUI icon and both hand views before changing world proportions or making a new sprite.
 - `studio.Model` offers named boxes and X/Z octagonal casting approximations built from overlapping legal cuboids, with cap planes offset slightly to avoid flicker. It is not a mesh boolean; inspect seams under animation and Minecraft lighting, and simplify if the approximation gets expensive.
+
+### Items
+
+- A 3D item model authors its `display` transforms in the recipe for `gui`, `ground`, `fixed`, both `thirdperson_*` and both `firstperson_*` hands, plus `head` when worn there; write the left-hand slots explicitly. Thin placeable models get them too: review an oblique centred GUI icon and both hand views before changing world proportions or making a new sprite.
+- The third-person hand layer turns an item to point forward from the hand. An object carried by a handle, such as a pack, lantern or bucket, needs roughly `[90, 180, 0]` to stand upright and hang below the grip, front out; the first-person view shows the front, small enough to keep the crosshair clear. The Backpack's values (third person: rotation `[90, 180, 0]`, translation `[0, 1, -3]`, scale 0.5; first person: rotation `[0, -45, 0]`, translation `[1, 3, 0]`, scale 0.35) are a starting point.
+- Set the transforms in Blockbench's display mode with the player reference (MCP `enter_display_mode` with `"reference": "player"`, then `capture_screenshot`), then confirm them in the Minecraft scene, which is the acceptance.
+- A worn item's renderer fixes which face touches the body; the Backpack's north face sits on the wearer's back. Keep that face the contact side in the geometry, and check the worn views from behind, three-quarter and side, over a chestplate, and as another player sees them.
+- The item's visual scene shows the inventory and hotbar icon, both first-person hands, third-person front and back, the dropped and framed item and, for a worn item, the worn views. A new item usually needs those views added to its scene ([testing](../../civilization-mod/testing.md#visual-scenes)). Copy the screenshots into the asset's `review/` folder as verify evidence.
 
 ### UVs and density
 

@@ -94,7 +94,7 @@ def main():
             result = client.call(args.tool, arguments)
         if args.out:
             args.out.mkdir(parents=True, exist_ok=True)
-            (args.out / 'response.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+            (args.out / 'response.json').write_text(json.dumps(result, indent=2), encoding='utf-8', newline='\n')
         for i, block in enumerate(result.get('content', [])):
             if block.get('type') == 'image':
                 data = block.pop('data')

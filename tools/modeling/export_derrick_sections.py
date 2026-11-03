@@ -52,7 +52,7 @@ def main():
     for p in model.parts:
         if p['group']=='feet': add(list(itertools.product(*zip(p['start'],p['end']))),0)
     data = [{'offset':list(c),'boxes':boxes} for c,boxes in sorted(cells.items(),key=lambda e:(e[0][1],e[0][2],e[0][0]))]
-    (OUT/'data/civilization/derrick_sections.json').write_text(json.dumps(data,separators=(',',':')),encoding='utf-8')
+    (OUT/'data/civilization/derrick_sections.json').write_text(json.dumps(data,separators=(',',':')),encoding='utf-8', newline='\n')
     geo = json.loads((SOURCE/'model/oil_derrick.geo.json').read_text())
     bones = geo['minecraft:geometry'][0]['bones']; children = []
     for bone in bones:
@@ -67,7 +67,7 @@ def main():
         for part,cubes in groups.items():
             children.append({'name':f'section_{part}_{bone["name"]}','parent':bone['name'],'pivot':bone.get('pivot',[0,0,0]),'cubes':cubes})
     bones.extend(children)
-    (OUT/'assets/civilization/geo/oil_derrick.geo.json').write_text(json.dumps(geo,indent=2)+'\n',encoding='utf-8')
+    (OUT/'assets/civilization/geo/oil_derrick.geo.json').write_text(json.dumps(geo,indent=2)+'\n',encoding='utf-8', newline='\n')
     assert {b[0] for c in data for b in c['boxes']} == set(range(24))
     print(f'Exported 24 native sections and {len(data)} collision cells')
 

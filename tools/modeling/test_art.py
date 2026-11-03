@@ -1,12 +1,13 @@
 """Lifecycle and failure checks; synthetic images never certify artistic quality."""
 import contextlib
 import io
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from PIL import Image
+from PIL import Image, ImageDraw
 import art
 
 
@@ -115,6 +116,70 @@ class ArtTests(unittest.TestCase):
     def test_java_default_uv_matches_partial_face(self):
         model=self.java_model();model['elements'][0]['to']=[8,16,16];model['elements'][0]['faces']['up'].pop('uv');art.write(self.folder/'block.json',model)
         art.uv_density(self.asset,self.folder)
+
+    def textured(self):
+        """A 2 by 1 master: a red panel with a dark top band and a blue panel, each inside a gray margin."""
+        master=Image.new('RGB',(200,100),'#808080'); draw=ImageDraw.Draw(master)
+        draw.rectangle((10,10,89,89),fill=(200,40,40)); draw.rectangle((10,10,89,29),fill=(110,20,20)); draw.rectangle((110,10,189,89),fill=(40,40,200))
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Red leather, then blue cloth.',encoding='utf-8')
+        self.asset['texture']={'grid':[2,1],'ground':'#808080','atlas':'model/atlas.png','size':[16,8],'colors':4,
+            'regions':{'red':{'cell':[0,0],'rect':[0,0,8,8]},'blue':{'cell':[1,0],'rect':[8,0,4,8]}}}
+        self.asset['outputs']=[{'source':'model/atlas.png','target':'textures/item/test.png','format':'png','size':[16,8],'alpha':'opaque'}]
+        self.save()
+
+    def test_supplied_master_reduces_to_atlas_regions(self):
+        self.textured(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        asset=art.read(self.folder/'asset.json')
+        self.assertEqual(asset['texture']['master'],'master-01.png')
+        self.assertEqual(asset['generations'][0]['prompt'],'Red leather, then blue cloth.')
+        self.assertNotIn(b'\r',(self.folder/'asset.json').read_bytes())
+        with Image.open(self.folder/'model/atlas.png') as atlas:
+            self.assertEqual(atlas.size,(16,8)); self.assertLessEqual(len(atlas.getcolors()),4)
+            band,red,blue=atlas.getpixel((4,0)),atlas.getpixel((4,6)),atlas.getpixel((10,4))
+            self.assertGreater(red[0],150); self.assertLess(band[0],150); self.assertGreater(blue[2],150)
+            self.assertIn(atlas.getpixel((14,4)),{atlas.getpixel((x,y)) for x in range(12) for y in range(8)})
+        self.assertTrue((self.folder/'review/texture.png').is_file())
+
+    def test_generated_master_states_the_layout_contract(self):
+        self.textured(); codex=self.root/'.tools/codex'; codex.mkdir(parents=True)
+        (codex/'codex-package.json').write_text('{"entrypoint":"codex.exe"}',encoding='utf-8')
+        def draw(command,**kwargs):
+            Image.open(self.root/'supplied.png').save(Path(command[command.index('--cd')+1])/'image.png')
+        with patch.object(art.setup,'DEST',self.root/'.tools'), patch.object(art.subprocess,'run',draw):
+            self.command('texture','--prompt','cells.txt','--references','asset/icon.png')
+        prompt=art.read(self.folder/'asset.json')['generations'][0]['prompt']
+        self.assertIn('strict 2 by 1 grid',prompt); self.assertIn('#808080',prompt)
+        self.assertIn('Row 1, column 2: reduced to 4 by 8 pixels for blue.',prompt); self.assertTrue(prompt.endswith('Red leather, then blue cloth.'))
+        self.assertTrue((self.folder/'master-01.png').is_file()); self.assertEqual(list((self.root/'.tools').iterdir()),[codex])
+
+    def test_panel_without_margin_is_rejected(self):
+        self.textured(); master=Image.open(self.root/'supplied.png'); ImageDraw.Draw(master).rectangle((110,0,189,89),fill=(40,40,200))
+        master.save(self.root/'supplied.png')
+        with self.assertRaisesRegex(ValueError,'margin'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
+
+    def test_texture_layout_is_checked_once_at_the_boundary(self):
+        for change,message in [({'rect':[6,0,4,8]},'overlap'),({'cell':[2,0]},'master grid'),({'rect':[14,0,4,8]},'outside the atlas')]:
+            self.textured(); self.asset['texture']['regions']['blue'].update(change)
+            with self.assertRaisesRegex(ValueError,message): art.definition(self.asset,self.folder)
+        self.textured(); self.asset['texture']['master']='other.png'
+        with self.assertRaisesRegex(ValueError,'recorded'): art.definition(self.asset,self.folder)
+
+    def test_prepare_builds_the_atlas_before_the_recipe(self):
+        self.textured(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        (self.folder/'recipe.py').write_text('import json, pathlib, assets\nfrom PIL import Image\n'
+            "regions = json.loads(pathlib.Path('asset.json').read_text(encoding='utf-8'))['texture']['regions']\n"
+            "pathlib.Path('recipe-saw').write_text(str(Image.open('model/atlas.png').size) + ' ' + ','.join(regions))\n",encoding='utf-8')
+        asset=art.read(self.folder/'asset.json'); asset['source']={'mode':'recipe','path':'recipe.py'}; art.write(self.folder/'asset.json',asset)
+        (self.folder/'model/atlas.png').unlink(); self.command('prepare')
+        self.assertEqual((self.folder/'recipe-saw').read_text(),'(16, 8) red,blue')
+        self.assertIn('textures/item/test.png',art.read(self.folder/'prepare-receipt.json')['outputs'])
+
+    def test_worktrees_share_the_main_checkout(self):
+        main=self.root/'main'; main.mkdir()
+        git=lambda *args: subprocess.run(['git','-c','user.name=t','-c','user.email=t@example.com',*args],cwd=main,check=True,capture_output=True)
+        git('init','-q'); git('commit','-q','--allow-empty','-m','start'); git('worktree','add','-q',str(self.root/'tree'))
+        (self.root/'tree/tools').mkdir()
+        for path in (main,self.root/'tree/tools'): self.assertEqual(art.setup.main_checkout(path).resolve(),main.resolve())
 
     def test_failed_copy_restores_bundle(self):
         first=self.runtime/'textures/item/test.png'; second=self.runtime/'textures/item/other.png'

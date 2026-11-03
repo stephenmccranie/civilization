@@ -1,15 +1,22 @@
-"""Compact art workflow; existing schema-1 assets retain pipeline.py unchanged."""
+"""Compact art workflow: concepts, texture masters and atlases, native exports, reviews and publication.
+
+Existing schema-1 assets retain pipeline.py unchanged.
+"""
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageStat
 import pipeline as legacy
+import setup
 
-ROOT = legacy.ROOT
+# Art, references and authoring tools live in the main checkout; a worktree publishes into its own runtime resources.
+ROOT = setup.ROOT
 RUNTIME = legacy.RUNTIME
 QUESTIONS = ('character', 'materials', 'readability', 'function')
 
@@ -40,6 +47,84 @@ def definition(asset, folder):
     density = asset['texels_per_block']
     if density != 64 and not asset.get('density_reason'):
         raise ValueError('New world assets use 64px; explain legacy or UI density exceptions')
+    if 'texture' in asset: layout(asset)
+
+
+def layout(asset):
+    """A texture layout reduces grid cells of one recorded master to disjoint rectangles of one atlas."""
+    texture = asset['texture']; cols, rows = texture['grid']; width, height = texture['size']
+    if texture.get('master') not in (None, *(g['file'] for g in asset['generations'])):
+        raise ValueError('The texture master must be a recorded generation')
+    ImageColor.getrgb(texture['ground'])
+    if not 2 <= texture['colors'] <= 256: raise ValueError('A texture palette has 2 to 256 colours')
+    placed = []
+    for name, region in texture['regions'].items():
+        (col, row), (x, y, w, h) = region['cell'], region['rect']
+        if not (0 <= col < cols and 0 <= row < rows): raise ValueError(f'Texture region {name} takes a cell outside the master grid')
+        if min(w, h) <= 0 or min(x, y) < 0 or x+w > width or y+h > height: raise ValueError(f'Texture region {name} lies outside the atlas')
+        for other, (ox, oy, ow, oh) in placed:
+            if x < ox+ow and ox < x+w and y < oy+oh and oy < y+h: raise ValueError(f'Texture regions {other} and {name} overlap')
+        placed.append((name, region['rect']))
+
+
+def master_prompt(texture):
+    """The master sheet contract the atlas reduction relies on, stated from the layout ahead of the asset's cell descriptions."""
+    cols, rows = texture['grid']; sizes = {}
+    for name, region in texture['regions'].items():
+        sizes.setdefault(tuple(region['cell']), []).append(f'{region["rect"][2]} by {region["rect"][3]} pixels for {name}')
+    cells = '\n'.join(f'Row {row+1}, column {col+1}: reduced to {", ".join(found)}.'
+                      for (col, row), found in sorted(sizes.items(), key=lambda item: item[0][::-1]))
+    return (f'Draw a flat texture master sheet: a strict {cols} by {rows} grid of equal cells on a perfectly flat, solid {texture["ground"]} '
+            'background. Each cell listed below holds one flat rectangular material panel, seen straight on and centred, with a margin of plain '
+            'background at least 6% of the cell on every side; leave other cells empty. No perspective, 3D form, cast shadows, lighting '
+            'gradients, objects, text or grid lines. Crisp and matte, with broad two-to-three-tone colour clusters and no dithering or noise. '
+            'Each panel is reduced by area averaging to the pixel sizes listed: shape it to the largest one and draw seams, stitches and '
+            f'fasteners bold enough to survive.\n{cells}\n\n')
+
+
+def atlas(asset, folder):
+    """Reduce each region's master panel to its atlas rectangle with one shared palette, and draw the inspection sheet."""
+    texture = asset['texture']
+    if not texture.get('master'): raise ValueError('Record a texture master first with texture --prompt')
+    with Image.open(local(folder, texture['master'])) as opened: master = opened.convert('RGB')
+    cols, rows = texture['grid']; panels = {}
+    for col, row in {tuple(r['cell']) for r in texture['regions'].values()}:
+        cell = (col*master.width//cols, row*master.height//rows, (col+1)*master.width//cols, (row+1)*master.height//rows)
+        crop = master.crop(cell)
+        # The panel is everything that differs from the flat ground; one touching its cell edge has no margin to trust.
+        found = ImageChops.difference(crop, Image.new('RGB', crop.size, texture['ground'])).point(lambda v: 255 if v > 14 else 0).getbbox()
+        if found is None or 0 in found[:2] or found[2] == crop.width or found[3] == crop.height:
+            raise ValueError(f'Master cell {col},{row} has no panel inside a margin of plain {texture["ground"]}')
+        inset = max(2, (found[2]-found[0])//60)  # Inside the antialiased rim.
+        panels[col, row] = (cell[0]+found[0]+inset, cell[1]+found[1]+inset, cell[0]+found[2]-inset, cell[1]+found[3]-inset)
+    tiles = {name: master.crop(panels[tuple(r['cell'])]).resize(tuple(r['rect'][2:]), Image.Resampling.BOX)
+             for name, r in texture['regions'].items()}
+    # The palette comes from the panels alone and applies without dithering; unused atlas space takes their mean colour.
+    swatch = Image.frombytes('RGB', (sum(t.width*t.height for t in tiles.values()), 1), b''.join(t.tobytes() for t in tiles.values()))
+    palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    image = Image.new('RGB', tuple(texture['size']), tuple(round(v) for v in ImageStat.Stat(swatch).mean))
+    for name, tile in tiles.items(): image.paste(tile, tuple(texture['regions'][name]['rect'][:2]))
+    image = image.quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
+    path = local(folder, texture['atlas'])
+    if path.is_file(): preserve(folder, path)
+    path.parent.mkdir(parents=True, exist_ok=True); image.save(path)
+    (folder/'review').mkdir(exist_ok=True); sheet(master, panels, image, texture['regions']).save(folder/'review/texture.png')
+    return path
+
+
+def sheet(master, panels, image, regions):
+    """The panels found on the master beside the atlas they reduce to, with its regions outlined and named."""
+    zoom = max(1, 512//image.height)
+    right = image.resize((image.width*zoom, image.height*zoom), Image.Resampling.NEAREST); draw = ImageDraw.Draw(right)
+    for name, region in regions.items():
+        x, y, w, h = (v*zoom for v in region['rect'])
+        draw.rectangle((x, y, x+w-1, y+h-1), outline=(255, 0, 0)); draw.text((x+3, y+2), name, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
+    scale = right.height/master.height
+    left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
+    for box in panels.values(): draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
+    result = Image.new('RGB', (left.width+16+right.width, right.height), (32, 32, 32))
+    result.paste(left, (0, 0)); result.paste(right, (left.width+16, 0))
+    return result
 
 
 def output_asset(asset):
@@ -163,31 +248,51 @@ def copy_bundle(asset, folder):
         raise
 
 
-def generate(prompt, references):
-    """Draw a concept with Codex's image tool on the owner's ChatGPT sign-in; setup.py installs the pinned CLI."""
-    codex = ROOT / '.tools/modeling/codex'
-    out = ROOT / '.tools/modeling/concept/concept.png'
-    out.parent.mkdir(exist_ok=True); out.unlink(missing_ok=True)
-    command = [str(codex / read(codex / 'codex-package.json')['entrypoint']), 'exec', '--skip-git-repo-check',
-               '--sandbox', 'workspace-write', '--cd', str(out.parent), *(a for p in references for a in ('--image', str(p.resolve())))]
-    request = ('Call your image generation tool once with exactly the prompt below, passing any attached images as references, '
-               f'and save the result as {out.name} in the current directory. Do nothing else.\n\n{prompt}')
-    # The request goes on stdin because --image takes every following argument as another file.
-    subprocess.run(command, input=request, text=True, encoding='utf-8', check=True)
-    if not out.is_file(): raise ValueError('Codex saved no concept image')
-    return out
+def generate(prompt, references, dest):
+    """Draw an image with Codex's image tool on the owner's ChatGPT sign-in; setup.py installs the pinned CLI."""
+    codex = setup.DEST / 'codex'
+    with tempfile.TemporaryDirectory(dir=setup.DEST) as scratch:
+        out = Path(scratch) / 'image.png'
+        command = [str(codex / read(codex / 'codex-package.json')['entrypoint']), 'exec', '--skip-git-repo-check',
+                   '--sandbox', 'workspace-write', '--cd', scratch, *(a for p in references for a in ('--image', str(p)))]
+        request = ('Call your image generation tool once with exactly the prompt below, passing any attached images as references, '
+                   f'and save the result as {out.name} in the current directory. Do nothing else.\n\n{prompt}')
+        # The request goes on stdin because --image takes every following argument as another file.
+        subprocess.run(command, input=request, text=True, encoding='utf-8', check=True)
+        if not out.is_file(): raise ValueError('Codex saved no image')
+        with Image.open(out) as opened: opened.verify()
+        shutil.copyfile(out, dest)
+
+
+def record(asset, folder, stem, prompt, references, image=None):
+    """Keep a generated, or supplied, image in the asset with its exact prompt and references; returns its file name."""
+    references = [local(ROOT, p) for p in references]
+    dest = folder / f'{stem}-{len(asset["generations"])+1:02}{image.suffix.lower() if image else ".png"}'
+    if dest.exists(): raise ValueError(f'{dest.name} exists')
+    if image:
+        with Image.open(image) as opened: opened.verify()
+        shutil.copyfile(image, dest)
+    else: generate(prompt, references, dest)
+    asset['generations'].append({'file': dest.name, 'sha256': sha(dest), 'prompt': prompt,
+        'references': {str(p): sha(p) for p in references}})
+    return dest.name
+
+
+def workspace(value):
+    """Command-line paths name files in the main checkout, wherever the command runs."""
+    return ROOT / value
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('init', 'prepare', 'views', 'compare', 'record', 'review', 'preview', 'publish', 'check', 'materials'))
-    parser.add_argument('asset', type=Path, nargs='?')
+    parser.add_argument('command', choices=('init', 'prepare', 'views', 'compare', 'record', 'texture', 'review', 'preview', 'publish', 'check', 'materials'))
+    parser.add_argument('asset', type=workspace, nargs='?')
     parser.add_argument('--kind', choices=legacy.KINDS, default='block')
     parser.add_argument('--stage', choices=('build', 'verify'), default='build')
-    parser.add_argument('--review', type=Path)
+    parser.add_argument('--review', type=workspace)
     parser.add_argument('--evidence', nargs='+')
-    parser.add_argument('--image', type=Path); parser.add_argument('--prompt', type=Path)
-    parser.add_argument('--references', type=Path, nargs='*', default=[])
+    parser.add_argument('--image', type=workspace); parser.add_argument('--prompt', type=workspace)
+    parser.add_argument('--references', type=workspace, nargs='*', default=[])
     parser.add_argument('--model'); parser.add_argument('--target', type=float, nargs=3)
     parser.add_argument('--span', type=float); parser.add_argument('--complete', action='store_true')
     parser.add_argument('--images', nargs='+', help='Workspace image paths, optionally path|left,top,right,bottom')
@@ -195,7 +300,7 @@ def main():
     if args.command == 'materials':
         print(json.dumps(read(Path(__file__).with_name('materials.json')), indent=2)); return
     if args.asset is None: parser.error('Choose an asset directory')
-    folder = args.asset.resolve(); local(ROOT, str(folder))
+    folder = local(ROOT, args.asset)
     file = folder / 'asset.json'
     if args.command == 'init':
         if file.exists(): raise ValueError('Asset exists; preserve its schema and history')
@@ -219,10 +324,12 @@ def main():
         for output in asset['outputs']:
             previous = local(folder, output['source'])
             if previous.is_file(): preserve(folder, previous)
+        if 'texture' in asset: atlas(asset, folder)
         if asset['source']['mode'] == 'recipe':
             recipe = local(folder, asset['source']['path'])
             if recipe.suffix != '.py': raise ValueError('Recipe must be a Python file')
-            subprocess.run([sys.executable, str(recipe)], cwd=folder, check=True)
+            # Recipes import the modelling tools of the checkout that runs them.
+            subprocess.run([sys.executable, str(recipe)], cwd=folder, env=dict(os.environ, PYTHONPATH=str(Path(__file__).parent)), check=True)
         elif asset['source']['path'].endswith('.bbmodel'):
             subprocess.run([sys.executable, str(Path(__file__).with_name('export_project.py')),
                             str(folder/'export'), '--name', asset.get('resource_name', folder.name),
@@ -242,15 +349,17 @@ def main():
         subprocess.run([sys.executable, str(Path(__file__).with_name('compare.py')), str(sheet), *images], check=True)
     elif args.command == 'record':
         if not args.prompt: parser.error('record needs the exact --prompt, and --image for a supplied concept')
-        prompt = args.prompt.read_text(encoding='utf-8')
-        image = args.image or generate(prompt, args.references)
-        with Image.open(image) as opened: opened.verify()
-        dest = folder / f'concept-{len(asset["generations"])+1:02}{image.suffix.lower()}'
-        if dest.exists(): raise ValueError('Concept exists')
-        shutil.copyfile(image, dest)
-        asset['generations'].append({'file': dest.name, 'sha256': sha(dest), 'prompt': prompt,
-            'references': {str(p.resolve()): sha(p) for p in args.references}})
+        print(record(asset, folder, 'concept', args.prompt.read_text(encoding='utf-8'), args.references, args.image))
         write(file, asset)
+    elif args.command == 'texture':
+        if 'texture' not in asset: raise ValueError('Declare the texture layout in asset.json first')
+        if args.prompt:
+            # A generated master gets the layout's sheet contract; a supplied one keeps the prompt that made it.
+            prompt = args.prompt.read_text(encoding='utf-8')
+            asset['texture']['master'] = record(asset, folder, 'master', prompt if args.image else master_prompt(asset['texture'])+prompt,
+                                                args.references, args.image)
+            write(file, asset)
+        print(atlas(asset, folder))
     elif args.command == 'review':
         validate(asset, folder)
         if read(folder/'prepare-receipt.json') != receipt(asset, folder): raise ValueError('Prepare exports after source changes')
