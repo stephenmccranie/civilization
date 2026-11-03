@@ -84,6 +84,10 @@ Ordinary 64-item stacks hold **32**, including custom items; 16-item stacks and 
 
 All custom items are in the **Civilization** creative tab, marked with the kiln icon: machines first, then ingredients and foods. New items in the mod's namespace join it automatically and remain in creative search. Item tooltips give short purpose, control and safety hints; construction bills and processing details belong to the placed guides, machine screens and [JEI](machines.md#jei).
 
+### Welcome message
+
+On every join the server sends a short getting-started list in chat: offhand block carrying, that furnaces and campfires are retired, the Stone Saw, building and lighting the [Kiln](machines.md#kiln), bricks leading to the Foundry, early food and foraging, and JEI's **R** lookup. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.
+
 ### Player-list ping
 
 Hold **Tab** to see each player's round-trip latency beside their name, such as `42 ms`. The server sends one native ping probe per second and shows the mean of replies received during the last five seconds; client frame stalls and queued traffic count. A new connection shows `-- ms` until a reply arrives, and a probe unanswered after five seconds shows a lower bound such as `≥ 6000 ms`. Samples are bounded, expire automatically and clear on disconnect or server stop. Team formatting and custom tab names are kept. This uses Minecraft's ping/pong packets and tab display-name updates, so protocol-compatible clients need no update; native connection timeouts are unchanged.
