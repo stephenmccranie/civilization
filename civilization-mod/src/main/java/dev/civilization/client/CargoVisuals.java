@@ -16,7 +16,6 @@ public final class CargoVisuals {
     public record Grid(int across,int along,int layers,float width,float height){
         int cells(){return across*along*layers;}
     }
-    private static final float SEAM=.004f;
     private static BlockState[] eighths=new BlockState[0];
     private CargoVisuals(){}
     /** Draws from the grid's first-row, first-column, bottom corner at the pose origin. */
@@ -46,7 +45,7 @@ public final class CargoVisuals {
         return true;
     }
     private static void block(BlockState state,float x,float y,float z,float width,float height,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
-        pose.pushPose();pose.translate(x+SEAM,y,z+SEAM);pose.scale(width-2*SEAM,height-SEAM,width-2*SEAM);
+        pose.pushPose();pose.translate(x,y,z);pose.scale(width,height,width);
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state,pose,buffers,light,overlay);pose.popPose();
     }
 }
