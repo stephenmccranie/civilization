@@ -36,6 +36,8 @@ Civilization runs without these. Each version-gated integration activates only f
 | C2ME (`c2me_notickvd` module) | 0.4.0-alpha.0.122+1.21.1 | Server | [Directional chunk loading](vehicle-physics.md#directional-chunk-loading) |
 | Terrain Diffusion | Surface-water API, built against 1.4.1 (detected, not version-gated) | Server | [Local river elevations](geography.md#generator-integration) |
 
+Lithium's two entity-collision shortcuts (`mixin.entity.collisions.movement` and `mixin.entity.collisions.intersection`) are switched off through Lithium's per-mod override in `neoforge.mods.toml`. They collide every entity as its bounding box, which would make wheelbarrows block far beyond their body; the rest of Lithium stays active.
+
 Photon is the primary shader target; Bliss and Complementary are secondary checks.
 
 ## Development
