@@ -48,7 +48,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `uranium` | Exposed ore, stocked chest and held Raw Uranium |
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |
 | `builders-line` | Builder's Line clicks, automatic building and mining, and cancel |
-| `wheelbarrow` | Wheelbarrow first-person view, walking bob, key and facing steering, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering |
+| `wheelbarrow` | Wheelbarrow first-person view, walking bob, A/D steering with a free mouse look, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering |
 | `pallet` | Pallet stacks at each fill level, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking and shared menus |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
