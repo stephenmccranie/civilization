@@ -1,444 +1,350 @@
 # Civilization — game rules
 
-This is the single source of agreed game-design rules. “Agreed” means the direction is settled, not that it is implemented. Current build status and work packages live in [development_plan.md](development_plan.md); unresolved choices and recommendations live in [open_decisions.md](open_decisions.md). The original philosophy and previous drafts are reference material, not additional requirements.
+The agreed rules and setting, one section per system. "Agreed" means settled, not necessarily built: [development_plan.md](development_plan.md) says what is deployed and what comes next, and the system docs in `civilization-mod/` own shipped behaviour and tuning values. Each section ends with its unresolved questions; an Open item stays a proposal until the owner decides it.
 
-## 1. The point of the game
+## Vision
 
-**Energy → surplus → capability → dependency → power → status.**
+**Energy → surplus → capability → dependency → power → status.** Status is the social shadow of real power. Players start with personal labour and expand the matter, territory and energy they command, build productive places, control resources and routes, and spend surplus on extraordinary institutions. Hierarchy, exclusion and concentrated power are intended outcomes; status emerges from what people build, supply and control, never from a prestige score or assigned class.
 
-Start with personal labor and expand the scale of matter and territory you can influence. Build productive places, control useful resources and routes, and use their surplus to create extraordinary institutions. Hierarchy, exclusion and concentrated power are intended outcomes. Status emerges from what people can build, supply and control, without a universal prestige score or assigned social class.
+- Solo play and trusted groups of typically 2–8 (not a cap) are supported. Large institutions can emerge, but farming, building, exploring and trading stay worthwhile lives.
+- No formal jurisdictions. Trade rivalry and politics are central; PvP is optional — sieges, the Gladiator Pit or the wearable PvP flag — never unrestricted raiding.
+- The design target is up to 200 concurrent players, maintained by one human with assistant support. It is a goal, not verified capacity.
+- Gameplay is mostly custom Java; vanilla systems may be reworked or removed when the result is simpler and more intuitive.
+- Immersion matters in every activity: atmosphere, physical interaction and understandable consequences are part of system design, not polish. This alone approves no new meters, minigames, slower actions or simulations.
+- Out of scope for now: global power networks, elaborate contracts, NPC labour, detailed ecology or chemistry and universal wear.
 
-Support solo play and trusted groups, typically 2–8 people; that is not a membership cap. Large institutions can emerge, but ordinary farming, building, exploration and trade should be worthwhile lives. No formal jurisdictions. Trade rivalry and politics are central; PvP is optional, through organized conflict or the planned wearable flag below, not unrestricted destructive raiding.
+**Joining.** A client needs a compatible Civilization network protocol, not an identical build; server-only generation, balance and settings changes never force a client update. The protocol version changes only when packets or synchronised content become incompatible, and missing or incompatible installations are rejected at the mod handshake. This is compatibility, not client authentication; client-only graphics mods may differ. The client ships as a Prism instance with a pre-launch updater ([modpack/README.md](modpack/README.md)).
 
-Target up to 200 concurrent players, maintained by one human with assistant support. Most gameplay is custom Java development. Vanilla systems may be reworked or removed when the resulting rules are simpler and more intuitive.
+**Open**
+- Setting statement, world name and tone.
+- Hosting budget and active chunk, entity and machine limits before any capacity promise.
+- Deferred ambitions: research progression, provenance, detailed wear, NPC labour, banking, general contracts.
+- Immersion treatment (proposal): world cues first, exact numbers on inspection; a small shared sound and material vocabulary tied to real state; working, stopped and complete states readable without menus; prices, deadlines and protection never hidden for atmosphere.
 
-The baseline full day/night cycle is 60 minutes with vanilla phase proportions; gameplay simulation keeps its normal tick rate.
+## Setting and material style
 
-Joining a Civilization server requires a compatible Civilization network protocol, not an identical release version. Server-only generation, balance and settings changes must not force a client update. Keep a stable protocol identity across compatible builds; change it when packet formats or synchronized content become incompatible. Missing Civilization installations and incompatible protocols must be rejected before play through the normal mod handshake. This is a compatibility requirement, not authentication of an unmodified client; client-only graphics mods may differ. [Connection behavior](civilization-mod/README.md#server-connections) owns the implementation boundary.
-
-Distribute the client as a native Prism instance ZIP with its pre-launch updater already enabled, outside the loaded mod; no separate updater installer or `.mrpack` distribution. Each approved release owns the complete managed mod/shader/resource-pack set, including third-party dependency updates and removals. Preserve extra player-installed mods and personal configuration; migrate only named settings still matching prior defaults. Verify all changed files before applying the set and recover interrupted transactions before launch. Follow explicitly approved GitHub playtest Releases; ordinary tags, local checkpoints and server-only tuning do not force downloads. Retain recoverable previous managed files and preserve saved data. Minecraft/loader/protocol baseline changes use a full-pack upgrade. [Player setup and release policy](modpack/README.md#automatic-civilization-updates) own the implementation.
-
-### Setting and material style
-
-When Grassier Grass is installed, disable its automatic white blade tint from cold biome/altitude alone. Keep the normal biome grass color; actual snow cover and snow rules remain independent. [Client compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns the supported version and implementation boundary.
-
-Grassier Grass blades should look like taller wild grass with restrained natural height variation. Cumulative player footsteps, including continuous trampling beneath ordinary sprint-jumps, shorten blades along traveled routes, shared between players and saved with the world. Wear is permanent: unused grass does not recover. Standing still, flying and teleporting do not add wear. This is visual ground cover; it does not turn blocks into paths or add a movement bonus. [Grass compatibility](civilization-mod/README.md#grassier-grass-compatibility) owns current tuning and bounds.
-
-The visual and cultural reference is **Nikola Tesla's lifetime (1856–1943)**, interpreted as **a late nineteenth-century industrial foundation developing toward monumental electrical modernism**. This is a coherent alternate history, not a mixture of every style from that period. Later nuclear technology and extraordinary sky machinery retain physical materials and legible instruments.
+The reference is **Nikola Tesla's lifetime (1856–1943)**: a late-nineteenth-century industrial foundation developing toward monumental electrical modernism, as one coherent alternate history. Nuclear technology and sky machinery keep physical materials and legible instruments.
 
 | World layer | Material and form language |
 | --- | --- |
-| Farms and frontier | Timber, wool, leather, ceramics and rough masonry; practical, repairable, visibly assembled by hand |
-| Town industry | Brick, dark cast iron, steel, enamel and restrained brass; substantial mechanisms, wheels, levers and readable physical controls |
-| Advanced infrastructure | Porcelain insulators, copper conductors, coils, glass instruments and disciplined machinery; precise functional connections |
-| Sky civilization | Pale stone and metal, ivory/turquoise accents, monumental symmetry, precision and restrained Art Deco; enormous electrical apparatus |
+| Farms and frontier | Timber, wool, leather, ceramics, rough masonry; practical, repairable, visibly hand-assembled |
+| Town industry | Brick, dark cast iron, steel, enamel, restrained brass; substantial mechanisms and readable physical controls |
+| Advanced infrastructure | Porcelain insulators, copper conductors, coils, glass instruments; precise functional connections |
+| Sky civilization | Pale stone and metal, ivory and turquoise accents, monumental symmetry, restrained Art Deco; enormous electrical apparatus |
 
-These are visual stages, not new resource tiers or automatic changes to recipes. Increasing **precision, scale and command over energy** connects them. Wealth reads through craftsmanship, finish, architecture and infrastructure rather than accumulating gold trim. Early machinery is assembled and maintained by hand; elite machinery expresses extraordinary control. Beautiful ground settlements remain possible.
+These are visual stages, not resource tiers. Precision, scale and command over energy connect them; wealth reads through craftsmanship, finish and infrastructure, not gold trim. Beautiful ground settlements stay possible at every stage.
 
-New standard block faces and item artwork target 64×64 native pixels, beginning with Street Pavers. Existing 32×32 families remain valid during a reviewed, family-by-family migration; model atlases and UI retain their declared sizes. Faithful 32x may still supply vanilla materials without copying its textures into the mod.
+- Brass for bearings, fittings, instruments and contacts; copper where heat or electricity explains it. No decorative gears, lightning emblems or generic steampunk clutter. Raw materials look like their substances.
+- Material behaviour stays distinct — wool weave, timber grain, fractured minerals, cast-metal wear — never one generic surface.
+- New block and item art is **64 pixels per block face**, starting with Street Pavers. Existing 32px families stay valid until migrated family by family; Faithful 32x may supply vanilla materials without being copied into the mod.
+- Models are editable Blockbench sources, animated with GeckoLib 4 where they move. Production follows the `civilization-art` skill and [tools/modeling/README.md](tools/modeling/README.md).
+- The first firearm, the Colt Paterson (1836), is an explicit earlier addition to the setting.
+- Grassier Grass (optional client mod) never whitens blades from cold or altitude alone. Blades look like taller wild grass with restrained height variation. Cumulative footsteps permanently shorten blades along travelled routes, shared and saved with the world; standing, flying and teleporting add no wear. Visual only.
 
-The first firearm artwork is the **Colt Paterson family (1836)**, using the supplied long-barrel references: octagonal barrel, open-top frame, five-chamber cylinder, curved walnut grip, exposed hammer and folding trigger. Match the long barrel proportions and narrow visible seam between the cylinder and domed rear shield in the supplied references. Trace the supplied handle and frame cheek silhouette: curved back, concave lower front, rounded tilted butt and continuous upper junction. Check native side-view overlays using one cylinder-aligned scale and translation, without warping the grip independently. Seat the wood/frame interface and rear shield continuously, with no incidental open joints. Use a detailed native Blockbench model with smooth held cylinder/rear-shield curves, rounded grip edges, muted weathered grey steel, restrained worn edges, warm brown-grey tarnish and walnut. Retain the genuinely octagonal barrel, 64px-style texture density and separately animated visible mechanisms. This earlier historical reference is an explicit addition to the industrial setting; exact production-year/subtype fidelity is not established by the pictures. The playable prototype uses main-hand left-click firing, tap R to cock each shot/empty reload and hold R for partial reload, five chambers, slight recoil and server-side projectile damage. Reload requires one complete .36 ammunition item per chamber, visually represented by the supplied conical lead bullet; powder/caps are included in that game item. Reuse existing claim and vanilla damage rules. [Firearms](civilization-mod/firearms.md) owns controls and tunable trial values; crafting/progression and production balance remain [open](open_decisions.md#guns--first-paterson-model).
+## People: calories, movement and recovery
 
-Use brass for bearings, fittings, instruments and contacts; copper where heat or electricity explains it. Coils, insulators and glass communicate function. Avoid decorative gears, arbitrary lightning emblems and generic steampunk clutter. Raw materials should look like their substances: sulfur need not be visibly “Tesla-themed.” Period identity emerges through the machines, containers, instruments and buildings around those resources.
+- One calorie reserve replaces hunger, saturation and exhaustion. Work, movement, healing and sleep have explicit costs; cut-piece placement scales with volume, and sleep pays for elapsed in-game time. No idle or offline drain; cold adds a bounded passive cost while an active Survival player is online.
+- On level ground, walking is 3.2 blocks/s and sprinting 4.6, with jumps scaled to match; sprint-jumping gives about 20% over sprinting. Sprinting costs three times walking per block, at a constant rate per gait. Ascent costs 1 kcal per vertical block, separate from the 2 kcal jump charge, with no descent refund.
+- Rowing a vanilla boat costs less per block than sprinting, and only for the paddling player.
+- **Street Pavers** — gray, muted red and brown long-paver brick, distinct from structural bricks — give 25% faster ground movement, including their slabs, stairs and cut pieces; ordinary bricks do not. No stored buff, airborne boost or calorie change.
+- At depletion, walking and basic actions work; mining slows, sprinting and natural healing stop. Starvation alone has a health floor. Hand-foraging is a slow recovery route. Death and relog never refill calories.
+- Death leaves everything carried in an owner-only recovery container near the death location, persisting through restarts. Respawn keeps calorie state.
+- The full day/night cycle is 60 minutes with vanilla proportions; the tick rate is unchanged.
 
-Keep material behavior distinct: wool weave, directional timber grain, fractured minerals and cast-metal wear should not share one generic surface pattern. Match project lighting and visual density without flattening these differences. This section is the authoritative visual-direction sheet; production instructions belong in the [asset pipeline](tools/modeling/README.md#complete-asset-pipeline).
+**Open**
+- Spawn, starting items and subsistence: a fresh solo player must reach food, tools and claim inputs without existing buyers.
+- Death recovery in hazardous or inaccessible places, repeated deaths, XP and respawn health.
 
-Approved art tooling: editable Blockbench models operated through Jason Gardner's MCP plugin, with GeckoLib 4 for animated machinery on the current Minecraft target. Keep 64-pixel-per-block density for new artwork, declared legacy density for unmigrated families, explicit UV atlases and assembled-model review. Static structures need not use animated rendering. Setup and asset conventions live in the [model toolset](tools/modeling/README.md). All art types follow the compact shared workflow: define the target and constraints, build and refine the actual asset, then verify in game and publish. Generate a concept when exploration is useful; established directions and routine repairs may use existing references. Choose one authoritative editable source, reuse reviewed materials and record specific visual defects. Multiple competing concepts are opt-in. Refine until there are no blocking implementation or visual issues; routine steps do not require user approval. The Oil Engine was restarted from a fresh brief: exposed four-spoke flywheel, enclosed crankcase, horizontal flanged cylinder, short integrated iron feet and restrained iron/steel/brass. No broad copper support plate; preserve the selected mockup's meaningful shapes and fittings in the actual model. Its [active asset record](art/assets/oil_engine/asset.json) supersedes the earlier A/B concepts.
+## Food and cooking
 
-### First custom mob — Lacertan visual direction
+- Farming and uncooked food sustain a person without industrial fuel; river crops supply staple calories. Fishing and gathering add subsistence and variety while purchased provisions stay useful.
+- Livestock kills yield one meat portion, with no Looting bonus.
+- Future husbandry uses farm feed at breeding and production, with no animal-hunger simulation or livestock region.
+- Household cooking uses one coal-fired station. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
+- **Tier 2 cooking** grows into a kitchen workshop of distinct multiblocks. Mastery is the player learning — no cooking XP — and pays off in higher-calorie meals and stronger work bonuses. Chopping is not a mastery mechanic.
+- Mastery means reading colour and sound cues that change continuously, with a forgiving optimal plateau. A frying sound runs under every active phase, with distinct textures for the plateau and overcooking; loudness follows pan heat.
+- Heat is a continuous physical dial, no presets. Stronger heat cooks faster and narrows the optimal window.
+- The first station is a dedicated stovetop with loading and serving in its interface; standing beside it is warmer than comfort but far below furnace heat. Cookware can rest on a countertop and return with its batch intact; already-paid heat keeps cooking gradually; handling awards no quality.
+- The baking oven is a nineteenth-century professional oven: cast-iron exterior, refractory brick inside, a real opening door, a draft dial, a 2×2×2 body and a flue above.
 
-The owner approved the v4 character card and requested an editable Blockbench model. The first mob's visual target is a robust upright, tailless reptilian humanoid around 2.1 blocks tall: broad shoulders, strong forearms, five useful fingers, muted olive skin with brown mottling, lighter ochre ventral scales and loose charcoal cloth around the hips. Keep the head clearly reptilian, with a heavy scaled brow, short broad muzzle, large irregular cheek scutes and a central column of broad facial plates. The wide mouth sits low near the jaw rim with only a narrow margin beneath it; avoid a human nose, lips, chin, eyelashes or hairstyle. Keep the sturdy build but moderate the chest, shoulder and waist width to avoid a clunky silhouette. Green slit eyes remain alert and intelligent. The resting expression is neutral and alert; keep the eye framing near level rather than raising the inner brows into a sad expression. Small dorsal thermal plates follow the back's midline and stay uncovered by clothing. Basking exposes those plates to the sun, with a relaxed forward lean and no pressure from a chair back.
+**Open**
+- The rest of the kitchen: stations and dimensions, Survival construction, recipes, batches, specialties (mining speed is a candidate), packaging, eating at full reserve. Oven fuel, heat, trays and baking; the deferred preparation table.
+- Station proposals: preparation bench, cooking range (browning then simmering), oven (preheat, trays, a generous browned window), portioning bench (only if it earns a role); freely arranged, no room detection. Cues should work by colour or sound alone; no hidden quality rolls or perfect-state lamp. Recipe sets specialties; batch quality sets calories and bonus strength, capped by ingredient energy.
+- Husbandry products, domestic versus wild yields, feed-supported wool and hides, and any animal role in fertilizer.
+- Cheap foods such as berries must not undercut farmland.
 
-The [local approved card](concept_art/lacertan/character-card-v4.png) is a visual target, not a dimensioned blueprint. The [local native asset](art/assets/lacertan/asset.json) preserves the rejected first pass; the current [direct Blockbench study](art/assets/lacertan/head-study/README.md) owns its revised editable prototype and actual comparison evidence. The owner accepted the current connected-body and fitted painted-surface treatment as the native design baseline. Use geometry for the silhouette and prominent facial/back plates, with painted small-scale patterns at 64 texels/block. The [shared creature modeling route](tools/modeling/MODELING.md#creature-modeling) preserves this approach for future mobs. The owner requests substantial useful detail within Minecraft's visual language: deliberately angular masses, broad flat faces, a short wedge muzzle, recessed eyes beneath heavy brows and selectively beveled scutes using GeckoLib cuboids. Do not approximate smooth anatomy with circular tiled shells or circular eye rims; increased cube count must support silhouette, anatomy and fitted detail. This is a fictional synthesis of the supplied images and accounts, not established biology. Names, spawning, encounters, damage, warmth effects and progression remain [proposals](open_decisions.md#first-mob--lacertan-scout-proposal); approving the appearance and modeling does not settle gameplay.
+## Farming and weather
 
-## 2. Four connected systems
+- **Eligibility.** Farmland follows the local natural river elevation, including high valleys, within a bounded reach of the water surface. Sea level is not a ceiling; sky platforms gain nothing from being above a river; placed water creates neither eligibility nor the rain bonus.
+- **Growth.** Soil holds the water: river soil gives 50% growth, stored rainwater 100%. Full-speed planting to harvest averages two hours (four at baseline), normalised by growth stage, without vanilla moisture or row multipliers.
+- **Rain reserve.** 30 minutes of open-sky rain charges a farmland block's reserve to 120 minutes; it grows at full speed and recharges while rain falls, then drains a minute per minute. Roofs block rain; the crop does not. No lateral spread or pipe irrigation. Breaking soil cannot refill it; replanting keeps it.
+- Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval.
+- **Fertilizer** raises yield, not speed: one non-stacking dose per cycle tripling harvest output after replanting material (wheat keeps its 1→3). Fortune and alternative paths cannot bypass yields. Mineral Fertilizer comes only from refinery sulfur plus gravel. Bone meal is disabled.
+- Trees grow anywhere suitable, substantially faster in woodland. Every other growable needs its own habitat policy rather than inheriting wheat rules.
+- **Regional weather.** Weather runs in fixed 512×512-block districts — atmosphere, not claims — through one authoritative server query that natural rain, the Rain Caller and later towers all feed. Overworld only. Sleeping changes time, not weather.
+- Natural rain lasts 25–35 minutes. Clear spells end with a constant chance over time (mean 12 real hours) and no minimum or maximum, so back-to-back storms and multi-day droughts both happen. Rain only: no lightning, wind, floods or destructive storms; snow is not irrigation.
+- Crops and soil advance only while loaded; district schedules advance with server time; no offline catch-up or forced loading.
+- The **Rain Caller** is a creative/admin prototype with no Survival recipe, since a pocket item would bypass the towers' energy investment. It starts a 30-minute rain in the user's district, or reports that it is already raining. Rain benefits the whole district, with no rain ownership. Tower service will charge fuel only for rain it actually starts or sustains.
+- Wet soil darkens; hoe inspection reports suitability, growth rate and stored water; failed planting explains why. Photon is the primary shader target.
 
-| System | Simple rule | What it creates |
+**Open**
+- Habitat policy for cocoa, berries, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
+- Meltwater and cold-region farming.
+- The Rain Caller's eventual form; tower energy and Survival access; offline production.
+- Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
+
+## Land, deposits and geography
+
+Terrain makes opportunity understandable. One shared region/biome foundation drives growth, spawning and deposits; regions overlap.
+
+- Livestock needs suitable sites and feed, not a special region. Crossings and junctions attract towns because supplies meet there, not through a city bonus.
+- The dedicated server uses [the owner's Terrain Diffusion fork](https://github.com/stephenmccranie/terra-diffusion) at **world scale 4**. It is the evaluation baseline, not proof that river farming or freight works.
+- Food, timber and biological materials are renewable; metals, industrial fuels and strategic minerals are finite. Renewable metal and fuel sources are removed from loot and trading. Building materials stay plentiful. Automation may process finite stock but never replenish it.
+- **Climate bands** from the natural surface biome: coal never in hot country and twice as frequent in cold as temperate; oil never in cold country and twice as frequent in hot as temperate (halved from the first implementation); uranium equally rare everywhere. Climate changes frequency, not size. A town catchment of about 2,048 blocks' radius holds one or two cold-country coal opportunities and half that for hot-country oil; temperate country half of each. Towns may lack a resource and need trade. Sites use physical host-rock and cover checks, not flatness.
+- **Physical deposits.** Mining removes real coal and pumping lowers real oil. An oil seep above the centre reveals it but holds no reserve. Coal has no clue block: river cuts, cliffs and caves expose some seams. Derricks may stand anywhere above the oil footprint.
+- Ordinary small coal stays hand-mineable for usable Coal; huge veins use [manual mining](#manual-coal-mining).
+- **Uranium** is rare, small, hand-mined ore scattered through suitable frontier rock. Explorers wear a Geiger counter that clicks faster nearby and carry finds personally; value comes after processing. Exposed ore, uranium in hand and chests holding it show sparse silver radiation tracks — a visual cue only.
+- Three accessory slots beside the player portrait hold wearable role tools, not storage or a power ladder.
+- Deposit geography is developed against fresh worlds; existing natural sites need no migration during development.
+
+**Open**
+- Navigable river width, depth and continuity, local river elevations and permanent-world generation policy.
+- Realised stock, sites per climate, generation cost and depletion in representative worlds.
+- How fresh uranium frontier stays available.
+- World lifespan: reserve horizon and expansion or reset policy before a permanent world, since nothing replenishes finite stock.
+
+## Energy and industry
+
+| Tier | Energy and access | Capability |
 | --- | --- | --- |
-| **Land and resources** | Terrain determines productive opportunities; deposits hold finite reserves | Places worth discovering, developing and buying |
-| **Energy and production** | People spend calories; industry spends finite fuel to transform real inputs | Food demand, useful surplus and increasing capability |
-| **Storage, freight and trade** | Goods and fuel occupy inventory space and move physically | Markets, carriers, routes and supply relationships |
-| **Ownership and access** | Powered claims protect places; per-claim whitelists share access; land can change hands through payment | Investment, cooperation and competition for control |
+| **1 — Coal** | Hand-accessible Coal | First machinery, kiln, fertilizer, cooking; first river freight |
+| **2 — Oil** | Rare large deposits needing extraction and refining | Larger industry and transport |
+| **3 — Uranium** | Small frontier finds, fuel processing, reactors | Major installations, regional instruments, sky civilization |
 
-These are ways to organize the design, not four mandatory code frameworks. The same physical fuel supports production, commerce and claims. The same inventories support households, warehouses, shops and vehicles. Regional information also supports the map and local feedback.
+Calories support people throughout and are not a tier. Lower-tier goods and fuels stay useful; oil stays useful for mobile work after reactors.
 
-## 3. People, food and recovery
+- No renewable industrial power or biomass fuel; food, cranks and animals never become industrial energy. Conversions have explicit inputs and losses. Uranium fuels reactors, not furnaces. No universal fuel conversion or fixed exchange rate.
+- Coal is the heat fuel; oil the mobile mechanical fuel and source of lubricant and sulfur. Per mass, petroleum should eventually hold only moderately more energy than coal.
+- Each stage builds the next from what is already available, with no circular recipes: ordinary coal starts industry, coal opens oil, oil processes hand-found uranium.
+- **One Coal** serves crafting, fuel and claim reserves; charcoal, renewable coal and coal blocks are removed. Kilns fire nonmetals, Foundries metals and ore, stoves food; vanilla furnaces, blast furnaces and smokers retire, and no controller needs one.
+- **Coal demand.** Production burns four times the original coal baseline, with speeds, outputs and claim upkeep unchanged. Every coal machine is lit by hand with a paced, random-chance flint-and-steel button (each accepted strike costs a little labour), then feeds itself, idling far cheaper than working, until it runs out. Coal machines have two fuel slots.
+- Heat machines cannot ignite or work while rain reaches their work face; a roof shelters them.
+- **Refining.** Coal powers the first pump and heater. Heater, distillation and condenser multiblocks connect through basic pipes, balanced one-to-one with an extractor, producing refined fuel, lubricating oil and sulfur. One extractor fills a basic pipe; branching never multiplies capacity. Lubrication wears with work, not idle time; running dry gradually cuts efficiency. Pipes have no valves; glass inspection strips show the moving fluid.
+- Refined fuel drives transport and machinery and is not needed for coal. **No oil dependency may block building the first oil chain.**
+- **Equipment needs production**: stone tools and Coal → kiln bricks → a brick, coal-fired Foundry buildable without metal → ingots → steel and Machine Parts → T2 machinery. The material vocabulary stays short.
 
-- One calorie reserve replaces hunger, saturation and exhaustion. Work, movement, healing and sleep have explicit costs; cut-piece placement scales with material volume, and sleeping costs calories for elapsed in-game time, including a skipped night. Sprinting costs three times as much per block as walking; each gait’s per-block rate stays constant regardless of speed or road bonuses. Rowing a vanilla boat costs less per block than sprinting, only while the controlling player paddles. Passive passengers and motorized vessels do not pay rowing labor. There is no baseline idle or offline calorie drain; cold felt temperature, which gradually follows local air, adds a bounded passive cost while an active Survival player is online.
-- At depletion, walking and basic actions remain possible; mining slows, sprinting and natural healing stop. Starvation alone has a health floor. Deliberate hand-foraging provides a slow recovery route. Death/relog do not refill calories or clear depletion.
-- Baseline movement on ordinary level ground is **3.2 blocks/second walking** and **4.6 sprinting** at 20 TPS. Keep native jump height, but scale airborne acceleration and forward jump boost to these slower gaits. Sprint jumping should give a modest bonus of about **20% over sprinting** (approximately 5.52 blocks/second), rather than approaching vanilla speed. Calories charge horizontal travel, positive elevation gain and a separate jump cost: stairs and ladders cost energy to ascend, while jumping uphill costs more. Ascent starts at 1 kcal per vertical block, before warmth discounts, with no descent refund; the existing 2 kcal jump charge remains. Terrain and effects still matter.
-- Dedicated Street Pavers give **25% faster ground movement** to reward road infrastructure. Their gray, muted red and brown fired-brick surface is distinct from structural red bricks. Favor a plausible late-19th-century long-paver character, while scaling the bricks for attractive readability at 64 pixels per block instead of reproducing exact historic dimensions. Include Street Paver slabs, stairs and cut pieces; mixed pieces qualify only where exposed paving supports the player. Ordinary red bricks and stone bricks do not qualify. No stored road buff or additional airborne acceleration; distance-based calorie costs stay unchanged.
-- **Fertilizer:** only sulfur plus gravel supplies the current fertilizer production chain, fired in the Fertilizer Furnace. Remove the clay/gravel route now. Advanced animal husbandry remains future work; any fertilizer contribution must be reconsidered against this newer rule before implementation.
-- Ordinary farming and uncooked food can sustain a person without industrial fuel. River crops supply staple calories. Cows, mooshrooms, pigs, hoglins, sheep, chickens and rabbits currently yield one meat portion per kill, without extra meat from Looting; hides and other products retain their own rules. The future husbandry design calls for farm feed at breeding/production interactions, with no continuous animal-hunger simulation or additional regional restriction for kept animals.
-- Fishing and wild gathering support subsistence and variety; their effort and yields must leave purchased provisions useful.
-- Household cooking uses one simple coal-fired station. Cooking improves food value and preparation options. Packing provisions conserves calories; food tiers express convenience, carrying density and luxury within one calorie scale.
-- Tier 2 cooking expands into an entire kitchen room/workshop composed of multiple distinct multiblocks. A chef's skill and experience mean the player learning to cook; that mastery should manifest in stronger meal work bonuses and higher calorie meals. Cooking mastery does not come from a character cooking-XP stat. Quality rules, station roles, meal benefits and process details remain in the [kitchen proposal](open_decisions.md#tier-2-kitchen-workshop).
-- Cooking mastery centers on learned timing and reading color/sound cues that change continuously or through many stages. Cooking quality has a forgiving optimal plateau, rather than only uncooked/perfect/overcooked states. The prototype keeps a frying sound beneath every active phase, with distinct blended textures for the optimal plateau and overcooking; loudness follows pan heat. Chopping is not a cooking mastery mechanic. Exact sensory cues, quality curves and heat/handling controls remain in the [spatial cooking proposal](open_decisions.md#spatial-cooking-mastery-proposal).
-- Cooking heat creates a speed-versus-timing tradeoff: stronger heat cooks faster and shortens the time available at optimal quality; gentler heat gives more time to read the cues and finish well. Player mastery should make faster cooking at high quality possible. The [first prototype package](development_plan.md#tier-2-cooking--first-prototype-plan) owns the work order; the [cooking reference](civilization-mod/cooking.md) owns trial values.
-- Control cooking heat with a continuously adjustable physical knob, like a stove dial. Dial position, cooking rate and the resulting timing tolerance vary smoothly; there are no three-setting presets. This specifies the control, not a change to the industrial fuel type.
-- Build the first cooking prototype around the stove alone, with ingredient loading and serving in its interface. It should look like a dedicated stovetop, with no oven door or baking cavity; the kitchen has a separate oven station. Defer the preparation table. Standing beside the cooking stove should be warmer than perfect comfort without industrial-furnace levels of heat. The [implemented prototype](civilization-mod/cooking.md) owns trial recipes, controls, timings and rewards; it does not settle the full kitchen's multiblock layout or final balance.
-- The next station is a nineteenth-century professional/industrial baking oven with a real opening door and cast-iron exterior; refractory brick belongs inside. Its first in-game slice is a Creative-placeable model with a 2x2x2 body envelope, player-height casing and a flue allowed above it, with collision, an opening main door and a continuous physical draft dial. Fuel, stored heat, trays, baking and Survival construction are deferred; [cooking](civilization-mod/cooking.md#baking-oven-physical-first-pass) owns implemented controls and limits.
-- Cooking cookware can be lifted, rested on a broad supported countertop and returned to the stove with its batch intact. Stored, previously paid heat continues cooking gradually while sensory activity fades. Early removal is recoverable; handling itself awards no quality. Serve from a resting vessel to free the stove for another batch. The [cooking reference](civilization-mod/cooking.md) owns prototype controls, bounds and conservation rules.
-- Globally disable bone meal use. Custom Mineral Fertilizer remains a separate input that improves eligible agricultural output.
-- Ordinary death leaves all carried possessions, including equipment, in an owner-only recovery container near the death location. It persists through logout/restart. Respawn at bed/spawn preserves calorie state; players return to recover goods.
+**Open**
+- Oil and uranium processing beyond the refinery; uranium fuel packaging and yield; oil freight quantities.
+- Whether furnace-style burning and workshop heat converge into one policy.
+- The remaining vanilla boundary: resource farms, special equipment and loot, enchanting, food shortcuts, mobs, redstone, automation, and storage or travel that bypasses freight; stonecutter overlap with saws.
+- Coal and oil balance rebuilt from mining, hauling and transport rather than the retired drill ratio.
 
-Current calorie values and working recipes are documented with the implementation, not duplicated here.
+## Manual coal mining
 
-### Weather-supported agriculture
+Manual mining unlocks huge coal veins and replaces the Coal Drill: special tools → chip the vein → shovel loose raw coal → minecart → surface preparation → usable Coal. One raw-coal material; no coke or coal grades.
 
-Farming should reward substantial land, labor and input investment, supporting specialization and trade. Farmland carries a water reserve rather than the crop: eligible river soil supplies a baseline of 50% growth speed; stored rainwater enables 100% speed up to a cap. Full-speed planting-to-harvest time targets **two hours on average**, implying four hours at the baseline. Fertilizer continues to increase yield rather than growth speed. Farming rules must cover all applicable crops, including repeat production; species on other growing surfaces need explicit habitat-specific treatment rather than silently inheriting wheat mechanics.
+- Huge veins yield more usable Coal per block than ordinary deposits.
+- A special pick chips away visible portions: blocks show real local removal, and loosened chunks fall to supported ground. Worked faces never repel players invisibly or hold floating piles.
+- Clicking commits a swing; holding repeats after full recovery. Camera movement shapes the stroke, but looking around never strikes. The pick feels heavy and somewhat detached from the camera: a close overhead wind-up, the head following the view with weight, and a forward-downward strike in one plane — never a dipped head or sideways spin.
+- A special shovel loads minecarts that are hauled to the preparation machine.
+- The full Survival loop must work before the drill retires.
 
-Natural rain should last about **30 minutes** and supply a bonus sufficient for a full growth cycle. Weather control is regional. The first usable control is an item that calls rain to the user's region; the later sky transmitter and regional receiving towers must use the same regional-weather foundation. The approved [regional weather package](#regional-weather-and-farming-package) specifies districts, moisture, item access and simulation policy. Natural clear intervals must be random and unbounded, permitting near-consecutive storms and multi-day droughts; the starting distribution mean is 12 real hours.
+**Open**
+- Per-block yield, extraction time, labour and route throughput, tuned together.
+- Further controls, fragment geometry, missed-swing costs; shovel custody and scoop size; cart capacity, uphill haulage and cross-claim access.
+- Preparation power (coal or hand; never mandatory oil), throughput and waste.
+- Keeping Fortune, explosions, pistons, hoppers and Builder's Line from bypassing extraction; drill legacy IDs and saves.
+- Not agreed: cave-ins, gas, ventilation, mandatory supports, elevators, locomotives, conveyors.
 
-## 4. Regional land and materials
+## Workshops, parts and equipment
 
-Terrain must make productive opportunities understandable. Use a shared region/biome foundation for growth, natural spawning and deposit placement. Regions can overlap.
+Towns concentrate production, customers and services: rural farms, mines and forests supply inputs, and town workshops turn them into goods sold back, later into ships and sky infrastructure.
 
-The dedicated server uses [the owner's Terrain Diffusion fork](https://github.com/stephenmccranie/terra-diffusion) at **world scale 4**, including the merged generation-performance and scale-aware village patches. On 2026-11-01 the owner replaced the Candidate 5 selection with a fresh random-seed world and explicitly requested permanent deletion of existing server worlds, maps and their backups, without another backup. This is a one-time authorized reset; further world replacement requires a new request. This choice does not waive the river-farming or navigable-freight requirements below. [Status](docs/status.md) owns deployment/validation; [remaining terrain evaluation](open_decisions.md#terrain-diffusion-river-evaluation--2026-09-19) owns unresolved integration and performance questions.
-
-| Landscape/activity | Rule |
+| Workplace | Input → output |
 | --- | --- |
-| River floodplain | Farming follows the local natural river elevation, including high valleys, with bounded vertical reach from its water surface. Terraces can qualify; sea level is not an altitude ceiling, and sky platforms do not inherit eligibility merely by being above a river |
-| Irrigation/fertilizer | Eligible river soil supplies baseline moisture; rain stores the growth bonus. Placed water cannot create eligibility or the rain bonus. Fertilizer improves harvest output |
-| Woodland | Trees grow on suitable ground elsewhere, but substantially faster in woodland |
-| Mineral resources | Large deposits follow the permanent climate rules below; local natural rock determines whether a body fits |
-| Livestock | Suitable sites with supplied farm feed; no special livestock region |
-| Crossings and route junctions | Attractive places for towns, processing and storage because supplies meet there, not because of a city-biome bonus |
+| Foundry | Ore + Coal → metals and steel |
+| Tannery | Raw Hide → Leather; brick, stone and wood, no iron |
+| Textile Workshop | Wool → Cloth |
+| Smithy | Metals → forged heads, Plates, Rods, Fasteners |
+| Assembly Bench | Parts, timber, Leather, Cloth → finished goods and repairs |
 
-Large deposits use three permanent climate bands, derived from the natural surface biome rather than named biome lists. Coal is excluded from hot country and occurs twice as frequently in cold country as temperate country. Oil is excluded from cold country and occurs twice as frequently in hot country as temperate country. Uranium remains equally rare across all three climates. Oil frequency is halved from the first climate implementation while coal and uranium remain unchanged; retained oil fields keep their locations and stock. These preferences change site frequency, not deposit size, richness or ordinary small-coal generation. Temperate country can support both fuel industries; no town is guaranteed either resource. Search a broad district for usable ground, with physical host-rock and cover checks rather than a flatness cutoff. [Industry](civilization-mod/industry.md#find-a-site) owns thresholds and placement mechanics.
+- **Cloth is wool only** — no plant fibres.
+- Heat and machines transform materials; benches and building sites join parts. Coal belongs in smelting and forging, never in fitting a handle. Intermediates stay few and recognisable; workshops make a selected product without skill grinds or minigames.
+- **Shared parts.** Ingredients that always travel together become one part: the Tool Handle (wood, leather grip, binding) serves pickaxe, axe and shovel. Core parts: Tool Handles, Fasteners, Plates, Rods, forged heads and Wheels, alongside Leather, Cloth and Machine Parts. Each part needs several customers; most recipes use two to four ingredient types.
+- The **Assembly Bench** is a timber-only two-block bench with one inventory. Assembly costs 5 kcal per working second; idle costs nothing.
+- Large structures are assembled on site through construction guides, never crafted into portable items.
+- **Forging cost.** Metal parts scale duration and total coal by material — iron 1×, gold 2×, diamond 4×, netherite 8× — at a constant coal rate per second. Assembly and repairs use labour, not Coal, with the same duration multiplier.
+- Gold is a real tier between iron and diamond, keeping its enchantability.
+- Coal-era workshops make iron equipment and everything for the first oil chain; later powered works use fuel and lubricant for throughput. Lubricant services machines; it is never a recipe ingredient.
+- **Density** comes from shared landings and warehouses, short transfers and concentrated customers — no city designation, proximity buff or forced residence.
+- **Grade.** Every damageable item gets a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits) that scales its base stats; 100% equals vanilla. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
+- **Repairs** at the Assembly Bench consume materials and lower grade, keeping names and enchantments, with no XP or prior-work penalty. No idle decay.
+- Mending and villager equipment trades are disabled. Completed production grants modest XP; hand assembly and repairs grant none. Crafting, repair and other acquisition routes may not bypass workshop production, though finite exploration finds stay usable.
+- **Maker's marks** (approved, deferred): colour accents and player-drawn pixel signatures on equipment.
 
-Food, timber and other biological materials are renewable. Metals, industrial fuels and strategic mineral deposits are finite. Remove renewable metal/fuel sources from loot, trading and other alternate acquisition paths. Ordinary building materials remain plentiful through extraction. Automation may gather/process finite stock but cannot replenish it indefinitely.
+**Open**
+- Gates for ranged and special equipment, horse armour and tools; renewable treasure and other metal sources.
+- Where coal smithing ends and oil-powered manufacturing begins.
+- Head and handle damage or disassembly; separate woodworking or assembly sites at scale; further product families.
+- Non-numeric grade effects and nonpositive grades.
+- Maker's mark details (a 6×6 grid is a candidate).
 
-Coal and oil occur in large, rarer deposits requiring infrastructure. **Ordinary small coal deposits remain normally hand-mineable and supply usable Coal directly.** A separate manual mining system, inspired by nineteenth-century coal mining, unlocks huge coal veins and replaces the Coal Drill. Huge veins yield more usable Coal per block than ordinary small deposits; the exact yield is unresolved. A special mining pick chips away visible portions of the huge vein; loosened raw coal breaks away at the strike as coherent chunks and falls to supported ground. Worked faces must not repel players through invisible collision, and small remaining slivers must not support floating full-cell piles. Players use a special shovel to load it into minecarts, haul it out of the mine and feed it into a preparation machine that produces the existing usable Coal. Clicking commits a pick swing; holding left-click repeats strikes after each full recovery. Releasing stops subsequent swings. Camera movement shapes direction and follow-through. The pick should feel heavy and somewhat detached from the camera: a close shoulder windup that raises and draws the head back in an arc above the player, a close tool whose head follows camera movement with weight rather than trailing behind the view, and a forward/downward strike with carried follow-through in the same plane. Raising the handle while dipping the head, or scripted sideways spinning at impact, contradicts this direction. Mere looking around does not trigger a strike. Huge-vein blocks must show actual local removal, rather than only a crack overlay followed by a whole-block drop. Exact controls beyond this rule, fragment geometry, loading, hauling and processing details remain [open](open_decisions.md#manual-coal-mining--proposed-implementation-plan). The [first Creative/admin prototype](civilization-mod/coal-mining.md) implements this loop with trial controls and quantities. Survival acquisition is implemented; regional presentation and drill retirement remain unfinished; [industry](civilization-mod/industry.md) owns the retained drill and ordinary ore behavior.
+## Construction
 
-**Coal and oil deposits physically exist in the world:** manual coal work removes real finite material, and pumping physically lowers the oil level. Their current playable shapes are broad and thin: coal is an irregular bed roughly 141–161 blocks long, 99–113 wide and usually 2–3 blocks thick, with a thicker center; oil is a capped, tapered pocket roughly 69–73 blocks long and 55–59 wide, one block deep at the rim and up to six at its center. Huge-vein geometry and presentation will be reviewed for manual work; ordinary small deposits retain normal mining. The oil-filled pocket is a game-readable simplification of real porous reservoir rock. A flowing oil seep directly above the deposit center reveals it at the surface, but the seep itself holds no extractable reserve; discovering or breaking it cannot duplicate or relocate the reserve. Coal has no separate clue block: natural river cuts, rock faces or caves should often reveal extractable seam blocks, while some seams stay buried. Derrick controllers may stand anywhere above the actual horizontal oil footprint. On irregular terrain, the oil clue and body must remain aligned beneath dry ground; unsuitable cliffs and mostly open underground space should not create misleading sites, but local river and cave cuts may expose coal. Uranium is deliberately different: rare, small, hand-minable ore scattered through frontier mineral country. An explorer can wear a Geiger counter in a utility accessory slot and hear faster clicks near it, then carry the raw finds personally without a bulk extractor or freight train. Its high energy value comes after industrial fuel processing; discovery and personal transport are the frontier playstyle. Uranium mineralization should follow suitable host rock and regional geology rather than a fixed elevation above sea level; exact game depths and abundance remain playtest tuning. Manual coal tools have Survival forged-head/Assembly Bench acquisition, with assembled cart/screen infrastructure; prove the full loop before retiring the drill. Develop deposit geography against fresh worlds; existing-world compatibility is not required for this phase. Existing user saves must still be preserved.
+- Construction respects volume: **one log → one plank block**. Saws cut halves, quarter beams and eighth cubes on a 2×2×2 grid, and are the only source of slabs. Pieces place freely, cost labour by volume and recombine without loss.
+- **Multiblocks.** Industrial structures are built from ordinary full blocks and saw cuts unless a native model is specified, as for the Oil Derrick. The controller explains requirements with textured ghost previews that vanish when complete or not inspected. Feeding matching full or cut items into the controller places them in the guide; manual placement still works. Construction consumes real items and labour, preserves existing blocks and obeys access. Guides show remaining quantities and obstructions, and stay cheap to render.
+- Placed crafting tables keep a shared nine-slot grid that persists when closed, so players can fetch more and cooperate.
+- **Builder's Line** is a wooden mason's cord reel. With blocks in the other hand it builds; with a tool, it mines. Two right-clicks mark endpoints along one world axis and immediately work the whole line (up to 16 full blocks, four per second, 16-block reach); crouch-right-click cancels. Normal costs and wear apply, and work stops at the first obstruction. It comes from the Smithy.
 
-A town-sized catchment means roughly **2,048 blocks in radius**. Cold-country coal retains roughly **one or two candidate opportunities** nearby; hot-country oil has half that frequency after the oil-density reduction. Temperate country has half the favored-climate opportunity frequency for each resource. Geology further reduces realized fields. Towns may lack a resource and need trade. The climate rule supersedes a universal coal-to-oil ratio or equal abundance in every climate. Uranium instead returns to rare, emerald-like small finds scattered through suitable terrain, with no district selection or one-to-two-per-town target. Manual coal mining supersedes the former oil-fueled extraction budget of two coal fields plus a one-fifth vehicle reserve; oil demand must be evaluated against actual transport and other engines. Per equal mass, petroleum's fuel energy should eventually be only moderately higher than coal's; item counts and mB have no agreed physical mass equivalence. Coal remains the fixed heat fuel, oil the mobile mechanical fuel and source of lubricant and sulfur. Actual site frequency, manual throughput and depletion depend on world terrain and need broad-world play validation.
+**Open**
+- Builder's Line length and pace in play, a powered speed boost, shaped pieces, functional blocks and vessels.
 
-The standard survival inventory has three accessory slots in the column to the right of the player portrait, above the offhand slot. These are for wearable role tools rather than extra general storage; the Geiger counter is the first example. Other accessories can specialize future explorers, workers and traders without adding a general equipment power ladder.
+## Storage, carrying and hauling
 
-Exposed Uranium Ore, uranium carried in hand and chests holding either uranium item share sparse, outward-moving silver radiation tracks. They originate at the object's edges, travel a few blocks, and leave quiet gaps between events. Each trail stays fixed in world space after launch, even if its source moves, and fades at both ends. This is a visual cue, with no radiation damage or new simulation. The [motion study](concept_art/uranium_radiation/brief.md) informed the runtime effect.
+Progression expands the quantities, distances and areas a player handles: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Each step enables bigger projects while small jobs stay convenient; a first home still fits in an ordinary session.
 
-Large resource installations are the strategic objectives for organized sieges, with player-built defenses and a decisive encounter at the site's control point rather than raiding ordinary claims or winning personal Minecraft PvP. The Oil Derrick is a complete native Blockbench tower with smooth tapered timbers, diagonal X braces and two galleries. Its shaded timber should remain readable under Photon, using nearby ambient world light rather than inheriting a dark controller sample; this adjustment is specific to the derrick. Players right-click its controller with held materials to build visible native sections along a contextual guide. Damage removes only the affected frame section or port, leaving the rest standing for repair. Its machine remains the intended oil control point. Replacing the Coal Drill removes the former coal-machine objective; the coal site's control point and relationship to manual mining must be redesigned before coal sieges are implemented. Exact capture interaction, timing, eligibility, asset transfer and protections remain [open](open_decisions.md#extraction-installation-sieges). Earlier coal [concept and block plans](concept_art/extraction_sieges/brief.md) are preserved as superseded proposals. Ordinary full blocks and existing saw cuts remain the default for other physical industrial structures.
+- Material volume, storage volume and mass are distinct and separate from energy value. A stone block is 1 m³; its cut pieces preserve it.
+- **Cargo stores** — wheelbarrows and pallets — limit cargo by mass only, with unlimited-count matching stacks. Pallets touching horizontally share one inventory and summed capacity.
+- **Personal carrying.** Building material travels as one offhand stack of up to 32 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
+- Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
+- The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, with an initial target of ten stacks of 32 cobblestone. The coal minecart keeps its separate rail role.
+- Placement draws only from explicitly selected nearby supplies; material reaches the worksite physically.
+- New limits follow an audit and explicit migration; inventories are never shrunk or discarded.
 
-Every contextual multiblock guide supports controller-fed assembly: feed matching full or saw-cut structural items into the controller, and it places them in the guide's positions. Manual placement remains possible. Construction consumes real items and labor, preserves existing blocks, and obeys land access. The guide shows remaining quantities by material and cut size, including pieces that need an obstruction cleared first.
+**Open**
+- Wheelbarrow acquisition, capacity and loaded handling.
+- Supply-fed building: selection, reach, access loss, competing builders.
+- Universal enforcement across containers, machines, hoppers and recipes; unknown goods are never weightless.
+- The first powered loading upgrade; hoists, cranes and rail are examples only.
+- Journey times (proposal): everyday supplies minutes away, early resource trips 5–10 minutes, regional freight 10–20 minutes.
+- Fuel value versus pocket freight: stack limits, payloads and consumption tuned together.
 
-Construction conversions should respect physical block volume: **one log → one plank block**. Partial blocks and other recipes need their own sensible ratios, not a blanket one-item-in/one-item-out requirement. Saws halve blocks into slabs, quarter beams and eighth cubes on a 2×2×2 grid. Ordinary slab crafting and slab-producing stonecutting, including the Street Pavers slab recipe, are disabled: make slabs with a saw. Pieces place freely in unoccupied cells, cost labor in proportion to volume, and recombine through crafting without losing material.
+## Heat, shelter and comfort
 
-## 5. Energy, industry and scale
+One environmental temperature field connects buildings, machines and people.
 
-| Industrial tier | Energy and access | Capability direction |
-| --- | --- | --- |
-| **1 — Coal** | Hand-accessible Coal | First machinery, kiln, fertilizer and household cooking; first river freight |
-| **2 — Oil** | Rare large deposits requiring extraction and refining | Larger industry and transport |
-| **3 — Uranium** | Small portable frontier finds, industrial fuel processing and reactors | Major installations, regional instruments and sky civilization |
+- Climate, altitude, weather and time set ambient air, with a mid-afternoon peak, warm evenings and a dawn low.
+- Blocks slow heat without stopping it; glass and doors pass more, openings more again. Wood insulates, masonry stores, air mixes. Heat eventually escapes.
+- Burning machines heat their shell and exhaust, warming nearby air; enclosure and insulation still matter. Torches give modest heat, campfires more, lava much more. Passive exchange conserves heat and never invents hotspots.
+- **Comfort.** Players feel the air around them with a short delay. Comfort peaks at 70°F, lowering calorie costs and speeding work, with a smaller movement benefit. Ordinary daylight is mildly cool, so shelter helps; hot biomes are their own challenge. Cold adds a capped passive calorie cost, never damage.
+- A brass thermometer between health and calories shows comfort and road speed; felt temperature gently tints the view, with a disable option.
+- Cold, exposed machines lose energy; sheltered, warm workshops are efficient. Recovered waste heat comes only from consumed fuel and never duplicates energy used for work; engines make waste heat without gaining furnace efficiency. Architectural heat reuse comes before ducts.
+- Cheap, readable heat beats precise prediction: batching and approximation are fine while warmth, insulation and cooling stay understandable and fuel accounting stays finite.
+- Architecture matters through physical relationships — shelter, heat, access, scale — not room types or proximity bonuses; outdoor life stays viable.
 
-Calories support people throughout; they are not a fourth industrial tier. Lower-tier goods and fuels remain useful after advancement. Oil remains useful for mobile work even when reactors exist.
+**Open**
+- Cadence (owner direction, still a proposal): about one update per second where changing, two to five seconds where settled, sleeping when negligible. Unverified targets: under 2 ms per tick and at most 3 s behind at 200 players.
+- Clothing, heat transport, greenhouses, internal machine temperatures, radiant exchange and oxygen-limited burning.
+- Architecture proposals: workshops warming homes, greenhouses on waste heat, ventilated engine rooms; heat aboard moving vessels.
 
-No renewable industrial generation or biomass fuel. Food, cranks and animal labor cannot become industrial power. Allowed energy conversions have explicit inputs and losses. Uranium fuels reactors rather than ordinary furnaces; no universal conversion between fuel types or fixed market exchange rate is implied.
+## Physical foundation
 
-Each stage must construct and start the next using already available materials and energy. Ordinary small coal deposits supply the initial usable Coal; special tools and preparation infrastructure then unlock richer huge veins. Their recipes and processing power remain unresolved, but must not require output that can only come from those huge veins. Coal industry opens oil; oil industry opens the ability to process hand-recovered uranium into useful reactor fuel, without requiring Tier 3 power to collect the first find. Oil refining has three useful outputs: refined machine fuel, lubricating oil and sulfur for fertilizer. Coal powers the initial pump and fired heater; distinct heater, distillation and condenser multiblocks connect through basic pipes. Lubrication declines through machinery work, not idle time; running dry gradually reduces efficiency, and replenishing oil restores it. Refinery sulfur plus gravel is the only current fertilizer feedstock. Unfertilized farming remains available before oil industry. Refined fuel supports transport and other mechanical work; it is no longer a prerequisite for coal extraction. Tanks and manual canisters establish liquid handling before vehicle freight. Avoid circular recipes. A short material vocabulary is preferable; steel and one shared Machine Parts item form the initial industrial catalog; advanced alloys and precision assemblies remain candidates.
+Mass, heat capacity and stored fuel energy are separate quantities drawn from shared material and shape properties; machine work credit is separate again. Sable owns rigid-body motion; Civilization supplies narrow adapters, energy accounting and gameplay policy. Controls stay simple, with no hidden engineering chores, and the foundation comes before any cargo penalty or machine-temperature rule.
 
-Balance the initial refinery as **one oil extractor → one heater → one distillation column → one condenser** at sustained nominal throughput. Basic crude pipes should be fully utilized by one extractor; push/pull or branches must not multiply a shared pipe segment’s capacity. Preserve useful fuel/lubricant/sulfur coproducts and physical deposits. Batch startup and genuine supply/output interruptions remain visible. [Current rates and limits](civilization-mod/industry.md#process-and-initial-tuning).
+**Open**
+- Dynamic cargo mass, heat aboard moving vessels and unified fuel → work + heat accounting.
+- Cargo penalties and machine-temperature rules each need approval.
 
-**Armor, tools and weapons beyond the stone stage must require an actual production pipeline.** Better equipment should depend on material processing and production infrastructure, rather than only direct crafting-table recipes. The first bridge is stone tools and Coal → kiln bricks → a brick-built, coal-fired Foundry → iron/copper/gold ingots → steel and shared Machine Parts → T2 machinery. The town-workshop direction below requires agricultural materials and dedicated workshops for the initial equipment catalog. The Foundry must be buildable without metal, and refinery construction must be possible before refined fuel exists. Later equipment tiers and alternate acquisition paths still need a broader pass.
+## Transport
 
-Machines have physical multiblock construction where specified. Controllers explain required materials with contextual textured ghost previews; guides disappear when complete or not being inspected. No separate build screen or hide key is needed. Every multiblock guide follows the [shared performance contract](civilization-mod/multiblock-builds.md#guide-performance-contract), with cached construction geometry and bounded visible outlines. This does not require every future cooking station or vehicle to be a multiblock.
-
-### Town workshops and the rural–urban production loop
-
-**Approved direction; initial workshops implemented.** Towns concentrate supplied production, customers and services. Rural farms, mines and forests deliver inputs; town workshops combine them into equipment and other goods sold back to rural producers. Later, town manufacturing supplies ships, monumental infrastructure and the sky civilization.
-
-The initial production family is the existing Foundry plus three dedicated multiblocks:
-
-| Workplace | Input and output | Role |
-| --- | --- | --- |
-| Foundry (existing) | Ore + Coal → metals | Rural mining supplies processed town materials |
-| Tannery | Livestock hides → leather | Grips, bindings, armor straps and fittings |
-| Textile workshop | **Wool → cloth** | Padding, clothing and later industrial textiles |
-| Smithy | Metals → forged heads, plates, rods and fasteners | Coal-fired material transformation |
-| Assembly Bench | Prepared parts, timber, leather and cloth → goods and repairs | Hand woodworking, final assembly and returning repair customers |
-
-**Cloth is wool-based only.** Do not introduce flax, hemp, cotton or another plant-fiber route. Livestock supplies both hides and wool; food remains another rural product. The advanced husbandry/fertilizer loop is related later work, not a requirement to finish a complete animal simulation before the first workshops. Its existing feed-at-production direction still applies.
-
-Recipes should express the item's construction. Tools can use metal, timber handles and leather bindings; armor can use metal, straps and cloth padding. The approved first quantities are listed below. Do not force every product to consume every resource. Keep intermediates few and recognizable; do not add separate machines for each hammering, riveting or finishing operation. Workshops offer a selected product, supplied inputs and straightforward production, without a skill-level grind or mandatory crafting minigame.
-
-Metal-part production scales both processing duration and **total** coal demand with material: iron/chainmail 1×, gold 2×, diamond 4× and netherite 8× where applicable. Final equipment assembly/repairs use player labor rather than Coal and retain the equipment material duration multiplier. Coal burned per second stays at the base workshop rate, so heat per second stays the same and total emitted heat follows total coal used. Gold equipment is a real intermediate tier between iron and diamond, including useful durability, protection, damage and iron-level harvesting, while retaining gold's high enchantability. The Tannery uses a small brick/stone/wood structure and needs no iron, letting hide become leather armor before the Smithy. Tanning takes ten seconds per hide and weaving ten seconds per wool at half the normal workshop heat rate, or one quarter Coal per batch, so leather and cloth remain affordable early steps. Armor at 100% grade or above receives an automatic random vanilla trim; the Smithing Table's trim application recipes are disabled, so the trim visibly marks exceptional quality. Coal-fired workshops must support ordinary iron equipment and the parts needed to establish oil industry. **No oil dependency may prevent construction of the first oil/refining chain.** Later powered machine works consume refined fuel and lubricant for industrial throughput and advanced manufacturing. Lubricant services working machinery rather than becoming an arbitrary ingredient in every sword.
-
-Density comes from physical deliveries to shared landings/warehouses, short transfers between complementary workshops, concentrated customers and the cost of duplicating stocked production facilities. Map-visible counters and roads support that economy. No city designation, population/proximity buff, formal jurisdiction or forced residence. A remote integrated estate remains possible. Useful batch throughput or modest startup-fuel economies are appropriate; proximity must not create free raw materials. Larger shared services can support later cities; the first workshops alone do not guarantee urban density.
-
-Ordinary equipment durability supports replacement and **material-consuming Assembly Bench repairs**. Repairs restore condition while reducing the item's grade, which also lowers its maximum durability and other base stats. Preserve enchantments, names and other identity data; charge no XP and apply no escalating prior-work penalty. Mending remains disabled under the rule below. Do not add idle decay or a second equipment-condition meter. **Disable Mending and villager equipment trades.** Completed thermal and town-workshop production earns modest XP when collected; idle burning, hand assembly and repairs do not generate XP. Direct crafting, repair and alternate acquisition routes must not provide an unlimited bypass around workshop production. Audit those routes with the equipment gates; exact treatment of finite finds, existing enchanted items and repair recipes remains implementation work. Disabling all villagers or all finite loot is not implied.
-
-**Equipment grade:** each piece of damageable equipment receives a persistent whole-percent grade from a normal distribution centered at **75%**, with a 20-point standard deviation. There is no imposed grade minimum or maximum: grades below 50% and at or above 100% each occur on roughly one in ten fresh rolls. Apply the percentage directly to numeric base equipment stats, including maximum durability, melee damage, protection, mining speed and attack speed where applicable. A 100% piece has vanilla base values; higher grades exceed them. Grade is distinct from ordinary damage but is the **single permanent wear measure**: an Assembly Bench repair lowers grade, and its maximum durability and other stats follow automatically. It never drains from ordinary use. Display grade as a percentage in the tooltip. Keep the durability bar at vanilla length: green for remaining capacity, black for durability spent since repair, gray for capacity unavailable at the item's grade, and cyan at the right end for up to the first 10% of exceptional grade. Give each item a persistent random wear pattern. Lower grades reveal progressively more connected, material-appropriate scuffs and corrosion on transparent item overlays, while **100% and above remain pristine**. Preserve the installed Faithful 32× art underneath the marks; repairs and upgrades retain the same pattern. Exact shipped stat coverage and technical engine limits live in the [workshop reference](civilization-mod/industry.md#town-workshops); further equipment coverage remains in [open decisions](open_decisions.md#town-workshop-implementation-details).
-
-**Later artisan identity:** offer selectable color accents and player-drawn pixel symbols as maker's marks/signatures on equipment. This is approved deferred customization, not part of the first workshop release. A small grid around **6×6 is a candidate**, not a locked size. It expresses a maker's identity without a universal prestige score or required skill leveling.
-
-#### Shared parts and final assembly
-
-**Agreed direction; first package implemented locally.** Manufactured tools, equipment, furniture, vehicles and machinery should draw from a small, recognizable set of shared materials and parts. Use **raw materials → specialized workshops → prepared materials/parts → final assembly**. Most everyday goods keep short preparation chains; reusable composite parts such as handles and mechanisms can add a joining stage before final assembly; substantial machines may justify another major assembly. Ordinary stone, brick and timber placement stays straightforward, while food and chemical processing retain their own ingredients. Do not force every product to use every material.
-
-**Separate transformation from joining:** heat and powered machinery transform materials; benches and construction sites join prepared parts. Coal belongs in smelting and forging, not in fitting a wooden handle and leather grip. Player labor supports hand woodworking and assembly without becoming a source of industrial power. The Foundry supplies metals/steel; the coal-fired Smithy shapes metal parts. Woodworking supplies handles and other useful wooden components. Existing Tannery and Textile Workshop supply leather and wool-based Cloth under their existing processing rules. Later powered machine works can add advanced assemblies and throughput without making coal-era workshops obsolete or blocking the first oil/refinery chain.
-
-**Combine ingredients that consistently travel together into a recognizable supplied component.** A **Tool Handle** includes its wooden body, leather grip and ordinary binding; final tool assembly consumes that handle rather than another separate Leather. Make the complete handle at a hand bench from wood and Leather, with wood shaping included in that job rather than requiring a single-use bare-handle intermediate. Share one handle item across the initial pickaxe, axe and shovel; fitting length and shape is abstracted into assembly. Do not require leather-wrapped handles for unrelated wooden goods or primitive bootstrap tools. Keep materials separate when they have independent uses, substitutions or different proportions; do not create generic kits that merely hide a finished product's whole ingredient list.
-
-Start recipe planning around **Tool Handles, iron Fasteners, metal Plates and metal Rods**, alongside existing **Leather, Cloth and Machine Parts** and a small family of forged tool heads. Fasteners abstract nails, rivets, bolts, and ordinary door/chest hinges and latches rather than separate items for each. Existing Machine Parts represent small internal mechanisms such as bearings, collars, gears and fittings; no individual gear or bearing item is implied. A finished Wheel can similarly represent its hub, spokes and rim, while its axle stays separate because wheel counts and axle arrangements vary. Armor Lining is only a candidate until the recipe audit establishes whether straps and padding consistently belong together. Add metal variants only for a demonstrated use, beginning with iron and specific steel applications rather than every part in every metal. Reuse existing planks and saw-cut structural timber instead of duplicating them with abstract beam ingredients. Small parts should be convenient to produce in batches. Each shared part should have several useful customers; tool heads make tool construction readable, and substantial unique assemblies such as engine cylinders remain appropriate. Current catalog, quantities and station recipes live in the [manufacturing reference](civilization-mod/manufacturing.md); [remaining review](open_decisions.md#shared-parts-and-assembly--remaining-design) owns later balance and coverage.
-
-Final assembly of tools, furniture and small mechanisms belongs at a general **Assembly Bench**, using prepared parts and player labor. A pickaxe illustrates the intended chain: iron → forged pick head; wood + Leather → Tool Handle; head + complete handle → finished pickaxe. The leather is paid once during handle production. Productive assembly costs 5 kcal per second before comfort reductions; idle or paused work costs nothing. One general bench is the starting direction; the first physical bench also handles woodworking. Specialized assembly stations need a useful scale or interaction reason rather than one station per product. Keep most finished recipes to two to four ingredient types.
-
-**For large structures, the construction site is the assembly station.** Deliver actual structural stock and prepared components through the existing contextual construction/guide flow rather than crafting a whole tower into a portable item. Preserve real material quantities, physical storage accounting, access and construction labor; compact parts must not create material or bypass carrying limits. Workshop construction must use earlier available supplies, never its own unavailable outputs.
-
-Repairs should ultimately distinguish replacing/joining parts at a bench from metalworking at the Smithy. The first package uses prepared metal stock and replacement fittings at the Assembly Bench; grade loss, names, enchantments and wear identity remain intact. More detailed separate head/handle damage is deferred. Existing Smithy work selections reset without removing physical stock. The [manufacturing reference](civilization-mod/manufacturing.md) owns actual recipes, controls and migration. This replaces the initial complete-tool Smithy production model. [Implementation sequence](development_plan.md#shared-parts-and-assembly--first-package-implemented-locally).
-
-#### Workshop recipes and repairs
-
-The [manufacturing reference](civilization-mod/manufacturing.md) owns current parts, output quantities, tool/armor assembly, hand-work costs and recipe coverage. [Industry](civilization-mod/industry.md#town-workshops) owns the existing Tannery/Textile/Smithy structures and their coal fires. Cloth remains wool-based; usable animal leather drops become Raw Hide and pass through the Tannery. Its construction remains independent of shears, Cloth and the metal tools it helps supply.
-
-The initial Assembly Bench combines woodworking and joining in one timber-only item with a two-block-wide, one-block-deep, one-block-high footprint. Give it a continuous custom-textured plank top, sturdy pegged legs, lower shelf and a few small visible tools. Both halves operate one inventory; construction/dismantling and access apply to the whole pair. Narrow legacy benches retain their contents and operation until replaced. It makes complete Tool Handles and Wheels, then assembles equipment, fixtures and machinery from shared stock. The Smithy no longer makes complete equipment or performs final repairs. Initial metal-free/early workshop controller recipes and cheap ordinary storage remain accessible. No oil is required for the first manufacturing/refinery chain.
-
-An Assembly Bench repair restores current durability to the new, lower maximum, preserves names/enchantments/wear identity and removes prior-work penalty. Primary stock costs scale with missing durability, targeting half a fresh item's primary amount near breakage, rounded up with a one-unit minimum. Iron/gold repairs use prepared Plates; other materials retain their corresponding primary input. Add a complete Tool Handle for headed tools, Cloth for armor or Leather for other covered equipment. Each repair takes a base ten seconds of hand work, scaled by material, with no XP or Coal. It loses `ceil(2 × fraction of durability restored × exp((100 − current grade) / 25))` grade points, minimum one. No 25% floor exists; repairs whose next grade is zero or lower are unavailable. Upgrades preserve grade and proportional damage instead of resetting lifespan.
-
-## 6. Carrying and transport
-
-Progression expands the quantities, distances and areas a player can manipulate: personal work → assisted handling → powered work → regional industry → extraordinary engineering. Develop extraction, storage, loading, construction and travel together. Larger terrain must contain useful local starting opportunities, connected routes and places worth developing; the selected Terra Diffusion scale-4 server world is the evaluation baseline, not proof of freight or farming compatibility.
-
-### Physical material storage and handling
-
-**Approved direction; staged implementation.** Bulk construction materials have credible dimensions. Separate material volume (substance), storage volume (packed space) and mass (load). A full stone block represents 1 m³; two halves, four quarter beams or eight eighth cubes preserve that material. Processing must account for inputs, outputs and explicit losses. Packed cut pieces initially use their solid volume; loose-pile packing factors and other item families need their own policies.
-
-Wheelbarrow and stockpile cargo use **mass as the only capacity limit**. Matching items merge into unlimited-count cargo stacks; slots/pages organize materials without imposing another count or item-type limit. Volume remains useful descriptive accounting, not a packing restriction on these stores. Use generous game mass allowances rather than literal human lifting limits. Ordinary chests serve tools, food, components and small supplies; substantial building stock belongs in stockpiles, warehouses or cargo spaces. Mass and volume remain separate from energy value. Containers must be empty to become portable inventory items; filled-container nesting cannot bypass capacity. Disable shared remote ender storage. An assembled cargo vehicle can physically move its inventory.
-
-Pallets touching horizontal sides on the same level automatically form **one shared inventory**, with their mass capacities added together. Connections extend through the whole touching group; diagonal corners and vertical stacking do not join. Opening any pallet accesses the same material counts, and nearby wheelbarrow loading uses that shared inventory. Preserve stock when groups merge, separate or reload, and enforce access across the connected group rather than allowing a public neighbor to expose protected cargo.
-
-Personal building cargo is **one stack of up to 32 placeable blocks/cut pieces, in the offhand only, regardless of mass**. Matching mined ground pickups automatically fill that stack; a different/occupied hand or a full stack leaves the remainder on the ground. Tools, seeds/crop foods, small planting supplies and small placeable supplies retain ordinary inventory slots; being implemented as a Minecraft BlockItem is not itself a reason to require offhand cargo. Construction materials, cut pieces and bulky fixtures retain the hand allowance. [Personal carrying](civilization-mod/physics.md#personal-block-carrying) owns the reviewed boundary and extensible exception tag. Empty Pallets also use ordinary inventory/hotbar storage and main-hand placement, exempt from the offhand building-block allowance. Filled portable containers cannot hide additional loads. Preserve old extra stock through explicit saved recovery rather than deletion. Creative/Spectator authoring is exempt. The first general building-material carrier is an inexpensive **wheelbarrow**, pushed over the ground without rails. Its initial hauling target is ten player-sized stacks of 32 cobblestone blocks, with other materials limited by the equivalent mass allowance. Pushing should match ordinary walking speed and gait, with a calorie cost for actual handling movement. The wheelbarrow can climb inclines with successive rises of at most one block each, while retaining main-body collision and handler headroom. Handles remain non-solid and separately targetable for taking control. Introduce it and stockpiles alongside restrictions. The dedicated coal minecart retains its separate rail-mining role. Placement tools should draw from explicitly selected nearby supplies with current access checks; material must reach the worksite physically. Right-clicking the tray opens familiar cargo slots; the rear/handle area starts pushing. Clicking and Shift-click transfer ordinary inventory stacks, while nearby parked carriers and stockpiles transfer directly with Load/Unload buttons. Show mass and visible representative contents. Easy matching-material deposits and batch loading reduce repetitive inventory handling. Exact allowance, ranges, capacities and controls remain [open](open_decisions.md#physical-storage-and-increasing-scale).
-
-Placed crafting tables own a persistent, shared nine-slot ingredient grid. Closing the menu leaves ingredients in the world so a player can fetch another hand-load, and other permitted players can use the same grid. Preserve table separation, claim access and exact stock through simultaneous use and reloads; breaking/replacing a table drops its remaining inputs once. Personal 2×2 crafting remains unchanged.
-
-Ordinary chests keep their **32-item ordinary stack** limits and multiple slots; non-block player goods keep their existing stack/equipment limits. Players carry building blocks only through the single offhand allowance above. Wheelbarrow/stockpile cargo retains unlimited-count, mass-limited stacks; personal block carrying uses a count limit instead of a mass budget. Audit item volumes, recipe conversions, automation, nesting and existing stock before enforcing new limits; preserve saves through an explicit migration. Do not shrink existing inventories or discard their contents to adopt the new policy.
-
-Each upgrade must enable larger useful projects while keeping small jobs convenient. A first home should be achievable in an ordinary session, solo operations must remain viable, and ground settlements remain worthwhile after advanced transport. Loading throughput must grow with extraction and freight throughput. Evaluate local supply trips, regional routes and expeditions by experienced journey time before fixing distances or increasing terrain scale. Numerical journey targets and specific future machines remain proposals.
-
-| Mode | Agreed position |
+| Mode | Position |
 | --- | --- |
-| Rivers | Primary network for routine long-distance passenger travel and bulk freight; early, cheapest freight |
-| Trains | Later ground freight; always more expensive than river transport |
-| Airships | Most expensive, fastest and greatest bulk capacity |
-
-Boats use the [freeform hull and engine direction](#bulk-freight-structures), superseding the earlier prefab platforms and fixed cabin bounds. Provide simple stable controls without mandatory linkages or manual balance engineering. Sable supplies motion; refined fuel and lubricant connect powered freight to industry. Existing chests, barrels, bunkers and tanks retain their current limits until physical-volume adapters and migration are implemented. [Vehicle controls and limits](civilization-mod/vehicle-physics.md) and [bulk storage](civilization-mod/industry.md#bulk-freight-storage) own shipped behavior; powered docking remains unfinished.
-
-### Rivers and ocean trade
-
-**Approved direction; not yet implemented as a complete world/economy loop.** Rivers are the backbone of long-distance passenger travel and bulk freight, connecting inland farms, mines, workshops and settlements to one another and to the sea. River mouths, confluences, navigable reaches and practical landings should create useful places for ports, warehouses, markets and towns. Their value comes from actual routes and deliveries, without assigned town bonuses. Walking, wheelbarrows and roads connect nearby sites to this network; later rail and exceptional airships extend its reach while rivers remain central to ordinary transport.
-
-The ocean must contain worthwhile destinations and productive opportunities that give players reasons to travel out and bring cargo inland through river systems. **Offshore oil is the first planned ocean-resource use case:** discover and develop finite offshore reserves, load physical crude cargo, and deliver it through a river mouth to inland storage, refining and industry. This extends the finite oil economy rather than introducing another fuel type. Preserve a reachable initial coal → oil bootstrap; offshore production does not silently replace existing onshore oil or become the sole route to the first refined fuel. Other ocean resources and destinations remain [proposals to select](open_decisions.md#river-network-and-ocean-opportunities).
-
-World terrain must provide connected sea-to-inland routes with useful channel width/depth, river-mouth access, turning room and landing opportunities. Evaluate loaded journeys in both directions, not just attractive river scenery. Not every tributary must be navigable, and not every settlement needs direct deep-water access; local handling and transfer points connect smaller sites. River elevations, waterfalls and other breaks must be understood before promising a route. Exact channel dimensions, navigation aids, port transfers and any engineering works remain to design; no full hydrology simulation is implied.
-
-Offshore deposit placement/discovery, extraction structures, acquisition, cargo transfer and balance are future work. The current land Derrick, dry-ground seep rules and deployed deposits are onshore implementations, not a working offshore system. [Route evaluation and open mechanics](open_decisions.md#river-network-and-ocean-opportunities) and the [freight package](development_plan.md#bulk-freight--planned-implementation-package) own the remaining work. Train details, airship physics, precise speeds/capacities and comparative cost definitions remain open.
-
-### Controller-built antigravity airships
-
-Fast travel should reduce distant-terrain detail dynamically through optional Civilization-side DH compatibility, including nearby DH terrain and restoring normal quality after one continuous second below the smoothed threshold when slowing down. Use one aggressive warp-detail threshold at 80 blocks/s, not multiple travel tiers. Use two fixed warp LOD qualities: moderately coarse within roughly 32 chunks, very coarse beyond, with a small boundary buffer to avoid repeated switching. In warp mode, suppress ordinary client terrain drawing and new terrain mesh jobs while preserving server simulation, received chunk data, vessel rendering and players; DH supplies the visible terrain. For the fast-flight prototype, prioritize pending server chunk requests along actual ship velocity while retaining the full existing coverage and physics safety checks. This changes rendering workload and chunk request order, not flight speed or world data; [implementation](civilization-mod/vehicle-physics.md#speed-adaptive-distant-horizons-detail).
-
-Airships are player-built flying machines assembled around a controller block, **not custom-model vessels or prescribed prefab hulls**. Players determine their architecture and silhouette with building blocks. This supersedes the earlier prefab-airship direction while preserving prefab boats.
-
-Their agreed endgame technology is **nuclear-powered antigravity**, with relatively realistic motion through Sable: material/load mass matters to performance, and aerodynamics plus air/wind resistance affect flight and speed. The initial controller integrates power and flight controls; antigravity support retains inertia and consumes power before propulsion. Powered hover should hold its resting position against wind when the pilot is not driving, subject to available power. Flight should feel inertial: acceleration and braking build gradually, and reversing controls must preserve existing momentum while the drive transitions through neutral, rather than instantly reversing travel. Detailed tuning and survival failure rules remain in the [airship plan](open_decisions.md#controller-built-airships--proposed-implementation-plan). The [first flight prototype](civilization-mod/vehicle-physics.md#airship-prototype) uses typed numeric power, without fuel or a gameplay power cap, so the entire finite power range can be tested. There is no configured speed ceiling: available power and resistance determine flight speed. Bounded, incremental terrain preparation follows current momentum and a predicted turning path, with lookahead informed by speed and loading delay. Anticipatory braking keeps motion within ready terrain; emergency suspension remains for unexpected gaps. This readiness boundary is separate from propulsion tuning. Collision protection must prevent high-speed travel from skipping terrain. Temporary chunk-streaming gaps must preserve an established pilot session so flight can resume without reacquiring the controls. While piloting, the player must remain attached to the craft through high acceleration and turns; leaving the controls releases that attachment. Stopped prototype airships can be disassembled into editable world blocks, snapped to a cardinal direction without overwriting terrain or losing cargo. Nuclear fuel machinery remains future work.
-
-Airships represent the most refined expression of our setting: precise metalwork, pale enamel/ivory, restrained turquoise, porcelain, glass instruments and disciplined electrical modernism. Player construction supplies the vessel's form. Extraordinary speed and large freight capacity remain goals for the tier, with design tradeoffs rather than every craft maximizing both. Reactor packaging, controls and technical limits remain open.
-
-## 7. Fuel currency and shops
-
-Coal is ordinary currency; oil and uranium are denser currencies for higher-level transactions. Payment consists of physical fuel that can later be consumed in its appropriate industrial process. Exact oil/uranium forms remain open.
-
-One trade counter presents a single exchange: **receive this item and quantity → pay that item and quantity**. Both selectors are ghost copies set by clicking a carried item, with Coal selected as payment by default. Any item may serve as payment, including non-fuel barter. Numeric fields set the exact quantities per trade, including batches spanning multiple stacks. One click exchanges one complete batch. One central chest inventory holds both outgoing payment stock and incoming goods; ordinary item stack limits still apply to storage.
-
-There is no separate buy/sell mode or automatic conversion. Reversing the item pair reverses the trade. Customers can trade but cannot directly move the owner's stock. Both inventories must have the required items and receiving space, and the exchange completes together. Shops operate while owners are offline.
-
-Shops/offers appear on the map, including beyond explored terrain. Information is remote; purchases, collection and delivery remain physical. Visible stock is not a reservation.
-
-## 8. Ownership and access
-
-Unclaimed land allows gathering, building and facility use under ordinary regional/tool/energy rules, without claim protection. A controller secures a place rather than unlocking basic gameplay. The owner-only death container retains its specific rule; other separate asset rights still need definition.
-
-There is no formal group system. Each claim has a player owner and a username whitelist managed by that owner. Whitelisted players have full access to the place and its shared facilities, subject to global rules and takeover locks. Lists are local to each claim, without invitations or member roles. Vehicle access remains a later implementation choice.
-
-### Land controller
-
-Craft and place a management block using a meaningful minimum of coal and other resources. Use three generous tiers with increasing upkeep. The controller opens like a single chest for actual coal stacks, with a few labeled controls on either side. Initial footprints are 64×64, 128×128 and 256×256 blocks, all 64 blocks tall; initial upkeep is 1, 4 and 16 coal per real hour. Changing tiers costs 24 hours of the destination tier’s upkeep (24/96/384 coal) from the reserve, for both upgrades and downgrades, and starts a 24-real-hour cooldown. Reject the change if it would empty the reserve. Controls are compact, attached parts of the inventory frame. The [implementation reference](civilization-mod/ownership-trade.md) owns precise bounds and migration behavior. **At zero energy an ordinary claim immediately becomes unclaimed and loses claim protection, with no grace period.** Structures and goods are not automatically deleted.
-
-Once a month, a buyer can take over by paying the owner a significant premium over **actual stored controller energy**, not empty storage capacity. The exact calendar/window and premium are open.
-
-The agreed transaction is:
-
-1. Buyer deposits the full required payment during an eligible opportunity.
-2. Snapshot actual stored energy and fix the price. Hold payment pending handover.
-3. Give the owner **one week** to move. Reserve withdrawals are locked; normal claim upkeep continues without repricing.
-4. At the deadline, transfer ownership and payment together. The buyer receives the remaining controller energy.
-
-The seller may remove buildings, machines, goods and vehicles during the week. This buys land, not guaranteed structures. Controller energy is the exception: it remains locked and transfers to the buyer. Removing a block must not erase the pending transaction or release locked stock.
-
-If power runs out during a funded takeover, protection ends immediately, the takeover is cancelled, and the buyer receives a full refund. The seller receives no payment.
-
-## 9. Information and interface
-
-The Tab player list shows numeric in-game round-trip ping in milliseconds, sampled once per second and averaged over a rolling five-second window. Do not present missing replies as zero latency; show waiting or overdue status. Preserve existing player/team display names.
-
-Refinery vessels use simple readable silhouettes: a standalone distillation tower without required decks, rails or ladders, and a visibly supported horizontal condenser. Pipes have no manual valves. Substantial mostly-steel faceted tubes with narrow clear glass inspection strips show actual moving fluid by color and direction; empty interiors are see-through. Liquid tooltips name their contents.
-
-T1 machines use two input and two output slots, retaining ordinary 32-item stack limits for 64 items of storage per role. The Smithy and hand Assembly Bench are exceptions: four ingredient slots and one output slot each; the Smithy forms stock and the bench joins goods. Tannery and Textile Workshop keep two output slots. Output stacks stay in their slots when another output is collected; hoppers can clear finished work without moving the remaining stack. Coal-burning machines use two coal slots. T2 item outputs use four-slot banks. Civic claim reserves and trade stock keep their full chest inventories. Extra storage does not multiply production speed; keep batch processing and fluid storage separate from inventory capacity.
-
-Terrain gives the main clues. A simple local inspection explains crop/forestry suitability; failed planting explains its cause. Prospecting discovers buried deposits separately.
-
-The map is accessed through a physical 2×2 Survey Table multiblock, with an immersive map on its surface and a closer inspection view. No handheld map, global map hotkey or permanent minimap. Nearby terrain is automatically revealed, shared by everyone at the table; exploration is not required. The map shows public shop locations/offers and property boundaries/ownership. Deposit discoveries remain private unless shared. No public live tracking of players or shipments.
-
-The basic interaction is **search goods → inspect offer → mark destination → travel**. The physical Survey Table and public claim/counter inspection are implemented; item search, destination pins and sharing remain later work. Avoid turning inspection into a mandatory permanent dashboard.
-
-### Shared machine interface direction
-
-Implemented shared interface direction: use a soft, slightly darker tan/warm-gray panel, restrained brass and dark metal, familiar native inventory slots, a clear material-to-output flow, and an optional collapsible recipe drawer. Coal machines have **two fuel slots**, accommodating the reduced stack sizes, and a well-drawn animated fire indicator rather than a fuel dial. Liquid machines retain labeled fuel/oil sight glasses, with exact fluid names and amounts on hover. Crafting tables, chests, the normal player inventory and its recipe-book backdrop use the same cabinet materials while retaining native equipment/crafting controls. Cabinet frames, brass nameplates, controls and inventory slots are shared across machine and civic controllers; layouts retain their specific roles.
-
-Players may select a recipe to see ghost requirements in empty input slots, then supply the real items. Recipe selection is optional: inserting materials directly must support automatic recipe recognition. Ghosts are guidance only, never extractable stock. Automatic workshop processing runs only a unique matching recipe; ambiguous materials wait for a player selection without spending fuel. Workshop materials can occupy any active input slot and split stacks are combined. Unrelated ingredients block the batch. Fixed furnace processes remain input-driven, with recipe selections serving as optional visual guides. Shared rendering and inventory/recipe helpers preserve each machine’s existing energy and pause policies; see the [implementation contract](civilization-mod/industry.md#shared-controller-interfaces).
-
-## 10. The apex and its visual identity
-
-**Extremely fast airships are a core sky-civilization status symbol and energy consumer.** Owners can pour substantial energy into exceptional speed, gaining useful reach and a visible expression of wealth. This is an agreed endgame direction. There is no configured speed ceiling; power and drag determine performance. The controller flight prototype is implemented, while survival energy curves, craft configurations and streaming/collision limits remain open.
-
-The intended scale is **hand tools → machines → facilities → networks → regional instruments**. Monumental construction, regional weather control, sky freight and elite sky institutions are established ambitions. They consume supplied materials/energy and depend on the ground economy; precise mechanisms remain open.
-
-The approved [setting and material style](#setting-and-material-style) connects productive river valleys and mineral country to industrial cities and sky estates, gardens and observatories. Freight and service infrastructure make the dependency visible. The sky offers awe, access and extraordinary reach; beautiful and powerful ground settlements remain possible. No automatic falling-city simulation or destructive weather weapon is approved.
-
-The four [concept images](concept_art/prompts.md) express this direction, not implemented capabilities. Preserve the aspirational scale while choosing a maintainable mechanism for each feature.
-
-The accepted creative direction gives every layer its own prosperity: warm river homes and painted warehouses, substantial forest halls, dramatic stone mining settlements, busy industrial cities and serene sky gardens. Buildings have attractive inhabited spaces and a visible working side—loading yards, fuel stores, service walks and machinery. Copper gorges, pale river country and misty forest valleys are visual references, not additional committed resource chains. Named airships, recognizable silhouettes and engine sounds express reputation; formal race mechanics remain a future candidate.
-
-**Sky-to-ground wireless power:** a single great machine is the sky civilization's central transmitter. It directs supplied energy to **one regional tower at a time**, rather than broadcasting to several simultaneously. Regional observatories are majestic, enormous towers that dominate their landscapes. They receive power to bring rain and potentially other useful effects. Draw on Tesla-inspired wireless-power imagery and ancient-monument transmitter stories as fictional engineering; pyramids are not required. Target selection, switching, ownership and effect mechanics remain open; no wireless network is implemented.
-
-Wireless transmission transfers supplied energy with losses; it is not a renewable source or item-transport system. Regional services retain a material supply chain and finite operating costs.
-
-**Ground access to the sky civilization:** the approved exterior direction is the [Apogee Pyramid schematic](concept_art/schematics/apogee_pyramid_v4/README.md), a 31×31×31 public great work modeled after the unified massing of the Great Pyramids. It is one continuous fourfold-symmetric stepped masonry shell, with identical copper conductor spines on all faces and an open 7×7 summit crown. The crown's four supports sit at diagonal corners so cardinal stair approaches remain clear. This approves the exterior architecture, not its material recipe, internal ascent, activation rules or beam-transfer mechanics.
-
-## 11. Immersion throughout the world
-
-Immersion is a core goal for every activity and stage: farming, mining, building, trade, travel and sky civilization. Ground-level work needs its own satisfying experience, not merely an obligation on the way to the endgame. Treat atmosphere, physical interaction and understandable consequences as part of system design, rather than a final visual polish pass.
-
-Specific sensory treatments and interaction proposals are in [open decisions](open_decisions.md#immersion-direction--proposals). This goal does not by itself approve new survival meters, mandatory minigames, slower actions or additional simulations.
-
-## Regional weather and farming package
-
-**Approved direction.** This package develops the agricultural rules above. Natural rain timing is stochastic, not a repeating wet/dry cycle. Current implementation and crop coverage live in [weather and farming](civilization-mod/weather.md); remaining habitat/economy choices live in [open decisions](open_decisions.md#regional-weather-and-farming-package).
-
-### Weather districts and natural rhythm
-
-- Fixed **512×512-block districts**, aligned with chunks and stable across saves, including negative coordinates. A district is an atmospheric area, not a land claim or formal jurisdiction; river/woodland/deposit eligibility continues using the existing geography provider. Weather never changes those eligibility rules. Grid borders are an explicit first-version compromise; no weather-front simulation.
-- Independent natural schedules: **25–35 minutes of rain**, with random clear-weather waiting times having **no minimum or maximum duration**. Near-consecutive rain and droughts lasting multiple real-world days must both be possible. No increasingly guaranteed rain after a dry spell. Use a constant chance per elapsed clear-weather time (an exponential waiting-time distribution); the starting mean is **12 real hours**. Seed-derived district random streams and saved scheduling prevent synchronization or rerolling by reload. Districts are evaluated on demand without loading terrain or ticking every district in the world.
-- One authoritative server query for weather at a position. Natural and called rain feed it; the later tower does too. Rainfall remains regional even when players stand in different districts. Overworld only initially.
-- Replace the Overworld's ordinary global rain schedule while this system is enabled. Sleeping changes day/night but does not cancel or restart weather. Day length does not scale weather timing. Admin commands inspect, request or clear one district; vanilla global weather commands need explicit interception/feedback rather than silently fighting the regional scheduler. Keep a global administrative weather-cycle pause. Other dimensions retain their existing weather behavior.
-- Initially use rain, not induced lightning, wind, flooding or destructive storms. Honor temperature/precipitation rules: snow is not liquid irrigation and rainless habitats do not gain new agriculture. Cold eligible fields retain the 50% river baseline; snowfall supplies no wet-cycle bonus. Meltwater and cold farming extensions are later decisions.
-
-### Soil and crop production
-
-- One capped rainwater reserve per farmland block. Rivers automatically maintain eligible farmland and its 50% baseline; ordinary placed water does not grant the rain bonus. This rule replaces vanilla irrigation dependence for governed farmland.
-- **30 minutes of exposed rain charges an empty reserve to 120 minutes.** While rain reaches the field it grows at 100% and recharges; afterwards the reserve drains one minute per minute. A full event therefore supplies about 150 minutes of full-speed opportunity including rainfall. A partial shower gives a proportional reserve; repeated rain tops up to the same cap.
-- Rain must reach the ground through open sky; its own crop does not block it. Roofs do. No lateral water spread, soil chemistry or pipe-fed irrigation in this package. Breaking/replacing soil cannot refill water. Harvesting/replanting preserves it; fresh tilled ground starts at baseline. Empty and mature plots also lose stored water over time.
-- Two hours average from planting to first harvest at full speed, four at baseline, with modest natural variation. Normalize by species growth stages rather than multiplying vanilla random ticks indiscriminately. Preserve appropriate light and space requirements, but remove hidden vanilla moisture/row-layout speed multipliers for governed crops. Those times assume otherwise valid growing conditions.
-- Apply to wheat, carrots, potatoes, beetroot, melon/pumpkin stems, torchflowers and pitcher plants. Melon/pumpkin first fruit fits the first growth cycle; each subsequent fruit also needs the production interval. Breaking fruit, replacing a stem or unloading must not reset it into fast production.
-- Fertilizer is one dose per harvest cycle and never stacks. Preserve wheat's existing 1-to-3 food yield and unchanged seeds. Use the same triple baseline **harvest output** for other covered crops, with an explicit yield table before code: reserve normal replanting material first, then multiply the produce. Carrot/potato/beetroot harvests must remain predictably replantable. Fertilized fruit stems store a dose until the next successful fruit; removing the plant loses the dose. Fortune and alternative harvest paths must not bypass the yield rules. Two-block crops must drop once.
-- Audit every renewable growable/harvest source and classify it explicitly. Cocoa, berries, sugar cane, trees, bamboo, cactus, kelp, mushrooms, vines, Nether wart and decorative spreaders need surface/habitat-specific policy; retaining their current rules is a documented deferral, not a declaration that farming is complete. In particular, cheaper food alternatives must not undermine the two-hour farmland economy. Do not force a tree into the farmland model.
-- Initial simulation policy: crops, stored-water recharge and drying advance only while their area actively simulates; natural district schedules advance with running-server time whether terrain is loaded or not. Unloaded soil misses rain and retains its prior reserve; no offline crop catch-up or forced chunk loading. Server shutdown pauses both clocks. Offline production remains a separate whole-economy decision.
-
-### First regional control: Rain Caller (working name)
-
-- Right-click targets the fixed district containing the user. Show the district and result clearly. No moving personal rain bubble, extra targeting GUI, crop-speed spell or direct soil refill.
-- Use a **creative/admin prototype item first**, usable without operator commands once granted. No survival recipe yet: a cheap pocket item would bypass the future monumental energy investment. Whether it later becomes a consumable, supplied instrument or development-only tool is unresolved.
-- Calling rain during clear weather starts a standard 30-minute event with a short visual fade and returns to the same random clear-weather distribution after it, without a guaranteed dry cooldown. During existing rain it reports “Already raining” and does not stack duration, reset the reserve or consume a charge. Cross-district state is independent; the server validates requests. No arbitrary cooldown is needed for the non-consumable prototype because duplicate calls do nothing.
-- Rain benefits the whole district, across claim boundaries. No whitelist of farms and no rain ownership; future tower control sells a regional benefit. Rain alone cannot destroy blocks or discharge lightning. Later fuel charges apply only to a successfully started/sustained tower service, not to rejected requests.
-
-### Presentation, persistence and technical boundary
-
-- Wet soil visibly darkens. Hoe inspection reports river suitability, 50%/100% growth and approximate stored-water time; clicking the crop inspects its soil. No permanent HUD. The physical Survey Table can show the local weather district and current weather; no global map hotkey or mandatory exact forecast.
-- Reuse Minecraft precipitation, sounds and sky/cloud treatment but make their sampling regional. Rain particles and impacts query their own positions; camera sky/audio transition gently at district borders. Synchronize nearby district state, not every farmland block each tick. Verify that rain-dependent vanilla gameplay agrees with local rain rather than the obsolete global flag.
-- Photon is the primary shader target. Local particles, server wetness and weather effects must work; regional cloud/sky blending needs a focused compatibility spike before promising the final appearance. Other shaders are not assumed compatible.
-- Store only necessary district overrides/scheduling state and farmland/production state in chunk/world data, with lazy elapsed-time evaluation and no ticking block entity per soil block. No whole-world scans or forced chunk loads. Do not simulate atmospheric physics or create a second general geography engine.
-- Future sky integration supplies a target district and energy-backed rain request through this boundary. The single great sky machine still targets one receiving tower at a time. Sustained service, fuel rate, switching and tower ownership are later work; the prototype item does not settle those rules.
-
-## Unified coal and thermal production
-
-Use one coal item for ordinary crafting, industrial fuel and claim reserves. Remove vanilla coal/charcoal duplication, renewable coal drops and coal-block compression/decompression. Preserve finite ore/salvage supply and the separate dense coal deposits. Kilns own nonmetal firing, Foundries own metals/mineral ore processing, and Cooking Stoves own food heat. Retire vanilla furnaces, blast furnaces and smokers after their useful outputs move to these existing machines; controller construction must remain reachable without a vanilla furnace. Keep vanilla blocks that still have distinct utility. Implementation details and legacy-stock behavior live in [industry](civilization-mod/industry.md#thermal-processing-and-retired-vanilla-systems).
-
-## Bulk freight structures
-
-Boats are freeform connected vessels assembled around one two-block Helm. There is no prefab hull, width/length/height band or mandatory wheelhouse: players build the hull, deck, cabin and machinery to suit their route and taste. Launch requires a small connected hull with enough deep-water contact and applies a 4,096-block safety cap so terrain cannot be assembled accidentally. After launch, owners may extend the vessel from any attached face and remove anything except its identity-defining Helm.
-
-Every complete, enabled **Hot-Bulb Engine** aboard contributes another fixed unit of thrust. Sable's physical block mass slows acceleration, attainable speed and steering response, so larger vessels need more running engines. Each engine holds and consumes its own refined fuel and lubricating oil; the Helm has no hidden propulsion tank. This creates an open scale tradeoff without linkages, shaft networks or manual balance engineering. Current cargo contents are not yet added to physical mass.
-
-Develop two reusable storage/transfer multiblocks that work both on land and aboard boats: an open-top bulk resource bunker, initially coal only, whose visible pile rises with stored quantity; and a liquid cargo tank. Later bulk material support should extend the same bunker system. Preserve simple piloting and player customization. Wheelhouses and cabins remain entirely player-built.
-
-### Steel freight construction and Hot-Bulb Engine
-
-Freight hulls, bulk bunkers and cargo tanks use structural steel, with timber decks and player-built cabins/wheelhouses. Reuse the steel-based Industrial Casing and its cut forms rather than adding a duplicate casing. Their substantial cost comes from actual fabricated structures, without treating a hollow casing as nine ingots of solid metal. Engine castings use iron, working parts steel, and fittings copper/brass in appearance.
-
-Approved land-storage starting rules: both stores occupy 3×5×3 blocks. The Coal Bunker holds 8,192 Mineral Coal; the Cargo Tank holds 64,000 mB of one supported liquid (crude oil, refined fuel or lubricating oil). An incomplete or unloaded shell pauses access and transfer while retaining stock. A stocked controller cannot be mined normally; forced destruction loses its contents rather than scattering cargo. Empty controllers can be removed. Local hoppers and existing pipes are the first transfer adapters; powered docking and vessel integration remain later stages. [Implemented controls and recipes](civilization-mod/industry.md#bulk-freight-storage).
-
-The first generic drive is a **Hot-Bulb Engine**, with refined fuel and lubricating oil. Its grounded early oil-engine appearance bridges coal workshops and later extraordinary nuclear/sky machinery. Keep controls simple and preserve the refinery requirement. It now powers freeform boats directly and remains reusable by later land machinery. Exact recipes and operation live in [industry](civilization-mod/industry.md#oil-engine).
-
-## Gladiator pit
-
-The Gladiator Pit is a stationary multiblock for two consenting players to fight on flat ground. Its official 29×19 oval walls and two opposed 5×5 prep interiors occupy 41×19 overall; players custom-build seating outside the requirements. Use stone bricks, half-slab caps/roofs and six oak fence gates. The flush controller's horizontal center coincides exactly with the oval's geometric center on both axes. The required structure is only the controller, walls, room shells/roofs and gates. Players may place anything in the interiors and freely raise or dig the terrain; neither a solid floor nor clear interior air is required for formation. Centered rear prep-room openings are one block wide, separate from the unchanged three-wide gates. Match bounds follow the horizontal footprint at any elevation; Ready finds a safe standing spot below the prep roof or explains that none is available. The arena needs no operating fuel.
-
-The controller enrolls two fighters, escrows optional item stakes, requires both to accept the current terms, and moves each ready fighter into their prep room. Ready requires Survival, full health and no active potion effects. A five-second countdown locks betting and opens the gates together. Enter the oval within ten seconds; the fight lasts at most five minutes, with ten minutes allowed for enrollment/preparation. An opponent's would-be lethal hit becomes a knockout without death drops. Ordinary equipment wear/breakage, ammunition and consumables remain spent; entry health is restored and harmful effects/fire/fall state are cleared, without copying inventory.
-
-Fighters and spectators wager real item stacks, preserving their components. Fighter offers may differ and both fighters explicitly accept them. Spectators match opposing identical item/quantity offers: one wager per spectator per match, at most 64 offers, no house cut, pooled odds or currency. A knockout pays both stakes to the corresponding winner; unmatched bets refund when betting locks. Payouts/refunds persist for personal collection independently of the controller.
-
-Arena consent permits combat only between its enrolled opponents inside the live fighting volume, overriding ordinary server PvP/team restrictions for that pair alone. Prep rooms remain safe, outsiders cannot damage protected fighters, and ready fighters cannot harm spectators through the match damage path. Joining an unready lobby grants no world immunity. The placer retains host cancellation and must retain claim rights over the footprint; public controller participation grants no other claim access.
-
-Departure, disconnect, invalid/unloaded structure, lost structural authority, cancellation, expiry/draw or restart refunds unfinished deposits rather than imposing a forfeit. This conservative first pass permits deliberate aborts; competitive adjudication remains follow-up work. The result has a five-second reset/protection interval. [Gladiator Pit reference](civilization-mod/gladiator-pit.md) owns the recipe, material bill, controls, boundaries and persistence; [status](docs/status.md) owns verification limits.
-
-## Pickpocketing and wearable PvP flag — planned
-
-A designated wearable item opts its wearer into PvP: other flagged players can attack and kill them, and wearing it prevents pickpocketing. Players who do not wear it can be pickpocketed from behind. This is approved future work, not implemented behavior. Exact item, theft interaction and switching/protection boundaries remain [open](open_decisions.md#pickpocketing-and-wearable-pvp-flag).
-
-## Production coal demand
-
-Increase coal consumption for production to four times the original baseline, including cooking, kiln/fertilizer/foundry work, town workshops, oil pumping and refinery heating. Keep non-equipment processing speeds, output quantities and claim upkeep unchanged. Equipment forging scales duration by material: iron/chainmail 1×, gold 2×, diamond 4×, netherite 8×. Productive coal burn per second remains constant; total coal and waste heat therefore scale by the same single material multiplier. Assembly, netherite upgrades and repairs at the hand bench use no Coal or machine waste heat; their productive duration still scales with equipment material. Use a shared production energy value and explicit work costs. All coal machines require manual ignition through a paced, random-chance flint-and-steel controller button; each accepted strike has a modest calorie cost even if the spark fails, while rejected clicks cost nothing. Once lit they automatically feed coal continuously, with significantly lower idle consumption than productive consumption. Running out extinguishes the fire and requires manual relighting. [Current rates](civilization-mod/industry.md#production-coal-balance).
-
-## Emergent construction and increasing scale
-
-Future design direction: make architecture useful through shared physical relationships rather than assigned room types or proximity bonuses. Players design places; shelter, energy and physical access give their choices consequences. Detailed mechanics remain to be designed, not implemented or committed by these examples.
-
-- **Shelter and exposure:** explore roofs stopping rain, walls blocking wind, enclosures retaining warmth and windows admitting light. The same rules should be useful in homes, workshops and vessels.
-- **Heat and energy:** explore fuel-powered equipment warming surrounding spaces, insulation slowing losses and openings releasing heat. Recovered heat must originate from consumed energy and must not duplicate the energy available for useful work.
-- **Physical access:** develop meaningful loading openings, passages, equipment reach and moving-part clearance alongside freight and powered construction. Layout should affect what a building can do without requiring a named building category.
-- **Increasing scale:** progress from personal block work to powered movement, excavation and construction, then regional effects. Advancement should unlock larger quantities, distances and areas of influence, with real inputs and energy costs.
-
-Keep ordinary outdoor life viable. Prioritize useful spaces and new capabilities over constant temperature-meter maintenance. Exact room recipes, arbitrary population/proximity bonuses and an exhaustive simulation are not the organizing principle. Existing multiblocks remain until a specific replacement is designed. [Proposals and unresolved heat rules](open_decisions.md#emergent-architecture-and-heat).
-
-### Straight-line hand tool
-
-**Builder's Line** is a practical wooden mason's cord reel with restrained iron/brass fittings, worn wooden cheeks, exposed cord and an open hook. For building, hold the reel in the main hand and blocks in offhand; for mining, hold the reel in offhand and the mining tool in the main hand. Right-click marks the first endpoint; a second right-click immediately starts building or demolition according to the working item. Both endpoints are included, along one world axis (X, Y or Z), never diagonally. Preview the candidate line before the second click; no extra confirmation or held-button step. Crouch-right-click cancels.
-
-The first pass uses up to 16 ordinary full blocks, four placements per second and normal effective tool mining speed with ordinary post-break pacing. A bounded 16-block working reach and clear sight let the complete line operate after the player walks between endpoint marks; endpoint selection retains ordinary interaction reach. Real blocks, calories, tool wear and drops follow existing player action rules. Stop at the first obstruction, changed target, lost access or unsupported location and retain completed work. The reel consumes no separate fuel or durability; a modest coal-fired Smithy recipe supplies Survival acquisition. [Construction](civilization-mod/cutting.md#builders-line) owns the exact controls, recipe and exclusions; [follow-up choices](open_decisions.md#builders-line--follow-up-choices) own broader coverage/tuning.
-
-## Shared heat and thermal comfort
-
-Outdoor air temperature peaks in mid-afternoon and reaches its daily low near dawn. Retain warmth through late afternoon and evening, with smooth slower overnight cooling; do not tie the air-temperature maximum directly to solar noon. Preserve biome mean temperatures and daily ranges while changing the cycle timing.
-
-Present local temperature in a compact brass/glass thermometer between health and calories. Color and a subtle breathing highlight imply comfort and its benefits; an integrated brick accent indicates road speed. Keep exact bonus numbers in an inventory inspection tooltip, not a permanent status panel.
-
-
-Approved direction: one environmental temperature field connects buildings, machines and people. Solid blocks impede heat transfer without perfectly stopping it; glass and closed doors transfer more, open doors/air gaps more again. Thickness matters, and masonry has thermal mass. Nearby fuelled sources should support warm interiors and modest district warmth without a city/proximity bonus. Climate, altitude, weather and day/night establish ambient conditions; small biome-family profiles distinguish dry day/night swings, moderated coastal and humid weather, cold peaks and steady caves without a separate rule for every biome. Heat eventually escapes. A burning machine's core and upper shell/chimney hold real heat and warm adjacent materials through the shared field, while most exhaust still leaves above its highest surfaces and warms whatever is above them. Connected air mixes faster than solids conduct, wood insulates better than masonry, and masonry stores more heat. Heat-requiring multiblocks cannot ignite or process while rain directly reaches their work face; a roof over that face shelters them even when their exhaust extends outside. Lit fires already running pause at their ordinary idle burn until work can resume. Torches provide modest environmental heat, campfires more, and lava substantially more. Player comfort, cold cost and temperature visuals use a distinct felt temperature that follows the air block around the player's torso over several seconds; there is no separate proximity or line-of-sight warmth bonus. Working machines should noticeably warm nearby outdoor air while enclosure and insulation retain a meaningful advantage.
-
-Comfort boosts human work: lower calories per action/distance, faster manual work and a smaller movement benefit. Use a bell-shaped comfort curve peaking at 70°F; 48°F and severe heat grant almost no benefit. Common woodland, river and plains daylight should be mildly cool, so heated shelter improves ordinary life; dry and humid hot biomes supply the contrasting heat challenge. Cold adds a gradual, capped passive calorie cost so shelter and heat matter without direct temperature damage or calorie debt. Keep outdoor life viable. Distance-based accounting and the sprint/walk calorie ratio remain intact.
-
-The player's felt temperature also colors the finished view gently: cold trends blue, temperatures near 70°F have a warm tan cast, and uncomfortable heat shifts gradually toward red. The effect covers the world and HUD, including open screens, with smooth transitions and a local intensity/disable option. Keep text readable and the tint restrained; the visual cue does not change the physical temperature rules.
-
-Heat-dependent machines lose more energy in cold/exposed places; sheltered, warmed workshops improve efficiency. Waste-heat recovery derives from consumed fuel. Engines produce waste heat but do not automatically gain thermal-furnace efficiency, and cooling equipment may eventually benefit from cold. Architectural heat reuse comes before ducts. Clothing insulation, deliberate heat transfer, greenhouse effects and full internal operating-temperature models are later steps, not implicitly active rules. [Initial implementation and limits](civilization-mod/heat.md).
-
-
-Physical consistency takes priority over the old temperature tuning: passive exchange must conserve heat and cannot create a ceiling hotspot from uniform warm air; open doors and trapdoors permit airflow. Two joined slabs have the same thermal material and closed faces as their full block. Ordinary and soul fire contribute maintained heat while their vanilla flame blocks exist, alongside maintained torches/campfires. Lava is a maintained hot boundary with one bounded, bidirectional surface-exchange path. Industrial ventilation reduces heat without guaranteeing comfort. These game sources do not imply finite chemical fuel or oxygen simulation. [Measured rules and test laboratory](civilization-mod/heat.md#dedicated-thermal-laboratory).
-
-Environmental releases retain their loaded-time order while bounded thermal work is delayed. A stale field must report its actual simulation-time lag; publishing a new but still-behind snapshot must not make it appear current. Machine exhaust enters at the actual outlet and travels through adjacent cells, rather than being placed high into a shaft. Open-sky columns may carry rising warm air through a continuous exit; enclosed ceilings must not accumulate artificial heat. These rules do not promise historical world replay, zero lag under arbitrary load or calibrated SI temperatures. [Time, transport and migration](civilization-mod/heat.md#initial-thermal-field).
-
-Prefer low compute cost and readable thermal behavior over fine time resolution or precise temperature prediction. Batching, slower updates and bounded approximation are acceptable: warmth, insulation, ventilation and source-off cooling should remain understandable, while exact transient curves may change. Keep finite fuel accounting, stable passive transfer and explicit losses; numerical precision is not a reason to spend continuously on settled areas. Specific cadence, sleeping and approximation policies remain [implementation proposals](open_decisions.md#thermal-field-redesign--proposal-2026-09-27) until measured.
-
-## Shared physical foundation
-
-Use shared material and shape properties for physical mass, thermal capacity and heat exchange. Keep these separate from chemical fuel energy and machine work credit. Sable owns rigid-body motion/collisions; Civilization supplies narrow adapters, energy accounting and gameplay policies. World and vessel-local coordinates must be explicit. Preserve simple stable controls and avoid adding player engineering chores implicitly. Introduce the foundation before enabling cargo penalties or new machine-temperature rules. [Implemented boundary](civilization-mod/physics.md) and [remaining work](open_decisions.md#unified-physical-foundation--proposed-implementation-plan).
+| Rivers | Primary passenger and bulk-freight network; earliest and cheapest |
+| Trains | Later ground freight; always dearer than rivers |
+| Airships | Most expensive, fastest, greatest capacity |
+
+Sable is the vehicle physics backend. Controls stay simple and stable, without linkages or balance engineering.
+
+- **Rivers** connect farms, mines, workshops and towns to each other and the sea. Mouths, confluences and landings create ports and markets through real deliveries, not assigned bonuses. Terrain must offer connected sea-to-inland routes judged by loaded journeys both ways; not every tributary must be navigable. There is no hydrology simulation.
+- **Offshore oil** is the first ocean resource: finite reserves, physical crude delivered inland by river. It never replaces onshore oil as the first route to refined fuel.
+- **Boats** are freeform vessels built around one Helm, with no prefab hull or size band and a 4,096-block safety cap. Owners extend them freely; only the Helm is fixed.
+- Every running **Hot-Bulb Engine** aboard adds fixed thrust, and block mass slows the ship, so larger vessels need more engines. Each engine burns its own refined fuel and oil; the Helm never burns cargo. The engine is an 1890s early oil engine, not steam or diesel, and runs on refined fuel by design to keep refining in demand.
+- Freight hulls, bunkers and tanks use structural steel with timber decks and player-built cabins.
+- The **Coal Bunker** and **Cargo Tank** are reusable 3×5×3 stores that work on land and aboard; later bulk materials extend the same bunker. Incomplete shells keep stock; stocked controllers resist mining, and forced destruction loses contents.
+- **Airships** are player-built around a controller — no prefab hulls. The endgame is nuclear-powered antigravity with realistic Sable motion: mass, aerodynamics and wind matter. Antigravity keeps inertia; powered hover holds position against wind; acceleration, braking and reversing build gradually.
+- **There is no airship speed ceiling**: power and drag set speed. Terrain preparation follows the predicted path and braking keeps the ship inside ready terrain, with collision protection at any speed. Pilots stay attached until they leave the controls. Stopped ships disassemble back into world blocks without overwriting terrain or losing cargo.
+- Fast flight lowers distant-terrain detail through Distant Horizons (one warp threshold at 80 blocks/s, two coarse LOD bands) and loads chunks along the flight path first. Rendering changes, speed and world data do not.
+- Airships express the most refined layer: precise metalwork, ivory enamel, restrained turquoise, porcelain and glass. Speed and capacity are tradeoffs.
+
+**Open**
+- Portals, mounts, elytra and teleport commands, before final distances.
+- A real ocean → river → inland route on the server terrain; offshore reserves and extraction; one vessel or transfers at the coast; useful return cargo.
+- Docking (proposal): a short port-to-port connection with Load/Unload and visible progress while moored, around 128 coal/s or 1,000 mB/s.
+- Cargo mass and draft, dismantling, damage, crew custody and vessel access.
+- Airship controls, hover assistance, live editing and disconnects; lift capacity and cargo mass; emergency reserve, damage and recovery; vessel size and count budgets; nuclear fuel processing and packaging; how extreme speed costs energy.
+- Proposed flight model: finite antigravity lift, mass with centre and inertia, propulsion with force and power limits, quadratic drag against wind-relative airspeed, smooth regional wind. A fixed thrust ceiling may not act as a hidden speed cap.
+- Sable's PolyForm Shield license question is deferred by the owner.
+
+## Currency and trade
+
+- Coal is ordinary currency; oil and uranium are denser currencies. Payment is physical fuel, later burned.
+- A **trade counter** presents one exchange: receive this item and quantity, pay that item and quantity. Any item can be payment; Coal is the default. Typed quantities can span several stacks; one click trades one batch. One chest holds stock and takings.
+- No buy/sell modes or conversions: reversing the pair reverses the trade. Customers cannot touch the owner's stock; both sides must have the goods and the space, and the trade completes together. Shops run while their owners are offline.
+- Offers appear on the map beyond explored terrain. Information is remote; goods move physically. Visible stock is not a reservation.
+
+**Open**
+- Oil and uranium payment forms; external counter storage.
+
+## Ownership and access
+
+- Unclaimed land allows gathering, building and use without protection; a claim secures a place rather than unlocking gameplay.
+- No formal groups. Each claim has one owner and an owner-managed username whitelist with full access.
+- The **land controller**, crafted from coal and other resources, holds real coal like a chest. Tiers of 64×64, 128×128 and 256×256 blocks (64 tall) cost 1, 4 and 16 coal per real hour. Changing tier costs 24 hours of the new upkeep and starts a 24-hour cooldown, and is refused if it would empty the reserve.
+- **At zero energy a claim instantly becomes unclaimed.** Structures and goods remain.
+- **Takeover.** Once a month a buyer can pay the owner a significant premium over the claim's stored energy. The full payment is deposited and the price fixed; the owner then has **one week** to move, with withdrawals and resizing locked and upkeep continuing. At the deadline ownership and payment transfer together, and the buyer receives the remaining energy. The seller may remove buildings, machines and goods — land is bought, not structures — but controller energy stays locked. If power runs out mid-takeover, protection ends, the takeover is cancelled and the buyer is fully refunded; the seller gets nothing.
+
+**Open**
+- The takeover calendar and premium; claim costs and capacity.
+- A small protection boundary for assets outside claims, keeping death containers recoverable.
+- Vehicle access; the automation and protection audit; public-server abuse policy.
+
+## Information and interface
+
+- Terrain gives the main clues. Inspection explains crop suitability and failed planting; prospecting finds buried deposits.
+- **Map.** The map lives on a physical 2×2 Survey Table — no handheld map, map key or minimap. Nearby terrain is revealed automatically and shared at the table. It shows public shops and property; deposit finds stay private unless shared; nobody is tracked live. The loop is **search goods → inspect offer → mark destination → travel**, without a mandatory dashboard.
+- **Cabinet interface.** Machines and civic controllers share one warm tan cabinet with brass and dark metal, native slots, a clear input-to-output flow and an optional recipe drawer. Coal machines show an animated fire; liquid machines show sight glasses.
+- Choosing a recipe shows ghost requirements, never real stock; inserting materials directly works too. Workshops run only an unambiguous recipe and never burn fuel waiting. Extra slots never multiply speed.
+- The Tab list shows each player's ping, averaged over five seconds, with waiting and overdue states rather than zero.
+
+**Open**
+- Item search, destination pins and sharing; recipe-drawer discoverability.
+
+## Conflict
+
+- **Sieges.** Large resource installations are the objectives of organised sieges, with player-built defences and a decisive encounter at the site's control point — never raids on ordinary claims. The Oil Derrick is the oil control point; it is built section by section from fed materials, and damage removes only the hit section. The coal site's control point must be redesigned now that the drill is retiring.
+- **Gladiator Pit.** A stone-brick oval arena with two opposed prep rooms where two consenting players fight. Fighters escrow optional item stakes and must both accept the terms; spectators match opposing identical item wagers, with no house cut, odds or currency. A would-be lethal hit is a knockout without death drops, and the winner takes both stakes. Combat is allowed only between the two fighters inside the arena. Unfinished matches refund rather than forfeit.
+- **Pickpocketing and the PvP flag** (approved, not built): wearing a designated item opts into PvP with other flagged players and prevents pickpocketing; unflagged players can be pickpocketed from behind.
+- **Firearms.** The Colt Paterson prototype: left-click fires; tap R cocks or reloads when empty, hold R partly reloads; five chambers, slight recoil, server-side projectiles under existing claim and damage rules. Each chamber takes one complete .36 ammunition item.
+
+**Open**
+- Sieges: who may start one, defence, notice, unpowered sites, what success transfers, relation to claims and mining. Proposed: reaching the control point ends the encounter.
+- Arena forfeits, rankings, loadouts and wider betting.
+- Pickpocketing item, range, eligible items, cooldown, flag switching and interaction with claims and death.
+- Firearm crafting, balance and penetration.
+
+## Creatures
+
+The first custom mob is the **Lacertan**. Its appearance is approved; its gameplay is not.
+
+- A robust, upright, tailless reptilian humanoid about 2.1 blocks tall: broad but not clunky, strong forearms, five useful fingers, olive skin with brown mottling, ochre ventral scales and loose charcoal hip cloth.
+- A clearly reptilian head: heavy scaled brow, short wedge muzzle, cheek scutes, central facial plates, a wide low mouth and no human features. Green slit eyes look alert; the resting expression is neutral.
+- Uncovered dorsal thermal plates run down its back. It basks with a relaxed forward lean.
+- It is fiction built in Minecraft's angular cuboid style with substantial detail.
+
+**Open** (proposals)
+- Name and role: "the Deep Listener", an observer from an older civilization below.
+- Encounters: initially neutral and rare near warm cave mouths; observe, warn, then strike or retreat; basking at rest. Health, damage and spawning unset.
+- Warmth benefits, drops and progression role.
+
+## Sky civilization
+
+- The scale runs **hand tools → machines → facilities → networks → regional instruments**. Monumental works, regional weather control, sky freight and elite institutions consume supplied energy and depend on the ground economy. No falling cities or weather weapons.
+- **Extremely fast airships are a core sky status symbol and energy sink.** Named ships, silhouettes and engine sounds express reputation.
+- Every layer has its own prosperity: river homes, forest halls, mining settlements, industrial cities and sky gardens, each with a visible working side.
+- **Wireless power.** One great sky machine sends energy to **one regional tower at a time**. The receiving observatories are enormous towers that bring rain and perhaps other services. Transmission loses energy and creates no fuel, items or jurisdiction.
+- **Ground access.** Players climb a public monument and take an energy-intensive beam for the final ascent — never a menu or teleport. Its approved exterior is the **Apogee Pyramid**: a 31×31×31 stepped masonry pyramid with copper spines on every face and an open 7×7 crown on diagonal supports (`tools/schematics/generate_apogee_pyramid.py`).
+
+**Open**
+- Sky power: range, switching, storage, whether charged towers keep working, ownership, payment and outages; other services such as fog clearing.
+- The pyramid's interior ascent, construction, costs and access rights.
+- Formal airship races.

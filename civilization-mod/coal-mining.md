@@ -1,54 +1,50 @@
-# Manual coal mining prototype
+# Coal mining
 
-The playable manual loop implements pick → loose coal → shovel → rail cart → hand preparation → existing usable Coal. Ordinary coal ore still uses normal mining and yields usable Coal directly. Huge-vein work is richer: a complete prototype vein block prepares into **16 Coal**. These are trial values, not final Survival balance. Survival acquisition is available for playtesting; the Coal Drill remains during broader balance, custody and migration review.
+Huge coal veins are worked by hand: pick → loose coal → shovel → rail cart → hand preparation → Coal. A complete vein block prepares into **16 Coal**. Ordinary coal ore still mines normally and drops Coal directly, and the [Coal Drill](industry.md#refinery) still extracts dense seams with refined fuel. The quantities below are prototype tuning.
 
-## Try it
+## Equipment
 
-Start with ordinary hand-mined Coal, build the Kiln/Foundry/Smithy, then obtain the manual kit through Survival production:
+Start with hand-mined Coal and the Kiln, Foundry and Smithy, then make the kit:
 
 | Item | Route | Materials |
 | --- | --- | --- |
-| Coal Mining Pick | Forge + Assembly Bench | Iron Pickaxe Head + complete Tool Handle |
-| Coal Loading Shovel | Forge + Assembly Bench | Iron Shovel Head + complete Tool Handle |
-| Coal Minecart | Assembly Bench, 10 seconds | 4 Planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners |
-| Coal Preparation Screen | Assembly Bench, 10 seconds | 4 Planks + 2 Iron Plates + 2 Sticks |
+| Coal Mining Pick | Smithy + Assembly Bench | Iron Pickaxe Head + Tool Handle |
+| Coal Loading Shovel | Smithy + Assembly Bench | Iron Shovel Head + Tool Handle |
+| Coal Minecart | Assembly Bench, 10 seconds | 4 planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners |
+| Coal Preparation Screen | Assembly Bench, 10 seconds | 4 planks + 2 Iron Plates + 2 Sticks |
 
-An iron head takes 25 seconds and 1.25 Coal at base efficiency (3 ingots for the pick, 1 for the shovel); final assembly takes five seconds by hand without Coal. A plank plus Leather makes four complete handles, so there is no separate grip charge per tool. Tools receive grade on completion and use Assembly Bench repairs. Mixed planks work for the handling infrastructure. Machine Parts require coal-era steel/copper preparation; oil is unnecessary. [Manufacturing](manufacturing.md) owns exact parts/batch costs and rails. The preparation screen's actual mining work/calorie costs remain unchanged.
+An iron head takes 25 seconds and 1.25 Coal at base efficiency (3 ingots for the pick, 1 for the shovel); final assembly is five seconds of hand work. Tools receive a grade and use Assembly Bench repairs ([manufacturing](manufacturing.md#repairs)). Mixed planks work for the cart and screen. Nothing here needs oil.
 
-The pick starts manual excavation of naturally generated dense geological coal-seam blocks. Place ordinary rails and a screen beside the worksite, expose a seam, and follow the loop below. The Creative tab still supplies a **Huge Coal Vein** workface for demonstrations; the resource block itself has no Survival crafting recipe.
+## Working a vein
 
-1. Hold the pick and click the exposed coal. A click commits one swing; hold left-click to repeat after each full recovery. Releasing stops the next swing, while the committed stroke finishes. Menus and pause prevent new swings; camera movement alone never strikes. Turn your view to pull the pick around: the head follows camera yaw/pitch with bounded weighted carry, then settles back into alignment when you stop. It follows the turn rather than hanging behind the view. The grip stays close through both windup and contact; the close ready pose raises it beside the shoulder and draws the head back over the player, then brings the working point forward/down toward the aimed coal. The strike and downward follow-through stay in one plane; only camera movement changes the plane. The tool recovers into a forward-ready pose. The camera remains freely responsive; there is no forced shake or extra stock from faster turns. The inertial first-person pose also responds between strikes; looking alone never mines. The server resolves the actual current aim at contact, within normal reach capped at 4.5 blocks.
-2. Each successful contact removes an exposed 2×2 patch one quarter-cell deep in a 4×4×4 block grid. Collision, outline and chunk mesh follow the saved remaining material. Work through the notch to reach deeper layers. The final portion clears the block.
-3. A successful strike releases its stock as one persistent chunk at the actual contact, with a small outward impulse, rather than moving it outside the entire worked block. Chunks fall under gravity, roll off small ledges when they cannot settle, and become piles on supported, empty floor cells. Walking over them gives no items. Right-click a pile with the shovel to scoop up to 16 raw units, visibly carried on that actual shovel.
-4. Place the Coal Minecart on rails; right-click it with the loaded shovel. Only available space transfers. Empty-hand right-click pushes the cart in your viewing direction using native rail movement.
-5. Park within 2.5 blocks of the screen. With an empty hand, right-click the screen to receive cart stock and prepare one batch; repeat after its short work interval. Crouch-right-click collects ready Coal into available inventory space. It is the existing fuel used by machines and claims.
+The pick works naturally generated dense coal-seam blocks. The Creative tab also supplies a **Huge Coal Vein** workface for demonstrations; it has no Survival recipe. Lay ordinary rails and place a screen near the worksite, expose the seam and:
 
-## Trial quantities and work
+1. **Mine.** Hold the pick and click exposed coal. Each click commits one swing; holding left-click repeats after each full recovery, and releasing stops the next swing while the committed stroke finishes. Menus and pause prevent new swings, and looking around never strikes. The pick head follows camera yaw and pitch with bounded weighted carry, then settles back; the swing winds up beside the shoulder, strikes forward and down toward the aimed coal in one plane, and recovers to a ready pose. There is no forced camera shake or extra stock from faster turns. The server resolves your current aim at contact, within normal reach capped at 4.5 blocks.
+2. **Notch.** Each contact removes an exposed 2×2 patch one quarter-cell deep on the block's 4×4×4 grid. Collision, outline and mesh follow the remaining material; work through the notch to go deeper, and the last portion clears the block.
+3. **Collect.** Each strike drops its stock as one persistent chunk at the contact point with a small outward push. Chunks fall, roll off small ledges and settle into piles on supported empty floor cells. Walking over piles gives nothing; right-click a pile with the shovel to scoop up to 16 raw units, carried visibly on the shovel.
+4. **Haul.** Place the Coal Minecart on rails and right-click it with the loaded shovel; only available space transfers. Empty-hand right-click pushes the cart along the rails in your viewing direction.
+5. **Prepare.** Park the cart within 2.5 blocks of the screen. Empty-hand right-click the screen to take cart stock and prepare one batch; repeat after its short work interval. Crouch-right-click collects ready Coal into inventory.
 
-| Stock or action | Prototype value |
+| Stock or action | Value |
 | --- | --- |
-| Raw units | Each removed quarter-cell owns 1; 4 prepare into 1 Coal |
+| Raw units | Each removed quarter-cell holds 1; 4 prepare into 1 Coal |
 | Full vein block | 64 raw units, 16 Coal, normally 16 successful contacts |
 | Ground pile | 64 raw units maximum; four visible height stages |
-| Shovel | 16 raw units, equivalent to 4 Coal |
-| Cart | 4,096 raw units, equivalent to 1,024 Coal |
+| Shovel | 16 raw units (4 Coal) |
+| Cart | 4,096 raw units (1,024 Coal) |
 | Screen | 256 raw input units and 64 ready Coal; no idle production |
-| Pick | Contact at tick 12, recovery through tick 32; depleted players take twice as long |
-| Successful pick contact | 1 durability and 2 base kcal; misses/rejected contacts are free |
-| Scoop, accepted push, preparation batch | 1 base kcal each; normal comfort/meal adjustments apply |
-| Preparation | 4 raw units per Coal; at least 10 ticks between accepted batches; blocked when depleted |
-| Coal collection | Up to 32 per crouch-click, stopping at inventory capacity |
+| Pick | Contact at tick 12, recovery through tick 32; twice as slow when depleted |
+| Successful pick contact | 1 durability and 2 base kcal; misses and rejected contacts are free |
+| Scoop, accepted push, preparation batch | 1 base kcal each, with comfort and meal adjustments |
+| Preparation | 4 raw units per Coal; at least 10 ticks between batches; blocked when depleted |
+| Coal collection | Up to 32 per crouch-click, limited by inventory space |
 
-The pick has 768 base durability; shovel durability/repair tuning is unfinished and scooping currently adds no wear. The screen is manually worked for this prototype. Its final power, acquisition and throughput remain [open decisions](../open_decisions.md#manual-coal-mining--proposed-implementation-plan).
+The pick has 768 base durability; scooping adds no shovel wear.
 
-## Persistence, protection and limits
+## Persistence and protection
 
-Remaining vein masks, falling batches, piles, shovel components, cart cargo and screen input/output are saved. Shovel loads follow the item through switching, dropping and ordinary inventory persistence. Native cart destruction spills raw cargo, including Creative destruction; breaking a screen spills stock and drops its controller. Pile support follows the actual remaining coal collision surface: a small remnant cannot hold a full-cell pile. Changing a workface mask notifies neighboring piles, and loading a saved worked face rechecks a pile above it. Unsupported piles become falling batches. Gravity rechecks support even after a chunk has landed. If settlement fails, a chunk checks eight nearby downhill exits every ten ticks and rolls toward open space; walls still block it. Falling stock does not despawn or become an ordinary pickup, and a fully blocked landing retains its saved quantity. It pauses at unloaded chunk boundaries without forcing terrain.
+Remaining vein masks, falling batches, piles, shovel loads, cart cargo and screen stock are saved; shovel loads follow the item through switching, dropping and storage. Destroying a cart spills its raw cargo (Creative included); breaking a screen spills its stock and drops the screen. A pile's support follows the actual remaining coal surface, so a small remnant cannot hold a full pile; changing a workface notifies piles above it, and unsupported piles fall again. A chunk that cannot settle checks eight nearby downhill exits every ten ticks and rolls toward open space; walls still block it. Falling stock never despawns or becomes an item, keeps its quantity when fully blocked, and waits at unloaded chunk borders without loading terrain.
 
-Mining rechecks held-tool identity, slot, world, reach, loaded terrain and current claim access at contact. Canceled break hooks, changed targets and failed carrier creation cannot grant stock or charge wear. Scooping, cart placement/loading/pushing and screen operation respect current claims. Work on assembled boats/airships is rejected. Raw piles/carts/screens expose no hopper inventory or general cargo adapter.
+Mining rechecks the held tool, slot, world, reach, loaded terrain and claim access at contact; canceled breaks, changed targets and failed drops grant nothing and cost no wear. Scooping, cart placement, loading and pushing and screen use respect claims. Work on boats and airships is refused. Piles, carts and screens expose no hopper or cargo adapter.
 
-This is a placed-face and short flat-route prototype. Regional vein shapes, irregular fractures, uphill haulage, moving screen/cargo art, multiplayer contention, separate-process restart/death recovery, vessel use, comprehensive external-hook cancellation and a busy-face performance sample remain later work. Administrative deletion can still destroy stock; no crash-transaction guarantee is claimed. Ordinary mining, legacy seam/drill drops and the drill recipe are retained during this transition. Do not treat those legacy paths as proof of the final huge-vein extraction boundary.
-
-Untouched geological seams keep their ordinary block model. Only worked faces gain an unticked block entity. Worked blocks disable Minecraft's static blockstate-shape cache so collision, suffocation/push-out and pile support follow each saved mask. Mask collision and chunk mesh geometry use bounded 512-entry caches; settled piles and screens have no continuous ticker. A falling batch aggregates a strike's material rather than creating an entity for every quarter-cell. These bounds do not establish multiplayer capacity.
-
-The original 64px timber/steel tools and timber/iron screen use the [local coal asset](../art/assets/coal_mining/asset.json). Coal inherits the active resource pack; the cart retains its native body and icon. Native model views and the hidden Photon/Faithful `coal-mining` scene cover held/inventory views, camera-shaped swings, notches with shaders disabled, loading, rail travel, preparation and consumption in an existing cooking station. [Testing](testing.md) owns the checks; [status](../docs/status.md) owns current results and publication limits.
+Untouched seams keep their ordinary block model; only worked faces gain an unticked block entity and opt out of Minecraft's static shape cache, so collision, suffocation and pile support follow the saved mask. Mask collision and mesh geometry use bounded 512-entry caches; settled piles and screens do not tick, and a falling batch is one entity per strike. Coal textures follow the active resource pack and the cart keeps its native body.

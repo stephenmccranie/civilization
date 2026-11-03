@@ -1,64 +1,90 @@
-# Geography
+# Geography and weather
 
-The first regional system gives farming and forestry a shared, server-owned location query. It uses existing natural biome geography; it does not replace terrain generation.
+Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Deposits of coal and oil are in [industry](industry.md#deposits).
 
-## In play
+## Farmland and woodland
 
-Inspection uses short, direct wording: **Can farm here | Trees grow fast**. Unsuitable sites say **Can't farm here**, with the river or height requirement where relevant; non-woodland sites say **Trees grow slowly**.
+**Crouch-right-click with any hoe** to inspect ground without tilling it, spending calories or wearing the tool (clicking a crop inspects the soil beneath). Inspection reads **Can farm here | Trees grow fast**, or **Can't farm here** with the river or height requirement, or **Trees grow slowly**; on farmland it also shows **River-fed: 50% growth** or **Rain-soaked: 100% growth**, stored-water minutes and fertilizer status. `/civilization geography` reports the ground under your feet without operator permission.
 
-**Crouch-right-click with any hoe** to inspect the selected ground without tilling it, spending calories or wearing the tool. Clicking a crop inspects the block underneath it. `/civilization geography` reports the ground under your feet without operator permission.
-
-| Property | Starting behavior |
+| Property | Rule |
 | --- | --- |
 | River farmland | Within 48 blocks of a river or frozen-river biome, measured on the four-block biome grid |
-| Height | Four blocks below to eight above the nearest natural river's top water block. Supported Terrain Diffusion rivers use their local elevation, including high valleys; other generators retain the configured Y62 reference (Y58–70 soil) |
-| Eligible crops | Wheat, fertilized wheat, carrots, potatoes, beetroot, melon/pumpkin stems, torchflower/pitcher crops, sweet berries, sugar cane and cocoa |
-| Woodland | Forest, taiga and jungle biome families, cherry groves and mangrove swamps |
-| Trees | Saplings retain vanilla random-tick speed in woodland; outside woodland they receive one quarter as many attempts |
+| Height | Four blocks below to eight above the nearest natural river's top water block. Supported Terrain Diffusion rivers use their local elevation, including high valleys; other generators use the configured Y62 reference (Y58–70 soil) |
+| Eligible crops | Wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflower and pitcher crops, sweet berries, sugar cane and cocoa |
+| Woodland | Forest, taiga and jungle families, cherry groves and mangrove swamps |
+| Trees | Saplings keep vanilla random-tick speed in woodland and get one quarter as many attempts elsewhere |
 
-Vanilla light, plant support, space and species requirements still apply. Eligible farmland now supplies the 50% river baseline automatically; regional rain fills its water reserve for 100% growth. See [weather and farming](weather.md) for covered crops, timing, fertilizer and explicit exceptions. Eligibility does not guarantee that a tree fits. Woodland and river farmland can overlap. Removing trees does not erase woodland suitability; planting a plantation does not create it.
+Vanilla light, support, space and species requirements still apply. River farmland and woodland can overlap; felling trees does not remove woodland and planting does not create it. Crops planted outside the band show a warning and do not grow; existing crops are never destroyed, so mature ones can be harvested and immature ones stay dormant. Placed water creates no eligibility. The Nether and End cannot grow these crops.
 
-Players can plant outside the river band for decoration, but receive a warning and crops do not advance through natural random ticks. Existing crops are not destroyed: mature crops can be harvested, immature crops remain dormant. Fertilizer refuses unsuitable ground without consuming an item or charging calories. Already-fertilized crops retain their dose and report that they are already fertilized.
+## Weather
 
-Placed water cannot create eligibility or give farmland the rain bonus. Non-farmland species retain their native water/support requirements. Building high above a river or deep beneath it does not qualify. The Nether and End cannot grow these crops. Emergency hand-foraging is unchanged. Other renewable plants—such as bamboo, cactus, kelp, mushrooms and Nether wart—retain their existing rules pending the broader resource audit. Bone meal remains globally disabled.
+Weather is local to fixed **512×512-block Overworld districts** and never changes river eligibility or claims.
 
-## Representation and limits
+- Natural storms last 25–35 minutes. Each following clear interval is drawn from an exponential distribution with a 12-hour mean: no dry cooldown, maximum drought or guaranteed rain (about 13.5% of intervals exceed 24 hours and 1.8% exceed 48).
+- A **Rain Caller** (Civilization creative tab; no Survival recipe or cost) starts 30 minutes of rain in your district; calling during rain does nothing.
+- Weather time runs at 20 ticks per second while the server runs, independently of the day; sleeping does not clear storms, shutdown pauses it and lag slows it. Unvisited districts start their schedule when first queried and catch up lazily without loading terrain.
+- Natural destructive thunder is disabled. The server checks local precipitation for exposed wetness, fire and precipitation ticks, including snow and cauldron filling. Other mods that read the global weather flag are not regionalized.
 
-`Geography.inspect(level, soilPos)` returns overlapping river-band, height and woodland properties plus a readable failure reason. `canFarm` accepts the **ground** position; growth checks use the block immediately below the ticking crop. For multi-block sugar cane, each ticking segment must remain within the height band. `woodland` is a cheap independent query for tree growth.
+Clients receive the nine nearby districts once per second. Rain and snow particles follow their positions, and sky strength fades over two seconds and blends near the viewer's district boundary. Clouds, fog and shader wetness use viewer-centered shader uniforms tuned for Photon; there is no simulated moving storm front. The [Survey Table](ownership-trade.md#survey-table) inspection view shows district lines and the viewer's district weather; there is no weather HUD. Rain also cools the air ([heat](heat.md#climate)).
 
-The generator's biome source is sampled on four-block cells. Distance is circular between cell centers, so boundaries have four-block steps rather than exact block-level distance from a shoreline. The geographic query uses no placed-block scans, Minecraft chunk tickets or background simulation. The separate weather/farming layer persists sparse soil and crop-production state in active farm chunks. Edits to water, trees or `/fillbiome` do not change the generator's geographic properties.
+## Crops and harvests
 
-For Alesrr Terrain Diffusion's surface-water API (integration targets 1.4.1), river-tagged cells also require a generated surface-water column. The API supplies the nearest cell's local water elevation; underground reaches and dry corridors do not qualify. Biomes are sampled above the terrain to avoid treating a high river or forest as its underlying cave biome. Existing bounded caches retain each sampled water height, so neighboring farms reuse it. The query can populate the generator's terrain-model cache, as its biome lookup already does; it never generates Minecraft chunks or scans player-placed water. No hard altitude ceiling or new temperature gate is added: ordinary crop support/light and existing weather rules remain in effect.
+Eligible farmland stays farmland without water trenches and grows at **50%** from the river alone. Exposed rain grows crops at **100%** and stores four seconds of water per second, up to 120 minutes (an empty field fills in 30 minutes); stored water then drains one second per second, even when the field is empty or mature. Roofs block recharge; harvesting and replanting keep the reserve, breaking the soil discards it. Snow does not recharge soil. Wet soil uses the resource pack's dark farmland texture.
 
-Other generators, or a Terrain Diffusion version without that API, retain the configured **river-biome corridor** and water elevation. Dry stretches in those river biomes can qualify. Oceans, lakes outside river tags and player canals do not create bands. Natural, ceiling-free custom dimensions use the same configuration. Local river elevations on other generators and navigable channel geometry remain separate integration work.
+Each covered crop cycle averages **two hours at full water or four at the river baseline**, ±10%; row layouts and vanilla growth multipliers do not change it. Melon and pumpkin stems need a full interval for each fruit and pause while a fruit is attached or no space is free. **Soil and crops advance only in actively simulated chunks**: unloaded soil freezes, keeps its reserve and misses rain, with no catch-up or forced loading. `randomTickSpeed=0` pauses farming; higher values do not speed it. Keep crops lit for night growth.
 
-Each active level has bounded access-ordered caches: up to 32,768 sampled biome cells and 8,192 derived columns. A cold 48-block query considers at most 625 candidate cells; neighboring fields reuse samples and repeated cells reuse the result. Tree checks sample only their own cell. Height-ineligible growth exits before the river scan. Cache entries are disposable and regenerated deterministically. Level unload/server stop clears them; server tag reloads and radius/water-height changes invalidate them. This is bounded implementation work, not a 200-player performance certification.
+| Mature harvest | Ordinary | Fertilized |
+| --- | --- | --- |
+| Wheat | 1 wheat + 2 seeds | 3 wheat + 2 seeds |
+| Carrots | 4 carrots | 10 carrots |
+| Potatoes | 4 potatoes | 10 potatoes |
+| Beetroot | 1 beetroot + 2 seeds | 3 beetroot + 2 seeds |
+| Torchflower | 1 flower | 3 flowers |
+| Pitcher crop | 1 plant | 3 plants |
+| Melon fruit | 3 slices | 9 slices |
+| Pumpkin fruit | 1 pumpkin | 3 pumpkins |
 
-## Configuration and data
+Carrots and potatoes reserve one planting item before tripling the rest. **Mineral Fertilizer** ([made in the Fertilizer Furnace](machines.md#fertilizer-furnace)) gives one dose to an immature crop or detached fruit stem on eligible ground; it changes yield only, never growth speed or moisture, and cannot stack. Fruit consumes the stem's dose and records the fruit's yield until harvest. Replanting loses the dose but keeps water. Unsuitable ground refuses fertilizer without consuming it or charging calories, and already-fertilized crops say so. Either half of a mature pitcher crop gives one harvest. Fortune and Silk Touch do not change governed mature yields; immature drops keep their normal rules.
 
-World configuration: `serverconfig/civilization-geography.toml`. Stop the world before editing. Radius, fallback water elevation, vertical allowance and outside-woodland divisor are tunable. Supported Terrain Diffusion rivers override the fallback with their local water surface; the same above/below allowance applies. Radius is capped at 64 blocks to bound query work. Configuration affects existing fields immediately on the next world load; it does not move crops or rewrite chunks.
+### Other plants
 
-Data-pack tags in the `civilization` namespace:
+| Source | Treatment |
+| --- | --- |
+| The eight farmland crops above | Shared soil, timing and fertilizer rules |
+| Sugar cane, cocoa, sweet berries | River and height eligibility plus native requirements, timing and yields; no water reserve or fertilizer. Each sugar-cane segment must be inside the height band |
+| Saplings | Woodland speed rule; no water reserve |
+| Bamboo, cactus, kelp, mushrooms, vines and Nether wart | Native growth |
+| Grass, flowers, moss and other spread | Native behavior |
+| Animal food, fishing and emergency foraging | Separate systems |
 
-- Biomes: `river_regions`, `woodland_regions`; frontier ore uses `uranium_regions`, which includes `#minecraft:is_overworld`. Coal/oil use the shared permanent [climate rule](industry.md#find-a-site), not named-biome allowlists.
-- Blocks: `river_crops`, `woodland_saplings` (the latter includes vanilla's saplings tag).
+**Bone meal cannot grow** crops, trees, land or underwater vegetation; manual use explains why, and dispensers and villagers cannot apply it. It still works as a crafting ingredient.
 
-Use tag replacement deliberately when changing coverage. Tags control the existing eligibility gate; the explicitly enumerated farmland crops additionally use the soil clock instead of native random growth. Adding another block to the tag does not automatically adapt its growth stages or harvests. Scripted growth, commands and other mods directly changing block states are not universally intercepted.
+## Commands and configuration
 
-Existing worlds need no chunk regeneration. Geography is derived rather than saved separately: changing the generator, biome tags or these settings may change suitability. Public-world migrations must preserve or explicitly migrate those inputs. The separate [deposit and industry layer](industry.md) now adds biome-tagged coal/oil placement, prospecting and finite extraction; that phase targets fresh worlds. Navigable river generation, broader habitat/spawn rules and monumental rain towers remain future work; regional weather and the prototype Rain Caller are described separately.
+- `/civilization weather` inspects your district without permission; `/civilization weather rain` or `clear` (operator level 2) targets the command position. In the Overworld `/weather rain` and `/weather clear` use the regional control (rain is always 30 minutes; a duration argument is ignored with a note) and `/weather thunder` is rejected; other dimensions keep vanilla commands. `doWeatherCycle=false` freezes the schedule; existing rain still wets active fields.
+- `serverconfig/civilization-geography.toml`: `riverRadius` (48, capped at 64), `riverWaterY` (62), `farmlandBelowWater` (4), `farmlandAboveWater` (8) and `outsideWoodlandDivisor` (4). Supported Terrain Diffusion rivers replace `riverWaterY` with their local surface.
+- `serverconfig/civilization-weather.toml`: `meanClearHours` (12) and `cropSeconds` (7200; applies to newly started cycles). The soil water cap stays 120 minutes.
+- Stop the world before editing either file; changes apply on the next load without moving crops or rewriting chunks.
+- Datapack tags in the `civilization` namespace: biomes `river_regions`, `woodland_regions` and `uranium_regions` (which includes `#minecraft:is_overworld`); blocks `river_crops` and `woodland_saplings` (which includes vanilla's saplings tag). Tags control eligibility; only the enumerated farmland crops use the soil clock, so tagging another block does not adapt its growth stages or harvests. Scripted growth, commands and other mods setting block states directly are not intercepted.
 
-## Frontier uranium and accessories
+## Generator integration
 
-The first Tier 3 frontier resource is physical Uranium Ore as rare, tiny finds throughout all three climates. The `civilization:uranium_regions` tag includes all Overworld biomes, including plains, rivers and oceans; no named-biome climate filter remains. Compatible host rock and surface-relative cover still limit actual placement. Placement makes one size-two pocket attempt per eight eligible chunks, independently of any large region or district selection. This restores the earlier emerald-like exploration pattern; uranium has no town-catchment quota or district gate. It classifies the surface biome first, then places within local rock cover instead of a fixed Y16–192 band: cover ranges from 4 to 80 blocks, concentrated near 40. Vanilla's offset modifier permits only ±16 per step, so five bounded offsets supply this distribution. There is no `height_range` for the Terrain Diffusion fork to extend toward its deeper world floor. This targets new chunks; old ore is retained. Actual yield is lower than the attempt count because the feature must intersect compatible rock.
+Biomes are sampled on four-block cells, so band edges step in four-block increments. With Alesrr Terrain Diffusion's surface-water API (integration target 1.4.1), river-tagged cells also need a generated surface-water column, whose local water elevation sets the height band; underground reaches and dry corridors do not qualify, and biomes are sampled above the terrain so a high river or forest is not mistaken for its cave biome. Other generators, or Terrain Diffusion without that API, use the river-biome corridor and `riverWaterY`, so dry stretches of river biome qualify and oceans, lakes and canals do not.
 
-Host blocks are stone-family ore-replaceable rock plus sandstone and red sandstone. This is a simplified regional/geological approximation: real uranium occurs in multiple settings, including sandstone-hosted and granite-related mineralization, rather than obeying a global altitude band. [USGS sandstone model](https://pubs.usgs.gov/bul/b1693/html/bull1ghh.htm), [IAEA classification](https://www-pub.iaea.org/MTCD/Publications/PDF/TE-1861web.pdf). The chosen game depths and rates are playtest tuning, not measured natural abundance. The registered pocket feature uses vanilla scattered-ore placement for the tiny pockets: vanilla vein ellipsoids at size two produced zero blocks in the controlled host-rock comparison, while the scattered pockets produced 49 across 64 trials. Pockets remain at most two blocks per attempt, dispersed through suitable terrain rather than concentrated into districts. The existing `civilization:uranium` feature ID is retained for save compatibility. Some finds are in surface-counter reach; deeper ones require cliffs, caves or excavation. Iron-or-better pickaxes yield one Raw Uranium per ore block. Raw Uranium remains portable with no active fuel/processing recipe.
+Each level keeps bounded access-ordered caches of up to 32,768 sampled biome cells and 8,192 derived columns; a cold 48-block query checks at most 625 cells, tree checks sample only their own cell, and height-ineligible growth exits before the river scan. Caches are deterministic, clear on level unload or server stop, and invalidate on tag reloads or setting changes. Queries never generate chunks, add tickets or scan placed water (the Terrain Diffusion lookup may fill the generator's own terrain-model cache, as biome lookup does). `SoilChunk` keeps sparse per-soil state in chunk attachments and `SoilSystem` advances registered fields once per active second, without a block entity per plot; `RegionalWeather` owns saved district schedules, and natural rain and the Rain Caller share its `call`.
 
-The three accessory slots occupy the previously empty right column beside the player portrait at menu coordinates `(77,8)`, `(77,26)` and `(77,44)`, with offhand unchanged at `(77,62)`. Only accessory items can be equipped there; the Geiger Counter is the first. It uses a loaded-section ore check once per second, within 48 blocks of the wearer. Its wearer alone hears a click every 1 second at the edge, rising to four per second at the ore. It does not reveal direction or coordinates, force-load chunks, spend a battery or detect raw uranium items. Standard survival death drops include equipped accessories; keep-inventory preserves them. Creative inventory does not show these slots, so switch to survival to equip during testing. No radiation effects are implemented.
+## Frontier uranium
 
-The counter is a ten-second Assembly Bench job using 1 Glass Pane, 2 Copper Plates, 1 Redstone and 1 Machine Parts; [manufacturing](manufacturing.md) owns its production route. Its T2 components make it a town-made instrument for frontier explorers. Other role-specific accessories are future content, not active bonuses.
+Rare, tiny pockets of **Uranium Ore** generate in new chunks throughout the Overworld (the `civilization:uranium_regions` tag covers every Overworld biome). Placement makes one size-two pocket attempt per eight eligible chunks with no district or climate gate, in stone-family ore-replaceable rock, sandstone and red sandstone, at 4 to 80 blocks of cover below the local surface (concentrated near 40) rather than a fixed Y band. Actual finds are fewer than attempts because a pocket must hit compatible rock; some are within reach of the surface, others need cliffs, caves or digging. An iron-or-better pickaxe yields one **Raw Uranium** per ore. Raw Uranium is portable and has no processing or power use.
 
-## Verification
+Exposed ore, uranium carried by a player and nearby chests holding Raw Uranium or Uranium Ore emit occasional fine silver tracks that travel about 2½–3½ blocks outward, stay where launched as their source moves and taper at their tips. These cues are visual only.
 
-Unit checks cover circular and negative-coordinate boundaries, elevated river heights and nearest-river selection, vertical limits, overlapping properties, cache reuse, eviction and deterministic reconstruction. Server checks use isolated river/forest/plains dimensions to exercise real crop dispatch, fertilizer acceptance/refusal, natural wheat growth, sky exclusion, forestry gating and queries that do not load chunks. Existing fertilizer/industry tests now apply their manufactured fertilizer on eligible river ground.
+**Accessory slots:** three slots to the right of the player portrait, above the offhand slot (menu coordinates `(77,8)`, `(77,26)` and `(77,44)`), take only accessory items. They keep their contents through saves and dimension changes and follow normal death drops or keep-inventory. Creative inventory does not show them.
 
-The isolated dimensions are embedded in the development-only flat preset because Minecraft's GameTest server discards standalone dimension definitions. They are excluded from the shipped mod JAR. The preset is a test fixture, not the planned navigable sample region. Current validation and deployment results live in [project status](../docs/status.md).
+The **Geiger Counter** is a ten-second Assembly Bench job from 1 Glass Pane, 2 Copper Plates, 1 Redstone and 1 Machine Parts. Worn in an accessory slot, it checks loaded sections within 48 blocks once per second; only the wearer hears it, from one click per second at the edge to four per second at the ore. It reveals no direction or coordinates, uses no battery, does not detect raw uranium items and ignores unloaded chunks. No radiation effects exist.
+
+## Save compatibility
+
+- Geography is derived, not saved: changing the generator, biome tags or these settings changes suitability for existing worlds, which need no regeneration.
+- The uranium feature keeps its ID `civilization:uranium`; ore generated in older chunks stays.
+- Partially grown crops from older saves keep their visible age while the soil timer catches up.

@@ -13,11 +13,11 @@ import java.nio.file.Files;
 
 @EventBusSubscriber(modid="civilization")
 public final class AirshipPersistenceCheck {
-    private static final String PHASE=System.getProperty("civilization.airshipPhase","manual");
+    private static final String PHASE=Fixture.phase("airship");
     private static int ticks;
-    @SubscribeEvent public static void start(ServerStartedEvent e){ticks=0;if(PHASE.equals("manual"))return;for(int x=0;x<3;x++)for(int z=0;z<3;z++){e.getServer().overworld().setChunkForced(x,z,true);e.getServer().overworld().getChunk(x,z);}}
+    @SubscribeEvent public static void start(ServerStartedEvent e){ticks=0;if(PHASE.isEmpty())return;for(int x=0;x<3;x++)for(int z=0;z<3;z++){e.getServer().overworld().setChunkForced(x,z,true);e.getServer().overworld().getChunk(x,z);}}
     @SubscribeEvent public static void tick(ServerTickEvent.Post e){
-        if(PHASE.equals("manual")||++ticks!=100)return;
+        if(PHASE.isEmpty()||++ticks!=100)return;
         try{
             var server=e.getServer();var l=server.overworld();var path=server.getWorldPath(LevelResource.ROOT).resolve("airship-check.txt");
             if(PHASE.equals("seed")){
