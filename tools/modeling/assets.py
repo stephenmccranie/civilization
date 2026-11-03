@@ -109,7 +109,7 @@ def main():
         for key, target in outputs.items():
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(files[key].read_bytes())
-        receipt_path.write_text(json.dumps(receipt, indent=2) + '\n')
+        receipt_path.write_text(json.dumps(receipt, indent=2) + '\n', newline='\n')
     print(json.dumps(summary))
 
 if __name__ == '__main__':

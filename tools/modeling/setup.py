@@ -1,18 +1,28 @@
 """Download pinned authoring tools into ignored local storage. Does not launch apps."""
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 from urllib.request import urlopen
 import zipfile
 
-ROOT = Path(__file__).resolve().parents[2]
+def main_checkout(path):
+    """The checkout that owns the local art/ and .tools/ folders; every git worktree of it shares them."""
+    common = subprocess.run(['git', 'rev-parse', '--path-format=absolute', '--git-common-dir'], cwd=path,
+                            capture_output=True, text=True, check=True).stdout.strip()
+    return Path(common).parent
+
+ROOT = main_checkout(Path(__file__).resolve().parent)
 DEST = ROOT / '.tools/modeling'
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 def main():
+    if importlib.util.find_spec('PIL') is None:
+        raise SystemExit('The art tools need Pillow: python -m pip install --user pillow')
     DEST.mkdir(parents=True, exist_ok=True)
     pins = json.loads(Path(__file__).with_name('pins.json').read_text())
     receipt = {}
@@ -44,7 +54,7 @@ def main():
     (DEST / 'mcp.js').write_text(patched, encoding='utf-8', newline='')
     receipt['mcp']['local_patch'] = 'Bind listener to 127.0.0.1 instead of all interfaces'
     receipt['mcp']['patched_sha256'] = sha(patched.encode())
-    (DEST / 'setup-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    (DEST / 'setup-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n', newline='\n')
     print('Pinned Blockbench, MCP, GeckoLib editor and Codex tools ready:', DEST)
 
 if __name__ == '__main__':
