@@ -24,13 +24,13 @@
     {
       "path": "mods/civilization-0.35.8-dev.jar",
       "hashes": {
-        "sha1": "aa74144dab9cebcb0cfb83e0dfa833e588ddb29e",
-        "sha512": "7df8031f2cd04956b2c1fe1b4cce522e84bd6b0b561508a87c508f082efb7233e3f9307c2f00e236bf73a7210b932d65fdb95f0f4d01a23ff29afdbe8a18ce3b"
+        "sha1": "51d1d37c5ce5d2241b000062dad9d44563b61367",
+        "sha512": "45ecaff54128d5a61a0cb120a0c5e3fc37501292c7e2b154feefdc867678bac3faa7e41ef0ceffb88a7093f2d9e0e3218476dacadbbb51d832837057f03378d9"
       },
       "downloads": [
         "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.8-1/civilization-0.35.8-dev.jar"
       ],
-      "fileSize": 5393525,
+      "fileSize": 5393565,
       "id": "civilization"
     },
     {

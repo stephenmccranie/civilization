@@ -31,6 +31,10 @@
     "civilization:fluid_pipe",
     "civilization:engine_cylinder",
     "civilization:engine_flywheel",
-    "civilization:prototype_stove"
+    "civilization:prototype_stove",
+    "civilization:resting_skillet",
+    "civilization:baking_oven",
+    "civilization:coal_preparation_screen",
+    "civilization:gladiator_pit"
   ]
 }
