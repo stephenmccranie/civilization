@@ -39,10 +39,20 @@ public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEnti
         // Distance / tyre radius, never a free-running timer when parked.
         getGeoModel().getBone("wheel").ifPresent(bone->bone.setRotX(-Mth.lerp(partial,e.previousTravel,e.renderedTravel())/WheelbarrowEntity.WHEEL_RADIUS));
     }
-    /** The debug hitbox shows the measured surfaces that actually collide, turned with the carrier. */
+    /** The debug hitbox shows the body that actually collides, turned with the carrier: its outline at the ground and the rim, joined at each corner. */
     public static void hitbox(PoseStack pose,VertexConsumer lines,WheelbarrowEntity e,float partial,float red,float green,float blue){
         pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(180-Mth.rotLerp(partial,e.yRotO,e.getYRot())));
-        for(var box:WheelbarrowCollision.BODY)LevelRenderer.renderLineBox(pose,lines,box,red,green,blue,1);
+        var body=WheelbarrowCollision.BODY;var at=pose.last();
+        for(int i=0;i<body.corners();i++){
+            int j=(i+1)%body.corners();
+            for(double y:new double[]{body.bottom,body.top})line(at,lines,body.x(i),y,body.z(i),body.x(j),y,body.z(j),red,green,blue);
+            line(at,lines,body.x(i),body.bottom,body.z(i),body.x(i),body.top,body.z(i),red,green,blue);
+        }
         pose.popPose();
+    }
+    private static void line(PoseStack.Pose at,VertexConsumer lines,double x0,double y0,double z0,double x1,double y1,double z1,float red,float green,float blue){
+        float dx=(float)(x1-x0),dy=(float)(y1-y0),dz=(float)(z1-z0),length=Mth.sqrt(dx*dx+dy*dy+dz*dz);
+        lines.addVertex(at,(float)x0,(float)y0,(float)z0).setColor(red,green,blue,1).setNormal(at,dx/length,dy/length,dz/length);
+        lines.addVertex(at,(float)x1,(float)y1,(float)z1).setColor(red,green,blue,1).setNormal(at,dx/length,dy/length,dz/length);
     }
 }

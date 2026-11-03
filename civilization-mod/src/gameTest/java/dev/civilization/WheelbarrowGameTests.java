@@ -44,7 +44,7 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void solidBodyBlocksWalkingButHandlesAndEscapeStayClear(GameTestHelper h){
         var e=barrow(h);var p=player(h);
         p.setPos(e.position().add(-2.5,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(5,0,0));
-        h.assertTrue(p.getX()<e.getX()-.73&&p.getX()>e.getX()-.77,"Solid tray body blocks a walking player");
+        h.assertTrue(Math.abs(p.getBoundingBox().maxX-e.getBoundingBox().minX)<1e-6,"The tray rim stops a walking player where they touch it: "+p.position());
         p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-1,0,0));
         h.assertTrue(p.getX()<e.getX()-1.7,"Brushing the solid body does not prevent walking away");
         p.setPos(e.position());p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(2.5,0,0));
@@ -52,7 +52,7 @@ public final class WheelbarrowGameTests {
         e.setYRot(45);e.setPos(e.position());var grip=e.handlerPosition(e.position(),45);
         p.setPos(grip.add(1,0,0));p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(-1,0,0));
         h.assertTrue(p.position().distanceTo(grip)<.001,"Player can approach diagonal handles without striking an invisible envelope");
-        h.assertTrue(e.canBeCollidedWith()&&e.isPickable(),"Carrier retains player collision and interaction");h.succeed();
+        h.assertTrue(!e.canBeCollidedWith()&&e.isPickable(),"Native entity collision, which would use the bounding box, never sees the carrier; the mouse still does");h.succeed();
     }
     @GameTest(template="industrial") public static void entireHandleAreaIsWalkableAndStillPickableAtEveryHeading(GameTestHelper h){
         var e=barrow(h);var p=player(h);
@@ -96,13 +96,31 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void diagonalEmptyCornersAndBrushingRemainClear(GameTestHelper h){
         var e=barrow(h);var p=player(h);e.setYRot(45);e.setPos(e.position());
         p.setPos(e.position().add(.9,0,.8));
-        h.assertTrue(h.getLevel().noCollision(p,p.getBoundingBox()),"Empty diagonal bounding-box corner is not solid");
+        h.assertTrue(!e.body().overlaps(Solid.of(p.getBoundingBox())),"Empty diagonal bounding-box corner is not solid");
         var before=p.position();p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,0,.5));
         h.assertTrue(p.position().distanceTo(before.add(0,0,.5))<.001,"Brushing past a diagonal carrier does not catch on invisible box corners");
         var corner=e.position().add(.9,.5,.9);var tray=e.position().add(0,.8,0);
         h.assertTrue(pick(p,corner.add(0,2,0),corner.add(0,-1,0),e)==null,"A mouse ray through an empty diagonal corner misses the carrier");
         h.assertTrue(pick(p,tray.add(0,2,0),tray.add(0,-1,0),e)!=null,"A mouse ray onto the tray hits it");h.succeed();
     }
+    @GameTest(template="industrial") public static void turnedBodySlidesWithoutCatching(GameTestHelper h){
+        var e=barrow(h);var p=player(h);float yaw=30;e.setYRot(yaw);e.setPos(e.position());
+        // Pressed into the long right side while walking forward, no step loses any of its motion along the face.
+        var normal=model(1,0,yaw);var step=model(-.5,-1,yaw).normalize().scale(.1);var along=step.subtract(normal.scale(step.dot(normal)));
+        var start=e.position().add(model(1,.5,yaw));p.setPos(start);
+        for(int i=0;i<8;i++){p.move(net.minecraft.world.entity.MoverType.SELF,step);h.assertTrue(!e.body().overlaps(Solid.of(p.getBoundingBox())),"Sliding never enters the body");}
+        h.assertTrue(Math.abs(p.position().subtract(start).dot(along.normalize())-8*along.length())<1e-9&&e.body().overlaps(Solid.of(p.getBoundingBox().move(normal.scale(-1e-6)))),"A turned side keeps every step's motion along it and holds the player against it: "+p.position());
+        // Walking across the front rides around the tyre's point instead of stopping on it.
+        p.setPos(e.position().add(model(-.9,-1.35,yaw)));var across=model(.1,0,yaw);
+        for(int i=0;i<18;i++){
+            var before=p.position();p.move(net.minecraft.world.entity.MoverType.SELF,across);
+            h.assertTrue(p.position().subtract(before).dot(across)>.02*.1&&!e.body().overlaps(Solid.of(p.getBoundingBox())),"Every step across the nose makes headway: "+p.position());
+        }
+        var past=p.position().subtract(e.position());
+        h.assertTrue(past.dot(model(1,0,yaw))>.6&&past.dot(model(0,-1,yaw))>1.35,"The player passed the wheel, deflected out around its point: "+past);h.succeed();
+    }
+    /** A model-frame direction on a carrier facing `yaw`, in exact arithmetic. */
+    private static Vec3 model(double x,double z,float yaw){double a=Math.toRadians(180d-yaw);return new Vec3(x*Math.cos(a)+z*Math.sin(a),0,z*Math.cos(a)-x*Math.sin(a));}
     private static net.minecraft.world.phys.EntityHitResult pick(net.minecraft.world.entity.player.Player p,Vec3 from,Vec3 to,WheelbarrowEntity e){
         return net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p,from,to,new AABB(from,to).inflate(2),candidate->candidate==e,9);
     }
@@ -110,7 +128,7 @@ public final class WheelbarrowGameTests {
         var e=barrow(h);var p=player(h);e.setYRot(45);e.setPos(e.position());take(h,e,p);double y=e.getY();
         // Inside the axis-aligned bounds of the turned body, yet clear of the body itself.
         var beside=BlockPos.containing(e.position().add(1,0,1));h.getLevel().setBlockAndUpdate(beside,Blocks.STONE.defaultBlockState());
-        h.assertTrue(e.getBoundingBox().intersects(new AABB(beside))&&!net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(e.playerCollisionShape(),net.minecraft.world.phys.shapes.Shapes.block().move(beside.getX(),beside.getY(),beside.getZ()),net.minecraft.world.phys.shapes.BooleanOp.AND),"The block lies in the empty corner");
+        h.assertTrue(e.getBoundingBox().intersects(new AABB(beside))&&!e.body().overlaps(Solid.of(new AABB(beside))),"The block lies in the empty corner");
         var start=e.position();e.input(p,new WheelbarrowPayload(1,false));for(int i=0;i<3;i++)e.tick();
         h.assertTrue(Math.abs(e.getY()-y)<1e-6&&e.position().distanceTo(start)>.4,"A block beside the body neither lifts nor stops it: "+e.position());h.succeed();
     }
@@ -156,7 +174,7 @@ public final class WheelbarrowGameTests {
         var e=barrow(h);var p=player(h);take(h,e,p);double wallZ=e.getZ()+2.5;
         for(int x=-2;x<=2;x++)for(int y=0;y<2;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
         e.input(p,new WheelbarrowPayload(1,false));for(int i=0;i<35;i++)e.tick();
-        h.assertTrue(e.playerCollisionShape().max(Direction.Axis.Z)<=Math.floor(wallZ)+1e-6,"The measured body stops at a wall");
+        h.assertTrue(e.body().bounds().maxZ<=Math.floor(wallZ)+1e-6,"The body stops at a wall");
         e.input(p,new WheelbarrowPayload(0,false));var pos=e.position();e.tick();h.assertTrue(e.position().distanceTo(pos)<.001,"Blocked carrier remains parked");h.succeed();
     }
     @GameTest(template="industrial") public static void halfStepStillClimbs(GameTestHelper h){

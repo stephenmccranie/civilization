@@ -43,7 +43,6 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private static final EntityDataAccessor<Boolean> HELD=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HEADING=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
-    private final WheelbarrowCollision collision=new WheelbarrowCollision();
     // The whole ledger in its saved form, so clients draw the load one for one.
     private static final EntityDataAccessor<CompoundTag> CARGO=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.COMPOUND_TAG);
     private final CargoLedger cargo=new CargoLedger(()->CAPACITY,this::cargoChanged);
@@ -60,7 +59,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public final WalkAnimationState handlerWalkAnimation=new WalkAnimationState();
     public WheelbarrowEntity(EntityType<? extends WheelbarrowEntity> type,Level level){super(type,level);}
     @Override protected void defineSynchedData(SynchedEntityData.Builder b){b.define(HELD,false);b.define(TRAVEL,0f);b.define(HEADING,0f);b.define(CARGO,new CompoundTag());}
-    public VoxelShape playerCollisionShape(){return collision.at(position(),getYRot());}
+    public Solid body(){return body(position(),getYRot());}
+    private static Solid body(Vec3 at,float yaw){return WheelbarrowCollision.BODY.place(at,yaw);}
     private void cargoChanged(){
         if(level().isClientSide)return;
         var tag=new CompoundTag();tag.put("Cargo",cargo.save(registryAccess()));entityData.set(CARGO,tag);
@@ -89,9 +89,6 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
     @Override public boolean isPickable(){return !isRemoved();}
-    // The collision hook replaces these broad bounds with measured surfaces.
-    @Override public boolean canBeCollidedWith(){return isAlive();}
-    @Override public boolean canCollideWith(Entity other){return other instanceof WheelbarrowEntity&&!other.isRemoved()&&!isPassengerOfSameVehicle(other);}
     @Override public boolean shouldRiderSit(){return false;}
     @Override protected boolean canAddPassenger(Entity passenger){return passenger instanceof Player&&getPassengers().isEmpty();}
     // Deliberately retain Entity's null controlling-passenger contract: physics
@@ -166,11 +163,11 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     // The carriage may hang up to a block below its resting height over a step.
     @Override public AABB getBoundingBoxForCulling(){return interactionBounds().inflate(0,STEP,0);}
     public boolean clearOfPlayers(Vec3 at,float yaw){
-        var shape=collision.at(at,yaw);
-        return level().getEntitiesOfClass(Player.class,shape.bounds(),p->!p.isSpectator()&&!hasPassenger(p)&&Shapes.joinIsNotEmpty(shape,Shapes.create(p.getBoundingBox()),BooleanOp.AND)).isEmpty();
+        var body=body(at,yaw);
+        return level().getEntitiesOfClass(Player.class,body.bounds(),p->!p.isSpectator()&&!hasPassenger(p)&&body.overlaps(Solid.of(p.getBoundingBox()))).isEmpty();
     }
     /** Whether a new carrier fits here: claimed land, players and solid surfaces all permit it. */
-    public boolean placeable(Player p){var body=collision.at(position(),getYRot());return accessible(p,getBoundingBox())&&clearOfPlayers(position(),getYRot())&&clear(body,obstacles(body.bounds()));}
+    public boolean placeable(Player p){var body=body();return accessible(p,getBoundingBox())&&clearOfPlayers(position(),getYRot())&&clear(body,obstacles(body.bounds()));}
     /** Small bounded footprint query; neither movement nor placement loads chunks. */
     public boolean accessible(Player p,AABB box){
         for(int x=Mth.floor(box.minX);x<=Mth.floor(box.maxX);x++)for(int z=Mth.floor(box.minZ);z<=Mth.floor(box.maxZ);z++){
@@ -179,28 +176,28 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         }
         return level().getWorldBorder().isWithinBounds(box);
     }
-    /** Block surfaces and other carriers' measured bodies within `region`. */
-    private List<AABB> obstacles(AABB region){
-        var boxes=new ArrayList<AABB>();
-        for(var shape:level().getBlockCollisions(this,region))boxes.addAll(shape.toAabbs());
-        for(var shape:level().getEntityCollisions(this,region))boxes.addAll(shape.toAabbs());
-        return boxes;
+    /** Block surfaces and other carriers' bodies within `region`. */
+    private List<Solid> obstacles(AABB region){
+        var solids=new ArrayList<Solid>();
+        for(var shape:level().getBlockCollisions(this,region))for(var box:shape.toAabbs())solids.add(Solid.of(box));
+        for(var other:level().getEntitiesOfClass(WheelbarrowEntity.class,region,e->e!=this))solids.add(other.body());
+        return solids;
     }
-    private static boolean clear(VoxelShape body,List<AABB> obstacles){return obstacles.stream().noneMatch(b->Shapes.joinIsNotEmpty(body,Shapes.create(b.deflate(1e-7)),BooleanOp.AND));}
+    private static boolean clear(Solid body,List<Solid> obstacles){return obstacles.stream().noneMatch(body::overlaps);}
     /** How far the body can sink, up to `limit`, before something holds it. */
-    private static double lower(VoxelShape body,List<AABB> obstacles,double limit){for(var b:obstacles)limit=Math.min(limit,body.collide(Direction.Axis.Y,b,limit));return limit;}
+    private static double lower(Solid body,List<Solid> obstacles,double limit){for(var o:obstacles)limit=-body.reach(o,-limit);return limit;}
     /**
      * Where the measured body comes to rest at `at`, in native step order: on the level path if that is
      * clear, otherwise lifted at most a block (ceilings permitting), then lowered onto what lies within a
      * block below. Null when it fits nowhere or would hang over a deeper drop.
      */
     private Vec3 settle(Vec3 at,float yaw){
-        var body=collision.at(at,yaw);var reach=body.bounds();
+        var body=body(at,yaw);var reach=body.bounds();
         var near=obstacles(new AABB(reach.minX,reach.minY-2*STEP,reach.minZ,reach.maxX,reach.maxY+STEP,reach.maxZ));
         // Obstacles already overlapping the body (a step ahead) never limit its climb.
-        double room=STEP;for(var b:near)room=Math.min(room,-body.collide(Direction.Axis.Y,b,-room));
+        double room=STEP;for(var o:near)room=body.reach(o,room);
         for(double lift:new double[]{0,room}){
-            var raised=body.move(0,lift,0);
+            var raised=body.rise(lift);
             if(!clear(raised,near))continue;
             double limit=lift+STEP+1e-4,drop=lower(raised,near,limit);
             return drop<limit?at.add(0,lift-drop,0):null;
@@ -215,7 +212,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private double wheelGround(Vec3 at,float yaw){return ground(WheelbarrowCollision.place(at,yaw,WHEEL),at.y);}
     /** Whatever stops holding the carrier lets it fall. */
     private void fall(){
-        var body=collision.at(position(),getYRot());double speed=Math.min(.8,.04-getDeltaMovement().y);
+        var body=body();double speed=Math.min(.8,.04-getDeltaMovement().y);
         double drop=lower(body,obstacles(body.bounds().expandTowards(0,-speed,0)),speed);
         setOnGround(drop<speed);setDeltaMovement(0,onGround()?0:-speed,0);
         if(drop>0)setPos(getX(),getY()-drop,getZ());
