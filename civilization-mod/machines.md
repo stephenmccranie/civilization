@@ -4,12 +4,16 @@ A machine is a controller block plus a structure the player builds around it. Th
 
 ## Building with a controller
 
-1. Craft the controller and place it where the structure's bottom/front center belongs; its front faces you. Its tooltip lists the additional structural blocks.
+1. Craft the controller and place it where the structure's bottom/front center belongs; its front faces you. Its tooltip lists the additional structural blocks, and holding it shows the whole structure first (see [placement preview](#placement-preview)).
 2. Look at the controller within eight blocks. Translucent ghosts of the missing pieces appear, using the real block models and resource-pack textures; correctly filled positions disappear. The top-left HUD lists remaining quantities by material and piece size, including pieces behind obstructions (air requirements count as obstructions but need no item).
 3. Holding an accepted variant previews it (stone bricks, aged or waxed copper, a downward hopper for a hatch) in the guide's orientation and connections. Red outlines mark blocks that must be replaced and chambers that must be emptied; wrongly occupied positions show the real block with a correction outline. The directly aimed requirement is outlined in cyan and named in the HUD; real blocks stop target selection. Declared shared-cell pieces (such as Smithy table feet and tops) each keep their own guide, and excess cells or wrong materials are marked.
 4. Right-click the controller with a matching stack to place as many missing pieces as that stack covers, with exact cut shapes and facing, or place them yourself. Full blocks need full items; halves, quarter beams and eighth cubes need saw-cut items or native slabs — **the controller never cuts or recuts pieces**. Already-correct pieces cost nothing; existing blocks, liquids and inaccessible or unloaded spaces are never replaced. Empty-hand right-click opens the controller.
 
 The guide and HUD share one visibility decision: they show only while you look at the selected unfinished area (0.1-block retention margin, 150 ms release delay to avoid edge flicker) and hide immediately when the build completes, a menu opens or the HUD is hidden. One controller is selected at a time; walking more than 32 blocks away clears it. There is no toggle key or build screen. Guides are client-only and never load terrain.
+
+### Placement preview
+
+Holding a block that fills more than one cell or brings a structure (every controller with a construction guide, including the Oil Derrick, plus the Assembly Bench, Small Boat Helm and Baking Oven) and aiming at a block face shows where a right-click would put it, at the exact position and facing, before anything is placed. The preview asks the same placement code the click runs. The cells the click fills are textured with a cyan outline and the HUD names the block with **Right-click to place here**. A refused spot (an occupied cell, an entity in the way or missing support) is outlined in red without texture and reads **Can't place here: blocked or unsupported**. A controller's structure follows as the ordinary guide, so parts that would need clearing are already red, and the HUD counts the missing and obstructed blocks and lists the materials still needed. Claims are checked only by the server, so a spot inside someone else's claim can look valid and still be refused. Aiming at a block that opens on right-click, such as a chest or a machine, opens it instead; crouch to place against it.
 
 Ghosts draw after the world's shader effects with their own neutral brightness (they do not inherit shader-pack lighting), test world depth without writing it, and keep the whole build's textures while drawing at most 64 hard outlines that are not hidden by nearer guide surfaces or real blocks. Client settings persist in `config/civilization-client.toml` and need no server permission:
 
@@ -18,7 +22,7 @@ Ghosts draw after the world's shader effects with their own neutral brightness (
 
 ### Guide performance contract
 
-This contract binds every construction guide: `MachinePreview` for block assemblies, `DerrickPreview` for the Oil Derrick's native sections, and the Builder's Line preview. New assemblies reuse these renderers; a custom renderer follows the same policy.
+This contract binds every construction guide: `MachinePreview` for block assemblies and held placements, `DerrickPreview` for the Oil Derrick's native sections, and the Builder's Line preview. A held placement comes from `PlacementPlan`, recomputed each client tick from the aimed face; a changed plan refreshes at once, like a changed selection. New assemblies reuse these renderers; a custom renderer follows the same policy.
 
 - Cache static positions and bounds per world, controller and orientation; cache missing-section geometry per construction state; clear on selection or world change.
 - Prepare missing parts, obstruction states and material counts outside rendering. Refresh immediately on a changed selection, construction key or relevant held stack; poll other world changes only through `GuidePerformance.Refresh` (every 10 client ticks). Do not add separate polling intervals or budget constants.

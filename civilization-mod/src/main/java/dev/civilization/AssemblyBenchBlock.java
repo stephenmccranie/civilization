@@ -16,7 +16,7 @@ import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.*;
 
 /** Two static native halves, one inventory. No per-frame geometry or polling for adjacent stock. */
-public final class AssemblyBenchBlock extends WorkshopBlock {
+public final class AssemblyBenchBlock extends WorkshopBlock implements MultiCellBlock {
     public static final BooleanProperty PART=BooleanProperty.create("part"), WIDE=BooleanProperty.create("wide");
     private static final VoxelShape[][] SHAPES=shapes();
     public AssemblyBenchBlock(Properties properties){super(properties,ManufacturingJobs.BENCH);registerDefaultState(defaultBlockState().setValue(PART,false).setValue(WIDE,false));}
@@ -33,8 +33,9 @@ public final class AssemblyBenchBlock extends WorkshopBlock {
         return level.hasChunkAt(mate)&&!level.isOutsideBuildHeight(mate)&&level.getWorldBorder().isWithinBounds(mate)
             &&level.getBlockState(mate).canBeReplaced(context)&&allowed(level,pos,state,context.getPlayer())&&level.noCollision(new AABB(mate))?state:null;
     }
+    @Override public java.util.List<Cell> cells(BlockPos pos,BlockState state){return java.util.List.of(new Cell(pos,state),new Cell(other(pos,state),state.setValue(PART,true)));}
     @Override public void setPlacedBy(Level level,BlockPos pos,BlockState state,LivingEntity entity,ItemStack stack){
-        if(!level.isClientSide&&state.getValue(WIDE)&&!state.getValue(PART))level.setBlock(other(pos,state),state.setValue(PART,true),3);
+        if(!level.isClientSide&&state.getValue(WIDE)&&!state.getValue(PART)){var mate=cells(pos,state).get(1);level.setBlock(mate.pos(),mate.state(),3);}
     }
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return state.getValue(PART)?null:super.newBlockEntity(pos,state);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level,BlockState state,BlockEntityType<T> type){return state.getValue(PART)?null:super.getTicker(level,state,type);}

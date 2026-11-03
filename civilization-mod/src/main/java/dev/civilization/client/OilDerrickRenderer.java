@@ -35,6 +35,7 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
         visibilityBones.add(new Visibility(bone,part,name.equals("controller")));for(var child:bone.getChildBones())indexVisibility(child);
     }
     private final java.util.Map<IndustrialBlockEntity,DerrickAnimation> instances=new java.util.WeakHashMap<>();
+    private DerrickAnimation guide;
     public OilDerrickRenderer(BlockEntityRendererProvider.Context context) {}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),OilDerrickRenderer::new);}
     @Override public AABB getRenderBoundingBox(IndustrialBlockEntity m){return new AABB(m.getBlockPos()).inflate(10,34,10);}
@@ -51,19 +52,22 @@ public final class OilDerrickRenderer implements BlockEntityRenderer<IndustrialB
 
     @Override public void render(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         if(m.kind!=IndustrialBlock.Kind.PUMP || m.getLevel()==null)return;
-        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.mask=m.derrickSections;a.guide=false;a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
+        var a=instances.computeIfAbsent(m,owner->new DerrickAnimation(owner.getBlockPos(),owner.getBlockState()));a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.mask=m.derrickSections;a.guide=false;a.running=m.formed&&m.getBlockState().getValue(MachineFeedback.WORKING);
         renderer.render(a,partial,pose,buffers,a.modelLight(light),overlay);
     }
 
-    public void renderGuide(IndustrialBlockEntity m,float partial,PoseStack pose,MultiBufferSource buffers){
-        var a=instances.computeIfAbsent(m,DerrickAnimation::new);a.setLevel(m.getLevel());a.setBlockState(m.getBlockState());a.running=false;a.guide=true;a.mask=ModeledDerrick.ALL^m.derrickSections;
-        renderer.render(a,partial,pose,buffers,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+    /** The missing sections of a pump at `at`, built or only aimed with a held pump; one guide shows at a time. */
+    public void renderGuide(net.minecraft.world.level.Level level,net.minecraft.core.BlockPos at,net.minecraft.core.Direction front,int built,float partial,PoseStack pose,MultiBufferSource buffers){
+        var state=IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front);
+        if(guide==null||!guide.getBlockPos().equals(at))guide=new DerrickAnimation(at,state);
+        guide.setLevel(level);guide.setBlockState(state);guide.guide=true;guide.mask=ModeledDerrick.ALL^built;
+        renderer.render(guide,partial,pose,buffers,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
     }
     private static final class DerrickAnimation extends BlockEntity implements GeoBlockEntity {
         private static final RawAnimation CYCLE=RawAnimation.begin().thenLoop("animation.oil_derrick.cycle");
         private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);private boolean running,guide;private int mask;
         private long lightTick=Long.MIN_VALUE;private int sampledLight;
-        DerrickAnimation(IndustrialBlockEntity m){super(IndustrialContent.ENTITY.get(),m.getBlockPos(),m.getBlockState());}
+        DerrickAnimation(net.minecraft.core.BlockPos pos,net.minecraft.world.level.block.state.BlockState state){super(IndustrialContent.ENTITY.get(),pos,state);}
         private int modelLight(int controllerLight){
             long tick=level.getGameTime()/5;
             if(tick!=lightTick){sampledLight=DerrickLighting.sample(level,worldPosition,controllerLight);lightTick=tick;}

@@ -60,7 +60,7 @@ One dish, one heated position and one pan per resting block; no cooking XP, spil
 
 ## Baking Oven
 
-A physical preview: Civilization creative tab or `/give @s civilization:baking_oven`. Place it on a solid 2×2 base with three blocks of clear space above; it faces you and rejects obstructed or unauthorized placement. The cast-iron body fits in 2×2×2 blocks and stands 1.8 blocks high, with a rear flue to about 2.3 blocks. Leave room in front for the door.
+A physical preview: Civilization creative tab or `/give @s civilization:baking_oven`. Place it on a solid 2×2 base with three blocks of clear space above; it faces you and rejects obstructed or unauthorized placement. Holding it outlines its twelve cells where it would go, in red when the spot is refused. The cast-iron body fits in 2×2×2 blocks and stands 1.8 blocks high, with a rear flue to about 2.3 blocks. Leave room in front for the door.
 
 - Empty-hand right-click opens or closes the main door; the leaf swings outward over 0.8 seconds and the window is transparent.
 - Crouch + scroll while looking at it turns the continuous draft dial (sprint key for fine steps); the pointer moves, the action bar shows the percentage and the setting is saved.

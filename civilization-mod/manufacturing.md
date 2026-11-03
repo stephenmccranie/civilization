@@ -41,7 +41,7 @@ Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hi
 
 ## Assembly Bench
 
-Craft one with three planks across the top row and a stick under each end (`PPP / S S`); any plank species works. It is a **2-wide × 1-deep × 1-high** timber workbench, placed as one item into two adjacent spaces that must be loaded, clear, inside the world border and accessible; canceled placement restores both cells. Both halves have real tabletop, leg and shelf collision, open the same screen and inventory, and resist pistons. Dismantling either half returns one bench and the inventory once; Creative mints no bench item. It needs no multiblock, metal, leather or fuel.
+Craft one with three planks across the top row and a stick under each end (`PPP / S S`); any plank species works. It is a **2-wide × 1-deep × 1-high** timber workbench, placed as one item into two adjacent spaces that must be loaded, clear, inside the world border and accessible; canceled placement restores both cells. Holding it previews both halves where a right-click would put them, in red when the second space is blocked. Both halves have real tabletop, leg and shelf collision, open the same screen and inventory, and resist pistons. Dismantling either half returns one bench and the inventory once; Creative mints no bench item. It needs no multiblock, metal, leather or fuel.
 
 Choose a recipe, insert its materials in any of the four input slots and press **Work**. Automatic recognizes only a unique complete match. The drawer and JEI show actual counts; ghosts are guidance, never stock. Each press runs one batch; there is no unattended queue.
 
