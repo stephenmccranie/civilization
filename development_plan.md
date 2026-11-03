@@ -4,7 +4,7 @@ What is deployed, what is known to be missing, and what gets built next. Agreed 
 
 ## Now
 
-**Deployed.** The dedicated server and the owner's development instance run the current build (version in `civilization-mod/gradle.properties`). Players install the playtest 0.35.9 revision 1 Prism pack, whose updater follows approved GitHub releases. Older clients back to 0.35.0 still join but keep the old small-placeable inventory restrictions. Server-owned features such as the daily temperature cycle, Tab ping and shared crafting tables need no client update.
+**Deployed.** The dedicated server and the owner's development instance run the current build (version in `civilization-mod/gradle.properties`). Players install the playtest 0.35.10 revision 1 Prism pack, whose updater follows approved GitHub releases. Older clients back to 0.35.0 still join but keep the old small-placeable inventory restrictions. Server-owned features such as the daily temperature cycle, Tab ping and shared crafting tables need no client update.
 
 **World.** A fresh random-seed Terrain Diffusion world at scale 4, from the owner's fork with its performance and village patches, with climate-based deposits and Survival as the default game mode. Full-chunk and Distant Horizons pregeneration were running at last check; automatic generator startup is disabled.
 

@@ -86,7 +86,7 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 ### Welcome message
 
-On every join the server sends a short getting-started list in chat: offhand block carrying, that furnaces and campfires are retired, the Stone Saw, building and lighting the [Kiln](machines.md#kiln), bricks leading to the Foundry, early food and foraging, and JEI's **R** lookup. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.
+On every join the server sends a short framed getting-started card in chat: offhand block carrying, that furnaces and campfires are retired, five numbered steps from the Stone Saw through building and lighting the [Kiln](machines.md#kiln) to bricks for the Foundry, raw food, JEI's **R** lookup, and an invitation to give feedback in ordinary chat. It fits the ten lines closed chat shows, without wrapping at the pack's 4× GUI scale. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.
 
 ### Player-list ping
 
