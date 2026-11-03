@@ -13,6 +13,8 @@ final class WelcomeVisualCheck {
             mc.options.hideGui = false;
             mc.options.guiScale().set(4);
             mc.options.chatScale().set(0.5);
+            mc.options.chatWidth().set(0.5);
+            mc.options.chatHeightUnfocused().set(1.0);
             mc.resizeDisplay();
             mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
         }
