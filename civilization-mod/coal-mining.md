@@ -13,7 +13,7 @@ Start with hand-mined Coal and the Kiln, Foundry and Smithy, then make the kit:
 | Coal Minecart | Assembly Bench, 10 seconds | 4 planks + 2 Iron Rods + 1 Machine Parts + 4 Fasteners |
 | Coal Preparation Screen | Assembly Bench, 10 seconds | 4 planks + 2 Iron Plates + 2 Sticks |
 
-An iron head takes 25 seconds and 1.25 Coal at base efficiency (3 ingots for the pick, 1 for the shovel); final assembly is five seconds of hand work. Tools receive a grade and use Assembly Bench repairs ([manufacturing](manufacturing.md#repairs)). Mixed planks work for the cart and screen. Nothing here needs oil.
+An iron head takes 25 seconds and draws 1.25 Coal from a hot Smithy (3 ingots for the pick, 1 for the shovel); final assembly is five seconds of hand work. Tools receive a grade and use Assembly Bench repairs ([manufacturing](manufacturing.md#repairs)). Mixed planks work for the cart and screen. Nothing here needs oil.
 
 ## Working a vein
 

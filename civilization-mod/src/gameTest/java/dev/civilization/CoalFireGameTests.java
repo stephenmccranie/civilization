@@ -38,36 +38,69 @@ public final class CoalFireGameTests {
             h.succeed();
         });
     }
-    @GameTest(template="industrial") public static void ignitionCooldownExhaustionAndRefill(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,0,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack());
-        w.process();h.assertTrue(!w.fire.lit()&&w.getItem(4).getCount()==1,"Cold fuel does not self-ignite");
+    @GameTest(template="industrial") public static void aFireWarmsTheMasonryBeforeItWorks(GameTestHelper h){
+        var w=WorkshopGameTests.build(h,0,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack(16));
+        w.process();h.assertTrue(!w.fire.lit()&&w.fire.heat()==0&&w.getItem(4).getCount()==16,"Cold fuel does not self-ignite");
         MachineFixture.spark(h.getLevel(),false);h.assertTrue(w.fire.strike(true)&&!w.fire.lit(),"A valid spark may fail without consuming fuel");
-        MachineFixture.spark(h.getLevel(),true);h.assertTrue(!w.fire.strike(true)&&w.getItem(4).getCount()==1,"Repeated packet rejected by server cooldown");
+        MachineFixture.spark(h.getLevel(),true);h.assertTrue(!w.fire.strike(true)&&w.getItem(4).getCount()==16,"Repeated packet rejected by server cooldown");
         var save=new CompoundTag();w.fire.save(save);var copy=new CoalFire(w);copy.load(save);
         h.assertTrue(!copy.strike(true),"Cooldown survives reload");
         h.runAfterDelay(21,()->{
-            MachineFixture.spark(h.getLevel(),true);h.assertTrue(w.fire.strike(true)&&w.fire.lit()&&w.getItem(4).isEmpty(),"First allowed successful strike lights one coal");
-            h.assertTrue(w.fire.remaining()==1000,"Fresh coal starts with a full gauge");int start=w.heat;for(int i=0;i<10;i++)w.process();h.assertTrue(w.heat==start-10,"Idle uses ten percent thermal work rate");h.assertTrue(w.fire.remaining()<1000&&w.fire.remaining()>900,"Idle drain reduces the remaining-coal gauge");
-            var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(tag,h.getLevel().registryAccess());h.assertTrue(restored.fire.lit()&&restored.heat==w.heat&&restored.fire.remaining()==w.fire.remaining(),"Lit reserve and gauge denominator persist");
-            for(int i=0;i<500;i++)w.process();h.assertTrue(!w.fire.lit()&&w.heat==0&&w.fire.remaining()==0,"Exhausted fire and gauge go out");
-            w.setItem(4,KilnContent.MINERAL_COAL.toStack());w.process();h.assertTrue(!w.fire.lit()&&w.getItem(4).getCount()==1,"Refilling needs a new strike");h.succeed();
+            MachineFixture.spark(h.getLevel(),true);
+            h.assertTrue(w.fire.strike(true)&&w.fire.lit()&&!w.fire.hot()&&!w.fire.draw(1),"A newly lit fire is cold and cannot work yet");
+            double capacity=w.fire.capacity();
+            h.assertTrue(Math.abs(capacity-8*.7*Energy.COAL)<1,"The Tannery's eight masonry blocks store 5.6 Coal of heat");
+            int ticks=0;while(!w.fire.hot()&&ticks<4000){w.process();ticks+=10;}
+            double warming=CoalFire.WORKING*CoalFire.WARMING_TICKS;
+            h.assertTrue(w.fire.hot()&&ticks>=warming&&ticks<warming*1.05,"The fire reaches working heat in about a hundred seconds, a little slower for the leak: "+ticks+" ticks");
+            h.assertTrue(16-w.getItem(4).getCount()==(int)Math.ceil(CoalFireFixture.stored(w.fire)/Energy.COAL),"Warming burns whole Coal into the masonry");
+            h.assertTrue(w.fire.draw(1),"A hot fire supplies work");
+            var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(tag,h.getLevel().registryAccess());
+            h.assertTrue(restored.fire.lit()&&CoalFireFixture.stored(restored.fire)==CoalFireFixture.stored(w.fire)&&CoalFireFixture.reserve(restored.fire)==CoalFireFixture.reserve(w.fire),"The fire, its reserve and the stored heat persist");
+            h.succeed();
         });
     }
-    @GameTest(template="industrial") public static void stoveIdleAndWorkshopBroken(GameTestHelper h){
+    @GameTest(template="industrial") public static void everyJouleBurnedIsStoredOrReleased(GameTestHelper h){
+        var l=h.getLevel();var field=ThermalField.get(l);var w=WorkshopGameTests.build(h,2,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack(32));
+        long key=w.getBlockPos().asLong();field.pending.remove(key);
+        MachineFixture.spark(l,true);h.assertTrue(w.fire.strike(true),"The Smithy lights");
+        for(int i=0;i<300;i++)w.process();
+        for(int i=0;i<50;i++)w.fire.draw(4);
+        for(int i=0;i<100;i++)w.process();
+        double burned=(32-w.getItem(4).getCount())*Energy.COAL-CoalFireFixture.reserve(w.fire);
+        double released=field.pending.get(key)/(ThermalRules.COAL_WASTE_HEAT/Energy.COAL);
+        h.assertTrue(burned>0&&Math.abs(burned-CoalFireFixture.stored(w.fire)-released)<1e3,"Burned "+burned+" J = stored "+CoalFireFixture.stored(w.fire)+" + released "+released);
+        h.succeed();
+    }
+    @GameTest(template="industrial") public static void anUnfedHotMachineStaysHotForAWhile(GameTestHelper h){
+        var w=WorkshopGameTests.build(h,0,Direction.NORTH);CoalFireFixture.set(w.fire,false,w.fire.capacity());
+        w.fire.tick(1);int minutes=w.fire.minutesHot();
+        h.assertTrue(minutes>=13&&minutes<=22,"Unfed, a full store works for about twenty minutes in ordinary air: "+minutes);
+        for(int i=0;i<(minutes-1)*60;i++)w.fire.tick(20);
+        h.assertTrue(w.fire.hot(),"Still at working heat a minute before its estimate");
+        for(int i=0;i<3*60;i++)w.fire.tick(20);
+        h.assertTrue(!w.fire.hot()&&w.fire.heat()>700,"It then falls below working heat while still warm");
+        h.succeed();
+    }
+    @GameTest(template="industrial") public static void aBurntOutFireLeavesItsMachineHot(GameTestHelper h){
         var p=h.absolutePos(new BlockPos(4,1,4));var l=h.getLevel();l.setBlockAndUpdate(p,CookingContent.STATION.get().defaultBlockState());var k=(KilnBlockEntity)l.getBlockEntity(p);k.setItem(1,KilnContent.MINERAL_COAL.toStack());
         for(int i=0;i<50;i++)KilnBlockEntity.tick(l,p,k.getBlockState(),k);
-        h.assertTrue(k.fireHeat()==0&&k.getItem(1).getCount()==1,"Stove waits for manual ignition even with coal");
-        MachineFixture.spark(h.getLevel(),true);k.fire.strike(true);int heat=k.fireHeat();for(int i=0;i<100;i++)KilnBlockEntity.tick(l,p,k.getBlockState(),k);
-        h.assertTrue(k.fireHeat()==heat-10&&k.fire.lit(),"Stove stays lit at low idle rate");
-        var w=WorkshopGameTests.build(h,2,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack());MachineFixture.spark(h.getLevel(),true);w.fire.strike(true);l.removeBlock(w.getBlockPos().east(),false);w.process();h.assertTrue(!w.fire.lit()&&w.heat==0,"Broken shell extinguishes burning reserve");h.succeed();
+        h.assertTrue(k.fire.heat()==0&&k.getItem(1).getCount()==1,"Stove waits for manual ignition even with coal");
+        MachineFixture.spark(l,true);k.fire.strike(true);
+        for(int i=0;i<3000&&k.fire.lit();i++)KilnBlockEntity.tick(l,p,k.getBlockState(),k);
+        h.assertTrue(!k.fire.lit()&&k.getItem(1).isEmpty()&&k.fire.hot(),"Its one Coal burns out, leaving the masonry-free stove at working heat");
+        k.setItem(1,KilnContent.MINERAL_COAL.toStack());KilnBlockEntity.tick(l,p,k.getBlockState(),k);
+        h.assertTrue(!k.fire.lit()&&k.getItem(1).getCount()==1,"Refilling needs a new strike");
+        var w=WorkshopGameTests.build(h,2,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack());CoalFireFixture.light(w);l.removeBlock(w.getBlockPos().east(),false);w.process();
+        h.assertTrue(!w.fire.lit()&&w.fire.heat()==0,"A broken shell loses its fire and its stored heat");h.succeed();
     }
-    @GameTest(template="empty") public static void industrialIdleIsFiniteAndNeedsRelight(GameTestHelper h){
+    @GameTest(template="empty") public static void tooLittleCoalNeverReachesWorkingHeat(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,67,4));l.setBlockAndUpdate(p,IndustrialContent.PUMP.get().defaultBlockState());
         var m=(IndustrialBlockEntity)l.getBlockEntity(p);MachineFixture.build((net.minecraft.server.level.ServerLevel)m.getLevel(),m.getBlockPos());
-        m.setItem(0,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(m.heat==0&&m.getItem(0).getCount()==1,"Pump coal waits for strike");
-        MachineFixture.spark(h.getLevel(),true);h.assertTrue(m.fire.strike(IndustrialStructure.bind(m))&&m.heat==250,"Pump strike purchases one coal reserve");
-        for(int i=0;i<400;i++)m.fire.finish(10,false);
-        h.assertTrue(m.heat==0&&!m.fire.lit()&&m.output.isEmpty(),"Exactly one coal over 200 idle seconds, no output");
+        m.setItem(0,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(m.fire.heat()==0&&m.getItem(0).getCount()==1,"Pump coal waits for strike");
+        MachineFixture.spark(h.getLevel(),true);h.assertTrue(m.fire.strike(IndustrialStructure.bind(m))&&m.getItem(0).getCount()==1,"A strike lights without burning coal yet");
+        for(int i=0;i<400;i++)m.fire.tick(10);
+        h.assertTrue(!m.fire.lit()&&!m.fire.hot()&&m.getItem(0).isEmpty()&&m.output.isEmpty(),"One Coal cannot bring the Derrick's footings to working heat");
         m.setItem(2,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(!m.fire.lit()&&m.getItem(2).getCount()==1,"Backup coal cannot relight an extinguished pump");h.succeed();
     }
 }

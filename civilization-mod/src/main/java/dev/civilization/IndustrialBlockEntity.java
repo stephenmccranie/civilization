@@ -21,12 +21,10 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     public final Kind kind;
     private final NonNullList<ItemStack> items=NonNullList.withSize(8,ItemStack.EMPTY);
     public final FluidTank input,output,lubricant;
-    public int heat,progress,status;
+    public int progress,status;
     public final CoalFire fire=new CoalFire(this);
-    public int fireHeat(){return heat;}
-    public void fireHeat(int value){heat=value;}
-    public int coalCapacity(){return ProductionEnergy.OIL_MB_PER_COAL;}
-    public int coalBudget(){return coalCapacity();}
+    /** The Derrick's stone footings and the Fired Heater's brick hearth. */
+    public int masonry(){return kind==Kind.PUMP?7:20;}
     public int[] coalFuelSlots(){return MachineInventory.INDUSTRIAL_INPUT;}
     public boolean coalFireIgnoresRain(){return kind==Kind.PUMP;}
     public boolean coalPowered(){return kind==Kind.PUMP||kind==Kind.REFINERY;}
@@ -60,7 +58,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         }
     }
     void process(){
-        firePaused=false;processWork();if(!firePaused&&coalPowered()&&level!=null&&!level.isClientSide){fire.finish(IndustrialRates.STEP_TICKS,status==MachineStatus.Industry.WORKING);syncFire();}
+        firePaused=false;processWork();if(!firePaused&&coalPowered()&&level!=null&&!level.isClientSide){fire.tick(IndustrialRates.STEP_TICKS);syncFire();}
     }
     private void syncFire(){var state=getBlockState();if(state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)!=fire.lit())level.setBlock(worldPosition,state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT,fire.lit()),3);}
     private void processWork(){
@@ -71,7 +69,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(structure!=MachineStructure.COMPLETE){formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
         formed=true;
         if(kind==Kind.REFINERY&&MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Industry.WET);return;}
-        if(coalPowered()&&!fire.lit()){pause(MachineStatus.Industry.FIRE_UNLIT);return;}
+        if(coalPowered()&&!fire.hot()){pause(fire.lit()?MachineStatus.Industry.WARMING:MachineStatus.Industry.FIRE_UNLIT);return;}
         MachineInventory.refill(this,MachineInventory.INDUSTRIAL_INPUT);
         transfer(true);
         if(kind==Kind.COLUMN||kind==Kind.CONDENSER){refine();return;}
@@ -86,10 +84,6 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         else{
             if(output.getSpace()<amount){pause(MachineStatus.Industry.OUTPUT_FULL);return;}
             if(kind==Kind.REFINERY&&input.getFluidAmount()<amount){pause(MachineStatus.Industry.NEEDS_INPUT);return;}
-            int cost=kind==Kind.PUMP?amount:(int)Math.ceil(amount/ThermalField.efficiency(level,worldPosition));
-            int needed=Math.max(0,(cost-heat+ProductionEnergy.OIL_MB_PER_COAL-1)/ProductionEnergy.OIL_MB_PER_COAL);
-            int available=0;for(int slot:MachineInventory.INDUSTRIAL_INPUT)if(items.get(slot).is(KilnContent.MINERAL_COAL.get()))available+=items.get(slot).getCount();
-            if(needed>available){pause(MachineStatus.Industry.NEEDS_FUEL);return;}
         }
         status=MachineStatus.Industry.WORKING;working(true);progress+=IndustrialRates.STEP_TICKS;setChanged();
         if(progress<duration())return;
@@ -98,11 +92,9 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
             if(!work.extract(server,site,worldPosition,target))return;
             input.drain(IndustrialRates.DRILL_FUEL_MB,EXECUTE);if(lubricant.getFluidAmount()>=10){lubricant.drain(10,EXECUTE);lubrication=1000;}else lubrication=Math.max(200,lubrication-10);MachineInventory.insert(this,MachineInventory.INDUSTRIAL_OUTPUT,KilnContent.MINERAL_COAL.toStack(amount));
         }else{
-            int cost=kind==Kind.PUMP?amount:(int)Math.ceil(amount/ThermalField.efficiency(level,worldPosition));
             if(kind==Kind.PUMP&&!work.extract(server,site,worldPosition,target))return;
-            if(!fire.supply(cost))return;
-            heat-=cost;
-            fire.spent(cost);
+            // Checked hot this step, so the draw always succeeds.
+            fire.draw(amount*(double)ProductionEnergy.COAL/ProductionEnergy.OIL_MB_PER_COAL);
             if(kind==Kind.REFINERY)input.drain(amount,EXECUTE);
             output.fill(new FluidStack(kind==Kind.PUMP?IndustrialContent.CRUDE.get():IndustrialContent.HEATED.get(),amount),EXECUTE);
         }
@@ -144,8 +136,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(result!=null)p.setItemInHand(hand,new ItemStack(result));else p.displayClientMessage(Component.literal("Needs 1,000 mB available or room for one full canister of the right liquid."),true);
     }
     public final ContainerData data=new ContainerData(){
-        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->heat;case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->fire.remaining();case 13->model()!=null&&build.sections==model().all?1:0;default->0;};}
-        public void set(int i,int v){}public int getCount(){return 14;}
+        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->fire.heat();case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->model()!=null&&build.sections==model().all?1:0;default->0;};}
+        public void set(int i,int v){}public int getCount(){return 13;}
     };
     @Override public void onLoad(){
         super.onLoad();
@@ -156,8 +148,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
             }
         }
     }
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("progress",progress);}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=saveWithoutMetadata(r);t.putBoolean("formed",formed);return t;}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}

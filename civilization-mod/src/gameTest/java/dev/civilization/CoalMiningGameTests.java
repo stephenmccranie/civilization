@@ -16,7 +16,7 @@ public final class CoalMiningGameTests {
     public static void survivalSmithyMakesAndRepairsManualCoalTools(GameTestHelper h){
         var w=WorkshopGameTests.build(h,3,Direction.NORTH);
         for(var tool:java.util.List.of(CoalMiningContent.PICK.get(),CoalMiningContent.SHOVEL.get())){
-            w.clearContent();w.heat=0;
+            w.clearContent();
             var id=net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(tool).toString();
             int index=WorkshopJobs.index(3,id);h.assertTrue(index>=0,"Coal tool has a Smithy job");w.select(index);
             var job=WorkshopJobs.jobs(3).get(index);
@@ -24,7 +24,7 @@ public final class CoalMiningGameTests {
             WorkshopGameTests.run(w,job.ticks());
             var result=w.getItem(5).copy();
             h.assertTrue(result.is(tool)&&EquipmentGrade.hasGrade(result),"Smithy produces a graded coal tool");
-            h.assertTrue(w.getItem(4).isEmpty()&&w.heat==0,"Hand assembly spends no Coal");
+            h.assertTrue(w.getItem(4).isEmpty()&&w.fire.heat()==0,"Hand assembly spends no Coal");
             for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Actual tool materials are consumed");
             EquipmentGrade.apply(result,1000); // Repairability here must not depend on the production grade roll.
             result.setDamageValue(Math.max(1,result.getMaxDamage()/2));

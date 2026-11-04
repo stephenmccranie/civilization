@@ -83,7 +83,7 @@ final class CoalMiningVisualCheck {
             int slot=p.getInventory().findSlotMatchingItem(KilnContent.MINERAL_COAL.toStack());var fuel=p.getInventory().removeItem(slot,1);var stove=(KilnBlockEntity)server.overworld().getBlockEntity(STOVE);stove.setItem(1,fuel);
             // Seed only the disposable ignition fixture, retaining real CoalFire consumption.
             MachineFixture.spark(server.overworld(),true);
-            if(!stove.fire.strike(p,true)||!stove.fire.lit()||!stove.getItem(1).isEmpty()||stove.fireHeat()<=0)throw new IllegalStateException("Prepared Coal did not fuel the existing cooking station");verified=true;
+            if(!stove.fire.strike(p,true)||!stove.fire.lit())throw new IllegalStateException("Prepared Coal did not light the existing cooking station");verified=true;
         });
         if(ticks==610)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
         if(ticks==625)shot(mc,"inventory");

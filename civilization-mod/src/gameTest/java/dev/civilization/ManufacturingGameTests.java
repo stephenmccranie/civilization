@@ -32,7 +32,7 @@ public final class ManufacturingGameTests {
             h.assertTrue(w.getItem(5).is(job.output().getItem())&&w.getItem(5).getCount()==job.output().getCount(),"Actual output: "+job.id());
             for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Exact consumption: "+job.id());
             int output=w.getItem(5).getCount();w.process();h.assertTrue(w.getItem(5).getCount()==output,"No automatic second batch");
-            h.assertTrue(w.heat==0&&w.getItem(4).isEmpty()&&w.getItem(6).isEmpty(),"Hand work has no fuel");
+            h.assertTrue(w.fire.heat()==0&&w.getItem(4).isEmpty()&&w.getItem(6).isEmpty(),"Hand work has no fuel");
             CalorieFoodData.of(p).reserve().set(2400);
         }
         h.succeed();
@@ -41,7 +41,7 @@ public final class ManufacturingGameTests {
         var w=WorkshopGameTests.build(h,2,Direction.NORTH);
         for(var job:WorkshopJobs.jobs(2)){
             h.assertTrue(!WorkshopJobs.gated(job.output()),"Smithy only makes stock: "+job.id());
-            supply(w,job);w.heat=0;w.setItem(4,KilnContent.MINERAL_COAL.toStack(16));
+            supply(w,job);w.setItem(4,KilnContent.MINERAL_COAL.toStack(16));
             WorkshopGameTests.run(w,job.ticks());
             h.assertTrue(w.getItem(5).is(job.output().getItem())&&w.getItem(5).getCount()==job.output().getCount(),"Forged output: "+job.id());
             for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Forging paid inputs");

@@ -136,7 +136,7 @@ public final class CivilizationJei implements IModPlugin {
     private <T extends AbstractCookingRecipe> void cooking(IRecipeRegistration r,String name,net.minecraft.world.item.crafting.RecipeType<T> recipeType){
         var level=Minecraft.getInstance().level;
         var recipes=level.getRecipeManager().getAllRecipesFor(recipeType).stream().sorted(Comparator.comparing(h->h.id().toString())).map(h->{
-            var recipe=h.value();return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,recipe.getResultItem(level.registryAccess()).copy()),coal()),recipe.getCookingTime(),"One Coal (250 MJ) supplies 20 s of base heat. Select the recipe in the controller; light its fire.");
+            var recipe=h.value();return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,recipe.getResultItem(level.registryAccess()).copy()),coal()),recipe.getCookingTime(),"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire.");
         }).toList();add(r,name,recipes);
     }
     private void industry(IRecipeRegistration r){
@@ -147,7 +147,7 @@ public final class CivilizationJei implements IModPlugin {
             if(batch.sulfur()>0)slots.add(output(IndustrialContent.SULFUR.get(),batch.sulfur()));
             boolean fired=kind==IndustrialBlock.Kind.REFINERY;if(fired)slots.add(coal());
             String name=fired?"heater":kind==IndustrialBlock.Kind.COLUMN?"column":"condenser";
-            add(r,name,List.of(process(name,slots,batch.ticks(),fired?"Coal heats 250 mB at baseline. Temperature and idle burning affect consumption.":"Connect the multiblock fluid ports with pipes. All output buffers need room.")));
+            add(r,name,List.of(process(name,slots,batch.ticks(),fired?"Draws one Coal per 250 mB from a hot machine; warming up and heat loss come on top.":"Connect the multiblock fluid ports with pipes. All output buffers need room.")));
         }
         add(r,"oil_pump",List.of(process("oil_extraction",List.of(fluid(RecipeIngredientRole.OUTPUT,IndustrialContent.CRUDE.get(),125),coal()),50,"Build above the physical oil deposit within its footprint. Drains 125 mB per step. One Coal extracts 250 mB before idle losses.")));
         add(r,"coal_drill",List.of(process("coal_extraction",List.of(fluid(RecipeIngredientRole.INPUT,IndustrialContent.FUEL.get(),IndustrialRates.DRILL_FUEL_MB),

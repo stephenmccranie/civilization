@@ -133,7 +133,7 @@ Calories support people throughout and are not a tier. Lower-tier goods and fuel
 - Coal is the heat fuel; oil the mobile mechanical fuel and source of lubricant and sulfur. Per mass, petroleum should eventually hold only moderately more energy than coal.
 - Each stage builds the next from what is already available, with no circular recipes: ordinary coal starts industry, coal opens oil, oil processes hand-found uranium.
 - **One Coal** serves crafting, fuel and claim reserves; charcoal, renewable coal and coal blocks are removed. Kilns fire nonmetals, Foundries metals and ore, stoves food; vanilla furnaces, blast furnaces and smokers retire, and no controller needs one.
-- **Coal demand.** Production burns four times the original coal baseline, with speeds, outputs and claim upkeep unchanged. Every coal machine is lit by hand with a paced, random-chance flint-and-steel button (each accepted strike costs a little labour), then feeds itself, idling far cheaper than working, until it runs out. Coal machines have two fuel slots.
+- **Fired machines store heat.** Every coal machine is lit by hand with a paced, random-chance flint-and-steel button (each accepted strike costs a little labour), then stokes itself from two fuel slots. The fire heats the machine's masonry first: warming a cold machine is the big cost, about one dense block of Coal for a Foundry and less for smaller machines, over about two minutes. Work needs working heat and draws a little per job; a hot machine leaks slowly into the air around it, so unfed it stays hot for about twenty minutes, longer when sheltered and walled, shorter in cold or rain. Heat once and work a lot: a busy shared furnace pays one warm-up.
 - Heat machines cannot ignite or work while rain reaches their work face; a roof shelters them.
 - **Refining.** Coal powers the first pump and heater. Heater, distillation and condenser multiblocks connect through basic pipes, balanced one-to-one with an extractor, producing refined fuel, lubricating oil and sulfur. One extractor fills a basic pipe; branching never multiplies capacity. Lubrication wears with work, not idle time; running dry gradually cuts efficiency. Pipes have no valves; glass inspection strips show the moving fluid.
 - Refined fuel drives transport and machinery and is not needed for coal. **No oil dependency may block building the first oil chain.**
@@ -141,7 +141,6 @@ Calories support people throughout and are not a tier. Lower-tier goods and fuel
 
 **Open**
 - Oil and uranium processing beyond the refinery; uranium fuel packaging and yield; oil freight quantities.
-- Whether furnace-style burning and workshop heat converge into one policy.
 - The remaining vanilla boundary: resource farms, special equipment and loot, enchanting, food shortcuts, mobs, redstone, automation, and storage or travel that bypasses freight; stonecutter overlap with saws.
 - Coal and oil balance rebuilt from mining, hauling and transport rather than the retired drill ratio. With real energy per item, what goods cost is set by how fast coal and oil are mined, drilled and hauled: a dense block yields 4 GJ, so mining and drilling rates per block need rethinking alongside heat-and-hammer refining.
 - How powers are shown while the day runs 24 times faster than real time, so real energies per job meet compressed hours.

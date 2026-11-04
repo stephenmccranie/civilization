@@ -46,8 +46,8 @@ Air mixes with neighbors, with extra upward transfer when lower air is hotter, l
 
 | Source | Heat |
 | --- | --- |
-| Coal in an industrial machine | 13,000 units per Coal, released as its work reserve is spent: about 650 units/s at full productive burn, a tenth of that idle |
-| Coal in the Cooking Stove or Prototype Stove | 5% of industrial: 650 units per Coal (about 32.5 units/s at full burn) |
+| Coal in an industrial machine | 13,000 units per Coal, released as work draws it from the store (about 650 units/s at a Kiln's full draw) and as hot masonry leaks (about 1.7 units/s per block of full masonry); heat still being stored releases nothing yet |
+| Coal in the Cooking Stove or Prototype Stove | 5% of industrial: 650 units per Coal (about 32.5 units/s at full draw) |
 | Hot-Bulb Engine | From fuel actually consumed |
 | Torch, soul torch | 6 units per loaded second |
 | Campfire, soul campfire, fire, soul fire | 24 units per loaded second |
@@ -76,9 +76,9 @@ The server updates air and felt temperature once per second; felt temperature fo
 
 ## Machines
 
-Kiln-family machines and town workshops buy a temperature-adjusted work budget with each new Coal: unchanged from 32°F through 78.8°F, up to 10% more when warmer, and up to 30% less below 32°F, with overhead shelter halving the cold penalty. The Fired Heater instead pays an adjusted heat cost per batch, checking physical coal first. Times and yields never change; the Oil Derrick, engines and claim upkeep are unaffected, and already-bought work credit is kept. Neighboring field temperatures are sampled around the controller. `ThermalRules` owns the tuning.
+A hot machine's masonry leaks at a temperature-adjusted rate: unchanged from 32°F through 78.8°F, so an unfed machine stays hot up to 10% longer when warmer and up to 30% less long below 32°F, with overhead shelter halving the cold penalty. This applies to every coal-fired machine; work draws, times and yields never change, and engines and claim upkeep are unaffected. Neighboring field temperatures are sampled around the controller once a second. `ThermalRules` owns the tuning.
 
-**Rain on the work face:** direct rain on the block in front of a heated controller blocks ignition and pauses productive work in Kilns, Foundries, Cooking Stoves, Fertilizer Furnaces, town workshops and the Fired Heater. The regional `isRainingAt` query includes sky exposure and biome precipitation, so a roof over the work face is enough and a chimney may stay outdoors. A lit fire keeps idling and resumes when sheltered or dry; the screen names the obstruction. Oil Derricks, Coal Drills, the Distillation Column, Condenser and Hot-Bulb Engines are not rain-paused.
+**Rain on the work face:** direct rain on the block in front of a heated controller blocks ignition and pauses productive work in Kilns, Foundries, Cooking Stoves, Fertilizer Furnaces, town workshops and the Fired Heater. The regional `isRainingAt` query includes sky exposure and biome precipitation, so a roof over the work face is enough and a chimney may stay outdoors. A lit fire keeps the masonry hot and work resumes when sheltered or dry; the screen names the obstruction. Oil Derricks, Coal Drills, the Distillation Column, Condenser and Hot-Bulb Engines are not rain-paused.
 
 ## Player display
 

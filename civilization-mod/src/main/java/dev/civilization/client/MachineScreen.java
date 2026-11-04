@@ -103,14 +103,14 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
         }
         MachineUi.panel(g,leftPos,topPos,imageWidth,imageHeight);MachineUi.title(g,title.getString(),leftPos,topPos,imageWidth);MachineUi.slots(g,menu,leftPos,topPos);drawMachine(g,partial,mx,my);
         if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()){
-            int x=leftPos+116,y=topPos+85,h=Math.round(21*fire.coalRemaining()/1000f);
+            int x=leftPos+116,y=topPos+85,h=Math.round(21*fire.heat()/1000f);
             g.fill(x,y,x+6,y+23,0xff37352f);g.fill(x+1,y+1,x+5,y+22,0xff191919);
             if(h>0){g.fill(x+1,y+22-h,x+5,y+22,0xffe99a28);g.fill(x+1,y+22-h,x+2,y+22,0xffffdf73);}
         }
     }
     protected abstract void drawMachine(GuiGraphics g,float partial,int mx,int my);
     @Override protected void renderLabels(GuiGraphics g,int mx,int my){g.drawString(font,playerInventoryTitle,inventoryLabelX,inventoryLabelY,MachineUi.INK,false);}
-    @Override public void render(GuiGraphics g,int mx,int my,float dt){super.render(g,mx,my,dt);renderTooltip(g,mx,my);if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()&&isHovering(115,84,8,25,mx,my))g.renderTooltip(font,Component.literal("Burning coal: "+Math.round(fire.coalRemaining()/10f)+"% · "+dev.civilization.Energy.text(fire.coalRemaining()/1000.0*dev.civilization.Energy.COAL)+" left"),mx,my);}
+    @Override public void render(GuiGraphics g,int mx,int my,float dt){super.render(g,mx,my,dt);renderTooltip(g,mx,my);if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()&&isHovering(115,84,8,25,mx,my))g.renderTooltip(font,MachineUi.heat(fire),mx,my);}
     private int thumbHeight(int size){return Math.max(8,rowCount*18*rowCount/size);}
     private int thumbTop(int size){return listY+Math.round((float)(rowCount*18-thumbHeight(size))*offset/(size-rowCount));}
     private void dragThumb(double y){int size=filtered().size();if(size>rowCount)offset=Math.round((float)(y-grab-listY)*(size-rowCount)/(rowCount*18-thumbHeight(size)));updateDrawer();}

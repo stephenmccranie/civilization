@@ -82,6 +82,12 @@ public final class MachineUi {
         g.fill(x+2,y+1,x+4,y+39,0x33ffffff);
         for(int i=10;i<40;i+=10)g.fill(x,y+i,x+5,y+i+1,0xffd6ccb6);
     }
+    /** The fire gauge's words: how full the machine's stored heat is, and how long it lasts. */
+    public static net.minecraft.network.chat.Component heat(dev.civilization.CoalFireMenu fire) {
+        String state = fire.hot() ? "Hot: works for about " + fire.minutesHot() + " min unfed"
+                : (fire.fireState() & 1) != 0 ? "Warming up: works from " + Math.round(dev.civilization.CoalFire.WORKING * 100) + "%" : "Cold";
+        return net.minecraft.network.chat.Component.literal("Heat " + Math.round(fire.heat() / 10f) + "% · " + state);
+    }
     public static void fire(GuiGraphics g,int x,int y,int w,int h,boolean burning) {
         g.fill(x,y,x+w,y+h,0xff353631);g.fill(x+1,y+1,x+w-1,y+h-1,0xff68665c);
         g.fill(x+2,y+2,x+w-2,y+h-2,0xff221e19);

@@ -36,7 +36,7 @@ Controller crafting needs no leather, cloth, shears, anvil or oil; the assembled
 | Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
 | Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
 
-Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire idles. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
+Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire keeps the Smithy hot. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
 
 Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 
@@ -61,7 +61,7 @@ Inputs are consumed only when the whole output fits. Hoppers may supply inputs f
 | Iron Fasteners | 1 iron ingot | 8 | 5 seconds | Smithy |
 | Machine Parts | 2 Steel Plates + 4 Copper Rods | 2 | 10 seconds | Assembly Bench |
 
-Plates and Rods come in iron, copper, steel and gold; gold takes twice as long. Fasteners stand for nails, rivets, bolts, hinges and latches. A Tool Handle includes the wood, leather grip and binding, so tools never need extra leather. A Wheel includes hub, spokes and rim. Machine Parts abstract bearings, gears and fittings. At neutral efficiency a Plate, Rod or Fasteners batch uses 0.25 Coal before ignition, idle burn and temperature.
+Plates and Rods come in iron, copper, steel and gold; gold takes twice as long. Fasteners stand for nails, rivets, bolts, hinges and latches. A Tool Handle includes the wood, leather grip and binding, so tools never need extra leather. A Wheel includes hub, spokes and rim. Machine Parts abstract bearings, gears and fittings. A Plate, Rod or Fasteners batch draws 0.25 Coal from a hot Smithy; warming up and heat loss come on top.
 
 ## Equipment
 

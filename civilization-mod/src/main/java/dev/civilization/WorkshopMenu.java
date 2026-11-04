@@ -18,9 +18,9 @@ public final class WorkshopMenu extends AbstractContainerMenu implements CoalFir
         MachineMenus.playerSlots(this::addSlot,inv,132);
         addDataSlots(data);
     }
-    public int fireState(){return data.get(5);}
+    public int fireState(){return data.get(4);}
     @Override public boolean hasCoalFire(){return kind()!=ManufacturingJobs.BENCH;}
-    public int coalRemaining(){return data.get(6);}
+    public int heat(){return data.get(5);}
     public int kind(){return data.get(0);}public int selection(){return data.get(1);}
     public WorkshopJobs.Job job(){return MachineWork.job(inventory,kind(),selection());}
     @Override public boolean stillValid(Player p){return inventory.stillValid(p);}
