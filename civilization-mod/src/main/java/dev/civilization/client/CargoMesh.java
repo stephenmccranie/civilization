@@ -12,9 +12,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,9 +30,10 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 /**
  * A store's goods drawn as its {@link CargoLayout} places them, built once per layout: each stored block a quarter-size
  * block, eight pieces for a cell of slabs or cut pieces, in the grid's frame from its first-row, first-column, bottom
- * corner. Goods drawn from their block model become block quads by render type, without the faces hidden between whole
- * cells of solid blocks and with their tint baked in, so the same quads draw in the terrain or on a moving store. Goods
- * drawn by a block entity or as their item, such as chests and the Baking Oven, are {@link #drawn} each frame instead.
+ * corner. Goods drawn from their block model become block quads by render type, as their model draws them among the
+ * other goods (see {@link Goods}), without the faces hidden between whole cells of solid blocks and with their tint baked
+ * in, so the same quads draw in the terrain or on a moving store. Goods drawn by a block entity or as their item, such as
+ * chests and the Baking Oven, are {@link #drawn} each frame instead.
  */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class CargoMesh {
@@ -69,47 +75,56 @@ public final class CargoMesh {
 
     private static CargoMesh build(CargoLayout layout){
         var quads=new HashMap<RenderType,List<BakedQuad>>();var drawn=new ArrayList<Cell>();
-        var grid=layout.grid;float width=CargoGrid.CELL,height=grid.height();
+        var goods=new Goods(layout);float width=CargoGrid.CELL,height=layout.grid.height();
         for(int cell=0;cell<layout.cells();cell++){
-            int level=cell/grid.layer(),row=cell%grid.layer()/grid.across(),column=cell%grid.across();
-            float x=column*width,y=level*height,z=row*width;
+            var at=goods.pos(cell);
+            float x=at.getX()*width,y=at.getY()*height,z=at.getZ()*width;
             var whole=layout.whole(cell);
-            if(whole!=null){
-                int at=cell;
-                add(whole,x,y,z,width,height,side->solid(layout.whole(neighbour(grid,at,side))),quads,drawn);
-            }else for(int k=0;k<8&&cell*8+k<layout.eighths.size();k++)
-                add(layout.eighths.get(cell*8+k),x+k%2*width/2,y+k/4*height/2,z+k/2%2*width/2,width/2,height/2,side->false,quads,drawn);
+            if(whole!=null)add(whole,goods,at,x,y,z,width,height,side->solid(goods,at.relative(side)),quads,drawn);
+            else for(int k=0;k<8&&cell*8+k<layout.eighths.size();k++)
+                add(layout.eighths.get(cell*8+k),goods,at,x+k%2*width/2,y+k/4*height/2,z+k/2%2*width/2,width/2,height/2,side->false,quads,drawn);
         }
         return new CargoMesh(quads,drawn);
     }
 
-    /** The cell beside `cell` toward `side` in the grid, or -1 past its edge. */
-    private static int neighbour(CargoGrid grid,int cell,Direction side){
-        int row=cell%grid.layer()/grid.across(),column=cell%grid.across();
-        return switch(side){
-            case UP->cell+grid.layer();
-            case DOWN->cell-grid.layer();
-            case EAST->column+1<grid.across()?cell+1:-1;
-            case WEST->column>0?cell-1:-1;
-            case SOUTH->row+1<grid.along()?cell+grid.across():-1;
-            case NORTH->row>0?cell-grid.across():-1;
-        };
-    }
+    private static boolean solid(Goods goods,BlockPos pos){return goods.getBlockState(pos).isSolidRender(goods,pos);}
 
-    private static boolean solid(BlockState state){return state!=null&&state.isSolidRender(EmptyBlockGetter.INSTANCE,BlockPos.ZERO);}
-
-    private static void add(BlockState state,float x,float y,float z,float width,float height,java.util.function.Predicate<Direction> hidden,Map<RenderType,List<BakedQuad>> quads,List<Cell> drawn){
+    /** `state` at `at` among the goods, drawn into the box from `x`, `y` and `z` of `width` by `height` by `width`. */
+    private static void add(BlockState state,Goods goods,BlockPos at,float x,float y,float z,float width,float height,java.util.function.Predicate<Direction> hidden,Map<RenderType,List<BakedQuad>> quads,List<Cell> drawn){
         if(state.getRenderShape()!=RenderShape.MODEL){drawn.add(new Cell(state,x,y,z,width,height));return;}
-        var model=Minecraft.getInstance().getBlockRenderer().getBlockModel(state);var random=RandomSource.create(42);
-        for(var type:model.getRenderTypes(state,random,ModelData.EMPTY)){
+        var model=Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        var data=model.getModelData(goods,at,state,ModelData.EMPTY);long seed=state.getSeed(at);var random=RandomSource.create(seed);
+        for(var type:model.getRenderTypes(state,random,data)){
             var into=quads.computeIfAbsent(type,t->new ArrayList<>());
             for(var side:SIDES){
                 if(side!=null&&hidden.test(side))continue;
-                random.setSeed(42);
-                for(var quad:model.getQuads(state,side,random,ModelData.EMPTY,type))
+                random.setSeed(seed);
+                for(var quad:model.getQuads(state,side,random,data,type))
                     into.add(place(quad,x,y,z,width,height,quad.isTinted()?Minecraft.getInstance().getBlockColors().getColor(state,null,null,quad.getTintIndex()):-1));
             }
         }
+    }
+
+    /**
+     * The goods' whole blocks as a world of their own, each cell at its column, layer and row, and air around them, so a
+     * model that reads its surroundings, such as a resource pack's connected, repeating or random textures, draws a
+     * stored block as it would among those neighbours. Light, shade and tint come from the world the goods are drawn in.
+     */
+    private record Goods(CargoLayout layout) implements BlockAndTintGetter {
+        BlockPos pos(int cell){var grid=layout.grid;return new BlockPos(cell%grid.across(),cell/grid.layer(),cell%grid.layer()/grid.across());}
+        @Override public BlockState getBlockState(BlockPos pos){
+            var grid=layout.grid;
+            var inside=pos.getX()>=0&&pos.getX()<grid.across()&&pos.getZ()>=0&&pos.getZ()<grid.along()&&pos.getY()>=0;
+            var state=inside?layout.whole(pos.getY()*grid.layer()+pos.getZ()*grid.across()+pos.getX()):null;
+            return state==null?Blocks.AIR.defaultBlockState():state;
+        }
+        @Override public FluidState getFluidState(BlockPos pos){return getBlockState(pos).getFluidState();}
+        @Override public BlockEntity getBlockEntity(BlockPos pos){return null;}
+        @Override public int getHeight(){return layout.grid.layers();}
+        @Override public int getMinBuildHeight(){return 0;}
+        @Override public float getShade(Direction side,boolean shade){return Minecraft.getInstance().level.getShade(side,shade);}
+        @Override public LevelLightEngine getLightEngine(){return Minecraft.getInstance().level.getLightEngine();}
+        @Override public int getBlockTint(BlockPos pos,ColorResolver resolver){return Minecraft.getInstance().level.getBlockTint(pos,resolver);}
     }
 
     /** `quad` scaled by `width`, `height` and `width` and moved by `x`, `y` and `z`, its colour multiplied by `tint`. */
