@@ -78,6 +78,8 @@
   "item.civilization.cake_batter": "Cake Batter",
   "message.civilization.bone_meal_disabled": "Bone meal cannot grow plants. Use Mineral Fertilizer on growing wheat.",
   "tooltip.civilization.cooking_input": "Cook food and bake dough · coal-fired",
+  "message.civilization.hammering": "Hammering %s: %s/%s strikes",
+  "message.civilization.hammered": "Hammered %s: %s → %s",
   "tooltip.civilization.cooking_fuel": "Warms up before it cooks, and burns Coal while lit, even when idle",
   "tooltip.civilization.bake": "Bake in a coal-fired Cooking Stove",
   "gui.civilization.operating_0": "Structure incomplete",

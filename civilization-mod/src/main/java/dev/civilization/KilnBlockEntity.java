@@ -34,6 +34,11 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
                 .map(r->r.value().getCookingTime()).orElse(200));
         setChanged();
     }
+    /** What one batch of `input` makes; a pass that keeps its material heats it instead. */
+    private ItemStack product(net.minecraft.world.item.crafting.SingleRecipeInput input) {
+        var result=processingRecipe(input).map(recipe->recipe.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
+        return !result.isEmpty()&&result.is(input.item().getItem())?HotMetal.heated(result,level.getGameTime()):result;
+    }
     public java.util.Optional<net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.AbstractCookingRecipe>> processingRecipe(net.minecraft.world.item.crafting.SingleRecipeInput input) {
         return recipes().stream().filter(r -> selectedRecipe==null || r.id().equals(selectedRecipe))
                 .filter(r -> r.value().matches(input,level)).findFirst();
@@ -68,10 +73,8 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         if (MachineWeather.wetWorkFace(level, worldPosition, getBlockState())) return 7;
         if (!getItem(0).isEmpty() && !canPlaceItem(0, getItem(0))) return 5;
         if (getItem(0).isEmpty()) return MachineInventory.count(this,MachineInventory.KILN_OUTPUT)==0 ? 2 : 6;
-        var match = processingRecipe(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)));
-        if(match.isEmpty())return 5;
-        var recipe = match.get().value();
-        var result = recipe.assemble(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)), level.registryAccess());
+        var result = product(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)));
+        if (result.isEmpty()) return 5;
         if (!MachineInventory.room(this,MachineInventory.KILN_OUTPUT,result)) return 3;
         return fire.hot() ? 2 : fire.lit() ? 8 : 4;
     }
@@ -86,7 +89,8 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     }
     @Override public int getContainerSize(){return 6;}
     @Override public int[] getSlotsForFace(net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN?MachineInventory.KILN_OUTPUT:side==net.minecraft.core.Direction.UP?MachineInventory.KILN_INPUT:MachineInventory.KILN_FUEL;}
-    @Override public boolean canTakeItemThroughFace(int slot,ItemStack stack,net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN&&MachineInventory.contains(MachineInventory.KILN_OUTPUT,slot);}
+    /** Hot metal is taken by hand. */
+    @Override public boolean canTakeItemThroughFace(int slot,ItemStack stack,net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN&&MachineInventory.contains(MachineInventory.KILN_OUTPUT,slot)&&!stack.has(HotMetal.HOT.get());}
     protected String auditPrefix() { return "kiln"; }
     public static boolean acceptsFuel(ItemStack stack) { return stack.is(KilnContent.MINERAL_COAL.get()); }
     /** The coal fire stokes the fuel; vanilla never burns it. */
@@ -126,6 +130,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     }
     public static void tick(Level level, BlockPos pos, BlockState state, KilnBlockEntity kiln) {
         kiln.returnLegacyOverflow();
+        if (level.getGameTime() % 20 == 0) for (int slot : MachineInventory.KILN_OUTPUT) HotMetal.cool(kiln.getItem(slot), level.getGameTime());
         MachineInventory.refill(kiln,MachineInventory.KILN_INPUT);
         // Active machines validate every work tick; idle ones stagger checks once per second.
         if (kiln.fire.lit() || kiln.fire.heat() > 0 || !kiln.getItem(0).isEmpty() || Math.floorMod(level.getGameTime() + pos.asLong(), 20) == 0)
@@ -146,9 +151,10 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 0.2f, 0.9f);
         if (!kiln.fire.hot() || MachineWeather.wetWorkFace(level, pos, state)) { feedback(level, pos, kiln.fire.lit(), false); return; }
         var input=new net.minecraft.world.item.crafting.SingleRecipeInput(kiln.getItem(0));
-        var result=kiln.processingRecipe(input).map(recipe->recipe.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
+        var result=kiln.product(input);
+        boolean heats=result.has(HotMetal.HOT.get());
         // Vanilla cooks into slot 2 only, one unit of the input at a time. Each batch cooks into an emptied
-        // slot 2; the product takes its grade from the input unit it used, then joins the output bank.
+        // slot 2; the product takes its grade from the input unit it used, a heat takes the rest of its load, then it joins the output bank.
         boolean redirect=!result.isEmpty()&&MachineInventory.room(kiln,MachineInventory.KILN_OUTPUT,result);
         var originalOutput=redirect?kiln.items.set(2,ItemStack.EMPTY):ItemStack.EMPTY;
         var inputUnits=kiln.getItem(0).copy();
@@ -159,14 +165,14 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         // Vanilla cooks only while lit and spends a tick of burn time first; the heat itself comes from the fire.
         kiln.dataAccess.set(0,2);
         try{serverTick(level, pos, state, kiln);}
-        finally{kiln.dataAccess.set(0,0);if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty()){Grade.smelted(produced,inputUnits,level.random);MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}}
+        finally{kiln.dataAccess.set(0,0);if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty()){Grade.smelted(produced,inputUnits,level.random);if(heats)HotMetal.load(kiln,0,MachineInventory.KILN_OUTPUT,HotMetal.heated(produced,level.getGameTime()));MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}}
         boolean completed = kiln.getItem(0).getCount() < inputCount;
         boolean working = completed || kiln.dataAccess.get(2) > progress;
         if (working) kiln.fire.draw(1);
         feedback(level, pos, kiln.fire.lit(), working);
         if (completed) {
             EnergyLog.machine(level, pos, kiln.auditPrefix() + "_batch", net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(inputItem).toString(),
-                    1, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(kiln.getItem(2).getItem()).toString(), MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT) - outputCount);
+                    inputCount - kiln.getItem(0).getCount(), net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(kiln.getItem(2).getItem()).toString(), MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT) - outputCount);
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.DECORATED_POT_PLACE,
                     net.minecraft.sounds.SoundSource.BLOCKS, 0.15f, 1.2f);
         }

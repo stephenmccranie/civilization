@@ -94,7 +94,7 @@ public final class GradeGameTests {
         h.succeed();
     }
 
-    private static void select(FoundryBlockEntity f, String path) {
+    static void select(FoundryBlockEntity f, String path) {
         var recipes = f.recipes();
         for (int i = 0; i < recipes.size(); i++) if (recipes.get(i).id().getPath().equals(path)) { f.selectRecipe(i); return; }
         throw new IllegalStateException("No Foundry recipe " + path);
@@ -105,13 +105,6 @@ public final class GradeGameTests {
         h.assertTrue(f.getItem(2).is(Items.IRON_INGOT) && f.getItem(2).getCount() == 8 && Grade.of(f.getItem(2)).units().size() > 1, "Each smelted ingot rolls its own grade and the ingots share one stack");
         f.setItem(2, ItemStack.EMPTY); f.setItem(1, KilnContent.MINERAL_COAL.toStack(16)); f.setItem(0, ingots(1000, 900, 700)); FoundryGameTests.run(h, f, 3 * 800 + 40);
         h.assertTrue(f.getItem(2).is(KilnContent.STEEL.get()) && grades(f.getItem(2)).equals(List.of(1000, 900, 700)), "On Automatic, iron still becomes steel, each ingot keeping its grade");
-        f.setItem(2, ItemStack.EMPTY); select(f, "refine_iron_ingot"); f.setItem(0, ingots(960, 400)); FoundryGameTests.run(h, f, 2 * 200 + 40);
-        var refined = grades(f.getItem(2));
-        h.assertTrue(refined.size() == 2 && refined.getFirst() > 960 && refined.getLast() > 400, "Refining raises every unit it passes: " + refined);
-        f.setItem(2, ItemStack.EMPTY); select(f, "refine_iron_ingot"); f.setItem(0, new ItemStack(Items.IRON_INGOT)); FoundryGameTests.run(h, f, 240);
-        h.assertTrue(Grade.value(f.getItem(2)) > Grade.STANDARD, "An ingot with no recorded grade refines up from the standard 75%");
-        f.setItem(2, ItemStack.EMPTY); f.selectRecipe(-1); f.setItem(0, new ItemStack(Items.DIAMOND)); FoundryGameTests.run(h, f, 240);
-        h.assertTrue(f.getItem(2).is(Items.DIAMOND) && Grade.value(f.getItem(2)) > Grade.STANDARD, "Diamonds, which have no other Foundry job, refine on Automatic");
         h.succeed();
     }
 

@@ -129,14 +129,16 @@ public final class CivilizationJei implements IModPlugin {
             add(r,new String[]{"tannery","textile","smithy","assembly"}[kind],recipes);
         }
         industry(r);cutting(r);
-        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; place it and build the furnace from it with 3 stone and 20 brick blocks, no metal. Smelt iron/copper/gold here. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
+        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; place it and build the furnace from it with 3 stone and 20 brick blocks, no metal. Smelt iron/copper/gold here, and heat ingots for hammering at an anvil. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
         r.addItemStackInfo(KilnContent.RETORT_ITEM.toStack(),Component.literal("Fertilizer: refinery sulfur and gravel make Sulfur Blend, fired here into Mineral Fertilizer. Its controller is four brick blocks and four iron ingots around cobblestone; place it and build the works from it with 4 stone, 17 brick blocks, 6 planks and 8 steel plates."));
         r.addItemStackInfo(KilnContent.MINERAL_COAL.toStack(),Component.literal("Coal machines require manual ignition and keep burning while idle. Consumption depends on work, idle time and temperature; JEI shows baseline processing times, not a fixed Coal charge per recipe."));
     }
     private <T extends AbstractCookingRecipe> void cooking(IRecipeRegistration r,String name,net.minecraft.world.item.crafting.RecipeType<T> recipeType){
         var level=Minecraft.getInstance().level;
         var recipes=level.getRecipeManager().getAllRecipesFor(recipeType).stream().sorted(Comparator.comparing(h->h.id().toString())).map(h->{
-            var recipe=h.value();return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,recipe.getResultItem(level.registryAccess()).copy()),coal()),recipe.getCookingTime(),"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire.");
+            var recipe=h.value();var output=recipe.getResultItem(level.registryAccess()).copy();
+            String note=recipe.getIngredients().getFirst().test(output)?"Heats a load of up to "+dev.civilization.HotMetal.LOAD+" for the same Coal. Hammer each hot unit at an anvil within a minute to refine it.":"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire.";
+            return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,output),coal()),recipe.getCookingTime(),note);
         }).toList();add(r,name,recipes);
     }
     private void industry(IRecipeRegistration r){

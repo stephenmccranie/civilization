@@ -13,7 +13,10 @@ final class StorageVisualCheck {
             var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();var pos=new BlockPos(80,101,0);
             p.teleportTo(l,80.5,101,-2,java.util.Set.of(),0,0);l.setBlockAndUpdate(pos,KilnContent.KILN.get().defaultBlockState());
             var k=(KilnBlockEntity)l.getBlockEntity(pos);k.setItem(0,new ItemStack(Items.CLAY,32));k.setItem(4,new ItemStack(Items.CLAY,32));
-            k.setItem(2,new ItemStack(Items.BRICK,32));k.setItem(5,new ItemStack(Items.BRICK,32));k.setItem(1,KilnContent.MINERAL_COAL.toStack(32));k.setItem(3,KilnContent.MINERAL_COAL.toStack(32));p.openMenu(k);
+            k.setItem(2,new ItemStack(Items.BRICK,32));k.setItem(5,new ItemStack(Items.BRICK,32));k.setItem(1,KilnContent.MINERAL_COAL.toStack(32));k.setItem(3,KilnContent.MINERAL_COAL.toStack(32));
+            // Fresh, three-quarters cooled and cold metal side by side in the hotbar.
+            var now=l.getGameTime();p.getInventory().setItem(0,HotMetal.heated(new ItemStack(Items.IRON_INGOT,8),now));
+            p.getInventory().setItem(1,HotMetal.heated(new ItemStack(Items.COPPER_INGOT,8),now-HotMetal.COOL_TICKS*3/4));p.getInventory().setItem(2,new ItemStack(Items.IRON_INGOT,8));p.openMenu(k);
         });}
         if(ticks==95){
             if(!(mc.player.containerMenu instanceof KilnMenu m)||m.slots.size()!=42||m.getSlot(4).getItem().getCount()!=32||m.getSlot(5).getItem().getCount()!=32)throw new IllegalStateException("Paired kiln storage failed menu sync");

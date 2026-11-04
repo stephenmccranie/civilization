@@ -66,7 +66,7 @@ public record Grade(List<Integer> units) {
     /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
     public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 200); }
     /**
-     * A refining pass always raises a unit by at least a tenth of a point. Its gain is exponentially distributed, with a
+     * A hammering always raises a unit by at least a tenth of a point. Its gain is exponentially distributed, with a
      * mean of 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it
      * never carries a unit past the target; from there on each pass adds a tenth.
      */
@@ -75,11 +75,9 @@ public record Grade(List<Integer> units) {
         double mean = 45 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
         return grade + Math.max(1, Math.min(gap, (int)Math.round(-mean * Math.log(1 - random.nextDouble()))));
     }
-    /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal, refined in the same one. */
+    /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal or through a heat. */
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
-        if (!graded(product)) return;
-        int unit = !graded(input) ? roll(random) : top(input, 1).getFirst();
-        assign(product, graded(input) && product.is(input.getItem()) ? refined(unit, random) : unit);
+        if (graded(product)) assign(product, graded(input) ? top(input, 1).getFirst() : roll(random));
     }
     /** Gives every unit of the stack one grade. */
     public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }

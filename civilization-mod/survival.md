@@ -26,6 +26,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Jump | 2 kcal plus horizontal movement |
 | Successful melee attack | 3 kcal |
 | Accepted coal-machine ignition strike | 1 kcal; failed spark still costs labor |
+| Accepted anvil strike on hot metal | 2 kcal; 20 strikes refine one unit ([grade](manufacturing.md#grade)) |
 | Natural healing | 40 kcal per half-heart, every 4 seconds |
 | Minimum reserve to sprint | 100 kcal |
 | Hunger effect | 2 kcal/second per level |
@@ -98,7 +99,7 @@ Hold **Tab** to see each player's round-trip latency beside their name, such as 
 
 ## Energy journal
 
-The world-local `civilization-energy/energy-current.jsonl` records player calorie and production events (such as `sleep`, `row`, `push_wheelbarrow` and `cold_exposure`) and separate machine records (such as `coal_fire_fuel` and structure breaks). Movement is aggregated, and machine records carry no invented player attribution. The asynchronous journal is bounded (8,192 queued entries, 16 MiB files, eight backups) and best effort: crashes, overflow or disk failures can lose records. It is a diagnostic log, not an inventory, payment or ownership ledger.
+The world-local `civilization-energy/energy-current.jsonl` records player calorie and production events (such as `sleep`, `row`, `push_wheelbarrow`, `anvil_strike` and `cold_exposure`) and separate machine records (such as `coal_fire_fuel` and structure breaks). Movement is aggregated, and machine records carry no invented player attribution. The asynchronous journal is bounded (8,192 queued entries, 16 MiB files, eight backups) and best effort: crashes, overflow or disk failures can lose records. It is a diagnostic log, not an inventory, payment or ownership ledger.
 
 ## Save compatibility
 
