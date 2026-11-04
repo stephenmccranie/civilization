@@ -19,7 +19,7 @@ Every run starts from a clean directory that `dev.ps1` rebuilds: `runs/gametest`
 
 GameTest and visual runs pass on a zero exit code; a check fails by throwing. Each fixture phase must also print `<NAME>_<PHASE>_PASS`. Fixtures copy the EULA acceptance from `runs/server`, so run `.\dev.ps1 Server` once first.
 
-Visual clients are hidden, unfocused, 1920x1080 and cannot grab the mouse (`VisualTestGuard` and `civilization.visual.mixins.json`). They never use the owner's Prism instance. Screenshots land in `runs/visual/screenshots` (and `runs/peer/screenshots`); look at them whenever appearance changes. `-Full` extends a scene with its optional night, outline or placement tour.
+Visual clients are hidden, unfocused, silent, 1920x1080 and cannot grab the mouse; their sounds still play, so scenes can check them, but OpenAL output is muted (`VisualTestGuard` and `civilization.visual.mixins.json`). They never use the owner's Prism instance. Screenshots land in `runs/visual/screenshots` (and `runs/peer/screenshots`); look at them whenever appearance changes. `-Full` extends a scene with its optional night, outline or placement tour.
 
 GameTest templates must contain their whole fixture: the suite places tests in a randomized grid, so a fixture that writes outside its declared bounds breaks its neighbours. Multiblock guide changes keep `GuidePerformanceTest` coverage.
 
