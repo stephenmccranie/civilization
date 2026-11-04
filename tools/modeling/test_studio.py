@@ -29,6 +29,10 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(uv_faces(p,r,density=4)['west'],[10,36,18,60])
         with self.assertRaises(ValueError):uv_faces(Model().box('body','tall',[0,0,0],[2,6,2],'wood',faces={'east':('wood',12,0,90)}),r,density=4)
 
+    def test_hidden_faces_take_no_uv(self):
+        p=Model().box('body','stone',[0,0,0],[4,2,1],'gray',faces={'south':None})
+        self.assertEqual(sorted(uv_faces(p,{'gray':{'rect':[0,0,64,64]}},density=4)),['down','east','north','up','west'])
+
     def test_unique_names_and_volume(self):
         m=Model();m.box('a','part',[0,0,0],[1,1,1])
         with self.assertRaises(ValueError):m.box('b','part',[0,0,0],[1,1,1])

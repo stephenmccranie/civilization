@@ -126,15 +126,16 @@ def bounds(parts):
 def face_spec(part, face):
     """A face's material, the offset of its island inside that region, and its quarter turn: a material name takes the
     region's corner; (material, x, y) an offset part of it; (material, x, y, 90) turns the island so grain painted
-    along the region follows an upright piece."""
+    along the region follows an upright piece. None leaves out a face the model always hides, so it is never drawn."""
     spec=part.get('faces',{}).get(face,part['material'])
-    return (spec,0,0,0) if isinstance(spec,str) else (*spec,0)[:4]
+    return None if spec is None else (spec,0,0,0) if isinstance(spec,str) else (*spec,0)[:4]
 
 
 def uv_faces(part, regions, density=2):
     """Never silently compress a long surface into a small material tile."""
     result={}
     for face,(w,h) in face_dimensions(part).items():
+        if face_spec(part,face) is None: continue
         material,x,y,turn=face_spec(part,face)
         r=regions[material];u,v,rw,rh=r['rect']
         if r.get('fit',False):
@@ -158,7 +159,7 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
         u,v,w,h=region['rect']
         if min(u,v)<0 or min(w,h)<=0 or u+w>image.width or v+h>image.height:
             raise ValueError('Atlas region outside texture')
-    pieces=[dict(p,uvs=uv_faces(p,regions,density),turns={f:face_spec(p,f)[3] for f in face_dimensions(p)}) for p in parts]
+    pieces=[dict(p,uvs=(uvs:=uv_faces(p,regions,density)),turns={f:face_spec(p,f)[3] for f in uvs}) for p in parts]
     cfg=dict(name=name,pieces=pieces,offset=offset,pivots=pivots or {},size=image.size,texture_name=Path(atlas).name,
              texture='data:image/png;base64,'+base64.b64encode(Path(atlas).read_bytes()).decode(),gecko=gecko)
     client.call('create_project',{'name':name,'format':'geckolib_model' if gecko else 'java_block'})
@@ -172,7 +173,9 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
       for(const p of c.pieces){
         if(!groups[p.group]) groups[p.group]=new Group({name:p.group,origin:sub(c.pivots[p.group]||c.offset)}).init();
         const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation:p.rotation,autouv:0,box_uv:false}).addTo(groups[p.group]).init();
-        for(const [face,uv] of Object.entries(p.uvs)){cube.faces[face].texture=t.uuid;cube.faces[face].uv=uv;cube.faces[face].rotation=p.turns[face];}
+        for(const [face,f] of Object.entries(cube.faces)){
+          if(p.uvs[face]){f.texture=t.uuid;f.uv=p.uvs[face];f.rotation=p.turns[face];}else f.texture=null;
+        }
       }
       Canvas.updateAll();return {cubes:Cube.all.length,bones:Group.all.length};
     })()'''

@@ -96,7 +96,7 @@ Kiln-family pages come from the synchronized recipe manager, workshop and repair
 
 ## Kiln
 
-Craft the **Kiln Controller** from nine cobblestone. Placed, it is the japanned firebox door at the foot of a fieldstone beehive kiln that stands on a 3×3 footprint, one block either side and two behind the controller, and rises to a capped flue nearly four blocks up. It is built in five sections paid with **17 stone** in all — cobblestone, stone, stone bricks or cobbled deepslate, mixed freely: plinth and corner stones (5), lower wall (4), bands and upper wall (4), dome (3), flue and cap (1). It uses no bricks or iron, so it can be built before the first brick exists. The fire warms the whole masonry body.
+Craft the **Kiln Controller** from nine cobblestone. Placed, it is the japanned firebox door at the foot of a fieldstone beehive kiln that stands on a 3×3 footprint, one block either side and two behind the controller, and rises to a capped flue nearly four blocks up. It is built in five sections paid with **17 stone** in all — cobblestone, stone, stone bricks or cobbled deepslate, mixed freely: plinth (2), lower wall (5), bands and upper wall (5), dome (4), flue and cap (1). It uses no bricks or iron, so it can be built before the first brick exists. The fire warms the whole masonry body.
 
 | Input | Output | Time |
 | --- | --- | --- |

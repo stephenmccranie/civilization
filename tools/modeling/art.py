@@ -166,12 +166,12 @@ def subjects(master, ground, cols, rows):
 
 
 def opening(mask, box):
-    """The opening drawn inside a panel: plain ground enclosed by it, in master coordinates, or None. The panel's rim is
-    left out so rounded corners are not openings, and specks are dropped."""
-    m = max(4, round(0.03*min(box[2]-box[0], box[3]-box[1])))
-    inner = (box[0]+m, box[1]+m, box[2]-m, box[3]-m)
-    found = ImageChops.invert(mask.crop(inner)).filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5)).getbbox()
-    return found and (inner[0]+found[0], inner[1]+found[1], inner[0]+found[2], inner[1]+found[3])
+    """The opening drawn inside a panel: plain ground the panel encloses, in master coordinates, or None. Ground reaching
+    round the panel's edge, as at rounded or stepped corners, is outside it; specks are dropped."""
+    ground = ImageChops.invert(mask.crop((box[0]-1, box[1]-1, box[2]+1, box[3]+1)))
+    ImageDraw.floodfill(ground, (0, 0), 0)
+    found = ground.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5)).getbbox()
+    return found and (box[0]-1+found[0], box[1]-1+found[1], box[0]-1+found[2], box[1]-1+found[3])
 
 
 def atlas(asset, folder):
