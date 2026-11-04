@@ -59,10 +59,10 @@
         "north": {
           "texture": "#door",
           "uv": [
-            0,
-            0,
-            16,
-            16
+            2,
+            2,
+            14,
+            15
           ],
           "cullface": "north"
         }
