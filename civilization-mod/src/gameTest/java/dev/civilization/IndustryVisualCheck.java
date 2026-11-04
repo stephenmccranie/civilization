@@ -9,7 +9,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble(m);else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
+    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);

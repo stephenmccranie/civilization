@@ -136,6 +136,8 @@ Fix a weak silhouette with geometry and unreadable materials with value, contras
 
 - Static Java 1.21.1 models allow cuboids with limited single-axis rotation; never design freeform meshes and expect them to survive export. GeckoLib animates cuboids but static item and guide geometry must stay compatible.
 - `studio.Model` offers named boxes and X/Z octagonal casting approximations built from overlapping legal cuboids, with cap planes offset slightly to avoid flicker. It is not a mesh boolean; inspect seams under animation and Minecraft lighting, and simplify if the approximation gets expensive.
+- GeckoLib cubes may turn about all three axes: give `box` an angle triple, applied about x, then y, then z round the pivot, to tilt a part that also turns, such as a dome's stones following its curve.
+- A machine model names its build sections in its groups (`section_<n>_…`), and `machine_cells` derives each section's collision cells from its parts. Give rough surfaces a hidden solid core and mark the visible detail on it `collide=False`, so collision follows the mass rather than every stone. `claim` gives the controller the solid core inside its own cell, which the placed controller draws before any section exists. The Kiln recipe (`art/assets/kiln`) shows coursed rubble, tilted dome courses and cores.
 
 ### Items
 

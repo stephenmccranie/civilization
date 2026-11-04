@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class FoundryBlock extends KilnBlock {
+    @Override public MachineModel model() { return null; }
     public static final MapCodec<FoundryBlock> CODEC = simpleCodec(FoundryBlock::new);
     public FoundryBlock(Properties properties) { super(properties); }
     @Override protected MapCodec<FoundryBlock> codec() { return CODEC; }

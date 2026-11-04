@@ -18,15 +18,17 @@ final class MachineLightingVisualCheck {
             server.execute(()->{
                 var level=server.overworld();level.setDayTime(6000);level.setWeatherParameters(100000,0,false,false);
                 for(int x=-10;x<=10;x++)for(int z=-6;z<=8;z++){level.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE.defaultBlockState());for(int y=101;y<=107;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
-                for(int i=0;i<4;i++) {
-                    var pos=pos(i);boolean works=i>=2;
-                    level.setBlockAndUpdate(pos,(works?KilnContent.RETORT.get():KilnContent.KILN.get()).defaultBlockState());
-                    for(var part:MachineStructure.parts(works))MachineStructure.placePart(level,pos,Direction.NORTH,part);
-                    if((i&1)==1 && level.getBlockEntity(pos) instanceof net.minecraft.world.Container inventory){inventory.setItem(0,works?IndustrialContent.ENRICHED_BLEND.toStack(32):new ItemStack(Items.CLAY,32));inventory.setItem(1,KilnContent.MINERAL_COAL.toStack(8));}
-                }
-                for(int i=4;i<6;i++) {
-                    level.setBlockAndUpdate(pos(i),CookingContent.STATION.get().defaultBlockState());
-                    if(i==5 && level.getBlockEntity(pos(i)) instanceof net.minecraft.world.Container inventory){inventory.setItem(0,new ItemStack(Items.BEEF,32));inventory.setItem(1,KilnContent.MINERAL_COAL.toStack(8));}
+                // A cold and a fuelled, struck Kiln, Fertilizer Furnace and Cooking Stove.
+                for(int i=0;i<6;i++) {
+                    var pos=pos(i);
+                    level.setBlockAndUpdate(pos,(switch(i/2){case 0->KilnContent.KILN.get();case 1->KilnContent.RETORT.get();default->CookingContent.STATION.get();}).defaultBlockState());
+                    if(i<4)MachineFixture.build(level,pos);
+                    if((i&1)==1 && level.getBlockEntity(pos) instanceof KilnBlockEntity fired){
+                        fired.setItem(0,switch(i/2){case 0->new ItemStack(Items.CLAY,32);case 1->IndustrialContent.ENRICHED_BLEND.toStack(32);default->new ItemStack(Items.BEEF,32);});
+                        fired.setItem(1,KilnContent.MINERAL_COAL.toStack(8));
+                        MachineFixture.spark(level,true);
+                        if(!fired.fire.strike(true))throw new IllegalStateException("Lighting fixture spark refused");
+                    }
                 }
                 var player=server.getPlayerList().getPlayers().getFirst();player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);player.getInventory().clearContent();player.getAbilities().flying=true;player.onUpdateAbilities();player.teleportTo(level,3,104,-8,java.util.Set.of(),15f,17f);
             });

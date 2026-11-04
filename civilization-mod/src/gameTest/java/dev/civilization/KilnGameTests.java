@@ -70,7 +70,7 @@ public class KilnGameTests {
     static KilnBlockEntity kiln(GameTestHelper h) {
         var pos = h.absolutePos(new BlockPos(2, 1, 1));
         h.getLevel().setBlockAndUpdate(pos, KilnContent.KILN.get().defaultBlockState());
-        buildShell(h, pos, Direction.NORTH, false);
+        MachineFixture.build(h.getLevel(), pos);
         return (KilnBlockEntity) h.getLevel().getBlockEntity(pos);
     }
     static void ticks(GameTestHelper h, KilnBlockEntity kiln, int count) {
@@ -80,14 +80,10 @@ public class KilnGameTests {
     private static FertilizerRetortBlockEntity retort(GameTestHelper h) {
         var pos = h.absolutePos(new BlockPos(7, 1, 1));
         h.getLevel().setBlockAndUpdate(pos, KilnContent.RETORT.get().defaultBlockState());
-        buildShell(h, pos, Direction.NORTH, true);
+        MachineFixture.build(h.getLevel(), pos);
         return (FertilizerRetortBlockEntity) h.getLevel().getBlockEntity(pos);
     }
-    static void buildShell(GameTestHelper h, BlockPos pos, Direction facing, boolean works) {
-        for (var part : MachineStructure.parts(works)) {
-            MachineStructure.placePart(h.getLevel(), pos, facing, part);
-        }
-    }
+
     @GameTest(template="industrial")
     public static void unifiedCoalAndThermalProgression(GameTestHelper h) {
         var manager = h.getLevel().getRecipeManager();

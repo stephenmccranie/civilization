@@ -171,8 +171,8 @@ public final class PreviewVisualCheck {
                     player.teleportTo(level, 3.5, 103, -5.0, java.util.Set.of(), 35f, 22f);
                     if(!FULL)for(int i=0;i<2;i++) {
                         var controller=new BlockPos(-4+i*4,101,0);
-                        for(var part:MachineStructure.parts(i==1))MachineStructure.placePart(level,controller,net.minecraft.core.Direction.NORTH,part);
-                        if(MachineStructure.check(level,controller,net.minecraft.core.Direction.NORTH).status()!=MachineStructure.COMPLETE)throw new IllegalStateException("Quick machine fixture is incomplete");
+                        MachineFixture.build(level,controller);
+                        if(MachineFixture.status(level,controller)!=MachineStructure.COMPLETE)throw new IllegalStateException("Quick machine fixture is incomplete");
                     }
                 }
                 } catch(Throwable failure){com.mojang.logging.LogUtils.getLogger().error("Visual fixture setup failed",failure);}
@@ -223,8 +223,7 @@ public final class PreviewVisualCheck {
         if (ticks == 440) screenshot(mc, "outline");
         if (ticks == 450 && !CHECK.equals("machines")) mc.getSingleplayerServer().execute(() -> {
             var level = mc.getSingleplayerServer().overworld();
-            for (var part : MachineStructure.parts(false))
-                MachineStructure.placePart(level, new BlockPos(0, 101, 0), net.minecraft.core.Direction.NORTH, part);
+            MachineFixture.build(level, new BlockPos(0, 101, 0));
         });
         if (ticks == 450 && CHECK.equals("machines")) mc.getSingleplayerServer().execute(() -> {
             var level = mc.getSingleplayerServer().overworld();
@@ -232,10 +231,8 @@ public final class PreviewVisualCheck {
             // Inspect controllers in their actual shells, including the cobblestone kiln.
             for (int i = 0; i < 2; i++) {
                 var controller = new BlockPos(-4 + i * 4, 101, 0);
-                for (var part : MachineStructure.parts(i == 1)) {
-                    MachineStructure.placePart(level, controller, net.minecraft.core.Direction.NORTH, part);
-                }
-                if (MachineStructure.check(level, controller, net.minecraft.core.Direction.NORTH).status() != MachineStructure.COMPLETE)
+                MachineFixture.build(level, controller);
+                if (MachineFixture.status(level, controller) != MachineStructure.COMPLETE)
                     throw new IllegalStateException("Assembled visual fixture is incomplete");
             }
         });

@@ -69,7 +69,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==680)shot(mc,"crown-level-sodium");
         if(ticks==685)shaders(true);
         if(ticks==700){
-            int raw=net.minecraft.client.renderer.LevelRenderer.getLightColor(mc.level,AT),filled=dev.civilization.client.ModeledMachineRenderer.light(mc.level,AT,MachineModel.OIL_DERRICK,raw);
+            int raw=net.minecraft.client.renderer.LevelRenderer.getLightColor(mc.level,AT),filled=dev.civilization.client.ModeledMachineRenderer.cellLight(mc.level,AT);
             if(net.minecraft.client.renderer.LightTexture.sky(raw)!=0||net.minecraft.client.renderer.LightTexture.sky(filled)!=15)throw new IllegalStateException("Exposed derrick must recover world skylight from outside its opaque controller");
             if(net.minecraft.client.renderer.LightTexture.block(filled)<net.minecraft.client.renderer.LightTexture.block(raw))throw new IllegalStateException("Derrick fill discarded local block lighting");
             System.out.println("DERRICK_MODEL_LIGHT raw="+raw+" filled="+filled);

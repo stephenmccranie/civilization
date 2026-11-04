@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.*;
  * cubes fill and the ports it places, read once from the definition its Blockbench source exports.
  */
 public final class MachineModel {
-    public static final MachineModel OIL_DERRICK=load("oil_derrick");
+    public static final MachineModel OIL_DERRICK=load("oil_derrick"), KILN=load("kiln");
 
     /** Accepts any listed item or tag; `material` names them together on the guide. */
     public record Section(String name,List<String> items,String material,int count,int labor) {
@@ -64,6 +64,8 @@ public final class MachineModel {
 
     /** `like` names the vanilla block whose sound, hardness and tool the part cells copy. */
     public final String id,geo,partBlock,like,animation;
+    /** Whether the machine's fire warms its whole body, as a masonry kiln's does, rather than only its controller. */
+    public final boolean heated;
     public final List<Section> sections;
     public final List<Cell> cells;
     public final List<Port> ports;
@@ -73,7 +75,7 @@ public final class MachineModel {
     public final IntegerProperty cell;
 
     private MachineModel(String id,JsonObject o){
-        this.id=id;geo=o.get("geo").getAsString();partBlock=o.get("part").getAsString();like=o.get("like").getAsString();animation=o.has("animation")?o.get("animation").getAsString():null;
+        this.id=id;geo=o.get("geo").getAsString();partBlock=o.get("part").getAsString();like=o.get("like").getAsString();animation=o.has("animation")?o.get("animation").getAsString():null;heated=o.has("heated")&&o.get("heated").getAsBoolean();
         var sections=new ArrayList<Section>();
         for(var e:o.getAsJsonArray("sections")){
             var s=e.getAsJsonObject();var items=new ArrayList<String>();for(var item:s.getAsJsonArray("items"))items.add(item.getAsString());
@@ -115,7 +117,7 @@ public final class MachineModel {
             return new MachineModel(id,JsonParser.parseReader(new InputStreamReader(in,StandardCharsets.UTF_8)).getAsJsonObject());
         }catch(IOException e){throw new ExceptionInInitializerError(e);}
     }
-    public static List<MachineModel> all(){return List.of(OIL_DERRICK);}
+    public static List<MachineModel> all(){return List.of(OIL_DERRICK,KILN);}
     public Section section(int part){return sections.get(part);}
     /** Everything the model can occupy around a controller at `at`, in any facing. */
     public AABB area(net.minecraft.core.BlockPos at){return new AABB(at).inflate(reach,0,reach).setMinY(at.getY()+bottom).setMaxY(at.getY()+top);}

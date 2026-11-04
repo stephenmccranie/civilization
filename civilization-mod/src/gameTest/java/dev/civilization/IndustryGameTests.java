@@ -109,7 +109,7 @@ public final class IndustryGameTests {
     private static IndustrialBlockEntity machine(GameTestHelper h,IndustrialBlock block,int x){
         var at=h.absolutePos(new BlockPos(x,67,2));h.getLevel().removeBlock(at,false);h.getLevel().setBlockAndUpdate(at,block.defaultBlockState());
         var m=(IndustrialBlockEntity)h.getLevel().getBlockEntity(at);
-        if(m.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble(m);else for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
+        if(m.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build((net.minecraft.server.level.ServerLevel)m.getLevel(),m.getBlockPos());else for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
     }
     private static void bind(IndustrialBlockEntity m,Deposits.Site s){try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,s);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}}
     private static Deposits.Site site(IndustrialBlockEntity m,Deposits.Kind k,int count){
@@ -298,7 +298,7 @@ public final class IndustryGameTests {
     }
     @GameTest(template="empty") public static void industrialStructuresRotateWithCutSlabs(GameTestHelper h){
         var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
-            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble((IndustrialBlockEntity)h.getLevel().getBlockEntity(at));else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
+            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
             h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.kind==IndustrialBlock.Kind.PUMP)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
         }h.succeed();
     }

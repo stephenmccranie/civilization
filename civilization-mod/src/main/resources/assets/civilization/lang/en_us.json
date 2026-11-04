@@ -46,7 +46,7 @@
   "material.civilization.stone_hatch": "stone wall or a downward-facing hopper",
   "material.civilization.brick_hatch": "brick wall or a downward-facing hopper",
   "tooltip.civilization.works_blocks": "Build: 13 bricks, 4 brick slabs, 4 brick beams, 1 copper slab, 4 copper eighths.",
-  "tooltip.civilization.kiln_blocks": "Build: 13 stone blocks, 4 slabs, 4 beams, 4 eighth cubes.",
+  "tooltip.civilization.kiln_blocks": "Build: 17 stone in 5 sections, from the placed controller.",
   "tooltip.civilization.preview": "Place for the build guide",
   "preview.civilization.remaining": "%s blocks missing, %s to replace or clear",
   "preview.civilization.place": "Right-click to place here",

@@ -395,29 +395,25 @@ public final class ThermalGameTests {
                 "Hot exhaust continues into the upper shaft when the field was full");
         h.succeed();
     }
-    @GameTest(template="industrial") public static void openMachineOutletsTakePriorityOverCoveredTop(GameTestHelper h){
+    /** The Kiln's fire warms its whole masonry; exhaust leaves only through the open top of its flue, and a capped flue keeps the heat in the masonry. */
+    @GameTest(template="industrial") public static void kilnExhaustLeavesThroughItsOpenFlue(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,3,6));
         for(var q:BlockPos.betweenClosed(p.offset(-3,0,-3),p.offset(3,5,5)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
-        var state=KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
-        l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
-        var outlet=p.south().above(3);
-        for(int x=-1;x<=1;x++)for(int z=0;z<=2;z++){
-            var roof=p.offset(x,3,z);
-            if(!roof.equals(outlet))l.setBlockAndUpdate(roof,Blocks.OAK_PLANKS.defaultBlockState());
-        }
+        l.setBlockAndUpdate(p,KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH));
+        MachineFixture.build(l,p);
+        var flue=p.south().above(4);
+        h.assertTrue(ThermalField.body(l,p).size()==MachineModel.KILN.cells.size()+1,"The fire warms every cell of the masonry and the controller");
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
-        double plume=field.energy.getOrDefault(outlet.asLong(),0d);
-        h.assertTrue(Math.abs(plume-64)<.001&&field.energy.getOrDefault(outlet.above().asLong(),0d)==0,
-                "The only open outlet receives the full top share locally, without remote heat placement");
+        h.assertTrue(Math.abs(field.energy.getOrDefault(flue.asLong(),0d)-64)<.001&&field.energy.getOrDefault(flue.above().asLong(),0d)==0,
+                "The open flue receives the full top share locally, without remote heat placement");
         h.assertTrue(Math.abs(field.energy.values().stream().mapToDouble(Double::doubleValue).sum()-80)<.001,
-                "Prioritizing the outlet does not create extra heat");
-        l.setBlockAndUpdate(outlet,Blocks.OAK_PLANKS.defaultBlockState());
+                "Venting through the flue creates no extra heat");
+        l.setBlockAndUpdate(flue,Blocks.OAK_PLANKS.defaultBlockState());
         var covered=new ThermalField();covered.pending.put(p.asLong(),80d);covered.releaseSources(l);
-        h.assertTrue(covered.energy.getOrDefault(outlet.asLong(),0d)==0,
-                "A blocked top cannot absorb exhaust that should remain in the machine casing");
+        h.assertTrue(covered.energy.getOrDefault(flue.asLong(),0d)==0,
+                "A capped flue cannot absorb exhaust that should remain in the masonry");
         h.assertTrue(Math.abs(covered.energy.values().stream().mapToDouble(Double::doubleValue).sum()-80)<.001,
-                "Blocking the outlet retains rather than creates or destroys the coal heat");
+                "Capping the flue retains rather than creates or destroys the coal heat");
         h.succeed();
     }
     @GameTest(template="industrial") public static void cutBlockShaftRetainsRisingAirHeat(GameTestHelper h){

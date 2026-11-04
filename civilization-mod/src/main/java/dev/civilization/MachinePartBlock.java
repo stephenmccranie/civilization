@@ -11,7 +11,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 
 /** The invisible physical cells of one machine model: collision from its built sections; clicks and damage go to the controller. */
-public final class MachinePartBlock extends Block {
+public final class MachinePartBlock extends Block implements WorldlyContainerHolder {
     /** The model whose cells this block is, set while the block is constructed so its state definition can size the cell property. */
     static final ThreadLocal<MachineModel> PENDING=new ThreadLocal<>();
     public final MachineModel model;
@@ -50,6 +50,10 @@ public final class MachinePartBlock extends Block {
         var c=owner(l,p,s);if(c==null||!ModeledMachine.accepts(c,stack))return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if(!l.isClientSide)ModeledMachine.build(c,player,stack);
         return ItemInteractionResult.sidedSuccess(l.isClientSide);
+    }
+    /** Hoppers reach the controller through any cell, with the face they touch: from above, the side or below. */
+    @Override public WorldlyContainer getContainer(BlockState s,LevelAccessor l,BlockPos p){
+        return l instanceof Level level&&owner(level,p,s) instanceof WorldlyContainer container?container:null;
     }
     @Override protected void onRemove(BlockState s,Level l,BlockPos p,BlockState next,boolean moving){
         if(!l.isClientSide&&!s.is(next.getBlock())){var c=owner(l,p,s);if(c!=null&&!c.build().changing)ModeledMachine.builtSection(c,cell(s)).ifPresent(part->ModeledMachine.removeSection(c,part,true));}

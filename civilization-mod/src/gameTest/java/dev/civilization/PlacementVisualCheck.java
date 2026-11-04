@@ -34,7 +34,7 @@ final class PlacementVisualCheck {
             // The controller fits, but dirt fills its chamber and a front wall cell: those parts turn red.
             new Stage("kiln-obstructed", KilnContent.KILN, InteractionHand.OFF_HAND, new BlockPos(18, 100, 0), new Vec3(2.8, 2.2, -3.2), Direction.NORTH, true, dirt(new BlockPos(18, 102, 1), new BlockPos(19, 101, 0))),
             // A shell built first leaves only the controller's own ghost, facing the player in its gap.
-            new Stage("kiln-into-shell", KilnContent.KILN, InteractionHand.OFF_HAND, new BlockPos(-8, 100, 7), new Vec3(0, 1.7, -3.2), Direction.NORTH, true, kilnShell(new BlockPos(-8, 101, 7))),
+            new Stage("furnace-into-shell", KilnContent.RETORT, InteractionHand.OFF_HAND, new BlockPos(-8, 100, 7), new Vec3(0, 1.7, -3.2), Direction.NORTH, true, furnaceShell(new BlockPos(-8, 101, 7))),
             new Stage("oven", BakingOvenContent.OVEN, InteractionHand.OFF_HAND, new BlockPos(24, 100, 0), new Vec3(2.6, 2.2, -3.2), Direction.NORTH, true, NOTHING),
             new Stage("derrick", IndustrialContent.PUMP, InteractionHand.OFF_HAND, new BlockPos(38, 100, 0), new Vec3(0, 2.6, -3.6), Direction.NORTH, true, NOTHING));
     private static int ticks;
@@ -45,8 +45,8 @@ final class PlacementVisualCheck {
     private static Consumer<ServerLevel> dirt(BlockPos... cells) {
         return level -> { for (var cell : cells) level.setBlockAndUpdate(cell, Blocks.DIRT.defaultBlockState()); };
     }
-    private static Consumer<ServerLevel> kilnShell(BlockPos controller) {
-        return level -> { for (var part : MachineStructure.parts(false)) MachineStructure.placePart(level, controller, Direction.NORTH, part); };
+    private static Consumer<ServerLevel> furnaceShell(BlockPos controller) {
+        return level -> { for (var part : MachineStructure.parts(true)) MachineStructure.placePart(level, controller, Direction.NORTH, part); };
     }
 
     static void tick(Minecraft mc) {

@@ -108,7 +108,7 @@ final class WorkshopVisualCheck {
         if(ticks==470)server.execute(()->{
             var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(0));
             if(!w.fire.lit()){
-                for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if(r.nextInt(3)==0){server.overworld().random.setSeed(seed);break;}}
+                MachineFixture.spark(server.overworld(),true);
                 p.containerMenu.clickMenuButton(p,CoalFire.BUTTON);
             }
         });

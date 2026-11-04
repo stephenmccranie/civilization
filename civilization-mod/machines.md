@@ -1,8 +1,12 @@
 # Machines
 
-A machine is a controller block plus a structure the player builds around it. This page owns what every machine shares — construction guides, the cabinet interface, coal fires, the coal budget, production XP and JEI — and the two first machines, the Kiln and Fertilizer Furnace. The Foundry and town workshops are in [manufacturing](manufacturing.md), the oil machines in [industry](industry.md), the stoves in [cooking](cooking.md).
+A machine is a controller block plus the machine built around it: a native model built in sections for the Kiln and Oil Derrick, a block structure for the others until they are redrawn. This page owns what every machine shares — construction guides, the cabinet interface, coal fires, the coal budget, production XP and JEI — and the two first machines, the Kiln and Fertilizer Furnace. The Foundry and town workshops are in [manufacturing](manufacturing.md), the oil machines in [industry](industry.md), the stoves in [cooking](cooking.md).
 
 ## Building with a controller
+
+**Modeled machines** (the Kiln and Oil Derrick) are one native model built in sections. Holding the controller shows the whole machine where a right-click would put it. Once placed, right-click it, or any part of the machine, with a held stack: the stack pays for as many unbuilt sections as it covers, in order, and leftovers stay in hand. A section needs its whole space clear, loaded and accessible and nothing standing in it; otherwise it consumes nothing and says why. Built sections are solid at once. Breaking any part of a section removes that whole section and refunds exactly what it cost; breaking the controller dismantles the machine, refunds every section once and drops its inventory. The guide shows the missing sections, red outlines on cells something else occupies, and the materials still due.
+
+**Block structures** follow these steps:
 
 1. Craft the controller and place it where the structure's bottom/front center belongs; its front faces you. Its tooltip lists the additional structural blocks, and holding it shows the whole structure first (see [placement preview](#placement-preview)).
 2. Look at the controller within eight blocks. Translucent ghosts of the missing pieces appear, using the real block models and resource-pack textures; correctly filled positions disappear. The top-left HUD lists remaining quantities by material and piece size, including pieces behind obstructions (air requirements count as obstructions but need no item).
@@ -32,13 +36,13 @@ This contract binds every construction guide: `MachinePreview` for block assembl
 
 ## Structure rules
 
-An active machine validates its structure on every processing tick (26 positions for the Kiln, 27 for the Fertilizer Furnace). Idle empty controllers stagger checks once per second, and opening a menu checks immediately. Validation reads only nearby loaded chunks and never scans globally or force-loads.
+An active machine validates its structure on every processing tick (every cell of a modeled machine; 27 positions for the Fertilizer Furnace). Idle empty controllers stagger checks once per second, and opening a menu checks immediately. Validation reads only nearby loaded chunks and never scans globally or force-loads.
 
 Removing or replacing a required block, or obstructing the chamber, stops processing before the next batch completes: the fire goes out, unfinished work resets, no further coal is spent and materials are kept. Repairing allows operation with new coal. If a required neighboring chunk is unloaded, the machine waits with heat and work preserved. Validity is recomputed after load. Oxidation does not invalidate copper fittings.
 
 Inventories live only in the controller. Breaking a shell block scatters nothing; breaking the controller drops its inventory and itself, and shell blocks stay as ordinary blocks. Decorative blocks outside required positions are allowed. Unloaded machines pause; there is no offline production or forced loading.
 
-**Hoppers:** kiln-family machines take ingredients from above, coal from the sides or front and give output below. In the Kiln and Fertilizer Furnace the wall block directly above the controller (the hatch) may be a downward hopper feeding the ingredient slot; supply it from outside the front. A hopper underneath the controller extracts output (dig below or raise the build). No casing inventories or hidden transfers exist.
+**Hoppers:** kiln-family machines take ingredients from above, coal from the sides or front and give output below. A modeled machine reaches its controller through every part: a hopper feeding into its top adds ingredients, one at a side adds coal and one underneath extracts output. In the Fertilizer Furnace the wall block directly above the controller (the hatch) may be a downward hopper feeding the ingredient slot; supply it from outside the front. A hopper underneath the controller extracts output (dig below or raise the build). No casing inventories or hidden transfers exist.
 
 **Removing controllers:** stone pickaxes recover stone and metal controllers (the Smithy, extraction and refinery machinery, Hot-Bulb Engine, Land Controller, bulk stores) and Industrial Casing, pipes and engine pieces. Stone axes recover wooden controllers such as the Trade Counter, Survey Table and Small Boat Helm. Stocked bulk stores must be emptied first; claim and vehicle protections still apply.
 
@@ -92,9 +96,7 @@ Kiln-family pages come from the synchronized recipe manager, workshop and repair
 
 ## Kiln
 
-Craft the **Kiln Controller** from nine cobblestone. The shell adds **13 cobblestone or stone-brick blocks, 4 slabs, 4 quarter beams and 4 eighth cubes** (stone variants may be mixed) and uses no bricks, so it can be built before the first brick exists.
-
-The body extends one block left and right, two behind and two above the controller. The bottom layer is a full 3×3 plinth with the controller at front center. The middle layer has four inset upright quarter-beam corners (each in the inward corner along both horizontal axes), full side and hatch walls and an empty central chamber. The roof has four eighth-cube corners, four half-slab edge centers and one full central crown; roof pieces sit at the bottom of their cells.
+Craft the **Kiln Controller** from nine cobblestone. Placed, it is the japanned firebox door at the foot of a fieldstone beehive kiln that stands on a 3×3 footprint, one block either side and two behind the controller, and rises to a capped flue nearly four blocks up. It is built in five sections paid with **17 stone** in all — cobblestone, stone, stone bricks or cobbled deepslate, mixed freely: plinth and corner stones (5), lower wall (4), bands and upper wall (4), dome (3), flue and cap (1). It uses no bricks or iron, so it can be built before the first brick exists. The fire warms the whole masonry body.
 
 | Input | Output | Time |
 | --- | --- | --- |
@@ -122,5 +124,6 @@ Vanilla furnace, blast-furnace and smoker processing is disabled, including on e
 ## Save compatibility
 
 - The Kiln and Fertilizer Furnace keep the registry IDs `civilization:brick_kiln` and `civilization:fertilizer_retort`, and the furnace's journal events keep their `retort_*` names (for example `retort_structure_broken`).
+- A Kiln built as a block shell before it became a model keeps its controller and inventory but starts with no sections; the old shell stays as ordinary blocks to reuse, so nothing is lost or created. Clear the footprint and build the sections.
 - Sulfur Blend keeps the ID `civilization:enriched_mineral_blend`. Raw Mineral Blend (`civilization:mineral_blend`) is an inert legacy item: it cannot be crafted or fired and is hidden from creative and JEI.
 - Legacy vanilla coal and charcoal stay loadable but power nothing. Old furnace minecarts roll without propulsion, and retired processors keep their contents accessible.

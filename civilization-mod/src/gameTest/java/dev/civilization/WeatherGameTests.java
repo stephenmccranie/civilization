@@ -32,7 +32,7 @@ public final class WeatherGameTests {
   var state=KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
   l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());
   l.setBlockAndUpdate(p,state);
-  for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
+  MachineFixture.build(l,p);
   var kiln=(KilnBlockEntity)l.getBlockEntity(p);var face=p.north();var roof=face.above(3);
   l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());
   float oldRain=l.getRainLevel(1);l.setRainLevel(1);
@@ -43,7 +43,7 @@ public final class WeatherGameTests {
    h.assertTrue(!kiln.fire.strike(true)&&kiln.getItem(1).getCount()==2,"Wet fire cannot be ignited");
    l.setBlockAndUpdate(roof,Blocks.BRICKS.defaultBlockState());
    h.assertTrue(!MachineWeather.wetWorkFace(l,p,state),"A roof over the work face stops direct rain");
-   for(long seed=0;;seed++){var random=net.minecraft.util.RandomSource.create(seed);random.nextFloat();if(random.nextInt(3)==0){l.random.setSeed(seed);break;}}
+   MachineFixture.spark(l,true);
    h.assertTrue(kiln.fire.strike(true)&&kiln.fire.lit(),"Sheltered kiln lights during district rain");
    l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());
    for(int i=0;i<250;i++)KilnBlockEntity.tick(l,p,kiln.getBlockState(),kiln);

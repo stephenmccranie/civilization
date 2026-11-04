@@ -3,6 +3,7 @@ package dev.civilization.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.civilization.*;
 import java.util.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,6 +20,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
@@ -37,12 +39,36 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     private static final class Renderer extends GeoBlockRenderer<Look> {
         private BakedGeoModel indexed;
         private final List<Visibility> bones=new ArrayList<>();
+        private final Map<GeoCube,Vector3f> centres=new IdentityHashMap<>();
+        private final Vector3f at=new Vector3f();
+        private Look drawing;
         Renderer(MachineModel model){super(new MachineGeoModel<>(model.geo));}
         @Override public void preRender(PoseStack pose,Look look,BakedGeoModel model,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
             super.preRender(pose,look,model,buffers,vertices,reRender,partial,light,overlay,color);
+            drawing=look;
             if(indexed!=model){indexed=model;bones.clear();for(var bone:model.topLevelBones())index(bone);}
             for(var v:bones)v.bone().setHidden(v.section()>=0?(look.sections&(1<<v.section()))==0
                     :v.controller()?look.hideController:v.fire()!=0&&(v.fire()>0)!=look.lit);
+        }
+        // The fire's own bones glow whatever light falls on the masonry around them.
+        @Override public void renderRecursively(PoseStack pose,Look look,GeoBone bone,net.minecraft.client.renderer.RenderType type,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
+            super.renderRecursively(pose,look,bone,type,buffers,vertices,reRender,partial,bone.getName().startsWith("lit_")?LightTexture.FULL_BRIGHT:light,overlay,color);
+        }
+        /** A model reaching over many blocks is lit like those blocks: each cube takes the light of the cell it is drawn
+         *  in, found from its centre through the render transform, so one side of a machine can stand in a neighbour's
+         *  firelight while the other stays in the dark. A cube already drawn at full brightness keeps it. */
+        @Override public void renderCube(PoseStack pose,GeoCube cube,com.mojang.blaze3d.vertex.VertexConsumer vertices,int light,int overlay,int color){
+            if(light!=LightTexture.FULL_BRIGHT){
+                pose.last().pose().transformPosition(centres.computeIfAbsent(cube,Renderer::centre),at);
+                var camera=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+                light=drawing.light(BlockPos.asLong(net.minecraft.util.Mth.floor(camera.x+at.x),net.minecraft.util.Mth.floor(camera.y+at.y),net.minecraft.util.Mth.floor(camera.z+at.z)));
+            }
+            super.renderCube(pose,cube,vertices,light,overlay,color);
+        }
+        private static Vector3f centre(GeoCube cube){
+            var sum=new Vector3f();int corners=0;
+            for(var quad:cube.quads())if(quad!=null)for(var vertex:quad.vertices()){sum.add(vertex.position());corners++;}
+            return sum.div(Math.max(1,corners));
         }
         private void index(GeoBone bone){
             String name=bone.getName();
@@ -57,7 +83,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     private Look guide;
 
     public ModeledMachineRenderer(BlockEntityRendererProvider.Context context) {}
-    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);}
+    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.ENTITY.get(),ModeledMachineRenderer::new);}
     @Override public AABB getRenderBoundingBox(BlockEntity entity){var c=ModeledMachine.of(entity);return c==null?new AABB(entity.getBlockPos()):c.model().area(entity.getBlockPos());}
     // A tall model spans sections beyond its controller's; it must not vanish when that section leaves view.
     @Override public boolean shouldRenderOffScreen(BlockEntity entity){return ModeledMachine.of(entity)!=null;}
@@ -72,7 +98,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         var look=looks.computeIfAbsent(entity,e->new Look(e.getType(),e.getBlockPos(),e.getBlockState(),c.model()));
         look.setLevel(entity.getLevel());look.setBlockState(entity.getBlockState());
         look.sections=c.build().sections;look.hideController=false;look.running=c.working();look.lit=c.working();
-        renderer(c.model()).render(look,partial,pose,buffers,look.light(light),overlay);
+        renderer(c.model()).render(look,partial,pose,buffers,light,overlay);
     }
     /** The sections of `model` not in `built`, for a controller at `at`; a controller not yet placed is drawn too. */
     public void renderGuide(Level level,BlockPos at,BlockState controller,MachineModel model,int built,boolean placed,float partial,PoseStack pose,MultiBufferSource buffers){
@@ -82,16 +108,13 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         renderer(model).render(guide,partial,pose,buffers,LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
     }
 
-    /** The solid controller is no fair light sample for a model reaching beyond it: take the brightest real light just
-     *  outside the model on each side and above it, so a dark enclosure stays dark and night remains night. */
-    public static int light(Level level,BlockPos controller,MachineModel model,int controllerLight){
-        int sky=LightTexture.sky(controllerLight),block=LightTexture.block(controllerLight);
-        for(var side:new Direction[]{Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST,Direction.UP}){
-            var at=controller.relative(side,side==Direction.UP?model.top:model.reach+1);
-            if(!level.hasChunkAt(at))continue;
-            int nearby=LevelRenderer.getLightColor(level,at);
-            sky=Math.max(sky,LightTexture.sky(nearby));block=Math.max(block,LightTexture.block(nearby));
-        }
+    /** The light a model's cube takes from the cell it is drawn in: the cell's own light or, where a solid block such as
+     *  the controller fills it, the brightest light on any of its faces, as Minecraft lights a block's faces. */
+    public static int cellLight(Level level,BlockPos cell){
+        int light=LevelRenderer.getLightColor(level,cell);
+        if(!level.getBlockState(cell).isSolidRender(level,cell))return light;
+        int sky=LightTexture.sky(light),block=LightTexture.block(light);
+        for(var side:Direction.values()){int face=LevelRenderer.getLightColor(level,cell.relative(side));sky=Math.max(sky,LightTexture.sky(face));block=Math.max(block,LightTexture.block(face));}
         return LightTexture.pack(block,sky);
     }
     /** The animatable stand-in for one controller, or for the guide. */
@@ -99,11 +122,12 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
         private final MachineModel model;
         private boolean running,lit,hideController;private int sections;
-        private long lightTick=Long.MIN_VALUE;private int sampledLight;
+        private final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap lights=new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();private long lightTick=Long.MIN_VALUE;
         Look(net.minecraft.world.level.block.entity.BlockEntityType<?> type,BlockPos pos,BlockState state,MachineModel model){super(type,pos,state);this.model=model;}
-        private int light(int controllerLight){
-            long tick=level.getGameTime()/5;if(tick!=lightTick){lightTick=tick;sampledLight=ModeledMachineRenderer.light(level,worldPosition,model,controllerLight);}
-            return sampledLight;
+        /** Cell light, sampled afresh every quarter second. */
+        private int light(long cell){
+            long tick=level.getGameTime()/5;if(tick!=lightTick){lightTick=tick;lights.clear();}
+            return lights.computeIfAbsent(cell,key->cellLight(level,BlockPos.of(key)));
         }
         @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
         @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers){

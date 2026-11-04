@@ -41,8 +41,15 @@ class StudioTests(unittest.TestCase):
         self.assertAlmostEqual(lo[1],-2**.5)
         self.assertEqual(hi[2],1)
 
+    def test_compound_rotation_turns_x_then_y(self):
+        m=Model();m.box('a','tilted',[0,0,0],[2,1,1],angle=[90,90,0])
+        lo,hi=bounds(m.parts)
+        for got,want in zip(lo+hi,[0,-1,-2,1,0,0]):self.assertAlmostEqual(got,want)
+
     def test_controller_claims_its_cell_and_takes_no_part_cells(self):
-        m=Model();m.box('section_0_wall','wall',[-16,0,0],[32,16,48]);m.claim('controller',[0,0,0],[16,16,16])
+        m=Model();m.box('section_0_wall','wall',[-16,0,0],[32,16,48]);m.box('section_0_wall','stone',[-2,2,-1],[2,4,0],collide=False)
+        m.claim('controller',[0,0,0],[16,16,16])
+        self.assertEqual(next(p['group'] for p in m.parts if p['name']=='stone'),'section_0_wall')
         self.assertEqual([(p['start'],p['end']) for p in m.parts if p['group']=='controller'],[([0,0,0],[16,16,16])])
         cells=machine_cells(m.parts)
         self.assertNotIn([0,0,0],[c['offset'] for c in cells])
