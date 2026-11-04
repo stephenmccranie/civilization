@@ -181,6 +181,11 @@ class ArtTests(unittest.TestCase):
         master.save(self.root/'supplied.png')
         with self.assertRaisesRegex(ValueError,'margin'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
+    def test_own_output_is_not_a_reference(self):
+        target=self.runtime/'textures/item/test.png'; target.parent.mkdir(parents=True); target.write_bytes(b'old sprite')
+        self.asset['references'].append({'path':'runtime/textures/item/test.png','role':'previous sprite'})
+        with self.assertRaisesRegex(ValueError,'own output'): art.definition(self.asset,self.folder)
+
     def test_texture_layout_is_checked_once_at_the_boundary(self):
         for change,message in [({'rect':[6,0,4,8]},'overlap'),({'cell':[2,0]},'master grid'),({'rect':[14,0,4,8]},'outside the atlas')]:
             self.textured(); self.asset['texture']['regions']['blue'].update(change)

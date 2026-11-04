@@ -34,9 +34,12 @@ def definition(asset, folder):
     if any(not asset['brief'].get(k) for k in ('purpose', 'target', 'constraints')):
         raise ValueError('Fill purpose, target and constraints')
     if not asset['references']: raise ValueError('Inspect and declare visual references')
+    outputs = {local(RUNTIME, o['target']) for o in asset.get('outputs', [])}
     for ref in asset['references']:
         if not ref.get('role') or not local(ROOT, ref['path']).is_file():
             raise ValueError('Reference needs an existing file and a role')
+        if local(ROOT, ref['path']) in outputs:
+            raise ValueError(f'{ref["path"]} is this asset\'s own output; reference its kept copy in art/references instead')
     for generation in asset.get('generations', []):
         if sha(local(folder, generation['file'])) != generation['sha256']:
             raise ValueError('Recorded concept changed')
