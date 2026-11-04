@@ -101,7 +101,8 @@ def master_prompt(texture):
     cols, rows = texture['grid']; regions = texture['regions']; notes = {}
     for name, region in regions.items():
         if 'in' in region:
-            note = f'a panel reduced into the opening left in the {region["in"]} panel, for {name}'
+            note = (f'a panel reduced into the opening left in the {region["in"]} panel, for {name}: only what shows through the opening, '
+                    'edge to edge, with no frame, rim, border or screws of its own, since the opening already frames it')
             host = notes.setdefault(tuple(regions[region['in']]['cell']), [])
             if 'with one opening' not in ' '.join(host): host.append('with one opening left as a clean rectangle of plain background, filled from another cell')
         else:
@@ -195,17 +196,22 @@ def atlas(asset, folder):
             if name not in filled and opening(mask, box):
                 raise ValueError(f'The {name} panel shows the background inside it; draw it solid or declare an inset to fill its opening')
             placed[name] = master.crop(panel(region)).resize(tuple(region['rect'][2:]), Image.Resampling.BOX).convert('RGBA'), tuple(region['rect'][:2])
-    # Regions paint in declared order, so an inset covers its host's opening. The palette comes from the visible result
-    # and applies without dithering; k-means refinement moves each colour to its cluster's mean, so small accents such as
-    # brass are not averaged into the dominant material. Unused space in an image of panels takes the mean colour; an
-    # image holding a sprite stays transparent around it.
+    # Regions paint in declared order, so an inset covers its host's opening. The palette comes from the visible result,
+    # each region weighted equally, so a small vent, window or icon keeps its colours beside a large panel; it applies
+    # without dithering, and k-means refinement moves each colour to its cluster's mean. Unused space in an image of
+    # panels takes the mean colour; an image holding a sprite stays transparent around it.
     composed = {}
     for target, size in images(texture).items():
         image = Image.new('RGBA', tuple(size))
         for name, region in regions.items():
             if image_of(texture, region) == target: image.alpha_composite(*placed[name])
         composed[target] = image
-    visible = [data[i:i+3] for data in (c.tobytes() for c in composed.values()) for i in range(0, len(data), 4) if data[i+3]]
+    parts = []
+    for name, region in regions.items():
+        tile, (x, y) = placed[name]; data = composed[image_of(texture, region)].crop((x, y, x+tile.width, y+tile.height)).tobytes()
+        parts.append([data[i:i+3] for i in range(0, len(data), 4) if data[i+3]])
+    most = max(len(part) for part in parts)
+    visible = [pixel for part in parts if part for pixel in part*(most//len(part))]
     swatch = Image.frombytes('RGB', (len(visible), 1), b''.join(visible))
     palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, kmeans=16, dither=Image.Dither.NONE)
     written = {}

@@ -211,6 +211,8 @@ class ArtTests(unittest.TestCase):
             self.assertEqual((min(x for x,_ in changed),min(y for _,y in changed),max(x for x,_ in changed),max(y for _,y in changed)),(3,10,12,14))
             self.assertGreater(lit.getpixel((8,11))[0],200); self.assertLess(cold.getpixel((8,11))[0],100)
             self.assertTrue(all(c[0]<200 or c[1]>100 for _,c in cold.getcolors()))  # No ground left showing.
+            # A small accent keeps its own colour beside a large panel of another.
+            self.assertIn((240,140,30),{lit.getpixel((x,y)) for x in range(16) for y in range(16)})
         self.assertIn('with one opening left',art.master_prompt(self.asset['texture']))
         for change,message in [({'rect':[0,0,4,4]},'take no rectangle'),({'in':'window_on'},'earlier panel'),({'cell':[0,0]},'own cell')]:
             region=dict(self.asset['texture']['regions']['window'],**change); asset=json.loads(json.dumps(self.asset)); asset['texture']['regions']['window']=region
