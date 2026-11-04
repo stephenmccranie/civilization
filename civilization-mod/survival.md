@@ -51,7 +51,7 @@ Settings are in the world's `serverconfig/civilization-server.toml` (stop the wo
 
 ## Movement
 
-Ordinary level-ground travel settles at **3.2 blocks/s walking** and **4.6 blocks/s sprinting** at 20 TPS. Sneaking keeps its proportional slowdown and jump height is native. Airborne acceleration follows the walking/sprinting gait, and the forward sprint-jump impulse gives repeated sprint-jumping about **5.52 blocks/s**, roughly 20% faster than sprinting: a momentum bonus, not a velocity cap. Ice, slopes, effects, equipment and tick rate change these figures. Creative flight, vehicles and mobs keep their own speeds.
+Ordinary level-ground travel settles at **3.2 blocks/s walking** and **4.6 blocks/s sprinting** at 20 TPS. Sneaking keeps its proportional slowdown and jump height is native. Airborne acceleration follows the walking/sprinting gait, and the forward sprint-jump impulse gives repeated sprint-jumping about **5.52 blocks/s**, roughly 20% faster than sprinting: a momentum bonus, not a velocity cap. Ice, slopes, effects, equipment and tick rate change these figures. Creative and spectator flight run at twice vanilla's speed, about 22 blocks/s or 43 sprinting; vehicles and mobs keep their own speeds.
 
 ### Street paving
 

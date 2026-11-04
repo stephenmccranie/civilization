@@ -103,6 +103,7 @@ public final class MovementGameTests {
     public static void oldPlayerAbilitiesMigrateAndSprintDoesNotStack(GameTestHelper h) {
         var p = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "movement-save"));
         p.getAbilities().setWalkingSpeed(.1f);
+        p.getAbilities().setFlyingSpeed(.05f);
         var saved = new CompoundTag();
         p.addAdditionalSaveData(saved);
         p.readAdditionalSaveData(saved);
@@ -112,7 +113,7 @@ public final class MovementGameTests {
         h.assertTrue(Math.abs(p.getAttributeValue(Attributes.MOVEMENT_SPEED) / PlayerMovement.WALK_ATTRIBUTE - 4.6 / 3.2) < .00001, "Sprint multiplier cannot stack");
         p.setSprinting(false);
         h.assertTrue(Math.abs(p.getAttributeValue(Attributes.MOVEMENT_SPEED) - PlayerMovement.WALK_ATTRIBUTE) < .00001, "Stopping restores walking");
-        h.assertTrue(p.getAbilities().getFlyingSpeed() == .05f, "Creative flight ability unchanged");
+        h.assertTrue(p.getAbilities().getFlyingSpeed() == PlayerMovement.FLYING_SPEED, "Old flying ability updated on load");
         h.succeed();
     }
 }

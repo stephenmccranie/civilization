@@ -14,9 +14,12 @@ public final class PlayerMovement {
     public static final double AIR_CONTROL_RATIO = (1 - .91) / (1 - .6 * .91);
     // Calibrated for a 20% flat-ground sprint-jump bonus at the current sprint speed.
     public static final double JUMP_BOOST_SCALE = .686;
+    // Creative and spectator flight at twice vanilla's 0.05; the server sends it to the client with the other abilities.
+    public static final float FLYING_SPEED = .1f;
 
     public static void apply(Player player) {
         player.getAbilities().setWalkingSpeed(WALK_ATTRIBUTE);
+        player.getAbilities().setFlyingSpeed(FLYING_SPEED);
         player.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(WALK_ATTRIBUTE);
     }
 }
