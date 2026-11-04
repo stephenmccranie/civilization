@@ -11,7 +11,7 @@ import subprocess
 import sys
 import uuid
 from pathlib import Path
-from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageStat
+from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageFilter, ImageStat
 import pipeline as legacy
 import setup
 
@@ -19,6 +19,7 @@ import setup
 ROOT = setup.ROOT
 RUNTIME = legacy.RUNTIME
 QUESTIONS = ('character', 'materials', 'readability', 'function')
+KEY = 40  # How far a master pixel must lie from the ground colour to belong to a subject; generated grounds are only nearly flat.
 
 
 def read(path): return json.loads(path.read_text(encoding='utf-8'))
@@ -71,59 +72,95 @@ def master_prompt(texture):
     """The master sheet contract the atlas reduction relies on, stated from the layout ahead of the asset's cell descriptions."""
     cols, rows = texture['grid']; sizes = {}
     for name, region in texture['regions'].items():
-        sizes.setdefault(tuple(region['cell']), []).append(f'{region["rect"][2]} by {region["rect"][3]} pixels for {name}')
-    cells = '\n'.join(f'Row {row+1}, column {col+1}: reduced to {", ".join(found)}.'
+        fit = 'an icon reduced to fit within' if region.get('sprite') else 'a panel reduced to'
+        sizes.setdefault(tuple(region['cell']), []).append(f'{fit} {region["rect"][2]} by {region["rect"][3]} pixels for {name}')
+    cells = '\n'.join(f'Row {row+1}, column {col+1}: {", ".join(found)}.'
                       for (col, row), found in sorted(sizes.items(), key=lambda item: item[0][::-1]))
-    return (f'Draw a flat texture master sheet: a strict {cols} by {rows} grid of equal cells on a perfectly flat, solid {texture["ground"]} '
-            'background. Each cell listed below holds one flat rectangular material panel, seen straight on and centred, with a margin of plain '
-            'background at least 6% of the cell on every side; leave other cells empty. No perspective, 3D form, cast shadows, lighting '
-            'gradients, objects, text or grid lines. Crisp and matte, with broad two-to-three-tone colour clusters and no dithering or noise. '
-            'Each panel is reduced by area averaging to the pixel sizes listed: shape it to the largest one and draw seams, stitches and '
-            f'fasteners bold enough to survive.\n{cells}\n\n')
+    return (f'Draw a texture master sheet: a strict {cols} by {rows} grid of equal cells on a perfectly flat, solid {texture["ground"]} '
+            'background, with no grid lines. Each cell listed below holds one subject, centred with a margin of plain background at least '
+            '6% of the cell on every side; leave other cells empty. A panel is a flat rectangular material surface seen straight on, with no '
+            'perspective, 3D form, cast shadow or lighting gradient. An icon is one whole object drawn as a pixel-art inventory sprite, with '
+            'no cast shadow, floor or outline glow; its openings show the plain background. No text. Crisp and matte, with broad '
+            'two-to-three-tone colour clusters and no dithering or noise. Each subject is reduced by area averaging to the pixel sizes '
+            f'listed: shape it to the largest one and draw seams, edges and fasteners bold enough to survive.\n{cells}\n\n')
+
+
+def subject(crop, ground):
+    """Mask of the pixels that differ from the flat ground."""
+    difference = ImageChops.difference(crop, Image.new('RGB', crop.size, ground)).split()
+    return ImageChops.lighter(ImageChops.lighter(*difference[:2]), difference[2]).point(lambda v: 255 if v > KEY else 0)
 
 
 def atlas(asset, folder):
-    """Reduce each region's master panel to its atlas rectangle with one shared palette, and draw the inspection sheet."""
-    texture = asset['texture']
+    """Reduce each region's master subject to its atlas rectangle with one shared palette, and draw the inspection sheet.
+
+    A panel fills its rectangle. A sprite keeps its silhouette and proportions, centred in its rectangle on transparency."""
+    texture = asset['texture']; regions = texture['regions']
     if not texture.get('master'): raise ValueError('Record a texture master first with texture --prompt')
     with Image.open(local(folder, texture['master'])) as opened: master = opened.convert('RGB')
-    cols, rows = texture['grid']; panels = {}
-    for col, row in {tuple(r['cell']) for r in texture['regions'].values()}:
+    cols, rows = texture['grid']; found = {}
+    for col, row in {tuple(r['cell']) for r in regions.values()}:
         cell = (col*master.width//cols, row*master.height//rows, (col+1)*master.width//cols, (row+1)*master.height//rows)
-        crop = master.crop(cell)
-        # The panel is everything that differs from the flat ground; one touching its cell edge has no margin to trust.
-        found = ImageChops.difference(crop, Image.new('RGB', crop.size, texture['ground'])).point(lambda v: 255 if v > 14 else 0).getbbox()
-        if found is None or 0 in found[:2] or found[2] == crop.width or found[3] == crop.height:
-            raise ValueError(f'Master cell {col},{row} has no panel inside a margin of plain {texture["ground"]}')
-        inset = max(2, (found[2]-found[0])//60)  # Inside the antialiased rim.
-        panels[col, row] = (cell[0]+found[0]+inset, cell[1]+found[1]+inset, cell[0]+found[2]-inset, cell[1]+found[3]-inset)
-    tiles = {name: master.crop(panels[tuple(r['cell'])]).resize(tuple(r['rect'][2:]), Image.Resampling.BOX)
-             for name, r in texture['regions'].items()}
-    # The palette comes from the panels alone and applies without dithering; unused atlas space takes their mean colour.
-    swatch = Image.frombytes('RGB', (sum(t.width*t.height for t in tiles.values()), 1), b''.join(t.tobytes() for t in tiles.values()))
+        mask = subject(master.crop(cell), texture['ground']); box = mask.getbbox()
+        # A subject touching its cell edge has no margin to trust.
+        if box is None or 0 in box[:2] or box[2] == mask.width or box[3] == mask.height:
+            raise ValueError(f'Master cell {col},{row} has no subject inside a margin of plain {texture["ground"]}')
+        found[col, row] = cell, mask, box
+    tiles = {}
+    for name, region in regions.items():
+        (left, top, _, _), mask, box = found[tuple(region['cell'])]; width, height = region['rect'][2:]
+        if region.get('sprite'):
+            # Drop the rim blended with the ground, then reduce premultiplied so the ground cannot tint the edge.
+            crop = master.crop((left+box[0], top+box[1], left+box[2], top+box[3])).convert('RGBA')
+            crop.putalpha(mask.filter(ImageFilter.MinFilter(5)).crop(box))
+            scale = min(width/crop.width, height/crop.height)
+            small = crop.convert('RGBa').resize((max(1, round(crop.width*scale)), max(1, round(crop.height*scale))), Image.Resampling.BOX).convert('RGBA')
+            small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
+            tile = Image.new('RGBA', (width, height)); tile.paste(small, ((width-small.width)//2, (height-small.height)//2))
+        else:
+            inset = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
+            panel = (left+box[0]+inset, top+box[1]+inset, left+box[2]-inset, top+box[3]-inset)
+            tile = master.crop(panel).resize((width, height), Image.Resampling.BOX).convert('RGBA')
+        tiles[name] = tile
+    # The palette comes from the visible subjects alone and applies without dithering. Unused space in an atlas of
+    # panels takes their mean colour; an atlas holding a sprite stays transparent around it.
+    visible = [data[i:i+3] for data in (t.tobytes() for t in tiles.values()) for i in range(0, len(data), 4) if data[i+3]]
+    swatch = Image.frombytes('RGB', (len(visible), 1), b''.join(visible))
     palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-    image = Image.new('RGB', tuple(texture['size']), tuple(round(v) for v in ImageStat.Stat(swatch).mean))
-    for name, tile in tiles.items(): image.paste(tile, tuple(texture['regions'][name]['rect'][:2]))
-    image = image.quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
+    transparent = any(r.get('sprite') for r in regions.values())
+    image = Image.new('RGBA', tuple(texture['size']), (0, 0, 0, 0) if transparent else (*map(round, ImageStat.Stat(swatch).mean), 255))
+    for name, tile in tiles.items(): image.alpha_composite(tile, tuple(regions[name]['rect'][:2]))
+    coverage = image.getchannel('A')
+    image = image.convert('RGB').quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
+    if transparent: image = Image.composite(image.convert('RGBA'), Image.new('RGBA', image.size), coverage)
     path = local(folder, texture['atlas'])
     if path.is_file(): preserve(folder, path)
     path.parent.mkdir(parents=True, exist_ok=True); image.save(path)
-    (folder/'review').mkdir(exist_ok=True); sheet(master, panels, image, texture['regions']).save(folder/'review/texture.png')
+    subjects = [(c[0]+b[0], c[1]+b[1], c[0]+b[2], c[1]+b[3]) for c, _, b in found.values()]
+    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, image, regions).save(folder/'review/texture.png')
     return path
 
 
-def sheet(master, panels, image, regions):
-    """The panels found on the master beside the atlas they reduce to, with its regions outlined and named."""
+def sheet(master, subjects, image, regions):
+    """The subjects found on the master beside the atlas they reduce to, with its regions outlined and named,
+    and the atlas at native and double size on dark and light grounds."""
     zoom = max(1, 512//image.height)
-    right = image.resize((image.width*zoom, image.height*zoom), Image.Resampling.NEAREST); draw = ImageDraw.Draw(right)
+    right = Image.new('RGBA', (image.width*zoom, image.height*zoom), (32, 32, 32, 255))
+    right.alpha_composite(image.convert('RGBA').resize(right.size, Image.Resampling.NEAREST)); draw = ImageDraw.Draw(right)
     for name, region in regions.items():
         x, y, w, h = (v*zoom for v in region['rect'])
         draw.rectangle((x, y, x+w-1, y+h-1), outline=(255, 0, 0)); draw.text((x+3, y+2), name, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
     scale = right.height/master.height
     left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
-    for box in panels.values(): draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
-    result = Image.new('RGB', (left.width+16+right.width, right.height), (32, 32, 32))
-    result.paste(left, (0, 0)); result.paste(right, (left.width+16, 0))
+    for box in subjects: draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
+    native = Image.new('RGBA', (image.width*3+32, max(right.height, image.height*4+32)), (32, 32, 32, 255))
+    for row, ground in enumerate(((36, 37, 42, 255), (198, 198, 198, 255))):
+        y = row*(image.height*2+16)
+        native.paste(ground, (0, y, native.width, y+image.height*2+16))
+        native.alpha_composite(image.convert('RGBA'), (8, y+8))
+        native.alpha_composite(image.convert('RGBA').resize((image.width*2, image.height*2), Image.Resampling.NEAREST), (image.width+24, y+8))
+    result = Image.new('RGB', (left.width+16+right.width+16+native.width, max(right.height, native.height)), (32, 32, 32))
+    result.paste(left, (0, 0)); result.paste(right.convert('RGB'), (left.width+16, 0)); result.paste(native.convert('RGB'), (left.width+right.width+32, 0))
     return result
 
 
@@ -309,7 +346,8 @@ def main():
     folder = local(ROOT, args.asset)
     file = folder / 'asset.json'
     if args.command == 'init':
-        if file.exists(): raise ValueError('Asset exists; preserve its schema and history')
+        # A restart begins a fresh record; the previous one stays in history with the files it names.
+        if file.exists(): print('Previous record kept as', preserve(folder, file))
         folder.mkdir(parents=True, exist_ok=True)
         write(file, {'schema': 2, 'kind': args.kind,
             'brief': {'purpose': '', 'target': '', 'constraints': ''},

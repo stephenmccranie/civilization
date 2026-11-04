@@ -149,8 +149,26 @@ class ArtTests(unittest.TestCase):
             self.command('texture','--prompt','cells.txt','--references','asset/icon.png')
         prompt=art.read(self.folder/'asset.json')['generations'][0]['prompt']
         self.assertIn('strict 2 by 1 grid',prompt); self.assertIn('#808080',prompt)
-        self.assertIn('Row 1, column 2: reduced to 4 by 8 pixels for blue.',prompt); self.assertTrue(prompt.endswith('Red leather, then blue cloth.'))
+        self.assertIn('Row 1, column 2: a panel reduced to 4 by 8 pixels for blue.',prompt); self.assertTrue(prompt.endswith('Red leather, then blue cloth.'))
         self.assertTrue((self.folder/'master-01.png').is_file()); self.assertEqual(list((self.root/'.tools').iterdir()),[codex])
+
+    def test_sprite_keeps_its_silhouette_on_transparency(self):
+        """A wide blue bar with a hole on a magenta key: proportions kept, the hole and surround transparent, no key tint."""
+        master=Image.new('RGB',(400,400),'#ff00ff'); draw=ImageDraw.Draw(master)
+        draw.rectangle((40,150,359,249),fill=(40,60,200)); draw.rectangle((180,180,219,219),fill='#ff00ff')
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('A bar.',encoding='utf-8')
+        self.asset['texture']={'grid':[1,1],'ground':'#ff00ff','atlas':'icon.png','size':[64,64],'colors':8,
+            'regions':{'bar':{'cell':[0,0],'rect':[4,4,56,56],'sprite':True}}}
+        self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        with Image.open(self.folder/'icon.png') as icon:
+            self.assertEqual(icon.mode,'RGBA'); box=icon.getchannel('A').getbbox()
+            self.assertEqual((box[0],box[2]),(4,60)); self.assertLess(box[3]-box[1],22)
+            self.assertEqual(icon.getpixel((32,32))[3],0); self.assertEqual(icon.getpixel((2,2)),(0,0,0,0))
+            colours={c for _,c in icon.getcolors() if c[3]}
+            self.assertTrue(all(b>150 and r<100 for r,g,b,a in colours))
+        prompt=art.read(self.folder/'asset.json')['generations'][0]['prompt']
+        self.assertEqual(prompt,'A bar.')
+        self.assertIn('an icon reduced to fit within 56 by 56 pixels for bar',art.master_prompt(self.asset['texture']))
 
     def test_panel_without_margin_is_rejected(self):
         self.textured(); master=Image.open(self.root/'supplied.png'); ImageDraw.Draw(master).rectangle((110,0,189,89),fill=(40,40,200))
