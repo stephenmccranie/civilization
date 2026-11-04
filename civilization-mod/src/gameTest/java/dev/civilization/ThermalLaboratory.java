@@ -110,12 +110,12 @@ public final class ThermalLaboratory {
                 l.setBlockAndUpdate(door.above(),Blocks.OAK_DOOR.defaultBlockState().setValue(
                     net.minecraft.world.level.block.state.properties.BlockStateProperties.DOUBLE_BLOCK_HALF,
                     net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
-                if(s.vent())l.setBlockAndUpdate(p.south(2).above(8),Blocks.AIR.defaultBlockState());
+                if(s.vent())l.setBlockAndUpdate(p.south().above(8),Blocks.AIR.defaultBlockState());
             }
             if(s.machine()){
                 var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
                 l.setBlockAndUpdate(p,state);
-                for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
+                MachineFixture.build(l,p);
                 var kiln=(KilnBlockEntity)l.getBlockEntity(p);
                 require(kiln.checkStructure().status()==MachineStructure.COMPLETE,"Lab foundry must form");
                 kiln.setItem(0,new ItemStack(Items.RAW_IRON,32));

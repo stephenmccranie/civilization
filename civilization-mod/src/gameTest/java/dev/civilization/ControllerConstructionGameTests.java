@@ -30,7 +30,7 @@ public final class ControllerConstructionGameTests {
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
-        List<Block> controllers=List.of(KilnContent.RETORT.get(),KilnContent.FOUNDRY.get(),
+        List<Block> controllers=List.of(KilnContent.RETORT.get(),
                 WorkshopContent.TANNERY.get(),WorkshopContent.TEXTILE.get(),WorkshopContent.SMITHY.get(),
                 IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),

@@ -36,6 +36,7 @@
     "civilization:baking_oven",
     "civilization:coal_preparation_screen",
     "civilization:gladiator_pit",
-    "civilization:kiln_part"
+    "civilization:kiln_part",
+    "civilization:foundry_part"
   ]
 }

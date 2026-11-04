@@ -44,7 +44,7 @@ final class IndustryVisualCheck {
             // Reuse the clear foreground after refinery checks; this fixture has no bearing on production saves.
             for(int x=26;x<=30;x++)for(int z=-1;z<=3;z++)for(int y=101;y<=107;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
             l.setBlockAndUpdate(at,KilnContent.FOUNDRY.get().defaultBlockState());
-            for(var part:MachineStructure.parts(l.getBlockState(at)))MachineStructure.placePart(l,at,Direction.NORTH,part);
+            MachineFixture.build(l,at);
             var f=(FoundryBlockEntity)l.getBlockEntity(at);if(f.checkStructure().status()!=MachineStructure.COMPLETE)throw new IllegalStateException("Foundry fixture incomplete");
             f.setItem(0,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT,4));f.setItem(1,KilnContent.MINERAL_COAL.toStack(4));CoalFireFixture.light(f);
             var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,28.5,101,-3,java.util.Set.of(),0,0);p.getInventory().setItem(0,KilnContent.STEEL.toStack());p.getInventory().setItem(1,KilnContent.MACHINE_PARTS.toStack());p.openMenu(f);

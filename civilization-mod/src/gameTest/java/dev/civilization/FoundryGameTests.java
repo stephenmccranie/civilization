@@ -9,8 +9,10 @@ import net.neoforged.neoforge.gametest.*;
 public class FoundryGameTests {
     private static FoundryBlockEntity build(GameTestHelper h,Direction facing) {
         var pos=h.absolutePos(new BlockPos(4,1,2));
+        // A turned controller is a new machine: take the old one down first.
+        h.getLevel().setBlockAndUpdate(pos,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
         h.getLevel().setBlockAndUpdate(pos,KilnContent.FOUNDRY.get().defaultBlockState().setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING,facing));
-        for(var p:MachineStructure.parts(h.getLevel().getBlockState(pos)))MachineStructure.placePart(h.getLevel(),pos,facing,p);
+        MachineFixture.build(h.getLevel(),pos);
         return (FoundryBlockEntity)h.getLevel().getBlockEntity(pos);
     }
     private static void run(GameTestHelper h,FoundryBlockEntity f,int ticks) {CoalFireFixture.light(f);for(int i=0;i<ticks;i++)KilnBlockEntity.tick(h.getLevel(),f.getBlockPos(),f.getBlockState(),f);}

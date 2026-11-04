@@ -4,7 +4,7 @@ Town manufacturing runs **Foundry metals + hides and wool → Tannery, Textile W
 
 ## Foundry
 
-Craft the **Foundry** controller from **8 brick blocks around cobblestone**. Its three-wide brick body has a hollow hearth, cut-brick shoulders and a raised rear chimney; a stone saw makes every cut, and neither the Kiln nor the Foundry needs metal to build. It has two ingredient slots, two Coal slots and two outputs, and runs one recipe at a time.
+Craft the **Foundry** controller from **8 brick blocks around cobblestone**. Placed, it is the japanned furnace door of a brick furnace three blocks wide and two deep behind the controller: a low barrel-vaulted body with piers at its front corners, a chimney rising at the back to about two and a half blocks, and a sand casting trough with two ingot moulds along its right side. It is built in five sections paid with **3 stone and 20 brick blocks**: footing (3 stone or cobblestone), walls and piers (8 brick blocks), vault and arches (6), chimney (4) and casting trough (2). Neither the Kiln nor the Foundry needs metal to build. The fire warms the whole masonry body, and its exhaust leaves through the chimney. It has two ingredient slots, two Coal slots and two outputs, and runs one recipe at a time.
 
 | Input | Output | Time |
 | --- | --- | --- |

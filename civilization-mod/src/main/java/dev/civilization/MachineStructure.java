@@ -43,20 +43,7 @@ public final class MachineStructure {
         if (works) parts.add(new Part(0, 3, 1, "copper", 2, Direction.DOWN));
         return List.copyOf(parts);
     }
-    public static List<Part> foundryParts() {
-        var a=new ArrayList<Part>();
-        for(int y=0;y<3;y++)for(int z=0;z<3;z++)for(int x=-1;x<=1;x++) {
-            if(x==0&&y==0&&z==0)continue;
-            String material=x==0&&y==1&&z==1?"air":"brick";
-            int units=y==2?(x==0&&z==2?4:x!=0&&z!=1?3:2):4;
-            a.add(new Part(x,y,z,material,units,Direction.DOWN));
-        }
-        a.add(new Part(0,3,2,"brick",4,Direction.DOWN));
-        a.add(new Part(0,4,2,"brick",2,Direction.DOWN));
-        return List.copyOf(a);
-    }
-    private static final List<Part> FOUNDRY = foundryParts();
-    public static List<Part> parts(BlockState state) {return state.getBlock() instanceof WorkshopBlock w?WorkshopStructure.parts(w.kind):state.is(KilnContent.FOUNDRY.get())?FOUNDRY:parts(state.is(KilnContent.RETORT.get()));}
+    public static List<Part> parts(BlockState state) {return state.getBlock() instanceof WorkshopBlock w?WorkshopStructure.parts(w.kind):parts(state.is(KilnContent.RETORT.get()));}
     /** Every controller that exposes the contextual construction guide uses this blueprint. */
     public static List<Part> guideParts(BlockState state) {
         if (state.getBlock() instanceof ArenaBlock) return ArenaStructure.PARTS;
