@@ -62,7 +62,7 @@ Runtime GeckoLib files follow `geo/<id>.geo.json`, `animations/<id>.animation.js
 
 Native export details: `export_model` with codec `project` saves the source and `bedrock` invokes the GeckoLib geometry hooks; discover codecs rather than guessing. `Animator.buildFile(null, Animation.all.map(a => a.name))` exports animations where no codec is exposed.
 
-The tools write UTF-8 text with LF line endings; recipes write theirs with `newline='\n'`, so an export has the same bytes on every platform.
+The tools write UTF-8 text with LF line endings; recipes write theirs with `newline='\n'`, so an export has the same bytes on every platform. Geometry, animation and block-model exports are compact JSON, one line each.
 
 Fast checks need no Minecraft launch: `python -m unittest discover -s tools/modeling -p "test_*.py"`.
 

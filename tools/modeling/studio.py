@@ -200,15 +200,18 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
 
 
 def save(client,folder,name,gecko=True):
+    # Exports are machine-written and read by machines, so they are written compact: a model of hundreds of cubes is
+    # one line a few hundred kilobytes long rather than tens of thousands of indented lines.
+    compact=lambda value:json.dumps(value,separators=(',',':'))
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     (folder/f'{name}.bbmodel').write_text(export(client,'project'),encoding='utf-8', newline='\n')
     data=json.loads(export(client,'bedrock' if gecko else 'java_block'))
     if not gecko:
         data['parent']='minecraft:block/block';data['textures']['particle']=next(iter(data['textures'].values()))
-    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(json.dumps(data,indent=2),encoding='utf-8', newline='\n')
+    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(compact(data),encoding='utf-8', newline='\n')
     if gecko:
         a=evaluate(client,'Animator.buildFile(null, Animation.all.map(a=>a.name))')
-        (folder/f'{name}.animation.json').write_text(json.dumps(a,indent=2),encoding='utf-8', newline='\n')
+        (folder/f'{name}.animation.json').write_text(compact(a),encoding='utf-8', newline='\n')
 
 
 def capture(client,path,position,target,span=70,size=1000):
