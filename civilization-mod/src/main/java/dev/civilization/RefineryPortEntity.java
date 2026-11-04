@@ -7,15 +7,22 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 /** No liquid duplicated here: the port exposes a validated controller buffer. */
 public final class RefineryPortEntity extends BlockEntity {
-    private BlockPos controller;private String role="";private boolean derrickAssembly;
-    public boolean derrickAssembly(){return derrickAssembly;}
-    public void breakAssembly(){var m=owner();if(derrickAssembly&&m!=null&&!m.derrickChanging)ModeledDerrick.removeSection(m,24,true);}
-    public boolean keepAssemblyCheck(){
-        if(!derrickAssembly||level==null||controller==null)return false;
-        if(!level.hasChunkAt(controller))return true;
-        var m=owner();if(m==null||!m.derrickBuilt){level.removeBlock(worldPosition,false);return false;}return true;
+    private BlockPos controller;private String role="";
+    /** Placed by a section of its controller's native model, so it belongs to that section rather than to its finder. */
+    private boolean assembly;
+    public boolean assembly(){return assembly;}
+    private java.util.OptionalInt section(IndustrialBlockEntity m){
+        if(m.model()==null)return java.util.OptionalInt.empty();
+        for(var port:m.model().ports)if(port.part().material().equals(role)&&MachineStructure.position(controller,m.front(),port.part()).equals(worldPosition))return java.util.OptionalInt.of(port.section());
+        return java.util.OptionalInt.empty();
     }
-    @Override public void onLoad(){super.onLoad();if(level!=null&&!level.isClientSide&&derrickAssembly)level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
+    public void breakAssembly(){var m=owner();if(assembly&&m!=null&&!m.build().changing)section(m).ifPresent(part->ModeledMachine.removeSection(m,part,true));}
+    public boolean keepAssemblyCheck(){
+        if(!assembly||level==null||controller==null)return false;
+        if(!level.hasChunkAt(controller))return true;
+        var m=owner();if(m==null||section(m).stream().noneMatch(m.build()::has)){level.removeBlock(worldPosition,false);return false;}return true;
+    }
+    @Override public void onLoad(){super.onLoad();if(level!=null&&!level.isClientSide&&assembly)level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
     public RefineryPortEntity(BlockPos p,BlockState s){super(IndustrialContent.PORT_ENTITY.get(),p,s);}
     private IndustrialBlockEntity owner(){
         if(level==null||controller==null||!level.hasChunkAt(controller)||!(level.getBlockEntity(controller) instanceof IndustrialBlockEntity m))return null;
@@ -26,7 +33,7 @@ public final class RefineryPortEntity extends BlockEntity {
     public boolean boundTo(BlockPos at){return at.equals(controller);}
     public boolean canBind(IndustrialBlockEntity m){var old=owner();return old==null||old==m||!IndustrialStructure.complete(level,old.getBlockPos(),old.front(),old.kind);}
     public void bind(IndustrialBlockEntity m,String role,Direction side){
-        if(m.kind==IndustrialBlock.Kind.PUMP&&m.derrickBuilt&&!derrickAssembly){derrickAssembly=true;setChanged();level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
+        if(m.model()!=null&&!assembly){assembly=true;setChanged();level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
         if(!m.getBlockPos().equals(controller)||!this.role.equals(role)){controller=m.getBlockPos();this.role=role;setChanged();level.updateNeighborsAt(worldPosition,getBlockState().getBlock());}
         if(getBlockState().getValue(RefineryPortBlock.FACING)!=side)level.setBlockAndUpdate(worldPosition,getBlockState().setValue(RefineryPortBlock.FACING,side));
     }
@@ -43,6 +50,6 @@ public final class RefineryPortEntity extends BlockEntity {
         public FluidStack drain(int n,FluidAction a){var t=tank();return t!=null&&!role.equals("input_port")?t.drain(n,a):FluidStack.EMPTY;}
         public FluidStack drain(FluidStack s,FluidAction a){var t=tank();return t!=null&&!role.equals("input_port")?t.drain(s,a):FluidStack.EMPTY;}
     };}
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putBoolean("derrickAssembly",derrickAssembly);if(controller!=null)t.putLong("controller",controller.asLong());t.putString("role",role);}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);derrickAssembly=t.getBoolean("derrickAssembly");controller=t.contains("controller")?BlockPos.of(t.getLong("controller")):null;role=t.getString("role");}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putBoolean("assembly",assembly);if(controller!=null)t.putLong("controller",controller.asLong());t.putString("role",role);}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);assembly=t.getBoolean("assembly")||t.getBoolean("derrickAssembly");controller=t.contains("controller")?BlockPos.of(t.getLong("controller")):null;role=t.getString("role");}
 }

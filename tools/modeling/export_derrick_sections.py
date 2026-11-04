@@ -52,7 +52,11 @@ def main():
     for p in model.parts:
         if p['group']=='feet': add(list(itertools.product(*zip(p['start'],p['end']))),0)
     data = [{'offset':list(c),'boxes':boxes} for c,boxes in sorted(cells.items(),key=lambda e:(e[0][1],e[0][2],e[0][0]))]
-    (OUT/'data/civilization/derrick_sections.json').write_text(json.dumps(data,separators=(',',':')),encoding='utf-8', newline='\n')
+    # The derrick's sections, bill and port live in its machine definition; this rule owns only the cells.
+    definition_path = OUT/'assets/civilization/machines/oil_derrick.json'
+    definition = json.loads(definition_path.read_text(encoding='utf-8')); definition['cells'] = data
+    definition_path.write_text(json.dumps(definition,separators=(',',':')),encoding='utf-8', newline='
+')
     geo = json.loads((SOURCE/'model/oil_derrick.geo.json').read_text())
     bones = geo['minecraft:geometry'][0]['bones']; children = []
     for bone in bones:

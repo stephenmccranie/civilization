@@ -1,6 +1,6 @@
 """Focused regression checks for silent UV distortion and invalid atlas use."""
 import unittest
-from studio import Model, uv_faces, bounds
+from studio import machine_cells, Model, uv_faces, bounds
 
 class StudioTests(unittest.TestCase):
     def test_density_and_long_face_rejection(self):
@@ -40,5 +40,18 @@ class StudioTests(unittest.TestCase):
         self.assertAlmostEqual(hi[0],2**.5)
         self.assertAlmostEqual(lo[1],-2**.5)
         self.assertEqual(hi[2],1)
+
+    def test_controller_claims_its_cell_and_takes_no_part_cells(self):
+        m=Model();m.box('section_0_wall','wall',[-16,0,0],[32,16,48]);m.claim('controller',[0,0,0],[16,16,16])
+        self.assertEqual([(p['start'],p['end']) for p in m.parts if p['group']=='controller'],[([0,0,0],[16,16,16])])
+        cells=machine_cells(m.parts)
+        self.assertNotIn([0,0,0],[c['offset'] for c in cells])
+        self.assertAlmostEqual(sum((b[4]-b[1])*(b[5]-b[2])*(b[6]-b[3]) for c in cells for b in c['boxes']),8)
+
+    def test_rotated_parts_are_sliced_across_cells(self):
+        m=Model();m.box('section_1_brace','brace',[0,16,8],[4,40,12],angle=45,axis='z',pivot=[2,16,10])
+        offsets=sorted(tuple(c['offset']) for c in machine_cells(m.parts))
+        self.assertIn((-1,1,0),offsets);self.assertNotIn((1,1,0),offsets)
+        self.assertTrue(all(b[0]==1 for c in machine_cells(m.parts) for b in c['boxes']))
 
 if __name__=='__main__':unittest.main()

@@ -17,7 +17,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 import static dev.civilization.IndustrialBlock.Kind;
 
 /** Machines share fixed buffers. Transfers and completed batches run only on the server thread. */
-public final class IndustrialBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, CoalFireHost {
+public final class IndustrialBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, CoalFireHost, ModeledController {
     public final Kind kind;
     private final NonNullList<ItemStack> items=NonNullList.withSize(8,ItemStack.EMPTY);
     public final FluidTank input,output,lubricant;
@@ -34,10 +34,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     private final DepositWork work=new DepositWork();
     private Deposits.Site site;
     private boolean surveyed,firePaused;
-    public boolean formed,derrickBuilt,derrickChanging;
-    public int derrickSections;
-    public final java.util.Map<Integer,java.util.List<ItemStack>> derrickPaid=new java.util.HashMap<>();
-    public final java.util.List<ItemStack> derrickMaterials=new java.util.ArrayList<>();
+    public boolean formed;
+    private final ModeledBuild build=new ModeledBuild();
     private int lastPumpView = -1;
     public IndustrialBlockEntity(BlockPos p,BlockState s){super(IndustrialContent.ENTITY.get(),p,s);kind=((IndustrialBlock)s.getBlock()).kind;
         input=tank(kind==Kind.TANK?16000:4000,stack->switch(kind){case TANK->IndustrialContent.industrial(stack);case REFINERY->stack.is(IndustrialContent.CRUDE.get());case COLUMN->stack.is(IndustrialContent.HEATED.get());case CONDENSER->stack.is(IndustrialContent.VAPOR.get());case DRILL->stack.is(IndustrialContent.FUEL.get());default->false;});
@@ -46,6 +44,10 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     }
     private FluidTank tank(int capacity,java.util.function.Predicate<FluidStack> validator){return new FluidTank(capacity,validator){@Override protected void onContentsChanged(){setChanged();}};}
     public Direction front(){return getBlockState().getValue(CivicBlock.FACING);}
+    @Override public MachineModel model(){return ((ModeledBlock)getBlockState().getBlock()).model();}
+    @Override public ModeledBuild build(){return build;}
+    @Override public boolean working(){return formed&&getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT);}
+    @Override public void sectionsChanged(){formed=false;}
     public int duration(){return switch(kind){case PUMP->IndustrialRates.PUMP_TICKS;case DRILL->lubricant.getFluidAmount()>=10?100:100000/Math.max(200,lubrication);case REFINERY,COLUMN,CONDENSER->IndustrialProcess.forKind(kind).ticks();case TANK->1;};}
 
     public void tick(){
@@ -63,7 +65,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     private void syncFire(){var state=getBlockState();if(state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)!=fire.lit())level.setBlock(worldPosition,state.setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT,fire.lit()),3);}
     private void processWork(){
         if(!(level instanceof ServerLevel server)||kind==Kind.TANK)return;
-        if(kind==Kind.PUMP){ModeledDerrick.migrate(this);ModeledDerrick.reconcile(this);}
+        if(model()!=null)ModeledMachine.reconcile(this);
         int structure=IndustrialStructure.bindStatus(this);
         if(structure==MachineStructure.UNLOADED){formed=false;firePaused=true;pause(MachineStatus.Industry.UNLOADED);return;}
         if(structure!=MachineStructure.COMPLETE){formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
@@ -142,7 +144,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(result!=null)p.setItemInHand(hand,new ItemStack(result));else p.displayClientMessage(Component.literal("Needs 1,000 mB available or room for one full canister of the right liquid."),true);
     }
     public final ContainerData data=new ContainerData(){
-        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->heat;case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->fire.remaining();case 13->derrickSections==ModeledDerrick.ALL?1:0;default->0;};}
+        public int get(int i){return switch(i){case 0->kind.ordinal();case 1->input.getFluidAmount();case 2->output.getFluidAmount();case 3->IndustrialContent.fluidId(input.getFluid());case 4->progress;case 5->status;case 6->heat;case 7->lubricant.getFluidAmount();case 8->kind==Kind.DRILL&&lubricant.getFluidAmount()>=10?1000:lubrication;case 9->duration();case 10->IndustrialContent.fluidId(output.getFluid());case 11->coalPowered()?fire.state():0;case 12->fire.remaining();case 13->model()!=null&&build.sections==model().all?1:0;default->0;};}
         public void set(int i,int v){}public int getCount(){return 14;}
     };
     @Override public void onLoad(){
@@ -154,8 +156,29 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
             }
         }
     }
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putBoolean("derrickBuilt",derrickBuilt);t.putInt("derrickSections",derrickSections);var sections=new net.minecraft.nbt.ListTag();for(var entry:derrickPaid.entrySet()){var section=new CompoundTag();section.putInt("part",entry.getKey());var stacks=new net.minecraft.nbt.ListTag();for(var stack:entry.getValue())if(!stack.isEmpty())stacks.add(stack.save(r));section.put("stacks",stacks);sections.add(section);}t.put("derrickPaid",sections);var paid=new net.minecraft.nbt.ListTag();for(var stack:derrickMaterials)if(!stack.isEmpty())paid.add(stack.save(r));t.put("derrickMaterials",paid);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);derrickBuilt=t.getBoolean("derrickBuilt");derrickSections=t.getInt("derrickSections")&ModeledDerrick.ALL;derrickPaid.clear();for(var entry:t.getList("derrickPaid",10)){var section=(CompoundTag)entry;int part=section.getInt("part");if(part<0||part>=ModeledDerrick.PARTS)continue;var stacks=new java.util.ArrayList<ItemStack>();for(var stack:section.getList("stacks",10))stacks.add(ItemStack.parseOptional(r,(CompoundTag)stack));derrickPaid.put(part,stacks);}derrickMaterials.clear();for(var tag:t.getList("derrickMaterials",10))derrickMaterials.add(ItemStack.parseOptional(r,(CompoundTag)tag));fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;if(!t.contains("derrickSections"))ModeledDerrick.migrate(this);}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null)loadBuild(t,r);fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
+    /** Derricks saved before machines shared one model format kept their sections under derrick keys; the first ones recorded
+     *  only that they were built and one pool of materials, which is shared out by each section's bill, any remainder
+     *  refunded with the footings. */
+    private void loadBuild(CompoundTag t,HolderLookup.Provider r){
+        var model=model();
+        if(t.contains("modeled")){build.load(t,r,model);return;}
+        build.sections=t.getInt("derrickSections")&model.all;build.paid.clear();
+        for(var entry:t.getList("derrickPaid",10)){
+            var section=(CompoundTag)entry;int part=section.getInt("part");if(part<0||part>=model.sections.size())continue;
+            var stacks=new java.util.ArrayList<ItemStack>();for(var stack:section.getList("stacks",10))stacks.add(ItemStack.parseOptional(r,(CompoundTag)stack));build.paid.put(part,stacks);
+        }
+        if(t.contains("derrickSections")||!t.getBoolean("derrickBuilt"))return;
+        var pool=new java.util.ArrayList<ItemStack>();for(var tag:t.getList("derrickMaterials",10))pool.add(ItemStack.parseOptional(r,(CompoundTag)tag));
+        build.sections=model.all;
+        for(int part=0;part<model.sections.size();part++){
+            var section=model.section(part);var paid=new java.util.ArrayList<ItemStack>();int left=section.count();
+            for(var stack:pool)if(left>0&&section.accepts(stack)){int n=Math.min(left,stack.getCount());paid.add(stack.split(n));left-=n;}
+            build.paid.put(part,paid);
+        }
+        pool.removeIf(ItemStack::isEmpty);build.paid.get(0).addAll(pool);
+    }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=saveWithoutMetadata(r);t.putBoolean("formed",formed);return t;}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}

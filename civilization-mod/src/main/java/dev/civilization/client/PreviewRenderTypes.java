@@ -16,12 +16,14 @@ final class PreviewRenderTypes extends RenderType {
                     .setOverlayState(OVERLAY)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
-    static final RenderType DERRICK = create("civilization_derrick_preview", DefaultVertexFormat.NEW_ENTITY,
+    /** A machine model's own texture as a translucent guide, one render type per model. */
+    private static final java.util.function.Function<String,RenderType> MODEL = net.minecraft.Util.memoize(geo -> create("civilization_model_preview_" + geo, DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
                     .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                    .setTextureState(new TextureStateShard(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("civilization","textures/entity/oil_derrick.png"), false, false))
+                    .setTextureState(new TextureStateShard(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("civilization","textures/entity/" + geo + ".png"), false, false))
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL).setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY).setWriteMaskState(COLOR_WRITE).createCompositeState(false));
+                    .setOverlayState(OVERLAY).setWriteMaskState(COLOR_WRITE).createCompositeState(false)));
+    static RenderType model(String geo) { return MODEL.apply(geo); }
     static final RenderType OUTLINE = create("civilization_preview_outline", DefaultVertexFormat.POSITION_COLOR_NORMAL,
             VertexFormat.Mode.LINES, 1536, false, false, CompositeState.builder()
                     .setShaderState(RENDERTYPE_LINES_SHADER)

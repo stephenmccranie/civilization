@@ -99,7 +99,7 @@ For multiblocks made mostly of ordinary and saw-cut blocks, [isometric_plan.py](
 python tools/modeling/isometric_plan.py tools/modeling/examples/isometric_example.py .tools/isometric-example
 ```
 
-It writes a front/rear isometric sheet, individual views and a labelled half-block layer plan; colours identify materials, not final textures. Keep a machine's layout source with its asset record and review the PNGs before adopting dimensions or material counts. [export_oil_derrick.py](export_oil_derrick.py) shows converting a half-grid plan into saw-piece orientations and mixed-cell masks; [export_derrick_sections.py](export_derrick_sections.py) splits a native model into repairable sections with matching collision.
+It writes a front/rear isometric sheet, individual views and a labelled half-block layer plan; colours identify materials, not final textures. Keep a machine's layout source with its asset record and review the PNGs before adopting dimensions or material counts. [export_oil_derrick.py](export_oil_derrick.py) shows converting a half-grid plan into saw-piece orientations and mixed-cell masks; [export_derrick_sections.py](export_derrick_sections.py) splits the derrick into repairable sections with matching collision.
 
 ## Modelling craft
 

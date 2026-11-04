@@ -52,6 +52,56 @@ class Model:
                      point(cx+length/2,cy+thickness/2,end-inset),material,-45 if sx*sy>0 else 45,
                      axis,point(cx,cy,(start+end)/2))
 
+    def claim(self, group, start, end):
+        """Give `group` the geometry inside the box start..end: every unrotated part crossing it is split, the inside piece
+        moving to `group`. A machine's controller claims its own cell this way, so the controller block draws the
+        masonry around it before any section is built."""
+        inside = lambda p: ([max(a, s) for a, s in zip(p['start'], start)], [min(b, e) for b, e in zip(p['end'], end)])
+        for part in list(self.parts):
+            if part['group'] == group or part['angle']: continue
+            lo, hi = inside(part)
+            if any(b <= a for a, b in zip(lo, hi)): continue
+            self.parts.remove(part)
+            pieces = [(lo, hi, group)]
+            # The outside remainder as up to six boxes, peeled off one axis at a time.
+            rest_lo, rest_hi = list(part['start']), list(part['end'])
+            for axis in range(3):
+                if rest_lo[axis] < lo[axis]:
+                    a, b = list(rest_lo), list(rest_hi); b[axis] = lo[axis]; pieces.append((a, b, part['group'])); rest_lo[axis] = lo[axis]
+                if rest_hi[axis] > hi[axis]:
+                    a, b = list(rest_lo), list(rest_hi); a[axis] = hi[axis]; pieces.append((a, b, part['group'])); rest_hi[axis] = hi[axis]
+            for i, (a, b, g) in enumerate(pieces):
+                self.parts.append(dict(part, group=g, name=f"{part['name']}_{i}" if i else part['name']+'_claimed', start=a, end=b))
+
+
+def machine_cells(parts, controller=(0, 0, 0), exclude=()):
+    """Collision cells of a machine model whose groups name its sections (`section_<n>_...`): each part's volume, split
+    over the block cells it crosses, as [section, box...] in cell-local units. Rotated parts are sliced into pieces at
+    most 4 units long before taking bounds, so a diagonal brace stays close to its true shape. The controller's cell and
+    any `exclude` cells (ports) hold their own blocks and take no part cells."""
+    cells = {}
+    skip = {tuple(controller), *map(tuple, exclude)}
+    for part in parts:
+        if not part['group'].startswith('section_'): continue
+        section = int(part['group'].split('_')[1])
+        counts = [max(1, math.ceil((b - a) / 4)) if part['angle'] else 1 for a, b in zip(part['start'], part['end'])]
+        axis = 'xyz'.index(part['axis']); u, v = (axis + 1) % 3, (axis + 2) % 3
+        angle = math.radians(part['angle']); c, s = math.cos(angle), math.sin(angle)
+        def turn(point):
+            q = [x - o for x, o in zip(point, part['pivot'])]
+            q[u], q[v] = q[u] * c - q[v] * s, q[u] * s + q[v] * c
+            return [x + o for x, o in zip(q, part['pivot'])]
+        steps = [[a + (b - a) * k / n for k in range(n + 1)] for a, b, n in zip(part['start'], part['end'], counts)]
+        for i, j, k in itertools.product(*(range(n) for n in counts)):
+            lo = [steps[0][i], steps[1][j], steps[2][k]]; hi = [steps[0][i + 1], steps[1][j + 1], steps[2][k + 1]]
+            points = [turn(corner) for corner in itertools.product(*zip(lo, hi))]
+            a = [min(p[d] for p in points) / 16 for d in range(3)]; b = [max(p[d] for p in points) / 16 for d in range(3)]
+            for cell in itertools.product(*(range(math.floor(a[d] + 1e-6), math.ceil(b[d] - 1e-6)) for d in range(3))):
+                if cell in skip: continue
+                box = [round(max(0, a[d] - cell[d]), 5) for d in range(3)] + [round(min(1, b[d] - cell[d]), 5) for d in range(3)]
+                if all(box[d + 3] > box[d] for d in range(3)): cells.setdefault(cell, []).append([section, *box])
+    return [{'offset': list(c), 'boxes': boxes} for c, boxes in sorted(cells.items(), key=lambda e: (e[0][1], e[0][2], e[0][0]))]
+
 
 def face_dimensions(part):
     x,y,z=[b-a for a,b in zip(part['start'],part['end'])]

@@ -22,7 +22,7 @@ Ghosts draw after the world's shader effects with their own neutral brightness (
 
 ### Guide performance contract
 
-This contract binds every construction guide: `MachinePreview` for block assemblies and held placements, `DerrickPreview` for the Oil Derrick's native sections, and the Builder's Line preview. A held placement comes from `PlacementPlan`, recomputed each client tick from the aimed face; a changed plan refreshes at once, like a changed selection. New assemblies reuse these renderers; a custom renderer follows the same policy.
+This contract binds every construction guide: `MachinePreview` for block assemblies and held placements, `MachineGuide` for machines built as native models in sections (the Oil Derrick), and the Builder's Line preview. A held placement comes from `PlacementPlan`, recomputed each client tick from the aimed face; a changed plan refreshes at once, like a changed selection. New assemblies reuse these renderers; a custom renderer follows the same policy.
 
 - Cache static positions and bounds per world, controller and orientation; cache missing-section geometry per construction state; clear on selection or world change.
 - Prepare missing parts, obstruction states and material counts outside rendering. Refresh immediately on a changed selection, construction key or relevant held stack; poll other world changes only through `GuidePerformance.Refresh` (every 10 client ticks). Do not add separate polling intervals or budget constants.
