@@ -136,7 +136,7 @@ public final class CivilizationJei implements IModPlugin {
     private <T extends AbstractCookingRecipe> void cooking(IRecipeRegistration r,String name,net.minecraft.world.item.crafting.RecipeType<T> recipeType){
         var level=Minecraft.getInstance().level;
         var recipes=level.getRecipeManager().getAllRecipesFor(recipeType).stream().sorted(Comparator.comparing(h->h.id().toString())).map(h->{
-            var recipe=h.value();return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,recipe.getResultItem(level.registryAccess()).copy()),coal()),recipe.getCookingTime(),"One Coal supplies 20s of base heat. Select the recipe in the controller; light its fire.");
+            var recipe=h.value();return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,recipe.getResultItem(level.registryAccess()).copy()),coal()),recipe.getCookingTime(),"One Coal (250 MJ) supplies 20 s of base heat. Select the recipe in the controller; light its fire.");
         }).toList();add(r,name,recipes);
     }
     private void industry(IRecipeRegistration r){

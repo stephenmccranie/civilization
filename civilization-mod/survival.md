@@ -10,7 +10,7 @@ The default is applied once per world without changing the current time; the `ci
 
 ## Calories
 
-One server-owned calorie reserve replaces vanilla hunger, saturation and exhaustion. Defaults:
+One server-owned calorie reserve replaces vanilla hunger, saturation and exhaustion. Players see it in joules, like every energy in the game: the HUD shows the reserve in MJ, food tooltips and messages show kJ or MJ (1 kcal = 4.184 kJ), and cold drain is shown as power. The configuration and the defaults below are in kcal:
 
 | Rule | Value |
 | --- | ---: |

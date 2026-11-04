@@ -1,6 +1,6 @@
 # Coal mining
 
-Huge coal veins are worked by hand: pick → loose coal → shovel → rail cart → hand preparation → Coal. A complete vein block prepares into **16 Coal**. Ordinary coal ore still mines normally and drops Coal directly, and the [Coal Drill](industry.md#refinery) still extracts dense seams with refined fuel. The quantities below are prototype tuning.
+Huge coal veins are worked by hand: pick → loose coal → shovel → rail cart → hand preparation → Coal. A complete vein block prepares into **16 Coal**: the 160 kg (4 GJ) of fuel-grade coal screened from its rock partings and dust. Ordinary coal ore still mines normally and drops Coal directly, and the [Coal Drill](industry.md#refinery) still extracts dense seams with refined fuel. The quantities below are prototype tuning.
 
 ## Equipment
 

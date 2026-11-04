@@ -110,7 +110,7 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     }
     protected abstract void drawMachine(GuiGraphics g,float partial,int mx,int my);
     @Override protected void renderLabels(GuiGraphics g,int mx,int my){g.drawString(font,playerInventoryTitle,inventoryLabelX,inventoryLabelY,MachineUi.INK,false);}
-    @Override public void render(GuiGraphics g,int mx,int my,float dt){super.render(g,mx,my,dt);renderTooltip(g,mx,my);if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()&&isHovering(115,84,8,25,mx,my))g.renderTooltip(font,Component.literal("Burning coal: "+Math.round(fire.coalRemaining()/10f)+"% remaining"),mx,my);}
+    @Override public void render(GuiGraphics g,int mx,int my,float dt){super.render(g,mx,my,dt);renderTooltip(g,mx,my);if(menu instanceof dev.civilization.CoalFireMenu fire&&fire.hasCoalFire()&&isHovering(115,84,8,25,mx,my))g.renderTooltip(font,Component.literal("Burning coal: "+Math.round(fire.coalRemaining()/10f)+"% · "+dev.civilization.Energy.text(fire.coalRemaining()/1000.0*dev.civilization.Energy.COAL)+" left"),mx,my);}
     private int thumbHeight(int size){return Math.max(8,rowCount*18*rowCount/size);}
     private int thumbTop(int size){return listY+Math.round((float)(rowCount*18-thumbHeight(size))*offset/(size-rowCount));}
     private void dragThumb(double y){int size=filtered().size();if(size>rowCount)offset=Math.round((float)(y-grab-listY)*(size-rowCount)/(rowCount*18-thumbHeight(size)));updateDrawer();}

@@ -10,9 +10,9 @@ Right-click it for a **single-chest inventory of 27 Coal slots** (27 stacks of 3
 
 | Tier | Footprint, in blocks | Upkeep per real hour |
 | --- | --- | --- |
-| 1 | 64×64 | 1 Coal |
-| 2 | 128×128 | 4 Coal |
-| 3 | 256×256 | 16 Coal |
+| 1 | 64×64 | 1 Coal (250 MJ) |
+| 2 | 128×128 | 4 Coal (1 GJ) |
+| 3 | 256×256 | 16 Coal (4 GJ) |
 
 Every tier covers **64 blocks vertically**, from controller Y−32 through Y+31, and is centered horizontally with the same half-open convention (Tier 1 spans −32 through +31 on X and Z). A new controller starts at Tier 1 for free. Switching tier costs **24 hours of the destination tier's upkeep — 24, 96 or 384 Coal** — from the reserve, and starts a **24-real-hour cooldown**; some fuel must remain after paying. Same-tier clicks, insufficient fuel, overlap, missing access, an active cooldown and takeover locks cost nothing. The cooldown runs through logout, unloading and downtime, and the header shows what remains.
 

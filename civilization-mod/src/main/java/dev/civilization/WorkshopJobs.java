@@ -26,7 +26,7 @@ public final class WorkshopJobs {
             var e=equipment(output);if(e==null)return ManufacturingContent.materialMultiplier(output);
             return e.material()==Items.NETHERITE_INGOT?8:e.material()==Items.DIAMOND?4:e.material()==Items.GOLD_INGOT?2:1;
         }
-        public String coalNote(){return String.format(Locale.ROOT,"Base coal: %.2f per batch%s. Temperature and idle burn affect usage.",heatSpent(ticks())/(double)ProductionEnergy.HEAT_TICKS,workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
+        public String coalNote(){double coal=heatSpent(ticks())/(double)ProductionEnergy.HEAT_TICKS;return String.format(Locale.ROOT,"Base coal: %.2f (%s) per batch%s. Temperature and idle burn affect usage.",coal,Energy.text(coal*Energy.COAL),workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
     }
     public record Equipment(Item item,Item material,int amount,boolean armor){}
     private static List<Job> smithy;

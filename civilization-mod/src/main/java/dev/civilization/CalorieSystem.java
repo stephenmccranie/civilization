@@ -143,14 +143,15 @@ final class CalorieSystem {
                     var player = context.getSource().getPlayerOrException();
                     var data = CalorieFoodData.of(player);
                     context.getSource().sendSuccess(() -> Component.literal(data.isDepleted()
-                            ? "Depleted: eat back to " + (int) data.recoveryThreshold() + " kcal. Empty hands + crouch-right-click natural ground to forage."
+                            ? "Depleted: eat back to " + Energy.text(data.recoveryThreshold() * Energy.KCAL) + ". Empty hands + crouch-right-click natural ground to forage."
                             : "Energy state: normal."), false);
+                    java.util.function.DoubleFunction<String> joules = kcal -> Energy.text(kcal * Energy.KCAL);
                     context.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
-                            "Calories: %.1f / %.0f kcal | Sprint minimum: %.0f kcal\nLabor: %d broken, %d placed; %.1f kcal\nTravel: %.2f walking, %.2f sprinting, %.2f rowing blocks; %.2f kcal\nOther/healing/cold: %.1f kcal | Food absorbed: %.1f kcal\nWalk: %.2f | Sprint: %.2f | Row: %.2f kcal/block",
-                            data.reserve().calories(), data.reserve().capacity(), CalorieConfig.SPRINT_MINIMUM.get(),
-                            data.broken, data.placed, data.laborSpent, data.walkDistance, data.sprintDistance, data.rowDistance,
-                            data.travelSpent, data.otherSpent, data.eaten, CalorieConfig.WALK.get(),
-                            CalorieConfig.WALK.get() * CalorieConfig.SPRINT_MULTIPLIER.get(), CalorieConfig.ROW.get())), false);
+                            "Energy: %s / %s | Sprint minimum: %s\nLabor: %d broken, %d placed; %s\nTravel: %.2f walking, %.2f sprinting, %.2f rowing blocks; %s\nOther/healing/cold: %s | Food absorbed: %s\nWalk: %s | Sprint: %s | Row: %s per block",
+                            joules.apply(data.reserve().calories()), joules.apply(data.reserve().capacity()), joules.apply(CalorieConfig.SPRINT_MINIMUM.get()),
+                            data.broken, data.placed, joules.apply(data.laborSpent), data.walkDistance, data.sprintDistance, data.rowDistance,
+                            joules.apply(data.travelSpent), joules.apply(data.otherSpent), joules.apply(data.eaten), joules.apply(CalorieConfig.WALK.get()),
+                            joules.apply(CalorieConfig.WALK.get() * CalorieConfig.SPRINT_MULTIPLIER.get()), joules.apply(CalorieConfig.ROW.get()))), false);
                     return 1;
                 }).then(Commands.literal("reset").executes(context -> {
                     CalorieFoodData.of(context.getSource().getPlayerOrException()).resetCounters();
@@ -168,7 +169,7 @@ final class CalorieSystem {
                                     before, data.reserve().calories(), 1, false);
                             data.sync(player, true);
                             context.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
-                                    "Test reserve set to %.1f kcal.", data.reserve().calories())), false);
+                                    "Test reserve set to %s (%.1f kcal).", Energy.text(data.reserve().calories() * Energy.KCAL), data.reserve().calories())), false);
                             return 1;
                         })))));
     }

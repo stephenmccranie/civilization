@@ -61,7 +61,7 @@ public final class ComfortHud {
         lines.add(Component.literal(String.format(Locale.ROOT,"Felt temperature: %.1f°F",ThermalDisplay.fahrenheit(data.playerTemperature()))));
         lines.add(Component.literal(String.format(Locale.ROOT,"Comfort: %.0f%%",data.comfort()*100)));
         double cold=ThermalRules.coldKcalPerSecond(data.playerTemperature(),CalorieConfig.COLD_EXPOSURE.get());
-        if(cold>0)lines.add(Component.literal(CalorieFoodData.of(Minecraft.getInstance().player).isDepleted()?"Cold drain: no calories left":String.format(Locale.ROOT,"Cold drain: %.2f kcal/s",cold)));
+        if(cold>0)lines.add(Component.literal(CalorieFoodData.of(Minecraft.getInstance().player).isDepleted()?"Cold drain: no calories left":"Cold drain: "+dev.civilization.Energy.watts(cold*dev.civilization.Energy.KCAL)));
         lines.add(Component.literal(String.format(Locale.ROOT,"Work / travel calories: −%.0f%%",20*c)));
         lines.add(Component.literal(String.format(Locale.ROOT,"Mining speed: +%.0f%%",15*c)));
         lines.add(Component.literal(String.format(Locale.ROOT,"Comfort movement: +%.0f%%",5*c)));
