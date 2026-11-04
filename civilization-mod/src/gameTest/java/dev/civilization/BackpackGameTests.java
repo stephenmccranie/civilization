@@ -41,15 +41,15 @@ public final class BackpackGameTests {
     }
 
     @GameTest(template="industrial") public static void gradeSetsSlotsAndBlockCap(GameTestHelper h){
-        int[][] cases={{100,9,24},{75,7,18},{50,5,12},{125,11,30},{0,0,0},{-10,0,0}};
+        int[][] cases={{1000,9,24},{750,7,18},{500,5,12},{1250,11,30},{0,0,0},{-100,0,0}};
         for(var c:cases){
             var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,c[0],1);
-            h.assertTrue(Backpack.slots(pack)==c[1]&&Backpack.blocks(pack)==c[2],"Grade "+c[0]+"% gives "+c[1]+" slots and "+c[2]+" blocks");
+            h.assertTrue(Backpack.slots(pack)==c[1]&&Backpack.blocks(pack)==c[2],"Grade "+Grade.percent(c[0])+" gives "+c[1]+" slots and "+c[2]+" blocks");
         }
         var grades=new java.util.HashSet<Integer>();
         for(int i=0;i<20;i++){var made=Backpack.ITEM.toStack();EquipmentGrade.ensure(made,h.getLevel().random);h.assertTrue(EquipmentGrade.hasGrade(made)&&!made.isDamageableItem(),"A finished backpack rolls a grade and gains no durability");grades.add(Grade.value(made));}
         h.assertTrue(grades.size()>1,"Each backpack rolls its own grade");
-        var p=player(h);var pack=wear(p,75);var stone=new ItemStack(Items.STONE,32);pack.insert(stone);
+        var p=player(h);var pack=wear(p,750);var stone=new ItemStack(Items.STONE,32);pack.insert(stone);
         h.assertTrue(pack.getContainerSize()==7&&held(pack,Items.STONE)==18&&stone.getCount()==14&&pack.blockRoom()==0,"A 75% pack has 7 slots and stops at 18 blocks");
         var apples=new ItemStack(Items.APPLE,32);pack.insert(apples);
         h.assertTrue(apples.isEmpty()&&held(pack,Items.APPLE)==32,"Ordinary goods fill the slots blocks leave free");
@@ -61,7 +61,7 @@ public final class BackpackGameTests {
     }
 
     @GameTest(template="industrial") public static void pickupsFillTheHandThenThePack(GameTestHelper h){
-        var p=player(h);var pack=wear(p,100);
+        var p=player(h);var pack=wear(p,1000);
         var stone=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.STONE,32));stone.setNoPickUpDelay();stone.playerTouch(p);
         var more=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.STONE,8));more.setNoPickUpDelay();more.playerTouch(p);
         h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==24&&!more.isRemoved()&&more.getItem().getCount()==8,"Blocks fill the 8-block hand, then the pack to its 24-block cap; the rest stays on the ground");
@@ -73,7 +73,7 @@ public final class BackpackGameTests {
 
     @GameTest(template="industrial") public static void placingRefillsTheHandAndTopsUpPackStacksFromTheBoundStore(GameTestHelper h){
         var store=pallet(h);store.cargo().insert(new ItemStack(Items.STONE),64);store.cargo().insert(new ItemStack(Items.GLASS),10);
-        var p=player(h);var pack=wear(p,100);pack.setItem(0,new ItemStack(Items.STONE,5));pack.setItem(1,new ItemStack(Items.OAK_PLANKS,2));
+        var p=player(h);var pack=wear(p,1000);pack.setItem(0,new ItemStack(Items.STONE,5));pack.setItem(1,new ItemStack(Items.OAK_PLANKS,2));
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));bind(h,p,store);
         long before=stored(store.cargo(),Items.STONE)+held(pack,Items.STONE)+p.getOffhandItem().getCount();
         var at=h.absolutePos(new BlockPos(8,1,8));
@@ -95,7 +95,7 @@ public final class BackpackGameTests {
 
     @GameTest(template="industrial") public static void supplyStopsOutOfReachWhenOffAndWithoutAccess(GameTestHelper h){
         var store=pallet(h);store.cargo().insert(new ItemStack(Items.STONE),64);
-        var p=player(h);wear(p,100);bind(h,p,store);var stone=new ItemStack(Items.STONE);
+        var p=player(h);wear(p,1000);bind(h,p,store);var stone=new ItemStack(Items.STONE);
         p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,3));
         var near=p.position();p.setPos(store.cargoPosition().add(Backpack.RADIUS+1,0,0));Backpack.refill(p,stone);
         h.assertTrue(p.getOffhandItem().getCount()==3&&stored(store.cargo(),Items.STONE)==64,"Nothing comes from a store beyond reach");
@@ -113,7 +113,7 @@ public final class BackpackGameTests {
     @GameTest(template="industrial") public static void aBoundWheelbarrowSuppliesWhereverItIsParked(GameTestHelper h){
         pallet(h);var barrow=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());var at=h.absolutePos(new BlockPos(7,1,5));
         barrow.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);h.getLevel().addFreshEntity(barrow);barrow.cargo().insert(new ItemStack(Items.COBBLESTONE),30);
-        var p=player(h);wear(p,100);bind(h,p,barrow);var cobble=new ItemStack(Items.COBBLESTONE);
+        var p=player(h);wear(p,1000);bind(h,p,barrow);var cobble=new ItemStack(Items.COBBLESTONE);
         barrow.setPos(barrow.position().add(0,0,-2));Backpack.refill(p,cobble);
         h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&barrow.cargo().count(0)==22,"The binding follows the wheelbarrow by identity as it moves");
         var handler=player(h);handler.setPos(barrow.handlerPosition(barrow.position(),barrow.getYRot()));barrow.interact(handler,InteractionHand.MAIN_HAND);
@@ -125,7 +125,7 @@ public final class BackpackGameTests {
     }
 
     @GameTest(template="industrial") public static void aLoadedPackStaysOnAndOnlyOneIsWorn(GameTestHelper h){
-        var p=player(h);var pack=wear(p,100);var worn=p.getData(Accessories.INVENTORY);
+        var p=player(h);var pack=wear(p,1000);var worn=p.getData(Accessories.INVENTORY);
         h.assertTrue(!worn.isItemValid(1,Backpack.ITEM.toStack())&&worn.isItemValid(1,FrontierContent.GEIGER_COUNTER.get().getDefaultInstance()),"One backpack at a time, beside other accessories");
         var slot=new AccessorySlot(p,0,0,0);pack.setItem(0,new ItemStack(Items.APPLE));
         h.assertTrue(!slot.mayPickup(p),"A pack holding anything cannot be taken off");
@@ -134,7 +134,7 @@ public final class BackpackGameTests {
     }
 
     @GameTest(template="industrial") public static void theMenuMovesBlocksBetweenHandAndPackAndUnloadsThem(GameTestHelper h){
-        var store=pallet(h);var p=player(h);var pack=wear(p,100);bind(h,p,store);
+        var store=pallet(h);var p=player(h);var pack=wear(p,1000);bind(h,p,store);
         pack.setItem(0,new ItemStack(Items.STONE,12));pack.setItem(1,new ItemStack(Items.APPLE,3));
         var menu=new BackpackMenu(1,p.getInventory(),pack,new net.minecraft.world.inventory.SimpleContainerData(3));
         menu.clicked(0,0,ClickType.QUICK_MOVE,p);
@@ -148,7 +148,7 @@ public final class BackpackGameTests {
 
     private static long packSlots(net.minecraft.world.inventory.AbstractContainerMenu menu){return menu.slots.stream().filter(s->s instanceof Backpack.PackSlot).count();}
     @GameTest(template="industrial") public static void thePackShowsBesideEveryMenuAndFillsAfterThePockets(GameTestHelper h){
-        var store=pallet(h);var p=player(h);var pack=wear(p,100);var chest=new net.minecraft.world.SimpleContainer(27);
+        var store=pallet(h);var p=player(h);var pack=wear(p,1000);var chest=new net.minecraft.world.SimpleContainer(27);
         p.openMenu(new net.minecraft.world.SimpleMenuProvider((id,inv,player)->net.minecraft.world.inventory.ChestMenu.threeRows(id,inv,chest),net.minecraft.network.chat.Component.literal("Chest")));
         var menu=p.containerMenu;p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
         h.assertTrue(menu instanceof net.minecraft.world.inventory.ChestMenu&&packSlots(menu)==Backpack.SLOTS,"A chest menu shows the worn pack's nine slots");
@@ -171,7 +171,7 @@ public final class BackpackGameTests {
     }
 
     @GameTest(template="industrial") public static void deathDropsThePackAndItsContentsSeparately(GameTestHelper h){
-        var p=player(h);var pack=wear(p,100);pack.setItem(0,new ItemStack(Items.STONE,10));pack.setItem(1,new ItemStack(Items.APPLE,3));
+        var p=player(h);var pack=wear(p,1000);pack.setItem(0,new ItemStack(Items.STONE,10));pack.setItem(1,new ItemStack(Items.APPLE,3));
         var drops=new ArrayList<ItemEntity>();NeoForge.EVENT_BUS.post(new LivingDropsEvent(p,h.getLevel().damageSources().generic(),drops,false));
         h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Items.STONE)&&d.getItem().getCount()==10)&&drops.stream().anyMatch(d->d.getItem().is(Items.APPLE)&&d.getItem().getCount()==3),"The contents drop as ordinary stacks");
         h.assertTrue(drops.stream().anyMatch(d->d.getItem().is(Backpack.ITEM)&&!BlockCarry.filledContainer(d.getItem()))&&Backpack.worn(p)==null,"The pack drops empty, so it can be picked up again");

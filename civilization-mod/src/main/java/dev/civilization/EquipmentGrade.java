@@ -60,7 +60,7 @@ public final class EquipmentGrade {
     /** A top-grade armor trim is tied to the item's saved identity, never rerolled on inventory ticks. */
     public static void updateTrim(ItemStack stack, HolderLookup.Provider registries) {
         if (!stack.is(ItemTags.TRIMMABLE_ARMOR) || !hasGrade(stack)) return;
-        if (Grade.value(stack) < 100) { stack.remove(DataComponents.TRIM); return; }
+        if (Grade.value(stack) < 1000) { stack.remove(DataComponents.TRIM); return; }
         if (stack.has(DataComponents.TRIM)) return;
         var patterns = registries.lookupOrThrow(Registries.TRIM_PATTERN).listElements()
                 .filter(holder -> holder.key().location().getNamespace().equals("minecraft"))
@@ -81,9 +81,9 @@ public final class EquipmentGrade {
 
     public static void apply(ItemStack stack, int grade) {
         if (!eligible(stack)) return;
-        double factor = grade / 100.0;
+        double factor = grade / 1000.0;
         stack.set(Grade.GRADE.get(), new Grade(List.of(grade)));
-        if (grade < 100 && stack.is(ItemTags.TRIMMABLE_ARMOR)) stack.remove(DataComponents.TRIM);
+        if (grade < 1000 && stack.is(ItemTags.TRIMMABLE_ARMOR)) stack.remove(DataComponents.TRIM);
         if (stack.isDamageableItem()) {
             int oldMax = stack.getMaxDamage();
             int oldDamage = stack.getDamageValue();
@@ -127,12 +127,12 @@ public final class EquipmentGrade {
         }
     }
 
-    /** A full repair erodes a weak item quickly; small repairs consume a proportional fraction. */
+    /** A full repair erodes a weak item quickly; small repairs consume a proportional fraction, in whole points. */
     public static int afterRepair(ItemStack stack) {
         int grade = Grade.value(stack);
         double restored = stack.getDamageValue() / (double)Math.max(1, stack.getMaxDamage());
-        double wear = 2 * restored * Math.exp((100.0 - grade) / 25.0);
-        return grade - Math.max(1, (int)Math.ceil(wear));
+        double wear = 2 * restored * Math.exp((1000 - grade) / 250.0);
+        return grade - 10 * Math.max(1, (int)Math.ceil(wear));
     }
 
     @SubscribeEvent public static void projectileDamage(LivingIncomingDamageEvent event) {
@@ -140,7 +140,7 @@ public final class EquipmentGrade {
         ItemStack weapon = projectile.getWeaponItem();
         if (weapon == null || !hasGrade(weapon)
                 || !(weapon.getItem() instanceof ProjectileWeaponItem || weapon.is(Items.TRIDENT))) return;
-        event.setAmount((float)(event.getAmount() * (Grade.value(weapon) / 100.0)));
+        event.setAmount((float)(event.getAmount() * (Grade.value(weapon) / 1000.0)));
     }
 
     @SubscribeEvent public static void crafted(PlayerEvent.ItemCraftedEvent event) {

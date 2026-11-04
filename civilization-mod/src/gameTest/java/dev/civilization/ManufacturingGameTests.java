@@ -26,7 +26,7 @@ public final class ManufacturingGameTests {
         for(var job:WorkshopJobs.jobs(3)){
             if(job.output().isEmpty())continue;
             supply(w,job);
-            if(job.output().getItem().toString().contains("netherite_"))EquipmentGrade.apply(w.getItem(0),100,71);
+            if(job.output().getItem().toString().contains("netherite_"))EquipmentGrade.apply(w.getItem(0),1000,71);
             h.assertTrue(w.beginWork(p),"Job can start: "+job.id());
             for(int ticks=0;ticks<job.ticks();ticks+=10)w.process();
             h.assertTrue(w.getItem(5).is(job.output().getItem())&&w.getItem(5).getCount()==job.output().getCount(),"Actual output: "+job.id());
@@ -76,11 +76,11 @@ public final class ManufacturingGameTests {
         for(var item:List.of(Items.IRON_PICKAXE,Items.IRON_AXE,Items.IRON_SHOVEL)){
             var tool=job(3,item);h.assertTrue(tool.needs().stream().noneMatch(n->n.count()>0&&n.ingredient().test(new ItemStack(Items.LEATHER))),"Final tool does not bill leather again");
         }
-        var w=WorkshopGameTests.build(h,3,Direction.NORTH);var p=operator(w);var damaged=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(damaged,80,123);damaged.setDamageValue(100);damaged.set(DataComponents.CUSTOM_NAME,net.minecraft.network.chat.Component.literal("Kept"));
+        var w=WorkshopGameTests.build(h,3,Direction.NORTH);var p=operator(w);var damaged=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(damaged,800,123);damaged.setDamageValue(100);damaged.set(DataComponents.CUSTOM_NAME,net.minecraft.network.chat.Component.literal("Kept"));
         var repair=WorkshopJobs.repair(damaged);w.select(0);w.setItem(0,new ItemStack(Items.IRON_PICKAXE));w.setItem(3,damaged);w.setItem(1,repair.needs().get(1).icon());w.setItem(2,repair.needs().get(2).icon());
         h.assertTrue(w.beginWork(p),"Repair matches the actual damaged target despite a pristine same-item stack first");
         for(int i=0;i<repair.ticks();i+=10)w.process();
-        var out=w.getItem(5);h.assertTrue(out.getDamageValue()==0&&Grade.value(out)<80&&EquipmentGrade.wearSeed(out)==123&&out.getHoverName().getString().equals("Kept"),"Repair preserves identity and lowers grade");
+        var out=w.getItem(5);h.assertTrue(out.getDamageValue()==0&&Grade.value(out)<800&&EquipmentGrade.wearSeed(out)==123&&out.getHoverName().getString().equals("Kept"),"Repair preserves identity and lowers grade");
         h.assertTrue(w.getItem(0).is(Items.IRON_PICKAXE)&&w.getItem(3).isEmpty(),"Only the damaged item was consumed");h.succeed();
     }
     @GameTest(template="industrial") public static void tableBypassesRetiredAndBootstrapRemains(GameTestHelper h){
@@ -110,7 +110,7 @@ public final class ManufacturingGameTests {
         for(var forged:WorkshopJobs.jobs(2))h.assertTrue(WorkshopJobs.jobs(3).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(forged.output()))),"Forged part earns a stock slot: "+forged.id());h.succeed();
     }
     @GameTest(template="industrial") public static void legacyRepairInputReceivesStableIdentityBeforeWork(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,3,Direction.NORTH);var gear=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(gear,80,123);gear.setDamageValue(100);w.setItem(0,gear);
+        var w=WorkshopGameTests.build(h,3,Direction.NORTH);var gear=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(gear,800,123);gear.setDamageValue(100);w.setItem(0,gear);
         gear.remove(EquipmentGrade.WEAR_SEED.get());var quote=WorkshopJobs.repair(gear);for(int i=1;i<4;i++)w.setItem(i,quote.needs().get(i).icon());w.select(0);var p=operator(w);h.assertTrue(w.beginWork(p),"Legacy gear accepts repair work");
         for(int i=0;i<quote.ticks();i+=10)w.process();
         h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.getItem(5).has(EquipmentGrade.WEAR_SEED.get()),"Repair completes instead of rerolling a missing identity each work step");h.succeed();

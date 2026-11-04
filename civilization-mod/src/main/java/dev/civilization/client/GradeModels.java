@@ -78,7 +78,7 @@ public final class GradeModels {
     }
 
     private static int layerCount(int grade) {
-        return grade >= 100 ? 0 : Math.min(8, Math.max(1, (int)Math.ceil((100 - grade) / 9.0)));
+        return grade >= 1000 ? 0 : Math.min(8, Math.max(1, (int)Math.ceil((1000 - grade) / 90.0)));
     }
 
     private static List<BakedModel> wearLayers(BakedModel[] overlays, long seed, int count) {

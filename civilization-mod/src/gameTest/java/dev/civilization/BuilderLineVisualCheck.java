@@ -28,7 +28,7 @@ final class BuilderLineVisualCheck {
         if(ticks==185)click(mc);
         if(ticks==189)release(mc);
         if(ticks==220)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();for(int i=0;i<3;i++)if(!server.overworld().getBlockState(A.east(i)).is(Blocks.STONE_BRICKS))throw new IllegalStateException("Actual right-click line placement failed");if(p.getMainHandItem().getCount()!=1||CalorieFoodData.of(p).placed!=3||BuilderLineSystem.selected(p))throw new IllegalStateException("Placement conservation/cleanup failed");built=true;});
-        if(ticks==230){shot(mc,"built");check(server,()->{var tool=Items.IRON_PICKAXE.getDefaultInstance();EquipmentGrade.apply(tool,100,12345L);server.getPlayerList().getPlayers().getFirst().setItemInHand(InteractionHand.MAIN_HAND,tool);});}
+        if(ticks==230){shot(mc,"built");check(server,()->{var tool=Items.IRON_PICKAXE.getDefaultInstance();EquipmentGrade.apply(tool,1000,12345L);server.getPlayerList().getPlayers().getFirst().setItemInHand(InteractionHand.MAIN_HAND,tool);});}
         if(ticks==245)aim(server,A.getCenter());
         if(ticks==260)click(mc);
         if(ticks==264)release(mc);

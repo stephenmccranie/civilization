@@ -20,20 +20,22 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Whole-percent grades of the units in a stack, best first: one value means every unit has it, otherwise there is
+ * Grades of the units in a stack, in tenths of a percent (750 is 75.0%), best first: one value means every unit has it, otherwise there is
  * one value per unit. Units leave a stack from the top, so a stack hands out and spends its best units first. A
  * stack resized without saying which units moved keeps its worst ones, so no path can invent grade.
  */
 public record Grade(List<Integer> units) {
-    public static final int STANDARD = 75, TARGET = 150, MAX_UNITS = 99;
+    public static final int STANDARD = 750, TARGET = 1500, MAX_UNITS = 99;
     private static final Grade STANDARD_UNITS = new Grade(List.of(STANDARD));
     /** Materials whose units carry grades: smelted metal, diamonds and the Smithy's parts. */
     public static final TagKey<Item> GRADED = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(Civilization.MOD_ID, "graded"));
-    private static final Codec<Grade> CODEC = Codec.either(Codec.INT, ExtraCodecs.nonEmptyList(Codec.INT.sizeLimitedListOf(MAX_UNITS))).xmap(
+    /** Saved as a percentage, so a whole-percent grade saved by an older build reads unchanged. */
+    private static final Codec<Integer> PERCENT = Codec.DOUBLE.xmap(percent -> (int)Math.round(percent * 10), tenths -> tenths / 10.0);
+    private static final Codec<Grade> CODEC = Codec.either(PERCENT, ExtraCodecs.nonEmptyList(PERCENT.sizeLimitedListOf(MAX_UNITS))).xmap(
             either -> new Grade(either.map(List::of, list -> list)),
             grade -> grade.units.size() == 1 ? Either.left(grade.units.getFirst()) : Either.right(grade.units));
     private static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Civilization.MOD_ID);
-    // The ID predates material grades; a single grade is saved as a bare number, as equipment always was.
+    // The ID predates material grades; a single grade is saved as a bare number, as equipment's always was.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Grade>> GRADE = COMPONENTS.registerComponentType("equipment_grade",
             builder -> builder.persistent(CODEC).networkSynchronized(ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.list(MAX_UNITS)).map(Grade::new, Grade::units)));
 
@@ -50,6 +52,7 @@ public record Grade(List<Integer> units) {
     /** The single unit's grade, or the rounded mean of the stack's units. */
     public static int value(ItemStack stack) { return mean(of(stack).units); }
     public static int mean(List<Integer> units) { return (int)Math.round(units.stream().mapToInt(Integer::intValue).average().orElseThrow()); }
+    public static String percent(int grade) { return grade % 10 == 0 ? grade / 10 + "%" : String.format(java.util.Locale.ROOT, "%.1f%%", grade / 10.0); }
     /** The grades of the top `n` units, best first. */
     public static List<Integer> top(ItemStack stack, int n) { return fit(of(stack).units, stack.getCount()).subList(0, n); }
     /** The units a list describes at `count`: the worst `count` of them, the worst repeated to make up a shortfall. */
@@ -61,15 +64,15 @@ public record Grade(List<Integer> units) {
     }
 
     /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
-    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 20); }
+    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 200); }
     /**
-     * A refining pass always raises a unit by at least a point. Its gain is exponentially distributed, with a mean of
-     * 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it never
-     * carries a unit past the target; from there on each pass adds a point.
+     * A refining pass always raises a unit by at least a tenth of a point. Its gain is exponentially distributed, with a
+     * mean of 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it
+     * never carries a unit past the target; from there on each pass adds a tenth.
      */
     public static int refined(int grade, RandomSource random) {
         int gap = TARGET - grade;
-        double mean = 4.5 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
+        double mean = 45 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
         return grade + Math.max(1, Math.min(gap, (int)Math.round(-mean * Math.log(1 - random.nextDouble()))));
     }
     /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal, refined in the same one. */

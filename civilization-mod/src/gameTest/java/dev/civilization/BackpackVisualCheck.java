@@ -37,7 +37,7 @@ final class BackpackVisualCheck {
             machines.insert(new ItemStack(Items.OAK_DOOR),1);machines.insert(BakingOvenContent.ITEM.toStack(),1);
             l.setBlockAndUpdate(CHEST,Blocks.CHEST.defaultBlockState());((net.minecraft.world.level.block.entity.ChestBlockEntity)l.getBlockEntity(CHEST)).setItem(0,new ItemStack(Items.APPLE,12));
             var p=player(server);p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();
-            var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,100,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
+            var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,1000,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
             var contents=Backpack.worn(p);contents.setItem(0,new ItemStack(Items.STONE,PACKED));contents.setItem(1,new ItemStack(Items.OAK_PLANKS,4));
             contents.setItem(2,new ItemStack(Items.APPLE,5));contents.setItem(3,new ItemStack(Items.TORCH,16));
             p.teleportTo(l,174.5,Y,1.5,java.util.Set.of(),0,35);ready=true;

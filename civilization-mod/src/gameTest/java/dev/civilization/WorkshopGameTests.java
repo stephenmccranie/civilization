@@ -85,7 +85,7 @@ public final class WorkshopGameTests {
             var forged=ManufacturingGameTests.job(2,ManufacturingContent.head(metal,"pickaxe"));int multiplier=metal.equals("diamond")?4:metal.equals("gold")?2:1;
             h.assertTrue(forged.materialMultiplier()==multiplier&&forged.ticks()==500*multiplier,"Material scales the forging duration and total Coal");
         }
-        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(tool,100,44);tool.setDamageValue(300);
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(tool,1000,44);tool.setDamageValue(300);
         var job=WorkshopJobs.repair(tool);w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());
         run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.heat==0,"Diamond repair completes by hand without Coal");h.succeed();
     }
@@ -117,17 +117,17 @@ public final class WorkshopGameTests {
         }h.succeed();
     }
     @GameTest(template="industrial") public static void repairLowersGradeAndRetainsIdentity(GameTestHelper h){
-        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75,4242L);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,750,4242L);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
         var unbreaking=h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);tool.enchant(unbreaking,2);
         long originalWearSeed=EquipmentGrade.wearSeed(tool);
         w.setItem(0,tool);w.setItem(1,new ItemStack(ManufacturingContent.part("iron","plate"),2));w.setItem(2,ManufacturingContent.HANDLE.toStack());run(w,200);
-        var out=w.getItem(5);h.assertTrue(Grade.value(out)==70&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
+        var out=w.getItem(5);h.assertTrue(Grade.value(out)==700&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
         h.assertTrue(out.getHoverName().getString().equals("Townsmith")&&EnchantmentHelper.getItemEnchantmentLevel(unbreaking,out)==2&&EquipmentGrade.wearSeed(out)==originalWearSeed,"Name, enchantment and personal wear pattern retained");
         out.setDamageValue(174);var quote=WorkshopJobs.repair(out);
-        h.assertTrue(Grade.value(quote.output())==63&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
+        h.assertTrue(Grade.value(quote.output())==630&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeScalesEquipmentStatsAndLowGradeRepairsEnd(GameTestHelper h){
-        var sword=new ItemStack(Items.IRON_SWORD);var base=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);EquipmentGrade.apply(sword,70);
+        var sword=new ItemStack(Items.IRON_SWORD);var base=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);EquipmentGrade.apply(sword,700);
         var scaled=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);
         var baseDamage=base.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)).findFirst().orElseThrow().modifier().amount();
         var damage=scaled.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)).findFirst().orElseThrow().modifier().amount();
@@ -135,12 +135,12 @@ public final class WorkshopGameTests {
         var speedMod=scaled.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)).findFirst().orElseThrow().modifier().amount();
         h.assertTrue(sword.getMaxDamage()==175&&Math.abs((1+damage)-(1+baseDamage)*.7)<.001,"Durability and final attack damage scale together");
         h.assertTrue(Math.abs((4+speedMod)-(4+baseSpeed)*.7)<.001,"Negative attack-speed modifiers do not invert grade");
-        var pick=new ItemStack(Items.IRON_PICKAXE);float speed=pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());EquipmentGrade.apply(pick,70);
+        var pick=new ItemStack(Items.IRON_PICKAXE);float speed=pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());EquipmentGrade.apply(pick,700);
         h.assertTrue(Math.abs(pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState())-speed*.7)<.001,"Mining speed scales directly");
-        EquipmentGrade.apply(pick,50);pick.setDamageValue(pick.getMaxDamage()-1);var first=WorkshopJobs.repair(pick).output();
+        EquipmentGrade.apply(pick,500);pick.setDamageValue(pick.getMaxDamage()-1);var first=WorkshopJobs.repair(pick).output();
         first.setDamageValue(first.getMaxDamage()-1);var second=WorkshopJobs.repair(first).output();
         second.setDamageValue(second.getMaxDamage()-1);
-        h.assertTrue(Grade.value(first)==35&&Grade.value(second)==8&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
+        h.assertTrue(Grade.value(first)==350&&Grade.value(second)==80&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeChangesActualBlockBreakingRate(GameTestHelper h){
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GradeMiner"));
@@ -155,22 +155,22 @@ public final class WorkshopGameTests {
         for(var entry:materials.entrySet()){
             var state=entry.getValue().defaultBlockState();h.getLevel().setBlockAndUpdate(pos,state);
             float base=new ItemStack(entry.getKey()).getDestroySpeed(state),lowProgress=0,normalProgress=0;
-            for(int grade:new int[]{50,100,125}){
+            for(int grade:new int[]{500,1000,1250}){
                 var tool=new ItemStack(entry.getKey());EquipmentGrade.apply(tool,grade);
                 player.getInventory().setItem(0,tool);
-                h.assertTrue(Math.abs(tool.getDestroySpeed(state)-base*grade/100.0)<.001,"The held tool's mining speed follows its grade");
+                h.assertTrue(Math.abs(tool.getDestroySpeed(state)-base*grade/1000.0)<.001,"The held tool's mining speed follows its grade");
                 float progress=state.getDestroyProgress(player,h.getLevel(),pos);
                 h.assertTrue(progress>0,"The player can mine the test block");
-                if(grade==50)lowProgress=progress;
-                if(grade==100){normalProgress=progress;h.assertTrue(Math.abs(lowProgress-normalProgress*.5)<.001,"Actual block-breaking progress decreases with grade");}
-                if(grade==125)h.assertTrue(Math.abs(progress-normalProgress*1.25)<.001,"Actual block-breaking progress increases with grade");
+                if(grade==500)lowProgress=progress;
+                if(grade==1000){normalProgress=progress;h.assertTrue(Math.abs(lowProgress-normalProgress*.5)<.001,"Actual block-breaking progress decreases with grade");}
+                if(grade==1250)h.assertTrue(Math.abs(progress-normalProgress*1.25)<.001,"Actual block-breaking progress increases with grade");
             }
         }
         h.succeed();
     }
     @GameTest(template="industrial") public static void goldIsAUsefulIntermediateTierAndArmorGradeAffectsProtection(GameTestHelper h){
         var ironPick=new ItemStack(Items.IRON_PICKAXE);var goldPick=new ItemStack(Items.GOLDEN_PICKAXE);var diamondPick=new ItemStack(Items.DIAMOND_PICKAXE);
-        EquipmentGrade.apply(goldPick,100);
+        EquipmentGrade.apply(goldPick,1000);
         h.assertTrue(ironPick.getMaxDamage()<goldPick.getMaxDamage()&&goldPick.getMaxDamage()<diamondPick.getMaxDamage(),"Gold tool durability sits between iron and diamond");
         float ironSpeed=ironPick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());
         float goldSpeed=goldPick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());
@@ -178,7 +178,7 @@ public final class WorkshopGameTests {
         h.assertTrue(ironSpeed<goldSpeed&&goldSpeed<diamondSpeed,"Gold mining speed sits between iron and diamond");
         h.assertTrue(goldPick.get(DataComponents.TOOL).isCorrectForDrops(Blocks.DIAMOND_ORE.defaultBlockState())
                 &&!goldPick.get(DataComponents.TOOL).isCorrectForDrops(Blocks.OBSIDIAN.defaultBlockState()),"Gold harvests iron-tier ores, not diamond-tier blocks");
-        var goldSword=new ItemStack(Items.GOLDEN_SWORD);EquipmentGrade.apply(goldSword,100);
+        var goldSword=new ItemStack(Items.GOLDEN_SWORD);EquipmentGrade.apply(goldSword,1000);
         double ironDamage=stat(new ItemStack(Items.IRON_SWORD),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
         double goldDamage=stat(goldSword,net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
         double diamondDamage=stat(new ItemStack(Items.DIAMOND_SWORD),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
@@ -186,7 +186,7 @@ public final class WorkshopGameTests {
         for(var tier:List.of(List.of(Items.IRON_AXE,Items.GOLDEN_AXE,Items.DIAMOND_AXE),
                 List.of(Items.IRON_SHOVEL,Items.GOLDEN_SHOVEL,Items.DIAMOND_SHOVEL),
                 List.of(Items.IRON_HOE,Items.GOLDEN_HOE,Items.DIAMOND_HOE))){
-            var middle=new ItemStack(tier.get(1));EquipmentGrade.apply(middle,100);
+            var middle=new ItemStack(tier.get(1));EquipmentGrade.apply(middle,1000);
             double low=stat(new ItemStack(tier.get(0)),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
             double mid=stat(middle,net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
             double high=stat(new ItemStack(tier.get(2)),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
@@ -198,18 +198,18 @@ public final class WorkshopGameTests {
                 List.of(Items.IRON_BOOTS,Items.GOLDEN_BOOTS,Items.DIAMOND_BOOTS));
         for(var tier:armorTiers){
             Item armor=tier.get(1);
-            var item=new ItemStack(armor);EquipmentGrade.apply(item,100);
+            var item=new ItemStack(armor);EquipmentGrade.apply(item,1000);
             double defense=stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
             h.assertTrue(stat(new ItemStack(tier.get(0)),net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)<defense
                     &&defense<stat(new ItemStack(tier.get(2)),net.minecraft.world.entity.ai.attributes.Attributes.ARMOR),"Gold armor protection is intermediate on each piece");
             h.assertTrue(defense>0&&Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-1)<.001,"Gold armor has defense and intermediate toughness");
-            EquipmentGrade.apply(item,70);
+            EquipmentGrade.apply(item,700);
             h.assertTrue(Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-defense*.7)<.001
                     &&Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-.7)<.001,"Grade scales every gold armor piece's protection and toughness");
         }
-        var ironArmor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(ironArmor,70);
+        var ironArmor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(ironArmor,700);
         h.assertTrue(Math.abs(stat(ironArmor,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4.2)<.001,"Armor without a component still grades its vanilla defense");
-        var netherite=new ItemStack(Items.NETHERITE_CHESTPLATE);EquipmentGrade.apply(netherite,70);
+        var netherite=new ItemStack(Items.NETHERITE_CHESTPLATE);EquipmentGrade.apply(netherite,700);
         h.assertTrue(Math.abs(stat(netherite,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-2.1)<.001
                 &&Math.abs(stat(netherite,net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.07)<.001,"Grade scales netherite armor's special stats");h.succeed();
     }
@@ -217,15 +217,15 @@ public final class WorkshopGameTests {
         return stack.getAttributeModifiers().modifiers().stream().filter(e->e.attribute().is(attribute)).mapToDouble(e->e.modifier().amount()).sum();
     }
     @GameTest(template="industrial") public static void exceptionalArmorTrimsComeFromGradeNotSmithing(GameTestHelper h){
-        var armor=new ItemStack(Items.LEATHER_CHESTPLATE);EquipmentGrade.apply(armor,105,12345L);
+        var armor=new ItemStack(Items.LEATHER_CHESTPLATE);EquipmentGrade.apply(armor,1050,12345L);
         EquipmentGrade.ensure(armor,h.getLevel().random,h.getLevel().registryAccess());
         var trim=armor.get(DataComponents.TRIM);
         h.assertTrue(trim!=null&&trim.pattern().unwrapKey().orElseThrow().location().getNamespace().equals("minecraft")
                 &&trim.material().unwrapKey().orElseThrow().location().getNamespace().equals("minecraft"),"100%+ leather armor receives a random vanilla trim");
         EquipmentGrade.ensure(armor,h.getLevel().random,h.getLevel().registryAccess());
         h.assertTrue(trim.equals(armor.get(DataComponents.TRIM)),"The trim is stable across inventory scans");
-        EquipmentGrade.apply(armor,99);h.assertTrue(!armor.has(DataComponents.TRIM),"Falling below 100% removes the status trim");
-        var ordinary=new ItemStack(Items.DIAMOND_CHESTPLATE);EquipmentGrade.apply(ordinary,99);
+        EquipmentGrade.apply(armor,990);h.assertTrue(!armor.has(DataComponents.TRIM),"Falling below 100% removes the status trim");
+        var ordinary=new ItemStack(Items.DIAMOND_CHESTPLATE);EquipmentGrade.apply(ordinary,990);
         EquipmentGrade.ensure(ordinary,h.getLevel().random,h.getLevel().registryAccess());
         h.assertTrue(!ordinary.has(DataComponents.TRIM),"Lower grade armor stays untrimmed");
         long active=h.getLevel().getRecipeManager().getRecipes().stream().filter(recipe->recipe.value() instanceof SmithingTrimRecipe).count();
@@ -234,14 +234,14 @@ public final class WorkshopGameTests {
     @GameTest(template="industrial") public static void projectileDamageUsesFiredWeaponsGrade(GameTestHelper h){
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GradeArcher"));
         var target=h.spawn(net.minecraft.world.entity.EntityType.ZOMBIE,new BlockPos(4,2,2));
-        for(int grade:new int[]{50,120}){
+        for(int grade:new int[]{500,1200}){
             var bow=new ItemStack(Items.BOW);EquipmentGrade.apply(bow,grade);
             var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),player,new ItemStack(Items.ARROW),bow);
             var source=h.getLevel().damageSources().arrow(arrow,player);
             var hit=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(target,
                     new net.neoforged.neoforge.common.damagesource.DamageContainer(source,8));
             EquipmentGrade.projectileDamage(hit);
-            h.assertTrue(Math.abs(hit.getAmount()-8*grade/100.0)<.001,"Fired bow grade scales damage before armor mitigation");
+            h.assertTrue(Math.abs(hit.getAmount()-8*grade/1000.0)<.001,"Fired bow grade scales damage before armor mitigation");
         }
         h.succeed();
     }
@@ -319,9 +319,9 @@ public final class WorkshopGameTests {
         h.assertTrue(restored.selected==jobs.indexOf(job),"Saved job ID wins over reordered numerical indices");h.succeed();
     }
     @GameTest(template="industrial") public static void netheriteUpgradeRetainsWear(GameTestHelper h){
-        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,75,777L);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
+        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,750,777L);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
         var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(new net.minecraft.world.SimpleContainer(4),new MachineWork.Match(job,new int[4],old));
-        h.assertTrue(Grade.value(out)==75&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
+        h.assertTrue(Grade.value(out)==750&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
         h.assertTrue(out.getHoverName().getString().equals("Old pick"),"Upgrade keeps identity");h.succeed();
     }
     @GameTest(template="industrial") public static void vanillaRepairMenusKeepWorkshopBoundary(GameTestHelper h){

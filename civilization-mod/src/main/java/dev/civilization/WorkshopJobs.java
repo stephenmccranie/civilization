@@ -78,7 +78,7 @@ public final class WorkshopJobs {
         case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){
         int base=stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE,stack.getMaxDamage());
-        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*Grade.value(stack)/100.0)):base;
+        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*Grade.value(stack)/1000.0)):base;
     }
     public static Job repair(ItemStack stack){
         var e=equipment(stack);if(e==null||!stack.isDamaged()||stack.getCount()!=1)return null;

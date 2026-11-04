@@ -63,7 +63,7 @@ public final class Backpack {
 
     public static int slots(ItemStack pack){return scaled(SLOTS,pack);}
     public static int blocks(ItemStack pack){return scaled(BLOCKS,pack);}
-    private static int scaled(int full,ItemStack pack){return Math.max(0,(int)Math.round(full*Grade.value(pack)/100.0));}
+    private static int scaled(int full,ItemStack pack){return Math.max(0,(int)Math.round(full*Grade.value(pack)/1000.0));}
     /** The live contents of the backpack the player wears, or null. */
     public static Contents worn(Player p){return p.getData(Accessories.INVENTORY).backpack();}
 

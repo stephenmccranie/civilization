@@ -26,7 +26,7 @@ public final class CoalMiningGameTests {
             h.assertTrue(result.is(tool)&&EquipmentGrade.hasGrade(result),"Smithy produces a graded coal tool");
             h.assertTrue(w.getItem(4).isEmpty()&&w.heat==0,"Hand assembly spends no Coal");
             for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Actual tool materials are consumed");
-            EquipmentGrade.apply(result,100); // Repairability here must not depend on the production grade roll.
+            EquipmentGrade.apply(result,1000); // Repairability here must not depend on the production grade roll.
             result.setDamageValue(Math.max(1,result.getMaxDamage()/2));
             h.assertTrue(WorkshopJobs.repair(result)!=null&&WorkshopJobs.gated(result),"Manual tools use Smithy repair and equipment gates");
         }
@@ -42,7 +42,7 @@ public final class CoalMiningGameTests {
         }
         h.succeed();
     }
-    private static net.neoforged.neoforge.common.util.FakePlayer player(GameTestHelper h,BlockPos at){var p=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"coal-miner"));p.setGameMode(GameType.SURVIVAL);p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-2);p.setItemInHand(InteractionHand.MAIN_HAND,CoalMiningContent.PICK.toStack());EquipmentGrade.apply(p.getMainHandItem(),100,42);CalorieFoodData.of(p).reserve().set(2400);return p;}
+    private static net.neoforged.neoforge.common.util.FakePlayer player(GameTestHelper h,BlockPos at){var p=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"coal-miner"));p.setGameMode(GameType.SURVIVAL);p.setPos(at.getX()+.5,at.getY()-1,at.getZ()-2);p.setItemInHand(InteractionHand.MAIN_HAND,CoalMiningContent.PICK.toStack());EquipmentGrade.apply(p.getMainHandItem(),1000,42);CalorieFoodData.of(p).reserve().set(2400);return p;}
     private static BlockPos face(GameTestHelper h){var a=h.absolutePos(new BlockPos(3,3,3));for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++){h.getLevel().setBlockAndUpdate(a.offset(x,-2,z),Blocks.STONE.defaultBlockState());for(int y=-1;y<=2;y++)h.getLevel().setBlockAndUpdate(a.offset(x,y,z),Blocks.AIR.defaultBlockState());}h.getLevel().setBlockAndUpdate(a,CoalMiningContent.FACE.get().defaultBlockState());return a;}
     private static void aim(net.minecraft.server.level.ServerPlayer p,Vec3 at){var d=at.subtract(p.getEyePosition());p.setYRot((float)Math.toDegrees(Math.atan2(-d.x,d.z)));p.setXRot((float)-Math.toDegrees(Math.atan2(d.y,Math.sqrt(d.x*d.x+d.z*d.z))));}
     @GameTest(template="industrial") public static void partialCoalUsesRealCollisionAndCannotPushOutOfEmptySpace(GameTestHelper h){

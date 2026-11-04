@@ -19,9 +19,9 @@ public final class GradeTooltip {
         if (!Grade.graded(stack) && !EquipmentGrade.hasGrade(stack)) return;
         int grade = Grade.value(stack);
         var units = Grade.of(stack).units();
-        var color = grade > 100 ? ChatFormatting.AQUA : grade == 100 ? ChatFormatting.GOLD : grade >= 85 ? ChatFormatting.GREEN
-                : grade >= 60 ? ChatFormatting.GRAY : ChatFormatting.DARK_RED;
-        event.getToolTip().add(1, Component.literal("Grade: " + grade + "%"
-                + (units.size() > 1 ? " average, " + units.getLast() + "–" + units.getFirst() + "%" : "")).withStyle(color));
+        var color = grade > 1000 ? ChatFormatting.AQUA : grade == 1000 ? ChatFormatting.GOLD : grade >= 850 ? ChatFormatting.GREEN
+                : grade >= 600 ? ChatFormatting.GRAY : ChatFormatting.DARK_RED;
+        event.getToolTip().add(1, Component.literal("Grade: " + Grade.percent(grade)
+                + (units.size() > 1 ? " average, " + Grade.percent(units.getLast()) + "–" + Grade.percent(units.getFirst()) : "")).withStyle(color));
     }
 }
