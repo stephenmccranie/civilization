@@ -79,7 +79,10 @@ public final class MachineModel {
         var sections=new ArrayList<Section>();
         for(var e:o.getAsJsonArray("sections")){
             var s=e.getAsJsonObject();var items=new ArrayList<String>();for(var item:s.getAsJsonArray("items"))items.add(item.getAsString());
-            int count=s.get("count").getAsInt();sections.add(new Section(s.get("name").getAsString(),List.copyOf(items),s.get("material").getAsString(),count,s.has("labor")?s.get("labor").getAsInt():count));
+            int count=s.get("count").getAsInt();
+            // A section is paid from one held stack, and a hand carries building material an armful at a time.
+            if(count<1||count>BlockCarry.LIMIT)throw new IllegalStateException(id+": "+s.get("name").getAsString()+" must cost one armful or less");
+            sections.add(new Section(s.get("name").getAsString(),List.copyOf(items),s.get("material").getAsString(),count,s.has("labor")?s.get("labor").getAsInt():count));
         }
         if(sections.isEmpty()||sections.size()>31)throw new IllegalStateException(id+": a machine has 1 to 31 sections");
         this.sections=List.copyOf(sections);all=(1<<sections.size())-1;

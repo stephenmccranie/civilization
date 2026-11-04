@@ -158,26 +158,35 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     }
     @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.put("input",input.writeToNBT(r,new CompoundTag()));t.put("output",output.writeToNBT(r,new CompoundTag()));t.put("lubricant",lubricant.writeToNBT(r,new CompoundTag()));t.putInt("lubrication",lubrication);t.putInt("cursor",work.cursor);t.putInt("heat",heat);t.putInt("progress",progress);}
     @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null)loadBuild(t,r);fire.load(t);ContainerHelper.loadAllItems(t,items,r);input.readFromNBT(r,t.getCompound("input"));output.readFromNBT(r,t.getCompound("output"));lubricant.readFromNBT(r,t.getCompound("lubricant"));lubrication=t.contains("lubrication")?Math.clamp(t.getInt("lubrication"),200,1000):1000;work.cursor=Math.max(0,t.getInt("cursor"));heat=Math.clamp(t.getInt("heat"),0,1000);progress=Math.clamp(t.getInt("progress"),0,duration()-1);formed=t.getBoolean("formed");surveyed=false;}
+    /** The sections each section of a derrick saved under derrick keys became once its galleries were paid an armful at a
+     *  time: the middle gallery four sides, the crown two pairs. */
+    private static final int[][] DERRICK_SECTIONS=java.util.stream.IntStream.range(0,25).mapToObj(i->i<21?new int[]{i}:i==21?new int[]{21,22,23,24}:i==22?new int[]{25,26}:new int[]{i+4}).toArray(int[][]::new);
     /** Derricks saved before machines shared one model format kept their sections under derrick keys; the first ones recorded
-     *  only that they were built and one pool of materials, which is shared out by each section's bill, any remainder
-     *  refunded with the footings. */
+     *  only that they were built and one pool of materials. Each old payment is shared out by the bills of the sections it
+     *  became, any remainder refunded with the first of them. */
     private void loadBuild(CompoundTag t,HolderLookup.Provider r){
         var model=model();
         if(t.contains("modeled")){build.load(t,r,model);return;}
-        build.sections=t.getInt("derrickSections")&model.all;build.paid.clear();
-        for(var entry:t.getList("derrickPaid",10)){
-            var section=(CompoundTag)entry;int part=section.getInt("part");if(part<0||part>=model.sections.size())continue;
-            var stacks=new java.util.ArrayList<ItemStack>();for(var stack:section.getList("stacks",10))stacks.add(ItemStack.parseOptional(r,(CompoundTag)stack));build.paid.put(part,stacks);
+        build.sections=0;build.paid.clear();
+        if(t.contains("derrickSections")){
+            int old=t.getInt("derrickSections");
+            for(int part=0;part<DERRICK_SECTIONS.length;part++)if((old&(1<<part))!=0)for(int now:DERRICK_SECTIONS[part])build.sections|=1<<now;
+            for(var entry:t.getList("derrickPaid",10)){
+                var section=(CompoundTag)entry;int part=section.getInt("part");
+                if(part>=0&&part<DERRICK_SECTIONS.length)share(DERRICK_SECTIONS[part],section.getList("stacks",10),r);
+            }
+        }else if(t.getBoolean("derrickBuilt")){
+            build.sections=model.all;share(java.util.stream.IntStream.range(0,model.sections.size()).toArray(),t.getList("derrickMaterials",10),r);
         }
-        if(t.contains("derrickSections")||!t.getBoolean("derrickBuilt"))return;
-        var pool=new java.util.ArrayList<ItemStack>();for(var tag:t.getList("derrickMaterials",10))pool.add(ItemStack.parseOptional(r,(CompoundTag)tag));
-        build.sections=model.all;
-        for(int part=0;part<model.sections.size();part++){
-            var section=model.section(part);var paid=new java.util.ArrayList<ItemStack>();int left=section.count();
+    }
+    private void share(int[] parts,net.minecraft.nbt.ListTag stacks,HolderLookup.Provider r){
+        var pool=new java.util.ArrayList<ItemStack>();for(var tag:stacks)pool.add(ItemStack.parseOptional(r,(CompoundTag)tag));
+        for(int part:parts){
+            var section=model().section(part);var paid=new java.util.ArrayList<ItemStack>();int left=section.count();
             for(var stack:pool)if(left>0&&section.accepts(stack)){int n=Math.min(left,stack.getCount());paid.add(stack.split(n));left-=n;}
             build.paid.put(part,paid);
         }
-        pool.removeIf(ItemStack::isEmpty);build.paid.get(0).addAll(pool);
+        pool.removeIf(ItemStack::isEmpty);build.paid.get(parts[0]).addAll(pool);
     }
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=saveWithoutMetadata(r);t.putBoolean("formed",formed);return t;}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}

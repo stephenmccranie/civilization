@@ -11,11 +11,14 @@ OUT = ROOT / 'civilization-mod/src/main/resources'
 
 def section(name, y):
     if name == 'feet': return 0
-    if name.startswith('middle_'): return 21
-    if name.startswith('crown_'): return 22
-    if name in ('pump_string', 'crosshead', 'oil_line'): return 23
-    if name == 'controller': return -1
     tokens = name.split('_')
+    if tokens[0] in ('middle', 'crown'):
+        # Each gallery is paid an armful at a time: the middle one by side, the crown by opposite pair of sides. A knee
+        # goes with the side it carries.
+        axis, side = ('x', tokens[3]) if tokens[1] == 'knee' else (tokens[2], tokens[3])
+        return 21 + (axis == 'z') * 2 + (int(side) > 0) if tokens[0] == 'middle' else 25 + (axis == 'z')
+    if name in ('pump_string', 'crosshead', 'oil_line'): return 27
+    if name == 'controller': return -1
     if tokens[0] == 'leg':
         band = max(0, min(4, int((y - 28) // 72)))
         side = (int(tokens[1]) > 0) * 2 + (int(tokens[2]) > 0)
@@ -55,8 +58,7 @@ def main():
     # The derrick's sections, bill and port live in its machine definition; this rule owns only the cells.
     definition_path = OUT/'assets/civilization/machines/oil_derrick.json'
     definition = json.loads(definition_path.read_text(encoding='utf-8')); definition['cells'] = data
-    definition_path.write_text(json.dumps(definition,separators=(',',':')),encoding='utf-8', newline='
-')
+    definition_path.write_text(json.dumps(definition,separators=(',',':')),encoding='utf-8', newline='\n')
     geo = json.loads((SOURCE/'model/oil_derrick.geo.json').read_text())
     bones = geo['minecraft:geometry'][0]['bones']; children = []
     for bone in bones:
@@ -72,7 +74,7 @@ def main():
             children.append({'name':f'section_{part}_{bone["name"]}','parent':bone['name'],'pivot':bone.get('pivot',[0,0,0]),'cubes':cubes})
     bones.extend(children)
     (OUT/'assets/civilization/geo/oil_derrick.geo.json').write_text(json.dumps(geo,indent=2)+'\n',encoding='utf-8', newline='\n')
-    assert {b[0] for c in data for b in c['boxes']} == set(range(24))
-    print(f'Exported 24 native sections and {len(data)} collision cells')
+    assert {b[0] for c in data for b in c['boxes']} == set(range(28))
+    print(f'Exported 28 native sections and {len(data)} collision cells')
 
 if __name__ == '__main__': main()

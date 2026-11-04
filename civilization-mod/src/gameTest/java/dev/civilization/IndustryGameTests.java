@@ -57,16 +57,25 @@ public final class IndustryGameTests {
             h.assertTrue(m.build().sections==MachineModel.OIL_DERRICK.all&&IndustrialStructure.bind(m)&&player.getInventory().getItem(1).getCount()==64,"Complete all rotations without touching inventory reserves");
             h.assertTrue(CalorieFoodData.of(player).laborSpent-labor>0&&CalorieFoodData.of(player).laborSpent-labor<500,"Charge material labor, not hidden cells");
             int dropped=derrickDrops(l,at);l.destroyBlock(port,true);
-            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.build().sections)==24&&!IndustrialStructure.bind(m)&&derrickDrops(l,at)-dropped==1,"Port damage is local and refunds exactly one paid port");
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.build().sections)==MachineModel.OIL_DERRICK.sections.size()-1&&!IndustrialStructure.bind(m)&&derrickDrops(l,at)-dropped==1,"Port damage is local and refunds exactly one paid port");
             h.assertTrue(ModeledMachine.build(m,player,IndustrialContent.PORT.toStack())&&IndustrialStructure.bind(m),"Repair port from held materials");
             dropped=derrickDrops(l,at);var cell=MachineModel.OIL_DERRICK.cells.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(1)).findFirst().orElseThrow();l.destroyBlock(ModeledMachine.position(at,front,cell),true);
-            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.build().sections)==24&&derrickDrops(l,at)-dropped==6,"A broken panel leaves the other sections standing");
-            m.process();h.assertTrue(!m.formed&&Integer.bitCount(m.build().sections)==24,"Incomplete pump stops without dismantling");
+            h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.build().sections)==MachineModel.OIL_DERRICK.sections.size()-1&&derrickDrops(l,at)-dropped==6,"A broken panel leaves the other sections standing");
+            m.process();h.assertTrue(!m.formed&&Integer.bitCount(m.build().sections)==MachineModel.OIL_DERRICK.sections.size()-1,"Incomplete pump stops without dismantling");
             h.assertTrue(ModeledMachine.build(m,player,new ItemStack(Items.OAK_PLANKS,6))&&IndustrialStructure.bind(m),"Repair the missing frame panel");
             var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(copy.build().paid.values().stream().flatMap(List::stream).mapToInt(ItemStack::getCount).sum()==165,"Exact per-section refund ledger survives reload");
             dropped=derrickDrops(l,at);l.removeBlock(at,false);h.assertTrue(derrickDrops(l,at)-dropped==165,"Controller removal refunds remaining materials exactly once");
             h.assertTrue(MachineModel.OIL_DERRICK.cells.stream().allMatch(c->l.getBlockState(ModeledMachine.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Controller removal clears owned physical cells");
         }h.succeed();
+    }
+    @GameTest(template="empty",batch="derrick-construction") public static void derrickSavedUnderOldKeysKeepsItsGalleries(GameTestHelper h){
+        var r=h.getLevel().registryAccess();var t=new CompoundTag();t.putInt("derrickSections",(1<<23)-1);
+        var gallery=new CompoundTag();gallery.putInt("part",21);var stacks=new net.minecraft.nbt.ListTag();stacks.add(new ItemStack(Items.OAK_PLANKS,20).save(r));gallery.put("stacks",stacks);
+        var paid=new net.minecraft.nbt.ListTag();paid.add(gallery);t.put("derrickPaid",paid);
+        var m=new IndustrialBlockEntity(h.absolutePos(BlockPos.ZERO),IndustrialContent.PUMP.get().defaultBlockState());m.loadWithComponents(t,r);
+        h.assertTrue(m.build().sections==(1<<27)-1,"Built galleries stay built as their armful sections");
+        for(int part=21;part<25;part++)h.assertTrue(m.build().paid.get(part).getFirst().getCount()==5,"The middle gallery's payment is shared by its sides");
+        h.succeed();
     }
     private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
     @GameTest(template="empty",batch="derrick-construction") public static void derrickCollisionThroughChunkGetter(GameTestHelper h){
@@ -82,7 +91,7 @@ public final class IndustryGameTests {
             for(var entry:cell.pieces().entrySet())if((mask&(1<<entry.getKey()))!=0)expected=net.minecraft.world.phys.shapes.Shapes.or(expected,entry.getValue()[front.get2DDataValue()]);
             var shape=cell.shape(front,mask);
             h.assertTrue(!net.minecraft.world.phys.shapes.Shapes.joinIsNotEmpty(expected,shape,net.minecraft.world.phys.shapes.BooleanOp.NOT_SAME),"Cached corner collision exactly matches section geometry");
-            for(int i=0;i<100;i++)h.assertTrue(cell.shape(front,mask)==shape&&cell.shape(front,mask^(1<<24))==shape,"Repeated movement and unrelated section changes reuse the same local shape");
+            for(int i=0;i<100;i++)h.assertTrue(cell.shape(front,mask)==shape&&cell.shape(front,mask^(1<<MachineModel.OIL_DERRICK.ports.getFirst().section()))==shape,"Repeated movement and unrelated section changes reuse the same local shape");
         }
         h.succeed();
     }

@@ -21,11 +21,11 @@ final class DerrickGuideVisualCheck {
             });}
         if(ticks>100&&!ready){ticks=101;return;}
         if(ticks==135)shot(mc,"construction-guide");
-        if(ticks==140)check(mc,()->server.getPlayerList().getPlayers().getFirst().setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE,7)));
+        if(ticks==140)check(mc,()->server.getPlayerList().getPlayers().getFirst().setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE,7)));
         if(ticks==145)useController(mc);
-        if(ticks==160)check(mc,()->{var m=(IndustrialBlockEntity)server.overworld().getBlockEntity(AT);var p=server.getPlayerList().getPlayers().getFirst();if(m.build().sections!=1||!p.getMainHandItem().isEmpty())throw new IllegalStateException("Actual held-stack footing construction failed");p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,60));});
+        if(ticks==160)check(mc,()->{var m=(IndustrialBlockEntity)server.overworld().getBlockEntity(AT);var p=server.getPlayerList().getPlayers().getFirst();if(m.build().sections!=1||!p.getOffhandItem().isEmpty())throw new IllegalStateException("Actual held-stack footing construction failed");p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,BlockCarry.LIMIT));});
         if(ticks==165)useController(mc);
-        if(ticks==175)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();var m=(IndustrialBlockEntity)server.overworld().getBlockEntity(AT);if(Integer.bitCount(m.build().sections)!=11||!p.getMainHandItem().isEmpty())throw new IllegalStateException("Held wood did not build partial tower");p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,110,-3,java.util.Set.of(),0,-15);});
+        if(ticks==175)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();var m=(IndustrialBlockEntity)server.overworld().getBlockEntity(AT);if(Integer.bitCount(m.build().sections)!=2||p.getOffhandItem().getCount()!=2)throw new IllegalStateException("An armful of planks did not build one frame panel");ModeledMachine.build(m,p,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,54));if(Integer.bitCount(m.build().sections)!=11)throw new IllegalStateException("Further armfuls did not build the partial tower");p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,110,-3,java.util.Set.of(),0,-15);});
         if(ticks==180){mc.options.fov().set(80);mc.gui.getChat().clearMessages(false);}
         if(ticks==183)profileGuide(mc);
         if(ticks==185)shot(mc,"partial-guide");
@@ -82,7 +82,8 @@ final class DerrickGuideVisualCheck {
         var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var renderer=mc.getBlockEntityRenderDispatcher().getRenderer(m);
         if(renderer==null||!renderer.shouldRenderOffScreen(m)||!renderer.shouldRender(m,mc.gameRenderer.getMainCamera().getPosition()))throw new IllegalStateException("Derrick must remain eligible when its controller section leaves view");
         if(renderer.shouldRenderOffScreen(new IndustrialBlockEntity(AT,IndustrialContent.REFINERY.get().defaultBlockState())))throw new IllegalStateException("Only derricks should bypass controller-section culling");
-        if(!renderer.getRenderBoundingBox(m).contains(.5,127,5))throw new IllegalStateException("Render bounds omit the crown");
+        // The crown's top rail stands 25.875 blocks above the controller.
+        if(!renderer.getRenderBoundingBox(m).contains(.5,126.8,5))throw new IllegalStateException("Render bounds omit the crown");
         if(renderer.shouldRender(m,new net.minecraft.world.phys.Vec3(500,121,0)))throw new IllegalStateException("Global registration bypassed the view-distance limit");
         if(mc.levelRenderer.getFrustum().isVisible(new net.minecraft.world.phys.AABB(AT)))throw new IllegalStateException("Crown regression camera must exclude the ground controller");
         try{
@@ -130,6 +131,8 @@ final class DerrickGuideVisualCheck {
             for(int repeat=0;repeat<3;repeat++){
                 long start=System.nanoTime();var expected=new java.util.HashMap<Integer,net.minecraft.world.phys.AABB>();
                 for(int i=0;i<MachineModel.OIL_DERRICK.cells.size();i++){var cell=MachineModel.OIL_DERRICK.cells.get(i);var shape=uncachedShape(cell,m.front(),MachineModel.OIL_DERRICK.all^mask);if(!shape.isEmpty())expected.put(i,shape.bounds().move(ModeledMachine.position(AT,m.front(),cell)));}
+                // A missing port is shown as its whole block, under no cell index.
+                for(var port:MachineModel.OIL_DERRICK.ports)if((mask&(1<<port.section()))==0)expected.put(-1,new net.minecraft.world.phys.AABB(MachineStructure.position(AT,m.front(),port.part())));
                 oldTime+=System.nanoTime()-start;start=System.nanoTime();var snapshot=dev.civilization.client.MachineGuide.geometry(AT,m.front(),MachineModel.OIL_DERRICK,mask);newTime+=System.nanoTime()-start;count=snapshot.cells().size();
                 if(count!=expected.size())throw new IllegalStateException("Cached guide lost missing cells");
                 for(var cell:snapshot.cells())if(!cell.box().equals(expected.get(cell.index())))throw new IllegalStateException("Cached guide changed collision outline bounds");
@@ -137,7 +140,7 @@ final class DerrickGuideVisualCheck {
             log.info("DERRICK GUIDE CPU: mask={}, cells={}, old voxel unions={} ms/build, cached bounds snapshot={} ms/build; render performs zero voxel unions",mask,count,oldTime/3e6,newTime/3e6);
         }
     }
-    private static void useController(Minecraft mc){mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(.5,101.5,0),net.minecraft.core.Direction.NORTH,AT,false));}
+    private static void useController(Minecraft mc){mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.OFF_HAND,new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(.5,101.5,0),net.minecraft.core.Direction.NORTH,AT,false));}
     private static void check(Minecraft mc,Runnable action){mc.getSingleplayerServer().execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"derrick-"+name+".png",mc.getMainRenderTarget(),m->{});}
 }
