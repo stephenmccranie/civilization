@@ -177,6 +177,25 @@ class ArtTests(unittest.TestCase):
         small=Image.new('RGB',(400,400),'#ff00ff'); ImageDraw.Draw(small).rectangle((20,20,120,60),fill=(40,60,200)); small.save(self.root/'supplied.png')
         with self.assertRaisesRegex(ValueError,'under half'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
+    def test_images_share_a_panel_and_differ_by_inset(self):
+        """A cold and a lit face take the same door panel; each paints its own window inset over it."""
+        master=Image.new('RGB',(300,100),'#ff00ff'); draw=ImageDraw.Draw(master)
+        for i,colour in enumerate([(30,30,40),(60,60,70),(240,140,30)]): draw.rectangle((i*100+10,10,i*100+89,89),fill=colour)
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Door, cold window, lit window.',encoding='utf-8')
+        self.asset['texture']={'grid':[3,1],'ground':'#ff00ff','colors':8,'images':{'front.png':[16,16],'front_on.png':[16,16]},
+            'regions':{'door':{'cell':[0,0],'image':'front.png','rect':[0,0,16,16]},'window':{'cell':[1,0],'image':'front.png','rect':[4,10,8,4]},
+                       'door_on':{'cell':[0,0],'image':'front_on.png','rect':[0,0,16,16]},'window_on':{'cell':[2,0],'image':'front_on.png','rect':[4,10,8,4]}}}
+        self.asset['outputs']=[{'source':'front.png','target':'textures/block/test.png','format':'png','size':[16,16],'alpha':'opaque'}]
+        self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        with Image.open(self.folder/'front.png') as cold, Image.open(self.folder/'front_on.png') as lit:
+            changed={(x,y) for x in range(16) for y in range(16) if cold.getpixel((x,y))!=lit.getpixel((x,y))}
+            self.assertEqual(changed,{(x,y) for x in range(4,12) for y in range(10,14)})
+            self.assertGreater(lit.getpixel((6,11))[0],200); self.assertLess(cold.getpixel((6,11))[0],100)
+        self.asset['texture']['regions']['window']['rect']=[12,10,8,4]
+        with self.assertRaisesRegex(ValueError,'outside its image'): art.definition(self.asset,self.folder)
+        self.asset['texture']['regions']['window']['rect']=[4,10,8,4]; self.asset['texture']['regions']['spill']={'cell':[1,0],'image':'front.png','rect':[0,0,16,16]}
+        with self.assertRaisesRegex(ValueError,'overlap'): art.definition(self.asset,self.folder)
+
     def test_panel_without_margin_is_rejected(self):
         self.textured(); master=Image.open(self.root/'supplied.png'); ImageDraw.Draw(master).rectangle((110,0,189,89),fill=(40,40,200))
         master.save(self.root/'supplied.png')
@@ -188,7 +207,7 @@ class ArtTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'own output'): art.definition(self.asset,self.folder)
 
     def test_texture_layout_is_checked_once_at_the_boundary(self):
-        for change,message in [({'rect':[6,0,4,8]},'overlap'),({'cell':[2,0]},'master grid'),({'rect':[14,0,4,8]},'outside the atlas')]:
+        for change,message in [({'rect':[6,0,4,8]},'overlap'),({'cell':[2,0]},'master grid'),({'rect':[14,0,4,8]},'outside its image')]:
             self.textured(); self.asset['texture']['regions']['blue'].update(change)
             with self.assertRaisesRegex(ValueError,message): art.definition(self.asset,self.folder)
         self.textured(); self.asset['texture']['master']='other.png'

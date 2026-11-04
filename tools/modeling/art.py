@@ -55,21 +55,34 @@ def definition(asset, folder):
     if 'texture' in asset: layout(asset)
 
 
+def images(texture):
+    """The images a layout fills, by path and size: its declared images, or the single atlas most layouts name."""
+    return texture.get('images') or {texture['atlas']: texture['size']}
+
+
+def image_of(texture, region): return region.get('image', texture.get('atlas'))
+
+
 def layout(asset):
-    """A texture layout reduces grid cells of one recorded master to disjoint rectangles of one atlas."""
-    texture = asset['texture']; cols, rows = texture['grid']; width, height = texture['size']
+    """A texture layout reduces grid cells of one recorded master to rectangles of its images. Regions in one image never
+    overlap, except that a region lying wholly inside an earlier one is an inset painted over it, such as a lit window."""
+    texture = asset['texture']; cols, rows = texture['grid']; sizes = images(texture)
     if texture.get('master') not in (None, *(g['file'] for g in asset['generations'])):
         raise ValueError('The texture master must be a recorded generation')
     ImageColor.getrgb(texture['ground'])
     if not 2 <= texture['colors'] <= 256: raise ValueError('A texture palette has 2 to 256 colours')
-    placed = []
+    placed = {}
     for name, region in texture['regions'].items():
         (col, row), (x, y, w, h) = region['cell'], region['rect']
         if not (0 <= col < cols and 0 <= row < rows): raise ValueError(f'Texture region {name} takes a cell outside the master grid')
-        if min(w, h) <= 0 or min(x, y) < 0 or x+w > width or y+h > height: raise ValueError(f'Texture region {name} lies outside the atlas')
-        for other, (ox, oy, ow, oh) in placed:
-            if x < ox+ow and ox < x+w and y < oy+oh and oy < y+h: raise ValueError(f'Texture regions {other} and {name} overlap')
-        placed.append((name, region['rect']))
+        image = image_of(texture, region)
+        if image not in sizes: raise ValueError(f'Texture region {name} names no declared image')
+        width, height = sizes[image]
+        if min(w, h) <= 0 or min(x, y) < 0 or x+w > width or y+h > height: raise ValueError(f'Texture region {name} lies outside its image')
+        for other, (ox, oy, ow, oh) in placed.get(image, []):
+            inset = ox <= x and oy <= y and x+w <= ox+ow and y+h <= oy+oh
+            if x < ox+ow and ox < x+w and y < oy+oh and oy < y+h and not inset: raise ValueError(f'Texture regions {other} and {name} overlap')
+        placed.setdefault(image, []).append((name, region['rect']))
 
 
 def master_prompt(texture):
@@ -97,7 +110,8 @@ def subject(crop, ground):
 
 
 def atlas(asset, folder):
-    """Reduce each region's master subject to its atlas rectangle with one shared palette, and draw the inspection sheet.
+    """Reduce each region's master subject to its rectangle with one palette shared by all the layout's images, write the
+    images, and draw the inspection sheet.
 
     A panel fills its rectangle. A sprite keeps its silhouette and proportions, centred in its rectangle on transparency."""
     texture = asset['texture']; regions = texture['regions']
@@ -132,32 +146,40 @@ def atlas(asset, folder):
         tiles[name] = tile
     # The palette comes from the visible subjects alone and applies without dithering; k-means refinement moves each
     # colour to its cluster's mean, so small accents such as brass are not averaged into the dominant material.
-    # Unused space in an atlas of panels takes their mean colour; an atlas holding a sprite stays transparent around it.
+    # Unused space in an image of panels takes their mean colour; an image holding a sprite stays transparent around it.
+    # Regions paint in declared order, so an inset covers the region it lies in.
     visible = [data[i:i+3] for data in (t.tobytes() for t in tiles.values()) for i in range(0, len(data), 4) if data[i+3]]
     swatch = Image.frombytes('RGB', (len(visible), 1), b''.join(visible))
     palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, kmeans=16, dither=Image.Dither.NONE)
-    transparent = any(r.get('sprite') for r in regions.values())
-    image = Image.new('RGBA', tuple(texture['size']), (0, 0, 0, 0) if transparent else (*map(round, ImageStat.Stat(swatch).mean), 255))
-    for name, tile in tiles.items(): image.alpha_composite(tile, tuple(regions[name]['rect'][:2]))
-    coverage = image.getchannel('A')
-    image = image.convert('RGB').quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
-    if transparent: image = Image.composite(image.convert('RGBA'), Image.new('RGBA', image.size), coverage)
-    path = local(folder, texture['atlas'])
-    if path.is_file(): preserve(folder, path)
-    path.parent.mkdir(parents=True, exist_ok=True); image.save(path)
+    written = {}
+    for target, size in images(texture).items():
+        own = [name for name, region in regions.items() if image_of(texture, region) == target]
+        transparent = any(regions[name].get('sprite') for name in own)
+        image = Image.new('RGBA', tuple(size), (0, 0, 0, 0) if transparent else (*map(round, ImageStat.Stat(swatch).mean), 255))
+        for name in own: image.alpha_composite(tiles[name], tuple(regions[name]['rect'][:2]))
+        coverage = image.getchannel('A')
+        image = image.convert('RGB').quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
+        if transparent: image = Image.composite(image.convert('RGBA'), Image.new('RGBA', image.size), coverage)
+        path = local(folder, target)
+        if path.is_file(): preserve(folder, path)
+        path.parent.mkdir(parents=True, exist_ok=True); image.save(path); written[target] = image
     subjects = [(c[0]+b[0], c[1]+b[1], c[0]+b[2], c[1]+b[3]) for c, _, b in found.values()]
-    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, image, regions).save(folder/'review/texture.png')
-    return path
+    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, written, texture).save(folder/'review/texture.png')
+    return [local(folder, target) for target in written]
 
 
-def sheet(master, subjects, image, regions):
-    """The subjects found on the master beside the atlas they reduce to, with its regions outlined and named,
-    and the atlas at native and double size on dark and light grounds."""
+def sheet(master, subjects, written, texture):
+    """The subjects found on the master beside the images they reduce to, side by side with their regions outlined and
+    named, and the images at native and double size on dark and light grounds."""
+    offsets, x = {}, 0
+    for target, image in written.items(): offsets[target] = x; x += image.width + 8
+    image = Image.new('RGBA', (x-8, max(i.height for i in written.values())))
+    for target, part in written.items(): image.paste(part.convert('RGBA'), (offsets[target], 0))
     zoom = max(1, 512//image.height)
     right = Image.new('RGBA', (image.width*zoom, image.height*zoom), (32, 32, 32, 255))
-    right.alpha_composite(image.convert('RGBA').resize(right.size, Image.Resampling.NEAREST)); draw = ImageDraw.Draw(right)
-    for name, region in regions.items():
-        x, y, w, h = (v*zoom for v in region['rect'])
+    right.alpha_composite(image.resize(right.size, Image.Resampling.NEAREST)); draw = ImageDraw.Draw(right)
+    for name, region in texture['regions'].items():
+        x, y, w, h = (v*zoom for v in (region['rect'][0]+offsets[image_of(texture, region)], *region['rect'][1:]))
         draw.rectangle((x, y, x+w-1, y+h-1), outline=(255, 0, 0)); draw.text((x+3, y+2), name, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
     scale = right.height/master.height
     left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
