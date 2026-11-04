@@ -167,11 +167,11 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         MachineInventory.refill(kiln,MachineInventory.KILN_FUEL);
         var input=new net.minecraft.world.item.crafting.SingleRecipeInput(kiln.getItem(0));
         var result=kiln.processingRecipe(input).map(recipe->recipe.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
-        // Vanilla cooks into slot 2 only. Briefly use it as a scratch output when a batch
-        // fits across the bank but not in slot 2; restore both original stacks in place.
-        boolean redirect=!result.isEmpty()&&!MachineInventory.room(kiln,MachineInventory.KILN_PRIMARY_OUTPUT,result)
-                &&MachineInventory.room(kiln,MachineInventory.KILN_OUTPUT,result);
+        // Vanilla cooks into slot 2 only, one unit of the input at a time. Each batch cooks into an emptied
+        // slot 2; the product takes its grade from the input unit it used, then joins the output bank.
+        boolean redirect=!result.isEmpty()&&MachineInventory.room(kiln,MachineInventory.KILN_OUTPUT,result);
         var originalOutput=redirect?kiln.items.set(2,ItemStack.EMPTY):ItemStack.EMPTY;
+        var inputUnits=kiln.getItem(0).copy();
         var inputItem = kiln.getItem(0).getItem();
         int inputCount = kiln.getItem(0).getCount();
         int outputCount = MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT);
@@ -181,7 +181,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         // Vanilla decrements before cooking; a sentinel keeps the final paid tick productive.
         kiln.dataAccess.set(0,heat+1);
         try{serverTick(level, pos, state, kiln);}
-        finally{if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty())MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}
+        finally{if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty()){Grade.smelted(produced,inputUnits,level.random);MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}}
         boolean completed = kiln.getItem(0).getCount() < inputCount;
         boolean working = completed || kiln.dataAccess.get(2) > progress;
         // Vanilla burns one tick while idle; restore it and charge the shared low idle rate instead.

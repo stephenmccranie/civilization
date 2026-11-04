@@ -78,7 +78,7 @@ public final class WorkshopJobs {
         case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){
         int base=stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE,stack.getMaxDamage());
-        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*EquipmentGrade.value(stack)/100.0)):base;
+        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*Grade.value(stack)/100.0)):base;
     }
     public static Job repair(ItemStack stack){
         var e=equipment(stack);if(e==null||!stack.isDamaged()||stack.getCount()!=1)return null;
@@ -91,15 +91,23 @@ public final class WorkshopJobs {
         Item fitting=e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;
         return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material,count),need(fitting,1),empty()),200);
     }
-    public static ItemStack result(Job job,ItemStack first){
-        var out=job.output().copy();
-        if(first.getItem() instanceof TieredItem||first.getItem() instanceof ArmorItem){
-            if(!job.name().equals("Repair")&&BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().startsWith("netherite_")){
-                out.applyComponents(first.getComponentsPatch());
-                EquipmentGrade.apply(out,EquipmentGrade.value(first));
-                out.setDamageValue((int)Math.ceil(first.getDamageValue()/(double)first.getMaxDamage()*out.getMaxDamage()));
-            }
+    /**
+     * The output of a matched job. A repair is fully quoted and an upgrade keeps the item it upgrades; any other
+     * graded output takes the mean grade of the graded units it consumes, the top units of each input stack.
+     */
+    public static ItemStack result(net.minecraft.world.Container c,MachineWork.Match match){
+        var job=match.job();var out=job.output().copy();var first=match.first();
+        if(job.name().equals("Repair")||!EquipmentGrade.eligible(out)&&!Grade.graded(out))return out;
+        if(BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().startsWith("netherite_")&&(first.getItem() instanceof TieredItem||first.getItem() instanceof ArmorItem)){
+            out.applyComponents(first.getComponentsPatch());
+            EquipmentGrade.apply(out,Grade.value(first));
+            out.setDamageValue((int)Math.ceil(first.getDamageValue()/(double)first.getMaxDamage()*out.getMaxDamage()));
+            return out;
         }
+        var units=new ArrayList<Integer>();
+        for(int i=0;i<4;i++)if(Grade.graded(c.getItem(i)))units.addAll(Grade.top(c.getItem(i),match.consumed()[i]));
+        if(units.isEmpty())return out;
+        if(Grade.graded(out))Grade.assign(out,Grade.mean(units));else EquipmentGrade.apply(out,Grade.mean(units));
         return out;
     }
 }

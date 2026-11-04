@@ -2,6 +2,7 @@ package dev.civilization.client;
 
 import dev.civilization.Civilization;
 import dev.civilization.EquipmentGrade;
+import dev.civilization.Grade;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,10 +16,12 @@ public final class GradeTooltip {
 
     @SubscribeEvent public static void tooltip(ItemTooltipEvent event) {
         var stack = event.getItemStack();
-        if (!EquipmentGrade.hasGrade(stack)) return;
-        int grade = EquipmentGrade.value(stack);
+        if (!Grade.graded(stack) && !EquipmentGrade.hasGrade(stack)) return;
+        int grade = Grade.value(stack);
+        var units = Grade.of(stack).units();
         var color = grade > 100 ? ChatFormatting.AQUA : grade == 100 ? ChatFormatting.GOLD : grade >= 85 ? ChatFormatting.GREEN
                 : grade >= 60 ? ChatFormatting.GRAY : ChatFormatting.DARK_RED;
-        event.getToolTip().add(1, Component.literal("Grade: " + grade + "%").withStyle(color));
+        event.getToolTip().add(1, Component.literal("Grade: " + grade + "%"
+                + (units.size() > 1 ? " average, " + units.getLast() + "–" + units.getFirst() + "%" : "")).withStyle(color));
     }
 }

@@ -36,12 +36,12 @@ final class InventoryVisualCheck {
         }
         if(ticks==130){mc.setScreen(new InventoryScreen(mc.player));var s=(InventoryScreen)mc.screen;if(s.getRecipeBookComponent().isVisible())toggle(mc);}
         if(ticks==150){
-            if(EquipmentGrade.value(mc.player.getInventory().getItem(11))!=45||EquipmentGrade.value(mc.player.getInventory().getItem(17))!=115||EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))!=1992L
+            if(Grade.value(mc.player.getInventory().getItem(11))!=45||Grade.value(mc.player.getInventory().getItem(17))!=115||EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))!=1992L
                     ||!mc.player.getInventory().getItem(19).has(net.minecraft.core.component.DataComponents.TRIM)
                     ||!mc.player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).has(net.minecraft.core.component.DataComponents.TRIM)
                     ||!mc.player.inventoryMenu.getSlot(46).getItem().is(FrontierContent.GEIGER_COUNTER.get()))
                 throw new IllegalStateException("Inventory fixture did not synchronize: grades="
-                        +EquipmentGrade.value(mc.player.getInventory().getItem(11))+","+EquipmentGrade.value(mc.player.getInventory().getItem(17))
+                        +Grade.value(mc.player.getInventory().getItem(11))+","+Grade.value(mc.player.getInventory().getItem(17))
                         +" seed="+EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))
                         +" trim="+mc.player.getInventory().getItem(19).has(net.minecraft.core.component.DataComponents.TRIM)
                         +" helmet="+mc.player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).has(net.minecraft.core.component.DataComponents.TRIM)

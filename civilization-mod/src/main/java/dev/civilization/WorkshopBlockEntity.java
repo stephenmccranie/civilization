@@ -37,7 +37,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState()))return false;
         if(!(player.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this)return false;
         var quote=MachineWork.match(this,job());
-        if(quote==null||!MachineInventory.room(this,outputSlots(),WorkshopJobs.result(quote.job(),quote.first())))return false;
+        if(quote==null||!MachineInventory.room(this,outputSlots(),WorkshopJobs.result(this,quote)))return false;
         worker=player;setChanged();return true;
     }
     private ItemStack workingResult=ItemStack.EMPTY;
@@ -56,7 +56,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         ensureInputIdentity();
         var job=job();var match=MachineWork.match(this,job);
         if(match==null){worker=null;pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
-        var result=WorkshopJobs.result(job,match.first());
+        var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
         if(!MachineInventory.room(this,outputSlots(),result)){worker=null;pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
         double labor=2.5*ThermalRules.calorieFactor(ThermalSystem.comfort(worker));
@@ -82,7 +82,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         ensureInputIdentity();
         var job=job();if(job==null){pause(selected<0&&MachineWork.matches(this,kind).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var match=MachineWork.match(this,job);if(match==null){pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
-        var result=WorkshopJobs.result(job,match.first());
+        var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
         if(!MachineInventory.room(this,outputSlots(),result)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
         MachineInventory.refill(this,MachineInventory.WORKSHOP_FUEL);

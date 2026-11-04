@@ -166,7 +166,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 
 | Workplace | Input → output |
 | --- | --- |
-| Foundry | Ore + Coal → metals and steel |
+| Foundry | Ore + Coal → metals and steel; refining |
 | Tannery | Raw Hide → Leather; brick, stone and wood, no iron |
 | Textile Workshop | Wool → Cloth |
 | Smithy | Metals → forged heads, Plates, Rods, Fasteners |
@@ -181,7 +181,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 - Gold is a real tier between iron and diamond, keeping its enchantability.
 - Coal-era workshops make iron equipment and everything for the first oil chain; later powered works use fuel and lubricant for throughput. Lubricant services machines; it is never a recipe ingredient.
 - **Density** comes from shared landings and warehouses, short transfers and concentrated customers — no city designation, proximity buff or forced residence.
-- **Grade.** Every damageable item gets a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits) that scales its base stats; 100% equals vanilla. A backpack's grade scales its capacity instead. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
+- **Grade.** Grade belongs to each unit of metal. Smelting rolls every ingot a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits); refining at the Foundry raises it at the same cost per pass with diminishing returns toward 150%. Steel keeps its iron's grade, and diamonds refine like ingots. Parts take the mean grade of the metal they use and equipment the mean of its metal parts; gear without graded material is standard 75%. Stacks mix grades, show their average and keep each unit's grade, handing out their best units first. Grade scales equipment's base stats; 100% equals vanilla. A backpack's grade scales its capacity instead. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
 - **Repairs** at the Assembly Bench consume materials and lower grade, keeping names and enchantments, with no XP or prior-work penalty. No idle decay.
 - Mending and villager equipment trades are disabled. Completed production grants modest XP; hand assembly and repairs grant none. Crafting, repair and other acquisition routes may not bypass workshop production, though finite exploration finds stay usable.
 - **Maker's marks** (approved, deferred): colour accents and player-drawn pixel signatures on equipment.
@@ -191,6 +191,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 - Where coal smithing ends and oil-powered manufacturing begins.
 - Head and handle damage or disassembly; separate woodworking or assembly sites at scale; further product families.
 - Non-numeric grade effects and nonpositive grades.
+- Grade in trade offers, and through nuggets and storage blocks.
 - Maker's mark details (a 6×6 grid is a candidate).
 
 ## Construction

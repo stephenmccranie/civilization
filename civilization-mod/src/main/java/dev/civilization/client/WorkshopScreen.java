@@ -15,7 +15,7 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
     public WorkshopScreen(WorkshopMenu m,Inventory i,Component title){super(m,i,title);imageHeight=214;inventoryLabelY=120;}
     @SubscribeEvent public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent e){e.register(WorkshopContent.MENU.get(),WorkshopScreen::new);}
     @Override protected void init(){super.init();work=null;if(menu.kind()==ManufacturingJobs.BENCH)work=addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal("Work"),b->minecraft.gameMode.handleInventoryButtonClick(menu.containerId,WorkshopBlockEntity.WORK_BUTTON)).bounds(leftPos+17,topPos+86,90,20).build());}
-    @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,new int[]{5},WorkshopJobs.result(match.job(),match.first()));}}
+    @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,new int[]{5},WorkshopJobs.result(menu.inventory,match));}}
     @Override protected int recipeCatalogKey(){return menu.kind();}
     @Override protected List<RecipeEntry> recipes(){
         var list=new ArrayList<RecipeEntry>();var jobs=WorkshopJobs.jobs(menu.kind());
@@ -32,7 +32,7 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
     private ItemStack ghost(int slot){
         if(slot==4||slot==6)return menu.hasCoalFire()?KilnContent.MINERAL_COAL.toStack():ItemStack.EMPTY;
         var job=menu.job();if(job==null)return ItemStack.EMPTY;
-        if(slot==5||slot==7)return WorkshopJobs.result(job,MachineWork.first(menu.inventory,job));
+        if(slot==5||slot==7){var match=MachineWork.match(menu.inventory,job);return match!=null?WorkshopJobs.result(menu.inventory,match):job.output().copy();}
         var missing=new ArrayList<ItemStack>();
         for(var need:job.needs())if(need.count()>0){int count=0;for(int i=0;i<4;i++)if(need.ingredient().test(menu.inventory.getItem(i)))count+=menu.inventory.getItem(i).getCount();if(count<need.count())missing.add(need.icon().copyWithCount(need.count()-count));}
         int empty=0;for(int i=0;i<slot;i++)if(menu.inventory.getItem(i).isEmpty())empty++;

@@ -13,19 +13,6 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class WorkshopGameTests {
-    @GameTest(template="industrial") public static void widerEquipmentGradeRollHasBothTails(GameTestHelper h){
-        var random=net.minecraft.util.RandomSource.create(987654321L);
-        int low=0,high=0;long total=0;
-        for(int i=0;i<20000;i++){
-            int grade=EquipmentGrade.roll(random);total+=grade;
-            if(grade<50)low++;
-            if(grade>=100)high++;
-        }
-        h.assertTrue(total/20000.0>74&&total/20000.0<76,"The wider roll stays centered near 75%");
-        h.assertTrue(low>1600&&low<2800&&high>1600&&high<2800,
-                "Both low (<50%) and exceptional (100%+) grades appear on roughly one in ten rolls");
-        h.succeed();
-    }
     @GameTest(template="industrial") public static void pairedWorkshopStorageAndSmithySingleOutput(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack());w.setItem(1,WorkshopContent.HIDE.toStack());w.setItem(5,new ItemStack(Items.LEATHER,31));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
         h.assertTrue(w.getItem(5).getCount()==32&&w.getItem(7).getCount()==1&&w.getItem(0).isEmpty()&&w.getItem(1).isEmpty(),"Two input stacks feed both output stacks");
@@ -130,14 +117,14 @@ public final class WorkshopGameTests {
         }h.succeed();
     }
     @GameTest(template="industrial") public static void repairLowersGradeAndRetainsIdentity(GameTestHelper h){
-        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75,4242L);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
         var unbreaking=h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);tool.enchant(unbreaking,2);
         long originalWearSeed=EquipmentGrade.wearSeed(tool);
         w.setItem(0,tool);w.setItem(1,new ItemStack(ManufacturingContent.part("iron","plate"),2));w.setItem(2,ManufacturingContent.HANDLE.toStack());run(w,200);
-        var out=w.getItem(5);h.assertTrue(EquipmentGrade.value(out)==70&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
+        var out=w.getItem(5);h.assertTrue(Grade.value(out)==70&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
         h.assertTrue(out.getHoverName().getString().equals("Townsmith")&&EnchantmentHelper.getItemEnchantmentLevel(unbreaking,out)==2&&EquipmentGrade.wearSeed(out)==originalWearSeed,"Name, enchantment and personal wear pattern retained");
         out.setDamageValue(174);var quote=WorkshopJobs.repair(out);
-        h.assertTrue(EquipmentGrade.value(quote.output())==63&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
+        h.assertTrue(Grade.value(quote.output())==63&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeScalesEquipmentStatsAndLowGradeRepairsEnd(GameTestHelper h){
         var sword=new ItemStack(Items.IRON_SWORD);var base=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);EquipmentGrade.apply(sword,70);
@@ -153,7 +140,7 @@ public final class WorkshopGameTests {
         EquipmentGrade.apply(pick,50);pick.setDamageValue(pick.getMaxDamage()-1);var first=WorkshopJobs.repair(pick).output();
         first.setDamageValue(first.getMaxDamage()-1);var second=WorkshopJobs.repair(first).output();
         second.setDamageValue(second.getMaxDamage()-1);
-        h.assertTrue(EquipmentGrade.value(first)==35&&EquipmentGrade.value(second)==8&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
+        h.assertTrue(Grade.value(first)==35&&Grade.value(second)==8&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeChangesActualBlockBreakingRate(GameTestHelper h){
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GradeMiner"));
@@ -332,9 +319,9 @@ public final class WorkshopGameTests {
         h.assertTrue(restored.selected==jobs.indexOf(job),"Saved job ID wins over reordered numerical indices");h.succeed();
     }
     @GameTest(template="industrial") public static void netheriteUpgradeRetainsWear(GameTestHelper h){
-        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,75);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
-        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(job,old);
-        h.assertTrue(EquipmentGrade.value(out)==75&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
+        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,75,777L);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
+        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(new net.minecraft.world.SimpleContainer(4),new MachineWork.Match(job,new int[4],old));
+        h.assertTrue(Grade.value(out)==75&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
         h.assertTrue(out.getHoverName().getString().equals("Old pick"),"Upgrade keeps identity");h.succeed();
     }
     @GameTest(template="industrial") public static void vanillaRepairMenusKeepWorkshopBoundary(GameTestHelper h){

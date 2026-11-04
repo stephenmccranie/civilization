@@ -1,0 +1,119 @@
+package dev.civilization;
+
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+/**
+ * Whole-percent grades of the units in a stack, best first: one value means every unit has it, otherwise there is
+ * one value per unit. Units leave a stack from the top, so a stack hands out and spends its best units first. A
+ * stack resized without saying which units moved keeps its worst ones, so no path can invent grade.
+ */
+public record Grade(List<Integer> units) {
+    public static final int STANDARD = 75, LIMIT = 150, MAX_UNITS = 99;
+    private static final Grade STANDARD_UNITS = new Grade(List.of(STANDARD));
+    /** Materials whose units carry grades: smelted metal, diamonds and the Smithy's parts. */
+    public static final TagKey<Item> GRADED = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(Civilization.MOD_ID, "graded"));
+    private static final Codec<Grade> CODEC = Codec.either(Codec.INT, ExtraCodecs.nonEmptyList(Codec.INT.sizeLimitedListOf(MAX_UNITS))).xmap(
+            either -> new Grade(either.map(List::of, list -> list)),
+            grade -> grade.units.size() == 1 ? Either.left(grade.units.getFirst()) : Either.right(grade.units));
+    private static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Civilization.MOD_ID);
+    // The ID predates material grades; a single grade is saved as a bare number, as equipment always was.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Grade>> GRADE = COMPONENTS.registerComponentType("equipment_grade",
+            builder -> builder.persistent(CODEC).networkSynchronized(ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.list(MAX_UNITS)).map(Grade::new, Grade::units)));
+
+    public Grade {
+        var sorted = new ArrayList<>(units);
+        sorted.sort(Comparator.reverseOrder());
+        units = sorted.getFirst().equals(sorted.getLast()) ? List.of(sorted.getFirst()) : List.copyOf(sorted);
+    }
+
+    public static void register(IEventBus bus) { COMPONENTS.register(bus); }
+    public static boolean graded(ItemStack stack) { return stack.is(GRADED); }
+    /** Units without a recorded grade are standard. */
+    public static Grade of(ItemStack stack) { return stack.getOrDefault(GRADE.get(), STANDARD_UNITS); }
+    /** The single unit's grade, or the rounded mean of the stack's units. */
+    public static int value(ItemStack stack) { return mean(of(stack).units); }
+    public static int mean(List<Integer> units) { return (int)Math.round(units.stream().mapToInt(Integer::intValue).average().orElseThrow()); }
+    /** The grades of the top `n` units, best first. */
+    public static List<Integer> top(ItemStack stack, int n) { return fit(of(stack).units, stack.getCount()).subList(0, n); }
+    /** The units a list describes at `count`: the worst `count` of them, the worst repeated to make up a shortfall. */
+    private static List<Integer> fit(List<Integer> units, int count) {
+        if (units.size() == 1) return Collections.nCopies(count, units.getFirst());
+        var fitted = new ArrayList<>(units.subList(Math.max(0, units.size() - count), units.size()));
+        while (fitted.size() < count) fitted.add(fitted.getLast());
+        return fitted;
+    }
+
+    /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
+    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 20); }
+    /** A refining pass closes a tenth of the gap to the limit, at least one point; at the limit it gains nothing. */
+    public static int refined(int grade) { return grade < LIMIT ? grade + Math.ceilDiv(LIMIT - grade, 10) : grade; }
+    /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal, refined in the same one. */
+    public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
+        if (!graded(product)) return;
+        int unit = !graded(input) ? roll(random) : top(input, 1).getFirst();
+        assign(product, graded(input) && product.is(input.getItem()) ? refined(unit) : unit);
+    }
+    /** Gives every unit of the stack one grade. */
+    public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }
+
+    /** Whether two stacks combine: identical, or the same graded material differing only in its units' grades. */
+    public static boolean stacks(ItemStack a, ItemStack b) {
+        return ItemStack.isSameItemSameComponents(a, b) || !a.isEmpty() && !b.isEmpty() && graded(a) && a.is(b.getItem())
+                && a.getComponentsPatch().forget(type -> type == GRADE.get()).equals(b.getComponentsPatch().forget(type -> type == GRADE.get()));
+    }
+    /** Moves up to `n` units from the top of `from` onto `into`, a stack it combines with, and returns how many moved. */
+    public static int join(ItemStack into, ItemStack from, int n) {
+        int moved = Math.min(n, from.getCount());
+        if (moved <= 0) return 0;
+        var units = new ArrayList<>(top(into, into.getCount()));
+        units.addAll(top(from, moved));
+        from.shrink(moved);
+        set(into, units);
+        return moved;
+    }
+
+    /** Every count change that names no units keeps the stack's units fitted to its count. */
+    public static void resize(ItemStack stack, int count) {
+        var grade = GRADE.isBound() ? stack.get(GRADE.get()) : null;
+        if (grade == null || grade.units.size() == 1 || count <= 0 || count == grade.units.size()) return;
+        put(stack, new Grade(fit(grade.units, count)));
+    }
+    /** ItemStack.split for a stack whose units differ: the part takes the top units. */
+    public static ItemStack split(ItemStack stack, int n) {
+        var grade = stack.get(GRADE.get());
+        int taken = Math.min(n, stack.getCount());
+        if (grade == null || grade.units.size() == 1 || taken <= 0) return null;
+        var units = fit(grade.units, stack.getCount());
+        var part = stack.copy();
+        set(part, units.subList(0, taken));
+        if (taken == units.size()) stack.setCount(0);
+        else set(stack, units.subList(taken, units.size()));
+        return part;
+    }
+    /** Makes `units` exactly the stack's units, its count included. */
+    private static void set(ItemStack stack, List<Integer> units) {
+        put(stack, new Grade(units));
+        stack.setCount(units.size());
+    }
+    private static void put(ItemStack stack, Grade grade) {
+        if (grade.equals(STANDARD_UNITS)) stack.remove(GRADE.get());
+        else stack.set(GRADE.get(), grade);
+    }
+}

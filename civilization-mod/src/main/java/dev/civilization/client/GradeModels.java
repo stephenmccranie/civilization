@@ -3,6 +3,7 @@ package dev.civilization.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.civilization.Civilization;
 import dev.civilization.EquipmentGrade;
+import dev.civilization.Grade;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +106,7 @@ public final class GradeModels {
                 @Override public BakedModel resolve(BakedModel base, ItemStack stack, ClientLevel level, LivingEntity entity, int seed) {
                     BakedModel selected = delegate.resolve(originalModel, stack, level, entity, seed);
                     if (selected == null) selected = originalModel;
-                    int count = EquipmentGrade.hasGrade(stack) ? layerCount(EquipmentGrade.value(stack)) : 0;
+                    int count = EquipmentGrade.hasGrade(stack) ? layerCount(Grade.value(stack)) : 0;
                     return count == 0 ? selected : new GradeModel(selected, overlays,
                             wearLayers(overlays, EquipmentGrade.wearSeed(stack), count));
                 }

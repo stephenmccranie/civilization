@@ -12,7 +12,8 @@ public final class KilnScreen extends MachineScreen<KilnMenu> {
         var list=new ArrayList<RecipeEntry>();for(int i=0;i<menu.recipes.size();i++){
             var recipe=menu.recipes.get(i).value();var output=recipe.getResultItem(minecraft.level.registryAccess());
             var input=recipe.getIngredients().getFirst().getItems()[0];
-            list.add(new RecipeEntry(i,output.getHoverName().copy().append(" — ").append(input.getHoverName()),output,"Components",net.minecraft.world.item.Items.AIR));
+            var name=output.is(input.getItem())?Component.literal("Refine ").append(output.getHoverName()):output.getHoverName().copy().append(" — ").append(input.getHoverName());
+            list.add(new RecipeEntry(i,name,output,"Components",net.minecraft.world.item.Items.AIR));
         }return list;
     }
     @Override protected int chosen(){return menu.selection();}

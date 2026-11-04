@@ -80,7 +80,7 @@ public final class ManufacturingGameTests {
         var repair=WorkshopJobs.repair(damaged);w.select(0);w.setItem(0,new ItemStack(Items.IRON_PICKAXE));w.setItem(3,damaged);w.setItem(1,repair.needs().get(1).icon());w.setItem(2,repair.needs().get(2).icon());
         h.assertTrue(w.beginWork(p),"Repair matches the actual damaged target despite a pristine same-item stack first");
         for(int i=0;i<repair.ticks();i+=10)w.process();
-        var out=w.getItem(5);h.assertTrue(out.getDamageValue()==0&&EquipmentGrade.value(out)<80&&EquipmentGrade.wearSeed(out)==123&&out.getHoverName().getString().equals("Kept"),"Repair preserves identity and lowers grade");
+        var out=w.getItem(5);h.assertTrue(out.getDamageValue()==0&&Grade.value(out)<80&&EquipmentGrade.wearSeed(out)==123&&out.getHoverName().getString().equals("Kept"),"Repair preserves identity and lowers grade");
         h.assertTrue(w.getItem(0).is(Items.IRON_PICKAXE)&&w.getItem(3).isEmpty(),"Only the damaged item was consumed");h.succeed();
     }
     @GameTest(template="industrial") public static void tableBypassesRetiredAndBootstrapRemains(GameTestHelper h){

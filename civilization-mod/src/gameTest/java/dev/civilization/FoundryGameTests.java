@@ -7,7 +7,7 @@ import net.minecraft.world.item.crafting.*;
 import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public class FoundryGameTests {
-    private static FoundryBlockEntity build(GameTestHelper h,Direction facing) {
+    static FoundryBlockEntity build(GameTestHelper h,Direction facing) {
         var pos=h.absolutePos(new BlockPos(4,1,2));
         // A turned controller is a new machine: take the old one down first.
         h.getLevel().setBlockAndUpdate(pos,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
@@ -15,7 +15,7 @@ public class FoundryGameTests {
         MachineFixture.build(h.getLevel(),pos);
         return (FoundryBlockEntity)h.getLevel().getBlockEntity(pos);
     }
-    private static void run(GameTestHelper h,FoundryBlockEntity f,int ticks) {CoalFireFixture.light(f);for(int i=0;i<ticks;i++)KilnBlockEntity.tick(h.getLevel(),f.getBlockPos(),f.getBlockState(),f);}
+    static void run(GameTestHelper h,FoundryBlockEntity f,int ticks) {CoalFireFixture.light(f);for(int i=0;i<ticks;i++)KilnBlockEntity.tick(h.getLevel(),f.getBlockPos(),f.getBlockState(),f);}
     @GameTest(template="industrial") public static void oreSteelAndPartsProgression(GameTestHelper h) {
         var f=build(h,Direction.NORTH);f.setItem(0,new ItemStack(Items.RAW_IRON));f.setItem(1,KilnContent.MINERAL_COAL.toStack());run(h,f,200);
         h.assertTrue(f.getItem(2).is(Items.IRON_INGOT),"Foundry smelts raw iron");

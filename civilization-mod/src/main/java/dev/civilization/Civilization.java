@@ -38,6 +38,7 @@ public final class Civilization {
         modBus.addListener(SurveyPayload::register);
         modBus.addListener(UraniumRadiationPayload::register);
         RecoveryItems.register(modBus);
+        Grade.register(modBus);
         EquipmentGrade.register(modBus);
         FarmingContent.register(modBus);
         KilnContent.register(modBus);
