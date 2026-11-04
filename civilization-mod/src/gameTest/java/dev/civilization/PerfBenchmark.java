@@ -57,13 +57,13 @@ final class PerfBenchmark {
     private static final long QUIET = 500_000_000;
 
     private record Leg(String name, int[][] to) {}
-    /** The walk relative to the town's corner, from {@link #START}: across the meadow to the town, along the lanes
-     *  between its yards, and out into the country. Each leg walks through its corners in turn. */
-    private static final int[] START = {-40, -50};
+    /** The walk relative to the town's corner, from {@link #START}: across the meadow to the town, along the lane
+     *  between the first two yards, and out into the country. Each leg walks through its corners in turn. */
+    private static final int[] START = {-44, 8};
     private static final List<Leg> LEGS = List.of(
-            new Leg("approach", new int[][]{{-15, -3}}),
-            new Leg("yards", new int[][]{{26, -3}, {26, 16}, {-15, 16}, {-15, 34}, {26, 34}}),
-            new Leg("outskirts", new int[][]{{70, 70}}));
+            new Leg("approach", new int[][]{{-15, 16}}),
+            new Leg("yards", new int[][]{{26, 16}}),
+            new Leg("outskirts", new int[][]{{55, 10}}));
     /** The walk's corners in order, the distance walked at each, the distance at which each leg ends, and the least
      *  and greatest x and z it reaches. */
     private static final List<int[]> CORNERS = new ArrayList<>();
