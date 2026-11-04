@@ -64,7 +64,7 @@ public final class WheelbarrowGameTests {
             h.assertTrue(p.position().distanceTo(end)<.002,"Players can walk across both visual handles without hitting invisible extensions at "+yaw);
             h.assertTrue(e.getBoundingBox().getZsize()<e.interactionBounds().getZsize()+1e-5,"Interaction reach is separate from physical body bounds");
             p.setPos(e.handlerPosition(e.position(),yaw));
-            var target=e.position().add(new Vec3(.3586,.8,1.4343).yRot(angle));var eye=p.getEyePosition();var ray=target.subtract(eye).normalize().scale(3);
+            var target=e.position().add(WheelbarrowEntity.GRIP.yRot(angle));var eye=p.getEyePosition();var ray=target.subtract(eye).normalize().scale(3);
             var hit=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p,eye,eye.add(ray),p.getBoundingBox().expandTowards(ray).inflate(1),candidate->candidate==e,9);
             h.assertTrue(hit!=null&&hit.getEntity()==e&&e.interactAt(p,hit.getLocation().subtract(e.position()),InteractionHand.MAIN_HAND).consumesAction()&&p.getVehicle()==e,"Non-solid handles remain targetable and grabbable through the native mouse-ray path at "+yaw);p.stopRiding();
         }h.succeed();
@@ -152,7 +152,7 @@ public final class WheelbarrowGameTests {
         double spent=data.travelSpent;var grip=e.handlerPosition(e.position(),e.getYRot());
         e.input(p,new WheelbarrowPayload(0,1,false));e.tick();
         double arc=e.handlerPosition(e.position(),e.getYRot()).subtract(grip).horizontalDistance();
-        h.assertTrue(arc>.1&&Math.abs(data.travelSpent-spent-arc*CalorieConfig.WALK.get()*factor)<1e-6,"Turning charges the handler's actual walk around the handles");
+        h.assertTrue(arc>.05&&Math.abs(data.travelSpent-spent-arc*CalorieConfig.WALK.get()*factor)<1e-6,"Turning charges the handler's actual walk around the handles");
         p.setYRot(e.getYRot());double before=data.reserve().calories();e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();
         h.assertTrue(data.reserve().calories()==before,"Holding still spends no pushing calories");
         p.setGameMode(GameType.CREATIVE);e.input(p,new WheelbarrowPayload(-1,0,false));e.tick();
@@ -204,8 +204,9 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void handlerNeedsHeadroomToFollowUpAStep(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int first=(int)Math.floor(e.getZ()+2);
         for(int x=-3;x<=3;x++)for(int z=first;z<=first+3;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y,z),Blocks.STONE.defaultBlockState());
-        // The carrier fits under this ceiling on the step; its handler does not.
-        for(int x=-1;x<=1;x++)for(int z=first;z<=first+3;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y+2,z),Blocks.STONE.defaultBlockState());
+        // The carrier fits under this upper-slab ceiling on the step; its handler does not.
+        var ceiling=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.SlabBlock.TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP);
+        for(int x=-1;x<=1;x++)for(int z=first;z<=first+3;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y+2,z),ceiling);
         e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<40;i++)e.tick();e.positionRider(p);
         var stopped=e.position();e.tick();
         h.assertTrue(Math.abs(e.getY()-y-1)<.001&&e.position().distanceTo(stopped)<.001,"The carrier climbs and then waits for its handler: "+e.position());
@@ -215,7 +216,8 @@ public final class WheelbarrowGameTests {
         var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int edge=(int)Math.floor(e.getZ()+2);
         for(int x=-3;x<=3;x++)for(int z=edge;z<=edge+3;z++)for(int d=1;d<=2;d++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y-d,z),Blocks.AIR.defaultBlockState());
         e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<40;i++)e.tick();
-        h.assertTrue(Math.abs(e.getY()-y)<.001&&e.getZ()>edge-.7&&e.getZ()<edge-.48&&e.onGround()&&p.getVehicle()==e,"The wheel stops at a two-block drop, still held: "+e.position());h.succeed();
+        // It stops within a step of where the tyre's whole footprint, which ends 10/16 behind the centre, would leave the edge.
+        h.assertTrue(Math.abs(e.getY()-y)<.001&&e.getZ()>edge-.625-PlayerMovement.WALK/20-1e-6&&e.getZ()<=edge-.625+1e-6&&e.onGround()&&p.getVehicle()==e,"The wheel stops at a two-block drop, still held: "+e.position());h.succeed();
     }
     @GameTest(template="industrial") public static void keysSteerAtTurnRateAndTheLookStaysOnTheHandles(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);

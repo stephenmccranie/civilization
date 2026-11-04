@@ -14,9 +14,9 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEntity> {
-    // The load fills quarter-size blocks from the wheel end, centred on the 0.75 x 1.125 tray floor: its front-left corner in the model frame.
-    private static final net.minecraft.world.phys.Vec3 TRAY=new net.minecraft.world.phys.Vec3(-.375,.616,-.3175);
-    public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.6f;}
+    // The load fills quarter-size blocks from the wheel end, across the 1 x 1 tray floor: its front-left corner in the model frame.
+    private static final net.minecraft.world.phys.Vec3 TRAY=new net.minecraft.world.phys.Vec3(-.5,7.5/16,-.5);
+    public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.7f;}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerEntityRenderer(WheelbarrowContent.ENTITY.get(),WheelbarrowRenderer::new);}
     @Override public RenderType getRenderType(WheelbarrowEntity e,net.minecraft.resources.ResourceLocation t,MultiBufferSource b,float partial){return RenderType.entityCutoutNoCull(t);}
     @Override public void render(WheelbarrowEntity e,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){

@@ -54,6 +54,10 @@ class ArtTests(unittest.TestCase):
         previous.write_bytes(b'wrong preview')
         with self.assertRaisesRegex(ValueError,'differs'): self.review('verify')
 
+    def test_more_references_than_the_image_tool_takes_are_refused(self):
+        self.asset['references']*=6; self.save()
+        with self.assertRaisesRegex(ValueError,'five references'): self.command('prepare')
+
     def test_revoked_review_blocks_preview(self):
         self.review('build'); self.review('build','revise')
         with self.assertRaisesRegex(ValueError,'visual review'): self.command('preview')

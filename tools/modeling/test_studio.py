@@ -22,6 +22,13 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(uv_faces(p,r)['north'],[64,0,96,32])
         self.assertEqual(uv_faces(p,r)['south'],[0,0,12,10])
 
+    def test_offset_and_turned_islands_stay_inside_their_region(self):
+        p=Model().box('body','leg',[0,0,0],[2,6,2],'wood',faces={'east':('wood',4,8,90),'west':('wood',0,16)})
+        r={'wood':{'rect':[10,20,32,40]}}
+        self.assertEqual(uv_faces(p,r,density=4)['east'],[14,28,38,36])
+        self.assertEqual(uv_faces(p,r,density=4)['west'],[10,36,18,60])
+        with self.assertRaises(ValueError):uv_faces(Model().box('body','tall',[0,0,0],[2,6,2],'wood',faces={'east':('wood',12,0,90)}),r,density=4)
+
     def test_unique_names_and_volume(self):
         m=Model();m.box('a','part',[0,0,0],[1,1,1])
         with self.assertRaises(ValueError):m.box('b','part',[0,0,0],[1,1,1])

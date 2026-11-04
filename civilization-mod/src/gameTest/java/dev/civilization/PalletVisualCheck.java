@@ -39,8 +39,8 @@ final class PalletVisualCheck {
             for(var at:BlockPos.betweenClosed(YARD,LAST))pallet(l,at.immutable());
             var yard=((StockpileEntity)l.getBlockEntity(YARD)).cargo();yard.insert(new ItemStack(Items.COBBLESTONE),300);yard.insert(new ItemStack(Items.OAK_PLANKS),100);
             pallet(l,BESIDE).cargo().insert(new ItemStack(Items.STONE),128);
-            barrow(l,HALF_BARROW).insert(new ItemStack(Items.STONE),18);
-            var full=barrow(l,FULL_BARROW);full.insert(new ItemStack(Items.STONE),24);full.insert(new ItemStack(Items.OAK_PLANKS),8);full.insert(new ItemStack(Items.OAK_SLAB),8);
+            barrow(l,HALF_BARROW).insert(new ItemStack(Items.STONE),32);
+            var full=barrow(l,FULL_BARROW);full.insert(new ItemStack(Items.STONE),40);full.insert(new ItemStack(Items.OAK_PLANKS),16);full.insert(new ItemStack(Items.OAK_SLAB),16);
             var p=player(server);p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.getInventory().clearContent();
             p.teleportTo(l,147.5,104.5,-5,java.util.Set.of(),0,28);ready=true;
         });}

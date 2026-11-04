@@ -35,6 +35,7 @@ def definition(asset, folder):
     if any(not asset['brief'].get(k) for k in ('purpose', 'target', 'constraints')):
         raise ValueError('Fill purpose, target and constraints')
     if not asset['references']: raise ValueError('Inspect and declare visual references')
+    if len(asset['references']) > 5: raise ValueError('Codex\'s image tool takes at most five references')
     for neighbour in asset.get('neighbours', []):
         if not local(ROOT, neighbour).is_file(): raise ValueError(f'Neighbour {neighbour} is missing')
     outputs = {local(RUNTIME, o['target']) for o in asset.get('outputs', [])}
@@ -135,8 +136,37 @@ def subject(crop, ground):
     return mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))
 
 
+def subjects(master, ground, cols, rows):
+    """Each cell's subject as its mask and box on the master: the connected regions that differ from the ground, each
+    given to the cell holding its centre, so a panel the generator drew a little past its cell's edge stays whole and its
+    neighbour's cell never sees the overflow. Regions are found on a quarter-size copy, where every master pixel's block
+    keeps it, and then taken back at full size."""
+    mask = subject(master, ground); width, height = -(-mask.width//4)*4, -(-mask.height//4)*4
+    padded = Image.new('L', (width, height)); padded.paste(mask)
+    small = padded.reduce(4).point(lambda v: 255 if v else 0); w, h = small.size; seen = bytearray(small.tobytes())
+    labels = bytearray(w*h); owner = {}
+    for start in range(w*h):
+        if not seen[start] or labels[start]: continue
+        label = len(owner)+1
+        if label > 255: raise ValueError('The master holds too many separate specks to read; draw it on a cleaner ground')
+        labels[start] = label; stack = [start]; x0, y0, x1, y1 = w, h, 0, 0
+        while stack:
+            i = stack.pop(); x, y = i % w, i//w; x0, y0, x1, y1 = min(x0, x), min(y0, y), max(x1, x+1), max(y1, y+1)
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    j = i+dy*w+dx
+                    if 0 <= x+dx < w and 0 <= y+dy < h and seen[j] and not labels[j]: labels[j] = label; stack.append(j)
+        owner[label] = (min(cols-1, (x0+x1)*2*cols//mask.width), min(rows-1, (y0+y1)*2*rows//mask.height))
+    full = Image.frombytes('L', (w, h), bytes(labels)).resize((width, height), Image.Resampling.NEAREST).crop((0, 0, *mask.size))
+    found = {}
+    for cell in set(owner.values()):
+        own = ImageChops.multiply(mask, full.point([255 if owner.get(v) == cell else 0 for v in range(256)]))
+        found[cell] = own, own.getbbox()
+    return found
+
+
 def opening(mask, box):
-    """The opening drawn inside a panel: plain ground enclosed by it, in cell coordinates, or None. The panel's rim is
+    """The opening drawn inside a panel: plain ground enclosed by it, in master coordinates, or None. The panel's rim is
     left out so rounded corners are not openings, and specks are dropped."""
     m = max(4, round(0.03*min(box[2]-box[0], box[3]-box[1])))
     inner = (box[0]+m, box[1]+m, box[2]-m, box[3]-m)
@@ -153,45 +183,43 @@ def atlas(asset, folder):
     texture = asset['texture']; regions = texture['regions']
     if not texture.get('master'): raise ValueError('Record a texture master first with texture --prompt')
     with Image.open(local(folder, texture['master'])) as opened: master = opened.convert('RGB')
-    cols, rows = texture['grid']; found = {}
+    cols, rows = texture['grid']; found = subjects(master, texture['ground'], cols, rows)
     for col, row in {tuple(r['cell']) for r in regions.values()}:
-        cell = (col*master.width//cols, row*master.height//rows, (col+1)*master.width//cols, (row+1)*master.height//rows)
-        mask = subject(master.crop(cell), texture['ground']); box = mask.getbbox()
-        # A subject touching its cell edge has no margin to trust.
-        if box is None or 0 in box[:2] or box[2] == mask.width or box[3] == mask.height:
+        box = found.get((col, row), (None, None))[1]
+        # A subject cut by the master's edge has no margin to trust.
+        if box is None or 0 in box[:2] or box[2] == master.width or box[3] == master.height:
             raise ValueError(f'Master cell {col},{row} has no subject inside a margin of plain {texture["ground"]}')
-        if max((box[2]-box[0])/mask.width, (box[3]-box[1])/mask.height) < 0.5:
+        if max((box[2]-box[0])*cols/master.width, (box[3]-box[1])*rows/master.height) < 0.5:
             raise ValueError(f'Master cell {col},{row} holds a subject under half its size; the sheet asks for it to fill the cell')
-        found[col, row] = cell, mask, box
     def panel(region):
-        (left, top, _, _), _, box = found[tuple(region['cell'])]; rim = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
-        return (left+box[0]+rim, top+box[1]+rim, left+box[2]-rim, top+box[3]-rim)
+        box = found[tuple(region['cell'])][1]; rim = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
+        return (box[0]+rim, box[1]+rim, box[2]-rim, box[3]-rim)
     sprites = [n for n, r in regions.items() if r.get('sprite')]
     scale = min((min(r['rect'][2]/(b[2]-b[0]), r['rect'][3]/(b[3]-b[1])) for r in map(regions.get, sprites)
-                 for _, _, b in [found[tuple(r['cell'])]]), default=None)
+                 for _, b in [found[tuple(r['cell'])]]), default=None)
     filled = {r['in'] for r in regions.values() if 'in' in r}; placed = {}; openings = []
     for name, region in regions.items():
-        (left, top, _, _), mask, box = found[tuple(region['cell'])]
+        mask, box = found[tuple(region['cell'])]
         if region.get('sprite'):
             # Drop the rim blended with the ground, a quarter of an output pixel deep, then reduce premultiplied
             # so the ground cannot tint the edge.
             width, height = region['rect'][2:]
-            crop = master.crop((left+box[0], top+box[1], left+box[2], top+box[3])).convert('RGBA'); rim = max(2, round(0.25/scale))
-            crop.putalpha(mask.filter(ImageFilter.MinFilter(2*rim+1)).crop(box))
+            crop = master.crop(box).convert('RGBA'); rim = max(2, round(0.25/scale)); pad = (box[0]-rim, box[1]-rim, box[2]+rim, box[3]+rim)
+            crop.putalpha(mask.crop(pad).filter(ImageFilter.MinFilter(2*rim+1)).crop((rim, rim, rim+crop.width, rim+crop.height)))
             small = crop.convert('RGBa').resize((max(1, round(crop.width*scale)), max(1, round(crop.height*scale))), Image.Resampling.BOX).convert('RGBA')
             small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
             tile = Image.new('RGBA', (width, height)); tile.paste(small, ((width-small.width)//2, (height-small.height)//2))
             placed[name] = tile, tuple(region['rect'][:2])
         elif 'in' in region:
-            host = regions[region['in']]; (hl, ht, _, _), hmask, hbox = found[tuple(host['cell'])]
+            host = regions[region['in']]; hmask, hbox = found[tuple(host['cell'])]
             hole = opening(hmask, hbox)
             if hole is None: raise ValueError(f'The {region["in"]} panel has no opening drawn for {name}')
             p = panel(host); x, y, w, h = host['rect']; sx, sy = w/(p[2]-p[0]), h/(p[3]-p[1])
             # Cover every pixel the opening touches, so no ground-tinted edge survives.
-            x0, y0 = math.floor(x+(hl+hole[0]-p[0])*sx), math.floor(y+(ht+hole[1]-p[1])*sy)
-            x1, y1 = math.ceil(x+(hl+hole[2]-p[0])*sx), math.ceil(y+(ht+hole[3]-p[1])*sy)
+            x0, y0 = math.floor(x+(hole[0]-p[0])*sx), math.floor(y+(hole[1]-p[1])*sy)
+            x1, y1 = math.ceil(x+(hole[2]-p[0])*sx), math.ceil(y+(hole[3]-p[1])*sy)
             placed[name] = master.crop(panel(region)).resize((x1-x0, y1-y0), Image.Resampling.BOX).convert('RGBA'), (x0, y0)
-            openings.append((hl+hole[0], ht+hole[1], hl+hole[2], ht+hole[3]))
+            openings.append(hole)
         else:
             if name not in filled and opening(mask, box):
                 raise ValueError(f'The {name} panel shows the background inside it; draw it solid or declare an inset to fill its opening')
@@ -224,13 +252,13 @@ def atlas(asset, folder):
         path = local(folder, target)
         if path.is_file(): preserve(folder, path)
         path.parent.mkdir(parents=True, exist_ok=True); image.save(path); written[target] = image
-    subjects = [(c[0]+b[0], c[1]+b[1], c[0]+b[2], c[1]+b[3]) for c, _, b in found.values()]
+    boxes = [found[tuple(r['cell'])][1] for r in regions.values()]
     neighbours = [Image.open(local(ROOT, n)).convert('RGBA') for n in asset.get('neighbours', [])]
-    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, openings, written, placed, texture, neighbours).save(folder/'review/texture.png')
+    (folder/'review').mkdir(exist_ok=True); sheet(master, boxes, openings, written, placed, texture, neighbours).save(folder/'review/texture.png')
     return [local(folder, target) for target in written]
 
 
-def sheet(master, subjects, openings, written, placed, texture, neighbours):
+def sheet(master, boxes, openings, written, placed, texture, neighbours):
     """The subjects (red) and openings (cyan) found on the master; the images they reduce to, side by side with their
     regions outlined and named; and a lineup of the images beside their neighbours at native and triple size on dark and
     light grounds."""
@@ -247,7 +275,7 @@ def sheet(master, subjects, openings, written, placed, texture, neighbours):
         draw.rectangle((x, y, x+w-1, y+h-1), outline=(255, 0, 0)); draw.text((x+3, y+2), name, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
     scale = right.height/master.height
     left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
-    for box in subjects: draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
+    for box in boxes: draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
     for box in openings: draw.rectangle(tuple(round(v*scale) for v in box), outline=(0, 255, 255), width=2)
     # Opaque square faces may repeat across neighbouring blocks, so the lineup also shows each tiled two by two.
     tiles = []

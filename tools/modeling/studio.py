@@ -72,19 +72,27 @@ def bounds(parts):
     return [[min(p[i] for p in points) for i in range(3)],[max(p[i] for p in points) for i in range(3)]]
 
 
+def face_spec(part, face):
+    """A face's material, the offset of its island inside that region, and its quarter turn: a material name takes the
+    region's corner; (material, x, y) an offset part of it; (material, x, y, 90) turns the island so grain painted
+    along the region follows an upright piece."""
+    spec=part.get('faces',{}).get(face,part['material'])
+    return (spec,0,0,0) if isinstance(spec,str) else (*spec,0)[:4]
+
+
 def uv_faces(part, regions, density=2):
     """Never silently compress a long surface into a small material tile."""
     result={}
     for face,(w,h) in face_dimensions(part).items():
-        material=part.get('faces',{}).get(face,part['material'])
+        material,x,y,turn=face_spec(part,face)
         r=regions[material];u,v,rw,rh=r['rect']
         if r.get('fit',False):
             width,height=rw,rh  # Explicit authored decal; exempt from material density.
         else:
-            width,height=w*density,h*density
-            if width>rw+1e-6 or height>rh+1e-6:
-                raise ValueError(f"{part['name']}/{face}: {width:g}x{height:g}px exceeds {material} {rw}x{rh}; enlarge region or split part")
-        result[face]=[u,v,u+width,v+height]
+            width,height=(h*density,w*density) if turn%180 else (w*density,h*density)
+            if x+width>rw+1e-6 or y+height>rh+1e-6:
+                raise ValueError(f"{part['name']}/{face}: {width:g}x{height:g}px at {x},{y} exceeds {material} {rw}x{rh}; enlarge region or split part")
+        result[face]=[u+x,v+y,u+x+width,v+y+height]
     return result
 
 
@@ -94,7 +102,7 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
         u,v,w,h=region['rect']
         if min(u,v)<0 or min(w,h)<=0 or u+w>image.width or v+h>image.height:
             raise ValueError('Atlas region outside texture')
-    pieces=[dict(p,uvs=uv_faces(p,regions,density)) for p in parts]
+    pieces=[dict(p,uvs=uv_faces(p,regions,density),turns={f:face_spec(p,f)[3] for f in face_dimensions(p)}) for p in parts]
     cfg=dict(name=name,pieces=pieces,offset=offset,pivots=pivots or {},size=image.size,texture_name=Path(atlas).name,
              texture='data:image/png;base64,'+base64.b64encode(Path(atlas).read_bytes()).decode(),gecko=gecko)
     client.call('create_project',{'name':name,'format':'geckolib_model' if gecko else 'java_block'})
@@ -109,7 +117,7 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
         if(!groups[p.group]) groups[p.group]=new Group({name:p.group,origin:sub(c.pivots[p.group]||c.offset)}).init();
         const rotation=[0,0,0];rotation['xyz'.indexOf(p.axis)]=p.angle;
         const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation,autouv:0,box_uv:false}).addTo(groups[p.group]).init();
-        for(const [face,uv] of Object.entries(p.uvs)){cube.faces[face].texture=t.uuid;cube.faces[face].uv=uv;}
+        for(const [face,uv] of Object.entries(p.uvs)){cube.faces[face].texture=t.uuid;cube.faces[face].uv=uv;cube.faces[face].rotation=p.turns[face];}
       }
       Canvas.updateAll();return {cubes:Cube.all.length,bones:Group.all.length};
     })()'''

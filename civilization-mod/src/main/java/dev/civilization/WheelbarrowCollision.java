@@ -10,11 +10,11 @@ import net.minecraft.world.phys.*;
  * entities and the mouse, and shows as the debug hitbox. The handles take mouse hits but never block.
  */
 public final class WheelbarrowCollision {
-    public static final double TRAY_TOP=15.525/16;
-    /** Straight sides along the flared tray rim, tapering past the axle brackets to the tyre's tread. */
-    public static final Solid BODY=new Solid(new double[]{-.531,.531,.531,.4185,.0616,-.0616,-.4185,-.531},new double[]{.82,.82,-.4556,-.9028,-1.1813,-1.1813,-.9028,-.4556},0,TRAY_TOP);
-    // The wide box makes the handles easy to grab.
-    private static final Solid HANDLES=Solid.of(new AABB(-.48,.45,12.69/16,.48,1.05,1.472));
+    public static final double TRAY_TOP=17/16d;
+    /** Straight sides along the strapped tray to the raked front board's top, tapering past the axle nuts to the tyre's tread. */
+    public static final Solid BODY=new Solid(new double[]{-.5781,.5781,.5781,.447,.084,-.084,-.447,-.5781},new double[]{.5938,.5938,-.8227,-1.078,-1.3125,-1.3125,-1.078,-.8227},0,TRAY_TOP);
+    // The wide box makes the handles easy to grab, parked or raised.
+    private static final Solid HANDLES=Solid.of(new AABB(-.48,.25,.6,.48,.95,1.45));
     private WheelbarrowCollision(){}
     /** World point of a model-frame point on a carrier at `at` facing `yaw`. */
     public static Vec3 place(Vec3 at,float yaw,Vec3 model){return at.add(model.yRot((float)Math.toRadians(180d-yaw)));}
