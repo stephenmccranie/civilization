@@ -105,15 +105,18 @@ def atlas(asset, folder):
         # A subject touching its cell edge has no margin to trust.
         if box is None or 0 in box[:2] or box[2] == mask.width or box[3] == mask.height:
             raise ValueError(f'Master cell {col},{row} has no subject inside a margin of plain {texture["ground"]}')
+        if max((box[2]-box[0])/mask.width, (box[3]-box[1])/mask.height) < 0.5:
+            raise ValueError(f'Master cell {col},{row} holds a subject under half its size; the sheet asks for it to fill the cell')
         found[col, row] = cell, mask, box
     tiles = {}
     for name, region in regions.items():
         (left, top, _, _), mask, box = found[tuple(region['cell'])]; width, height = region['rect'][2:]
         if region.get('sprite'):
-            # Drop the rim blended with the ground, then reduce premultiplied so the ground cannot tint the edge.
+            # Drop the rim blended with the ground, a quarter of an output pixel deep, then reduce premultiplied
+            # so the ground cannot tint the edge.
             crop = master.crop((left+box[0], top+box[1], left+box[2], top+box[3])).convert('RGBA')
-            crop.putalpha(mask.filter(ImageFilter.MinFilter(5)).crop(box))
-            scale = min(width/crop.width, height/crop.height)
+            scale = min(width/crop.width, height/crop.height); rim = max(2, round(0.25/scale))
+            crop.putalpha(mask.filter(ImageFilter.MinFilter(2*rim+1)).crop(box))
             small = crop.convert('RGBa').resize((max(1, round(crop.width*scale)), max(1, round(crop.height*scale))), Image.Resampling.BOX).convert('RGBA')
             small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
             tile = Image.new('RGBA', (width, height)); tile.paste(small, ((width-small.width)//2, (height-small.height)//2))

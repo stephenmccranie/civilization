@@ -169,6 +169,8 @@ class ArtTests(unittest.TestCase):
         prompt=art.read(self.folder/'asset.json')['generations'][0]['prompt']
         self.assertEqual(prompt,'A bar.')
         self.assertIn('an icon reduced to fit within 56 by 56 pixels for bar',art.master_prompt(self.asset['texture']))
+        small=Image.new('RGB',(400,400),'#ff00ff'); ImageDraw.Draw(small).rectangle((20,20,120,60),fill=(40,60,200)); small.save(self.root/'supplied.png')
+        with self.assertRaisesRegex(ValueError,'under half'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
     def test_panel_without_margin_is_rejected(self):
         self.textured(); master=Image.open(self.root/'supplied.png'); ImageDraw.Draw(master).rectangle((110,0,189,89),fill=(40,40,200))
