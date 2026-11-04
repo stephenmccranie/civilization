@@ -65,6 +65,16 @@ neoForge {
             systemProperty 'civilization.visualHeadless', 'true'
             programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--width', '1920', '--height', '1080')
         }
+        // The performance benchmark: a hidden 2560x1440 client laid out from the player pack (dev.ps1 Perf), with the
+        // pack's memory and the flight recorder its report profiles with.
+        perfClient {
+            client()
+            gameDirectory = project.file('runs/perf')
+            systemProperty 'civilization.previewCheck', 'perf'
+            systemProperty 'civilization.visualHeadless', 'true'
+            jvmArguments.addAll('-Xms512m', '-Xmx8192m', '--add-modules=jdk.jfr')
+            programArguments.addAll('--mixin', 'civilization.visual.mixins.json', '--mixin', 'civilization.perf.mixins.json', '--width', '2560', '--height', '1440')
+        }
         peerClient {
             client()
             gameDirectory = project.file('runs/peer')
@@ -101,6 +111,7 @@ tasks.named('runFixtureServer', JavaExec) {
 }
 tasks.named('runVisualClient', JavaExec) { timeout = java.time.Duration.ofMinutes(6) }
 tasks.named('runPeerClient', JavaExec) { timeout = java.time.Duration.ofMinutes(6) }
+tasks.named('runPerfClient', JavaExec) { timeout = java.time.Duration.ofMinutes(15) }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def properties = [

@@ -62,6 +62,7 @@ Run from this folder:
 .\dev.ps1 Build                                    # compile and unit tests
 .\dev.ps1 GameTest                                 # every server GameTest, fresh world
 .\dev.ps1 Visual -Scene machines [-Full]           # hidden client scene
+.\dev.ps1 Perf                                     # performance benchmark in the player pack
 .\dev.ps1 Fixture -Name boat|airship|thermal [-Phase physics|manual]
 .\dev.ps1 Deploy                                   # build and install into Civilization Dev
 .\dev.ps1 Client                                   # development client in run/

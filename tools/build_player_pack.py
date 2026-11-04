@@ -152,14 +152,35 @@ def check_downloads(index, cache, local_civilization):
         return dict(pool.map(check, index['files']))
 
 
+def lay_out(index, contents, cache, client, skip):
+    """The pack as a game directory: its settings and its verified downloads, less those the caller supplies itself."""
+    files = [item for item in index['files'] if not PurePosixPath(item['path']).name.startswith(skip)]
+    downloads = check_downloads({'files': files}, cache, None)
+    for name, data in contents.items():
+        if name.startswith('minecraft/') and not name.startswith('minecraft/civilization-updater/'):
+            target = client / name.removeprefix('minecraft/')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+    for path, source in downloads.items():
+        target = client / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source.read_bytes())
+    print(f'Laid out {len(downloads)} pack files and the pack settings in {client}')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / '.tools/prism-pack-build')
     parser.add_argument('--check-downloads', action='store_true')
     parser.add_argument('--cache', type=Path, default=ROOT / '.tools/player-pack-cache')
     parser.add_argument('--local-civilization', type=Path, help='Validate an unpublished release candidate JAR locally')
+    parser.add_argument('--client', type=Path, help='Lay the pack out as a game directory here instead of building the ZIP')
+    parser.add_argument('--skip', nargs='*', default=[], help='With --client, leave out downloads whose names start with these')
     args = parser.parse_args()
     index, contents = inputs()
+    if args.client:
+        lay_out(index, contents, args.cache, args.client, tuple(args.skip))
+        return
     if args.check_downloads:
         downloads = check_downloads(index, args.cache, args.local_civilization)
     else:
