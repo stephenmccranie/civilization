@@ -80,7 +80,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("storage")){StorageVisualCheck.tick(mc);return;}
         if(CHECK.equals("bulk")){BulkVisualCheck.tick(mc);return;}
         if(CHECK.equals("thermal")){ThermalVisualCheck.tick(mc);return;}
-        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")||CHECK.equals("components")){ItemArtVisualCheck.tick(mc,CHECK);return;}
+        if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")||CHECK.equals("components")||CHECK.equals("tools")){ItemArtVisualCheck.tick(mc,CHECK);return;}
         if(CHECK.equals("canisters")){CanisterVisualCheck.tick(mc);return;}
         if(CHECK.equals("paterson")){FirearmVisualCheck.tick(mc);return;}
         if(CHECK.equals("oven")){OvenVisualCheck.tick(mc);return;}

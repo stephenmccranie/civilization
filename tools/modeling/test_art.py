@@ -160,6 +160,7 @@ class ArtTests(unittest.TestCase):
         """A wide blue bar with a hole on a magenta key: proportions kept, the hole and surround transparent, no key tint."""
         master=Image.new('RGB',(400,400),'#ff00ff'); draw=ImageDraw.Draw(master)
         draw.rectangle((40,150,359,249),fill=(40,60,200)); draw.rectangle((180,180,219,219),fill='#ff00ff')
+        master.putpixel((0,399),(238,44,235))  # A compression speck in the corner is not the subject touching its edge.
         master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('A bar.',encoding='utf-8')
         self.asset['texture']={'grid':[1,1],'ground':'#ff00ff','atlas':'icon.png','size':[64,64],'colors':8,
             'regions':{'bar':{'cell':[0,0],'rect':[4,4,56,56],'sprite':True}}}

@@ -90,9 +90,10 @@ def master_prompt(texture):
 
 
 def subject(crop, ground):
-    """Mask of the pixels that differ from the flat ground."""
+    """Mask of the pixels that differ from the flat ground, opened so isolated compression specks drop out."""
     difference = ImageChops.difference(crop, Image.new('RGB', crop.size, ground)).split()
-    return ImageChops.lighter(ImageChops.lighter(*difference[:2]), difference[2]).point(lambda v: 255 if v > KEY else 0)
+    mask = ImageChops.lighter(ImageChops.lighter(*difference[:2]), difference[2]).point(lambda v: 255 if v > KEY else 0)
+    return mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))
 
 
 def atlas(asset, folder):
