@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 
-/** The invisible physical cells of one machine model: collision from its built sections; clicks and damage go to the controller. */
+/** The physical cells of one machine model: collision from its built sections, and its still geometry drawn with the terrain by the client; clicks and damage go to the controller. */
 public final class MachinePartBlock extends Block implements WorldlyContainerHolder {
     /** The model whose cells this block is, set while the block is constructed so its state definition can size the cell property. */
     static final ThreadLocal<MachineModel> PENDING=new ThreadLocal<>();
@@ -20,7 +20,6 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
         registerDefaultState(stateDefinition.any().setValue(CivicBlock.FACING,Direction.NORTH).setValue(model.cell,0));
     }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(CivicBlock.FACING,PENDING.get().cell);}
-    @Override protected RenderShape getRenderShape(BlockState s){return RenderShape.INVISIBLE;}
     private MachineModel.Cell cell(BlockState s){return model.cells.get(s.getValue(model.cell));}
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){
         Level world=l instanceof Level level?level:l instanceof net.minecraft.world.level.chunk.LevelChunk chunk?chunk.getLevel():null;
@@ -34,7 +33,8 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
         var at=controller(p,s);
         if(l.hasChunkAt(at)&&(owner(l,p,s)==null||getShape(s,l,p,CollisionContext.empty()).isEmpty()))l.removeBlock(p,false);else l.scheduleTick(p,this,1200);
     }
-    private BlockPos controller(BlockPos p,BlockState s){return p.subtract(ModeledMachine.position(BlockPos.ZERO,s.getValue(CivicBlock.FACING),cell(s)));}
+    /** Where this cell's controller stands. */
+    public BlockPos controller(BlockPos p,BlockState s){return p.subtract(ModeledMachine.position(BlockPos.ZERO,s.getValue(CivicBlock.FACING),cell(s)));}
     public static ModeledController owner(Level l,BlockPos p,BlockState s){
         if(!(s.getBlock() instanceof MachinePartBlock part))return null;
         var at=part.controller(p,s);var c=l.hasChunkAt(at)?ModeledMachine.of(l.getBlockEntity(at)):null;

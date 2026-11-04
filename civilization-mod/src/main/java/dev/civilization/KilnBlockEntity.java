@@ -101,7 +101,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     @Override protected AbstractContainerMenu createMenu(int id, Inventory inventory) { return new KilnMenu(id, inventory, this, dataAccess); }
     @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
         super.loadAdditional(tag, lookup);fire.load(tag);
-        if (model() != null) build.load(tag, lookup, model());
+        if (model() != null) { int before = build.sections; build.load(tag, lookup, model()); if (level != null && level.isClientSide && build.sections != before) ModeledMachine.redraw(this); }
         selectedRecipe=tag.contains("SelectedRecipe")?net.minecraft.resources.ResourceLocation.tryParse(tag.getString("SelectedRecipe")):null;
         legacyOverflow.clear();
         var old=net.minecraft.core.NonNullList.withSize(12,ItemStack.EMPTY);

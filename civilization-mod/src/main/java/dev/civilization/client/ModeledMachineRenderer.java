@@ -29,13 +29,15 @@ import software.bernie.geckolib.renderer.GeoBlockRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * Draws any machine built as a native model: its controller and built sections, its lit or cold bones and its work
- * animation while running. The same renderer draws the guide of missing sections. Bones carry the meaning in their
- * names: `section_<n>_…` belongs to section n, `controller` is the controller, `lit_…` and `cold_…` follow the fire.
+ * Draws the moving parts of any machine built as a native model, the bones its work animation moves, while the still
+ * rest is drawn with the terrain by {@link MachineBlockModel}; and draws the whole guide of missing sections. Bones carry
+ * the meaning in their names: `section_<n>_…` belongs to section n, `controller` is the controller, `lit_…` and `cold_…`
+ * follow the fire.
  */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEntity> {
-    private record Visibility(GeoBone bone,int section,boolean controller,int fire) {}
+    /** A bone's section, whether it is the controller or a fire bone, and whether it moves or holds moving bones. */
+    private record Visibility(GeoBone bone,int section,boolean controller,int fire,boolean moves,boolean holdsMoving) {}
     private static final class Renderer extends GeoBlockRenderer<Look> {
         private BakedGeoModel indexed;
         private final List<Visibility> bones=new ArrayList<>();
@@ -46,9 +48,13 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         @Override public void preRender(PoseStack pose,Look look,BakedGeoModel model,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
             super.preRender(pose,look,model,buffers,vertices,reRender,partial,light,overlay,color);
             drawing=look;
-            if(indexed!=model){indexed=model;bones.clear();for(var bone:model.topLevelBones())index(bone);}
-            for(var v:bones)v.bone().setHidden(v.section()>=0?(look.sections&(1<<v.section()))==0
-                    :v.controller()?look.hideController:v.fire()!=0&&(v.fire()>0)!=look.lit);
+            if(indexed!=model){indexed=model;bones.clear();var moving=MachineMesh.of(look.model).animated;for(var bone:model.topLevelBones())index(bone,moving);}
+            for(var v:bones){
+                boolean hidden=v.section()>=0?(look.sections&(1<<v.section()))==0:v.controller()?look.hideController:v.fire()!=0&&(v.fire()>0)!=look.lit;
+                // In the world only moving bones are drawn here; a still bone holding moving ones hides just its own cubes.
+                v.bone().setHidden(hidden||!look.guide&&!v.moves());
+                if(!hidden&&!look.guide&&v.holdsMoving())v.bone().setChildrenHidden(false);
+            }
         }
         // The fire's own bones glow whatever light falls on the masonry around them.
         @Override public void renderRecursively(PoseStack pose,Look look,GeoBone bone,net.minecraft.client.renderer.RenderType type,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
@@ -70,11 +76,15 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
             for(var quad:cube.quads())if(quad!=null)for(var vertex:quad.vertices()){sum.add(vertex.position());corners++;}
             return sum.div(Math.max(1,corners));
         }
-        private void index(GeoBone bone){
+        /** Indexes a bone and those below it; returns whether any of them moves. */
+        private boolean index(GeoBone bone,Set<String> moving){
             String name=bone.getName();
             int section=name.startsWith("section_")?Integer.parseInt(name.substring(8,name.indexOf('_',8))):-1;
-            bones.add(new Visibility(bone,section,name.equals("controller"),name.startsWith("lit_")?1:name.startsWith("cold_")?-1:0));
-            for(var child:bone.getChildBones())index(child);
+            int at=bones.size();bones.add(null);boolean below=false;
+            for(var child:bone.getChildBones())below|=index(child,moving);
+            boolean moves=moving.contains(name);
+            bones.set(at,new Visibility(bone,section,name.equals("controller"),name.startsWith("lit_")?1:name.startsWith("cold_")?-1:0,moves,below));
+            return moves||below;
         }
     }
     private static final Map<MachineModel,Renderer> RENDERERS=new HashMap<>();
@@ -89,7 +99,8 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     @Override public boolean shouldRenderOffScreen(BlockEntity entity){return ModeledMachine.of(entity)!=null;}
     @Override public int getViewDistance(){return 128;}
     @Override public boolean shouldRender(BlockEntity entity,net.minecraft.world.phys.Vec3 camera){
-        if(ModeledMachine.of(entity)==null||!BlockEntityRenderer.super.shouldRender(entity,camera))return false;
+        var c=ModeledMachine.of(entity);
+        if(c==null||MachineMesh.of(c.model()).animated.isEmpty()||!BlockEntityRenderer.super.shouldRender(entity,camera))return false;
         var frustum=net.minecraft.client.Minecraft.getInstance().levelRenderer.getFrustum();
         return frustum==null||frustum.isVisible(getRenderBoundingBox(entity));
     }
@@ -97,14 +108,14 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         var c=ModeledMachine.of(entity);if(c==null||entity.getLevel()==null)return;
         var look=looks.computeIfAbsent(entity,e->new Look(e.getType(),e.getBlockPos(),e.getBlockState(),c.model()));
         look.setLevel(entity.getLevel());look.setBlockState(entity.getBlockState());
-        look.sections=c.build().sections;look.hideController=false;look.running=c.working();look.lit=c.working();
+        look.sections=c.build().sections;look.hideController=false;look.running=c.working();look.lit=c.working();look.guide=false;
         renderer(c.model()).render(look,partial,pose,buffers,light,overlay);
     }
     /** The sections of `model` not in `built`, for a controller at `at`; a controller not yet placed is drawn too. */
     public void renderGuide(Level level,BlockPos at,BlockState controller,MachineModel model,int built,boolean placed,float partial,PoseStack pose,MultiBufferSource buffers){
         if(guide==null||guide.model!=model||!guide.getBlockPos().equals(at))
             guide=new Look(((EntityBlock)controller.getBlock()).newBlockEntity(at,controller).getType(),at,controller,model);
-        guide.setLevel(level);guide.setBlockState(controller);guide.sections=model.all^built;guide.hideController=placed;guide.running=false;guide.lit=false;
+        guide.setLevel(level);guide.setBlockState(controller);guide.sections=model.all^built;guide.hideController=placed;guide.running=false;guide.lit=false;guide.guide=true;
         renderer(model).render(guide,partial,pose,buffers,LightTexture.FULL_BRIGHT,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
     }
 
@@ -121,7 +132,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     private static final class Look extends BlockEntity implements GeoBlockEntity {
         private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
         private final MachineModel model;
-        private boolean running,lit,hideController;private int sections;
+        private boolean running,lit,hideController,guide;private int sections;
         private final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap lights=new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();private long lightTick=Long.MIN_VALUE;
         Look(net.minecraft.world.level.block.entity.BlockEntityType<?> type,BlockPos pos,BlockState state,MachineModel model){super(type,pos,state);this.model=model;}
         /** Cell light, sampled afresh every quarter second. */

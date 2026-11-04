@@ -22,6 +22,11 @@ public final class ModeledMachine {
     public static BlockPos position(BlockPos at,Direction front,MachineModel.Cell c){return at.relative(front.getClockWise(),c.x()).relative(front.getOpposite(),c.z()).above(c.y());}
     public static BlockState cellState(MachineModel model,int index,Direction front){return MachineParts.block(model).defaultBlockState().setValue(CivicBlock.FACING,front).setValue(model.cell,index);}
     private static BlockPos at(ModeledController c){return c.entity().getBlockPos();}
+    /** On the client, a change in built sections redraws the machine's cells, whose block states it leaves unchanged. */
+    public static void redraw(ModeledController c){
+        var l=c.entity().getLevel();
+        for(var cell:c.model().cells){var p=position(at(c),c.front(),cell);var s=l.getBlockState(p);l.sendBlockUpdated(p,s,s,net.minecraft.world.level.block.Block.UPDATE_CLIENTS);}
+    }
 
     public static int status(ModeledController c){
         var l=c.entity().getLevel();var model=c.model();

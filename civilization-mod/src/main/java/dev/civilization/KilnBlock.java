@@ -27,9 +27,6 @@ public class KilnBlock extends AbstractFurnaceBlock implements ModeledBlock {
     @Override protected MapCodec<? extends KilnBlock> codec() { return CODEC; }
     /** The Kiln is built as a native model; machines sharing this block keep block structures until theirs are drawn. */
     @Override public MachineModel model() { return MachineModel.KILN; }
-    @Override protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
-        return model() != null ? net.minecraft.world.level.block.RenderShape.INVISIBLE : super.getRenderShape(state);
-    }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
         var modeled = ModeledMachine.of(level.getBlockEntity(pos));
         if (modeled != null) {

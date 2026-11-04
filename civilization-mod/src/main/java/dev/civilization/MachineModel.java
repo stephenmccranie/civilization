@@ -49,6 +49,8 @@ public final class MachineModel {
             int bits=0;for(int part:pieces.keySet())bits|=1<<part;sectionMask=bits;
         }
         public int x(){return x;}public int y(){return y;}public int z(){return z;}
+        /** The sections with pieces in this cell, one bit each. */
+        public int sectionMask(){return sectionMask;}
         public Map<Integer,VoxelShape[]> pieces(){return pieces;}
         public VoxelShape shape(Direction front){return shapes[front.get2DDataValue()];}
         public VoxelShape shape(Direction front,int built){
