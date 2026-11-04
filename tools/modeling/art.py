@@ -125,11 +125,12 @@ def atlas(asset, folder):
             panel = (left+box[0]+inset, top+box[1]+inset, left+box[2]-inset, top+box[3]-inset)
             tile = master.crop(panel).resize((width, height), Image.Resampling.BOX).convert('RGBA')
         tiles[name] = tile
-    # The palette comes from the visible subjects alone and applies without dithering. Unused space in an atlas of
-    # panels takes their mean colour; an atlas holding a sprite stays transparent around it.
+    # The palette comes from the visible subjects alone and applies without dithering; k-means refinement moves each
+    # colour to its cluster's mean, so small accents such as brass are not averaged into the dominant material.
+    # Unused space in an atlas of panels takes their mean colour; an atlas holding a sprite stays transparent around it.
     visible = [data[i:i+3] for data in (t.tobytes() for t in tiles.values()) for i in range(0, len(data), 4) if data[i+3]]
     swatch = Image.frombytes('RGB', (len(visible), 1), b''.join(visible))
-    palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, kmeans=16, dither=Image.Dither.NONE)
     transparent = any(r.get('sprite') for r in regions.values())
     image = Image.new('RGBA', tuple(texture['size']), (0, 0, 0, 0) if transparent else (*map(round, ImageStat.Stat(swatch).mean), 255))
     for name, tile in tiles.items(): image.alpha_composite(tile, tuple(regions[name]['rect'][:2]))
