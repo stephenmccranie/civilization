@@ -151,6 +151,10 @@ class ArtTests(unittest.TestCase):
         self.assertIn('strict 2 by 1 grid',prompt); self.assertIn('#808080',prompt)
         self.assertIn('Row 1, column 2: a panel reduced to 4 by 8 pixels for blue.',prompt); self.assertTrue(prompt.endswith('Red leather, then blue cloth.'))
         self.assertTrue((self.folder/'master-01.png').is_file()); self.assertEqual(list((self.root/'.tools').iterdir()),[codex])
+        # Redrawing a referenced image later leaves the generation's kept reference, and so the record, valid.
+        Image.new('RGBA',(64,64),'#112233').save(self.folder/'icon.png'); art.definition(art.read(self.folder/'asset.json'),self.folder)
+        for kept in (self.root/'art/references').iterdir(): kept.unlink()
+        with self.assertRaisesRegex(ValueError,'missing'): art.definition(art.read(self.folder/'asset.json'),self.folder)
 
     def test_sprite_keeps_its_silhouette_on_transparency(self):
         """A wide blue bar with a hole on a magenta key: proportions kept, the hole and surround transparent, no key tint."""

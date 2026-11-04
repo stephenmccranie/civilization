@@ -41,7 +41,8 @@ def definition(asset, folder):
         if sha(local(folder, generation['file'])) != generation['sha256']:
             raise ValueError('Recorded concept changed')
         for path, digest in generation['references'].items():
-            if sha(local(ROOT, path)) != digest: raise ValueError('Generation reference changed')
+            kept = kept_reference(path, digest)
+            if not kept.is_file() or sha(kept) != digest: raise ValueError(f'Generation reference {path} is missing from {kept.parent}')
     source = asset['source']
     if source['mode'] not in ('project', 'recipe') or not local(folder, source['path']).is_file():
         raise ValueError('Declare one existing authoritative project or recipe')
@@ -311,17 +312,25 @@ def generate(prompt, references, dest):
         shutil.rmtree(scratch)
 
 
+def kept_reference(path, digest):
+    """Generations keep the exact bytes of their references by content, so redrawing a referenced asset later
+    leaves every earlier generation's provenance intact."""
+    return ROOT / 'art/references' / (digest + Path(path).suffix.lower())
+
+
 def record(asset, folder, stem, prompt, references, image=None):
     """Keep a generated, or supplied, image in the asset with its exact prompt and references; returns its file name."""
-    references = [local(ROOT, p) for p in references]
+    references = {str(p): sha(p) for p in (local(ROOT, p) for p in references)}
     dest = folder / f'{stem}-{len(asset["generations"])+1:02}{image.suffix.lower() if image else ".png"}'
     if dest.exists(): raise ValueError(f'{dest.name} exists')
     if image:
         with Image.open(image) as opened: opened.verify()
         shutil.copyfile(image, dest)
-    else: generate(prompt, references, dest)
-    asset['generations'].append({'file': dest.name, 'sha256': sha(dest), 'prompt': prompt,
-        'references': {str(p): sha(p) for p in references}})
+    else: generate(prompt, [Path(p) for p in references], dest)
+    for path, digest in references.items():
+        kept = kept_reference(path, digest)
+        if not kept.exists(): kept.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(path, kept)
+    asset['generations'].append({'file': dest.name, 'sha256': sha(dest), 'prompt': prompt, 'references': references})
     return dest.name
 
 
