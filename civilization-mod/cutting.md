@@ -45,7 +45,7 @@ Solid full building blocks can be cut. Containers and other block entities, flui
 
 Resource-pack textures, Faithful included, are cropped to keep their scale. Cut blocks store up to eight cells in an unticked block entity and render through chunk meshes; geometry, collision and previews share the cell grid. Client material data that arrives after a mesh was built refreshes the model and rebuilds that chunk mesh. Opaque cut faces block light (a solid half wall can enclose a lit room) while open and glass faces pass it; lighting uses fully covered outer faces, and collision and rendering keep the exact shape.
 
-Machine shells use cut pieces; the Kiln and Fertilizer Furnace bills are in [machines](machines.md#kiln).
+Block-structure machine shells use cut pieces; the workshop bills are in [manufacturing](manufacturing.md).
 
 ## Builder's Line
 

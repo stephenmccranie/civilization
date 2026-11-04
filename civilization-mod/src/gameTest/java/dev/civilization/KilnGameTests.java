@@ -196,12 +196,12 @@ public class KilnGameTests {
         h.succeed();
     }
     @GameTest(template = "industrial")
-    public static void retortRecipeRequiresBricksAndCopper(GameTestHelper h) {
-        var grid = CraftingInput.of(3, 3, List.of(new ItemStack(Items.BRICKS), new ItemStack(Items.COPPER_INGOT), new ItemStack(Items.BRICKS),
-                new ItemStack(Items.COPPER_INGOT), new ItemStack(Items.COBBLESTONE), new ItemStack(Items.COPPER_INGOT),
-                new ItemStack(Items.BRICKS), new ItemStack(Items.COPPER_INGOT), new ItemStack(Items.BRICKS)));
+    public static void retortRecipeRequiresBricksAndIron(GameTestHelper h) {
+        var grid = CraftingInput.of(3, 3, List.of(new ItemStack(Items.BRICKS), new ItemStack(Items.IRON_INGOT), new ItemStack(Items.BRICKS),
+                new ItemStack(Items.IRON_INGOT), new ItemStack(Items.COBBLESTONE), new ItemStack(Items.IRON_INGOT),
+                new ItemStack(Items.BRICKS), new ItemStack(Items.IRON_INGOT), new ItemStack(Items.BRICKS)));
         var recipe = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, grid, h.getLevel()).orElseThrow();
-        h.assertTrue(recipe.value().assemble(grid, h.getLevel().registryAccess()).is(KilnContent.RETORT_ITEM.get()), "Four brick blocks, four copper and cobblestone make a retort");
+        h.assertTrue(recipe.value().assemble(grid, h.getLevel().registryAccess()).is(KilnContent.RETORT_ITEM.get()), "Four brick blocks, four iron ingots and cobblestone make the furnace controller");
         h.succeed();
     }
     @GameTest(template = "industrial")

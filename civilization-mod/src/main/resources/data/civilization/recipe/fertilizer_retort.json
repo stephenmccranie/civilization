@@ -1,17 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "BCB",
-    "CFC",
-    "BCB"
+    "BIB",
+    "IFI",
+    "BIB"
   ],
   "result": {
     "count": 1,
     "id": "civilization:fertilizer_retort"
   },
   "key": {
-    "C": {
-      "item": "minecraft:copper_ingot"
+    "I": {
+      "item": "minecraft:iron_ingot"
     },
     "F": {
       "item": "minecraft:cobblestone"

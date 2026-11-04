@@ -83,7 +83,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     private Look guide;
 
     public ModeledMachineRenderer(BlockEntityRendererProvider.Context context) {}
-    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.FOUNDRY_ENTITY.get(),ModeledMachineRenderer::new);}
+    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.FOUNDRY_ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.RETORT_ENTITY.get(),ModeledMachineRenderer::new);}
     @Override public AABB getRenderBoundingBox(BlockEntity entity){var c=ModeledMachine.of(entity);return c==null?new AABB(entity.getBlockPos()):c.model().area(entity.getBlockPos());}
     // A tall model spans sections beyond its controller's; it must not vanish when that section leaves view.
     @Override public boolean shouldRenderOffScreen(BlockEntity entity){return ModeledMachine.of(entity)!=null;}

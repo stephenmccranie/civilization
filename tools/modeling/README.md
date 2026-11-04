@@ -173,6 +173,7 @@ Walls, roofs and floors made of discrete pieces — stones, bricks, planks, shin
 - Lay the model from the catalogue: pick sizes that fit each course, share the leftover length out as joints, and never set a piece beside one of its own colour. Give each course a bed that fills it edge to edge, such as mortar, and set the pieces on it, so the surface is completely solid; a joint that shows a dark core reads as a hole. Where the surface leans in, lay the bed in strips each as long as the course at its own foot so no wedge opens.
 - Match the concept's piece size to the whole object by counting pieces across a landmark; small pieces in even courses read as brickwork. On a curve a flat piece of width w stands off at its ends by about w²/8r, so keep w under √(6r) for no more than three quarters of a unit.
 - Build narrow places beside openings from squared quoins rather than squeezed rubble.
+- Recipes lay brick and fieldstone through [masonry.py](masonry.py): mortar masses carrying the collision, faced in running bond from a catalogue named `<kind>_<tone>`, cut to fit round openings and arches, capped with bricks laid flat, and stained by place (soot, sulfur) where the catalogue paints a stained piece.
 
 ### Creatures
 

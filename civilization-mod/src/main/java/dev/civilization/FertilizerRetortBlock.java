@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class FertilizerRetortBlock extends KilnBlock {
-    @Override public MachineModel model() { return null; }
+    @Override public MachineModel model() { return MachineModel.FERTILIZER_FURNACE; }
     public static final MapCodec<FertilizerRetortBlock> CODEC = simpleCodec(FertilizerRetortBlock::new);
     public FertilizerRetortBlock(Properties properties) { super(properties); }
     @Override protected MapCodec<FertilizerRetortBlock> codec() { return CODEC; }

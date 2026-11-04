@@ -1,6 +1,5 @@
 package dev.civilization;
 
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,27 +22,10 @@ public final class MachineStructure {
         public Part shared(int mask){return new Part(x,y,depth,material,units,side,corner,railConnections,mask);}
     }
     public record Result(int status, BlockPos problem, String material) {}
-    private static final List<Part> KILN = pattern(false), WORKS = pattern(true);
     private MachineStructure() {}
 
-    private static List<Part> pattern(boolean works) {
-        var parts = new ArrayList<Part>();
-        for (int y = 0; y < 3; y++) for (int depth = 0; depth < 3; depth++) for (int x = -1; x <= 1; x++) {
-            if (x == 0 && y == 0 && depth == 0) continue; // Controller at bottom/front center.
-            String material = works ? "brick" : "stone";
-            if (x == 0 && y == 1 && depth == 1) material = "air";
-            else if (x == 0 && y == 1 && depth == 0) material = works ? "brick_hatch" : "stone_hatch";
-            else if (works && y == 2 && x != 0 && depth != 1) material = "copper";
-            int units = 4;
-            Direction side = Direction.DOWN;
-            if (y == 2) units = x == 0 && depth == 1 ? 4 : x != 0 && depth != 1 ? 3 : 2;
-            if (y == 1 && x != 0 && depth != 1) { units = 1; side = x < 0 ? Direction.EAST : Direction.WEST; }
-            parts.add(new Part(x, y, depth, material, units, side));
-        }
-        if (works) parts.add(new Part(0, 3, 1, "copper", 2, Direction.DOWN));
-        return List.copyOf(parts);
-    }
-    public static List<Part> parts(BlockState state) {return state.getBlock() instanceof WorkshopBlock w?WorkshopStructure.parts(w.kind):parts(state.is(KilnContent.RETORT.get()));}
+    /** The block structure of a town workshop; every other kiln-family machine is a native model. */
+    public static List<Part> parts(BlockState state) {return WorkshopStructure.parts(((WorkshopBlock)state.getBlock()).kind);}
     /** Every controller that exposes the contextual construction guide uses this blueprint. */
     public static List<Part> guideParts(BlockState state) {
         if (state.getBlock() instanceof ArenaBlock) return ArenaStructure.PARTS;
@@ -54,7 +36,6 @@ public final class MachineStructure {
         if (state.getBlock() instanceof KilnBlock kiln) return kiln.model() != null ? List.of() : parts(state);
         return List.of();
     }
-    public static List<Part> parts(boolean works) { return works ? WORKS : KILN; }
     public static BlockPos position(BlockPos controller, Direction front, Part part) {
         return controller.relative(front.getClockWise(), part.x()).relative(front.getOpposite(), part.depth()).above(part.y());
     }
@@ -80,8 +61,6 @@ public final class MachineStructure {
             case "stone" -> state.is(KILN_WALL);
             case "brick" -> state.is(Blocks.BRICKS);
             case "copper" -> state.is(COPPER);
-            case "stone_hatch" -> state.is(KILN_WALL) || hopper(state);
-            case "brick_hatch" -> state.is(Blocks.BRICKS) || hopper(state);
             default -> false;
         };
     }
@@ -108,9 +87,9 @@ public final class MachineStructure {
             case "engine_flywheel" -> OilEngineContent.WHEEL.get().defaultBlockState();
             case "survey_section" -> CivicContent.TABLE_PART.get().defaultBlockState();
             case "air" -> Blocks.AIR.defaultBlockState();
-            case "brick", "brick_hatch" -> Blocks.BRICKS.defaultBlockState();
+            case "brick" -> Blocks.BRICKS.defaultBlockState();
             case "copper" -> Blocks.COPPER_BLOCK.defaultBlockState();
-            case "stone", "stone_hatch" -> Blocks.COBBLESTONE.defaultBlockState();
+            case "stone" -> Blocks.COBBLESTONE.defaultBlockState();
             default -> throw new IllegalArgumentException("Unknown structure material: " + material);
         };
     }
@@ -182,7 +161,6 @@ public final class MachineStructure {
         if((CutCells.mask(cells)&~allowed)!=0)return true;
         return false;
     }
-    private static boolean hopper(BlockState state) { return state.is(Blocks.HOPPER) && state.getValue(HopperBlock.FACING) == Direction.DOWN; }
     public static Result check(Level level, BlockPos controller, Direction front) {
         return checkParts(level, controller, front, parts(level.getBlockState(controller)));
     }
