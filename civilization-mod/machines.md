@@ -26,7 +26,7 @@ Ghosts draw after the world's shader effects with their own neutral brightness (
 
 ### Guide performance contract
 
-This contract binds every construction guide: `MachinePreview` for block assemblies and held placements, `MachineGuide` for machines built as native models in sections (the Oil Derrick), and the Builder's Line preview. A held placement comes from `PlacementPlan`, recomputed each client tick from the aimed face; a changed plan refreshes at once, like a changed selection. New assemblies reuse these renderers; a custom renderer follows the same policy.
+This contract binds every construction guide: `MachinePreview` for block assemblies and held placements, `MachineGuide` for machines built as native models in sections, and the Builder's Line preview. A held placement comes from `PlacementPlan`, recomputed each client tick from the aimed face; a changed plan refreshes at once, like a changed selection. New assemblies reuse these renderers; a custom renderer follows the same policy.
 
 - Cache static positions and bounds per world, controller and orientation; cache missing-section geometry per construction state; clear on selection or world change.
 - Prepare missing parts, obstruction states and material counts outside rendering. Refresh immediately on a changed selection, construction key or relevant held stack; poll other world changes only through `GuidePerformance.Refresh` (every 10 client ticks). Do not add separate polling intervals or budget constants.
@@ -124,6 +124,5 @@ Vanilla furnace, blast-furnace and smoker processing is disabled, including on e
 ## Save compatibility
 
 - The Kiln and Fertilizer Furnace keep the registry IDs `civilization:brick_kiln` and `civilization:fertilizer_retort`, and the furnace's journal events keep their `retort_*` names (for example `retort_structure_broken`).
-- A Kiln built as a block shell before it became a model keeps its controller and inventory but starts with no sections; the old shell stays as ordinary blocks to reuse, so nothing is lost or created. Clear the footprint and build the sections.
 - Sulfur Blend keeps the ID `civilization:enriched_mineral_blend`. Raw Mineral Blend (`civilization:mineral_blend`) is an inert legacy item: it cannot be crafted or fired and is hidden from creative and JEI.
 - Legacy vanilla coal and charcoal stay loadable but power nothing. Old furnace minecarts roll without propulsion, and retired processors keep their contents accessible.

@@ -68,15 +68,6 @@ public final class IndustryGameTests {
             h.assertTrue(MachineModel.OIL_DERRICK.cells.stream().allMatch(c->l.getBlockState(ModeledMachine.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Controller removal clears owned physical cells");
         }h.succeed();
     }
-    @GameTest(template="empty",batch="derrick-construction") public static void derrickSavedUnderOldKeysKeepsItsGalleries(GameTestHelper h){
-        var r=h.getLevel().registryAccess();var t=new CompoundTag();t.putInt("derrickSections",(1<<23)-1);
-        var gallery=new CompoundTag();gallery.putInt("part",21);var stacks=new net.minecraft.nbt.ListTag();stacks.add(new ItemStack(Items.OAK_PLANKS,20).save(r));gallery.put("stacks",stacks);
-        var paid=new net.minecraft.nbt.ListTag();paid.add(gallery);t.put("derrickPaid",paid);
-        var m=new IndustrialBlockEntity(h.absolutePos(BlockPos.ZERO),IndustrialContent.PUMP.get().defaultBlockState());m.loadWithComponents(t,r);
-        h.assertTrue(m.build().sections==(1<<27)-1,"Built galleries stay built as their armful sections");
-        for(int part=21;part<25;part++)h.assertTrue(m.build().paid.get(part).getFirst().getCount()==5,"The middle gallery's payment is shared by its sides");
-        h.succeed();
-    }
     private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
     @GameTest(template="empty",batch="derrick-construction") public static void derrickCollisionThroughChunkGetter(GameTestHelper h){
         var m=machine(h,IndustrialContent.PUMP.get(),8);var l=h.getLevel();

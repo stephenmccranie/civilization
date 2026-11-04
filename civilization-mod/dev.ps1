@@ -173,7 +173,7 @@ try {
             $label = "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$(git -C $root rev-parse --short HEAD)"
             $archive = Join-Path $root "../.tools/perf/$label"
             New-Item -ItemType Directory -Force $archive | Out-Null
-            Copy-Item -Path (Join-Path $perf 'report/*'), (Join-Path $perf 'screenshots/*') -Destination $archive -Exclude '*.jfr' -ErrorAction SilentlyContinue
+            Copy-Item -Path (Join-Path $perf 'report/*') -Destination $archive -Exclude '*.jfr'
             Write-Host "Report kept in .tools/perf/$label"
         }
         'Fixture' {

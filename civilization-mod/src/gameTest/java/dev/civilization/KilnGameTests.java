@@ -67,6 +67,20 @@ public class KilnGameTests {
         h.assertTrue(restored.getItem(2).is(Items.BRICK),"Automatic clay deterministically defaults to bricks");
         h.succeed();
     }
+    /** Hoppers reach the controller through the machine's cells: ingredients from above its top, coal from its side. */
+    @GameTest(template="industrial")
+    public static void hoppersFeedTheKilnThroughItsCells(GameTestHelper h) {
+        var k = kiln(h); var l = h.getLevel(); var front = k.front();
+        var cells = k.model().cells.stream().map(c -> ModeledMachine.position(k.getBlockPos(), front, c)).toList();
+        var top = cells.stream().max(java.util.Comparator.comparingInt(BlockPos::getY)).orElseThrow().above();
+        var side = cells.stream().filter(p -> p.getY() == k.getBlockPos().getY()).max(java.util.Comparator.comparingInt(p -> p.get(front.getClockWise().getAxis()) * front.getClockWise().getAxisDirection().getStep())).orElseThrow().relative(front.getClockWise());
+        l.setBlockAndUpdate(top, Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, Direction.DOWN));
+        l.setBlockAndUpdate(side, Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING, front.getCounterClockWise()));
+        ((net.minecraft.world.level.block.entity.HopperBlockEntity) l.getBlockEntity(top)).setItem(0, new ItemStack(Items.CLAY));
+        ((net.minecraft.world.level.block.entity.HopperBlockEntity) l.getBlockEntity(side)).setItem(0, KilnContent.MINERAL_COAL.toStack());
+        h.succeedWhen(() -> h.assertTrue(MachineInventory.count(k, MachineInventory.KILN_INPUT) == 1 && MachineInventory.count(k, MachineInventory.KILN_FUEL) == 1, "Clay reaches the input and coal the fuel through the cells"));
+    }
+
     static KilnBlockEntity kiln(GameTestHelper h) {
         var pos = h.absolutePos(new BlockPos(2, 1, 1));
         h.getLevel().setBlockAndUpdate(pos, KilnContent.KILN.get().defaultBlockState());

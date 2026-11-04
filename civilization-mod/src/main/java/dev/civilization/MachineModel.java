@@ -43,7 +43,7 @@ public final class MachineModel {
         private final VoxelShape[] shapes;
         private final Map<Integer,VoxelShape[]> pieces;
         // Shapes per subset of this cell's own sections; no controller or world references, so shared by both sides.
-        private final Map<Integer,VoxelShape> partial=new java.util.concurrent.ConcurrentHashMap<>();
+        private final Map<Long,VoxelShape> partial=new java.util.concurrent.ConcurrentHashMap<>();
         Cell(int x,int y,int z,VoxelShape[] shapes,Map<Integer,VoxelShape[]> pieces){
             this.x=x;this.y=y;this.z=z;this.shapes=shapes;this.pieces=Collections.unmodifiableMap(new TreeMap<>(pieces));
             int bits=0;for(int part:pieces.keySet())bits|=1<<part;sectionMask=bits;
@@ -58,7 +58,7 @@ public final class MachineModel {
             if(active==sectionMask)return shapes[index];
             if(active==0)return Shapes.empty();
             if(Integer.bitCount(active)==1)return pieces.get(Integer.numberOfTrailingZeros(active))[index];
-            return partial.computeIfAbsent((active<<2)|index,key->{
+            return partial.computeIfAbsent((long)active<<2|index,key->{
                 var result=Shapes.empty();for(var e:pieces.entrySet())if((active&(1<<e.getKey()))!=0)result=Shapes.or(result,e.getValue()[index]);return result;
             });
         }

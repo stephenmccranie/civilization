@@ -51,5 +51,5 @@ public final class RefineryPortEntity extends BlockEntity {
         public FluidStack drain(FluidStack s,FluidAction a){var t=tank();return t!=null&&!role.equals("input_port")?t.drain(s,a):FluidStack.EMPTY;}
     };}
     @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putBoolean("assembly",assembly);if(controller!=null)t.putLong("controller",controller.asLong());t.putString("role",role);}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);assembly=t.getBoolean("assembly")||t.getBoolean("derrickAssembly");controller=t.contains("controller")?BlockPos.of(t.getLong("controller")):null;role=t.getString("role");}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);assembly=t.getBoolean("assembly");controller=t.contains("controller")?BlockPos.of(t.getLong("controller")):null;role=t.getString("role");}
 }
