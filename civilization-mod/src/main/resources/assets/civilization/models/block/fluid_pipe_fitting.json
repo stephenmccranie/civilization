@@ -3,9 +3,9 @@
   "render_type": "minecraft:cutout",
   "ambientocclusion": false,
   "textures": {
-    "steel": "civilization:block/pipe_steel",
+    "steel": "civilization:block/black_steel",
     "glass": "civilization:block/pipe_glass",
-    "particle": "civilization:block/pipe_steel"
+    "particle": "civilization:block/black_steel"
   },
   "elements": [
     {
@@ -25,8 +25,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         },
         "south": {
@@ -34,8 +34,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         },
         "east": {
@@ -43,8 +43,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         },
         "west": {
@@ -52,8 +52,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         },
         "up": {
@@ -61,8 +61,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         },
         "down": {
@@ -70,8 +70,8 @@
           "uv": [
             0,
             0,
-            16,
-            16
+            8,
+            8
           ]
         }
       }

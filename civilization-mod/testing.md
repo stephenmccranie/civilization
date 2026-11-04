@@ -41,7 +41,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `storage` | Paired material, fuel and output banks in machine menus |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
 | `pipes` | Empty and flowing glass pipes, connections and flanges |
-| `industry` | Refinery, Oil Derrick, construction cabinet and industrial icons |
+| `industry` | Refinery, Oil Derrick, construction cabinet, industrial icons, and a boat helm and guardrail run |
 | `derrick-guide` | Oil Derrick section guides placed by real clicks, day and night |
 | `engine` | Oil Engine states, cabinet and wheel animation |
 | `models` | GeckoLib model integration beside the Oil Engine |

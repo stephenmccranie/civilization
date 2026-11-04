@@ -74,7 +74,10 @@ final class IndustryVisualCheck {
         if(ticks==650)shot(mc,"controller-family");
         if(ticks==655){mc.options.hideGui=false;mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}
         if(ticks==670)shot(mc,"controller-items");
-        if(ticks>675)mc.stop();
+        // Brass and gauge fittings: a helm console with its panel and a guardrail run beside a casing block.
+        if(ticks==675){mc.setScreen(null);mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();var at=new BlockPos(24,101,-27);l.setBlockAndUpdate(at,BoatContent.HELM.get().defaultBlockState());for(var part:BoatSystem.parts())MachineStructure.placePart(l,at,Direction.NORTH,part);for(int x=28;x<=31;x++)l.setBlockAndUpdate(new BlockPos(x,101,-27),IndustrialContent.GUARDRAIL.get().defaultBlockState());l.setBlockAndUpdate(new BlockPos(32,101,-27),IndustrialContent.CASING.get().defaultBlockState());p.teleportTo(l,28.5,102.5,-32,java.util.Set.of(),0,20);});}
+        if(ticks==705)shot(mc,"fittings");
+        if(ticks>710)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"industry-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }

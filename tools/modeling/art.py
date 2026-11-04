@@ -249,7 +249,15 @@ def sheet(master, subjects, openings, written, placed, texture, neighbours):
     left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
     for box in subjects: draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
     for box in openings: draw.rectangle(tuple(round(v*scale) for v in box), outline=(0, 255, 255), width=2)
-    parts = [i.convert('RGBA') for i in written.values()] + neighbours
+    # Opaque square faces may repeat across neighbouring blocks, so the lineup also shows each tiled two by two.
+    tiles = []
+    for part in (i.convert('RGBA') for i in written.values()):
+        if part.width == part.height and part.getchannel('A').getextrema()[0] == 255:
+            tiled = Image.new('RGBA', (part.width*2, part.height*2))
+            for dx in (0, part.width):
+                for dy in (0, part.height): tiled.paste(part, (dx, dy))
+            tiles.append(tiled)
+    parts = [i.convert('RGBA') for i in written.values()] + neighbours + tiles
     zoom3 = 3 if max(p.height for p in parts) <= 128 else 1
     lineup = Image.new('RGBA', (sum(p.width*(1+zoom3)+24 for p in parts)+8, 2*(max(p.height for p in parts)*zoom3+16)))
     for row, ground in enumerate(((36, 37, 42, 255), (198, 198, 198, 255))):
