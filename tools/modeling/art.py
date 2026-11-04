@@ -207,23 +207,36 @@ def uv_density(asset, folder):
     models = asset.get('models', [])
     if asset['source']['path'].endswith('.bbmodel'):
         models = list(dict.fromkeys([asset['source']['path'], *models]))
+    # Java models measure this asset's own textures and any pack copies it declares; other materials belong to the pack
+    # or to other assets.
+    own = {f'civilization:{o["target"][len("textures/"):-len(".png")]}': o['source'] for o in asset['outputs']
+           if o['target'].startswith('textures/') and o['target'].endswith('.png')}
     for model in models:
         data = read(local(folder, model))
         if isinstance(data.get('textures'), dict):
-            # Native Java block models may reference existing pack materials without exporting them.
-            materials = asset.get('material_textures', {})
-            for index, cube in enumerate(data.get('elements', [])):
+            materials = {**own, **asset.get('material_textures', {})}
+            def pixels(resource):
+                visited = set()
+                while resource and resource.startswith('#'):
+                    if resource in visited: raise ValueError('Cyclic Java texture alias')
+                    visited.add(resource); resource = data['textures'].get(resource[1:])
+                if resource not in materials: return None
+                if resource not in own and materials[resource] not in asset['sources']:
+                    raise ValueError('Java material pixels must be declared sources')
+                with Image.open(local(folder, materials[resource])) as image: return image.size
+            if not data.get('elements'):
+                # A parent template such as cube or orientable spreads each texture over a whole face.
+                for resource in data['textures'].values():
+                    found = pixels(resource)
+                    if found and found != (asset['texels_per_block'],)*2:
+                        raise ValueError(f'UV density mismatch: {model}: whole face {resource} is {found}')
+                continue
+            for index, cube in enumerate(data['elements']):
                 size = [abs(b-a) for a, b in zip(cube['from'], cube['to'])]
                 for face, entry in cube.get('faces', {}).items():
-                    resource = entry.get('texture'); visited = set()
-                    while resource and resource.startswith('#'):
-                        if resource in visited: raise ValueError('Cyclic Java texture alias')
-                        visited.add(resource); resource = data['textures'].get(resource[1:])
-                    if not resource or resource not in materials:
-                        raise ValueError(f'Declare source pixels for Java material {resource}')
-                    source = materials[resource]
-                    if source not in asset['sources']: raise ValueError('Java material pixels must be declared sources')
-                    with Image.open(local(folder, source)) as image: width, height = image.size
+                    found = pixels(entry.get('texture'))
+                    if found is None: continue
+                    width, height = found
                     axes = (0, 1) if face in ('north', 'south') else (2, 1) if face in ('east', 'west') else (0, 2)
                     uv = entry.get('uv', [0, 0, size[axes[0]], size[axes[1]]])
                     actual = (abs(uv[2]-uv[0])*width/16, abs(uv[3]-uv[1])*height/16)
@@ -231,7 +244,6 @@ def uv_density(asset, folder):
                     expected = tuple(size[i]*density for i in axes)
                     if any(abs(a-b)>1.01 for a,b in zip(actual,expected)):
                         raise ValueError(f'UV density mismatch: {model}:element {index}/{face}: {actual} versus {expected}')
-            if not data.get('elements'): raise ValueError('Java density check needs authored elements')
             continue
         for cube in data['elements']:
             if cube.get('type', 'cube') != 'cube': raise ValueError('Unsupported native element')

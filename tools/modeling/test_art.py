@@ -110,8 +110,22 @@ class ArtTests(unittest.TestCase):
     def test_java_alias_cycle_and_missing_source(self):
         model=self.java_model();model['textures']['stone']='#alias';art.write(self.folder/'block.json',model)
         with self.assertRaisesRegex(ValueError,'Cyclic'):art.uv_density(self.asset,self.folder)
+        # A material the asset neither publishes nor declares belongs to the pack or another asset.
         model['textures']['stone']='minecraft:block/unknown';art.write(self.folder/'block.json',model)
-        with self.assertRaisesRegex(ValueError,'source pixels'):art.uv_density(self.asset,self.folder)
+        art.uv_density(self.asset,self.folder)
+
+    def test_java_own_textures_are_measured_without_mapping(self):
+        """A door plate samples part of its own 64px face; a cube template takes whole faces."""
+        self.asset['outputs']=[{'source':'icon.png','target':'textures/block/door.png','format':'png','size':[64,64]}]
+        door={'textures':{'body':'minecraft:block/cobblestone','door':'civilization:block/door'},
+              'elements':[{'from':[0,0,0],'to':[16,16,16],'faces':{'north':{'texture':'#body'}}},
+                          {'from':[2,1,0],'to':[14,15,0],'faces':{'north':{'texture':'#door','uv':[2,1,14,15]}}}]}
+        art.write(self.folder/'door.json',door); art.write(self.folder/'cube.json',{'parent':'minecraft:block/cube_all','textures':{'all':'civilization:block/door'}})
+        self.asset['models']=['door.json','cube.json']; art.uv_density(self.asset,self.folder)
+        door['elements'][1]['faces']['north']['uv']=[0,0,16,16]; art.write(self.folder/'door.json',door)
+        with self.assertRaisesRegex(ValueError,'density mismatch'): art.uv_density(self.asset,self.folder)
+        Image.new('RGBA',(32,32)).save(self.folder/'icon.png'); self.asset['models']=['cube.json']
+        with self.assertRaisesRegex(ValueError,'whole face'): art.uv_density(self.asset,self.folder)
 
     def test_java_default_uv_matches_partial_face(self):
         model=self.java_model();model['elements'][0]['to']=[8,16,16];model['elements'][0]['faces']['up'].pop('uv');art.write(self.folder/'block.json',model)
