@@ -197,6 +197,22 @@ class ArtTests(unittest.TestCase):
         small=Image.new('RGB',(400,400),'#ff00ff'); ImageDraw.Draw(small).rectangle((20,20,120,60),fill=(40,60,200)); small.save(self.root/'supplied.png')
         with self.assertRaisesRegex(ValueError,'under half'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
+    def test_object_panel_keeps_its_outline_on_its_material(self):
+        """A round gray stone drawn on the key fills its rectangle, and dark mortar shows where its outline left the key."""
+        master=Image.new('RGB',(200,100),'#00ff00'); draw=ImageDraw.Draw(master)
+        draw.ellipse((10,20,89,79),fill=(130,128,124)); draw.rectangle((110,10,189,89),fill=(50,42,40))
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('A stone, then mortar.',encoding='utf-8')
+        self.asset['texture']={'grid':[2,1],'ground':'#00ff00','atlas':'wall.png','size':[64,64],'colors':8,
+            'regions':{'mortar':{'cell':[1,0],'rect':[0,0,32,32]},'stone':{'cell':[0,0],'rect':[32,0,16,12],'on':'mortar'}}}
+        self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        with Image.open(self.folder/'wall.png') as wall:
+            stone=wall.convert('RGB').crop((32,0,48,12))
+            self.assertGreater(sum(stone.getpixel((8,6))),330); self.assertLess(sum(stone.getpixel((0,0))),180)
+            self.assertTrue(all(g<=r+20 for r,g,b in stone.getdata()))
+        self.assertIn('an object panel reduced to 16 by 12 pixels for stone',art.master_prompt(self.asset['texture']))
+        self.asset['texture']['regions']['stone']['on']='stone'
+        with self.assertRaisesRegex(ValueError,'must sit on a plain panel'): art.layout(self.asset)
+
     def test_insets_fill_the_opening_drawn_in_their_panel(self):
         """A cold and a lit face take the same door, drawn with an off-centre opening; each fills it with its own window,
         wherever the drawing put it."""

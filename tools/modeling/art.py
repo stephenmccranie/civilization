@@ -82,6 +82,11 @@ def layout(asset):
         if not (0 <= col < cols and 0 <= row < rows): raise ValueError(f'Texture region {name} takes a cell outside the master grid')
         image = image_of(texture, region)
         if image not in sizes: raise ValueError(f'Texture region {name} names no declared image')
+        if 'on' in region:
+            base = regions.get(region['on'])
+            if (base is None or 'on' in base or base.get('sprite') or 'in' in base or 'rect' not in region
+                    or base['rect'][2] < region['rect'][2] or base['rect'][3] < region['rect'][3]):
+                raise ValueError(f'Object panel {name} must sit on a plain panel at least its size')
         if 'in' in region:
             host = regions.get(region['in'])
             if (host is None or 'in' in host or host.get('sprite') or image_of(texture, host) != image
@@ -107,7 +112,7 @@ def master_prompt(texture):
             host = notes.setdefault(tuple(regions[region['in']]['cell']), [])
             if 'with one opening' not in ' '.join(host): host.append('with one opening left as a clean rectangle of plain background, filled from another cell')
         else:
-            fit = 'an icon reduced to fit within' if region.get('sprite') else 'a panel reduced to'
+            fit = 'an icon reduced to fit within' if region.get('sprite') else 'an object panel reduced to' if 'on' in region else 'a panel reduced to'
             note = f'{fit} {region["rect"][2]} by {region["rect"][3]} pixels for {name}'
         notes.setdefault(tuple(region['cell']), []).insert(0, note)
     cells = '\n'.join(f'Row {row+1}, column {col+1}: {", ".join(found)}.'
@@ -116,7 +121,9 @@ def master_prompt(texture):
             'background, with no grid lines. Each cell listed below holds one subject, centred with a margin of plain background at least '
             '6% of the cell on every side; leave other cells empty. A panel is a flat rectangular material surface seen straight on, with no '
             'perspective, 3D form, cast shadow or lighting gradient; it is solid edge to edge, and the background shows inside it only '
-            'where its cell asks for an opening. An icon is one whole object drawn as a pixel-art inventory sprite, with no cast shadow, '
+            'where its cell asks for an opening. An object panel is the exception: one whole object, such as a single stone, painted '
+            'with its own light and shade to fill its rectangle; the plain background may show where its outline leaves the rectangle, '
+            'as at rounded corners. Draw every panel in the proportions of its listed pixel size. An icon is one whole object drawn as a pixel-art inventory sprite, with no cast shadow, '
             'floor or outline glow; its openings show the plain background. Icons in one sheet are drawn at one common scale, so things '
             'of the same size are drawn the same size. No text. Crisp and matte, with broad two-to-three-tone colour clusters and no '
             'dithering or noise. Each subject is reduced by area averaging to the pixel sizes listed: shape it to the largest one and draw '
@@ -210,6 +217,15 @@ def atlas(asset, folder):
             small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
             tile = Image.new('RGBA', (width, height)); tile.paste(small, ((width-small.width)//2, (height-small.height)//2))
             placed[name] = tile, tuple(region['rect'][:2])
+        elif 'on' in region:
+            # An object keeps its own outline: reduced premultiplied with the ground left out, its rim blended with the
+            # ground dropped as for sprites, then set on its material wherever the ground showed.
+            width, height = region['rect'][2:]; rim = max(2, round(0.25*(box[2]-box[0])/width)); pad = (box[0]-rim, box[1]-rim, box[2]+rim, box[3]+rim)
+            crop = master.crop(box).convert('RGBA')
+            crop.putalpha(mask.crop(pad).filter(ImageFilter.MinFilter(2*rim+1)).crop((rim, rim, rim+crop.width, rim+crop.height)))
+            small = crop.convert('RGBa').resize((width, height), Image.Resampling.BOX).convert('RGBA')
+            small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
+            placed[name] = small, tuple(region['rect'][:2])
         elif 'in' in region:
             host = regions[region['in']]; hmask, hbox = found[tuple(host['cell'])]
             hole = opening(hmask, hbox)
@@ -224,6 +240,10 @@ def atlas(asset, folder):
             if name not in filled and opening(mask, box):
                 raise ValueError(f'The {name} panel shows the background inside it; draw it solid or declare an inset to fill its opening')
             placed[name] = master.crop(panel(region)).resize(tuple(region['rect'][2:]), Image.Resampling.BOX).convert('RGBA'), tuple(region['rect'][:2])
+    for name, region in regions.items():
+        if 'on' in region:
+            small, at = placed[name]
+            placed[name] = Image.alpha_composite(placed[region['on']][0].crop((0, 0, *small.size)), small), at
     # Regions paint in declared order, so an inset covers its host's opening. The palette comes from the visible result,
     # each region weighted equally, so a small vent, window or icon keeps its colours beside a large panel; it applies
     # without dithering, and k-means refinement moves each colour to its cluster's mean. Unused space in an image of
