@@ -5,6 +5,7 @@ Existing schema-1 assets retain pipeline.py unchanged.
 import argparse
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -34,6 +35,8 @@ def definition(asset, folder):
     if any(not asset['brief'].get(k) for k in ('purpose', 'target', 'constraints')):
         raise ValueError('Fill purpose, target and constraints')
     if not asset['references']: raise ValueError('Inspect and declare visual references')
+    for neighbour in asset.get('neighbours', []):
+        if not local(ROOT, neighbour).is_file(): raise ValueError(f'Neighbour {neighbour} is missing')
     outputs = {local(RUNTIME, o['target']) for o in asset.get('outputs', [])}
     for ref in asset['references']:
         if not ref.get('role') or not local(ROOT, ref['path']).is_file():
@@ -64,42 +67,64 @@ def image_of(texture, region): return region.get('image', texture.get('atlas'))
 
 
 def layout(asset):
-    """A texture layout reduces grid cells of one recorded master to rectangles of its images. Regions in one image never
-    overlap, except that a region lying wholly inside an earlier one is an inset painted over it, such as a lit window."""
-    texture = asset['texture']; cols, rows = texture['grid']; sizes = images(texture)
+    """A texture layout reduces grid cells of one recorded master to the rectangles of its images. Panels and sprites take
+    declared rectangles that never overlap within an image. An inset names the earlier panel it fills: that panel is drawn
+    with an opening, and the inset's cell is reduced into the opening wherever the drawing put it."""
+    texture = asset['texture']; cols, rows = texture['grid']; sizes = images(texture); regions = texture['regions']; order = list(regions)
     if texture.get('master') not in (None, *(g['file'] for g in asset['generations'])):
         raise ValueError('The texture master must be a recorded generation')
     ImageColor.getrgb(texture['ground'])
     if not 2 <= texture['colors'] <= 256: raise ValueError('A texture palette has 2 to 256 colours')
     placed = {}
-    for name, region in texture['regions'].items():
-        (col, row), (x, y, w, h) = region['cell'], region['rect']
+    for name, region in regions.items():
+        col, row = region['cell']
         if not (0 <= col < cols and 0 <= row < rows): raise ValueError(f'Texture region {name} takes a cell outside the master grid')
         image = image_of(texture, region)
         if image not in sizes: raise ValueError(f'Texture region {name} names no declared image')
-        width, height = sizes[image]
+        if 'in' in region:
+            host = regions.get(region['in'])
+            if (host is None or 'in' in host or host.get('sprite') or image_of(texture, host) != image
+                    or order.index(region['in']) > order.index(name) or host['cell'] == region['cell'] or 'rect' in region):
+                raise ValueError(f'Inset {name} must name an earlier panel of its image, from its own cell, and take no rectangle')
+            continue
+        x, y, w, h = region['rect']; width, height = sizes[image]
         if min(w, h) <= 0 or min(x, y) < 0 or x+w > width or y+h > height: raise ValueError(f'Texture region {name} lies outside its image')
         for other, (ox, oy, ow, oh) in placed.get(image, []):
-            inset = ox <= x and oy <= y and x+w <= ox+ow and y+h <= oy+oh
-            if x < ox+ow and ox < x+w and y < oy+oh and oy < y+h and not inset: raise ValueError(f'Texture regions {other} and {name} overlap')
+            if x < ox+ow and ox < x+w and y < oy+oh and oy < y+h: raise ValueError(f'Texture regions {other} and {name} overlap')
         placed.setdefault(image, []).append((name, region['rect']))
+    hosts = [r['in'] for r in regions.values() if 'in' in r]
+    if len(hosts) != len(set(hosts)): raise ValueError('A panel holds one inset')
 
 
 def master_prompt(texture):
     """The master sheet contract the atlas reduction relies on, stated from the layout ahead of the asset's cell descriptions."""
-    cols, rows = texture['grid']; sizes = {}
-    for name, region in texture['regions'].items():
-        fit = 'an icon reduced to fit within' if region.get('sprite') else 'a panel reduced to'
-        sizes.setdefault(tuple(region['cell']), []).append(f'{fit} {region["rect"][2]} by {region["rect"][3]} pixels for {name}')
+    cols, rows = texture['grid']; regions = texture['regions']; notes = {}
+    for name, region in regions.items():
+        if 'in' in region:
+            note = f'a panel reduced into the opening left in the {region["in"]} panel, for {name}'
+            host = notes.setdefault(tuple(regions[region['in']]['cell']), [])
+            if 'with one opening' not in ' '.join(host): host.append('with one opening left as a clean rectangle of plain background, filled from another cell')
+        else:
+            fit = 'an icon reduced to fit within' if region.get('sprite') else 'a panel reduced to'
+            note = f'{fit} {region["rect"][2]} by {region["rect"][3]} pixels for {name}'
+        notes.setdefault(tuple(region['cell']), []).insert(0, note)
     cells = '\n'.join(f'Row {row+1}, column {col+1}: {", ".join(found)}.'
-                      for (col, row), found in sorted(sizes.items(), key=lambda item: item[0][::-1]))
+                      for (col, row), found in sorted(notes.items(), key=lambda item: item[0][::-1]))
     return (f'Draw a texture master sheet: a strict {cols} by {rows} grid of equal cells on a perfectly flat, solid {texture["ground"]} '
             'background, with no grid lines. Each cell listed below holds one subject, centred with a margin of plain background at least '
             '6% of the cell on every side; leave other cells empty. A panel is a flat rectangular material surface seen straight on, with no '
-            'perspective, 3D form, cast shadow or lighting gradient. An icon is one whole object drawn as a pixel-art inventory sprite, with '
-            'no cast shadow, floor or outline glow; its openings show the plain background. No text. Crisp and matte, with broad '
-            'two-to-three-tone colour clusters and no dithering or noise. Each subject is reduced by area averaging to the pixel sizes '
-            f'listed: shape it to the largest one and draw seams, edges and fasteners bold enough to survive.\n{cells}\n\n')
+            'perspective, 3D form, cast shadow or lighting gradient; it is solid edge to edge, and the background shows inside it only '
+            'where its cell asks for an opening. An icon is one whole object drawn as a pixel-art inventory sprite, with no cast shadow, '
+            'floor or outline glow; its openings show the plain background. Icons in one sheet are drawn at one common scale, so things '
+            'of the same size are drawn the same size. No text. Crisp and matte, with broad two-to-three-tone colour clusters and no '
+            'dithering or noise. Each subject is reduced by area averaging to the pixel sizes listed: shape it to the largest one and draw '
+            f'seams, edges and fasteners bold enough to survive.\n{cells}\n\n')
+
+
+def attached(asset):
+    """The asset's references in the order they are attached to a generation, each with the role it plays."""
+    lines = '\n'.join(f'{i}. {Path(r["path"]).name}: {r["role"]}' for i, r in enumerate(asset['references'], 1))
+    return f'The attached images are, in order:\n{lines}\n\n'
 
 
 def subject(crop, ground):
@@ -109,11 +134,21 @@ def subject(crop, ground):
     return mask.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(3))
 
 
+def opening(mask, box):
+    """The opening drawn inside a panel: plain ground enclosed by it, in cell coordinates, or None. The panel's rim is
+    left out so rounded corners are not openings, and specks are dropped."""
+    m = max(4, round(0.03*min(box[2]-box[0], box[3]-box[1])))
+    inner = (box[0]+m, box[1]+m, box[2]-m, box[3]-m)
+    found = ImageChops.invert(mask.crop(inner)).filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5)).getbbox()
+    return found and (inner[0]+found[0], inner[1]+found[1], inner[0]+found[2], inner[1]+found[3])
+
+
 def atlas(asset, folder):
-    """Reduce each region's master subject to its rectangle with one palette shared by all the layout's images, write the
+    """Reduce each region's master subject into its image with one palette shared by all the layout's images, write the
     images, and draw the inspection sheet.
 
-    A panel fills its rectangle. A sprite keeps its silhouette and proportions, centred in its rectangle on transparency."""
+    A panel fills its rectangle. An inset fills the opening drawn in its host panel. Sprites keep their silhouettes and
+    share one scale, so things drawn the same size come out the same size, each centred in its rectangle on transparency."""
     texture = asset['texture']; regions = texture['regions']
     if not texture.get('master'): raise ValueError('Record a texture master first with texture --prompt')
     with Image.open(local(folder, texture['master'])) as opened: master = opened.convert('RGB')
@@ -127,50 +162,72 @@ def atlas(asset, folder):
         if max((box[2]-box[0])/mask.width, (box[3]-box[1])/mask.height) < 0.5:
             raise ValueError(f'Master cell {col},{row} holds a subject under half its size; the sheet asks for it to fill the cell')
         found[col, row] = cell, mask, box
-    tiles = {}
+    def panel(region):
+        (left, top, _, _), _, box = found[tuple(region['cell'])]; rim = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
+        return (left+box[0]+rim, top+box[1]+rim, left+box[2]-rim, top+box[3]-rim)
+    sprites = [n for n, r in regions.items() if r.get('sprite')]
+    scale = min((min(r['rect'][2]/(b[2]-b[0]), r['rect'][3]/(b[3]-b[1])) for r in map(regions.get, sprites)
+                 for _, _, b in [found[tuple(r['cell'])]]), default=None)
+    filled = {r['in'] for r in regions.values() if 'in' in r}; placed = {}; openings = []
     for name, region in regions.items():
-        (left, top, _, _), mask, box = found[tuple(region['cell'])]; width, height = region['rect'][2:]
+        (left, top, _, _), mask, box = found[tuple(region['cell'])]
         if region.get('sprite'):
             # Drop the rim blended with the ground, a quarter of an output pixel deep, then reduce premultiplied
             # so the ground cannot tint the edge.
-            crop = master.crop((left+box[0], top+box[1], left+box[2], top+box[3])).convert('RGBA')
-            scale = min(width/crop.width, height/crop.height); rim = max(2, round(0.25/scale))
+            width, height = region['rect'][2:]
+            crop = master.crop((left+box[0], top+box[1], left+box[2], top+box[3])).convert('RGBA'); rim = max(2, round(0.25/scale))
             crop.putalpha(mask.filter(ImageFilter.MinFilter(2*rim+1)).crop(box))
             small = crop.convert('RGBa').resize((max(1, round(crop.width*scale)), max(1, round(crop.height*scale))), Image.Resampling.BOX).convert('RGBA')
             small.putalpha(small.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
             tile = Image.new('RGBA', (width, height)); tile.paste(small, ((width-small.width)//2, (height-small.height)//2))
+            placed[name] = tile, tuple(region['rect'][:2])
+        elif 'in' in region:
+            host = regions[region['in']]; (hl, ht, _, _), hmask, hbox = found[tuple(host['cell'])]
+            hole = opening(hmask, hbox)
+            if hole is None: raise ValueError(f'The {region["in"]} panel has no opening drawn for {name}')
+            p = panel(host); x, y, w, h = host['rect']; sx, sy = w/(p[2]-p[0]), h/(p[3]-p[1])
+            # Cover every pixel the opening touches, so no ground-tinted edge survives.
+            x0, y0 = math.floor(x+(hl+hole[0]-p[0])*sx), math.floor(y+(ht+hole[1]-p[1])*sy)
+            x1, y1 = math.ceil(x+(hl+hole[2]-p[0])*sx), math.ceil(y+(ht+hole[3]-p[1])*sy)
+            placed[name] = master.crop(panel(region)).resize((x1-x0, y1-y0), Image.Resampling.BOX).convert('RGBA'), (x0, y0)
+            openings.append((hl+hole[0], ht+hole[1], hl+hole[2], ht+hole[3]))
         else:
-            inset = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
-            panel = (left+box[0]+inset, top+box[1]+inset, left+box[2]-inset, top+box[3]-inset)
-            tile = master.crop(panel).resize((width, height), Image.Resampling.BOX).convert('RGBA')
-        tiles[name] = tile
-    # The palette comes from the visible subjects alone and applies without dithering; k-means refinement moves each
-    # colour to its cluster's mean, so small accents such as brass are not averaged into the dominant material.
-    # Unused space in an image of panels takes their mean colour; an image holding a sprite stays transparent around it.
-    # Regions paint in declared order, so an inset covers the region it lies in.
-    visible = [data[i:i+3] for data in (t.tobytes() for t in tiles.values()) for i in range(0, len(data), 4) if data[i+3]]
+            if name not in filled and opening(mask, box):
+                raise ValueError(f'The {name} panel shows the background inside it; draw it solid or declare an inset to fill its opening')
+            placed[name] = master.crop(panel(region)).resize(tuple(region['rect'][2:]), Image.Resampling.BOX).convert('RGBA'), tuple(region['rect'][:2])
+    # Regions paint in declared order, so an inset covers its host's opening. The palette comes from the visible result
+    # and applies without dithering; k-means refinement moves each colour to its cluster's mean, so small accents such as
+    # brass are not averaged into the dominant material. Unused space in an image of panels takes the mean colour; an
+    # image holding a sprite stays transparent around it.
+    composed = {}
+    for target, size in images(texture).items():
+        image = Image.new('RGBA', tuple(size))
+        for name, region in regions.items():
+            if image_of(texture, region) == target: image.alpha_composite(*placed[name])
+        composed[target] = image
+    visible = [data[i:i+3] for data in (c.tobytes() for c in composed.values()) for i in range(0, len(data), 4) if data[i+3]]
     swatch = Image.frombytes('RGB', (len(visible), 1), b''.join(visible))
     palette = swatch.quantize(colors=texture['colors'], method=Image.Quantize.MEDIANCUT, kmeans=16, dither=Image.Dither.NONE)
     written = {}
-    for target, size in images(texture).items():
-        own = [name for name, region in regions.items() if image_of(texture, region) == target]
-        transparent = any(regions[name].get('sprite') for name in own)
-        image = Image.new('RGBA', tuple(size), (0, 0, 0, 0) if transparent else (*map(round, ImageStat.Stat(swatch).mean), 255))
-        for name in own: image.alpha_composite(tiles[name], tuple(regions[name]['rect'][:2]))
+    for target, image in composed.items():
+        transparent = any(r.get('sprite') for r in regions.values() if image_of(texture, r) == target)
         coverage = image.getchannel('A')
+        if not transparent: image = Image.alpha_composite(Image.new('RGBA', image.size, (*map(round, ImageStat.Stat(swatch).mean), 255)), image)
         image = image.convert('RGB').quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
         if transparent: image = Image.composite(image.convert('RGBA'), Image.new('RGBA', image.size), coverage)
         path = local(folder, target)
         if path.is_file(): preserve(folder, path)
         path.parent.mkdir(parents=True, exist_ok=True); image.save(path); written[target] = image
     subjects = [(c[0]+b[0], c[1]+b[1], c[0]+b[2], c[1]+b[3]) for c, _, b in found.values()]
-    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, written, texture).save(folder/'review/texture.png')
+    neighbours = [Image.open(local(ROOT, n)).convert('RGBA') for n in asset.get('neighbours', [])]
+    (folder/'review').mkdir(exist_ok=True); sheet(master, subjects, openings, written, placed, texture, neighbours).save(folder/'review/texture.png')
     return [local(folder, target) for target in written]
 
 
-def sheet(master, subjects, written, texture):
-    """The subjects found on the master beside the images they reduce to, side by side with their regions outlined and
-    named, and the images at native and double size on dark and light grounds."""
+def sheet(master, subjects, openings, written, placed, texture, neighbours):
+    """The subjects (red) and openings (cyan) found on the master; the images they reduce to, side by side with their
+    regions outlined and named; and a lineup of the images beside their neighbours at native and triple size on dark and
+    light grounds."""
     offsets, x = {}, 0
     for target, image in written.items(): offsets[target] = x; x += image.width + 8
     image = Image.new('RGBA', (x-8, max(i.height for i in written.values())))
@@ -179,19 +236,25 @@ def sheet(master, subjects, written, texture):
     right = Image.new('RGBA', (image.width*zoom, image.height*zoom), (32, 32, 32, 255))
     right.alpha_composite(image.resize(right.size, Image.Resampling.NEAREST)); draw = ImageDraw.Draw(right)
     for name, region in texture['regions'].items():
-        x, y, w, h = (v*zoom for v in (region['rect'][0]+offsets[image_of(texture, region)], *region['rect'][1:]))
+        tile, (rx, ry) = placed[name]
+        x, y, w, h = (v*zoom for v in (rx+offsets[image_of(texture, region)], ry, *tile.size))
         draw.rectangle((x, y, x+w-1, y+h-1), outline=(255, 0, 0)); draw.text((x+3, y+2), name, fill=(255, 255, 255), stroke_width=1, stroke_fill=(0, 0, 0))
     scale = right.height/master.height
     left = master.resize((round(master.width*scale), right.height)); draw = ImageDraw.Draw(left)
     for box in subjects: draw.rectangle(tuple(round(v*scale) for v in box), outline=(255, 0, 0), width=2)
-    native = Image.new('RGBA', (image.width*3+32, max(right.height, image.height*4+32)), (32, 32, 32, 255))
+    for box in openings: draw.rectangle(tuple(round(v*scale) for v in box), outline=(0, 255, 255), width=2)
+    parts = [i.convert('RGBA') for i in written.values()] + neighbours
+    zoom3 = 3 if max(p.height for p in parts) <= 128 else 1
+    lineup = Image.new('RGBA', (sum(p.width*(1+zoom3)+24 for p in parts)+8, 2*(max(p.height for p in parts)*zoom3+16)))
     for row, ground in enumerate(((36, 37, 42, 255), (198, 198, 198, 255))):
-        y = row*(image.height*2+16)
-        native.paste(ground, (0, y, native.width, y+image.height*2+16))
-        native.alpha_composite(image.convert('RGBA'), (8, y+8))
-        native.alpha_composite(image.convert('RGBA').resize((image.width*2, image.height*2), Image.Resampling.NEAREST), (image.width+24, y+8))
-    result = Image.new('RGB', (left.width+16+right.width+16+native.width, max(right.height, native.height)), (32, 32, 32))
-    result.paste(left, (0, 0)); result.paste(right.convert('RGB'), (left.width+16, 0)); result.paste(native.convert('RGB'), (left.width+right.width+32, 0))
+        y = row*lineup.height//2; lineup.paste(ground, (0, y, lineup.width, y+lineup.height//2)); x = 8
+        for part in parts:
+            lineup.alpha_composite(part, (x, y+8)); x += part.width+8
+            lineup.alpha_composite(part.resize((part.width*zoom3, part.height*zoom3), Image.Resampling.NEAREST), (x, y+8)); x += part.width*zoom3+16
+    top = Image.new('RGB', (left.width+16+right.width, right.height), (32, 32, 32))
+    top.paste(left, (0, 0)); top.paste(right.convert('RGB'), (left.width+16, 0))
+    result = Image.new('RGB', (max(top.width, lineup.width), top.height+16+lineup.height), (32, 32, 32))
+    result.paste(top, (0, 0)); result.paste(lineup.convert('RGB'), (0, top.height+16))
     return result
 
 
@@ -356,9 +419,11 @@ def kept_reference(path, digest):
     return ROOT / 'art/references' / (digest + Path(path).suffix.lower())
 
 
-def record(asset, folder, stem, prompt, references, image=None):
-    """Keep a generated, or supplied, image in the asset with its exact prompt and references; returns its file name."""
-    references = {str(p): sha(p) for p in (local(ROOT, p) for p in references)}
+def record(asset, folder, stem, prompt, image=None):
+    """Keep a generated, or supplied, image in the asset with its exact prompt and its declared references; returns its
+    file name. A generation is told each reference's role ahead of the prompt."""
+    references = {str(p): sha(p) for p in (local(ROOT, r['path']) for r in asset['references'])}
+    if not image: prompt = attached(asset) + prompt
     dest = folder / f'{stem}-{len(asset["generations"])+1:02}{image.suffix.lower() if image else ".png"}'
     if dest.exists(): raise ValueError(f'{dest.name} exists')
     if image:
@@ -384,9 +449,8 @@ def main():
     parser.add_argument('--kind', choices=legacy.KINDS, default='block')
     parser.add_argument('--stage', choices=('build', 'verify'), default='build')
     parser.add_argument('--review', type=workspace)
-    parser.add_argument('--evidence', nargs='+')
+    parser.add_argument('--evidence', type=workspace, nargs='+')
     parser.add_argument('--image', type=workspace); parser.add_argument('--prompt', type=workspace)
-    parser.add_argument('--references', type=workspace, nargs='*', default=[])
     parser.add_argument('--model'); parser.add_argument('--target', type=float, nargs=3)
     parser.add_argument('--span', type=float); parser.add_argument('--complete', action='store_true')
     parser.add_argument('--images', nargs='+', help='Workspace image paths, optionally path|left,top,right,bottom')
@@ -444,15 +508,14 @@ def main():
         subprocess.run([sys.executable, str(Path(__file__).with_name('compare.py')), str(sheet), *images], check=True)
     elif args.command == 'record':
         if not args.prompt: parser.error('record needs the exact --prompt, and --image for a supplied concept')
-        print(record(asset, folder, 'concept', args.prompt.read_text(encoding='utf-8'), args.references, args.image))
+        print(record(asset, folder, 'concept', args.prompt.read_text(encoding='utf-8'), args.image))
         write(file, asset)
     elif args.command == 'texture':
         if 'texture' not in asset: raise ValueError('Declare the texture layout in asset.json first')
         if args.prompt:
             # A generated master gets the layout's sheet contract; a supplied one keeps the prompt that made it.
             prompt = args.prompt.read_text(encoding='utf-8')
-            asset['texture']['master'] = record(asset, folder, 'master', prompt if args.image else master_prompt(asset['texture'])+prompt,
-                                                args.references, args.image)
+            asset['texture']['master'] = record(asset, folder, 'master', prompt if args.image else master_prompt(asset['texture'])+prompt, args.image)
             write(file, asset)
         print(atlas(asset, folder))
     elif args.command == 'review':
@@ -464,9 +527,11 @@ def main():
         if any(not findings['criteria'].get(q) for q in QUESTIONS): raise ValueError(f'Answer {QUESTIONS} briefly')
         if findings['decision'] == 'pass' and findings['defects']: raise ValueError('Fix blocking defects')
         if args.stage == 'verify': approved(asset, folder, 'build'); runtime_matches(asset, folder)
-        for path in args.evidence:
-            with Image.open(local(folder, path)) as image: image.verify()
-        evidence = {preserve(folder, local(folder, p)): sha(local(folder, p)) for p in args.evidence}
+        # Evidence may come from anywhere in the workspace, such as a scene's screenshots; the record keeps its own copy.
+        evidence = [local(ROOT, p) for p in args.evidence]
+        for path in evidence:
+            with Image.open(path) as image: image.verify()
+        evidence = {preserve(folder, p): sha(p) for p in evidence}
         if args.stage in asset['reviews']: preserve(folder, file)
         asset['reviews'][args.stage] = dict(findings, snapshot=snapshot(asset, folder), evidence=evidence)
         write(file, asset)

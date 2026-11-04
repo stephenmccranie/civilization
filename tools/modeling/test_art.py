@@ -1,5 +1,6 @@
 """Lifecycle and failure checks; synthetic images never certify artistic quality."""
 import contextlib
+import json
 import io
 import subprocess
 import sys
@@ -34,7 +35,7 @@ class ArtTests(unittest.TestCase):
         if stage == 'build': self.command('prepare')
         art.write(self.folder/'findings.json', {'decision':decision,'criteria':dict.fromkeys(art.QUESTIONS,'fixture observation'),
                  'defects':[] if decision=='pass' else ['visible defect']})
-        self.command('review','--stage',stage,'--review',str(self.folder/'findings.json'),'--evidence','icon.png')
+        self.command('review','--stage',stage,'--review',str(self.folder/'findings.json'),'--evidence','asset/icon.png')
 
     def test_no_generation_lifecycle_and_stale_source(self):
         self.command('prepare'); self.review('build'); self.command('preview'); self.review('verify')
@@ -160,8 +161,9 @@ class ArtTests(unittest.TestCase):
         def draw(command,**kwargs):
             Image.open(self.root/'supplied.png').save(Path(command[command.index('--cd')+1])/'image.png')
         with patch.object(art.setup,'DEST',self.root/'.tools'), patch.object(art.subprocess,'run',draw):
-            self.command('texture','--prompt','cells.txt','--references','asset/icon.png')
+            self.command('texture','--prompt','cells.txt')
         prompt=art.read(self.folder/'asset.json')['generations'][0]['prompt']
+        self.assertTrue(prompt.startswith('The attached images are, in order:\n1. icon.png: material\n\n'))
         self.assertIn('strict 2 by 1 grid',prompt); self.assertIn('#808080',prompt)
         self.assertIn('Row 1, column 2: a panel reduced to 4 by 8 pixels for blue.',prompt); self.assertTrue(prompt.endswith('Red leather, then blue cloth.'))
         self.assertTrue((self.folder/'master-01.png').is_file()); self.assertEqual(list((self.root/'.tools').iterdir()),[codex])
@@ -191,24 +193,52 @@ class ArtTests(unittest.TestCase):
         small=Image.new('RGB',(400,400),'#ff00ff'); ImageDraw.Draw(small).rectangle((20,20,120,60),fill=(40,60,200)); small.save(self.root/'supplied.png')
         with self.assertRaisesRegex(ValueError,'under half'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
-    def test_images_share_a_panel_and_differ_by_inset(self):
-        """A cold and a lit face take the same door panel; each paints its own window inset over it."""
+    def test_insets_fill_the_opening_drawn_in_their_panel(self):
+        """A cold and a lit face take the same door, drawn with an off-centre opening; each fills it with its own window,
+        wherever the drawing put it."""
         master=Image.new('RGB',(300,100),'#ff00ff'); draw=ImageDraw.Draw(master)
-        for i,colour in enumerate([(30,30,40),(60,60,70),(240,140,30)]): draw.rectangle((i*100+10,10,i*100+89,89),fill=colour)
-        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Door, cold window, lit window.',encoding='utf-8')
+        draw.rectangle((10,10,89,89),fill=(30,30,40)); draw.rectangle((30,60,69,79),fill='#ff00ff')
+        for i,colour in [(1,(60,60,70)),(2,(240,140,30))]: draw.rectangle((i*100+10,30,i*100+89,69),fill=colour)
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Door with an opening, cold window, lit window.',encoding='utf-8')
         self.asset['texture']={'grid':[3,1],'ground':'#ff00ff','colors':8,'images':{'front.png':[16,16],'front_on.png':[16,16]},
-            'regions':{'door':{'cell':[0,0],'image':'front.png','rect':[0,0,16,16]},'window':{'cell':[1,0],'image':'front.png','rect':[4,10,8,4]},
-                       'door_on':{'cell':[0,0],'image':'front_on.png','rect':[0,0,16,16]},'window_on':{'cell':[2,0],'image':'front_on.png','rect':[4,10,8,4]}}}
+            'regions':{'door':{'cell':[0,0],'image':'front.png','rect':[0,0,16,16]},'window':{'cell':[1,0],'image':'front.png','in':'door'},
+                       'door_on':{'cell':[0,0],'image':'front_on.png','rect':[0,0,16,16]},'window_on':{'cell':[2,0],'image':'front_on.png','in':'door_on'}}}
         self.asset['outputs']=[{'source':'front.png','target':'textures/block/test.png','format':'png','size':[16,16],'alpha':'opaque'}]
         self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
         with Image.open(self.folder/'front.png') as cold, Image.open(self.folder/'front_on.png') as lit:
             changed={(x,y) for x in range(16) for y in range(16) if cold.getpixel((x,y))!=lit.getpixel((x,y))}
-            self.assertEqual(changed,{(x,y) for x in range(4,12) for y in range(10,14)})
-            self.assertGreater(lit.getpixel((6,11))[0],200); self.assertLess(cold.getpixel((6,11))[0],100)
-        self.asset['texture']['regions']['window']['rect']=[12,10,8,4]
-        with self.assertRaisesRegex(ValueError,'outside its image'): art.definition(self.asset,self.folder)
-        self.asset['texture']['regions']['window']['rect']=[4,10,8,4]; self.asset['texture']['regions']['spill']={'cell':[1,0],'image':'front.png','rect':[0,0,16,16]}
-        with self.assertRaisesRegex(ValueError,'overlap'): art.definition(self.asset,self.folder)
+            # The opening spans door pixels 30-70 by 60-80 of a 76-pixel panel starting at 12, so every 16-pixel cell it touches.
+            self.assertEqual((min(x for x,_ in changed),min(y for _,y in changed),max(x for x,_ in changed),max(y for _,y in changed)),(3,10,12,14))
+            self.assertGreater(lit.getpixel((8,11))[0],200); self.assertLess(cold.getpixel((8,11))[0],100)
+            self.assertTrue(all(c[0]<200 or c[1]>100 for _,c in cold.getcolors()))  # No ground left showing.
+        self.assertIn('with one opening left',art.master_prompt(self.asset['texture']))
+        for change,message in [({'rect':[0,0,4,4]},'take no rectangle'),({'in':'window_on'},'earlier panel'),({'cell':[0,0]},'own cell')]:
+            region=dict(self.asset['texture']['regions']['window'],**change); asset=json.loads(json.dumps(self.asset)); asset['texture']['regions']['window']=region
+            with self.assertRaisesRegex(ValueError,message): art.definition(asset,self.folder)
+        # An opening nothing fills, or a panel with nothing to fill it, is rejected.
+        self.asset=art.read(self.folder/'asset.json'); del self.asset['texture']['regions']['window']; self.save()
+        with self.assertRaisesRegex(ValueError,'shows the background'): self.command('texture')
+        self.asset['texture']['regions']['window']={'cell':[1,0],'image':'front.png','in':'door'}; self.save()
+        ImageDraw.Draw(master).rectangle((30,60,69,79),fill=(30,30,40)); master.save(self.root/'solid.png')
+        with self.assertRaisesRegex(ValueError,'no opening'): self.command('texture','--prompt','cells.txt','--image','solid.png')
+
+    def test_sprites_in_one_layout_share_a_scale(self):
+        """Two plates drawn at the same size come out the same size; one drawn half as long comes out half as long."""
+        master=Image.new('RGB',(600,300),'#ff00ff'); draw=ImageDraw.Draw(master)
+        draw.rectangle((40,70,279,229),fill=(40,60,200)); draw.rectangle((340,70,579,229),fill=(200,60,40))
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Two plates.',encoding='utf-8')
+        self.asset['neighbours']=['asset/icon.png']
+        self.asset['texture']={'grid':[2,1],'ground':'#ff00ff','colors':8,'images':{'a.png':[64,64],'b.png':[64,64]},
+            'regions':{'a':{'cell':[0,0],'image':'a.png','rect':[4,4,56,56],'sprite':True},'b':{'cell':[1,0],'image':'b.png','rect':[4,4,56,56],'sprite':True}}}
+        self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        boxes=[Image.open(self.folder/n).getchannel('A').getbbox() for n in ('a.png','b.png')]
+        self.assertEqual([b[2]-b[0] for b in boxes],[56,56]); self.assertEqual(boxes[0][3]-boxes[0][1],boxes[1][3]-boxes[1][1])
+        draw.rectangle((340,70,579,229),fill='#ff00ff'); draw.rectangle((340,70,459,229),fill=(200,60,40)); master.save(self.root/'supplied.png')
+        self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        boxes=[Image.open(self.folder/n).getchannel('A').getbbox() for n in ('a.png','b.png')]
+        self.assertEqual(boxes[0][2]-boxes[0][0],56); self.assertEqual(boxes[1][2]-boxes[1][0],28)
+        self.asset['neighbours']=['asset/missing.png']
+        with self.assertRaisesRegex(ValueError,'Neighbour'): art.definition(self.asset,self.folder)
 
     def test_panel_without_margin_is_rejected(self):
         self.textured(); master=Image.open(self.root/'supplied.png'); ImageDraw.Draw(master).rectangle((110,0,189,89),fill=(40,40,200))
