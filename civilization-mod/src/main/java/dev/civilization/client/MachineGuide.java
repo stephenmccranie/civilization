@@ -97,22 +97,27 @@ public final class MachineGuide {
         var matrix=com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();matrix.pushMatrix();matrix.mul(event.getModelViewMatrix());com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
         mc.getMainRenderTarget().bindWrite(false);pose.pushPose();
         try{
-            pose.translate(at.getX()-eye.x,at.getY()-eye.y,at.getZ()-eye.z);
+            pose.translate(-eye.x,-eye.y,-eye.z);
             boolean textured=PreviewConfig.MODE.get()==PreviewConfig.Mode.TEXTURED;
-            // A refused placement spot is outlined in red only.
-            if(textured&&(plan==null||plan.valid())){
-                var type=PreviewRenderTypes.model(site.model().geo);
-                var ghost=new TranslucentVertexConsumer(buffers.getBuffer(type),PreviewConfig.OPACITY.get().floatValue());
-                renderer.renderGuide(mc.level,at,site.controller(),site.model(),site.built(),site.placed(),event.getPartialTick().getGameTimeDeltaPartialTick(false),pose,unused->ghost);
-                buffers.endBatch(type);
-            }
-            pose.popPose();pose.pushPose();pose.translate(-eye.x,-eye.y,-eye.z);
             // Ports share the same visible-outline budget as the cells.
             var outlined=GuidePerformance.outlines(textured?blocked:outlineCells,cell->event.getFrustum()==null||event.getFrustum().isVisible(cell.box()),cell->cell.box().getCenter().distanceToSqr(eye),null);
             for(var cell:outlined){boolean wrong=cell.index()>=0&&(textured||blocked.contains(cell));net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),cell.box(),wrong?1:.5f,wrong?.2f:1,wrong?.2f:1,cell.index()<0?.7f:.5f);}
             if(plan!=null)net.minecraft.client.renderer.LevelRenderer.renderLineBox(pose,buffers.getBuffer(PreviewRenderTypes.OUTLINE),new AABB(at).inflate(.002),
                     plan.valid()?.5f:1,plan.valid()?1:.2f,plan.valid()?1:.2f,plan.valid()?.65f:.8f);
             buffers.endBatch(PreviewRenderTypes.OUTLINE);
+            // A refused placement spot is outlined in red only. The ghost comes after the outlines, since its depth would
+            // hide those inside it: it lays its depth, then colours only its front-most surface.
+            if(textured&&(plan==null||plan.valid())){
+                pose.popPose();pose.pushPose();pose.translate(at.getX()-eye.x,at.getY()-eye.y,at.getZ()-eye.z);
+                float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);var geo=site.model().geo;
+                var depth=PreviewRenderTypes.modelDepth(geo);
+                renderer.renderGuide(mc.level,at,site.controller(),site.model(),site.built(),site.placed(),partial,pose,unused->buffers.getBuffer(depth));
+                buffers.endBatch(depth);
+                var type=PreviewRenderTypes.model(geo);
+                var ghost=new TranslucentVertexConsumer(buffers.getBuffer(type),PreviewConfig.OPACITY.get().floatValue());
+                renderer.renderGuide(mc.level,at,site.controller(),site.model(),site.built(),site.placed(),partial,pose,unused->ghost);
+                buffers.endBatch(type);
+            }
         }finally{pose.popPose();matrix.popMatrix();com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();}
     }
     @SubscribeEvent public static void hud(RenderGuiEvent.Post event){
