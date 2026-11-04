@@ -62,7 +62,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |
 | `oven` | Baking Oven placement and animated door |
 | `canisters` | All four canisters in frames, inventory and hand |
-| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools` | Item art in frames, inventory slots and hand |
+| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools`, `minerals` | Item art in frames, inventory slots and hand |
 | `paterson` | Paterson revolver input, reload, hammer and recoil |
 | `boat` | Freeform boat placement, gears, steering and throttle |
 | `airship` | Airship assembly, flight controls and rider retention |

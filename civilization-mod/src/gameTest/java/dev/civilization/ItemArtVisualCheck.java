@@ -60,6 +60,7 @@ final class ItemArtVisualCheck {
   }
   return switch(scene){
    case "tools" -> java.util.List.of(FrontierContent.GEIGER_COUNTER.get(),CuttingContent.IRON_SAW.get(),CuttingContent.STONE_SAW.get(),CuttingContent.DIAMOND_SAW.get(),IndustrialContent.PROBE.get(),BuilderLineContent.LINE.get(),ManufacturingContent.head("iron","saw"),ManufacturingContent.HANDLE.get());
+   case "minerals" -> java.util.List.of(KilnContent.MINERAL_COAL.get(),FrontierContent.RAW_URANIUM.get(),IndustrialContent.SULFUR.get(),IndustrialContent.ENRICHED_BLEND.get(),net.minecraft.world.item.Items.COAL,net.minecraft.world.item.Items.RAW_IRON,net.minecraft.world.item.Items.GRAVEL,KilnContent.STEEL.get());
    case "manufactured" -> java.util.List.of(KilnContent.STEEL.get(),IndustrialContent.PROBE.get(),KilnContent.MACHINE_PARTS.get(),net.minecraft.world.item.Items.IRON_INGOT,net.minecraft.world.item.Items.COPPER_INGOT);
    case "foods" -> java.util.List.of(CookingContent.BREAD_DOUGH.get(),CookingContent.COOKIE_DOUGH.get(),CookingContent.CAKE_BATTER.get(),CookingContent.UNBAKED_PIE.get(),FarmingContent.RATION.get(),RecoveryItems.MORSEL.get(),WorkshopContent.CLOTH.get(),FarmingContent.FERTILIZER.get());
    case "supplies" -> java.util.List.of(WorkshopContent.HIDE.get(),WorkshopContent.CLOTH.get(),FarmingContent.MINERAL_BLEND.get(),IndustrialContent.ENRICHED_BLEND.get(),FarmingContent.FERTILIZER.get(),IndustrialContent.SULFUR.get(),KilnContent.MACHINE_PARTS.get());
