@@ -1,5 +1,6 @@
 [rendering]
-bladeHeight = 0.65
+bladesPerBlock = 32
+bladeHeight = 0.45
 heightVariation = 0.35
 bladeParticles = false
 grassPlantsAsBlades = false
