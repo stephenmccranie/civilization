@@ -35,7 +35,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat) |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
-| `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, and their icons |
+| `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip |
 | `workshops` | Tannery, Textile Workshop and Smithy, with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
 | `assembly` | Assembly Bench forging and assembly through the real menu |

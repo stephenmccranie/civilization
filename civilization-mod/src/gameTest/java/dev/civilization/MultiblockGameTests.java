@@ -31,6 +31,23 @@ public class MultiblockGameTests {
         CoalFireFixture.light(machine);
         for (int i = 0; i < count; i++) KilnBlockEntity.tick(h.getLevel(), machine.getBlockPos(), machine.getBlockState(), machine);
     }
+    /** A controller drawn by a native model leaves the ground beneath it and the blocks beside it drawn, since its model
+     *  never fills its cell; a block-structure controller still hides them like any full block. */
+    @GameTest(template = "industrial")
+    public static void modeledControllersHideNoNeighbourFaces(GameTestHelper h) {
+        var l = h.getLevel(); var at = h.absolutePos(new BlockPos(5, 1, 5)); var below = at.below(); int modeled = 0;
+        l.setBlockAndUpdate(below, Blocks.GRASS_BLOCK.defaultBlockState());
+        for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            if (!(block instanceof ModeledBlock m) || m.model() == null) continue;
+            l.setBlockAndUpdate(at, block.defaultBlockState());
+            h.assertTrue(net.minecraft.world.level.block.Block.shouldRenderFace(l.getBlockState(below), l, below, Direction.UP, at), "The ground under a " + block + " stays drawn");
+            modeled++;
+        }
+        h.assertTrue(modeled == MachineModel.all().size(), "Every machine model has one controller, found " + modeled);
+        l.setBlockAndUpdate(at, WorkshopContent.TANNERY.get().defaultBlockState());
+        h.assertTrue(!net.minecraft.world.level.block.Block.shouldRenderFace(l.getBlockState(below), l, below, Direction.UP, at), "A block-structure controller hides the face under it");
+        h.succeed();
+    }
     @GameTest(template = "industrial")
     public static void standaloneControllersCannotOperate(GameTestHelper h) {
         for (boolean works : new boolean[]{false, true}) {

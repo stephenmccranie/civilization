@@ -38,7 +38,10 @@ final class ThermalArtVisualCheck {
         if(ticks==300)shot(mc,"rear");
         if(ticks==305){mc.options.hideGui=false;mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}
         if(ticks==325)shot(mc,"inventory");
-        if(ticks>335)mc.stop();
+        // Looking down at the Fertilizer Furnace's door: the ground in front of its masonry, inside the controller's cell.
+        if(ticks==330){mc.setScreen(null);mc.options.hideGui=true;server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),15.5,101,-1.3,java.util.Set.of(),0,50));}
+        if(ticks==345)shot(mc,"base");
+        if(ticks>355)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"thermal-art-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }
