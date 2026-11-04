@@ -17,8 +17,8 @@ final class WorkshopVisualCheck {
                 var l=server.overworld();for(int x=24;x<=50;x++)for(int z=-5;z<7;z++){l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<110;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
                 for(int kind=0;kind<3;kind++){
                     var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();default->WorkshopContent.SMITHY.get();};l.setBlockAndUpdate(at(kind),block.defaultBlockState());
-                    for(var part:WorkshopStructure.parts(kind))MachineStructure.placePart(l,at(kind),Direction.NORTH,part);
-                    if(MachineStructure.check(l,at(kind),Direction.NORTH).status()!=1)throw new IllegalStateException("Incomplete workshop fixture");
+                    MachineFixture.build(l,at(kind));
+                    if(MachineFixture.status(l,at(kind))!=MachineStructure.COMPLETE)throw new IllegalStateException("Incomplete workshop fixture");
                     var w=(WorkshopBlockEntity)l.getBlockEntity(at(kind));CoalFireFixture.light(w);w.setItem(4,KilnContent.MINERAL_COAL.toStack(8));
                     if(kind==0)w.setItem(0,WorkshopContent.HIDE.toStack(8));
                     if(kind==1)w.setItem(0,new ItemStack(Items.WHITE_WOOL,8));
@@ -90,11 +90,11 @@ final class WorkshopVisualCheck {
         if(ticks==363){click(mc,"Recipes");shot(mc,"collapsed");}
         if(ticks==366){click(mc,"Recipes");mc.options.guiScale().set(4);mc.resizeDisplay();}
         if(ticks==370)shot(mc,"scale-4");
-        if(ticks==375){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();server.overworld().setBlockAndUpdate(at(2),WorkshopContent.SMITHY.get().defaultBlockState());p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
+        if(ticks==375){mc.player.closeContainer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();server.overworld().setBlockAndUpdate(at(2),WorkshopContent.SMITHY.get().defaultBlockState());MachineFixture.build(server.overworld(),at(2));p.teleportTo(server.overworld(),49,104,6,java.util.Set.of(),140,20);});}
         if(ticks==390)mc.options.hideGui=true;
         if(ticks==395)shot(mc,"smithy-rear");
         if(ticks==396)mc.options.hideGui=false;
-        if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);server.overworld().removeBlock(at(2).east(WorkshopStructure.SMITHY_ANVIL_X),false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
+        if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);ModeledMachine.removeSection(ModeledMachine.of(server.overworld().getBlockEntity(at(2))),3,false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
         if(ticks==409)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
         if(ticks==415)shot(mc,"smithy-guide");
         if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{

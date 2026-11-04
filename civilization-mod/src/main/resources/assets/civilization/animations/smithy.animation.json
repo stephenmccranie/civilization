@@ -1,0 +1,89 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.smithy.work": {
+      "loop": true,
+      "animation_length": 1.6,
+      "bones": {
+        "section_4_bellows_lid": {
+          "rotation": {
+            "0": {
+              "vector": [
+                0,
+                0,
+                0.0
+              ]
+            },
+            "0.4": {
+              "vector": [
+                0,
+                0,
+                2.828
+              ]
+            },
+            "0.8": {
+              "vector": [
+                0,
+                0,
+                4.0
+              ]
+            },
+            "1.2": {
+              "vector": [
+                0,
+                0,
+                2.828
+              ]
+            },
+            "1.6": {
+              "vector": [
+                0,
+                0,
+                0.0
+              ]
+            }
+          }
+        },
+        "section_4_lever": {
+          "rotation": {
+            "0": {
+              "vector": [
+                0,
+                0,
+                0.0
+              ]
+            },
+            "0.4": {
+              "vector": [
+                0,
+                0,
+                2.635
+              ]
+            },
+            "0.8": {
+              "vector": [
+                0,
+                0,
+                3.727
+              ]
+            },
+            "1.2": {
+              "vector": [
+                0,
+                0,
+                2.635
+              ]
+            },
+            "1.6": {
+              "vector": [
+                0,
+                0,
+                0.0
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -44,10 +44,12 @@ public final class WorkshopGameTests {
     }
     static WorkshopBlockEntity build(GameTestHelper h,int kind,Direction front){
         var pos=h.absolutePos(new BlockPos(5,1,4));var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();case 3->WorkshopContent.BENCH.get();default->WorkshopContent.SMITHY.get();};
+        // Removing the controller takes down a forge standing here; block shells are cleared cell by cell.
+        h.getLevel().removeBlock(pos,false);
         for(int oldKind=0;oldKind<3;oldKind++)for(var oldFront:Direction.Plane.HORIZONTAL)
             for(var part:WorkshopStructure.parts(oldKind))h.getLevel().removeBlock(MachineStructure.position(pos,oldFront,part),false);
         h.getLevel().setBlockAndUpdate(pos,block.defaultBlockState().setValue(WorkshopBlock.FACING,front));
-        for(var part:WorkshopStructure.parts(kind))MachineStructure.placePart(h.getLevel(),pos,front,part);
+        MachineFixture.build(h.getLevel(),pos);
         return (WorkshopBlockEntity)h.getLevel().getBlockEntity(pos);
     }
     static void run(WorkshopBlockEntity w,int ticks){if(w.handWorked()){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
@@ -279,37 +281,24 @@ public final class WorkshopGameTests {
         h.assertTrue(oldProgress.getItem(5).is(Items.LEATHER)&&oldProgress.heat==remaining,"Previously saved tanning work beyond the shorter duration completes without extra heat");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopsRotateAndProtectSlots(GameTestHelper h){
-        for(int kind=0;kind<3;kind++)for(var dir:Direction.Plane.HORIZONTAL){var w=build(h,kind,dir);h.assertTrue(MachineStructure.check(h.getLevel(),w.getBlockPos(),dir).status()==MachineStructure.COMPLETE,"Complete rotated workshop");}
+        for(int kind=0;kind<3;kind++)for(var dir:Direction.Plane.HORIZONTAL){var w=build(h,kind,dir);h.assertTrue(MachineFixture.status(h.getLevel(),w.getBlockPos())==MachineStructure.COMPLETE,"Complete rotated workshop");}
         var w=build(h,2,Direction.NORTH);h.assertTrue(Arrays.equals(w.getSlotsForFace(Direction.DOWN),new int[]{5})&&!w.canTakeItemThroughFace(0,new ItemStack(Items.IRON_PICKAXE),Direction.DOWN),"Hoppers access only the Smithy output");
         w.select(99999);h.assertTrue(w.selected==-1,"Invalid selection rejected");h.succeed();
     }
-    @GameTest(template="industrial") public static void smithyGroundAnvilAndCutBenchRequired(GameTestHelper h){
-        var w=build(h,2,Direction.NORTH);var l=h.getLevel();var pos=w.getBlockPos();
-        h.assertTrue(WorkshopStructure.parts(2).stream().mapToInt(MachineStructure.Part::depth).max().orElseThrow()==2,"Three-block envelope includes rear facade");
-        h.assertTrue(WorkshopStructure.parts(2).stream().filter(p->p.material().equals("air")&&p.y()==1&&p.depth()<2&&p.x()<2).count()==4,"Two-by-two clear hearth");
-        h.assertTrue(WorkshopStructure.parts(2).stream().filter(p->p.material().equals("planks")&&p.units()==3).count()==4,"Four eighth-cube feet");
-        var rear=WorkshopStructure.parts(2).stream().filter(p->p.x()==0&&p.y()==1&&p.depth()==2).findFirst().orElseThrow();
-        h.assertTrue(rear.units()==2,"Recessed slab rear panel");
-        l.removeBlock(MachineStructure.position(pos,Direction.NORTH,rear),false);
-        h.assertTrue(MachineStructure.check(l,pos,Direction.NORTH).status()==0,"Rear panel required");
-        MachineStructure.placePart(l,pos,Direction.NORTH,rear);
-        h.assertTrue(WorkshopStructure.parts(2).stream().anyMatch(p->p.units()==3),"Eighth-block hood corners required");
-        var table=WorkshopStructure.parts(2).stream().filter(p->p.material().equals("planks")).map(p->CutBlock.bounds(MachineStructure.shape(p,Direction.NORTH)).move(p.x(),p.y(),p.depth())).reduce(net.minecraft.world.phys.AABB::minmax).orElseThrow();
-        h.assertTrue(table.getXsize()==2&&table.getYsize()==1&&table.getZsize()==1.5,"Exact low table dimensions");
-        var anvil=pos.east(WorkshopStructure.SMITHY_ANVIL_X);h.assertTrue(l.getBlockState(anvil).is(Blocks.ANVIL),"Real anvil at controller floor height");
-        l.setBlockAndUpdate(anvil,Blocks.CHIPPED_ANVIL.defaultBlockState());
-        h.assertTrue(MachineStructure.check(l,pos,Direction.NORTH).status()==1,"Worn anvils remain valid");
-        l.removeBlock(anvil,false);w.select(1);w.setItem(0,new ItemStack(Items.IRON_INGOT,3));w.setItem(1,new ItemStack(Items.LEATHER));w.setItem(2,new ItemStack(Items.STICK,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack());w.process();
-        h.assertTrue(w.status==0&&w.getItem(4).getCount()==1,"Missing anvil stops work without fuel loss");
-        l.setBlockAndUpdate(anvil,Blocks.ANVIL.defaultBlockState());
-        var leg=WorkshopStructure.parts(2).stream().filter(p->p.material().equals("planks")&&p.units()==3).findFirst().orElseThrow();
-        var legPos=MachineStructure.position(pos,Direction.NORTH,leg);l.setBlockAndUpdate(legPos,Blocks.OAK_PLANKS.defaultBlockState());
-        h.assertTrue(MachineStructure.check(l,pos,Direction.NORTH).status()==0,"Full block cannot substitute for open bench leg");
-        l.removeBlock(legPos,false);
-        MachineStructure.placePart(l,pos,Direction.NORTH,leg);
-        var top=WorkshopStructure.parts(2).stream().filter(p->p.x()==leg.x()&&p.y()==leg.y()&&p.depth()==leg.depth()&&p.units()!=3).findFirst().orElseThrow();
-        h.assertTrue(!MachineStructure.matches(l,legPos,top,Direction.NORTH)&&!MachineStructure.obstructed(l,legPos,top,Direction.NORTH),"Foot permits missing tabletop guide");
-        MachineStructure.placePart(l,pos,Direction.NORTH,top);h.assertTrue(MachineStructure.check(l,pos,Direction.NORTH).status()==1,"Foot and tabletop restore structure");h.succeed();
+    @GameTest(template="industrial") public static void smithyForgeStopsWithoutItsChimney(GameTestHelper h){
+        var w=build(h,2,Direction.NORTH);var l=h.getLevel();
+        h.assertTrue(w.model()==MachineModel.SMITHY&&MachineFixture.status(l,w.getBlockPos())==MachineStructure.COMPLETE,"The forge stands complete from its sections");
+        var top=w.model().cells.stream().map(c->ModeledMachine.position(w.getBlockPos(),w.front(),c)).max(java.util.Comparator.comparingInt(BlockPos::getY)).orElseThrow();
+        l.destroyBlock(top,false);
+        w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));w.setItem(0,new ItemStack(Items.IRON_INGOT,3));w.setItem(4,KilnContent.MINERAL_COAL.toStack());w.process();
+        h.assertTrue(w.status==MachineStatus.Workshop.INCOMPLETE&&w.getItem(4).getCount()==1,"Without its chimney the forge stops and spends no coal");
+        // A survival smith rebuilds it from the controller with the chimney's four bricks in hand.
+        var pos=w.getBlockPos();var smith=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"smith"));
+        smith.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);smith.setPos(pos.getX()+.5,pos.getY(),pos.getZ()-2.5);
+        var bricks=new ItemStack(Items.BRICKS,4);smith.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,bricks);
+        var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.NORTH,pos,false);
+        h.assertTrue(smith.gameMode.useItemOn(smith,l,bricks,net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()&&bricks.isEmpty()&&w.build().sections==w.model().all,"Four bricks from the hand rebuild the chimney");
+        w.process();h.assertTrue(w.status!=MachineStatus.Workshop.INCOMPLETE,"Rebuilding the chimney restores the forge");h.succeed();
     }
     @GameTest(template="industrial") public static void recipesAndMendingCannotBypassWorkshops(GameTestHelper h){
         var manager=h.getLevel().getRecipeManager();

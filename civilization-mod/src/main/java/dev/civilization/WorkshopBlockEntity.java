@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** Eight physical slots; work and fuel commit on the server, with no reserved/offline inventories. */
-public final class WorkshopBlockEntity extends BlockEntity implements WorldlyContainer,MenuProvider,CoalFireHost {
+public final class WorkshopBlockEntity extends BlockEntity implements WorldlyContainer,MenuProvider,CoalFireHost,ModeledController {
     private final NonNullList<ItemStack> items=NonNullList.withSize(8,ItemStack.EMPTY);
     public final int kind;
     public final CoalFire fire=new CoalFire(this);
@@ -42,6 +42,17 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     }
     private ItemStack workingResult=ItemStack.EMPTY;
     public WorkshopBlockEntity(BlockPos p,BlockState s){super(WorkshopContent.ENTITY.get(),p,s);kind=((WorkshopBlock)s.getBlock()).kind;}
+    private final ModeledBuild build=new ModeledBuild();
+    @Override public MachineModel model(){return ((WorkshopBlock)getBlockState().getBlock()).model();}
+    @Override public ModeledBuild build(){return build;}
+    @Override public Direction front(){return getBlockState().getValue(WorkshopBlock.FACING);}
+    @Override public boolean working(){return getBlockState().getValue(MachineFeedback.WORKING);}
+    @Override public void sectionsChanged(){status=MachineStatus.Workshop.INCOMPLETE;}
+    /** A forge built as a native model checks its sections; the other workshops check their block structures. */
+    private int structure(){
+        if(model()==null)return MachineStructure.check(level,worldPosition,front()).status();
+        ModeledMachine.reconcile(this);return ModeledMachine.status(this);
+    }
     public WorkshopJobs.Job job(){return MachineWork.job(this,kind,selected);}
     public void select(int value){if(value< -1||value>=WorkshopJobs.jobs(kind).size()||value==selected)return;selected=value;progress=0;worker=null;workingResult=ItemStack.EMPTY;setChanged();}
     public void tick(){if(level!=null&&!level.isClientSide&&Math.floorMod(level.getGameTime()+worldPosition.asLong(),10)==0)process();}
@@ -75,8 +86,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     }
     private void processWork(){
         if(level==null||level.isClientSide)return;
-        var structure=MachineStructure.check(level,worldPosition,getBlockState().getValue(WorkshopBlock.FACING));
-        if(structure.status()!=MachineStructure.COMPLETE){firePaused=structure.status()==MachineStructure.UNLOADED;if(structure.status()==MachineStructure.INCOMPLETE)fire.extinguish();pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
+        int structure=structure();
+        if(structure!=MachineStructure.COMPLETE){firePaused=structure==MachineStructure.UNLOADED;if(structure==MachineStructure.INCOMPLETE)fire.extinguish();pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         if(MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Workshop.WET,false);return;}
         if(!fire.lit()){pause(MachineStatus.Workshop.FIRE_UNLIT,false);return;}
         ensureInputIdentity();
@@ -120,8 +131,11 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->heat;case 3->progress;case 4->status;case 5->fire.state();case 6->fire.remaining();default->0;};}
         public void set(int i,int v){}public int getCount(){return 7;}
     };
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("heat",heat);t.putInt("progress",progress);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;heat=Math.clamp(t.getInt("heat"),0,1600);progress=Math.clamp(t.getInt("progress"),0,20000);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("heat",heat);t.putInt("progress",progress);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;heat=Math.clamp(t.getInt("heat"),0,1600);progress=Math.clamp(t.getInt("progress"),0,20000);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
+    /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=new CompoundTag();if(model()!=null)build.save(t,r);return t;}
+    @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new WorkshopMenu(id,inv,this,data);}
     @Override public int getContainerSize(){return 8;}
