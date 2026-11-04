@@ -16,13 +16,45 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public final class WheelbarrowRenderer extends GeoEntityRenderer<WheelbarrowEntity> {
     // The load fills quarter-size blocks from the wheel end, across the 1 x 1 tray floor: its front-left corner in the model frame.
     private static final net.minecraft.world.phys.Vec3 TRAY=new net.minecraft.world.phys.Vec3(-.5,7.5/16,-.5);
+    /** Iris's shadow pass, when Iris is loaded: it draws from the sun with a parallel projection. */
+    private static final java.lang.invoke.MethodHandle SHADOW_PASS=irisShadowPass();
+    /** Whether the frame being drawn is the camera's, whose eye sits at the pose origin. */
+    private boolean camera;
     public WheelbarrowRenderer(EntityRendererProvider.Context c){super(c,new MachineGeoModel<>("wheelbarrow"));shadowRadius=.7f;}
+    private static java.lang.invoke.MethodHandle irisShadowPass(){
+        if(!net.neoforged.fml.ModList.get().isLoaded("iris"))return null;
+        try{
+            var api=Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            return java.lang.invoke.MethodHandles.publicLookup().findVirtual(api,"isRenderingShadowPass",java.lang.invoke.MethodType.methodType(boolean.class)).bindTo(api.getMethod("getInstance").invoke(null));
+        }catch(ReflectiveOperationException e){throw new IllegalStateException("Iris API",e);}
+    }
+    private static boolean shadowPass(){
+        try{return SHADOW_PASS!=null&&(boolean)SHADOW_PASS.invokeExact();}catch(Throwable t){throw new IllegalStateException("Iris API",t);}
+    }
+    /**
+     * The body's cubes are closed and its texture opaque, and in the camera's frame the eye sits at the pose origin, so
+     * a face turned away from it can never be seen: skipping those halves the vertices. Flat cubes, which show both
+     * sides, and the shadow pass draw every face.
+     */
+    @Override public void renderCube(PoseStack pose,software.bernie.geckolib.cache.object.GeoCube cube,VertexConsumer buffer,int light,int overlay,int colour){
+        var size=cube.size();
+        if(!camera||size.x==0||size.y==0||size.z==0){super.renderCube(pose,cube,buffer,light,overlay,colour);return;}
+        software.bernie.geckolib.util.RenderUtil.translateToPivotPoint(pose,cube);software.bernie.geckolib.util.RenderUtil.rotateMatrixAroundCube(pose,cube);software.bernie.geckolib.util.RenderUtil.translateAwayFromPivotPoint(pose,cube);
+        var normals=pose.last().normal();var at=new org.joml.Matrix4f(pose.last().pose());
+        for(var quad:cube.quads()){
+            if(quad==null)continue;
+            var normal=normals.transform(new org.joml.Vector3f(quad.normal()));
+            // Turned away by more than view bobbing moves the eye.
+            if(normal.dot(at.transformPosition(new org.joml.Vector3f(quad.vertices()[0].position())))>.05f)continue;
+            createVerticesOfQuad(quad,at,normal,buffer,light,overlay,colour);
+        }
+    }
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerEntityRenderer(WheelbarrowContent.ENTITY.get(),WheelbarrowRenderer::new);}
     @Override public RenderType getRenderType(WheelbarrowEntity e,net.minecraft.resources.ResourceLocation t,MultiBufferSource b,float partial){return RenderType.entityCutoutNoCull(t);}
     @Override public void render(WheelbarrowEntity e,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         // The wheel rests on its own ground, which lies below the body's resting height over a step down.
         pose.pushPose();pose.translate(0,e.wheelDrop(partial),0);
-        super.render(e,yaw,partial,pose,buffers,light);
+        camera=!shadowPass();super.render(e,yaw,partial,pose,buffers,light);
         pose.mulPose(Axis.YP.rotationDegrees(180-Mth.rotLerp(partial,e.yRotO,e.getYRot())));
         var axle=WheelbarrowEntity.AXLE;
         pose.translate(axle.x,axle.y,axle.z);pose.mulPose(Axis.XP.rotationDegrees(e.carriagePitch(partial)));pose.translate(-axle.x,-axle.y,-axle.z);
