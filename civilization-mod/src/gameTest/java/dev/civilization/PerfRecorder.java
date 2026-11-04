@@ -30,8 +30,9 @@ public final class PerfRecorder implements ProfilerFiller {
     /** One frame: its interval from the previous frame's start, per path its CPU and GPU nanoseconds and calls, and the
      *  nanoseconds the recorder itself spent on GPU queries. */
     record Frame(long interval, long[] cpu, long[] gpu, int[] calls, long overhead) {}
-    /** A window's frames, with each path's parent (or -1) and own section name, since names may hold slashes. */
-    record Window(String name, boolean gpu, List<String> paths, int[] parents, List<String> sections, List<Frame> frames) {}
+    /** A window's frames, with each path's parent (or -1) and own section name, since names may hold slashes, and when
+     *  it began and ended. */
+    record Window(String name, boolean gpu, List<String> paths, int[] parents, List<String> sections, List<Frame> frames, java.time.Instant start, java.time.Instant end) {}
     private record Span(int path, int start, int end) {}
 
     private final Map<Object, String> names = new IdentityHashMap<>();
@@ -47,6 +48,7 @@ public final class PerfRecorder implements ProfilerFiller {
     private final List<Frame> frames = new ArrayList<>();
     private Thread thread;
     private String name;
+    private java.time.Instant started;
     private boolean gpuTiming;
     private long frameStart, objectStart, overhead;
     private int objectPath = -1;
@@ -61,7 +63,7 @@ public final class PerfRecorder implements ProfilerFiller {
 
     /** Starts recording frames on the calling render thread under `name`, timing the rendering on the GPU when `gpu`. */
     void begin(String name, boolean gpu) {
-        this.name = name; gpuTiming = gpu; thread = Thread.currentThread(); frames.clear(); frameStart = 0; objectPath = -1; overhead = 0;
+        this.name = name; started = java.time.Instant.now(); gpuTiming = gpu; thread = Thread.currentThread(); frames.clear(); frameStart = 0; objectPath = -1; overhead = 0;
         Arrays.fill(cpu, 0); Arrays.fill(calls, 0); active = true;
     }
 
@@ -72,7 +74,7 @@ public final class PerfRecorder implements ProfilerFiller {
         for (var span : spans) { free.add(span.start()); free.add(span.end()); }
         stack.clear(); spans = new ArrayList<>();
         while (!pending.isEmpty()) resolve();
-        return new Window(name, gpuTiming, List.copyOf(paths), parents.toIntArray(), List.copyOf(sections), List.copyOf(frames));
+        return new Window(name, gpuTiming, List.copyOf(paths), parents.toIntArray(), List.copyOf(sections), List.copyOf(frames), started, java.time.Instant.now());
     }
 
     private int child(int parent, String section) {

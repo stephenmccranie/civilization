@@ -41,13 +41,13 @@ public final class PreviewVisualCheck {
             throw new IllegalStateException("Visual client must stay hidden, unfocused and unable to grab the mouse");
         if(CHECK.equals("weather-peer")){WeatherVisualCheck.peer(mc);return;}
         if(CHECK.equals("gladiator-peer")){ArenaVisualCheck.peer(mc);return;}
+        if(CHECK.equals("perf")){PerfBenchmark.tick(mc);return;}
         if (!opened && mc.screen instanceof TitleScreen) {
             opened = true;
             mc.createWorldOpenFlows().openWorld("preview-compatibility", mc::stop);
         }
         if (mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
 
-        if(CHECK.equals("perf")){PerfBenchmark.tick(mc);return;}
         if(CHECK.equals("welcome")){WelcomeVisualCheck.tick(mc);return;}
         if(CHECK.equals("grassier-grass")){GrassierGrassVisualCheck.tick(mc);return;}
         if(CHECK.equals("road")){RoadVisualCheck.tick(mc);return;}

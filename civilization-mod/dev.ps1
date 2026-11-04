@@ -83,6 +83,27 @@ function New-TestClient([string]$path) {
     [IO.File]::WriteAllLines((Join-Path $path 'options.txt'), $options)
 }
 
+# The player pack as players get it, in runs/perf: its pinned mods, Patrix and Photon and its settings, from the verified
+# download cache, at 2560x1440. This checkout supplies the Civilization build under test, GeckoLib and Sable. Each
+# Distant Horizons setting in `$changes` is replaced, from the pack's line to the given line.
+function New-PerfClient([hashtable]$changes) {
+    $perf = Join-Path $root 'runs/perf'
+    Reset-Directory $perf
+    & python (Join-Path $root '../tools/build_player_pack.py') --client $perf --skip civilization- geckolib- sable-
+    if ($LASTEXITCODE -ne 0) { throw 'Could not lay out the player pack.' }
+    [IO.File]::WriteAllText((Join-Path $perf 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 2560`nearlyWindowHeight = 1440`n")
+    $dh = Join-Path $perf 'config/DistantHorizons.toml'
+    $settings = [IO.File]::ReadAllText($dh)
+    foreach ($from in $changes.Keys) {
+        if (-not $settings.Contains($from)) { throw "The pack's Distant Horizons settings no longer hold $from." }
+        $settings = $settings.Replace($from, $changes[$from])
+    }
+    [IO.File]::WriteAllText($dh, $settings)
+    $options = @(Get-Content -LiteralPath (Join-Path $perf 'options.txt'))
+    $options += 'fullscreen:false', 'overrideWidth:2560', 'overrideHeight:1440', 'pauseOnLostFocus:false', 'onboardAccessibility:false', 'tutorialStep:none', 'joinedFirstServer:true'
+    [IO.File]::WriteAllLines((Join-Path $perf 'options.txt'), $options)
+}
+
 $previousJavaHome = $env:JAVA_HOME
 $peer = $null
 Push-Location $root
@@ -128,22 +149,24 @@ try {
             if ($peer) { Receive-Job $peer -Wait -ErrorAction Stop }
         }
         'Perf' {
-            # The player pack as players get it: its pinned mods, Patrix and Photon and its settings, from the verified
-            # download cache, on the pack's NeoForge. This checkout supplies the Civilization build under test, GeckoLib
-            # and Sable.
             $perf = Join-Path $root 'runs/perf'
-            Reset-Directory $perf
-            & python (Join-Path $root '../tools/build_player_pack.py') --client $perf --skip civilization- geckolib- sable-
-            if ($LASTEXITCODE -ne 0) { throw 'Could not lay out the player pack.' }
-            [IO.File]::WriteAllText((Join-Path $perf 'config/fml.toml'), "earlyWindowControl = false`nearlyWindowWidth = 2560`nearlyWindowHeight = 1440`n")
-            # Players' distant terrain comes from the server; a singleplayer client would generate it itself.
-            $dh = Join-Path $perf 'config/DistantHorizons.toml'
-            [IO.File]::WriteAllText($dh, ([IO.File]::ReadAllText($dh) -replace 'generatorPlan = "CHUNKS_ONLY"', 'generatorPlan = "DISABLED"'))
-            $options = @(Get-Content -LiteralPath (Join-Path $perf 'options.txt'))
-            $options += 'fullscreen:false', 'overrideWidth:2560', 'overrideHeight:1440', 'pauseOnLostFocus:false', 'onboardAccessibility:false', 'tutorialStep:none', 'joinedFirstServer:true'
-            [IO.File]::WriteAllLines((Join-Path $perf 'options.txt'), $options)
-            Copy-Item -LiteralPath (Join-Path $root 'run/saves/preview-compatibility') -Destination (Join-Path $perf 'saves/preview-compatibility') -Recurse
+            $world = Join-Path $root '../.tools/perf/world'
             $packNeoForge = (Get-Content -LiteralPath (Join-Path $root '../modpack/client-files.json') -Raw | ConvertFrom-Json).dependencies.neoforge
+            if (-not (Test-Path -LiteralPath $world)) {
+                # Made once and kept: the benchmark creates its world when it finds none, and Distant Horizons generates
+                # its terrain around the town with its own generator, to the pack's 128 chunks plus the walk's reach.
+                New-PerfClient @{
+                    'chunkGeneratorMode = "PRE_EXISTING_ONLY"' = "chunkGeneratorMode = `"FEATURES`"`nshowGenerationProgress = `"LOG`""
+                    'lodChunkRenderDistanceRadius = 128' = 'lodChunkRenderDistanceRadius = 136'
+                }
+                Write-Host 'Generating the benchmark world and its Distant Horizons terrain, once; it is kept in .tools/perf/world.'
+                Invoke-Gradle runPerfClient, "-Pneo_version=$packNeoForge"
+                New-Item -ItemType Directory -Force (Split-Path $world) | Out-Null
+                Move-Item -LiteralPath (Join-Path $perf 'saves/benchmark') -Destination $world
+            }
+            # Players' distant terrain comes from the server; a singleplayer client would generate it itself.
+            New-PerfClient @{ 'generatorPlan = "CHUNKS_ONLY"' = 'generatorPlan = "DISABLED"' }
+            Copy-Item -LiteralPath $world -Destination (Join-Path $perf 'saves/benchmark') -Recurse
             Write-Host "Hidden 2560x1440 performance benchmark in the player pack on NeoForge $packNeoForge. Report: runs/perf/report."
             Invoke-Gradle runPerfClient, "-Pneo_version=$packNeoForge"
             # Keep each report for comparison; runs/perf is rebuilt by the next run.

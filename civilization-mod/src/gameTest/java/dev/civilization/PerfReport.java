@@ -13,12 +13,16 @@ import net.minecraft.client.Minecraft;
  * per frame; the slowest frames are explained by the sections that ran furthest over their usual time.
  */
 final class PerfReport {
-    record Pass(PerfRecorder.Window window, boolean capped, Profile profile) {}
+    /** One leg of one walk, with the flight recording of that walk when it was profiled. */
+    record Pass(PerfRecorder.Window window, boolean capped, Path recording) {}
     /** A profile's sample counts: per thread group, and on the render thread and over all threads per owner and method. */
     record Profile(int samples, Map<String, Integer> threads, Map<String, Integer> renderOwners, Map<String, Integer> renderMethods,
                    Map<String, Integer> allOwners, Map<String, Integer> allMethods, int gcs, double gcPauseMs, double gcMaxMs, double periodMs) {}
     private static final double BUDGET = 1000.0 / PerfBenchmark.TARGET_FPS;
     private static final double SAMPLE_MS = 4;
+    /** The Distant Horizons settings a report names, as its config file holds them. */
+    private static final java.util.regex.Pattern DISTANT = java.util.regex.Pattern.compile(
+            "(generatorPlan|lodChunkRenderDistanceRadius|horizontalQuality|verticalQuality|maxHorizontalResolution|lodBiomeBlending)\\s*=\\s*\"?([^\"]*)\"?");
     /** Package roots of the code that runs in the pack, by owner; the first match wins. */
     private static final String[][] OWNERS = {
             {"dev.civilization", "Civilization"}, {"software.bernie.geckolib", "GeckoLib"}, {"net.caffeinemc", "Sodium"},
@@ -41,15 +45,23 @@ final class PerfReport {
         } catch (IOException | java.text.ParseException e) { throw new IllegalStateException("Flight recorder", e); }
     }
 
-    /** Stops the recording, keeps its file beside the report and reduces it to a profile. */
-    static Profile stopProfile(jdk.jfr.Recording recording, Minecraft mc, String name) {
+    /** Stops the recording and keeps its file beside the report. */
+    static Path saveProfile(jdk.jfr.Recording recording, Minecraft mc) {
         try {
             recording.stop();
-            var file = dir(mc).resolve(name + ".jfr"); recording.dump(file); recording.close();
+            var file = dir(mc).resolve("walk.jfr"); recording.dump(file); recording.close();
+            return file;
+        } catch (IOException e) { throw new IllegalStateException("Flight recorder", e); }
+    }
+
+    /** A recording's events within one window, reduced to a profile. */
+    private static Profile profile(Path file, PerfRecorder.Window w) {
+        try {
             var threads = new HashMap<String, Integer>(); var renderOwners = new HashMap<String, Integer>(); var renderMethods = new HashMap<String, Integer>();
             var allOwners = new HashMap<String, Integer>(); var allMethods = new HashMap<String, Integer>();
             int samples = 0, gcs = 0; double pause = 0, longest = 0;
             for (var event : jdk.jfr.consumer.RecordingFile.readAllEvents(file)) {
+                if (event.getStartTime().isBefore(w.start()) || event.getStartTime().isAfter(w.end())) continue;
                 var type = event.getEventType().getName();
                 if (type.equals("jdk.GarbageCollection")) {
                     gcs++; pause += event.getDuration("sumOfPauses").toNanos() / 1e6; longest = Math.max(longest, event.getDuration("longestPause").toNanos() / 1e6);
@@ -114,7 +126,7 @@ final class PerfReport {
         var gpuSorted = gpu.clone(); Arrays.sort(gpuSorted); var deltaSorted = deltas.clone(); Arrays.sort(deltaSorted);
         double tolerance = pass.capped() ? 1.0 : 0;
         var out = new LinkedHashMap<String, Object>();
-        out.put("view", w.name()); out.put("capped", pass.capped()); out.put("gpuTimed", w.gpu()); out.put("frames", frames.size());
+        out.put("leg", w.name()); out.put("capped", pass.capped()); out.put("gpuTimed", w.gpu()); out.put("frames", frames.size());
         out.put("recorderMs", frames.stream().mapToDouble(f -> f.overhead() / 1e6).average().orElse(0));
         out.put("seconds", Arrays.stream(interval).sum() / 1000);
         out.put("fps", 1000 / mean(interval));
@@ -166,7 +178,7 @@ final class PerfReport {
             }
             return Map.of("frame", i, "ms", interval[i], "cpuWorkMs", cpuWork[i], "gpuMs", gpu[i], "causes", causes);
         }).toList());
-        if (pass.profile() != null) out.put("profile", pass.profile());
+        if (pass.recording() != null) out.put("profile", profile(pass.recording(), w));
         return out;
     }
 
@@ -182,6 +194,12 @@ final class PerfReport {
         try (var in = Files.newInputStream(mc.gameDirectory.toPath().resolve("config/iris.properties"))) { iris.load(in); }
         meta.put("shaderPack", iris.getProperty("enableShaders", "false").equals("true") ? iris.getProperty("shaderPack") : "none");
         meta.put("resourcePacks", mc.getResourcePackRepository().getSelectedIds());
+        var distant = new TreeMap<String, String>();
+        for (var line : Files.readAllLines(mc.gameDirectory.toPath().resolve("config/DistantHorizons.toml"))) {
+            var setting = DISTANT.matcher(line.trim());
+            if (setting.matches()) distant.put(setting.group(1), setting.group(2));
+        }
+        meta.put("distantHorizons", distant);
         meta.put("renderDistance", mc.options.renderDistance().get()); meta.put("targetFps", PerfBenchmark.TARGET_FPS);
         meta.put("mods", net.neoforged.fml.ModList.get().getMods().stream().map(m -> m.getModId() + " " + m.getVersion()).sorted().toList());
         Files.writeString(dir.resolve("report.json"), new com.google.gson.GsonBuilder().setPrettyPrinting().serializeSpecialFloatingPointValues().create()
@@ -192,23 +210,24 @@ final class PerfReport {
     @SuppressWarnings("unchecked")
     private static String markdown(Map<String, Object> meta, List<Map<String, Object>> passes) {
         var md = new StringBuilder("# Performance report\n\n");
-        md.append(String.format(Locale.ROOT, "%s, %s, %s, shader %s, render distance %s, target %d fps (%.2f ms).%n%n", meta.get("resolution"), meta.get("renderer"),
-                meta.get("cpu"), meta.get("shaderPack"), meta.get("renderDistance"), PerfBenchmark.TARGET_FPS, BUDGET));
-        md.append("## Frame pacing\n\n| View | Cap | FPS | 1% low | 0.1% low | p50 ms | p99 ms | max ms | over budget | >16.7 ms | >33 ms | jitter mean / p99 ms | CPU work p50 / p99 | GPU p50 / p99 | Recorder ms |\n");
+        md.append(String.format(Locale.ROOT, "%s, %s, %s, shader %s, render distance %s, target %d fps (%.2f ms). Distant Horizons: %s.%n%n", meta.get("resolution"), meta.get("renderer"),
+                meta.get("cpu"), meta.get("shaderPack"), meta.get("renderDistance"), PerfBenchmark.TARGET_FPS, BUDGET, meta.get("distantHorizons")));
+        md.append("## Frame pacing\n\n| Leg | Cap | FPS | 1% low | 0.1% low | p50 ms | p99 ms | max ms | over budget | >16.7 ms | >33 ms | jitter mean / p99 ms | CPU work p50 / p99 | GPU p50 / p99 | Recorder ms |\n");
         md.append("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n");
         for (var p : passes) {
             var f = (Map<String, Double>) p.get("frameMs"); var j = (Map<String, Double>) p.get("jitterMs"); var c = (Map<String, Double>) p.get("cpuWorkMs"); var g = (Map<String, Double>) p.get("gpuMs");
             var gpu = (boolean) p.get("gpuTimed") ? String.format(Locale.ROOT, "%.2f / %.2f", g.get("p50"), g.get("p99")) : "not timed";
-            md.append(String.format(Locale.ROOT, "| %s | %s | %.0f | %.0f | %.0f | %.2f | %.2f | %.1f | %.1f%% | %d | %d | %.2f / %.2f | %.2f / %.2f | %s | %.2f |%n", p.get("view"),
+            md.append(String.format(Locale.ROOT, "| %s | %s | %.0f | %.0f | %.0f | %.2f | %.2f | %.1f | %.1f%% | %d | %d | %.2f / %.2f | %.2f / %.2f | %s | %.2f |%n", p.get("leg"),
                     (boolean) p.get("capped") ? PerfBenchmark.TARGET_FPS : "none", p.get("fps"), p.get("low1Fps"), p.get("low01Fps"), f.get("p50"), f.get("p99"), f.get("max"),
                     p.get("overBudgetPct"), p.get("stutters17"), p.get("stutters33"), j.get("mean"), j.get("p99"), c.get("p50"), c.get("p99"), gpu, p.get("recorderMs")));
         }
         md.append("\nCPU work is the render thread's frame less the present and frame-cap wait. GPU is the GPU time of everything the frame renders; it includes idle gaps when the GPU waits for the CPU. ")
                 .append("The capped pass times nothing on the GPU, so it shows the pacing players get; the uncapped pass times the frame's rendering on the GPU, at the recorder cost shown. ")
-                .append("The hidden client presents nothing and keeps at most two frames in flight on the GPU, as a visible window's swap chain does; Distant Horizons generates no terrain locally, as for players on the server.\n");
+                .append("The hidden client presents nothing and keeps at most two frames in flight on the GPU, as a visible window's swap chain does. ")
+                .append("Each pass walks the same route at walking pace; Distant Horizons draws its stored terrain 128 chunks out and generates none locally, as for players on the server.\n");
         for (var p : passes) {
             if ((boolean) p.get("capped")) continue;
-            md.append("\n## ").append(p.get("view")).append(", uncapped\n\n### Costliest by name (self ms per frame, summed over the frame)\n\n| Section | Calls | CPU | GPU |\n| --- | ---: | ---: | ---: |\n");
+            md.append("\n## ").append(p.get("leg")).append(", uncapped\n\n### Costliest by name (self ms per frame, summed over the frame)\n\n| Section | Calls | CPU | GPU |\n| --- | ---: | ---: | ---: |\n");
             var names = (List<Map<String, Object>>) p.get("names");
             names.stream().filter(m -> !m.get("name").equals("root")).sorted(Comparator.comparingDouble(m -> -Math.max((double) m.get("cpuSelfMs"), (double) m.get("gpuSelfMs")))).limit(30)
                     .forEach(m -> md.append(String.format(Locale.ROOT, "| %s | %.1f | %.3f | %.3f |%n", m.get("name"), m.get("calls"), m.get("cpuSelfMs"), m.get("gpuSelfMs"))));

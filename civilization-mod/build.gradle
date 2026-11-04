@@ -111,7 +111,8 @@ tasks.named('runFixtureServer', JavaExec) {
 }
 tasks.named('runVisualClient', JavaExec) { timeout = java.time.Duration.ofMinutes(6) }
 tasks.named('runPeerClient', JavaExec) { timeout = java.time.Duration.ofMinutes(6) }
-tasks.named('runPerfClient', JavaExec) { timeout = java.time.Duration.ofMinutes(15) }
+// Long enough for the first run, which also generates the benchmark world.
+tasks.named('runPerfClient', JavaExec) { timeout = java.time.Duration.ofMinutes(60) }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def properties = [
