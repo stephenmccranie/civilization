@@ -41,6 +41,7 @@ public final class Civilization {
         EquipmentGrade.register(modBus);
         FarmingContent.register(modBus);
         KilnContent.register(modBus);
+        MachineParts.register(modBus);
         WorkshopContent.register(modBus);
         ManufacturingContent.register(modBus);
         CookingContent.register(modBus);

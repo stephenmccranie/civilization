@@ -12,7 +12,7 @@ public final class RefineryPortBlock extends Block implements EntityBlock {
     @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){return defaultBlockState().setValue(FACING,c.getClickedFace());}
     @Override public BlockEntity newBlockEntity(BlockPos p,BlockState s){return new RefineryPortEntity(p,s);}
     @Override protected java.util.List<net.minecraft.world.item.ItemStack> getDrops(BlockState s,net.minecraft.world.level.storage.loot.LootParams.Builder b){
-        return b.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY) instanceof RefineryPortEntity p&&p.derrickAssembly()?java.util.List.of():super.getDrops(s,b);
+        return b.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY) instanceof RefineryPortEntity p&&p.assembly()?java.util.List.of():super.getDrops(s,b);
     }
     @Override protected void onRemove(BlockState s,Level l,BlockPos at,BlockState next,boolean moving){
         if(!l.isClientSide&&!s.is(next.getBlock())&&l.getBlockEntity(at) instanceof RefineryPortEntity p)p.breakAssembly();

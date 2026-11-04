@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** Reuses vanilla persistence, sided inventory, output limits and recipe completion. */
-public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalFireHost {
+public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalFireHost, ModeledController {
     private net.minecraft.resources.ResourceLocation selectedRecipe;
     public java.util.List<net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.AbstractCookingRecipe>> recipes() {
         return level.getRecipeManager().getAllRecipesFor((net.minecraft.world.item.crafting.RecipeType<net.minecraft.world.item.crafting.AbstractCookingRecipe>)processType)
@@ -49,11 +49,21 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     public int structureStatus() { return structure.status(); }
     public boolean requiresStructure() { return true; }
     public MachineStructure.Result checkStructure() {
-        structure = requiresStructure()
-                ? MachineStructure.check(level, worldPosition, getBlockState().getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING))
+        if (model() != null) { ModeledMachine.reconcile(this); structure = new MachineStructure.Result(ModeledMachine.status(this), null, ""); }
+        else structure = requiresStructure()
+                ? MachineStructure.check(level, worldPosition, front())
                 : new MachineStructure.Result(MachineStructure.COMPLETE, null, "");
         return structure;
     }
+    private final ModeledBuild build = new ModeledBuild();
+    @Override public MachineModel model() { return getBlockState().getBlock() instanceof ModeledBlock b ? b.model() : null; }
+    @Override public ModeledBuild build() { return build; }
+    @Override public net.minecraft.core.Direction front() { return getBlockState().getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING); }
+    @Override public boolean working() { return getBlockState().getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT); }
+    @Override public void sectionsChanged() { structure = new MachineStructure.Result(MachineStructure.INCOMPLETE, null, ""); }
+    /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider lookup) { var tag = new CompoundTag(); if (model() != null) build.save(tag, lookup); return tag; }
+    @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket() { return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this); }
     /** Small, synchronized state vocabulary shared by all three menus. */
     public int operatingStatus() {
         if (requiresStructure() && structureStatus() != MachineStructure.COMPLETE) return 0;
@@ -91,6 +101,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     @Override protected AbstractContainerMenu createMenu(int id, Inventory inventory) { return new KilnMenu(id, inventory, this, dataAccess); }
     @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
         super.loadAdditional(tag, lookup);fire.load(tag);
+        if (model() != null) { int before = build.sections; build.load(tag, lookup, model()); if (level != null && level.isClientSide && build.sections != before) ModeledMachine.redraw(this); }
         selectedRecipe=tag.contains("SelectedRecipe")?net.minecraft.resources.ResourceLocation.tryParse(tag.getString("SelectedRecipe")):null;
         legacyOverflow.clear();
         var old=net.minecraft.core.NonNullList.withSize(12,ItemStack.EMPTY);
@@ -106,6 +117,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     private final java.util.List<ItemStack> legacyOverflow=new java.util.ArrayList<>();
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider lookup){
         super.saveAdditional(tag,lookup);fire.save(tag);tag.putBoolean("TwoFuelSlots",true);
+        if(model()!=null)build.save(tag,lookup);
         tag.putBoolean("TwoMaterialSlots",true);
         if(selectedRecipe!=null)tag.putString("SelectedRecipe",selectedRecipe.toString());
         if(!legacyOverflow.isEmpty()){var list=new net.minecraft.nbt.ListTag();for(var item:legacyOverflow)list.add(item.save(lookup));tag.put("LegacyOverflow",list);}

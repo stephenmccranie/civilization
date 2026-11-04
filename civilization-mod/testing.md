@@ -11,6 +11,7 @@ Run the smallest check that covers the change, once. Repeat a passing check only
 | Vehicle state across a server restart | `.\dev.ps1 Fixture -Name boat` or `-Name airship` |
 | Heat solver | `.\dev.ps1 Fixture -Name thermal`, and `-Phase physics` for the reference physics checks |
 | Client and server together | `GameTest` plus the relevant scene |
+| Rendering cost or frame pacing | `.\dev.ps1 Perf`, before and after the change ([performance](#performance)) |
 
 ## How runs work
 
@@ -29,7 +30,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `machines` | Kiln, Fertilizer Furnace and Cooking Stove controllers and shells, and cut-block placement previews |
 | `textures` | Item and controller display |
 | `guide` | Textured multiblock build guide, including a wrong block and its removal |
-| `placement` | Held Kiln, Smithy, Oil Derrick, Assembly Bench and Baking Oven previews facing three ways, mostly from the offhand as survival carries them: a refused bench, an obstructed shell and a controller held up to a finished shell. Each real right-click must place exactly the previewed cells, or nothing |
+| `placement` | Held Kiln, Fertilizer Furnace, Smithy, Oil Derrick, Assembly Bench and Baking Oven previews facing three ways, mostly from the offhand as survival carries them: a refused bench, an obstructed shell and a controller held up to a finished shell. Each real right-click must place exactly the previewed cells, or nothing |
 | `modular` | Mixed-material and irregular cut-block assemblies |
 | `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat) |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
@@ -41,7 +42,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `storage` | Paired material, fuel and output banks in machine menus |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
 | `pipes` | Empty and flowing glass pipes, connections and flanges |
-| `industry` | Refinery, Oil Derrick, construction cabinet and industrial icons |
+| `industry` | Refinery, Oil Derrick, construction cabinet, industrial icons, and a boat helm and guardrail run |
 | `derrick-guide` | Oil Derrick section guides placed by real clicks, day and night |
 | `engine` | Oil Engine states, cabinet and wheel animation |
 | `models` | GeckoLib model integration beside the Oil Engine |
@@ -62,7 +63,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |
 | `oven` | Baking Oven placement and animated door |
 | `canisters` | All four canisters in frames, inventory and hand |
-| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components` | Item art in frames, inventory slots and hand |
+| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools`, `minerals` | Item art in frames, inventory slots and hand |
 | `paterson` | Paterson revolver input, reload, hammer and recoil |
 | `boat` | Freeform boat placement, gears, steering and throttle |
 | `airship` | Airship assembly, flight controls and rider retention |
@@ -70,6 +71,19 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `gladiator` | Two clients: arena menus, stakes, knockout and winnings |
 
 `weather` and `gladiator` start a second hidden client in `runs/peer` that joins once the host writes `runs/peer/ready.txt`. An unknown scene name fails the run.
+
+## Performance
+
+`.\dev.ps1 Perf` runs the benchmark in the player pack exactly as players get it: every mod, Patrix 32x, Photon on the pack's Medium settings and the pack's options, laid out from `modpack/client-files.json` and its verified download cache on the pack's NeoForge, with this checkout's Civilization build. The client is hidden at 2560x1440 with vsync off. Drivers throttle a hidden window's buffer swaps, so it presents nothing and instead keeps at most two frames in flight on the GPU, as a visible window's swap chain does. Distant Horizons draws its stored terrain at the pack's 128 chunks and quality settings, which the report lists, and generates none locally, as for players, whose distant terrain comes from the server.
+
+The benchmark has one world, generated on the first run and kept in `.tools/perf/world`: a fixed seed, a town site on open plains, every chunk the walk loads, and Distant Horizons terrain built 136 chunks around the town by its own generator. Each run copies it and builds the town on a grass lawn: three yards of every custom model, the Oil Derrick, Kiln, Foundry and Fertilizer Furnace built and burning, the Baking Oven and Cooking Stove, loaded pallets and wheelbarrows. It waits until the world has finished loading (the threads that build chunk meshes, grass blades and Distant Horizons' terrain have gone quiet), then walks one route of about 100 blocks at walking pace in three legs (`approach` across the meadow, `yards` along the lane between the first two yards, `outskirts` out into the country). The first walk is not measured, because chunk meshes and grass blades are built as the route first brings them near; the second is uncapped and the third capped at the 120 fps target, each measured per leg:
+
+- **Pacing:** frame rate, 1% and 0.1% lows, frame-time percentiles, the share of frames over the 8.33 ms budget, frames over 16.7 and 33 ms, and frame-to-frame jitter. The capped pass is the pacing players get.
+- **Cost:** every profiler section of the frame, Minecraft's, Sodium's, Iris's (including its shadow pass, shader passes and final pass) and Distant Horizons', timed on the CPU and on the GPU with timestamp queries; each draw by render type and texture; each block entity and entity render by type on the CPU. Tables give self time per frame by section and summed by name.
+- **Slowest frames:** the ten slowest uncapped frames with the sections that ran furthest over their usual time.
+- **Java profile:** a flight recording of every thread during the uncapped walk, summed per leg by thread, by owning mod and by method, with garbage-collection pauses.
+
+The report is `runs/perf/report/report.md`, with `report.json` for comparing runs, the recording (`walk.jfr`) and a screenshot at the start of each leg; each run's report and screenshots are also kept in `.tools/perf/<time>-<commit>`. The run fails if a chunk is generated after the town is built; delete `.tools/perf/world` after changing the seed, site or route so the next run generates the world again. Compare a change against a run of its base on the same quiet machine: other load on the desktop, a Minecraft client or another session, shifts the numbers.
 
 ## Fixtures
 

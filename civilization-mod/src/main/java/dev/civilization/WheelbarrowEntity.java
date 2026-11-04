@@ -25,21 +25,22 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * Its tray holds a fixed volume of goods that clients draw one for one.
  */
 public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHolder,net.minecraft.world.MenuProvider {
-    public static final float MODEL_SCALE=1.35f;
     public static final float PUSH_TILT_DEGREES=4;
-    public static final float WHEEL_RADIUS=4.1411056f/16*MODEL_SCALE;
+    public static final float WHEEL_RADIUS=5.5f/16;
     /** Degrees per tick A/D pivot the carrier: 70 degrees a second. */
     public static final float TURN=3.5f;
     /** The handler's head turns at most this far from the handles. */
     public static final float LOOK=75;
-    /** Three 3x4 layers of quarter-size blocks: one below the rim, one rising past it and one heaped above. */
-    public static final CargoGrid GRID=new CargoGrid(3,4,3,CargoGrid.CELL);
-    // Model frame: x right, y up, z rear.
-    public static final Vec3 AXLE=new Vec3(0,.3375,-.84375);
-    private static final Vec3 GRIP=new Vec3(5.7375/16,.8015,1.4343);
-    // The handler stands this far behind the center, steps a block at a time, and lets go beyond arm's reach.
-    private static final double HANDLER=1.4*MODEL_SCALE,STEP=1,REACH=4;
-    private static final AABB WHEEL=new AABB(-.055,0,-1.195,.055,.1,-.49),LEGS=new AABB(-6.48/16,0,9.72/16,6.48/16,.1,11.205/16);
+    /** Four 4x4 layers of quarter-size blocks: two below the rim, a third rising past it and a fourth heaped above. */
+    public static final CargoGrid GRID=new CargoGrid(4,4,4,CargoGrid.CELL);
+    // Model frame: x right, y up, z rear; measured from the model's landmarks.
+    public static final Vec3 AXLE=new Vec3(0,5.5/16,-15.5/16);
+    /** The right grip's centre, parked. */
+    public static final Vec3 GRIP=new Vec3(5.75/16,.6487,1.2199);
+    // The handler stands where the hands reach the raised grips, steps a block at a time, and lets go beyond arm's reach.
+    private static final double HANDLER=1.44,STEP=1,REACH=4;
+    // Where the tyre can touch the ground, and the parked legs' shoes.
+    private static final AABB WHEEL=new AABB(-.07,0,-21/16d,.07,.1,-10/16d),LEGS=new AABB(-8.125/16,0,4.625/16,8.125/16,.1,6.375/16);
     private static final EntityDataAccessor<Boolean> HELD=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> TRAVEL=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HEADING=SynchedEntityData.defineId(WheelbarrowEntity.class,EntityDataSerializers.FLOAT);
@@ -78,8 +79,8 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     @Override public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id,net.minecraft.world.entity.player.Inventory inv,Player p){return new CargoMenu(id,inv,this);}
     @Override public InteractionResult interactAt(Player p,Vec3 hit,InteractionHand hand){
         if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
-        // Transform the actual hit into the model frame: the handles lie at the rear.
-        if(p.isShiftKeyDown()||hit.yRot((getYRot()-180)*Mth.DEG_TO_RAD).z>.4*MODEL_SCALE)return interact(p,hand);
+        // Transform the actual hit into the model frame: the rear wall and the handles behind it take the handles.
+        if(p.isShiftKeyDown()||hit.yRot((getYRot()-180)*Mth.DEG_TO_RAD).z>.5)return interact(p,hand);
         if(!level().isClientSide&&cargoValid(p))p.openMenu(this);
         return InteractionResult.sidedSuccess(level().isClientSide);
     }
@@ -151,7 +152,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     @Override public Vec3 getDismountLocationForPassenger(LivingEntity passenger){
         var feet=handlerPosition(position(),getYRot());
         for(double side:new double[]{1,-1,0}){
-            Vec3 at=new Vec3(feet.x,passenger.getY(),feet.z).add(new Vec3(side*.95*MODEL_SCALE,0,0).yRot(-getYRot()*Mth.DEG_TO_RAD));
+            Vec3 at=new Vec3(feet.x,passenger.getY(),feet.z).add(new Vec3(side,0,0).yRot(-getYRot()*Mth.DEG_TO_RAD));
             var box=passenger.getBoundingBox().move(at.subtract(passenger.position()));
             if(level().hasChunkAt(BlockPos.containing(at))&&level().noCollision(passenger,box))return at;
         }

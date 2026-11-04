@@ -9,7 +9,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)DerrickFixture.assemble(m);else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
+    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);
@@ -44,7 +44,7 @@ final class IndustryVisualCheck {
             // Reuse the clear foreground after refinery checks; this fixture has no bearing on production saves.
             for(int x=26;x<=30;x++)for(int z=-1;z<=3;z++)for(int y=101;y<=107;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
             l.setBlockAndUpdate(at,KilnContent.FOUNDRY.get().defaultBlockState());
-            for(var part:MachineStructure.parts(l.getBlockState(at)))MachineStructure.placePart(l,at,Direction.NORTH,part);
+            MachineFixture.build(l,at);
             var f=(FoundryBlockEntity)l.getBlockEntity(at);if(f.checkStructure().status()!=MachineStructure.COMPLETE)throw new IllegalStateException("Foundry fixture incomplete");
             f.setItem(0,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT,4));f.setItem(1,KilnContent.MINERAL_COAL.toStack(4));CoalFireFixture.light(f);
             var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,28.5,101,-3,java.util.Set.of(),0,0);p.getInventory().setItem(0,KilnContent.STEEL.toStack());p.getInventory().setItem(1,KilnContent.MACHINE_PARTS.toStack());p.openMenu(f);
@@ -74,7 +74,10 @@ final class IndustryVisualCheck {
         if(ticks==650)shot(mc,"controller-family");
         if(ticks==655){mc.options.hideGui=false;mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}
         if(ticks==670)shot(mc,"controller-items");
-        if(ticks>675)mc.stop();
+        // Brass and gauge fittings: a helm console with its panel and a guardrail run beside a casing block.
+        if(ticks==675){mc.setScreen(null);mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();var at=new BlockPos(24,101,-27);l.setBlockAndUpdate(at,BoatContent.HELM.get().defaultBlockState());for(var part:BoatSystem.parts())MachineStructure.placePart(l,at,Direction.NORTH,part);for(int x=28;x<=31;x++)l.setBlockAndUpdate(new BlockPos(x,101,-27),IndustrialContent.GUARDRAIL.get().defaultBlockState());l.setBlockAndUpdate(new BlockPos(32,101,-27),IndustrialContent.CASING.get().defaultBlockState());p.teleportTo(l,28.5,102.5,-32,java.util.Set.of(),0,20);});}
+        if(ticks==705)shot(mc,"fittings");
+        if(ticks>710)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"industry-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }

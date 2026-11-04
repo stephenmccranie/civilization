@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class WorkshopBlock extends KilnBlock {
+    @Override public MachineModel model() { return null; }
     public final int kind;
     public WorkshopBlock(Properties p,int kind){super(p);this.kind=kind;}
     private static final net.minecraft.world.phys.shapes.VoxelShape BENCH_SHAPE=net.minecraft.world.phys.shapes.Shapes.or(

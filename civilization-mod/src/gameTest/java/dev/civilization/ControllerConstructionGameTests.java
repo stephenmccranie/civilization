@@ -30,8 +30,7 @@ public final class ControllerConstructionGameTests {
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
-        List<Block> controllers=List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),KilnContent.FOUNDRY.get(),
-                WorkshopContent.TANNERY.get(),WorkshopContent.TEXTILE.get(),WorkshopContent.SMITHY.get(),
+        List<Block> controllers=List.of(WorkshopContent.TANNERY.get(),WorkshopContent.TEXTILE.get(),WorkshopContent.SMITHY.get(),
                 IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
                 BulkContent.TANK.get(),OilEngineContent.ENGINE.get(),CivicContent.TABLE.get());
@@ -75,7 +74,7 @@ public final class ControllerConstructionGameTests {
 
     @GameTest(template="empty",batch="construction-materials") public static void controllerNeverCutsHeldBlocks(GameTestHelper h) {
         var level=h.getLevel();var at=h.absolutePos(new BlockPos(8,67,8));var front=Direction.NORTH;
-        var state=KilnContent.KILN.get().defaultBlockState().setValue(CivicBlock.FACING,front);
+        var state=WorkshopContent.SMITHY.get().defaultBlockState().setValue(CivicBlock.FACING,front);
         level.setBlockAndUpdate(at,state);
         var player=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"cut-check"));
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -86,11 +85,12 @@ public final class ControllerConstructionGameTests {
             var target=MachineStructure.position(at,front,part);
             level.getChunkAt(target);
             level.setBlockAndUpdate(target,Blocks.AIR.defaultBlockState());
-            var full=new ItemStack(Blocks.COBBLESTONE,4);
+            var material=Blocks.BRICKS;
+            var full=new ItemStack(material,4);
             h.assertTrue(!MachineConstruction.hasMissing(level,at,front,List.of(part),full),"Full blocks do not supply a "+units+"-unit cut piece");
             h.assertTrue(MachineConstruction.build(level,at,front,List.of(part),player,full)==0&&full.getCount()==4&&level.getBlockState(target).isAir(),"Controller cannot cut full blocks into "+units+"-unit pieces");
             int other=units==1?2:1;
-            var wrong=CuttingContent.stack(Blocks.COBBLESTONE.defaultBlockState(),other,4);
+            var wrong=CuttingContent.stack(material.defaultBlockState(),other,4);
             h.assertTrue(!MachineConstruction.hasMissing(level,at,front,List.of(part),wrong),"A different cut size does not supply a "+units+"-unit piece");
             h.assertTrue(MachineConstruction.build(level,at,front,List.of(part),player,wrong)==0&&wrong.getCount()==4&&level.getBlockState(target).isAir(),"Controller cannot recut a "+other+"-unit piece");
         }

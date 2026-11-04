@@ -42,7 +42,7 @@ final class WheelbarrowVisualCheck {
         if(t==130)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(.5,100,.5),Direction.UP,new BlockPos(0,99,0),false));
         if(t==150){var e=barrow(mc);entityId=e.getId();check(server,()->{var b=barrow(server);b.setYRot(45.125f);b.setPos(b.position());var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(InteractionHand.MAIN_HAND,WheelbarrowContent.ITEM.toStack());p.inventoryMenu.broadcastFullState();var at=b.handlerPosition(b.position(),45);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),45,20);});}
         if(t==160&&Math.abs(barrow(mc).getYRot()-45.125f)>.002f)throw new IllegalStateException("Client heading was rounded to native angle bytes: "+barrow(mc).getYRot());
-        if(t==165){var e=barrow(mc);var point=e.position().add(new Vec3(.3586,.8,1.4343).yRot((180-e.getYRot())*Mth.DEG_TO_RAD));mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,point),InteractionHand.MAIN_HAND);}
+        if(t==165){var e=barrow(mc);var point=e.position().add(WheelbarrowEntity.GRIP.yRot((180-e.getYRot())*Mth.DEG_TO_RAD));mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,point),InteractionHand.MAIN_HAND);}
         if(t==175&&Math.abs(Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>.01f)throw new IllegalStateException("Taking handles did not align the first-person heading");
         // Handler teleports turn the view by nothing (a relative turn to their own yaw): it comes round with the handles.
         if(t==180){if(!(mc.player.getVehicle() instanceof WheelbarrowEntity))throw new IllegalStateException("Taking diagonal handles while holding the placement item did not synchronize");check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(e.position());var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();var at=e.handlerPosition(e.position(),0);p.connection.teleport(at.x,at.y,at.z,p.getYRot(),20,java.util.Set.of(net.minecraft.world.entity.RelativeMovement.Y_ROT));});}
@@ -103,8 +103,8 @@ final class WheelbarrowVisualCheck {
         if(t==462){mc.getEntityRenderDispatcher().setRenderHitBoxes(true);mc.options.hideGui=true;observe(mc,new Vec3(-21.5,104.5,-8.5),0,48);}
         if(t==468){check(server,()->{if(Math.abs(barrow(server).getY()-100)>1e-6)throw new IllegalStateException("A block beside the body lifted the carrier");});shot(mc,"hitbox-diagonal");}
         if(t==470){mc.getEntityRenderDispatcher().setRenderHitBoxes(false);observe(mc,null,0,0);check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(-21,100,-4),Blocks.AIR.defaultBlockState()));}
-        // The tray draws every block it holds: one 3x4 layer below the rim, a second rising past it, then a mixed heap.
-        if(t==472){check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(-21.5,100,-4.5);e.cargo().insert(new ItemStack(Blocks.STONE),12);});observe(mc,new Vec3(-19.6,101.9,-2.3),139,30);}
+        // The tray draws every block it holds: two 4x4 layers below the rim, a third rising past it, then a mixed heap.
+        if(t==472){check(server,()->{var e=barrow(server);e.setYRot(0);e.setPos(-21.5,100,-4.5);e.cargo().insert(new ItemStack(Blocks.STONE),16);});observe(mc,new Vec3(-19.6,101.9,-2.3),139,30);}
         if(t==483){
             // Walk across the front, through the tyre's point: the real client, with the pack's Lithium, rides around the taper onto the tread line.
             var e=barrow(mc);if(Math.abs(Mth.wrapDegrees(e.getYRot()))>.01f)throw new IllegalStateException("The parked barrow had not settled facing south: "+e.getYRot());
@@ -116,15 +116,15 @@ final class WheelbarrowVisualCheck {
             mc.player.setPos(back);
         }
         if(t==478)shot(mc,"tray-layer");
-        if(t==479)check(server,()->barrow(server).cargo().insert(new ItemStack(Blocks.OAK_PLANKS),12));
+        if(t==479)check(server,()->{var c=barrow(server).cargo();c.insert(new ItemStack(Blocks.OAK_PLANKS),16);c.insert(new ItemStack(Blocks.STONE_BRICKS),16);});
         if(t==485)shot(mc,"tray-rim");
         if(t==486)check(server,()->{
-            var c=barrow(server).cargo();c.insert(new ItemStack(Blocks.COBBLESTONE),6);c.insert(new ItemStack(Blocks.STONE_SLAB),8);c.insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),16);
-            if(c.load()!=WheelbarrowEntity.GRID.capacity()||c.insert(new ItemStack(Blocks.STONE),1)!=0)throw new IllegalStateException("The heaped tray did not hold exactly its drawn 36 blocks: "+c.load());
+            var c=barrow(server).cargo();c.insert(new ItemStack(Blocks.COBBLESTONE),6);c.insert(new ItemStack(Blocks.STONE_SLAB),8);c.insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),48);
+            if(c.load()!=WheelbarrowEntity.GRID.capacity()||c.insert(new ItemStack(Blocks.STONE),1)!=0)throw new IllegalStateException("The heaped tray did not hold exactly its drawn 64 blocks: "+c.load());
         });
         if(t==492)shot(mc,"tray-heaped");
         if(t==494){mc.options.hideGui=false;observe(mc,null,0,0);check(server,()->{var e=barrow(server);var p=server.getPlayerList().getPlayers().getFirst();var at=e.handlerPosition(e.position(),0);p.teleportTo(server.overworld(),at.x,at.y,at.z,java.util.Set.of(),0,20);});}
-        if(t==500){var e=barrow(mc);var point=e.position().add(new Vec3(.3586,.8,1.4343).yRot((180-e.getYRot())*Mth.DEG_TO_RAD));mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,point),InteractionHand.MAIN_HAND);}
+        if(t==500){var e=barrow(mc);var point=e.position().add(WheelbarrowEntity.GRIP.yRot((180-e.getYRot())*Mth.DEG_TO_RAD));mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,point),InteractionHand.MAIN_HAND);}
         if(t==506){if(mc.player.getVehicle()!=barrow(mc))throw new IllegalStateException("Could not take the heaped barrow's handles");shot(mc,"heaped-first-person");mc.options.keyShift.setDown(true);}
         if(t==510){mc.options.keyShift.setDown(false);check(server,()->{var c=barrow(server).cargo();while(!c.isEmpty())c.remove(0,Long.MAX_VALUE);});}
     }
@@ -148,17 +148,17 @@ final class WheelbarrowVisualCheck {
         if(t==575)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100,.5),Direction.UP,new BlockPos(2,99,0),false));
         if(t==580)check(server,()->{
             var s=(StockpileEntity)server.overworld().getBlockEntity(new BlockPos(2,100,0));if(s==null)throw new IllegalStateException("Real stockpile placement failed");
-            // A full pallet (1,024 eighths) tops up a part-loaded barrow (224 eighths) to exactly its 288-eighth capacity.
+            // A full pallet (1,024 eighths) tops up a part-loaded barrow (224 eighths) to exactly its 512-eighth capacity.
             s.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),1024);barrow(server).cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),224);
             var p=server.getPlayerList().getPlayers().getFirst();var mined=new net.minecraft.world.entity.item.ItemEntity(server.overworld(),p.getX(),p.getY(),p.getZ(),new ItemStack(Blocks.STONE,BlockCarry.LIMIT));mined.setNoPickUpDelay();server.overworld().addFreshEntity(mined);p.inventoryMenu.broadcastFullState();
         });
         if(t==588){if(mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT||!mc.player.getOffhandItem().is(Blocks.STONE.asItem()))throw new IllegalStateException("Mined ground blocks did not synchronize into offhand");var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.8,0)),InteractionHand.MAIN_HAND);}
         if(t==600){if(!(mc.player.containerMenu instanceof CargoMenu))throw new IllegalStateException("Tray hit did not open cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
-        if(t==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=288||m.load()!=WheelbarrowEntity.GRID.capacity())throw new IllegalStateException("Cargo quantity or load did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
+        if(t==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=512||m.load()!=WheelbarrowEntity.GRID.capacity())throw new IllegalStateException("Cargo quantity or load did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
         if(t==620)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,1,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);
         if(t==625){if(mc.player.containerMenu.getCarried().getCount()!=16)throw new IllegalStateException("Real cargo right-click cursor did not synchronize");mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);}
         if(t==630)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,CargoMenu.OFFHAND_SLOT,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
-        if(t==635)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getOffhandItem().getCount()!=BlockCarry.LIMIT||barrow(server).cargo().entry(0).count()!=288)throw new IllegalStateException("Full cargo accepted an oversized transfer");});
+        if(t==635)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getOffhandItem().getCount()!=BlockCarry.LIMIT||barrow(server).cargo().entry(0).count()!=512)throw new IllegalStateException("Full cargo accepted an oversized transfer");});
         if(t==640)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,1);
         if(t==644&&((CargoMenu)mc.player.containerMenu).count(0)!=224)throw new IllegalStateException("Unload did not refill the pallet and keep the rest");
         if(t==650){mc.player.closeContainer();check(server,()->{var e=barrow(server);var p=server.getPlayerList().getPlayers().getFirst();var grip=e.handlerPosition(e.position(),0);p.teleportTo(server.overworld(),grip.x,grip.y,grip.z,java.util.Set.of(),0,20);});}

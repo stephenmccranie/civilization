@@ -82,7 +82,7 @@ final class CoalMiningVisualCheck {
             var p=server.getPlayerList().getPlayers().getFirst();if(p.getInventory().countItem(KilnContent.MINERAL_COAL.get())!=4)throw new IllegalStateException("Actual crouch-click did not collect the existing usable Coal item");
             int slot=p.getInventory().findSlotMatchingItem(KilnContent.MINERAL_COAL.toStack());var fuel=p.getInventory().removeItem(slot,1);var stove=(KilnBlockEntity)server.overworld().getBlockEntity(STOVE);stove.setItem(1,fuel);
             // Seed only the disposable ignition fixture, retaining real CoalFire consumption.
-            for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if(r.nextInt(3)==0){server.overworld().random.setSeed(seed);break;}}
+            MachineFixture.spark(server.overworld(),true);
             if(!stove.fire.strike(p,true)||!stove.fire.lit()||!stove.getItem(1).isEmpty()||stove.fireHeat()<=0)throw new IllegalStateException("Prepared Coal did not fuel the existing cooking station");verified=true;
         });
         if(ticks==610)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));

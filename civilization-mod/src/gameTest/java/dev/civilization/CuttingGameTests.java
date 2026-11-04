@@ -149,15 +149,16 @@ public final class CuttingGameTests {
     }
     @GameTest(template="industrial") public static void shapedMachineRequiresCorrectOrientationAndMaterial(GameTestHelper h) {
         var controller=h.absolutePos(new BlockPos(5,1,5));
-        h.getLevel().setBlockAndUpdate(controller,KilnContent.KILN.get().defaultBlockState());
-        KilnGameTests.buildShell(h,controller,Direction.NORTH,false);
-        var part=MachineStructure.parts(false).stream().filter(p->p.units()==2).findFirst().orElseThrow();
+        var smithy=WorkshopContent.SMITHY.get().defaultBlockState().setValue(CivicBlock.FACING,Direction.NORTH);
+        h.getLevel().setBlockAndUpdate(controller,smithy);
+        MachineFixture.build(h.getLevel(),controller);
+        var part=MachineStructure.parts(smithy).stream().filter(p->p.units()==2&&p.material().equals("brick")).findFirst().orElseThrow();
         var pos=MachineStructure.position(controller,Direction.NORTH,part);var good=h.getLevel().getBlockState(pos);
         h.getLevel().setBlockAndUpdate(pos,good.setValue(CutBlock.SIDE,good.getValue(CutBlock.SIDE).getOpposite()));
         h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.INCOMPLETE,"Wrong-facing slab cannot form machine");
         h.getLevel().setBlockAndUpdate(pos,good);((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(Blocks.OAK_PLANKS.defaultBlockState());
         h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.INCOMPLETE,"Wrong material cannot form machine");
-        ((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(Blocks.COBBLESTONE.defaultBlockState());
+        ((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(Blocks.BRICKS.defaultBlockState());
         h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.COMPLETE,"Correct repair forms machine");
         h.succeed();
     }

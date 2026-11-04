@@ -10,9 +10,10 @@ import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.network.chat.Component;
 
-public final class IndustrialBlock extends Block implements EntityBlock {
+public final class IndustrialBlock extends Block implements EntityBlock, ModeledBlock {
     public enum Kind { PUMP, REFINERY, DRILL, TANK, COLUMN, CONDENSER }
     public final Kind kind;
+    @Override public MachineModel model(){return kind==Kind.PUMP?MachineModel.OIL_DERRICK:null;}
     public IndustrialBlock(Properties p,Kind kind){super(p);this.kind=kind;registerDefaultState(stateDefinition.any().setValue(CivicBlock.FACING,Direction.NORTH).setValue(MachineFeedback.WORKING,false).setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT,false));}
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(CivicBlock.FACING,MachineFeedback.WORKING,net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT);}
     @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){return defaultBlockState().setValue(CivicBlock.FACING,c.getHorizontalDirection().getOpposite());}
@@ -30,8 +31,9 @@ public final class IndustrialBlock extends Block implements EntityBlock {
             if(!l.isClientSide && CivicAccess.allowed(l,pos,p) && l.getBlockEntity(pos) instanceof IndustrialBlockEntity machine)machine.canister(p,hand);
             return ItemInteractionResult.sidedSuccess(l.isClientSide);
         }
-        if(kind==Kind.PUMP&&java.util.stream.IntStream.range(0,4).anyMatch(i->ModeledDerrick.accepts(stack,i))){
-            if(!l.isClientSide&&l.getBlockEntity(pos) instanceof IndustrialBlockEntity m)ModeledDerrick.build(m,p,stack);
+        var modeled=ModeledMachine.of(l.getBlockEntity(pos));
+        if(modeled!=null&&ModeledMachine.accepts(modeled,stack)){
+            if(!l.isClientSide)ModeledMachine.build(modeled,p,stack);
             return ItemInteractionResult.sidedSuccess(l.isClientSide);
         }
         return MachineConstruction.useOn(stack,state,l,pos,p);
@@ -40,7 +42,7 @@ public final class IndustrialBlock extends Block implements EntityBlock {
         if(!l.isClientSide&&CivicAccess.allowed(l,pos,p)&&l.getBlockEntity(pos) instanceof IndustrialBlockEntity machine)p.openMenu(machine);
         return InteractionResult.sidedSuccess(l.isClientSide);
     }
-    @Override protected void onRemove(BlockState state,Level l,BlockPos p,BlockState next,boolean moving){if(!state.is(next.getBlock())&&l.getBlockEntity(p) instanceof IndustrialBlockEntity machine){if(!l.isClientSide&&kind==Kind.PUMP)ModeledDerrick.dismantle(machine);Containers.dropContents(l,p,machine);}super.onRemove(state,l,p,next,moving);}
+    @Override protected void onRemove(BlockState state,Level l,BlockPos p,BlockState next,boolean moving){if(!state.is(next.getBlock())&&l.getBlockEntity(p) instanceof IndustrialBlockEntity machine){if(!l.isClientSide&&machine.model()!=null)ModeledMachine.dismantle(machine);Containers.dropContents(l,p,machine);}super.onRemove(state,l,p,next,moving);}
     @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,java.util.List<Component> lines,TooltipFlag flag){
         lines.add(Component.literal(switch(kind){case PUMP->"Crude oil: 50 mB/s from oil fields";case REFINERY->"Coal-fired crude oil heater";case DRILL->"Fuel-powered coal seam extraction";case TANK->"16,000 mB · one liquid";case COLUMN->"Hot crude → vapor, oil and sulfur";case CONDENSER->"Vapor → refined fuel · 40 mB/s";}).withStyle(net.minecraft.ChatFormatting.GRAY));
         if(kind!=Kind.TANK)lines.add(Component.literal(kind==Kind.PUMP?"Supply held materials to the controller.":"Place for the construction guide.").withStyle(net.minecraft.ChatFormatting.GRAY));

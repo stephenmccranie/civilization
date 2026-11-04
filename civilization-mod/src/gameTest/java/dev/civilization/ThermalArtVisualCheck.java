@@ -18,7 +18,7 @@ final class ThermalArtVisualCheck {
                 var player=server.getPlayerList().getPlayers().getFirst();player.getInventory().clearContent();
                 for(int i=0;i<blocks.size();i++){
                     var at=new BlockPos(i*5,101,0);var state=blocks.get(i).defaultBlockState();l.setBlockAndUpdate(at,state);
-                    if(i!=2)for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,at,Direction.NORTH,part);
+                    if(i!=2)MachineFixture.build(l,at);
                     player.getInventory().setItem(i,new net.minecraft.world.item.ItemStack(blocks.get(i)));
                 }
                 player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);player.getAbilities().flying=true;player.onUpdateAbilities();player.teleportTo(l,7,105,-13,java.util.Set.of(),5,15);ready=true;

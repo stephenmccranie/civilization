@@ -313,6 +313,20 @@
       "key": "showGarbageCollectorWarning",
       "from": "true",
       "value": "false"
+    },
+    {
+      "path": "config/grassiergrass-client.toml",
+      "section": "rendering",
+      "key": "bladesPerBlock",
+      "from": "64",
+      "value": "32"
+    },
+    {
+      "path": "config/grassiergrass-client.toml",
+      "section": "rendering",
+      "key": "bladeHeight",
+      "from": "0.65",
+      "value": "0.45"
     }
   ]
 }

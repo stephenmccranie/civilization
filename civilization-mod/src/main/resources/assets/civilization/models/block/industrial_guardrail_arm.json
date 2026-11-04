@@ -1,15 +1,15 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "body": "civilization:block/refinery_side",
-    "trim": "civilization:block/refinery_side",
+    "body": "civilization:block/black_steel",
+    "trim": "civilization:block/black_steel",
     "dark": "minecraft:block/gray_concrete",
     "dial": "minecraft:block/white_concrete",
     "needle": "minecraft:block/black_concrete",
     "hot": "minecraft:block/orange_terracotta",
     "brick": "minecraft:block/bricks",
     "particle": "civilization:block/refinery_side",
-    "brass": "civilization:block/refinery_front"
+    "brass": "civilization:block/brass"
   },
   "elements": [
     {
@@ -25,22 +25,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ]
         },
         "south": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            1.5,
+            1.5
+          ]
         },
         "east": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            7,
+            1.5
+          ]
         },
         "west": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            7,
+            1.5
+          ]
         },
         "up": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            1.5,
+            7
+          ]
         },
         "down": {
-          "texture": "#body"
+          "texture": "#body",
+          "uv": [
+            0,
+            0,
+            1.5,
+            7
+          ]
         }
       }
     },
@@ -59,55 +95,55 @@
         "north": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            3.0,
+            2
           ]
         },
         "south": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            3.0,
+            2
           ]
         },
         "east": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            7,
+            2
           ]
         },
         "west": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            7,
+            2
           ]
         },
         "up": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            3.0,
+            7
           ]
         },
         "down": {
           "texture": "#brass",
           "uv": [
-            4,
-            3,
-            4.5,
-            3.5
+            0,
+            0,
+            3.0,
+            7
           ]
         }
       }

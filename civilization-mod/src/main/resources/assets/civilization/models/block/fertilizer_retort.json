@@ -1,8 +1,6 @@
 {
-  "parent": "minecraft:block/orientable",
   "textures": {
-    "front": "civilization:block/works_front",
-    "side": "civilization:block/works_side",
-    "top": "civilization:block/works_top"
-  }
+    "particle": "minecraft:block/bricks"
+  },
+  "elements": []
 }

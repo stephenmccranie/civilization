@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class KilnBlock extends AbstractFurnaceBlock {
+public class KilnBlock extends AbstractFurnaceBlock implements ModeledBlock {
     public static final MapCodec<KilnBlock> CODEC = simpleCodec(KilnBlock::new);
     public KilnBlock(Properties properties) {
         super(properties);
@@ -25,10 +25,22 @@ public class KilnBlock extends AbstractFurnaceBlock {
         MachineFeedback.animate(state, level, pos, random, false);
     }
     @Override protected MapCodec<? extends KilnBlock> codec() { return CODEC; }
+    /** The Kiln is built as a native model; machines sharing this block keep block structures until theirs are drawn. */
+    @Override public MachineModel model() { return MachineModel.KILN; }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        var modeled = ModeledMachine.of(level.getBlockEntity(pos));
+        if (modeled != null) {
+            if (!ModeledMachine.accepts(modeled, stack)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (!level.isClientSide) ModeledMachine.build(modeled, player, stack);
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
         return MachineConstruction.useOn(stack, state, level, pos, player);
     }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new KilnBlockEntity(pos, state); }
+    @Override protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState next, boolean moving) {
+        if (!level.isClientSide && !state.is(next.getBlock())) { var modeled = ModeledMachine.of(level.getBlockEntity(pos)); if (modeled != null) ModeledMachine.dismantle(modeled); }
+        super.onRemove(state, level, pos, next, moving);
+    }
     @Override protected void openContainer(Level level, BlockPos pos, Player player) {
         if (level.getBlockEntity(pos) instanceof KilnBlockEntity kiln) {
             var result = kiln.checkStructure();

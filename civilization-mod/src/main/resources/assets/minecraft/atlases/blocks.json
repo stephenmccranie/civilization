@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {"type": "single", "resource": "civilization:entity/oil_derrick"},
+    {"type": "single", "resource": "civilization:entity/kiln"},
+    {"type": "single", "resource": "civilization:entity/foundry"},
+    {"type": "single", "resource": "civilization:entity/fertilizer_furnace"}
+  ]
+}

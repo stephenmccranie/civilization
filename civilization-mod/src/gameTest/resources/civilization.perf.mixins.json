@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.civilization.perf",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["PerfMinecraftMixin", "PerfBlockEntityMixin", "PerfEntityMixin", "PerfDrawMixin", "PerfIrisCompositeMixin", "PerfIrisFinalMixin", "PerfPresentMixin"],
+  "injectors": {"defaultRequire": 1}
+}

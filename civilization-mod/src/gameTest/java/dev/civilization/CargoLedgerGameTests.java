@@ -95,26 +95,26 @@ public final class CargoLedgerGameTests {
     }
     @GameTest(template="industrial") public static void wheelbarrowHoldsTheVolumeItDraws(GameTestHelper h){
         var e=barrow(h);int tray=WheelbarrowEntity.GRID.capacity();
-        h.assertTrue(tray==36&&e.cargo().insert(new ItemStack(Items.STONE),400)==tray&&e.cargo().insert(new ItemStack(Items.STONE),1)==0,"A wheelbarrow holds exactly the 36 blocks its tray draws");
+        h.assertTrue(tray==64&&e.cargo().insert(new ItemStack(Items.STONE),400)==tray&&e.cargo().insert(new ItemStack(Items.STONE),1)==0,"A wheelbarrow holds exactly the 64 blocks its tray draws");
         e.cargo().remove(0,tray);
         h.assertTrue(e.cargo().insert(new ItemStack(Items.OAK_PLANKS),400)==tray,"Volume, not mass, limits it: light planks fill the same tray");
         e.cargo().remove(0,tray);
         h.assertTrue(e.cargo().insert(new ItemStack(Items.STONE_SLAB),1000)==2*tray&&e.cargo().load()==tray,"Slabs count as half a block");h.succeed();
     }
     @GameTest(template="industrial") public static void wheelbarrowsLoadedBeforeTheSmallerTrayKeepTheirLoad(GameTestHelper h){
-        // A barrow saved full under the old 324-block tray: nothing is removed, it draws full and takes nothing until under 36.
+        // A barrow saved full under the old 324-block tray: nothing is removed, it draws full and takes nothing until under 64.
         var wheel=barrow(h);var legacy=new CargoLedger(()->324,()->{});legacy.insert(new ItemStack(Items.STONE),324);
         var tag=new CompoundTag();wheel.saveWithoutId(tag);tag.put("Cargo",legacy.save(h.getLevel().registryAccess()));
         var loaded=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());loaded.load(tag);
-        h.assertTrue(loaded.cargo().count(0)==324&&loaded.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(loaded.cargo().load(),loaded.cargo().capacity()).equals("Overloaded: 324 / 36"),"An old full barrow keeps all 324 blocks and accepts nothing");
-        h.assertTrue(loaded.cargo().remove(0,290)==290&&loaded.cargo().insert(new ItemStack(Items.STONE),10)==2&&loaded.cargo().count(0)==36,"Once under 36 it takes goods again, up to its tray");h.succeed();
+        h.assertTrue(loaded.cargo().count(0)==324&&loaded.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(loaded.cargo().load(),loaded.cargo().capacity()).equals("Overloaded: 324 / 64"),"An old full barrow keeps all 324 blocks and accepts nothing");
+        h.assertTrue(loaded.cargo().remove(0,262)==262&&loaded.cargo().insert(new ItemStack(Items.STONE),10)==2&&loaded.cargo().count(0)==64,"Once under 64 it takes goods again, up to its tray");h.succeed();
     }
     @GameTest(template="industrial") public static void overloadedWheelbarrowKeepsSavedStockAndSyncsLongCounts(GameTestHelper h){
         stockpile(h);var wheel=barrow(h);var p=player(h);
         // A barrow saved under the old mass limit can hold more than its tray; nothing is removed.
         var item=CuttingContent.stack(Blocks.OAK_PLANKS.defaultBlockState(),3,1);long quantity=5_000_000_000L;
         var legacy=new CargoLedger(()->1e12,()->{});legacy.insert(item,quantity);wheel.cargo().load(legacy.save(h.getLevel().registryAccess()),h.getLevel().registryAccess());
-        h.assertTrue(wheel.cargo().count(0)==quantity&&wheel.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(wheel.cargo().load(),wheel.cargo().capacity()).equals("Overloaded: 625,000,000 / 36"),"An overloaded wheelbarrow keeps its stock and accepts nothing");
+        h.assertTrue(wheel.cargo().count(0)==quantity&&wheel.cargo().insert(new ItemStack(Items.STONE),1)==0&&CargoInventory.blocks(wheel.cargo().load(),wheel.cargo().capacity()).equals("Overloaded: 625,000,000 / 64"),"An overloaded wheelbarrow keeps its stock and accepts nothing");
         var server=new CargoMenu(1,p.getInventory(),wheel);var client=new CargoMenu(1,p.getInventory());
         for(int i=0;i<CargoMenu.DATA;i++)client.data.set(i,(short)server.data.get(i));
         h.assertTrue(client.count(0)==quantity&&client.load()==wheel.cargo().load()&&client.capacity()==WheelbarrowEntity.GRID.capacity(),"Signed-short menu synchronization retains full long counts and double loads");

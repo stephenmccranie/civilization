@@ -16,12 +16,18 @@ final class PreviewRenderTypes extends RenderType {
                     .setOverlayState(OVERLAY)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
-    static final RenderType DERRICK = create("civilization_derrick_preview", DefaultVertexFormat.NEW_ENTITY,
+    /** A machine model's own texture as a translucent guide, one render type per model and pass. A model's cubes lie in
+     *  many layers, which drawn see-through one over another pile up into a bright smear; so the guide first lays only
+     *  its depth, then draws colour on its front-most surface alone. */
+    private static final java.util.function.BiFunction<String,Boolean,RenderType> MODEL = net.minecraft.Util.memoize((geo, depth) -> create(
+            "civilization_model_preview_" + (depth ? "depth_" : "") + geo, DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
                     .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
-                    .setTextureState(new TextureStateShard(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("civilization","textures/entity/oil_derrick.png"), false, false))
+                    .setTextureState(new TextureStateShard(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("civilization","textures/entity/" + geo + ".png"), false, false))
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL).setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY).setWriteMaskState(COLOR_WRITE).createCompositeState(false));
+                    .setOverlayState(OVERLAY).setWriteMaskState(depth ? DEPTH_WRITE : COLOR_WRITE).createCompositeState(false)));
+    static RenderType model(String geo) { return MODEL.apply(geo, false); }
+    static RenderType modelDepth(String geo) { return MODEL.apply(geo, true); }
     static final RenderType OUTLINE = create("civilization_preview_outline", DefaultVertexFormat.POSITION_COLOR_NORMAL,
             VertexFormat.Mode.LINES, 1536, false, false, CompositeState.builder()
                     .setShaderState(RENDERTYPE_LINES_SHADER)

@@ -23,6 +23,8 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
     public static final CargoGrid TWO_HIGH=new CargoGrid(4,4,8,7f/32);
     /** The stack within the pallet's own block, while the block above is taken: a full stack is a full block. */
     public static final CargoGrid ONE_HIGH=new CargoGrid(4,4,4,7f/32);
+    /** Where the stack lies, for the pallet's block model to draw with the terrain. */
+    public static final net.neoforged.neoforge.client.model.data.ModelProperty<CargoLayout> CARGO=new net.neoforged.neoforge.client.model.data.ModelProperty<>();
     private final CargoLedger stack=new CargoLedger(()->grid().capacity(),this::changed);
     StockpileGroup group;
     private boolean dirty=true;
@@ -67,7 +69,12 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
     @Override public Component getDisplayName(){return cargoName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new CargoMenu(id,inv,this);}
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider r){super.saveAdditional(tag,r);tag.put("Cargo",stack.save(r));}
-    @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider r){super.loadAdditional(tag,r);stack.load(tag.getList("Cargo",10),r);}
+    @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider r){
+        super.loadAdditional(tag,r);stack.load(tag.getList("Cargo",10),r);
+        // On the client the stack is part of the terrain, so new goods or a new grid rebuild the pallet's chunk section.
+        if(level!=null&&level.isClientSide){requestModelDataUpdate();level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),net.minecraft.world.level.block.Block.UPDATE_CLIENTS);}
+    }
+    @Override public net.neoforged.neoforge.client.model.data.ModelData getModelData(){return net.neoforged.neoforge.client.model.data.ModelData.of(CARGO,stack.layout(grid()));}
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){return saveCustomOnly(r);}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
 }

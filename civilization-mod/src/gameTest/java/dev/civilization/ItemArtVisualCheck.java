@@ -21,11 +21,12 @@ final class ItemArtVisualCheck {
     var weather=RegionalWeather.get(l);var district=weather.district(l,RegionalWeather.key(0,0));district.rain=false;district.end=weather.clock+72000;weather.setDirty();
     for(var entity:l.getEntitiesOfClass(ItemFrame.class,new net.minecraft.world.phys.AABB(-2,99,-3,20,107,3)))entity.discard();
     for(int x=-2;x<=19;x++)for(int z=-14;z<=2;z++){l.setBlockAndUpdate(new BlockPos(x,99,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=100;y<=105;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
-    var player=server.getPlayerList().getPlayers().getFirst();player.getInventory().clearContent();player.removeAllEffects();
+    // Survival shows every inventory slot; Creative would replace the inventory with its item tabs.
+    var player=server.getPlayerList().getPlayers().getFirst();player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.getInventory().clearContent();player.removeAllEffects();
     var items=items(scene);
     var frames=scene.equals("components")?java.util.List.of(items.get(0),items.get(1),items.get(2),items.get(3),items.get(4),items.get(11),items.get(18),items.get(24)):items;
     for(int i=0;i<items.size();i++){
-     player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components"))player.getInventory().setItem(9+i,new ItemStack(items.get(i)));
+     player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components")){var worn=new ItemStack(items.get(i));if(EquipmentGrade.eligible(worn))EquipmentGrade.apply(worn,40,7001L+i);player.getInventory().setItem(9+i,worn);}
     }
     for(int i=0;i<frames.size();i++){
      for(int y=100;y<=103;y++)l.setBlockAndUpdate(new BlockPos(i*2, y,0),IndustrialContent.CASING.get().defaultBlockState());
@@ -58,8 +59,10 @@ final class ItemArtVisualCheck {
    return java.util.List.copyOf(items);
   }
   return switch(scene){
+   case "tools" -> java.util.List.of(FrontierContent.GEIGER_COUNTER.get(),CuttingContent.IRON_SAW.get(),CuttingContent.STONE_SAW.get(),CuttingContent.DIAMOND_SAW.get(),IndustrialContent.PROBE.get(),BuilderLineContent.LINE.get(),ManufacturingContent.head("iron","saw"),ManufacturingContent.HANDLE.get());
+   case "minerals" -> java.util.List.of(KilnContent.MINERAL_COAL.get(),FrontierContent.RAW_URANIUM.get(),IndustrialContent.SULFUR.get(),IndustrialContent.ENRICHED_BLEND.get(),net.minecraft.world.item.Items.COAL,net.minecraft.world.item.Items.RAW_IRON,net.minecraft.world.item.Items.GRAVEL,KilnContent.STEEL.get());
    case "manufactured" -> java.util.List.of(KilnContent.STEEL.get(),IndustrialContent.PROBE.get(),KilnContent.MACHINE_PARTS.get(),net.minecraft.world.item.Items.IRON_INGOT,net.minecraft.world.item.Items.COPPER_INGOT);
-   case "foods" -> java.util.List.of(CookingContent.BREAD_DOUGH.get(),CookingContent.COOKIE_DOUGH.get(),CookingContent.CAKE_BATTER.get(),CookingContent.UNBAKED_PIE.get(),FarmingContent.RATION.get(),RecoveryItems.MORSEL.get(),WorkshopContent.CLOTH.get(),FarmingContent.FERTILIZER.get());
+   case "foods" -> java.util.List.of(CookingContent.BREAD_DOUGH.get(),CookingContent.COOKIE_DOUGH.get(),CookingContent.CAKE_BATTER.get(),CookingContent.UNBAKED_PIE.get(),FarmingContent.RATION.get(),RecoveryItems.MORSEL.get(),PrototypeStoveContent.MEAL.get(),WorkshopContent.CLOTH.get(),FarmingContent.FERTILIZER.get());
    case "supplies" -> java.util.List.of(WorkshopContent.HIDE.get(),WorkshopContent.CLOTH.get(),FarmingContent.MINERAL_BLEND.get(),IndustrialContent.ENRICHED_BLEND.get(),FarmingContent.FERTILIZER.get(),IndustrialContent.SULFUR.get(),KilnContent.MACHINE_PARTS.get());
    case "parts" -> java.util.List.of(KilnContent.STEEL.get(),KilnContent.MACHINE_PARTS.get(),IndustrialContent.SULFUR.get(),WorkshopContent.CLOTH.get());
    case "sulfur" -> java.util.List.of(KilnContent.MINERAL_COAL.get(),IndustrialContent.SULFUR.get(),net.minecraft.world.item.Items.GOLD_INGOT,WorkshopContent.CLOTH.get());

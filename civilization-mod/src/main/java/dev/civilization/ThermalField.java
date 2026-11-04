@@ -112,6 +112,14 @@ public final class ThermalField extends SavedData {
         boolean heatedMachine=state.getBlock() instanceof IndustrialBlock || state.getBlock() instanceof OilEngineBlock
                 || state.getBlock() instanceof WorkshopBlock
                 || l.getBlockEntity(p) instanceof KilnBlockEntity kiln && kiln.requiresStructure();
+        var modeled=ModeledMachine.of(l.getBlockEntity(p));
+        if(modeled!=null&&modeled.model().heated){
+            for(int i=0;i<modeled.model().cells.size();i++){
+                var q=ModeledMachine.position(p,modeled.front(),modeled.model().cells.get(i));
+                if(supported(l,q)&&l.getBlockState(q).equals(ModeledMachine.cellState(modeled.model(),i,modeled.front())))cells.add(q);
+            }
+            return cells;
+        }
         var parts=heatedMachine?MachineStructure.guideParts(state):List.<MachineStructure.Part>of();
         if(!state.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING))return cells;
         var front=state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING);

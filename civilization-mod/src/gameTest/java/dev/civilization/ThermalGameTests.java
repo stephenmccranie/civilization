@@ -203,7 +203,7 @@ public final class ThermalGameTests {
         for(var at:java.util.List.of(p,p.east(4))){
             var state=(at.equals(p)?KilnContent.FOUNDRY.get():KilnContent.KILN.get()).defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
             l.setBlockAndUpdate(at,state);
-            for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,at,Direction.NORTH,part);
+            MachineFixture.build(l,at);
         }
         var field=new ThermalField();
         for(int second=0;second<45;second++){
@@ -225,13 +225,13 @@ public final class ThermalGameTests {
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,3,6));
         for(var q:BlockPos.betweenClosed(p.offset(-3,-1,-3),p.offset(3,6,3))){
             int dx=Math.abs(q.getX()-p.getX()),dz=Math.abs(q.getZ()-p.getZ()),dy=q.getY()-p.getY();
-            boolean shell=dy==-1||dy==6||dx==3||dz==3;
+            boolean shell=dy==-1||dy==4||dx==3||dz==3;
             l.setBlockAndUpdate(q,shell?Blocks.OAK_PLANKS.defaultBlockState():Blocks.AIR.defaultBlockState());
         }
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
-        var outlet=p.south(2).above(5);
+        MachineFixture.build(l,p);
+        var outlet=p.south().above(3);
         l.setBlockAndUpdate(outlet.above(),Blocks.AIR.defaultBlockState());
         var room=p.north(2).above();var field=new ThermalField();
         for(int second=0;second<120;second++){
@@ -265,14 +265,14 @@ public final class ThermalGameTests {
     static void buildFoundryWorkshop(net.minecraft.server.level.ServerLevel l,BlockPos p,boolean shaft){
         for(var q:BlockPos.betweenClosed(p.offset(-3,-1,-3),p.offset(3,9,3))){
             int dx=Math.abs(q.getX()-p.getX()),dz=Math.abs(q.getZ()-p.getZ()),dy=q.getY()-p.getY();
-            boolean shell=dy==-1||dy==8||dx==3||dz==3;
+            boolean shell=dy==-1||dy==6||dx==3||dz==3;
             l.setBlockAndUpdate(q,shell?Blocks.OAK_PLANKS.defaultBlockState():Blocks.AIR.defaultBlockState());
         }
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
+        MachineFixture.build(l,p);
         if(shaft){
-            var outlet=p.south(2).above(5);
+            var outlet=p.south().above(3);
             var body=ThermalField.body(l,p);
             for(int y=0;y<3;y++)for(var direction:Direction.Plane.HORIZONTAL){
                 var wall=outlet.above(y).relative(direction);
@@ -287,7 +287,7 @@ public final class ThermalGameTests {
         var vented=new ThermalField();
         for(int second=0;second<180;second++){vented.pending.put(p.asLong(),productiveHeatPerSecond());vented.step(l);}
         double open=vented.excess(l,room)*1.8;
-        var outlet=p.south(2).above(5);
+        var outlet=p.south().above(3);
         System.out.printf(java.util.Locale.ROOT,"FOUNDRY_SHAFT_F after=180s outlet=%.1f middle=%.1f mouth=%.1f above=%.1f%n",
                 vented.localTemperature(l,outlet)*1.8+32,
                 vented.localTemperature(l,outlet.above(2))*1.8+32,
@@ -321,8 +321,8 @@ public final class ThermalGameTests {
         for(var q:BlockPos.betweenClosed(p.offset(-5,0,-5),p.offset(6,8,6)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
-        var outlet=p.south(2).above(5);
+        MachineFixture.build(l,p);
+        var outlet=p.south().above(3);
         for(int x=-4;x<=4;x++)for(int z=-4;z<=4;z++){
             var roof=outlet.offset(x,0,z);
             if(!roof.equals(outlet))l.setBlockAndUpdate(roof,Blocks.OAK_PLANKS.defaultBlockState());
@@ -349,10 +349,10 @@ public final class ThermalGameTests {
         for(var q:BlockPos.betweenClosed(p.offset(-3,0,-3),p.offset(3,5,3)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
+        MachineFixture.build(l,p);
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
         double total=field.energy.values().stream().mapToDouble(Double::doubleValue).sum();
-        var outlet=p.south(2).above(5);
+        var outlet=p.south().above(3);
         double above=field.energy.getOrDefault(outlet.asLong(),0d);
         h.assertTrue(Math.abs(total-80)<.001,"Exhaust distribution conserves purchased coal heat");
         h.assertTrue(Math.abs(above-64)<.001&&field.energy.getOrDefault(outlet.above().asLong(),0d)==0,
@@ -372,8 +372,8 @@ public final class ThermalGameTests {
         for(var q:BlockPos.betweenClosed(p.offset(-3,0,-3),p.offset(3,8,4)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
-        var outlet=p.south(2).above(5);
+        MachineFixture.build(l,p);
+        var outlet=p.south().above(3);
         for(int y=0;y<=2;y++)for(var direction:Direction.Plane.HORIZONTAL)
             l.setBlockAndUpdate(outlet.above(y).relative(direction),Blocks.OAK_PLANKS.defaultBlockState());
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
@@ -395,29 +395,25 @@ public final class ThermalGameTests {
                 "Hot exhaust continues into the upper shaft when the field was full");
         h.succeed();
     }
-    @GameTest(template="industrial") public static void openMachineOutletsTakePriorityOverCoveredTop(GameTestHelper h){
+    /** The Kiln's fire warms its whole masonry; exhaust leaves only through the open top of its flue, and a capped flue keeps the heat in the masonry. */
+    @GameTest(template="industrial") public static void kilnExhaustLeavesThroughItsOpenFlue(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,3,6));
         for(var q:BlockPos.betweenClosed(p.offset(-3,0,-3),p.offset(3,5,5)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
-        var state=KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
-        l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))MachineStructure.placePart(l,p,Direction.NORTH,part);
-        var outlet=p.south().above(3);
-        for(int x=-1;x<=1;x++)for(int z=0;z<=2;z++){
-            var roof=p.offset(x,3,z);
-            if(!roof.equals(outlet))l.setBlockAndUpdate(roof,Blocks.OAK_PLANKS.defaultBlockState());
-        }
+        l.setBlockAndUpdate(p,KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH));
+        MachineFixture.build(l,p);
+        var flue=p.south().above(4);
+        h.assertTrue(ThermalField.body(l,p).size()==MachineModel.KILN.cells.size()+1,"The fire warms every cell of the masonry and the controller");
         var field=new ThermalField();field.pending.put(p.asLong(),80d);field.releaseSources(l);
-        double plume=field.energy.getOrDefault(outlet.asLong(),0d);
-        h.assertTrue(Math.abs(plume-64)<.001&&field.energy.getOrDefault(outlet.above().asLong(),0d)==0,
-                "The only open outlet receives the full top share locally, without remote heat placement");
+        h.assertTrue(Math.abs(field.energy.getOrDefault(flue.asLong(),0d)-64)<.001&&field.energy.getOrDefault(flue.above().asLong(),0d)==0,
+                "The open flue receives the full top share locally, without remote heat placement");
         h.assertTrue(Math.abs(field.energy.values().stream().mapToDouble(Double::doubleValue).sum()-80)<.001,
-                "Prioritizing the outlet does not create extra heat");
-        l.setBlockAndUpdate(outlet,Blocks.OAK_PLANKS.defaultBlockState());
+                "Venting through the flue creates no extra heat");
+        l.setBlockAndUpdate(flue,Blocks.OAK_PLANKS.defaultBlockState());
         var covered=new ThermalField();covered.pending.put(p.asLong(),80d);covered.releaseSources(l);
-        h.assertTrue(covered.energy.getOrDefault(outlet.asLong(),0d)==0,
-                "A blocked top cannot absorb exhaust that should remain in the machine casing");
+        h.assertTrue(covered.energy.getOrDefault(flue.asLong(),0d)==0,
+                "A capped flue cannot absorb exhaust that should remain in the masonry");
         h.assertTrue(Math.abs(covered.energy.values().stream().mapToDouble(Double::doubleValue).sum()-80)<.001,
-                "Blocking the outlet retains rather than creates or destroys the coal heat");
+                "Capping the flue retains rather than creates or destroys the coal heat");
         h.succeed();
     }
     @GameTest(template="industrial") public static void cutBlockShaftRetainsRisingAirHeat(GameTestHelper h){
@@ -594,10 +590,10 @@ public final class ThermalGameTests {
         var state=KilnContent.FOUNDRY.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
         for(var q:BlockPos.betweenClosed(p.offset(-3,-1,-2),p.offset(3,5,4)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
         l.setBlockAndUpdate(p,state);
-        for(var part:MachineStructure.parts(state))l.setBlockAndUpdate(MachineStructure.position(p,Direction.NORTH,part),MachineStructure.shape(part,Direction.NORTH));
+        MachineFixture.build(l,p);
         var f=new ThermalField();
         for(int second=0;second<30;second++){f.pending.put(p.asLong(),80d);f.step(l);}
-        h.assertTrue(f.excess(l,p.north())>0&&f.excess(l,p.south(3))>0,"Sustained casing heat reaches both front and rear room air");
+        h.assertTrue(f.excess(l,p.north())>0&&f.excess(l,p.south(2))>0,"Sustained casing heat reaches both front and rear room air");
         h.assertTrue(f.pending.isEmpty(),"Surface distribution does not multiply the fuel budget");
         h.assertTrue(f.energy.values().stream().mapToDouble(Double::doubleValue).sum()<=2400.001,"Distributed source conserves its total heat");h.succeed();
     }

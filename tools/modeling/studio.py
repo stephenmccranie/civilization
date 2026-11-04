@@ -17,7 +17,10 @@ class Model:
     def __init__(self):
         self.parts = []
 
-    def box(self, group, name, start, end, material='iron', angle=0, axis='x', pivot=None, faces=None):
+    def box(self, group, name, start, end, material='iron', angle=0, axis='x', pivot=None, faces=None, collide=True):
+        """`angle` turns the box about `axis`, or is a triple of angles about x, y and z applied in that order round
+        `pivot`, as Blockbench and GeckoLib turn cubes. `collide=False` marks surface detail, such as stones set into a
+        wall, that adds no collision of its own."""
         if any(b <= a for a, b in zip(start, end)):
             raise ValueError(f'{name}: box must have positive volume')
         if any(p['name'] == name for p in self.parts):
@@ -25,8 +28,9 @@ class Model:
         # Match the native project's coordinate precision before computing sizes/UVs.
         # Otherwise sqrt-based bevels change by 0.00001 units after save/reopen.
         snap=lambda values:[round(v,5) for v in values]
+        rotation = [round(a, 4) for a in angle] if isinstance(angle, (list, tuple)) else [angle if a == axis else 0 for a in 'xyz']
         part = dict(group=group, name=name, start=snap(start), end=snap(end), material=material,
-                    angle=angle, axis=axis, pivot=snap(pivot or [0, 0, 0]), faces=faces or {})
+                    rotation=rotation, pivot=snap(pivot or [0, 0, 0]), faces=faces or {}, collide=collide)
         self.parts.append(part)
         return part
 
@@ -52,6 +56,60 @@ class Model:
                      point(cx+length/2,cy+thickness/2,end-inset),material,-45 if sx*sy>0 else 45,
                      axis,point(cx,cy,(start+end)/2))
 
+    def claim(self, group, start, end):
+        """Give `group` the solid geometry inside the box start..end: every unrotated colliding part crossing it is split,
+        the inside piece moving to `group`; surface detail stays whole with its section. A machine's controller claims
+        its own cell this way, so the controller block draws the body around it before any section is built."""
+        inside = lambda p: ([max(a, s) for a, s in zip(p['start'], start)], [min(b, e) for b, e in zip(p['end'], end)])
+        for part in list(self.parts):
+            if part['group'] == group or any(part['rotation']) or not part['collide']: continue
+            lo, hi = inside(part)
+            if any(b <= a for a, b in zip(lo, hi)): continue
+            self.parts.remove(part)
+            pieces = [(lo, hi, group)]
+            # The outside remainder as up to six boxes, peeled off one axis at a time.
+            rest_lo, rest_hi = list(part['start']), list(part['end'])
+            for axis in range(3):
+                if rest_lo[axis] < lo[axis]:
+                    a, b = list(rest_lo), list(rest_hi); b[axis] = lo[axis]; pieces.append((a, b, part['group'])); rest_lo[axis] = lo[axis]
+                if rest_hi[axis] > hi[axis]:
+                    a, b = list(rest_lo), list(rest_hi); a[axis] = hi[axis]; pieces.append((a, b, part['group'])); rest_hi[axis] = hi[axis]
+            for i, (a, b, g) in enumerate(pieces):
+                self.parts.append(dict(part, group=g, name=f"{part['name']}_{i}" if i else part['name']+'_claimed', start=a, end=b))
+
+
+def machine_cells(parts, controller=(0, 0, 0), exclude=()):
+    """Collision cells of a machine model whose groups name its sections (`section_<n>_...`): each part's volume, split
+    over the block cells it crosses, as [section, box...] in cell-local units. Rotated parts are sliced into pieces at
+    most 4 units long before taking bounds, so a diagonal brace stays close to its true shape. The controller's cell and
+    any `exclude` cells (ports) hold their own blocks and take no part cells."""
+    cells = {}
+    skip = {tuple(controller), *map(tuple, exclude)}
+    for part in parts:
+        if not part['group'].startswith('section_') or not part.get('collide', True): continue
+        section = int(part['group'].split('_')[1])
+        counts = [max(1, math.ceil((b - a) / 4)) if any(part['rotation']) else 1 for a, b in zip(part['start'], part['end'])]
+        steps = [[a + (b - a) * k / n for k in range(n + 1)] for a, b, n in zip(part['start'], part['end'], counts)]
+        for i, j, k in itertools.product(*(range(n) for n in counts)):
+            lo = [steps[0][i], steps[1][j], steps[2][k]]; hi = [steps[0][i + 1], steps[1][j + 1], steps[2][k + 1]]
+            points = [turn(part, corner) for corner in itertools.product(*zip(lo, hi))]
+            a = [min(p[d] for p in points) / 16 for d in range(3)]; b = [max(p[d] for p in points) / 16 for d in range(3)]
+            for cell in itertools.product(*(range(math.floor(a[d] + 1e-6), math.ceil(b[d] - 1e-6)) for d in range(3))):
+                if cell in skip: continue
+                box = [round(max(0, a[d] - cell[d]), 5) for d in range(3)] + [round(min(1, b[d] - cell[d]), 5) for d in range(3)]
+                if all(box[d + 3] > box[d] for d in range(3)): cells.setdefault(cell, []).append([section, *box])
+    return [{'offset': list(c), 'boxes': boxes} for c, boxes in sorted(cells.items(), key=lambda e: (e[0][1], e[0][2], e[0][0]))]
+
+
+def turn(part, point):
+    """A point of a part after its cube rotation: about x, then y, then z, round its pivot."""
+    q = [x - o for x, o in zip(point, part['pivot'])]
+    for axis, angle in enumerate(part['rotation']):
+        if not angle: continue
+        u, v = (axis + 1) % 3, (axis + 2) % 3; c, s = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+        q[u], q[v] = q[u] * c - q[v] * s, q[u] * s + q[v] * c
+    return [x + o for x, o in zip(q, part['pivot'])]
+
 
 def face_dimensions(part):
     x,y,z=[b-a for a,b in zip(part['start'],part['end'])]
@@ -59,32 +117,39 @@ def face_dimensions(part):
 
 
 def bounds(parts):
-    """Bounds after each cuboid's native single-axis rotation; no bone animation."""
-    points=[]
-    for p in parts:
-        axis='xyz'.index(p['axis']);u,v=(axis+1)%3,(axis+2)%3
-        a=math.radians(p['angle']);c,s=math.cos(a),math.sin(a)
-        for corner in itertools.product(*zip(p['start'],p['end'])):
-            q=[x-o for x,o in zip(corner,p['pivot'])]
-            q[u],q[v]=q[u]*c-q[v]*s,q[u]*s+q[v]*c
-            points.append([x+o for x,o in zip(q,p['pivot'])])
+    """Bounds after each cuboid's native rotation; no bone animation."""
+    points=[turn(p,corner) for p in parts for corner in itertools.product(*zip(p['start'],p['end']))]
     if not points:raise ValueError('No geometry')
     return [[min(p[i] for p in points) for i in range(3)],[max(p[i] for p in points) for i in range(3)]]
+
+
+def face_spec(part, face):
+    """A face's material, the offset of its island inside that region, and its quarter turn: a material name takes the
+    region's corner; (material, x, y) an offset part of it; (material, x, y, 90) turns the island so grain painted
+    along the region follows an upright piece. None leaves out a face the model always hides, so it is never drawn."""
+    spec=part.get('faces',{}).get(face,part['material'])
+    return None if spec is None else (spec,0,0,0) if isinstance(spec,str) else (*spec,0)[:4]
 
 
 def uv_faces(part, regions, density=2):
     """Never silently compress a long surface into a small material tile."""
     result={}
     for face,(w,h) in face_dimensions(part).items():
-        material=part.get('faces',{}).get(face,part['material'])
+        if face_spec(part,face) is None: continue
+        material,x,y,turn=face_spec(part,face)
         r=regions[material];u,v,rw,rh=r['rect']
         if r.get('fit',False):
             width,height=rw,rh  # Explicit authored decal; exempt from material density.
         else:
-            width,height=w*density,h*density
-            if width>rw+1e-6 or height>rh+1e-6:
-                raise ValueError(f"{part['name']}/{face}: {width:g}x{height:g}px exceeds {material} {rw}x{rh}; enlarge region or split part")
-        result[face]=[u,v,u+width,v+height]
+            width,height=(h*density,w*density) if turn%180 else (w*density,h*density)
+            if x+width>rw+1e-6 or y+height>rh+1e-6:
+                raise ValueError(f"{part['name']}/{face}: {width:g}x{height:g}px at {x},{y} exceeds {material} {rw}x{rh}; enlarge region or split part")
+            if r.get('scatter') and face_spec(part,face)[1:3]==(0,0):
+                # A tiling material shows a different, stable part of its region on each face, so neighbouring
+                # faces do not repeat one corner; offsets stay on whole pixels inside the region.
+                seed=int(hashlib.sha256(f"{part['name']}/{face}".encode()).hexdigest()[:8],16)
+                x=(seed%1000)/1000*(rw-width)//1;y=(seed//1000%1000)/1000*(rh-height)//1
+        result[face]=[u+x,v+y,u+x+width,v+y+height]
     return result
 
 
@@ -94,7 +159,7 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
         u,v,w,h=region['rect']
         if min(u,v)<0 or min(w,h)<=0 or u+w>image.width or v+h>image.height:
             raise ValueError('Atlas region outside texture')
-    pieces=[dict(p,uvs=uv_faces(p,regions,density)) for p in parts]
+    pieces=[dict(p,uvs=(uvs:=uv_faces(p,regions,density)),turns={f:face_spec(p,f)[3] for f in uvs}) for p in parts]
     cfg=dict(name=name,pieces=pieces,offset=offset,pivots=pivots or {},size=image.size,texture_name=Path(atlas).name,
              texture='data:image/png;base64,'+base64.b64encode(Path(atlas).read_bytes()).decode(),gecko=gecko)
     client.call('create_project',{'name':name,'format':'geckolib_model' if gecko else 'java_block'})
@@ -107,9 +172,10 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
       const groups={};const sub=v=>v.map((n,i)=>n-c.offset[i]);
       for(const p of c.pieces){
         if(!groups[p.group]) groups[p.group]=new Group({name:p.group,origin:sub(c.pivots[p.group]||c.offset)}).init();
-        const rotation=[0,0,0];rotation['xyz'.indexOf(p.axis)]=p.angle;
-        const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation,autouv:0,box_uv:false}).addTo(groups[p.group]).init();
-        for(const [face,uv] of Object.entries(p.uvs)){cube.faces[face].texture=t.uuid;cube.faces[face].uv=uv;}
+        const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation:p.rotation,autouv:0,box_uv:false}).addTo(groups[p.group]).init();
+        for(const [face,f] of Object.entries(cube.faces)){
+          if(p.uvs[face]){f.texture=t.uuid;f.uv=p.uvs[face];f.rotation=p.turns[face];}else f.texture=null;
+        }
       }
       Canvas.updateAll();return {cubes:Cube.all.length,bones:Group.all.length};
     })()'''
