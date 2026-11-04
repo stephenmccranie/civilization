@@ -48,6 +48,47 @@ public class MultiblockGameTests {
         h.assertTrue(!net.minecraft.world.level.block.Block.shouldRenderFace(l.getBlockState(below), l, below, Direction.UP, at), "A block-structure controller hides the face under it");
         h.succeed();
     }
+    /** Every part of a machine carries its machine's name and gives its controller on pick-block, so Jade and the hand name
+     *  the machine wherever it is aimed at. */
+    @GameTest(template = "empty")
+    public static void machinePartsAreNamedForTheirMachine(GameTestHelper h) {
+        int named = 0;
+        for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
+            if (!(block instanceof ModeledBlock m) || m.model() == null) continue;
+            var part = MachineParts.block(m.model());
+            h.assertTrue(part.getDescriptionId().equals(block.getDescriptionId()), "A " + block + " part is named " + part.getDescriptionId());
+            h.assertTrue(part.getCloneItemStack(h.getLevel(), BlockPos.ZERO, part.defaultBlockState()).is(block.asItem()), "Picking a " + block + " part gives its controller");
+            named++;
+        }
+        h.assertTrue(named == MachineModel.all().size(), "Every machine model's parts are named, found " + named);
+        h.succeed();
+    }
+    /** A survival player walking into a masonry machine from any side, along any line across it, meets a wall: the step-up
+     *  takes them onto its footing at most, never up its leaning courses. */
+    @GameTest(template = "industrial")
+    public static void playersCannotWalkUpMasonryMachines(GameTestHelper h) {
+        var l = h.getLevel(); var at = h.absolutePos(new BlockPos(5, 1, 5));
+        // Level ground under the machine and all round it, so walkers meet its foot.
+        for (var cell : BlockPos.betweenClosed(at.offset(-6, -1, -6), at.offset(6, -1, 6))) l.setBlockAndUpdate(cell, Blocks.STONE.defaultBlockState());
+        for (var block : java.util.List.of(KilnContent.KILN.get(), KilnContent.FOUNDRY.get(), KilnContent.RETORT.get(), WorkshopContent.SMITHY.get())) {
+            l.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
+            l.setBlockAndUpdate(at, block.defaultBlockState());
+            MachineFixture.build(l, at);
+            int reach = ModeledMachine.of(l.getBlockEntity(at)).model().reach;
+            for (var side : Direction.Plane.HORIZONTAL) for (double across = -reach - 1; across <= reach + 1; across += .25) {
+                var walker = new net.neoforged.neoforge.common.util.FakePlayer(l, new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "walker"));
+                walker.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                var start = net.minecraft.world.phys.Vec3.atBottomCenterOf(at).relative(side, reach + 1.5).relative(side.getClockWise(), across); walker.setPos(start);
+                double highest = start.y;
+                for (int i = 0; i < 2 * (reach + 1.5) / .2; i++) {
+                    walker.move(net.minecraft.world.entity.MoverType.SELF, new net.minecraft.world.phys.Vec3(-side.getStepX() * .2, -.1, -side.getStepZ() * .2));
+                    highest = Math.max(highest, walker.getY());
+                }
+                h.assertTrue(highest <= start.y + walker.maxUpStep() + 1e-3, block + ": a player walking in from the " + side + ", " + across + " across, rises " + (highest - start.y) + " blocks");
+            }
+        }
+        h.succeed();
+    }
     @GameTest(template = "industrial")
     public static void standaloneControllersCannotOperate(GameTestHelper h) {
         for (boolean works : new boolean[]{false, true}) {

@@ -59,6 +59,16 @@ class StudioTests(unittest.TestCase):
         self.assertNotIn([0,0,0],[c['offset'] for c in cells])
         self.assertAlmostEqual(sum((b[4]-b[1])*(b[5]-b[2])*(b[6]-b[3]) for c in cells for b in c['boxes']),8)
 
+    def test_leaning_courses_collide_as_sheer_cells(self):
+        """Courses that step in as they rise rise to the cell's top, so the wall offers no ledge to walk up; another
+        section in the cell keeps its own height."""
+        m=Model()
+        for k in range(4):m.box('section_0_wall',f'course_{k}',[k,4*k,0],[16,4*k+4,16])
+        m.box('section_1_cap','cap',[0,0,0],[2,2,2])
+        cell=next(c for c in machine_cells(m.parts,controller=(9,9,9)) if c['offset']==[0,0,0])
+        self.assertEqual(sorted({(b[0],b[2],b[5]) for b in cell['boxes']}),[(0,0,1),(1,0,.125)])
+        self.assertIn([0,0,0,0,1,1,1],cell['boxes'])
+
     def test_rotated_parts_are_sliced_across_cells(self):
         m=Model();m.box('section_1_brace','brace',[0,16,8],[4,40,12],angle=45,axis='z',pivot=[2,16,10])
         offsets=sorted(tuple(c['offset']) for c in machine_cells(m.parts))
