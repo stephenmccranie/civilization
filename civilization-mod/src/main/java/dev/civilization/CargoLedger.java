@@ -14,6 +14,8 @@ public final class CargoLedger implements CargoInventory {
     private final Runnable changed;
     private double cachedLoad=Double.NaN;
     private long revision;
+    private CargoLayout layout;
+    private long layoutRevision;
     public CargoLedger(DoubleSupplier capacity,Runnable changed){this.capacity=capacity;this.changed=changed;}
     public double capacity(){return capacity.getAsDouble();}
     public boolean isEmpty(){return entries.isEmpty();}
@@ -24,6 +26,11 @@ public final class CargoLedger implements CargoInventory {
     public int indexOf(ItemStack item){
         for(int i=0;i<entries.size();i++)if(ItemStack.isSameItemSameComponents(entries.get(i).item,item))return i;
         return -1;
+    }
+    /** Where the goods lie in `grid`, worked out once per change of the goods or the grid. */
+    public CargoLayout layout(CargoGrid grid){
+        if(layout==null||layoutRevision!=revision||!layout.grid.equals(grid)){layout=CargoLayout.of(entries,grid);layoutRevision=revision;}
+        return layout;
     }
     /** Unknown goods count as infinite, so a store holding them accepts nothing until they are unloaded. */
     public double load(){
