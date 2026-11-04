@@ -46,8 +46,9 @@ public final class BackpackGameTests {
             var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,c[0],1);
             h.assertTrue(Backpack.slots(pack)==c[1]&&Backpack.blocks(pack)==c[2],"Grade "+c[0]+"% gives "+c[1]+" slots and "+c[2]+" blocks");
         }
-        var finished=Backpack.ITEM.toStack();EquipmentGrade.ensure(finished,h.getLevel().random);
-        h.assertTrue(Grade.value(finished)==Grade.STANDARD&&!finished.isDamageableItem(),"A leather backpack is standard grade and gains no durability");
+        var grades=new java.util.HashSet<Integer>();
+        for(int i=0;i<20;i++){var made=Backpack.ITEM.toStack();EquipmentGrade.ensure(made,h.getLevel().random);h.assertTrue(EquipmentGrade.hasGrade(made)&&!made.isDamageableItem(),"A finished backpack rolls a grade and gains no durability");grades.add(Grade.value(made));}
+        h.assertTrue(grades.size()>1,"Each backpack rolls its own grade");
         var p=player(h);var pack=wear(p,75);var stone=new ItemStack(Items.STONE,32);pack.insert(stone);
         h.assertTrue(pack.getContainerSize()==7&&held(pack,Items.STONE)==18&&stone.getCount()==14&&pack.blockRoom()==0,"A 75% pack has 7 slots and stops at 18 blocks");
         var apples=new ItemStack(Items.APPLE,32);pack.insert(apples);

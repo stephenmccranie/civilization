@@ -25,7 +25,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * stack resized without saying which units moved keeps its worst ones, so no path can invent grade.
  */
 public record Grade(List<Integer> units) {
-    public static final int STANDARD = 75, LIMIT = 150, MAX_UNITS = 99;
+    public static final int STANDARD = 75, TARGET = 150, MAX_UNITS = 99;
     private static final Grade STANDARD_UNITS = new Grade(List.of(STANDARD));
     /** Materials whose units carry grades: smelted metal, diamonds and the Smithy's parts. */
     public static final TagKey<Item> GRADED = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(Civilization.MOD_ID, "graded"));
@@ -62,13 +62,21 @@ public record Grade(List<Integer> units) {
 
     /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
     public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 20); }
-    /** A refining pass closes a tenth of the gap to the limit, at least one point; at the limit it gains nothing. */
-    public static int refined(int grade) { return grade < LIMIT ? grade + Math.ceilDiv(LIMIT - grade, 10) : grade; }
+    /**
+     * A refining pass always raises a unit by at least a point. Its gain is exponentially distributed, with a mean of
+     * 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it never
+     * carries a unit past the target; from there on each pass adds a point.
+     */
+    public static int refined(int grade, RandomSource random) {
+        int gap = TARGET - grade;
+        double mean = 4.5 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
+        return grade + Math.max(1, Math.min(gap, (int)Math.round(-mean * Math.log(1 - random.nextDouble()))));
+    }
     /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal, refined in the same one. */
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
         if (!graded(product)) return;
         int unit = !graded(input) ? roll(random) : top(input, 1).getFirst();
-        assign(product, graded(input) && product.is(input.getItem()) ? refined(unit) : unit);
+        assign(product, graded(input) && product.is(input.getItem()) ? refined(unit, random) : unit);
     }
     /** Gives every unit of the stack one grade. */
     public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }

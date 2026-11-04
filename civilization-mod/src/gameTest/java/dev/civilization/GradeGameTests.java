@@ -63,7 +63,7 @@ public final class GradeGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "industrial") public static void freshRollsAndDiminishingRefinement(GameTestHelper h) {
+    @GameTest(template = "industrial") public static void freshRollsAndRandomRefinement(GameTestHelper h) {
         var random = net.minecraft.util.RandomSource.create(987654321L);
         int low = 0, high = 0; long total = 0;
         for (int i = 0; i < 20000; i++) {
@@ -73,12 +73,19 @@ public final class GradeGameTests {
         }
         h.assertTrue(total / 20000.0 > 74 && total / 20000.0 < 76, "Fresh units centre on 75%");
         h.assertTrue(low > 1600 && low < 2800 && high > 1600 && high < 2800, "Both low (<50%) and exceptional (100%+) units appear on roughly one in ten rolls");
-        var path = new ArrayList<Integer>();
-        for (int grade = 75; path.size() < 5; grade = Grade.refined(grade)) path.add(grade);
-        int passes = 0;
-        for (int grade = 75; grade < Grade.LIMIT; grade = Grade.refined(grade)) passes++;
-        h.assertTrue(path.equals(List.of(75, 83, 90, 96, 102)) && passes == 26, "Each pass closes a tenth of the gap to 150%: four passes pass 100%, 26 reach the limit");
-        h.assertTrue(Grade.refined(40) == 51 && Grade.refined(149) == 150 && Grade.refined(150) == 150 && Grade.refined(170) == 170, "Low units gain most; at or above the limit a pass gains nothing");
+        int lowest = Integer.MAX_VALUE, single = 0, large = 0; long gained = 0, gainedHigh = 0, passes = 0;
+        for (int i = 0; i < 20000; i++) {
+            int gain = Grade.refined(75, random) - 75;
+            lowest = Math.min(lowest, gain); gained += gain;
+            if (gain == 1) single++;
+            if (gain >= 10) large++;
+            gainedHigh += Grade.refined(125, random) - 125;
+        }
+        for (int i = 0; i < 2000; i++) for (int grade = 75; grade < 100; grade = Grade.refined(grade, random)) passes++;
+        h.assertTrue(lowest >= 1 && gained / 20000.0 > 4.3 && gained / 20000.0 < 4.9, "Every pass raises a unit, about four and a half points on average from 75%");
+        h.assertTrue(single > 5000 && single < 6600 && large > 2000 && large < 2900, "Passes vary widely: about three in ten gain a single point, one in eight gains 10 or more");
+        h.assertTrue(gainedHigh / 20000.0 < 1.05 && passes / 2000.0 > 9.5 && passes / 2000.0 < 11.5, "Returns fall steeply: 75% reaches 100% in about ten passes, and at 125% a pass adds one point");
+        h.assertTrue(Grade.refined(149, random) == 150 && Grade.refined(150, random) == 151 && Grade.refined(170, random) == 171, "A pass never jumps past 150%, and beyond it still adds a point");
         h.succeed();
     }
 
@@ -94,11 +101,12 @@ public final class GradeGameTests {
         f.setItem(2, ItemStack.EMPTY); f.setItem(1, KilnContent.MINERAL_COAL.toStack(16)); f.setItem(0, ingots(100, 90, 70)); FoundryGameTests.run(h, f, 3 * 800 + 40);
         h.assertTrue(f.getItem(2).is(KilnContent.STEEL.get()) && grades(f.getItem(2)).equals(List.of(100, 90, 70)), "On Automatic, iron still becomes steel, each ingot keeping its grade");
         f.setItem(2, ItemStack.EMPTY); select(f, "refine_iron_ingot"); f.setItem(0, ingots(96, 40)); FoundryGameTests.run(h, f, 2 * 200 + 40);
-        h.assertTrue(grades(f.getItem(2)).equals(List.of(102, 51)), "Refining raises each unit by its own diminishing step");
+        var refined = grades(f.getItem(2));
+        h.assertTrue(refined.size() == 2 && refined.getFirst() > 96 && refined.getLast() > 40, "Refining raises every unit it passes: " + refined);
         f.setItem(2, ItemStack.EMPTY); select(f, "refine_iron_ingot"); f.setItem(0, new ItemStack(Items.IRON_INGOT)); FoundryGameTests.run(h, f, 240);
-        h.assertTrue(grades(f.getItem(2)).equals(List.of(83)), "An ingot with no recorded grade refines from the standard 75%");
+        h.assertTrue(Grade.value(f.getItem(2)) > Grade.STANDARD, "An ingot with no recorded grade refines up from the standard 75%");
         f.setItem(2, ItemStack.EMPTY); f.selectRecipe(-1); f.setItem(0, new ItemStack(Items.DIAMOND)); FoundryGameTests.run(h, f, 240);
-        h.assertTrue(f.getItem(2).is(Items.DIAMOND) && grades(f.getItem(2)).equals(List.of(83)), "Diamonds, which have no other Foundry job, refine on Automatic");
+        h.assertTrue(f.getItem(2).is(Items.DIAMOND) && Grade.value(f.getItem(2)) > Grade.STANDARD, "Diamonds, which have no other Foundry job, refine on Automatic");
         h.succeed();
     }
 
@@ -121,7 +129,7 @@ public final class GradeGameTests {
         h.assertTrue(Grade.value(bench.getItem(5)) == 90, "Armor takes the mean of its plates");
         var backpack = ManufacturingGameTests.job(3, Backpack.ITEM.get());
         ManufacturingGameTests.supply(bench, backpack); WorkshopGameTests.run(bench, backpack.ticks());
-        h.assertTrue(Grade.value(bench.getItem(5)) == Grade.STANDARD, "Gear made without graded material is standard");
+        h.assertTrue(bench.getItem(5).is(Backpack.ITEM.get()) && EquipmentGrade.hasGrade(bench.getItem(5)), "A backpack rolls its own grade when made");
         h.succeed();
     }
 
