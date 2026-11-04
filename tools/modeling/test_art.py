@@ -197,6 +197,18 @@ class ArtTests(unittest.TestCase):
         small=Image.new('RGB',(400,400),'#ff00ff'); ImageDraw.Draw(small).rectangle((20,20,120,60),fill=(40,60,200)); small.save(self.root/'supplied.png')
         with self.assertRaisesRegex(ValueError,'under half'): self.command('texture','--prompt','cells.txt','--image','supplied.png')
 
+    def test_rounded_panel_corners_take_no_ground(self):
+        """A panel drawn with rounded corners on a green key fills its rectangle with its own colours to the corners."""
+        master=Image.new('RGB',(200,100),'#00ff00'); draw=ImageDraw.Draw(master)
+        draw.rounded_rectangle((10,10,89,89),radius=18,fill=(150,90,50)); draw.rounded_rectangle((110,10,189,89),radius=18,fill=(40,40,48))
+        master.save(self.root/'supplied.png'); (self.root/'cells.txt').write_text('Timber, then iron.',encoding='utf-8')
+        self.asset['texture']={'grid':[2,1],'ground':'#00ff00','atlas':'model/atlas.png','size':[24,16],'colors':8,
+            'regions':{'timber':{'cell':[0,0],'rect':[0,0,16,16]},'iron':{'cell':[1,0],'rect':[16,0,8,8]}}}
+        self.save(); self.command('texture','--prompt','cells.txt','--image','supplied.png')
+        with Image.open(self.folder/'model/atlas.png') as atlas:
+            self.assertTrue(all(g<=r for r,g,b in atlas.convert('RGB').crop((0,0,16,16)).getdata()))
+            self.assertTrue(all(g<=b+12 for r,g,b in atlas.convert('RGB').crop((16,0,24,8)).getdata()))
+
     def test_object_panel_keeps_its_outline_on_its_material(self):
         """A round gray stone drawn on the key fills its rectangle, and dark mortar shows where its outline left the key."""
         master=Image.new('RGB',(200,100),'#00ff00'); draw=ImageDraw.Draw(master)
