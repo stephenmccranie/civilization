@@ -196,7 +196,12 @@ def atlas(asset, folder):
         # A subject cut by the master's edge has no margin to trust.
         if box is None or 0 in box[:2] or box[2] == master.width or box[3] == master.height:
             raise ValueError(f'Master cell {col},{row} has no subject inside a margin of plain {texture["ground"]}')
-        if max((box[2]-box[0])*cols/master.width, (box[3]-box[1])*rows/master.height) < 0.5:
+        objects = [r for r in regions.values() if tuple(r['cell']) == (col, row) and 'on' in r]
+        if objects:
+            # An object panel is drawn in its own proportions, so it needs only the detail to reduce well.
+            if min(min((box[2]-box[0])/r['rect'][2], (box[3]-box[1])/r['rect'][3]) for r in objects) < 2:
+                raise ValueError(f'Master cell {col},{row} holds an object under twice its pixel size')
+        elif max((box[2]-box[0])*cols/master.width, (box[3]-box[1])*rows/master.height) < 0.5:
             raise ValueError(f'Master cell {col},{row} holds a subject under half its size; the sheet asks for it to fill the cell')
     def panel(region):
         box = found[tuple(region['cell'])][1]; rim = max(2, (box[2]-box[0])//60)  # Inside the antialiased rim.
@@ -486,8 +491,10 @@ def record(asset, folder, stem, prompt, image=None):
     file name. A generation is told each reference's role ahead of the prompt."""
     references = {str(p): sha(p) for p in (local(ROOT, r['path']) for r in asset['references'])}
     if not image: prompt = attached(asset) + prompt
-    dest = folder / f'{stem}-{len(asset["generations"])+1:02}{image.suffix.lower() if image else ".png"}'
-    if dest.exists(): raise ValueError(f'{dest.name} exists')
+    # A restarted asset keeps its earlier images in the folder as provenance, so take the next free number.
+    number = len(asset['generations']) + 1; suffix = image.suffix.lower() if image else '.png'
+    while (folder / f'{stem}-{number:02}{suffix}').exists(): number += 1
+    dest = folder / f'{stem}-{number:02}{suffix}'
     if image:
         with Image.open(image) as opened: opened.verify()
         shutil.copyfile(image, dest)
