@@ -44,7 +44,7 @@ public final class CalorieFoodData extends FoodData {
             depleted = next;
             EnergyLog.marker(player, next ? "depleted_enter" : "depleted_recovered");
             if (player instanceof ServerPlayer) player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
-                    next ? "message.civilization.depleted" : "message.civilization.recovered", Energy.text(recoveryThreshold() * Energy.KCAL)), false);
+                    next ? "message.civilization.depleted" : "message.civilization.recovered", (int) recoveryThreshold()), false);
         }
     }
     public static CalorieFoodData of(Player player) { return (CalorieFoodData) player.getFoodData(); }

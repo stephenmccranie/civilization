@@ -80,7 +80,7 @@ public final class CalorieHud {
                     Math.ceil(innerWidth * (data.isDepleted() ? data.clientRecoveryThreshold : data.clientSprintMinimum)
                             / reserve.capacity()), 1, innerWidth);
             graphics.fill(threshold, y + 9, threshold + 1, y + 10, 0xFFFFB05C);
-            String label = dev.civilization.Energy.text(reserve.calories() * dev.civilization.Energy.KCAL);
+            String label = String.format(Locale.ROOT, "%,.0f kcal", reserve.calories());
             graphics.drawString(mc.font, label, x + width - mc.font.width(label), y - 10,
                     critical ? 0xFFFF8A75 : low ? 0xFFFFCE76 : 0xFFFFFFFF, true);
             ComfortHud.draw(graphics, graphics.guiWidth()/2, y);
@@ -127,7 +127,7 @@ public final class CalorieHud {
                 event.getToolTip().add(Component.translatable("tooltip.civilization.ration").withStyle(ChatFormatting.GRAY));
             var food = event.getItemStack().getFoodProperties(event.getEntity());
             if (food != null) event.getToolTip().add(Component.translatable("tooltip.civilization.calories",
-                    dev.civilization.Energy.text(FoodCalories.of(event.getItemStack(), food) * dev.civilization.Energy.KCAL))
+                    String.format(Locale.ROOT, "%,.0f", FoodCalories.of(event.getItemStack(), food)))
                     .withStyle(ChatFormatting.GOLD));
             if (event.getItemStack().is(dev.civilization.KilnContent.MINERAL_COAL.get()))
                 event.getToolTip().add(Component.translatable("tooltip.civilization.coal_energy", dev.civilization.Energy.text(dev.civilization.Energy.COAL),

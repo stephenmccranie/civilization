@@ -7,6 +7,10 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class CoalFireGameTests {
+    @GameTest(template="industrial") public static void coalEnergyReadsInJoules(GameTestHelper h){
+        h.assertTrue(Energy.text(Energy.COAL).equals("250 MJ")&&Energy.text(16*Energy.COAL).equals("4.00 GJ")&&Energy.text(.62*Energy.COAL).equals("155 MJ")&&Energy.text(Energy.COAL/400).equals("625 kJ"),"A Coal is 250 MJ, a dense block's 16 are 4 GJ, and a work unit is 625 kJ");
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void acceptedIgnitionStrikesCostCalories(GameTestHelper h){
         var w=WorkshopGameTests.build(h,0,Direction.NORTH);
         var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),

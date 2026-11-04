@@ -12,13 +12,6 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public class CalorieGameTests {
     @GameTest(template="industrial")
-    public static void energyReadsInJoules(GameTestHelper helper) {
-        helper.assertTrue(Energy.text(2400 * Energy.KCAL).equals("10.0 MJ") && Energy.text(500 * Energy.KCAL).equals("2.09 MJ"), "The full reserve reads 10.0 MJ and bread 2.09 MJ");
-        helper.assertTrue(Energy.text(Energy.COAL).equals("250 MJ") && Energy.text(16 * Energy.COAL).equals("4.00 GJ"), "A Coal is 250 MJ and a dense block's 16 Coal are 4 GJ");
-        helper.assertTrue(Energy.watts(0.2 * Energy.KCAL).equals("837 W") && Energy.text(25 * Energy.KCAL).equals("105 kJ"), "Cold drain reads as power and small foods in kJ");
-        helper.succeed();
-    }
-    @GameTest(template="industrial")
     public static void nativeSlabAndCutItemUseChargeByVolume(GameTestHelper h) {
         var origin=h.absolutePos(new net.minecraft.core.BlockPos(4,2,4));
         var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),
