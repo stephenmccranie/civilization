@@ -63,8 +63,8 @@ public record Grade(List<Integer> units) {
         return fitted;
     }
 
-    /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
-    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 200); }
+    /** A freshly smelted unit: normally distributed about the standard with a 10-point deviation, unbounded. */
+    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 100); }
     /**
      * A hammering always raises a unit by at least a tenth of a point. Its gain is exponentially distributed, with a
      * mean of 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it
