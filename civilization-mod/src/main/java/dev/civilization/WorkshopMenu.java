@@ -7,7 +7,7 @@ import net.minecraft.world.item.*;
 
 public final class WorkshopMenu extends AbstractContainerMenu implements CoalFireMenu {
     public final Container inventory;public final ContainerData data;
-    public WorkshopMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(6));}
+    public WorkshopMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(7));}
     public WorkshopMenu(int id,Inventory inv,Container container,ContainerData data){
         super(WorkshopContent.MENU.get(),id);this.inventory=container;this.data=data;
         for(int i=0;i<4;i++){final int index=i;addSlot(new Slot(container,i,17+i*18,43){@Override public boolean mayPlace(ItemStack s){return container.canPlaceItem(index,s);}@Override public boolean isActive(){return index<2||kind()>=2;}});}
@@ -19,7 +19,9 @@ public final class WorkshopMenu extends AbstractContainerMenu implements CoalFir
         addDataSlots(data);
     }
     public int fireState(){return data.get(4);}
-    @Override public boolean hasCoalFire(){return kind()!=ManufacturingJobs.BENCH;}
+    @Override public boolean hasCoalFire(){return WorkshopBlockEntity.fired(kind());}
+    /** Hides steeping in the Tannery's pit. */
+    public int pit(){return data.get(6);}
     public int heat(){return data.get(5);}
     public int kind(){return data.get(0);}public int selection(){return data.get(1);}
     public WorkshopJobs.Job job(){return MachineWork.job(inventory,kind(),selection());}

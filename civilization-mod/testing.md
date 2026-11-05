@@ -37,7 +37,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip |
-| `workshops` | Tannery, Textile Workshop and Smithy, with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
+| `workshops` | Tannery with a loaded pit, Textile Workshop and Smithy with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |

@@ -17,7 +17,7 @@ public final class WorkshopContent {
     private static final DeferredRegister<MenuType<?>> MENUS=DeferredRegister.create(Registries.MENU,Civilization.MOD_ID);
     public static final DeferredBlock<WorkshopBlock> TANNERY=block("tannery",0), TEXTILE=block("textile_workshop",1), SMITHY=block("smithy",2);
     public static final DeferredBlock<WorkshopBlock> BENCH=block("assembly_bench",3);
-    public static final DeferredItem<Item> HIDE=ITEMS.registerSimpleItem("raw_hide"), CLOTH=ITEMS.registerSimpleItem("cloth");
+    public static final DeferredItem<Item> HIDE=ITEMS.registerSimpleItem("raw_hide"), TANBARK=ITEMS.registerSimpleItem("tanbark"), CLOTH=ITEMS.registerSimpleItem("cloth");
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<WorkshopBlockEntity>> ENTITY=ENTITIES.register("workshop",()->BlockEntityType.Builder.of(WorkshopBlockEntity::new,TANNERY.get(),TEXTILE.get(),SMITHY.get(),BENCH.get()).build(null));
     public static final DeferredHolder<MenuType<?>,MenuType<WorkshopMenu>> MENU=MENUS.register("workshop",()->new MenuType<>(WorkshopMenu::new,FeatureFlags.DEFAULT_FLAGS));
     private static DeferredBlock<WorkshopBlock> block(String name,int kind){var b=BLOCKS.register(name,()->kind==3?new AssemblyBenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)):new WorkshopBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE),kind));ITEMS.registerSimpleBlockItem(b);return b;}

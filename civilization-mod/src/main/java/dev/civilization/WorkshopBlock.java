@@ -25,11 +25,17 @@ public class WorkshopBlock extends KilnBlock {
     @Override public void animateTick(BlockState s,Level l,BlockPos p,net.minecraft.util.RandomSource random){
         if(kind!=ManufacturingJobs.BENCH)super.animateTick(s,l,p,random);
     }
+    /** A water bucket fills the Tannery's pit and starts its batch. */
+    @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,net.minecraft.world.InteractionHand hand,net.minecraft.world.phys.BlockHitResult hit){
+        if(kind!=0||!stack.is(net.minecraft.world.item.Items.WATER_BUCKET))return super.useItemOn(stack,state,level,pos,player,hand,hit);
+        if(!level.isClientSide&&level.getBlockEntity(pos) instanceof WorkshopBlockEntity w)w.pour(player,hand);
+        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
     @Override protected void openContainer(Level l,BlockPos p,Player player){if(l.getBlockEntity(p) instanceof WorkshopBlockEntity w&&CivicAccess.allowed(l,p,player))player.openMenu(w);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> t){return l.isClientSide?null:createTickerHelper(t,WorkshopContent.ENTITY.get(),(world,pos,state,w)->w.tick());}
     @Override public void appendHoverText(net.minecraft.world.item.ItemStack stack,net.minecraft.world.item.Item.TooltipContext context,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag flag){
         if(kind==ManufacturingJobs.BENCH){lines.add(net.minecraft.network.chat.Component.literal("Woodworking, assembly and repairs · hand worked"));return;}
-        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Hide → leather";case 1->"Wool → cloth";default->"Forge heads, plates, rods and fasteners";}));
-        lines.add(net.minecraft.network.chat.Component.literal("Coal-fired · place for the build guide"));
+        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Hide + Tanbark → leather";case 1->"Wool → cloth";default->"Forge heads, plates, rods and fasteners";}));
+        lines.add(net.minecraft.network.chat.Component.literal(kind==0?"Bark pit · fill with a water bucket · place for the build guide":"Coal-fired · place for the build guide"));
     }
 }

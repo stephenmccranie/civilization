@@ -6,7 +6,7 @@ public final class MachineStatus {
     public static final class Workshop {
         private Workshop(){}
         public static final int INCOMPLETE=0, NEEDS_MATERIALS=1, OUTPUT_FULL=2, FIRE_UNLIT=3,
-                WORKING=4, AMBIGUOUS=5, WET=6, HAND_READY=7, NEEDS_FOOD=8, WARMING=9;
+                WORKING=4, AMBIGUOUS=5, WET=6, HAND_READY=7, NEEDS_FOOD=8, WARMING=9, POUR=10;
     }
     public static final class Industry {
         private Industry(){}

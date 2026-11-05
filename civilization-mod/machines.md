@@ -50,7 +50,7 @@ Inventories live only in the controller. Breaking a shell block scatters nothing
 
 Every machine and civic screen uses one cabinet: soft tan enamel, a dark metal frame with brass corner pins, a raised brass nameplate and inset native slots and controls. Land, trade and survey controllers keep their specialized layouts inside it. The Survival/Adventure player inventory (with its live character preview and brass Crafting label), its recipe book, crafting tables, single and double chests, barrels and other row-based vanilla containers use the same skin with their native slot layouts; Creative tabs and specialized containers keep their own. The [Hand well](physics.md#personal-block-carrying) sits left of the hotbar. The boat helm is an in-world control, not a screen.
 
-- **Slots.** Coal machines have two coal slots on the left of a centered fire window, with the striker on its right. The Kiln, Fertilizer Furnace, Cooking Stove, Foundry, Tannery and Textile Workshop have two inputs and two outputs; the Smithy and Assembly Bench have four interchangeable ingredient slots and one output; the Assembly Bench has no fuel. The Coal Drill's coal and the Distillation Column's sulfur use a 2×2 output bank. Stacks hold 32, so a paired bank holds 64. Kiln-family input drains the first slot before refilling from the second; new output fills the first compatible slot and splits across both; finished stacks stay in place when another is collected. Click, drag, shift-click and sided hoppers use whole banks; extra slots never raise processing speed.
+- **Slots.** Coal machines have two coal slots on the left of a centered fire window, with the striker on its right; the Tannery has none and shows its pit there. The Kiln, Fertilizer Furnace, Cooking Stove, Foundry, Tannery and Textile Workshop have two inputs and two outputs; the Smithy and Assembly Bench have four interchangeable ingredient slots and one output; the Assembly Bench has no fuel. The Coal Drill's coal and the Distillation Column's sulfur use a 2×2 output bank. Stacks hold 32, so a paired bank holds 64. Kiln-family input drains the first slot before refilling from the second; new output fills the first compatible slot and splits across both; finished stacks stay in place when another is collected. Click, drag, shift-click and sided hoppers use whole banks; extra slots never raise processing speed.
 - **Recipe drawer.** Open or collapse it with the side button, search by name and scroll item rows with the mouse wheel, Page Up/Down or the scrollbar beside them (drag its thumb, or click the track to jump there). Assembly Bench category tabs filter Tools, Weapons, Armor and Components, and material chips filter Iron, Gold, Diamond and Netherite; netherite rows are labeled as upgrades; Repair and Automatic are icon controls with hover labels. Filters never hide recipes because materials are missing. Selecting a recipe shows ghost requirements and output; ghosts never reserve or create stock. Selections are server-validated and saved with the machine; a selection restricts production to that output, incompatible ingredients wait, and switching resets partial progress without consuming ingredients.
 - **Automatic matching.** Kiln-family machines match in recipe-ID order (clay makes bricks and iron ingots make blister steel; select Terracotta or Heat Iron Ingot explicitly). Workshops accept an ingredient in any input slot, combine split stacks, keep extra quantities for later batches and block on unrelated ingredients; Automatic runs only one unambiguous match, so shared materials (such as axe and pickaxe heads' ingots) need a selection. Repair and upgrade identity come from the actual source item regardless of slot order.
 - **Feedback.** The fire window animates while lit and has no hover tooltip. A slim bar beside it shows the machine's stored heat; hover for the percentage and whether it is hot (with about how many minutes it would keep working unfed), warming up or cold. Liquid gauges show full fluid names and exact mB on hover, including the expected fluid in an empty buffer; color is supplemental. Menus report working, missing ingredients or fuel, wrong input, blocked output or ready to collect.
@@ -59,7 +59,7 @@ Every machine and civic screen uses one cabinet: soft tan enamel, a dark metal f
 
 ## Coal fires
 
-Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototype Stove, Foundry, Tannery, Textile Workshop, Smithy, Oil Derrick and Fired Heater — burns only Coal and shares one fire lifecycle:
+Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototype Stove, Foundry, Textile Workshop, Smithy, Oil Derrick and Fired Heater — burns only Coal and shares one fire lifecycle:
 
 - **Lighting.** Add Coal, complete the structure and click the striker. Each accepted strike costs `machineIgnitionKcal` (1 kcal at neutral comfort) and lights with a one-in-three chance; the server accepts at most one strike per second. An unlucky strike costs labor but no coal. Rejected clicks (cooldown, already lit, wet, incomplete or no coal) are free. Sparks and the native flint sound acknowledge a strike; the button disables while lit. Direct rain on the work face blocks ignition and pauses work ([heat](heat.md#machines)).
 - **Warming up.** The fire heats the machine's masonry before anything can be made. Full masonry holds 0.7 Coal (175 MJ) of heat per block, and every machine holds at least one Coal; work needs 80% of full. Beyond replacing what work draws, a lit fire fills an empty store in two minutes, so a cold machine reaches working heat in about 100 seconds. Warming up is the large cost of a session:
@@ -71,7 +71,6 @@ Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototyp
   | Fertilizer Furnace | 21 | 14.7 Coal | 11.8 Coal |
   | Fired Heater | 20 | 14 Coal | 11.2 Coal |
   | Kiln | 17 | 11.9 Coal | 9.5 Coal |
-  | Tannery | 8 | 5.6 Coal | 4.5 Coal |
   | Oil Derrick | 7 | 4.9 Coal | 3.9 Coal |
   | Cooking Stove, Prototype Stove, Textile Workshop | 0 | 1 Coal | 0.8 Coal |
 
@@ -82,7 +81,7 @@ Firelight and a quiet crackle follow the lit fire; smoke (industrial machines) o
 
 ## Coal budget
 
-`ProductionEnergy` owns one budget: one Coal, a 10 kg scuttle of 250 MJ, is **400 work units** of 625 kJ. Kilns and standard workshop jobs draw one unit per work tick (20 seconds per Coal); the Tannery and Textile Workshop draw one unit per two ticks; pumping and heating draw eight units per 5 mB. Work per Coal drawn from a hot machine:
+`ProductionEnergy` owns one budget: one Coal, a 10 kg scuttle of 250 MJ, is **400 work units** of 625 kJ. Kilns and standard workshop jobs draw one unit per work tick (20 seconds per Coal); the Textile Workshop draws one unit per two ticks; pumping and heating draw eight units per 5 mB. Work per Coal drawn from a hot machine:
 
 | Machine | One Coal drawn makes |
 | --- | --- |
@@ -90,7 +89,7 @@ Firelight and a quiet crackle follow the lit fire; smoke (industrial machines) o
 | Foundry | 2 units of rough metal, or one heat of up to 8; blister steel takes 2 Coal per ingot |
 | Cooking Stove | 2 cooked items |
 | Fertilizer Furnace | 8 Mineral Fertilizer (one batch) |
-| Tannery / Textile Workshop | 4 Leather / 8 Cloth from 4 wool |
+| Textile Workshop | 8 Cloth from 4 wool |
 | Oil Derrick / Fired Heater | 250 mB pumped / 250 mB heated |
 
 Equipment forging takes longer by material, which scales its coal. [Warming up](#coal-fires) and leakage come on top: they are most of the Coal a short session spends and spread thin over a long one. [Temperature](heat.md#machines) changes only how fast a machine leaks; recipe times, yields and work draws do not change. Claim upkeep, crafting and refined-fuel consumption are separate.

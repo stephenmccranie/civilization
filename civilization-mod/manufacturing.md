@@ -32,11 +32,13 @@ Controller crafting needs no leather, cloth, shears, anvil or oil. The Tannery a
 
 | Workshop | Job | Productive time |
 | --- | --- | --- |
-| Tannery | 1 Raw Hide → 1 Leather | 10 seconds at half heat rate (0.25 Coal) |
+| Tannery | Up to 8 Raw Hide, one Tanbark each, steeped in its water pit → as many Leather | 20 minutes while loaded; no fuel |
 | Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
 | Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
 
 Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire keeps the Smithy hot. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
+
+**Tanning** is bark tanning, with no fire. Stripping a tree's log or wood with an axe peels one **Tanbark**; bamboo and Nether stems have none. Load Raw Hide and Tanbark into the Tannery, then right-click it with a water bucket: the pit takes up to eight hides with one Tanbark each, the bucket comes back empty, and the batch tans in 20 minutes while the Tannery is complete and loaded, with no fuel or worker. The menu shows the pit and the minutes left, and the inputs can be changed or refilled meanwhile. The finished hides come out as Leather, waiting while both outputs are full, and the empty pit takes the next bucket. Breaking the Tannery returns the steeping hides and bark unfinished; the water is lost.
 
 Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 

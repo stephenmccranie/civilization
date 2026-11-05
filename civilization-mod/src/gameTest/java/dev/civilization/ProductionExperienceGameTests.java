@@ -19,7 +19,7 @@ public final class ProductionExperienceGameTests {
         copy.awardUsedRecipesAndPopExperience(player);h.assertTrue(h.getLevel().getEntitiesOfClass(ExperienceOrb.class,area).isEmpty(),"Claiming twice cannot duplicate XP");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopOutputBanksCollectSavedXpOnce(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));WorkshopGameTests.run(w,1200);
+        var w=WorkshopGameTests.build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));WorkshopGameTests.run(w,1200);
         h.assertTrue(w.pendingExperience==2,"Each completed production batch earns one XP");
         var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());
         h.assertTrue(copy.pendingExperience==2,"XP survives save/load");

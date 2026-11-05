@@ -14,11 +14,11 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class WorkshopGameTests {
     @GameTest(template="industrial") public static void pairedWorkshopStorageAndSmithySingleOutput(GameTestHelper h){
-        var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack());w.setItem(1,WorkshopContent.HIDE.toStack());w.setItem(5,new ItemStack(Items.LEATHER,31));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
-        h.assertTrue(w.getItem(5).getCount()==32&&w.getItem(7).getCount()==1&&w.getItem(0).isEmpty()&&w.getItem(1).isEmpty(),"Two input stacks feed both output stacks");
-        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(copy.getItem(7).getCount()==1,"Backup workshop output persists");
+        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL));w.setItem(1,new ItemStack(Items.WHITE_WOOL));w.setItem(5,WorkshopContent.CLOTH.toStack(31));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
+        h.assertTrue(w.getItem(5).getCount()==32&&w.getItem(7).getCount()==3&&w.getItem(0).isEmpty()&&w.getItem(1).isEmpty(),"Two input stacks feed both output stacks");
+        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(copy.getItem(7).getCount()==3,"Backup workshop output persists");
         copy.removeItem(5,32);
-        h.assertTrue(copy.getItem(5).isEmpty()&&copy.getItem(7).getCount()==1,"Taking the first Tannery output leaves the second in place");
+        h.assertTrue(copy.getItem(5).isEmpty()&&copy.getItem(7).getCount()==3,"Taking the first Textile Workshop output leaves the second in place");
         w=build(h,3,Direction.NORTH);var toolJob=ManufacturingGameTests.job(3,Items.IRON_PICKAXE);w.select(WorkshopJobs.index(3,toolJob.id()));
         w.setItem(0,new ItemStack(ManufacturingContent.head("iron","pickaxe"),2));w.setItem(1,ManufacturingContent.HANDLE.toStack(2));run(w,200);
         h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(7).isEmpty()&&w.getItem(0).getCount()==1,"Bench completes exactly one tool");
@@ -28,6 +28,44 @@ public final class WorkshopGameTests {
         h.assertTrue(w.getItem(5).is(Items.IRON_PICKAXE)&&w.getItem(0).isEmpty(),"Starting the next batch finishes the next tool");
         h.assertTrue(EquipmentGrade.hasGrade(first)&&EquipmentGrade.hasGrade(w.getItem(5))&&EquipmentGrade.wearSeed(first)!=EquipmentGrade.wearSeed(w.getItem(5)),"Each finished tool has its own identity");
         h.succeed();
+    }
+    @GameTest(template="industrial") public static void tanneryPitSteepsAHideBatchWithoutFuel(GameTestHelper h){
+        var w=build(h,0,Direction.NORTH);var p=ManufacturingGameTests.operator(w);
+        w.setItem(0,WorkshopContent.HIDE.toStack(10));w.setItem(1,WorkshopContent.TANBARK.toStack(5));
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));
+        h.assertTrue(w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.BUCKET),"Pouring a water bucket starts the batch and returns the bucket");
+        h.assertTrue(w.getItem(WorkshopBlockEntity.PIT_HIDES).getCount()==5&&w.getItem(WorkshopBlockEntity.PIT_BARK).getCount()==5&&w.getItem(0).getCount()==5&&w.getItem(1).isEmpty(),"One Tanbark per hide goes into the pit");
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));
+        h.assertTrue(!w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.WATER_BUCKET),"A busy pit refuses more water");
+        run(w,Tanning.TICKS-10);h.assertTrue(w.getItem(5).isEmpty()&&w.getItem(7).isEmpty()&&w.fire.heat()==0,"The batch is not done before twenty minutes and burns nothing");
+        w.setItem(0,ItemStack.EMPTY);run(w,10);
+        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==5&&w.getItem(WorkshopBlockEntity.PIT_HIDES).isEmpty()&&w.getItem(WorkshopBlockEntity.PIT_BARK).isEmpty()&&w.pendingExperience==5,"Changing the inputs leaves the pit alone; twenty minutes make five Leather");
+        w.setItem(0,WorkshopContent.HIDE.toStack(3));
+        h.assertTrue(!w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.WATER_BUCKET),"Without Tanbark the pit is not filled");h.succeed();
+    }
+    @GameTest(template="industrial",timeoutTicks=60) public static void tanneryPitKeepsItsBatchThroughSaveAndBreaking(GameTestHelper h){
+        var w=build(h,0,Direction.NORTH);var p=ManufacturingGameTests.operator(w);
+        w.setItem(0,WorkshopContent.HIDE.toStack(8));w.setItem(1,WorkshopContent.TANBARK.toStack(8));
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND);run(w,1000);
+        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());
+        h.assertTrue(copy.steep==1000&&copy.getItem(WorkshopBlockEntity.PIT_HIDES).getCount()==8,"The steeping batch and its time are saved");
+        h.getLevel().destroyBlock(w.getBlockPos(),true);
+        h.runAfterDelay(5,()->{
+            var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(w.getBlockPos()).inflate(4));
+            java.util.function.ToIntFunction<Item> count=item->drops.stream().filter(e->e.getItem().is(item)).mapToInt(e->e.getItem().getCount()).sum();
+            h.assertTrue(count.applyAsInt(WorkshopContent.HIDE.get())==8&&count.applyAsInt(WorkshopContent.TANBARK.get())==8&&count.applyAsInt(Items.LEATHER)==0,"Breaking the Tannery returns the steeping hides and bark, unfinished");h.succeed();
+        });
+    }
+    @GameTest(template="industrial") public static void strippingALogPeelsTanbark(GameTestHelper h){
+        var p=ManufacturingGameTests.operator(build(h,1,Direction.NORTH));
+        for(var log:List.of(Blocks.OAK_LOG,Blocks.BAMBOO_BLOCK)){
+            var at=h.absolutePos(new BlockPos(1,2,1));h.getLevel().setBlockAndUpdate(at,log.defaultBlockState());
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.IRON_AXE));
+            Items.IRON_AXE.useOn(new net.minecraft.world.item.context.UseOnContext(p,net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.phys.BlockHitResult(at.getCenter(),Direction.UP,at,false)));
+            var bark=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(2),e->e.getItem().is(WorkshopContent.TANBARK.get()));
+            int peeled=bark.stream().mapToInt(e->e.getItem().getCount()).sum();bark.forEach(net.minecraft.world.entity.Entity::discard);
+            h.assertTrue(log==Blocks.OAK_LOG?peeled==1&&h.getLevel().getBlockState(at).is(Blocks.STRIPPED_OAK_LOG):peeled==0,"Stripping a tree log peels one Tanbark; bamboo has none: "+log);
+        }h.succeed();
     }
     static WorkshopBlockEntity build(GameTestHelper h,int kind,Direction front){
         var pos=h.absolutePos(new BlockPos(5,1,4));var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();case 3->WorkshopContent.BENCH.get();default->WorkshopContent.SMITHY.get();};
@@ -39,7 +77,7 @@ public final class WorkshopGameTests {
         MachineFixture.build(h.getLevel(),pos);
         return (WorkshopBlockEntity)h.getLevel().getBlockEntity(pos);
     }
-    static void run(WorkshopBlockEntity w,int ticks){if(w.handWorked()){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
+    static void run(WorkshopBlockEntity w,int ticks){if(w.handWorked()){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else if(!w.steeped())CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
     @GameTest(template="industrial") public static void coalHeatFollowsIdleAndMaterialBurn(GameTestHelper h){
         var l=h.getLevel();var field=ThermalField.get(l);
         double[] emissions=new double[3];int n=0;
@@ -81,10 +119,10 @@ public final class WorkshopGameTests {
         var job=WorkshopJobs.repair(tool);w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());
         run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.fire.heat()==0,"Diamond repair completes by hand without Coal");h.succeed();
     }
-    @GameTest(template="industrial") public static void tanningClothProductiveCoal(GameTestHelper h){
-        var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
-        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==2&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two hides draw half a Coal from the hot fire, which stokes one to top up");
-        h.assertTrue(WorkshopJobs.jobs(0).getFirst().coalNote().contains("0.25"),"Tannery quote shows the lower coal cost");
+    @GameTest(template="industrial") public static void weavingProductiveCoal(GameTestHelper h){
+        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
+        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==4&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two wool draw half a Coal from the hot fire, which stokes one to top up");
+        h.assertTrue(WorkshopJobs.jobs(1).getFirst().coalNote().contains("0.25"),"Textile quote shows the lower coal cost");
         run(w,1600);h.assertTrue(w.fire.hot()&&w.getItem(4).getCount()==3,"A hot idle fire only replaces what its masonry leaks");
         w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.RED_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,190);
         h.assertTrue(w.getItem(5).isEmpty(),"Weaving needs the full ten seconds");
@@ -248,15 +286,15 @@ public final class WorkshopGameTests {
                 &&ingredients.stream().anyMatch(ingredient->ingredient.test(new ItemStack(Items.BARREL))),"Tannery controller needs a barrel but no iron");h.succeed();
     }
     @GameTest(template="industrial") public static void blockedStructureAndSaveResume(GameTestHelper h){
-        var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack());w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,100);
+        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,100);
         var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(saved,h.getLevel().registryAccess());
         h.assertTrue(copy.progress==100&&copy.fire.lit()&&CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(w.fire)&&copy.getItem(0).getCount()==1,"Saved work and stored heat retained");
         copy.setItem(5,new ItemStack(Items.STONE,32));copy.setItem(7,new ItemStack(Items.STONE,32));int coal=copy.getItem(4).getCount();run(copy,200);h.assertTrue(copy.progress==100&&copy.fire.hot()&&copy.getItem(4).getCount()==coal,"Blocked output preserves work; the hot fire only replaces leakage");copy.setItem(5,ItemStack.EMPTY);copy.setItem(7,ItemStack.EMPTY);
         var wall=w.getBlockPos().east();h.getLevel().removeBlock(wall,false);run(copy,200);h.assertTrue(copy.getItem(0).getCount()==1&&copy.fire.heat()==0&&!copy.fire.lit(),"A broken shell loses its fire and stored heat");
-        h.getLevel().setBlockAndUpdate(wall,Blocks.BRICKS.defaultBlockState());run(copy,100);h.assertTrue(copy.getItem(5).is(Items.LEATHER)&&copy.getItem(0).isEmpty(),"Relit shell finishes saved job once");
-        var oldProgress=build(h,0,Direction.NORTH);oldProgress.setItem(0,WorkshopContent.HIDE.toStack());oldProgress.setItem(4,KilnContent.MINERAL_COAL.toStack());run(oldProgress,100);
+        MachineFixture.build(h.getLevel(),w.getBlockPos());run(copy,100);h.assertTrue(copy.getItem(5).is(WorkshopContent.CLOTH.get())&&copy.getItem(0).isEmpty(),"Relit shell finishes saved job once");
+        var oldProgress=build(h,1,Direction.NORTH);oldProgress.setItem(0,new ItemStack(Items.WHITE_WOOL));oldProgress.setItem(4,KilnContent.MINERAL_COAL.toStack());run(oldProgress,100);
         oldProgress.progress=300;CoalFireFixture.set(oldProgress.fire,false,oldProgress.fire.capacity());double stored=CoalFireFixture.stored(oldProgress.fire);oldProgress.process();
-        h.assertTrue(oldProgress.getItem(5).is(Items.LEATHER)&&stored-CoalFireFixture.stored(oldProgress.fire)<CoalFire.UNIT,"Previously saved tanning work beyond the shorter duration completes without drawing heat");h.succeed();
+        h.assertTrue(oldProgress.getItem(5).is(WorkshopContent.CLOTH.get())&&stored-CoalFireFixture.stored(oldProgress.fire)<CoalFire.UNIT,"Previously saved weaving work beyond the shorter duration completes without drawing heat");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopsRotateAndProtectSlots(GameTestHelper h){
         for(int kind=0;kind<3;kind++)for(var dir:Direction.Plane.HORIZONTAL){var w=build(h,kind,dir);h.assertTrue(MachineFixture.status(h.getLevel(),w.getBlockPos())==MachineStructure.COMPLETE,"Complete rotated workshop");}
@@ -327,7 +365,7 @@ public final class WorkshopGameTests {
         h.assertTrue(grind.getSlot(2).getItem().getMaxDamage()==200&&grind.getSlot(2).getItem().getDamageValue()==150,"Disenchanting preserves wear and damage");h.succeed();
     }
     @GameTest(template="industrial",timeoutTicks=80) public static void mobGearAndBrokenWorkshopConservation(GameTestHelper h){
-        var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack(7));w.setItem(4,KilnContent.MINERAL_COAL.toStack(3));CoalFireFixture.light(w);w.process();
+        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,7));w.setItem(4,KilnContent.MINERAL_COAL.toStack(3));CoalFireFixture.light(w);w.process();
         h.runAfterDelay(10,()->{
             var zombie=h.spawn(net.minecraft.world.entity.EntityType.ZOMBIE,new BlockPos(4,2,2));
             for(var slot:net.minecraft.world.entity.EquipmentSlot.values())zombie.setItemSlot(slot,ItemStack.EMPTY);
@@ -340,7 +378,7 @@ public final class WorkshopGameTests {
             var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(w.getBlockPos()).inflate(6));
             java.util.function.ToIntFunction<Item> count=item->drops.stream().filter(e->e.getItem().is(item)).mapToInt(e->e.getItem().getCount()).sum();
             h.assertTrue(count.applyAsInt(Items.DIAMOND_SWORD)==1&&count.applyAsInt(Items.DIAMOND_HELMET)==0,"Player-supplied gear retained; naturally spawned gear excluded");
-            h.assertTrue(count.applyAsInt(WorkshopContent.HIDE.get())==7&&count.applyAsInt(KilnContent.MINERAL_COAL.get())==2,"Breaking returns all physical stock; consumed coal remains consumed");h.succeed();
+            h.assertTrue(count.applyAsInt(Items.WHITE_WOOL)==7&&count.applyAsInt(KilnContent.MINERAL_COAL.get())==2,"Breaking returns all physical stock; consumed coal remains consumed");h.succeed();
         });
     }
     @GameTest(template="industrial") public static void automaticRecipesAndTwoCoalSlots(GameTestHelper h){
