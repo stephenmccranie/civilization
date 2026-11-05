@@ -138,6 +138,7 @@ Calories support people throughout and are not a tier. Lower-tier goods and fuel
 - Heat machines cannot ignite or work while rain reaches their work face; a roof shelters them.
 - **Refining.** Coal powers the first pump and heater. Heater, distillation and condenser multiblocks connect through basic pipes, balanced one-to-one with an extractor, producing refined fuel, lubricating oil and sulfur. One extractor fills a basic pipe; branching never multiplies capacity. Lubrication wears with work, not idle time; running dry gradually cuts efficiency. Pipes have no valves; glass inspection strips show the moving fluid.
 - Refined fuel drives transport and machinery and is not needed for coal. **No oil dependency may block building the first oil chain.**
+- The bucket is a cooper's wooden pail, so water work such as tanning needs no metal; lava would burn it.
 - **Equipment needs production**: stone tools and Coal → kiln bricks → a brick, coal-fired Foundry buildable without metal → ingots → steel and Machine Parts → T2 machinery. The material vocabulary stays short.
 
 **Open**

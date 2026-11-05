@@ -46,7 +46,8 @@
     "WorkshopRepairMixin",
     "WorkshopMobMixin",
     "RetiredFurnaceMixin",
-    "RetiredMinecartMixin"
+    "RetiredMinecartMixin",
+    "LavaPickupMixin"
   ],
   "client": [
     "LocalPlayerMixin",

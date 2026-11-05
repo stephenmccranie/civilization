@@ -314,4 +314,24 @@ public class EverydayGameTests {
         h.assertTrue(villager.getInventory().countItem(Items.WHEAT) == 9 && villager.getInventory().countItem(Items.BREAD) == 0, "Villagers cannot bypass stove");
         h.succeed();
     }
+
+    @GameTest(template = "empty")
+    public static void woodenBucketIsMadeOfPlanksAndRefusesLava(GameTestHelper h) {
+        var plank = new ItemStack(Items.OAK_PLANKS);
+        var iron = new ItemStack(Items.IRON_INGOT);
+        var none = ItemStack.EMPTY;
+        h.assertTrue(craft(h, CraftingInput.of(3, 3, List.of(none, new ItemStack(Items.STICK), none, plank, none, plank, none, plank, none))).is(Items.BUCKET), "Three planks and a stick bail make a bucket");
+        h.assertTrue(craft(h, CraftingInput.of(3, 2, List.of(plank, none, plank, none, plank, none))).is(Items.BOWL), "Without the bail the planks still make bowls");
+        h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 2, List.of(iron, none, iron, none, iron, none)), h.getLevel()).isEmpty(), "Iron makes no bucket");
+        var lava = h.absolutePos(new BlockPos(1, 2, 1));
+        var water = h.absolutePos(new BlockPos(3, 2, 3));
+        h.getLevel().setBlockAndUpdate(lava, Blocks.LAVA.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(water, Blocks.WATER.defaultBlockState());
+        h.assertTrue(((LiquidBlock) Blocks.LAVA).pickupBlock(null, h.getLevel(), lava, h.getLevel().getBlockState(lava)).isEmpty() && h.getLevel().getBlockState(lava).is(Blocks.LAVA), "Lava would burn the bucket and stays put");
+        h.assertTrue(((LiquidBlock) Blocks.WATER).pickupBlock(null, h.getLevel(), water, h.getLevel().getBlockState(water)).is(Items.WATER_BUCKET), "Water still fills it");
+        h.assertTrue(!net.minecraft.core.cauldron.CauldronInteraction.LAVA.map().containsKey(Items.BUCKET), "A lava cauldron fills no bucket");
+        h.assertTrue(!BlockCarry.block(new ItemStack(Items.POWDER_SNOW_BUCKET)), "A bucket of powder snow travels as an ordinary item");
+        h.getLevel().setBlockAndUpdate(lava, Blocks.AIR.defaultBlockState());
+        h.succeed();
+    }
 }

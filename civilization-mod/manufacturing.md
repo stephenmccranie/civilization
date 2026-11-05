@@ -40,6 +40,8 @@ Choose a job in the recipe drawer or let Automatic start a unique match; ambiguo
 
 **Tanning** is bark tanning, with no fire. Stripping a tree's log or wood with an axe peels one **Tanbark**; bamboo and Nether stems have none. Load Raw Hide and Tanbark into the Tannery, then right-click it with a water bucket: the pit takes up to eight hides with one Tanbark each, the bucket comes back empty, and the batch tans in 20 minutes while the Tannery is complete and loaded, with no fuel or worker. The menu shows the pit and the minutes left, and the inputs can be changed or refilled meanwhile. The finished hides come out as Leather, waiting while both outputs are full, and the empty pit takes the next bucket. Breaking the Tannery returns the steeping hides and bark unfinished; the water is lost.
 
+The **bucket** is a wooden pail: three planks in a V under a stick bail at a crafting table, shown in the recipe book once you hold planks. It carries water, milk, powder snow and fish, but lava would burn it, so it scoops none by hand or dispenser and draws none from a lava cauldron.
+
 Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 
 ## Assembly Bench
