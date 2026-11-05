@@ -18,7 +18,7 @@ public final class BackpackMenu extends AbstractContainerMenu {
         for(int i=0;i<pack.getContainerSize();i++)addSlot(new Backpack.PackSlot(pack,i,8+i%9*18,PACK_Y+i/9*18));
         int y=playerY(pack.getContainerSize());
         MachineMenus.playerSlots(this::addSlot,inv,y);
-        if(BlockCarry.restricted(inv.player))addSlot(new Slot(inv,BlockCarry.OFFHAND,BlockCarry.HAND_SLOT_X,y+58));
+        if(BlockCarry.restricted(inv.player))addSlot(new BlockCarry.HandSlot(inv,y+58));
         addDataSlots(data);
     }
     /** Where the player's inventory starts below a pack of this many slots. */

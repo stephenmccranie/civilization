@@ -35,8 +35,7 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
         int x=drawer&&search!=null?drawerX-24:leftPos-24;
         return new net.minecraft.client.renderer.Rect2i(x,topPos,leftPos-x,imageHeight);
     }
-    private boolean hasCarrySlot(){return minecraft.player!=null&&menu.slots.stream().anyMatch(s->s.x<0&&s.container==minecraft.player.getInventory()&&s.getContainerSlot()==dev.civilization.BlockCarry.OFFHAND);}
-    public int handSlotX(){return dev.civilization.BlockCarry.HAND_SLOT_X-(drawer&&search!=null?drawerWidth+24:0);}
+    public boolean recipesOpen(){return drawer&&search!=null;}
     protected void choose(int id){guide=id;}
     private RecipeWidget button(int x,int y,int w,int h,boolean row,String label,ItemStack icon,Runnable action){
         var b=addRenderableWidget(new RecipeWidget(x,y,w,h,row,Component.literal(label),action));b.icon=icon;
@@ -45,11 +44,12 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     @Override protected void init(){
         super.init();repair=null;catalogKey=recipeCatalogKey();rows.clear();categories.clear();materials.clear();categoryKeys.clear();materialKeys.clear();
         catalog=List.copyOf(recipes());if(catalog.isEmpty()){ignition();return;}
-        int margin=hasCarrySlot()?88:28;
+        // The drawer and its tab take the left side; while it is open the Hand stands on the right.
+        int margin=28+(menu.slots.stream().anyMatch(s->s instanceof dev.civilization.BlockCarry.HandSlot)?MachineUi.HAND_ROOM:0);
         drawerWidth=Math.min(144,width-imageWidth-margin);
         drawer=drawer&&drawerWidth>=108;
         drawerWidth=Math.max(108,drawerWidth);
-        if(width>=imageWidth+drawerWidth+margin)leftPos=Math.max(leftPos,drawerWidth+margin-6);
+        if(width>=imageWidth+drawerWidth+margin)leftPos=Math.max(leftPos,drawerWidth+22);
         drawerX=leftPos-drawerWidth;String query=search==null?"":search.getValue();
         toggle=button(leftPos-22,topPos+4,20,20,false,"Recipes",new ItemStack(Items.BOOK),()->{drawer=!drawer;updateDrawer();});
         toggle.dark=true;toggle.active=width>=imageWidth+drawerWidth+margin;

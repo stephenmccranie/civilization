@@ -233,15 +233,35 @@ final class WheelbarrowVisualCheck {
         if(t==1135)shot(mc,"pallet-main-hand-clear");
         if(t==1150)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(CargoContent.STOCKPILE.get()));p.inventoryMenu.broadcastFullState();});
         if(t==1165){shot(mc,"pallet-offhand");palletViewsVerified=true;}
-        if(t==1170)check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.STONE,BlockCarry.LIMIT));p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),3.5,100,1,java.util.Set.of(),0,20);server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),Blocks.CRAFTING_TABLE.defaultBlockState());});
+        // A worn pack puts its panel above the Hand, so both are reviewed beside open recipe panels. The Hand holds dirt,
+        // which the Kiln does not take as a building material, so an empty-handed click opens its menu.
+        if(t==1170)check(server,()->{
+            var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.DIRT,BlockCarry.LIMIT));
+            var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,1000,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);Backpack.worn(p).setItem(0,new ItemStack(Blocks.STONE,6));
+            p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),3.5,100,1,java.util.Set.of(),0,20);server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),Blocks.CRAFTING_TABLE.defaultBlockState());
+        });
         if(t==1185)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
         if(t==1200)dev.civilization.client.CarryUiCheck.openRecipes(mc);
-        if(t==1210){dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,"hand-crafting-recipes");}
-        if(t==1215)mc.player.closeContainer();
-        if(t==1220)check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),KilnContent.KILN.get().defaultBlockState()));
-        if(t==1235)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
-        if(t==1250){if(!(mc.player.containerMenu instanceof KilnMenu))throw new IllegalStateException("Native machine menu did not open for Hand-layout review");dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,"hand-machine-recipes");handLayoutsVerified=true;}
-        if(t>1260){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!palletViewsVerified||!handLayoutsVerified)throw new IllegalStateException("Wheelbarrow/pallet/Hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: handle hits, movement/camera/gait, normal main-hand pallet placement and icon/held views, mined offhand pickup, cargo/chest/Creative conservation, full Hand frame cursor safety, crafting and machine recipe clearance, Photon/shaders-disabled views");mc.stop();}
+        if(t>=1210&&t<1290)handLayouts(mc,t-1210,"hand-crafting-recipes");
+        if(t==1290)mc.player.closeContainer();
+        if(t==1295)check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),KilnContent.KILN.get().defaultBlockState()));
+        if(t==1310)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
+        if(t==1325&&!(mc.player.containerMenu instanceof KilnMenu))throw new IllegalStateException("Native machine menu did not open for Hand-layout review: "+mc.player.containerMenu.getClass().getSimpleName());
+        if(t>=1325&&t<1405)handLayouts(mc,t-1325,"hand-machine-recipes");
+        if(t==1405)handLayoutsVerified=true;
+        if(t>1410){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!palletViewsVerified||!handLayoutsVerified)throw new IllegalStateException("Wheelbarrow/pallet/Hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: handle hits, movement/camera/gait, normal main-hand pallet placement and icon/held views, mined offhand pickup, cargo/chest/Creative conservation, full Hand frame cursor safety, crafting and machine recipe clearance, Photon/shaders-disabled views");mc.stop();}
+    }
+    /** The open menu's Hand and Pack panel at 1080p, at GUI scale 2 there, in a 768p window and at 1440p, then back to 1080p. */
+    private static void handLayouts(Minecraft mc,int t,String name){
+        var window=mc.getWindow().getWindow();
+        switch(t){
+            case 0->{dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,name);mc.options.guiScale().set(2);mc.resizeDisplay();}
+            case 10->{dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,name+"-gui2");mc.options.guiScale().set(0);org.lwjgl.glfw.GLFW.glfwSetWindowSize(window,1366,768);}
+            case 35->{dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,name+"-768p");org.lwjgl.glfw.GLFW.glfwSetWindowSize(window,2560,1440);}
+            case 60->{dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,name+"-1440p");org.lwjgl.glfw.GLFW.glfwSetWindowSize(window,1920,1080);}
+            case 79->{if(mc.getWindow().getHeight()!=1080)throw new IllegalStateException("The window did not return to 1080p");}
+            default->{}
+        }
     }
     private static void followed(Minecraft mc,String turn){if(Math.abs(Mth.wrapDegrees(mc.player.getYRot()-barrow(mc).getYRot()))>1)throw new IllegalStateException("The view did not stay on the handles after "+turn+": player="+mc.player.getYRot()+" carrier="+barrow(mc).getYRot());}
     /** The mouse only looks: the carrier keeps its heading and the view stays `look` degrees off the handles. */
