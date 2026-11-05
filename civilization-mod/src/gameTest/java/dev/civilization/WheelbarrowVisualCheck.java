@@ -150,10 +150,17 @@ final class WheelbarrowVisualCheck {
             var s=(StockpileEntity)server.overworld().getBlockEntity(new BlockPos(2,100,0));if(s==null)throw new IllegalStateException("Real stockpile placement failed");
             // A full pallet (1,024 eighths) tops up a part-loaded barrow (224 eighths) to exactly its 512-eighth capacity.
             s.cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),1024);barrow(server).cargo().insert(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1),224);
-            var p=server.getPlayerList().getPlayers().getFirst();var mined=new net.minecraft.world.entity.item.ItemEntity(server.overworld(),p.getX(),p.getY(),p.getZ(),new ItemStack(Blocks.STONE,BlockCarry.LIMIT));mined.setNoPickUpDelay();server.overworld().addFreshEntity(mined);p.inventoryMenu.broadcastFullState();
         });
-        if(t==588){if(mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT||!mc.player.getOffhandItem().is(Blocks.STONE.asItem()))throw new IllegalStateException("Mined ground blocks did not synchronize into offhand");var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.8,0)),InteractionHand.MAIN_HAND);}
-        if(t==600){if(!(mc.player.containerMenu instanceof CargoMenu))throw new IllegalStateException("Tray hit did not open cargo");mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);}
+        // An empty-handed tray hit opens the cargo; one holding goods would stack them instead.
+        if(t==584){var e=barrow(mc);mc.gameMode.interactAt(mc.player,e,new EntityHitResult(e,e.position().add(0,.8,0)),InteractionHand.MAIN_HAND);}
+        if(t==590)check(server,()->{
+            var p=server.getPlayerList().getPlayers().getFirst();var mined=new net.minecraft.world.entity.item.ItemEntity(server.overworld(),p.getX(),p.getY(),p.getZ(),new ItemStack(Blocks.STONE,BlockCarry.LIMIT));mined.setNoPickUpDelay();server.overworld().addFreshEntity(mined);
+        });
+        if(t==600){
+            if(!(mc.player.containerMenu instanceof CargoMenu))throw new IllegalStateException("Tray hit did not open cargo");
+            if(mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT||!mc.player.getOffhandItem().is(Blocks.STONE.asItem()))throw new IllegalStateException("Mined ground blocks did not synchronize into offhand");
+            mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);
+        }
         if(t==612){var m=(CargoMenu)mc.player.containerMenu;if(m.count(0)!=512||m.load()!=WheelbarrowEntity.GRID.capacity())throw new IllegalStateException("Cargo quantity or load did not synchronize beyond native stack counts");shot(mc,"cargo-menu");}
         if(t==620)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,1,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);
         if(t==625){if(mc.player.containerMenu.getCarried().getCount()!=16)throw new IllegalStateException("Real cargo right-click cursor did not synchronize");mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.PICKUP,mc.player);}
