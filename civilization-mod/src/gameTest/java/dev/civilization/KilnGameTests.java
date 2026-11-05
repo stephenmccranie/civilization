@@ -104,8 +104,10 @@ public class KilnGameTests {
     @GameTest(template="industrial")
     public static void unifiedCoalAndThermalProgression(GameTestHelper h) {
         var manager = h.getLevel().getRecipeManager();
-        for (var type : List.of(RecipeType.SMELTING, RecipeType.BLASTING, RecipeType.SMOKING, RecipeType.CAMPFIRE_COOKING))
+        for (var type : List.of(RecipeType.SMELTING, RecipeType.BLASTING, RecipeType.SMOKING))
             h.assertTrue(manager.getAllRecipesFor(type).isEmpty(), "No native heat recipes remain: " + type);
+        for (var recipe : manager.getAllRecipesFor(RecipeType.CAMPFIRE_COOKING))
+            h.assertTrue(recipe.value().getResultItem(h.getLevel().registryAccess()).has(CookingContent.ROASTED_FROM.get()), "Campfires only roast food: " + recipe.id());
         for (var recipe : manager.getRecipes())
             h.assertTrue(!VanillaRetirement.retired(recipe.value().getResultItem(h.getLevel().registryAccess())), "No retired output: " + recipe.id());
         var torch = CraftingInput.of(1, 2, List.of(KilnContent.MINERAL_COAL.toStack(), new ItemStack(Items.STICK)));

@@ -12,7 +12,7 @@ public final class CoalFireGameTests {
         h.succeed();
     }
     @GameTest(template="industrial") public static void acceptedIgnitionStrikesCostCalories(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,0,Direction.NORTH);
+        var w=WorkshopGameTests.build(h,1,Direction.NORTH);
         var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"ignition-labor"));
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -39,21 +39,21 @@ public final class CoalFireGameTests {
         });
     }
     @GameTest(template="industrial") public static void aFireWarmsTheMasonryBeforeItWorks(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,0,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack(16));
-        w.process();h.assertTrue(!w.fire.lit()&&w.fire.heat()==0&&w.getItem(4).getCount()==16,"Cold fuel does not self-ignite");
+        var w=WorkshopGameTests.build(h,2,Direction.NORTH);w.setItem(4,KilnContent.MINERAL_COAL.toStack(32));
+        w.process();h.assertTrue(!w.fire.lit()&&w.fire.heat()==0&&w.getItem(4).getCount()==32,"Cold fuel does not self-ignite");
         MachineFixture.spark(h.getLevel(),false);h.assertTrue(w.fire.strike(true)&&!w.fire.lit(),"A valid spark may fail without consuming fuel");
-        MachineFixture.spark(h.getLevel(),true);h.assertTrue(!w.fire.strike(true)&&w.getItem(4).getCount()==16,"Repeated packet rejected by server cooldown");
+        MachineFixture.spark(h.getLevel(),true);h.assertTrue(!w.fire.strike(true)&&w.getItem(4).getCount()==32,"Repeated packet rejected by server cooldown");
         var save=new CompoundTag();w.fire.save(save);var copy=new CoalFire(w);copy.load(save);
         h.assertTrue(!copy.strike(true),"Cooldown survives reload");
         h.runAfterDelay(21,()->{
             MachineFixture.spark(h.getLevel(),true);
             h.assertTrue(w.fire.strike(true)&&w.fire.lit()&&!w.fire.hot()&&!w.fire.draw(1),"A newly lit fire is cold and cannot work yet");
             double capacity=w.fire.capacity();
-            h.assertTrue(Math.abs(capacity-8*.7*Energy.COAL)<1,"The Tannery's eight masonry blocks store 5.6 Coal of heat");
+            h.assertTrue(Math.abs(capacity-24*.7*Energy.COAL)<1,"The Smithy's twenty-four masonry blocks store 16.8 Coal of heat");
             int ticks=0;while(!w.fire.hot()&&ticks<4000){w.process();ticks+=10;}
             double warming=CoalFire.WORKING*CoalFire.WARMING_TICKS;
             h.assertTrue(w.fire.hot()&&ticks>=warming&&ticks<warming*1.05,"The fire reaches working heat in about a hundred seconds, a little slower for the leak: "+ticks+" ticks");
-            h.assertTrue(16-w.getItem(4).getCount()==(int)Math.ceil(CoalFireFixture.stored(w.fire)/Energy.COAL),"Warming burns whole Coal into the masonry");
+            h.assertTrue(32-w.getItem(4).getCount()==(int)Math.ceil(CoalFireFixture.stored(w.fire)/Energy.COAL),"Warming burns whole Coal into the masonry");
             h.assertTrue(w.fire.draw(1),"A hot fire supplies work");
             var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(tag,h.getLevel().registryAccess());
             h.assertTrue(restored.fire.lit()&&CoalFireFixture.stored(restored.fire)==CoalFireFixture.stored(w.fire)&&CoalFireFixture.reserve(restored.fire)==CoalFireFixture.reserve(w.fire),"The fire, its reserve and the stored heat persist");

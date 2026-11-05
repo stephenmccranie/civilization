@@ -1,6 +1,6 @@
 # Geography and weather
 
-Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Deposits of coal and oil are in [industry](industry.md#deposits).
+Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Deposits of coal and oil are in [industry](industry.md#deposits).
 
 ## Farmland and woodland
 
@@ -51,7 +51,8 @@ Carrots and potatoes reserve one planting item before tripling the rest. **Miner
 | Source | Treatment |
 | --- | --- |
 | The eight farmland crops above | Shared soil, timing and fertilizer rules |
-| Sugar cane, cocoa, sweet berries | River and height eligibility plus native requirements, timing and yields; no water reserve or fertilizer. Each sugar-cane segment must be inside the height band |
+| Sweet berry bushes | River and height eligibility and the shared soil clock on whatever ground they grow: the ground keeps a water reserve, and each picking takes a full crop cycle to ripen again. Native picking yield; no fertilizer |
+| Sugar cane, cocoa | River and height eligibility plus native requirements, timing and yields; no water reserve or fertilizer. Each sugar-cane segment must be inside the height band |
 | Saplings | Woodland speed rule; no water reserve |
 | Bamboo, cactus, kelp, mushrooms, vines and Nether wart | Native growth |
 | Grass, flowers, moss and other spread | Native behavior |

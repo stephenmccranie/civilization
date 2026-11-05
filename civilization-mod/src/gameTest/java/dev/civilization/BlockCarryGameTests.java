@@ -17,6 +17,14 @@ import net.neoforged.neoforge.gametest.*;
 public final class BlockCarryGameTests {
     private static FakePlayer player(GameTestHelper h){var p=new FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"block-carry"));p.setGameMode(GameType.SURVIVAL);p.setPos(h.absolutePos(new BlockPos(4,2,4)).getCenter());return p;}
     private static ItemEntity drop(GameTestHelper h,ItemStack stack){var d=new ItemEntity(h.getLevel(),0,2,0,stack);d.setNoPickUpDelay();return d;}
+    @GameTest(template="industrial") public static void dropThrowsFromTheHandBeforeTheMainHand(GameTestHelper h){
+        var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.STICK));
+        h.assertTrue(p.drop(false)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT-1&&p.getMainHandItem().is(Items.STICK),"Drop throws one block from the hand before the main hand");
+        h.assertTrue(p.drop(true)&&p.getOffhandItem().isEmpty()&&p.getMainHandItem().is(Items.STICK),"Ctrl+drop throws the whole stack");
+        h.assertTrue(p.drop(false)&&p.getMainHandItem().isEmpty(),"With the hand empty, drop throws the main hand's item");
+        int thrown=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(p.blockPosition()).inflate(3)).stream().mapToInt(e->e.getItem().is(Items.STONE)?e.getItem().getCount():0).sum();
+        h.assertTrue(thrown==BlockCarry.LIMIT,"Every thrown block lands in the world: "+thrown);h.succeed();
+    }
     @GameTest(template="industrial") public static void smallPlaceablesUseNormalPocketsAndHandControls(GameTestHelper h){
         var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
         for(var item:new Item[]{Items.WHEAT_SEEDS,Items.BEETROOT_SEEDS,Items.PUMPKIN_SEEDS,Items.MELON_SEEDS,Items.TORCHFLOWER_SEEDS,Items.PITCHER_POD,
@@ -53,7 +61,7 @@ public final class BlockCarryGameTests {
         try{
             var rows=new java.util.ArrayList<String>();
             for(var item:net.minecraft.core.registries.BuiltInRegistries.ITEM)if(item instanceof BlockItem)
-                rows.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item)+"\t"+(BlockCarry.block(item.getDefaultInstance())?"offhand":"inventory"));
+                rows.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item)+"\t"+(BlockCarry.carried(item.getDefaultInstance())?"offhand":"inventory"));
             java.nio.file.Files.write(java.nio.file.Path.of("block-carry-classification.tsv"),rows);
         }catch(java.io.IOException e){throw new RuntimeException(e);}
         h.succeed();
@@ -66,7 +74,7 @@ public final class BlockCarryGameTests {
         h.assertTrue(!more.isRemoved()&&more.getItem().getCount()==17&&p.getOffhandItem().getCount()==BlockCarry.LIMIT,"Only matching space is collected; overflow remains on the ground");
         var dirt=drop(h,new ItemStack(Items.DIRT,12));dirt.playerTouch(p);
         h.assertTrue(!dirt.isRemoved()&&dirt.getItem().getCount()==12,"Different blocks remain on the ground");
-        for(int i=0;i<40;i++)h.assertTrue(!BlockCarry.block(p.getInventory().getItem(i)),"No second building stack enters another inventory slot");h.succeed();
+        for(int i=0;i<40;i++)h.assertTrue(!BlockCarry.carried(p.getInventory().getItem(i)),"No second building stack enters another inventory slot");h.succeed();
     }
     @GameTest(template="industrial") public static void occupiedOffhandAndFullPocketsRespectTheRule(GameTestHelper h){
         var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.SHIELD));var block=drop(h,new ItemStack(Items.STONE,3));block.playerTouch(p);
@@ -75,6 +83,12 @@ public final class BlockCarryGameTests {
         h.assertTrue(block.isRemoved()&&p.getOffhandItem().getCount()==3,"A free offhand accepts blocks even with full normal pockets");
         p.getInventory().setItem(1,ItemStack.EMPTY);var food=new ItemStack(Items.APPLE,4);p.getInventory().add(food);
         h.assertTrue(food.isEmpty()&&p.getInventory().getItem(1).is(Items.APPLE),"Non-block goods retain ordinary inventory behavior");h.succeed();
+    }
+    @GameTest(template="industrial") public static void shiftClickedGoodsFillTheHotbarNotTheHand(GameTestHelper h){
+        var p=player(h);var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.STONE_PICKAXE));
+        var menu=ChestMenu.threeRows(1,p.getInventory(),chest);BlockCarry.attachMenu(menu,p.getInventory());menu.quickMoveStack(p,0);
+        int at=-1;for(int i=0;i<36;i++)if(p.getInventory().getItem(i).is(Items.STONE_PICKAXE))at=i;
+        h.assertTrue(chest.getItem(0).isEmpty()&&p.getOffhandItem().isEmpty()&&net.minecraft.world.entity.player.Inventory.isHotbarSlot(at),"A shift-clicked tool fills the hotbar, never the empty Hand: slot "+at);h.succeed();
     }
     @GameTest(template="industrial") public static void menuClicksShiftDragAndSwapCannotPutBlocksInPockets(GameTestHelper h){
         var p=player(h);var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.STONE,32));chest.setItem(1,new ItemStack(Items.STONE,32));

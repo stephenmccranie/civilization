@@ -18,7 +18,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Walking/crouching | 0.10 kcal per block |
 | Sprinting | 0.30 kcal per block (3× walking) |
 | Rowing a vanilla boat/chest boat | 0.05 kcal per horizontal block while paddling |
-| Wheelbarrow handling | Walking rate: 0.10 kcal per horizontal block traveled at the handles, including turns |
+| Wheelbarrow handling | Walking or sprinting rate: 0.10 or 0.30 kcal per horizontal block traveled at the handles, including turns |
 | Break ordinary block / light vegetation / crop | 4 / 0.25 / 1 kcal |
 | Place block / plant crop / apply fertilizer | 2 / 1 / 1 kcal |
 | Place cut slab / quarter beam / eighth cube | 1 / 0.5 / 0.25 kcal |
@@ -36,7 +36,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 - **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 30 sprinting or 5 rowing. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming and the rising part of a jump; descending refunds nothing. Movement is measured from server-accepted displacement.
 - **Rowing** is charged only to the controlling player of a vanilla boat or chest boat while its paddles are active; passengers, drifting boats and powered Civilization vessels pay nothing. Rowing has its own distance counter.
 - **River steps.** A vanilla boat or chest boat meeting water that stands at most a block above its top with open air over it, as at a step in a river's surface or up a rapid, floats up onto it instead of sinking under it; deeper water, or water under a ceiling, still sinks it and drops its rider.
-- **Wheelbarrow handling** charges the walking rate for actual handle travel, including reversing and turning, plus normal ascent; idle or blocked drive is free.
+- **Wheelbarrow handling** charges the walking rate, or the sprinting rate while sprinting, for actual handle travel, including reversing and turning, plus normal ascent; idle or blocked drive is free.
 - **Not charged:** other riding, creative flight, elytra, teleports and abnormal large movement deltas; tool transformations, buckets, ranged attacks and automated or fake-player work.
 - **Placement** of a cut piece costs the full-block rate × its volume; native slabs count as half blocks.
 - **Sleep** charges `sleepKcalPerGameHour` on waking, for in-game time in bed including hours skipped when the night passes. There is no idle or offline drain.
@@ -88,11 +88,13 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 ### Interface scale
 
-With GUI Scale set to **Auto**, Civilization picks one scale step per 360 pixels of window height (3× at 1080p, 4× at 1440p, 6× at 4K, never more than fits), so the interface keeps the same share of the screen at every resolution; vanilla Auto would take the largest scale that fits. Explicit GUI scales and the slider's range are unchanged. This is client-only.
+With GUI Scale set to **Auto**, Civilization picks one scale step per 360 pixels of window height (3× at 1080p, 4× at 1440p, 6× at 4K, never more than fits), so the interface keeps the same share of the screen at every resolution; vanilla Auto would take the largest scale that fits. Explicit GUI scales and the slider's range are unchanged.
+
+Chat is sized from the window rather than the GUI scale: its text size and width options apply as if the GUI scale were the window height over 360 without rounding (3 at 1080p, 4 at 1440p), never below 1080p's 3 and never wider than the window allows. Chat therefore looks the same at every GUI scale setting, keeps its 1080p size in smaller windows such as a 768p laptop or a windowed game, and grows with larger ones. Both rules are client-only.
 
 ### Welcome message
 
-On every join the server sends an 18-line framed getting-started card in chat: offhand block carrying, calories, retired furnaces and campfires; six numbered steps from the Stone Saw through building and lighting the [Kiln](machines.md#kiln) to the Foundry; then food, foraging, where iron tools come from, Land Controller claims and JEI's **R**/**U** lookups; and an invitation to give feedback in ordinary chat. It fits the pack's closed chat (20 lines) without wrapping at the pack's chat size and width. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.
+On every join the server sends an 18-line framed getting-started card in chat: offhand block carrying, calories, retired furnaces; six numbered steps from the Stone Saw through building and lighting the [Kiln](machines.md#kiln) to the Foundry; then food, foraging, where iron tools come from, Land Controller claims and JEI's **R**/**U** lookups; and an invitation to give feedback in ordinary chat. It fits the pack's closed chat (20 lines) without wrapping at the pack's chat size and width. It is plain server chat, so any client shows it; the text lives in `Welcome.java`.
 
 ### Player-list ping
 

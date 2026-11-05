@@ -73,7 +73,7 @@ public final class WorkshopJobs {
     public static boolean gated(ItemStack s){return equipment(s)!=null;}
     public static int index(int kind,String id){var jobs=jobs(kind);for(int i=0;i<jobs.size();i++)if(jobs.get(i).id().equals(id))return i;return -1;}
     public static List<Job> jobs(int kind){return switch(kind){
-        case 0->List.of(new Job("Tanning",new ItemStack(Items.LEATHER),List.of(need(WorkshopContent.HIDE.get(),1),empty(),empty(),empty()),200,2));
+        case 0->List.of(new Job("Tanning",new ItemStack(Items.LEATHER,Tanning.PIT),List.of(need(WorkshopContent.HIDE.get(),Tanning.PIT),need(WorkshopContent.TANBARK.get(),Tanning.PIT),empty(),empty()),Tanning.TICKS));
         case 1->List.of(new Job("Weaving",WorkshopContent.CLOTH.toStack(2),List.of(new Need(Ingredient.of(ItemTags.WOOL),1),empty(),empty(),empty()),200,2));
         case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){

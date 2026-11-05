@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class WorkshopBlock extends KilnBlock {
     /** The Smithy is a forge built as a native model; the other workshops keep block structures. */
-    @Override public MachineModel model() { return kind == 2 ? MachineModel.SMITHY : null; }
+    @Override public MachineModel model() { return switch (kind) { case 0 -> MachineModel.TANNERY; case 2 -> MachineModel.SMITHY; default -> null; }; }
     public final int kind;
     public WorkshopBlock(Properties p,int kind){super(p);this.kind=kind;}
     private static final net.minecraft.world.phys.shapes.VoxelShape BENCH_SHAPE=net.minecraft.world.phys.shapes.Shapes.or(
@@ -23,13 +23,21 @@ public class WorkshopBlock extends KilnBlock {
         super.onRemove(old,l,p,next,moved);
     }
     @Override public void animateTick(BlockState s,Level l,BlockPos p,net.minecraft.util.RandomSource random){
-        if(kind!=ManufacturingJobs.BENCH)super.animateTick(s,l,p,random);
+        if(WorkshopBlockEntity.fired(kind))super.animateTick(s,l,p,random);
+    }
+    /** A water bucket, in the clicking hand or carried in the offhand, fills the Tannery's empty pit and starts its batch;
+     * when the pit cannot take it, the click opens the menu, which says why. */
+    @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,net.minecraft.world.InteractionHand hand,net.minecraft.world.phys.BlockHitResult hit){
+        var bucket=kind==0?MachineConstruction.material(player,stack,s->s.is(net.minecraft.world.item.Items.WATER_BUCKET)):net.minecraft.world.item.ItemStack.EMPTY;
+        if(!bucket.isEmpty()&&!level.isClientSide&&level.getBlockEntity(pos) instanceof WorkshopBlockEntity w&&w.pour(player,bucket==stack?hand:net.minecraft.world.InteractionHand.OFF_HAND))
+            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        return super.useItemOn(stack,state,level,pos,player,hand,hit);
     }
     @Override protected void openContainer(Level l,BlockPos p,Player player){if(l.getBlockEntity(p) instanceof WorkshopBlockEntity w&&CivicAccess.allowed(l,p,player))player.openMenu(w);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> t){return l.isClientSide?null:createTickerHelper(t,WorkshopContent.ENTITY.get(),(world,pos,state,w)->w.tick());}
     @Override public void appendHoverText(net.minecraft.world.item.ItemStack stack,net.minecraft.world.item.Item.TooltipContext context,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag flag){
         if(kind==ManufacturingJobs.BENCH){lines.add(net.minecraft.network.chat.Component.literal("Woodworking, assembly and repairs · hand worked"));return;}
-        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Hide → leather";case 1->"Wool → cloth";default->"Forge heads, plates, rods and fasteners";}));
-        lines.add(net.minecraft.network.chat.Component.literal("Coal-fired · place for the build guide"));
+        lines.add(net.minecraft.network.chat.Component.literal(switch(kind){case 0->"Hide + Tanbark → leather";case 1->"Wool → cloth";default->"Forge heads, plates, rods and fasteners";}));
+        lines.add(net.minecraft.network.chat.Component.literal(kind==0?"Bark pit · fill with a water bucket · place for the build guide":"Coal-fired · place for the build guide"));
     }
 }

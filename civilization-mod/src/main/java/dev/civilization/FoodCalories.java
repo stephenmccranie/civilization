@@ -33,7 +33,11 @@ public final class FoodCalories {
         if (stack.is(CookingContent.BREAD_DOUGH.get())) defaultValue = 300;
         if (stack.is(CookingContent.COOKIE_DOUGH.get())) defaultValue = 25;
         if (stack.is(CookingContent.UNBAKED_PIE.get())) defaultValue = 200;
-        return values.getOrDefault(id.toString(), defaultValue);
+        double value = values.getOrDefault(id.toString(), defaultValue);
+        var raw = stack.get(CookingContent.ROASTED_FROM.get());
+        if (raw == null) return value;
+        var rawStack = raw.getDefaultInstance();
+        return (value + of(rawStack, rawStack.getFoodProperties(null))) / 2;
     }
 
     public static double breadCalories() {

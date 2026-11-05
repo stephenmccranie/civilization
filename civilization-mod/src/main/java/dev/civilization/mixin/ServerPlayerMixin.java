@@ -19,6 +19,14 @@ public abstract class ServerPlayerMixin {
         var player=(ServerPlayer)(Object)this;
         if(dev.civilization.ArenaService.opposed(dev.civilization.ArenaData.get(player.server),player,other))ci.setReturnValue(true);
     }
+    @Inject(method="drop(Z)Z",at=@At("HEAD"),cancellable=true)
+    private void civilization$dropFromHand(boolean all,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean> ci){
+        var player=(ServerPlayer)(Object)this;if(!dev.civilization.BlockCarry.dropsFromHand(player))return;
+        var thrown=net.neoforged.neoforge.common.CommonHooks.onPlayerTossEvent(player,dev.civilization.BlockCarry.takeDrop(player,all),true);
+        // Clients predict a drop locally; resending the inventory corrects one that predicted the main hand.
+        player.containerMenu.sendAllDataToRemote();
+        ci.setReturnValue(thrown!=null);
+    }
     @Inject(method = "checkMovementStatistics", at = @At("HEAD"))
     private void civilization$movement(double dx, double dy, double dz, CallbackInfo ci) {
         ServerPlayer player = (ServerPlayer) (Object) this;

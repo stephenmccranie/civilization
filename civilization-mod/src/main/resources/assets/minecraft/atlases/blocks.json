@@ -4,6 +4,7 @@
     {"type": "single", "resource": "civilization:entity/kiln"},
     {"type": "single", "resource": "civilization:entity/foundry"},
     {"type": "single", "resource": "civilization:entity/fertilizer_furnace"},
+    {"type": "single", "resource": "civilization:entity/tannery"},
     {"type": "single", "resource": "civilization:entity/smithy"}
   ]
 }

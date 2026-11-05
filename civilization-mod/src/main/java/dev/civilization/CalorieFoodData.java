@@ -71,10 +71,13 @@ public final class CalorieFoodData extends FoodData {
         spendTravel(player,distance,ascent,sprint,sprint?"sprint":"walk",player.isInWater()?"swimming":player.onClimbable()?"climbing":"ground_or_air");
     }
 
-    /** The server carrier supplies actual handle displacement, including turning. */
-    public void pushWheelbarrow(Player player,double dx,double dy,double dz){
+    /** Sprinting, on foot or behind a wheelbarrow, needs the sprint minimum and no depletion; exempt players always may. */
+    public boolean maySprint(Player player){return !active(player)||!isDepleted()&&reserve.calories()>=CalorieConfig.SPRINT_MINIMUM.get();}
+
+    /** The server carrier supplies actual handle displacement, including turning, at its gait. */
+    public void pushWheelbarrow(Player player,double dx,double dy,double dz,boolean sprint){
         if(!active(player)||!(player.getVehicle() instanceof WheelbarrowEntity e)||e.getFirstPassenger()!=player)return;
-        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),false,"push_wheelbarrow","wheelbarrow");
+        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),sprint,"push_wheelbarrow","wheelbarrow");
     }
 
     private void spendTravel(Player player,double distance,double ascent,boolean sprint,String action,String detail){
@@ -161,7 +164,7 @@ public final class CalorieFoodData extends FoodData {
         resizeForConfig(player);
         if (!player.level().isClientSide) row(player);
         if (active(player)) {
-            if (isDepleted() || reserve.calories() < CalorieConfig.SPRINT_MINIMUM.get()) player.setSprinting(false);
+            if (!maySprint(player)) player.setSprinting(false);
             var hunger = player.getEffect(MobEffects.HUNGER);
             if (hunger != null) spendOther(player, CalorieConfig.HUNGER.get() * (hunger.getAmplifier() + 1.0) / 20.0, "hunger_effect");
             double healCost = CalorieConfig.HEAL.get();

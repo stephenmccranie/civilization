@@ -138,8 +138,15 @@ public class EverydayGameTests {
                 Items.COD, Items.SALMON, Items.POTATO, Items.KELP)) {
             var input = new SingleRecipeInput(new ItemStack(item));
             h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(CookingContent.RECIPE_TYPE.get(), input, h.getLevel()).isPresent(), "Stove cooks " + item);
-            for (var type : List.of(RecipeType.SMELTING, RecipeType.SMOKING, RecipeType.CAMPFIRE_COOKING, RecipeType.BLASTING))
+            for (var type : List.of(RecipeType.SMELTING, RecipeType.SMOKING, RecipeType.BLASTING))
                 h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(type, input, h.getLevel()).isEmpty(), "No vanilla heat bypass for " + item);
+            var campfire = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CAMPFIRE_COOKING, input, h.getLevel()).orElseThrow().value();
+            var roast = campfire.assemble(input, h.getLevel().registryAccess());
+            var cooked = new ItemStack(roast.getItem());
+            h.assertTrue(campfire.getCookingTime() == 600 && roast.get(CookingContent.ROASTED_FROM.get()) == item && !ItemStack.isSameItemSameComponents(roast, cooked),
+                    "A campfire roasts " + item + " in 30 seconds, apart from stove-cooked food");
+            double raw = FoodCalories.of(input.item(), input.item().getFoodProperties(null)), stove = FoodCalories.of(cooked, cooked.getFoodProperties(null));
+            h.assertTrue(FoodCalories.of(roast, roast.getFoodProperties(null)) == (raw + stove) / 2, "Roast " + item + " is worth halfway between raw and stove-cooked");
         }
         h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING,
                 new SingleRecipeInput(new ItemStack(Items.SAND)), h.getLevel()).isEmpty(), "Glass moves to the kiln");
@@ -160,10 +167,10 @@ public class EverydayGameTests {
 
     @GameTest(template = "industrial")
     public static void stoveCraftsAndCooksWithoutShell(GameTestHelper h) {
-        var copper = new ItemStack(Items.COPPER_INGOT);
+        var brick = new ItemStack(Items.BRICK);
         var stone = new ItemStack(Items.COBBLESTONE);
-        var result = craft(h, CraftingInput.of(3, 3, List.of(copper, copper, copper, stone, new ItemStack(Items.COBBLESTONE), stone, stone, stone, stone)));
-        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Copper top, six cobble make stove");
+        var result = craft(h, CraftingInput.of(3, 3, List.of(brick, brick, brick, stone, new ItemStack(Items.COBBLESTONE), stone, stone, stone, stone)));
+        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Brick top, six cobble make stove");
         var machine = stove(h);
         machine.setItem(0, new ItemStack(Items.BEEF, 9));
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack());
@@ -305,6 +312,34 @@ public class EverydayGameTests {
         method.setAccessible(true);
         method.invoke(work, villager);
         h.assertTrue(villager.getInventory().countItem(Items.WHEAT) == 9 && villager.getInventory().countItem(Items.BREAD) == 0, "Villagers cannot bypass stove");
+        h.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void woodenBucketIsMadeOfPlanksAndRefusesLava(GameTestHelper h) {
+        var plank = new ItemStack(Items.OAK_PLANKS);
+        var iron = new ItemStack(Items.IRON_INGOT);
+        var none = ItemStack.EMPTY;
+        h.assertTrue(craft(h, CraftingInput.of(3, 3, List.of(none, new ItemStack(Items.STICK), none, plank, none, plank, none, plank, none))).is(Items.BUCKET), "Three planks and a stick bail make a bucket");
+        h.assertTrue(craft(h, CraftingInput.of(3, 2, List.of(plank, none, plank, none, plank, none))).is(Items.BOWL), "Without the bail the planks still make bowls");
+        h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, CraftingInput.of(3, 2, List.of(iron, none, iron, none, iron, none)), h.getLevel()).isEmpty(), "Iron makes no bucket");
+        var lava = h.absolutePos(new BlockPos(1, 2, 1));
+        var water = h.absolutePos(new BlockPos(3, 2, 3));
+        h.getLevel().setBlockAndUpdate(lava, Blocks.LAVA.defaultBlockState());
+        h.getLevel().setBlockAndUpdate(water, Blocks.WATER.defaultBlockState());
+        h.assertTrue(((LiquidBlock) Blocks.LAVA).pickupBlock(null, h.getLevel(), lava, h.getLevel().getBlockState(lava)).isEmpty() && h.getLevel().getBlockState(lava).is(Blocks.LAVA), "Lava would burn the bucket and stays put");
+        h.assertTrue(((LiquidBlock) Blocks.WATER).pickupBlock(null, h.getLevel(), water, h.getLevel().getBlockState(water)).is(Items.WATER_BUCKET), "Water still fills it");
+        h.assertTrue(!net.minecraft.core.cauldron.CauldronInteraction.LAVA.map().containsKey(Items.BUCKET), "A lava cauldron fills no bucket");
+        for (var bucket : List.of(Items.BUCKET, Items.WATER_BUCKET, Items.MILK_BUCKET, Items.POWDER_SNOW_BUCKET, Items.COD_BUCKET))
+            h.assertTrue(BlockCarry.carried(new ItemStack(bucket)) && !BlockCarry.block(new ItemStack(bucket)) && Double.isNaN(CargoMass.volume(new ItemStack(bucket))), "Buckets ride in the offhand or a backpack but are not building cargo: " + bucket);
+        var carrier = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "bucket-carrier"));
+        carrier.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        h.assertTrue(new ItemStack(Items.BUCKET).getMaxStackSize() == 1, "Empty buckets do not stack");
+        var empty = new ItemStack(Items.BUCKET);
+        h.assertTrue(carrier.getInventory().add(empty) && empty.isEmpty() && carrier.getOffhandItem().is(Items.BUCKET)
+                && !carrier.getInventory().add(new ItemStack(Items.BUCKET)) && carrier.getOffhandItem().getCount() == 1
+                && carrier.getInventory().items.stream().noneMatch(s -> s.is(Items.BUCKET)), "A picked-up bucket rides alone in the offhand and a second never enters the pockets");
+        h.getLevel().setBlockAndUpdate(lava, Blocks.AIR.defaultBlockState());
         h.succeed();
     }
 }

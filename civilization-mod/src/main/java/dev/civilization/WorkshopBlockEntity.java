@@ -10,15 +10,22 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Eight physical slots; work and fuel commit on the server, with no reserved/offline inventories. */
+/**
+ * Eight menu slots, plus the Tannery's pit, which holds a steeping batch's hides and bark as real stock; work and fuel
+ * commit on the server, with no reserved/offline inventories.
+ */
 public final class WorkshopBlockEntity extends BlockEntity implements WorldlyContainer,MenuProvider,CoalFireHost,ModeledController {
-    private final NonNullList<ItemStack> items=NonNullList.withSize(8,ItemStack.EMPTY);
+    public static final int PIT_HIDES=8,PIT_BARK=9;
+    private final NonNullList<ItemStack> items=NonNullList.withSize(10,ItemStack.EMPTY);
     public final int kind;
     public final CoalFire fire=new CoalFire(this);
-    public int selected=-1,progress,status;
+    public int selected=-1,progress,status,steep;
     public int[] coalFuelSlots(){return MachineInventory.WORKSHOP_FUEL;}
-    /** The Tannery's stone plinth and the Smithy's footing and brickwork; the timber Textile Workshop has none. */
-    public int masonry(){return kind==0?8:kind==2?24:0;}
+    /** The Smithy's footing and brickwork store its fire's heat. */
+    public int masonry(){return kind==2?24:0;}
+    /** The Textile Workshop and Smithy burn Coal; the Tannery steeps and the Assembly Bench is worked by hand. */
+    public static boolean fired(int kind){return kind==1||kind==2;}
+    public boolean steeped(){return kind==0;}
     public int pendingExperience;
     public void awardExperience(net.minecraft.world.phys.Vec3 at){
         if(level instanceof net.minecraft.server.level.ServerLevel server && pendingExperience>0){
@@ -57,6 +64,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     public void process(){
         if(level==null||level.isClientSide)return;
         if(handWorked()){processHandWork();working(status==MachineStatus.Workshop.WORKING);return;}
+        if(steeped()){processSteep();working(status==MachineStatus.Workshop.WORKING);return;}
         firePaused=false;processWork();if(!firePaused)fire.tick(10);working(status==MachineStatus.Workshop.WORKING);
     }
     private void processHandWork(){
@@ -81,6 +89,40 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         EnergyLog.machine(level,worldPosition,"assembly_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
         level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.WOOD_PLACE,net.minecraft.sounds.SoundSource.BLOCKS,.35f,1f);
         worker=null;progress=0;workingResult=ItemStack.EMPTY;status=MachineStatus.Workshop.HAND_READY;setChanged();
+    }
+    /** Pouring a water bucket into the Tannery's empty pit starts a batch: up to eight hides, one Tanbark each. A pit that
+     * is busy, unfinished or unloaded takes nothing; its menu shows why. */
+    public boolean pour(Player p,InteractionHand hand){
+        if(!steeped()||!stillValid(p)||!items.get(PIT_HIDES).isEmpty()||structure()!=MachineStructure.COMPLETE)return false;
+        int batch=Math.min(Tanning.PIT,Math.min(count(WorkshopContent.HIDE.get()),count(WorkshopContent.TANBARK.get())));
+        if(batch==0)return false;
+        items.set(PIT_HIDES,take(WorkshopContent.HIDE.get(),batch));items.set(PIT_BARK,take(WorkshopContent.TANBARK.get(),batch));steep=0;
+        p.setItemInHand(hand,ItemUtils.createFilledResult(p.getItemInHand(hand),p,new ItemStack(Items.BUCKET)));
+        level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.BUCKET_EMPTY,net.minecraft.sounds.SoundSource.BLOCKS,1f,1f);
+        status=MachineStatus.Workshop.WORKING;working(true);setChanged();return true;
+    }
+    public int minutesLeft(){return (int)Math.ceil((Tanning.TICKS-steep)/1200.0);}
+    private int count(Item item){int n=0;for(int i=0;i<2;i++)if(items.get(i).is(item))n+=items.get(i).getCount();return n;}
+    private ItemStack take(Item item,int count){
+        var taken=ItemStack.EMPTY;
+        for(int i=0;i<2&&count>0;i++){var s=items.get(i);if(!s.is(item))continue;int n=Math.min(count,s.getCount());if(taken.isEmpty())taken=s.copyWithCount(n);else taken.grow(n);s.shrink(n);count-=n;}
+        return taken;
+    }
+    /** The pit needs no fire or worker: a complete Tannery steeps its batch while loaded, then empties into Leather. */
+    private void processSteep(){
+        if(structure()!=MachineStructure.COMPLETE){pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
+        var pit=items.get(PIT_HIDES);
+        if(pit.isEmpty()){pause(count(WorkshopContent.HIDE.get())>0&&count(WorkshopContent.TANBARK.get())>0?MachineStatus.Workshop.POUR:MachineStatus.Workshop.NEEDS_MATERIALS,false);return;}
+        if(steep<Tanning.TICKS){steep=Math.min(Tanning.TICKS,steep+10);setChanged();}
+        if(steep<Tanning.TICKS){status=MachineStatus.Workshop.WORKING;working(true);return;}
+        var leather=new ItemStack(Items.LEATHER,pit.getCount());
+        if(!MachineInventory.room(this,outputSlots(),leather)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
+        MachineInventory.insert(this,outputSlots(),leather);
+        pendingExperience=(int)Math.min(Integer.MAX_VALUE,(long)pendingExperience+pit.getCount());
+        EnergyLog.machine(level,worldPosition,"workshop_batch","Tanning",1,"minecraft:leather",pit.getCount());
+        items.set(PIT_HIDES,ItemStack.EMPTY);items.set(PIT_BARK,ItemStack.EMPTY);steep=0;
+        level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.BUCKET_FILL,net.minecraft.sounds.SoundSource.BLOCKS,.4f,.8f);
+        pause(MachineStatus.Workshop.NEEDS_MATERIALS,false);setChanged();
     }
     private void processWork(){
         if(level==null||level.isClientSide)return;
@@ -121,19 +163,21 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         }
     }
     private void pause(int state,boolean reset){status=state;if(reset&&progress!=0){progress=0;workingResult=ItemStack.EMPTY;setChanged();}working(false);}
-    private void working(boolean value){if(getBlockState().getValue(MachineFeedback.WORKING)!=value||getBlockState().getValue(WorkshopBlock.LIT)!=fire.lit())level.setBlock(worldPosition,getBlockState().setValue(MachineFeedback.WORKING,value).setValue(WorkshopBlock.LIT,fire.lit()),3);}
+    /** What the model's lit bones show: the fire burning, or the Tannery's pit holding a batch. */
+    private boolean lit(){return steeped()?!items.get(PIT_HIDES).isEmpty():fire.lit();}
+    private void working(boolean value){if(getBlockState().getValue(MachineFeedback.WORKING)!=value||getBlockState().getValue(WorkshopBlock.LIT)!=lit())level.setBlock(worldPosition,getBlockState().setValue(MachineFeedback.WORKING,value).setValue(WorkshopBlock.LIT,lit()),3);}
     public final ContainerData data=new ContainerData(){
-        public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->progress;case 3->status;case 4->fire.state();case 5->fire.heat();default->0;};}
-        public void set(int i,int v){}public int getCount(){return 6;}
+        public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->steeped()?steep:progress;case 3->status;case 4->fire.state();case 5->fire.heat();case 6->items.get(PIT_HIDES).getCount();default->0;};}
+        public void set(int i,int v){}public int getCount(){return 7;}
     };
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("progress",progress);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;progress=Math.clamp(t.getInt("progress"),0,20000);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
     /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=new CompoundTag();if(model()!=null)build.save(t,r);return t;}
     @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new WorkshopMenu(id,inv,this,data);}
-    @Override public int getContainerSize(){return 8;}
+    @Override public int getContainerSize(){return 10;}
     @Override public boolean isEmpty(){return items.stream().allMatch(ItemStack::isEmpty);}
     @Override public ItemStack getItem(int i){return items.get(i);}
     @Override public ItemStack removeItem(int i,int n){var s=ContainerHelper.removeItem(items,i,n);if(!s.isEmpty())changedInput(i);return s;}
@@ -144,13 +188,13 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     }
     private void changedInput(int i){if(i<4){progress=0;workingResult=ItemStack.EMPTY;}setChanged();}
     private int[] outputSlots(){return kind>=2?MachineInventory.SMITHY_OUTPUT:MachineInventory.WORKSHOP_OUTPUT;}
-    @Override public void clearContent(){items.clear();worker=null;progress=0;workingResult=ItemStack.EMPTY;setChanged();}
+    @Override public void clearContent(){items.clear();worker=null;progress=0;steep=0;workingResult=ItemStack.EMPTY;setChanged();}
     @Override public boolean stillValid(Player p){return !isRemoved()&&level!=null&&level.getBlockEntity(worldPosition)==this&&p.level()==level&&p.distanceToSqr(worldPosition.getCenter())<=64&&CivicAccess.allowed(level,worldPosition,p)&&(!(getBlockState().getBlock() instanceof AssemblyBenchBlock)||AssemblyBenchBlock.allowed(level,worldPosition,getBlockState(),p));}
-    @Override public boolean canPlaceItem(int i,ItemStack s){if(i==4||i==6)return !handWorked()&&s.is(KilnContent.MINERAL_COAL.get());return i>=0&&i<4&&(kind>=2||i<2)&&MachineWork.accepts(this,kind,selected,s);}
+    @Override public boolean canPlaceItem(int i,ItemStack s){if(i==4||i==6)return fired(kind)&&s.is(KilnContent.MINERAL_COAL.get());return i>=0&&i<4&&(kind>=2||i<2)&&MachineWork.accepts(this,kind,selected,s);}
     @Override public int[] getSlotsForFace(Direction side){
         if(side==Direction.DOWN)return outputSlots();
         if(side==Direction.UP)return kind>=2?new int[]{0,1,2,3}:new int[]{0,1};
-        return handWorked()?new int[0]:MachineInventory.WORKSHOP_FUEL;
+        return fired(kind)?MachineInventory.WORKSHOP_FUEL:new int[0];
     }
     @Override public boolean canPlaceItemThroughFace(int i,ItemStack s,Direction side){return side!=Direction.DOWN&&canPlaceItem(i,s);}
     @Override public boolean canTakeItemThroughFace(int i,ItemStack s,Direction side){return side==Direction.DOWN&&MachineInventory.contains(outputSlots(),i);}

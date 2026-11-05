@@ -1,10 +1,10 @@
 # Cooking
 
-Food is cooked on the **Cooking Stove**, a household kiln-family machine. The **Prototype Stove** adds a sensory skillet loop whose meals reduce work costs, and the **Baking Oven** is a physical preview. Calorie values and food rules are in [survival](survival.md#food).
+Food is roasted on a **campfire** or cooked on the **Cooking Stove**, a household kiln-family machine. The **Prototype Stove** adds a sensory skillet loop whose meals reduce work costs, and the **Baking Oven** is a physical preview. Calorie values and food rules are in [survival](survival.md#food).
 
 ## Cooking Stove
 
-A single block with no shell or guide. Craft it with three copper ingots across the top and six cobblestone below. It uses the [cabinet interface](machines.md#cabinet-interface) with two ingredient, two Coal and two output slots; hoppers feed ingredients from above and coal from the sides and take output below. It burns Coal in a [shared coal fire](machines.md#coal-fires): one Coal gives 20 loaded seconds of heat and each item cooks in 10 seconds, so two items per Coal. Unloading pauses work; partial cooking and heat are saved. Breaking the stove drops its inventory and the stove.
+A single block with no shell or guide. Craft it with three Kiln bricks across the top and six cobblestone below, so cooking starts as soon as a Kiln is lit. It uses the [cabinet interface](machines.md#cabinet-interface) with two ingredient, two Coal and two output slots; hoppers feed ingredients from above and coal from the sides and take output below. It burns Coal in a [shared coal fire](machines.md#coal-fires): one Coal gives 20 loaded seconds of heat and each item cooks in 10 seconds, so two items per Coal. Unloading pauses work; partial cooking and heat are saved. Breaking the stove drops its inventory and the stove.
 
 | Input | Output | Default edible energy |
 | --- | --- | --- |
@@ -17,7 +17,11 @@ A single block with no shell or guide. Craft it with three copper ingots across 
 
 The familiar bread, cookie, pie and cake crafting recipes make these preparations in the same quantities; cake preparation returns the three buckets. Raw dough, raw foods and foraging keep subsistence possible without fuel.
 
-Furnaces, smokers and campfires cook no food. Burning animals, including fire-aspect kills, drop raw meat and fish. Villagers do not sell cooked or baked foods or make bread at composters. Cold crafting (bowl recipes, golden foods), finite loot, existing food and placed cakes are unchanged.
+Furnaces and smokers cook no food. Burning animals, including fire-aspect kills, drop raw meat and fish. Villagers do not sell cooked or baked foods or make bread at composters. Cold crafting (bowl recipes, golden foods), finite loot, existing food and placed cakes are unchanged.
+
+## Campfire
+
+A lit campfire roasts raw meat, fish, potatoes and kelp as in vanilla: four at once, 30 seconds each, three times the stove's time, with no fuel and no XP. Roasted food is the ordinary cooked item marked **Campfire-roasted**, worth halfway between the raw food and the stove's result: roast beef gives 450 kcal against 200 raw and 700 from the stove by default. It does not stack with stove-cooked food.
 
 ## Prototype Stove
 

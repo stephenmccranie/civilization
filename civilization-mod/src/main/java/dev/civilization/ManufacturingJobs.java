@@ -45,7 +45,7 @@ public final class ManufacturingJobs {
     public static synchronized List<Job> assembly(){
         if(assembly!=null)return assembly;
         var jobs=new ArrayList<Job>();jobs.add(new Job("Repair",ItemStack.EMPTY,List.of(),200));
-        add(jobs,ManufacturingContent.HANDLE.get(),4,100,planks(1),need(Items.LEATHER,1));
+        add(jobs,ManufacturingContent.HANDLE.get(),1,100,planks(1),need(Items.LEATHER,1));
         add(jobs,ManufacturingContent.WHEEL.get(),1,200,planks(1),need(ManufacturingContent.FASTENERS.get(),2));
         for(var old:WorkshopJobs.equipmentJobs()){
             if(old.output().isEmpty())continue;
@@ -62,12 +62,12 @@ public final class ManufacturingJobs {
             else if(output==Items.SHIELD)add(jobs,output,1,200,planks(6),part("iron","plate",1),need(Items.LEATHER,1));
         }
         add(jobs,KilnContent.MACHINE_PARTS.get(),2,200,part("steel","plate",2),part("copper","rod",4));
-        // Existing inexpensive storage stays available before the first iron; metal fittings are used on doors and vehicles.
+        // Inexpensive storage and wooden doors stay available before the first iron; metal fittings go on gates and vehicles.
         add(jobs,Items.CHEST,1,100,planks(8));add(jobs,Items.BARREL,1,100,planks(7));
         for(String wood:List.of("oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry","bamboo","crimson","warped")){
             var timber=new Need(Ingredient.of(item("minecraft:"+wood+"_planks")),6);
-            add(jobs,item("minecraft:"+wood+"_door"),3,100,timber,need(ManufacturingContent.FASTENERS.get(),3));
-            add(jobs,item("minecraft:"+wood+"_trapdoor"),2,100,timber,need(ManufacturingContent.FASTENERS.get(),2));
+            add(jobs,item("minecraft:"+wood+"_door"),3,100,timber);
+            add(jobs,item("minecraft:"+wood+"_trapdoor"),2,100,timber);
             add(jobs,item("minecraft:"+wood+"_fence_gate"),1,100,new Need(timber.ingredient(),2),need(Items.STICK,4),need(ManufacturingContent.FASTENERS.get(),2));
         }
         add(jobs,WheelbarrowContent.ITEM.get(),1,200,planks(3),need(ManufacturingContent.WHEEL.get(),1),part("iron","rod",1),need(ManufacturingContent.FASTENERS.get(),4));

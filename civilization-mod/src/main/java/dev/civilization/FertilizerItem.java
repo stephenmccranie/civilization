@@ -22,7 +22,7 @@ public final class FertilizerItem extends Item {
             if (!level.isClientSide) player.displayClientMessage(Component.translatable("message.civilization.already_fertilized"), true);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
-        if (!SoilSystem.crop(state) || SoilSystem.mature(state) || state.getBlock() instanceof net.minecraft.world.level.block.AttachedStemBlock) {
+        if (!SoilSystem.fertilizable(state) || SoilSystem.mature(state) || state.getBlock() instanceof net.minecraft.world.level.block.AttachedStemBlock) {
             if (!level.isClientSide) player.displayClientMessage(Component.translatable("message.civilization.fertilizer_requires_growing_wheat"), true);
             return InteractionResult.PASS;
         }

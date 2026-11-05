@@ -32,12 +32,12 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `guide` | Textured multiblock build guide, including a wrong block and its removal |
 | `placement` | Held Kiln, Fertilizer Furnace, Smithy, Oil Derrick, Assembly Bench and Baking Oven previews facing three ways, mostly from the offhand as survival carries them: a refused bench, an obstructed shell and a controller held up to a finished shell. Each real right-click must place exactly the previewed cells, or nothing |
 | `modular` | Mixed-material and irregular cut-block assemblies |
-| `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat) |
+| `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings at 1080p, with GUI scale 2 there, in a 768p window and at 1440p (closed and open chat); fails if the chat text is not the expected size, a line would wrap or the card outgrows the closed chat |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip |
-| `workshops` | Tannery, Textile Workshop and Smithy, with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
+| `workshops` | Tannery with a loaded pit, Textile Workshop and Smithy with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks |
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
@@ -63,7 +63,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |
 | `oven` | Baking Oven placement and animated door |
 | `canisters` | All four canisters in frames, inventory and hand |
-| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools`, `minerals` | Item art in frames, inventory slots and hand |
+| `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools`, `minerals`, `buckets` | Item art in frames, inventory slots and hand |
 | `paterson` | Paterson revolver input, reload, hammer and recoil |
 | `boat` | Freeform boat placement, gears, steering and throttle |
 | `airship` | Airship assembly, flight controls and rider retention |

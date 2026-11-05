@@ -16,16 +16,23 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     @Inject(method="moveItemStackTo",at=@At("HEAD"),cancellable=true)
     private void civilization$shift(ItemStack stack,int from,int to,boolean reverse,CallbackInfoReturnable<Boolean> result){
         var menu=(AbstractContainerMenu)(Object)this;
-        if(BlockCarry.block(stack)||BlockCarry.filledContainer(stack)){
+        if(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack)){
             for(int i=from;i<to;i++)if(menu.slots.get(i).container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
                 result.setReturnValue(BlockCarry.insert(inv,stack)>0);return;
             }
             return;
         }
-        // Ordinary goods fill the pockets before the worn pack shown beside them, as pickups do.
-        for(int i=from+1;i<to;i++)if(menu.slots.get(i) instanceof dev.civilization.Backpack.PackSlot&&!(menu.slots.get(i-1) instanceof dev.civilization.Backpack.PackSlot)){
-            result.setReturnValue(civilization$move(stack,from,i,reverse)|civilization$move(stack,i,to,reverse));return;
+        // Ordinary goods fill the pockets, hotbar first, before the worn pack shown beside them, as pickups do. The Hand
+        // among the pockets is for building blocks.
+        int hand=-1,pack=to;
+        for(int i=from;i<to;i++){
+            var slot=menu.slots.get(i);
+            if(slot instanceof dev.civilization.Backpack.PackSlot){if(i>from&&!(menu.slots.get(i-1) instanceof dev.civilization.Backpack.PackSlot))pack=i;}
+            else if(to-from>1&&slot.container instanceof Inventory&&slot.getContainerSlot()==BlockCarry.OFFHAND)hand=i;
         }
+        if(hand<0&&pack==to)return;
+        boolean pockets=hand<0?civilization$move(stack,from,pack,reverse):civilization$move(stack,from,hand,reverse)|civilization$move(stack,hand+1,pack,reverse);
+        result.setReturnValue(pockets|civilization$move(stack,pack,to,reverse));
     }
     @Inject(method="clicked",at=@At("HEAD"),cancellable=true)
     private void civilization$click(int index,int button,ClickType type,Player player,CallbackInfo ci){
@@ -35,7 +42,7 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     private void civilization$drag(Slot slot,CallbackInfoReturnable<Boolean> result){
         if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
             var item=((AbstractContainerMenu)(Object)this).getCarried();
-            if(BlockCarry.filledContainer(item)||BlockCarry.block(item)&&slot.getContainerSlot()!=BlockCarry.OFFHAND)result.setReturnValue(false);
+            if(BlockCarry.filledContainer(item)||BlockCarry.carried(item)&&slot.getContainerSlot()!=BlockCarry.OFFHAND)result.setReturnValue(false);
         }
     }
 }

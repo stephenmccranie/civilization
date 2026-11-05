@@ -19,8 +19,8 @@ final class WorkshopVisualCheck {
                     var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();default->WorkshopContent.SMITHY.get();};l.setBlockAndUpdate(at(kind),block.defaultBlockState());
                     MachineFixture.build(l,at(kind));
                     if(MachineFixture.status(l,at(kind))!=MachineStructure.COMPLETE)throw new IllegalStateException("Incomplete workshop fixture");
-                    var w=(WorkshopBlockEntity)l.getBlockEntity(at(kind));CoalFireFixture.light(w);w.setItem(4,KilnContent.MINERAL_COAL.toStack(8));
-                    if(kind==0)w.setItem(0,WorkshopContent.HIDE.toStack(8));
+                    var w=(WorkshopBlockEntity)l.getBlockEntity(at(kind));if(WorkshopBlockEntity.fired(kind)){CoalFireFixture.light(w);w.setItem(4,KilnContent.MINERAL_COAL.toStack(8));}
+                    if(kind==0){w.setItem(0,WorkshopContent.HIDE.toStack(8));w.setItem(1,WorkshopContent.TANBARK.toStack(8));}
                     if(kind==1)w.setItem(0,new ItemStack(Items.WHITE_WOOL,8));
                     if(kind==2){w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));w.setItem(0,new ItemStack(Items.IRON_INGOT,8));}
                 }
@@ -40,6 +40,9 @@ final class WorkshopVisualCheck {
             if(ticks==155+k*40){mc.options.hideGui=false;server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),at(kind).getX()+.5,101,-2,java.util.Set.of(),0,0);p.openMenu((WorkshopBlockEntity)server.overworld().getBlockEntity(at(kind)));});}
             if(ticks==185+k*40){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.kind()!=kind)throw new IllegalStateException("Menu kind did not synchronize: "+kind);shot(mc,"menu-"+kind);}
         }
+        if(ticks==187)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));
+            if(!((WorkshopBlockEntity)server.overworld().getBlockEntity(at(0))).pour(p,net.minecraft.world.InteractionHand.MAIN_HAND))failure=new IllegalStateException("The Tannery pit refused its water");});
+        if(ticks==193){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.pit()!=Tanning.PIT)throw new IllegalStateException("The steeping pit did not synchronize");shot(mc,"menu-0-steeping");}
         if(ticks==270)server.execute(()->{var l=server.overworld();l.setBlockAndUpdate(at(2),WorkshopContent.BENCH.get().defaultBlockState());var w=(WorkshopBlockEntity)l.getBlockEntity(at(2));w.select(WorkshopJobs.index(3,"minecraft:iron_pickaxe"));var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.openMenu(w);});
         if(ticks==290){click(mc,"Tools");click(mc,"Iron");}
         if(ticks==300){
@@ -97,16 +100,19 @@ final class WorkshopVisualCheck {
         if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);ModeledMachine.removeSection(ModeledMachine.of(server.overworld().getBlockEntity(at(2))),3,false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
         if(ticks==409)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
         if(ticks==415)shot(mc,"smithy-guide");
+        // The Tannery still steeps the batch poured at tick 187: its liquor and hides show from the front left.
+        if(ticks==416){mc.options.hideGui=true;server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
+        if(ticks==423){shot(mc,"tannery-steeping");mc.options.hideGui=false;}
         if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
-            var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(0));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
-            var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,30.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);
+            var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(1));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
+            var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,37.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);
         });}
         if(ticks==445)shot(mc,"ignition-rest");
         if(ticks==446)click(mc,"Strike to light");
         if(ticks==447)shot(mc,"ignition-strike");
         // Exercise the real button first; a paced seeded menu strike makes the final art capture repeatable.
         if(ticks==470)server.execute(()->{
-            var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(0));
+            var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(1));
             if(!w.fire.lit()){
                 MachineFixture.spark(server.overworld(),true);
                 p.containerMenu.clickMenuButton(p,CoalFire.BUTTON);

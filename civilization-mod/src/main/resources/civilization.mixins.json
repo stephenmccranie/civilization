@@ -46,7 +46,8 @@
     "WorkshopRepairMixin",
     "WorkshopMobMixin",
     "RetiredFurnaceMixin",
-    "RetiredMinecartMixin"
+    "RetiredMinecartMixin",
+    "LavaPickupMixin"
   ],
   "client": [
     "LocalPlayerMixin",
@@ -63,7 +64,8 @@
     "InventoryRecipeBookMixin",
     "ContainerScreenMixin",
     "CraftingScreenMixin",
-    "AutoGuiScaleMixin"
+    "AutoGuiScaleMixin",
+    "ChatSizeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -65,7 +65,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Farming and uncooked food sustain a person without industrial fuel; river crops supply staple calories. Fishing and gathering add subsistence and variety while purchased provisions stay useful.
 - Livestock kills yield one meat portion, with no Looting bonus.
 - Future husbandry uses farm feed at breeding and production, with no animal-hunger simulation or livestock region.
-- Household cooking uses one coal-fired station. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
+- Household cooking uses one coal-fired station; a campfire also roasts raw food, three times slower and for half the calories the stove adds. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
 - **Tier 2 cooking** grows into a kitchen workshop of distinct multiblocks. Mastery is the player learning — no cooking XP — and pays off in higher-calorie meals and stronger work bonuses. Chopping is not a mastery mechanic.
 - Mastery means reading colour and sound cues that change continuously, with a forgiving optimal plateau. A frying sound runs under every active phase, with distinct textures for the plateau and overcooking; loudness follows pan heat.
 - Heat is a continuous physical dial, no presets. Stronger heat cooks faster and narrows the optimal window.
@@ -83,7 +83,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - **Eligibility.** Farmland follows the local natural river elevation, including high valleys, within a bounded reach of the water surface. Sea level is not a ceiling; sky platforms gain nothing from being above a river; placed water creates neither eligibility nor the rain bonus.
 - **Growth.** Soil holds the water: river soil gives 50% growth, stored rainwater 100%. Full-speed planting to harvest averages two hours (four at baseline), normalised by growth stage, without vanilla moisture or row multipliers.
 - **Rain reserve.** 30 minutes of open-sky rain charges a farmland block's reserve to 120 minutes; it grows at full speed and recharges while rain falls, then drains a minute per minute. Roofs block rain; the crop does not. No lateral spread or pipe irrigation. Breaking soil cannot refill it; replanting keeps it.
-- Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval.
+- Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval. Sweet berry bushes ripen on the same clock and water reserve wherever they grow, a full interval per picking, with their native picking yield and no fertilizer.
 - **Fertilizer** raises yield, not speed: one non-stacking dose per cycle tripling harvest output after replanting material (wheat keeps its 1→3). Fortune and alternative paths cannot bypass yields. Mineral Fertilizer comes only from refinery sulfur plus gravel. Bone meal is disabled.
 - Trees grow anywhere suitable, substantially faster in woodland. Every other growable needs its own habitat policy rather than inheriting wheat rules.
 - **Regional weather.** Weather runs in fixed 512×512-block districts — atmosphere, not claims — through one authoritative server query that natural rain, the Rain Caller and later towers all feed. Overworld only. Sleeping changes time, not weather.
@@ -93,8 +93,9 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Wet soil darkens; hoe inspection reports suitability, growth rate and stored water; failed planting explains why. Photon is the primary shader target.
 
 **Open**
-- Habitat policy for cocoa, berries, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
+- Habitat policy for cocoa, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
 - Meltwater and cold-region farming.
+- Tree felling: chopping a tree one log at a time was the strongest playtest complaint, and the owner wants a more advanced felling and timber-hauling system, designed later.
 - The Rain Caller's eventual form; tower energy and Survival access; offline production.
 - Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
 
@@ -137,6 +138,7 @@ Calories support people throughout and are not a tier. Lower-tier goods and fuel
 - Heat machines cannot ignite or work while rain reaches their work face; a roof shelters them.
 - **Refining.** Coal powers the first pump and heater. Heater, distillation and condenser multiblocks connect through basic pipes, balanced one-to-one with an extractor, producing refined fuel, lubricating oil and sulfur. One extractor fills a basic pipe; branching never multiplies capacity. Lubrication wears with work, not idle time; running dry gradually cuts efficiency. Pipes have no valves; glass inspection strips show the moving fluid.
 - Refined fuel drives transport and machinery and is not needed for coal. **No oil dependency may block building the first oil chain.**
+- The bucket is a cooper's wooden pail, so water work such as tanning needs no metal; lava would burn it.
 - **Equipment needs production**: stone tools and Coal → kiln bricks → a brick, coal-fired Foundry buildable without metal → ingots → steel and Machine Parts → T2 machinery. The material vocabulary stays short.
 
 **Open**
@@ -169,7 +171,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 | Workplace | Input → output |
 | --- | --- |
 | Foundry | Ore + Coal → metals and steel; refining |
-| Tannery | Raw Hide → Leather; brick, stone and wood, no iron |
+| Tannery | Raw Hide + Tanbark → Leather, steeped in a water bark pit by time alone; brick, stone and wood, no iron or fuel |
 | Textile Workshop | Wool → Cloth |
 | Smithy | Metals → forged heads, Plates, Rods, Fasteners |
 | Assembly Bench | Parts, timber, Leather, Cloth → finished goods and repairs |
@@ -203,7 +205,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 ## Construction
 
 - Construction respects volume: **one log → one plank block**. Saws cut halves, quarter beams and eighth cubes on a 2×2×2 grid, and are the only source of slabs. Pieces place freely, cost labour by volume and recombine without loss.
-- **Multiblocks.** Machines are native Blockbench models, each a new design, built from their controller in sections: holding a controller shows the whole machine where a right-click would put it, and a placed one shows the missing sections while inspected. Right-clicking the machine with material in either hand, including the offhand that carries building material, pays for as many sections as it covers; each section consumes real items and labour, needs clear, accessible space and is refunded once when broken, so damage stays local and repairable. Guides show remaining materials and obstructions, and stay cheap to render. Machines not yet redrawn keep block structures built from full blocks and saw cuts, fed through the same controller or placed by hand.
+- **Multiblocks.** Machines are native Blockbench models, each a new design, built from their controller in sections: holding a controller shows the whole machine where a right-click would put it, and a placed one shows the missing sections while inspected. Right-clicking the machine with material in either hand, including the offhand that carries building material, pays toward the sections in order, any amount at a time, and a section is built once paid in full; each section consumes real items and labour, needs clear, accessible space and is refunded once when broken, so damage stays local and repairable. Guides show remaining materials and obstructions, and stay cheap to render. Machines not yet redrawn keep block structures built from full blocks and saw cuts, fed through the same controller or placed by hand.
 - Placed crafting tables keep a shared nine-slot grid that persists when closed, so players can fetch more and cooperate.
 - **Builder's Line** is a wooden mason's cord reel. With blocks in the other hand it builds; with a tool, it mines. Two right-clicks mark endpoints along one world axis and immediately work the whole line (up to 16 full blocks, four per second, 16-block reach); crouch-right-click cancels. Normal costs and wear apply, and work stops at the first obstruction. It comes from the Smithy.
 
@@ -216,11 +218,11 @@ Progression expands the quantities, distances and areas a player handles: person
 
 - Material volume, storage volume and mass are distinct and separate from energy value. A stone block is 1 m³; its cut pieces preserve it.
 - **One packing density.** Carried and stored building goods pack 64 to a block of space, so every capacity is the carrier's real interior at that density: a hand holds an armful of 8, a wheelbarrow 64 and a pallet 128 in a stack two blocks high.
-- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one as quarter-size blocks, with unlimited-count matching stacks. Stores take everything the hand carries: pieces by volume, any other block as one block of space. A wheelbarrow's load heaps above its tray rim. A pallet's stack fills its block, then rises into the block above while that block is empty, and right-click stacks held goods onto it. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
-- **Personal carrying.** Building material travels as one offhand stack of up to 8 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
+- **Cargo stores.** Every store holds a fixed volume of goods, drawn one for one as quarter-size blocks, with unlimited-count matching stacks. Stores take every block the hand carries: pieces by volume, any other block as one block of space, and right-click puts held goods onto a store. A wheelbarrow's load heaps above its tray rim. A pallet's stack fills its block, then rises into the block above while that block is empty. Pallets touching horizontally share one menu and summed capacity; each keeps its own stack, filled one pallet at a time and sorted by item.
+- **Personal carrying.** Building material travels as one offhand stack of up to 8 blocks or cut pieces, and buckets, which do not stack, one at a time, or in a worn backpack; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
 - **Backpack.** An early leather pack worn in an accessory slot adds grade-scaled room for goods and building blocks: 9 slots and 24 blocks at 100% grade. It comes off only empty.
 - Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
-- The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, carrying eight hands: half a pallet. The coal minecart keeps its separate rail role.
+- The **wheelbarrow** is pushed over the ground at walking or sprinting speed, paying handling calories and climbing one-block rises, carrying eight hands: half a pallet. The coal minecart keeps its separate rail role.
 - **Supply-fed building.** Placement draws only from explicitly selected nearby supplies: a backpack bound to one wheelbarrow or Pallet group keeps the hand, and the block stacks already in the pack, topped up from it while the wearer builds within 16 blocks. It never adds new kinds of block. Supply is switched by the player, shown beside the hotbar, and checks access at every pull; out of reach, the pack alone refills the hand.
 - New limits follow an audit and explicit migration; inventories are never shrunk or discarded.
 

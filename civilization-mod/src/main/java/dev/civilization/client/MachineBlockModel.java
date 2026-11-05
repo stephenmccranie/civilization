@@ -34,7 +34,7 @@ import net.neoforged.neoforge.common.util.TriState;
 /**
  * Machines drawn with the terrain: the block model of every controller and part cell of a machine built as a native
  * model. Each cell gives the still geometry of its own built sections from {@link MachineMesh}, and the controller its
- * door and the fire's lit or cold bones by its lit state, so the chunk mesher builds a machine once, as it builds the
+ * door and its lit or cold bones by its lit state, so the chunk mesher builds a machine once, as it builds the
  * blocks around it, instead of every frame. Which sections are built is read from the controller as the chunk is meshed;
  * the controller redraws its cells when that changes.
  */

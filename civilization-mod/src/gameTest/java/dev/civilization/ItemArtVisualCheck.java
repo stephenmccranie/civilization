@@ -26,6 +26,8 @@ final class ItemArtVisualCheck {
     var items=items(scene);
     var frames=scene.equals("components")?java.util.List.of(items.get(0),items.get(1),items.get(2),items.get(3),items.get(4),items.get(11),items.get(18),items.get(24)):items;
     for(int i=0;i<items.size();i++){
+     // Carried goods ride in the offhand, one stack, as survival keeps them; the frames still show every item.
+     if(BlockCarry.carried(new ItemStack(items.get(i)))){if(player.getOffhandItem().isEmpty())player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(items.get(i)));continue;}
      player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components")){var worn=new ItemStack(items.get(i));if(EquipmentGrade.eligible(worn))EquipmentGrade.apply(worn,400,7001L+i);player.getInventory().setItem(9+i,worn);}
     }
     for(int i=0;i<frames.size();i++){
@@ -63,7 +65,8 @@ final class ItemArtVisualCheck {
    case "minerals" -> java.util.List.of(KilnContent.MINERAL_COAL.get(),FrontierContent.RAW_URANIUM.get(),IndustrialContent.SULFUR.get(),IndustrialContent.ENRICHED_BLEND.get(),net.minecraft.world.item.Items.COAL,net.minecraft.world.item.Items.RAW_IRON,net.minecraft.world.item.Items.GRAVEL,KilnContent.STEEL.get());
    case "manufactured" -> java.util.List.of(KilnContent.STEEL.get(),IndustrialContent.PROBE.get(),KilnContent.MACHINE_PARTS.get(),net.minecraft.world.item.Items.IRON_INGOT,net.minecraft.world.item.Items.COPPER_INGOT);
    case "foods" -> java.util.List.of(CookingContent.BREAD_DOUGH.get(),CookingContent.COOKIE_DOUGH.get(),CookingContent.CAKE_BATTER.get(),CookingContent.UNBAKED_PIE.get(),FarmingContent.RATION.get(),RecoveryItems.MORSEL.get(),PrototypeStoveContent.MEAL.get(),WorkshopContent.CLOTH.get(),FarmingContent.FERTILIZER.get());
-   case "supplies" -> java.util.List.of(WorkshopContent.HIDE.get(),WorkshopContent.CLOTH.get(),FarmingContent.MINERAL_BLEND.get(),IndustrialContent.ENRICHED_BLEND.get(),FarmingContent.FERTILIZER.get(),IndustrialContent.SULFUR.get(),KilnContent.MACHINE_PARTS.get());
+   case "supplies" -> java.util.List.of(WorkshopContent.HIDE.get(),WorkshopContent.TANBARK.get(),WorkshopContent.CLOTH.get(),FarmingContent.MINERAL_BLEND.get(),IndustrialContent.ENRICHED_BLEND.get(),FarmingContent.FERTILIZER.get(),IndustrialContent.SULFUR.get(),KilnContent.MACHINE_PARTS.get());
+   case "buckets" -> java.util.List.of(net.minecraft.world.item.Items.BUCKET,net.minecraft.world.item.Items.WATER_BUCKET,net.minecraft.world.item.Items.MILK_BUCKET,net.minecraft.world.item.Items.POWDER_SNOW_BUCKET,net.minecraft.world.item.Items.COD_BUCKET,net.minecraft.world.item.Items.SALMON_BUCKET,net.minecraft.world.item.Items.PUFFERFISH_BUCKET,net.minecraft.world.item.Items.TROPICAL_FISH_BUCKET,net.minecraft.world.item.Items.AXOLOTL_BUCKET,net.minecraft.world.item.Items.TADPOLE_BUCKET);
    case "parts" -> java.util.List.of(KilnContent.STEEL.get(),KilnContent.MACHINE_PARTS.get(),IndustrialContent.SULFUR.get(),WorkshopContent.CLOTH.get());
    case "sulfur" -> java.util.List.of(KilnContent.MINERAL_COAL.get(),IndustrialContent.SULFUR.get(),net.minecraft.world.item.Items.GOLD_INGOT,WorkshopContent.CLOTH.get());
    default -> java.util.List.of(net.minecraft.world.item.Items.WHITE_WOOL,WorkshopContent.CLOTH.get(),net.minecraft.world.item.Items.LEATHER,KilnContent.MINERAL_COAL.get());

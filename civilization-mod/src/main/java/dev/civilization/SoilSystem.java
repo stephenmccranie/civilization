@@ -12,7 +12,10 @@ import net.minecraft.tags.BlockTags;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-/** One sparse attachment per farm chunk. Production only advances from the vanilla active-chunk tick. */
+/**
+ * One sparse attachment per farm chunk. Production only advances from the vanilla active-chunk tick. Soil is farmland or
+ * the ground under a sweet berry bush, which ripens on the same clock but keeps its native picking yield.
+ */
 @EventBusSubscriber(modid="civilization")
 public final class SoilSystem {
  public static BlockPos cropBase(net.minecraft.world.level.Level l,BlockPos p){var s=l.getBlockState(p);return s.is(Blocks.PITCHER_CROP)&&s.getValue(PitcherCropBlock.HALF)==DoubleBlockHalf.UPPER?p.below():p;}
@@ -22,15 +25,18 @@ public final class SoilSystem {
   if(s.is(Blocks.MELON_STEM)||s.is(Blocks.ATTACHED_MELON_STEM))return "melon";
   if(s.is(Blocks.PUMPKIN_STEM)||s.is(Blocks.ATTACHED_PUMPKIN_STEM))return "pumpkin";
   if(s.is(Blocks.TORCHFLOWER_CROP)||s.is(Blocks.TORCHFLOWER))return "torch";
-  if(s.is(Blocks.PITCHER_CROP))return "pitcher";return "";
+  if(s.is(Blocks.PITCHER_CROP))return "pitcher";if(s.is(Blocks.SWEET_BERRY_BUSH))return "berry";return "";
  }
  private static int age(BlockState s){for(var e:s.getValues().entrySet())if(e.getKey().getName().equals("age")&&e.getValue() instanceof Integer n)return n;return -1;}
  public static boolean crop(BlockState s){return !kind(s).isEmpty();}
- public static boolean mature(BlockState s){if(s.getBlock() instanceof CropBlock c)return c.isMaxAge(s);return s.is(Blocks.TORCHFLOWER)||s.is(Blocks.PITCHER_CROP)&&s.getValue(PitcherCropBlock.AGE)==4;}
- public static SoilChunk.Soil observe(ServerLevel l,BlockPos p){if(!l.hasChunkAt(p)||!(l.getBlockState(p).getBlock() instanceof FarmBlock))return null;var chunk=l.getChunkAt(p);var data=chunk.getData(SoilChunk.TYPE);var existing=data.soils.get(p.asLong());if(existing!=null)return existing;var soil=new SoilChunk.Soil();data.soils.put(p.asLong(),soil);chunk.setUnsaved(true);return soil;}
+ /** Fertilizer raises the yield of the farmland crops; berry bushes take none. */
+ public static boolean fertilizable(BlockState s){return crop(s)&&!s.is(Blocks.SWEET_BERRY_BUSH);}
+ private static boolean soil(ServerLevel l,BlockPos p){return l.getBlockState(p).getBlock() instanceof FarmBlock||l.getBlockState(p.above()).is(Blocks.SWEET_BERRY_BUSH);}
+ public static boolean mature(BlockState s){if(s.getBlock() instanceof CropBlock c)return c.isMaxAge(s);return s.is(Blocks.TORCHFLOWER)||s.is(Blocks.PITCHER_CROP)&&s.getValue(PitcherCropBlock.AGE)==4||s.is(Blocks.SWEET_BERRY_BUSH)&&s.getValue(SweetBerryBushBlock.AGE)==SweetBerryBushBlock.MAX_AGE;}
+ public static SoilChunk.Soil observe(ServerLevel l,BlockPos p){if(!l.hasChunkAt(p)||!soil(l,p))return null;var chunk=l.getChunkAt(p);var data=chunk.getData(SoilChunk.TYPE);var existing=data.soils.get(p.asLong());if(existing!=null)return existing;var soil=new SoilChunk.Soil();data.soils.put(p.asLong(),soil);chunk.setUnsaved(true);return soil;}
  public static boolean randomTick(ServerLevel l,BlockPos p,BlockState state){
   if(state.getBlock() instanceof FarmBlock&&Geography.canFarm(l,p)){observe(l,p);return true;}
-  if(crop(state)&&!state.is(Blocks.TORCHFLOWER)){observe(l,p.below());return true;}return false;
+  if(crop(state)&&!state.is(Blocks.TORCHFLOWER)){if(Geography.canFarm(l,p.below()))observe(l,p.below());return true;}return false;
  }
  public static void changed(ServerLevel l,BlockPos p,BlockState old,BlockState state){
   // Player harvesting removes the block before its drop callback. Keep the old yield
@@ -54,11 +60,11 @@ public final class SoilSystem {
  public static void advance(ServerLevel l,LevelChunk c,double seconds){
   var d=c.getData(SoilChunk.TYPE);var iterator=d.soils.entrySet().iterator();
   while(iterator.hasNext()){
-   var entry=iterator.next();var p=BlockPos.of(entry.getKey());var state=l.getBlockState(p);if(!(state.getBlock() instanceof FarmBlock)){iterator.remove();continue;}
+   var entry=iterator.next();var p=BlockPos.of(entry.getKey());var state=l.getBlockState(p);if(!soil(l,p)){iterator.remove();continue;}
    var s=entry.getValue();if(!Geography.canFarm(l,p))continue;
    boolean rain=l.isRainingAt(p.above());double wet=rain?seconds:Math.min(seconds,s.water);
    s.water=Math.clamp(s.water+(rain?4*seconds:-seconds),0,7200);
-   int moisture=s.water>0||rain?7:0;if(state.getValue(FarmBlock.MOISTURE)!=moisture)l.setBlock(p,state.setValue(FarmBlock.MOISTURE,moisture),2);
+   int moisture=s.water>0||rain?7:0;if(state.getBlock() instanceof FarmBlock&&state.getValue(FarmBlock.MOISTURE)!=moisture)l.setBlock(p,state.setValue(FarmBlock.MOISTURE,moisture),2);
    grow(l,p,s,seconds*.5+wet*.5);
   }
   d.fruitYields.entrySet().removeIf(e->{var b=l.getBlockState(BlockPos.of(e.getKey()));return !b.is(Blocks.MELON)&&!b.is(Blocks.PUMPKIN);});
@@ -73,6 +79,8 @@ public final class SoilSystem {
   if(mature(state)||state.getBlock() instanceof AttachedStemBlock||l.getRawBrightness(p,0)<9||!state.canSurvive(l,p))return;
   s.work=Math.min(s.target,s.work+work);
   if(state.getBlock() instanceof CropBlock crop){int age=s.work>=s.target?crop.getMaxAge():(int)(s.work*crop.getMaxAge()/s.target);if(age>crop.getAge(state))l.setBlock(p,crop.getStateForAge(age),2);return;}
+  // A picked bush starts a new cycle, so every picking takes one full interval to ripen again.
+  if(state.is(Blocks.SWEET_BERRY_BUSH)){int age=Math.min(SweetBerryBushBlock.MAX_AGE,(int)(s.work*SweetBerryBushBlock.MAX_AGE/s.target));if(age>state.getValue(SweetBerryBushBlock.AGE))l.setBlock(p,state.setValue(SweetBerryBushBlock.AGE,age),2);return;}
   if(state.is(Blocks.PITCHER_CROP)){
    if(state.getValue(PitcherCropBlock.HALF)==DoubleBlockHalf.UPPER)return;
    int age=Math.min(4,(int)(s.work*4/s.target));if(age<=state.getValue(PitcherCropBlock.AGE))return;
@@ -91,7 +99,7 @@ public final class SoilSystem {
    }}
   }
  }
- public static boolean fertilize(ServerLevel l,BlockPos p){var state=l.getBlockState(p);if(!crop(state)||mature(state)||state.getBlock() instanceof AttachedStemBlock||!Geography.canFarm(l,p.below()))return false;var s=observe(l,p.below());if(s==null||s.fertilized)return false;s.fertilized=true;l.getChunkAt(p).setUnsaved(true);return true;}
+ public static boolean fertilize(ServerLevel l,BlockPos p){var state=l.getBlockState(p);if(!fertilizable(state)||mature(state)||state.getBlock() instanceof AttachedStemBlock||!Geography.canFarm(l,p.below()))return false;var s=observe(l,p.below());if(s==null||s.fertilized)return false;s.fertilized=true;l.getChunkAt(p).setUnsaved(true);return true;}
  public static boolean fertilized(ServerLevel l,BlockPos p){var s=observe(l,p.below());return s!=null&&s.fertilized;}
  public static String describe(ServerLevel l,BlockPos p){var s=observe(l,p);if(s==null||!Geography.canFarm(l,p))return "";return (s.water>0?"Rain-soaked | 100% growth | ~"+(int)Math.ceil(s.water/60)+" min water":"River-fed | 50% growth")+(s.fertilized?" | Fertilized":"");}
  @SubscribeEvent public static void harvest(BlockDropsEvent e){

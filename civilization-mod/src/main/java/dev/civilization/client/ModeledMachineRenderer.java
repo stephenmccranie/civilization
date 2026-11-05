@@ -32,7 +32,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * Draws the moving parts of any machine built as a native model, the bones its work animation moves, while the still
  * rest is drawn with the terrain by {@link MachineBlockModel}; and draws the whole guide of missing sections. Bones carry
  * the meaning in their names: `section_<n>_…` belongs to section n, `controller` is the controller, `lit_…` and `cold_…`
- * follow the fire.
+ * follow its lit state: a fire, which glows, or a Tannery's steeping batch.
  */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
 public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEntity> {
@@ -56,9 +56,9 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
                 if(!hidden&&!look.guide&&v.holdsMoving())v.bone().setChildrenHidden(false);
             }
         }
-        // The fire's own bones glow whatever light falls on the masonry around them.
+        // A fire's own bones glow whatever light falls on the masonry around them.
         @Override public void renderRecursively(PoseStack pose,Look look,GeoBone bone,net.minecraft.client.renderer.RenderType type,MultiBufferSource buffers,com.mojang.blaze3d.vertex.VertexConsumer vertices,boolean reRender,float partial,int light,int overlay,int color){
-            super.renderRecursively(pose,look,bone,type,buffers,vertices,reRender,partial,bone.getName().startsWith("lit_")?LightTexture.FULL_BRIGHT:light,overlay,color);
+            super.renderRecursively(pose,look,bone,type,buffers,vertices,reRender,partial,look.model.heated&&bone.getName().startsWith("lit_")?LightTexture.FULL_BRIGHT:light,overlay,color);
         }
         /** A model reaching over many blocks is lit like those blocks: each cube takes the light of the cell it is drawn
          *  in, found from its centre through the render transform, so one side of a machine can stand in a neighbour's

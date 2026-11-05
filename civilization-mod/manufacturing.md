@@ -24,19 +24,23 @@ Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbo
 | Textile Workshop | three brick blocks / plank–copper ingot–plank / three iron ingots |
 | Smithy | three brick blocks / plank–cobblestone–plank / three iron ingots |
 
-Controller crafting needs no leather, cloth, shears, anvil or oil. The Tannery and Textile Workshop are shells of vanilla or resource-pack materials and saw-cut pieces; the Smithy is a forge built from its controller in sections:
+Controller crafting needs no leather, cloth, shears, anvil or oil. The Textile Workshop is a shell of vanilla or resource-pack materials and saw-cut pieces; the Tannery and Smithy are built from their controllers in sections:
 
-- **Tannery** (3×3, four high): **2 brick blocks, 6 cobblestone or stone-brick blocks, 8 plank slabs, 5 plank quarter beams, 2 plank eighth cubes**. A stone plinth with two front brick accents carries a half-height oak rim around an open vat; the eighth cubes share the rear rim cells and join the rim to two narrow posts, and a three-piece crossbar completes the drying rack. No water or loose hide is placed.
+- **Tannery** (4×2, about 2.75 high): placed, its controller is the plank hatch of a bark tan pit: a waist-high brick curb on a fieldstone footing round a vat lined with upright boards under a timber coping, a slatted bin heaped with bark at its left and a drying rack along its back, a tanned hide over its rail. It is built like the other [modeled machines](machines.md#building-with-a-controller), in five sections paid with **4 stone, 8 brick blocks and 10 planks**: footing (4 stone or cobblestone), curb (8 brick blocks), vat (6 planks of any wood), bark bin (2) and drying rack (2). While a batch steeps, dark bark liquor with hides in it fills the vat, one lapping over its front; the empty pit shows its plank floor.
 - **Textile Workshop** (3×3, four high): **5 plank slabs, 9 plank quarter beams, 4 plank eighth cubes, 1 copper quarter beam**. A two-deep upper-slab bench stands on four shared-cell feet; two rear posts and a crossbar frame an open center, with the copper roller in the supported central cell.
 - **Smithy** (4×2, about 3.7 high): placed, its controller is the japanned ash-pit door of a brick coal forge: a waist-high hearth on a fieldstone footing with a coal bed in its firepot, brick cheeks and a sooty fireback under a hood that steps in to a square chimney, a leather bellows on a timber frame at its left whose lever pumps while the forge works, and a stave slack tub at its front right. It is built like the other [modeled machines](machines.md#building-with-a-controller), in six sections paid with **4 stone, 20 brick blocks and 8 planks**: footing (4 stone or cobblestone), hearth (8 brick blocks), hood (8), chimney (4), bellows (6 planks of any wood) and slack tub (2). The fire warms the whole forge. The coal bed and fire are visual only — no inventory, free fuel or real fire.
 
 | Workshop | Job | Productive time |
 | --- | --- | --- |
-| Tannery | 1 Raw Hide → 1 Leather | 10 seconds at half heat rate (0.25 Coal) |
+| Tannery | Up to 8 Raw Hide, one Tanbark each, steeped in its water pit → as many Leather | 20 minutes while loaded; no fuel |
 | Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
 | Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
 
 Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire keeps the Smithy hot. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
+
+**Tanning** is bark tanning, with no fire. Stripping a tree's log or wood with an axe peels one **Tanbark**; bamboo and Nether stems have none. Load Raw Hide and Tanbark into the Tannery, then right-click it with a water bucket in either hand: the pit takes up to eight hides with one Tanbark each, the bucket comes back empty, and the batch tans in 20 minutes while the Tannery is complete and loaded, with no fuel or worker. The menu shows the pit and the minutes left, and the inputs can be changed or refilled meanwhile. The finished hides come out as Leather, waiting while both outputs are full, and the empty pit takes the next bucket. Breaking the Tannery returns the steeping hides and bark unfinished; the water is lost.
+
+The **bucket** is a wooden pail: three planks in a V under a stick bail at a crafting table, shown in the recipe book once you hold planks. Buckets do not stack and, like building blocks, ride in the offhand or a worn backpack. It carries water, milk, powder snow and fish, but lava would burn it, so it scoops none by hand or dispenser and draws none from a lava cauldron.
 
 Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 
@@ -54,7 +58,7 @@ Inputs are consumed only when the whole output fits. Hoppers may supply inputs f
 
 | Product | Input | Output | Base time | Workplace |
 | --- | --- | --- | --- | --- |
-| Tool Handle | 1 plank + 1 Leather | 4 | 5 seconds | Assembly Bench |
+| Tool Handle | 1 plank + 1 Leather | 1 | 5 seconds | Assembly Bench |
 | Wooden Wheel | 1 plank + 2 Iron Fasteners | 1 | 10 seconds | Assembly Bench |
 | Metal Plate | 1 matching ingot | 1 | 5 seconds | Smithy |
 | Metal Rod | 1 matching ingot | 2 | 5 seconds | Smithy |
@@ -113,8 +117,8 @@ Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithin
 
 | Product | Assembly Bench bill | Output / base time |
 | --- | --- | --- |
-| Wooden doors | 6 matching species planks + 3 Fasteners | 3 / 5 seconds |
-| Wooden trapdoors | 6 matching species planks + 2 Fasteners | 2 / 5 seconds |
+| Wooden doors | 6 matching species planks | 3 / 5 seconds |
+| Wooden trapdoors | 6 matching species planks | 2 / 5 seconds |
 | Wooden fence gate | 2 matching species planks + 4 Sticks + 2 Fasteners | 1 / 5 seconds |
 | Chest / Barrel | 8 / 7 mixed planks | 1 / 5 seconds |
 | Wheelbarrow | 3 mixed planks + 1 Wooden Wheel + 1 Iron Rod + 4 Fasteners | 1 / 10 seconds |

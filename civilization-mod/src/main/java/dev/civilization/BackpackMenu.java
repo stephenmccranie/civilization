@@ -34,7 +34,7 @@ public final class BackpackMenu extends AbstractContainerMenu {
     @Override public ItemStack quickMoveStack(Player p,int index){
         var slot=slots.get(index);if(!slot.hasItem())return ItemStack.EMPTY;
         var stack=slot.getItem();var before=stack.copy();
-        if(index<size()){if(BlockCarry.block(stack)&&BlockCarry.restricted(p))BlockCarry.hold(p.getInventory(),stack);else moveItemStackTo(stack,size(),size()+36,true);}
+        if(index<size()){if(BlockCarry.carried(stack)&&BlockCarry.restricted(p))BlockCarry.hold(p.getInventory(),stack);else moveItemStackTo(stack,size(),size()+36,true);}
         else moveItemStackTo(stack,0,size(),false);
         if(stack.getCount()==before.getCount())return ItemStack.EMPTY;
         if(stack.isEmpty())slot.setByPlayer(ItemStack.EMPTY);else slot.setChanged();

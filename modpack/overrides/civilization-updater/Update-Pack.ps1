@@ -27,9 +27,10 @@ function Assert-CivPack($Manifest) {
     $civ=@($Manifest.files | Where-Object id -eq 'civilization')
     if ($civ.Count -ne 1 -or $civ[0].path -notmatch '^mods/civilization-(\d+\.\d+\.\d+)-dev.jar$' -or !$Manifest.versionId.StartsWith('playtest-'+$Matches[1]+'-')) { throw 'Pack/Civilization version mismatch' }
     $migrationKeys=@{}
-    foreach ($patch in $Manifest.configMigrations) {
+    # Updaters from before key-binding migrations read only configMigrations, which repeats the ones they accept.
+    foreach ($patch in $Manifest.migrations) {
         if ($patch.path -ne 'options.txt' -and $patch.path -notmatch '^config/[a-zA-Z0-9_-]+\.toml$') { throw 'Unsafe configuration migration path' }
-        if ($patch.key -notmatch '^[a-zA-Z0-9_]+$' -or $patch.section -notmatch '^[a-zA-Z0-9_.]*$' -or $patch.from -match '[\r\n]' -or $patch.value -match '[\r\n]') { throw 'Unsafe configuration migration' }
+        if ($patch.key -notmatch '^[a-zA-Z0-9_.]+$' -or $patch.section -notmatch '^[a-zA-Z0-9_.]*$' -or $patch.from -match '[\r\n]' -or $patch.value -match '[\r\n]') { throw 'Unsafe configuration migration' }
         $key=$patch.path+'|'+$patch.section+'|'+$patch.key
         if ($migrationKeys.ContainsKey($key)) { throw 'Duplicate configuration migration' }; $migrationKeys[$key]=$true
         if ($patch.path -eq 'options.txt' -and $patch.section) { throw 'Options migration cannot have a section' }
@@ -55,7 +56,7 @@ function Get-CivAppliedMigrations([string]$Game) {
 function Save-CivInitialReceipt([string]$Folder,$Manifest) {
     Assert-CivPack $Manifest
     # A fresh import's settings already hold every migration its manifest lists.
-    $applied=@($Manifest.configMigrations | ForEach-Object { Get-CivMigrationId $_ })
+    $applied=@($Manifest.migrations | ForEach-Object { Get-CivMigrationId $_ })
     [IO.File]::WriteAllText((Join-Path $Folder 'applied-migrations.json'),(ConvertTo-Json -InputObject $applied),[Text.UTF8Encoding]::new($false))
     $temporary=Join-Path $Folder 'managed-pack.pending'
     [IO.File]::WriteAllText($temporary,($Manifest | ConvertTo-Json -Depth 15),[Text.UTF8Encoding]::new($false))
@@ -123,6 +124,23 @@ function Get-CivMigratedConfig([string]$Text,$Patch) {
     if ($found -gt 1) { throw 'Ambiguous configuration migration' }
     return [pscustomobject]@{Text=$parts -join '';Found=$found -eq 1}
 }
+# Each migration applies once, so a player who later picks the old value keeps it. A setting the game has not
+# written yet stays pending until it exists. Due says whether any migration applies now.
+function Get-CivMigrationPlan([string]$Game,$Manifest) {
+    $applied=[Collections.Generic.List[string]]::new([string[]]@(Get-CivAppliedMigrations $Game))
+    $count=$applied.Count; $configs=@{}
+    foreach ($patch in $Manifest.migrations) {
+        $id=Get-CivMigrationId $patch
+        if ($applied.Contains($id)) { continue }
+        $path=Join-Path $Game $patch.path
+        if (!(Test-Path -LiteralPath $path)) { continue }
+        if (!$configs.ContainsKey($patch.path)) { $configs[$patch.path]=[IO.File]::ReadAllText($path) }
+        $result=Get-CivMigratedConfig $configs[$patch.path] $patch
+        $configs[$patch.path]=$result.Text
+        if ($result.Found) { $applied.Add($id) }
+    }
+    return [pscustomobject]@{Configs=$configs;Applied=$applied;Due=$applied.Count -ne $count}
+}
 function Install-CivPack([string]$Game,$Old,$Next) {
     Assert-CivPack $Old; Assert-CivPack $Next
     $folder=Join-Path $Game 'civilization-updater/transaction'
@@ -165,30 +183,16 @@ function Install-CivPack([string]$Game,$Old,$Next) {
                 Add-CivPlanEntry $plan $Game $folder $item.path ''
             }
         }
-        # Each migration applies once, so a player who later picks the old value keeps it. A setting the game
-        # has not written yet stays pending until it exists.
-        $applied=[Collections.Generic.List[string]]::new([string[]]@(Get-CivAppliedMigrations $Game))
-        $appliedCount=$applied.Count
-        $configs=@{}
-        foreach ($patch in $Next.configMigrations) {
-            $id=Get-CivMigrationId $patch
-            if ($applied.Contains($id)) { continue }
-            $path=Join-Path $Game $patch.path
-            if (!(Test-Path -LiteralPath $path)) { continue }
-            if (!$configs.ContainsKey($patch.path)) { $configs[$patch.path]=[IO.File]::ReadAllText($path) }
-            $result=Get-CivMigratedConfig $configs[$patch.path] $patch
-            $configs[$patch.path]=$result.Text
-            if ($result.Found) { $applied.Add($id) }
-        }
-        foreach ($path in $configs.Keys) {
-            if ($configs[$path] -ceq [IO.File]::ReadAllText((Join-Path $Game $path))) { continue }
+        $migration=Get-CivMigrationPlan $Game $Next
+        foreach ($path in $migration.Configs.Keys) {
+            if ($migration.Configs[$path] -ceq [IO.File]::ReadAllText((Join-Path $Game $path))) { continue }
             $staged=Join-Path $folder 'journal.pending'
-            [IO.File]::WriteAllText($staged,$configs[$path],[Text.UTF8Encoding]::new($false))
+            [IO.File]::WriteAllText($staged,$migration.Configs[$path],[Text.UTF8Encoding]::new($false))
             Add-CivPlanEntry $plan $Game $folder $path $staged
         }
-        if ($applied.Count -ne $appliedCount) {
+        if ($migration.Due) {
             $staged=Join-Path $folder 'journal.pending'
-            [IO.File]::WriteAllText($staged,(ConvertTo-Json -InputObject @($applied.ToArray())),[Text.UTF8Encoding]::new($false))
+            [IO.File]::WriteAllText($staged,(ConvertTo-Json -InputObject @($migration.Applied.ToArray())),[Text.UTF8Encoding]::new($false))
             Add-CivPlanEntry $plan $Game $folder 'civilization-updater/applied-migrations.json' $staged
         }
         $staged=Join-Path $folder 'journal.pending'
@@ -245,4 +249,8 @@ function Invoke-CivPackUpdate([string]$Instance) {
     # Missing managed files must be repaired from the CURRENT receipt, never the old ZIP baseline.
     $current=Get-Content -LiteralPath $receipt -Raw | ConvertFrom-Json
     if (@(Get-CivManagedFiles $current | Where-Object { !(Test-Path -LiteralPath (Join-Path $game $_.path)) }).Count -gt 0) { Install-CivPack $game $current $current }
+    # Due migrations apply from the current receipt too, so one published alongside a new updater applies on the
+    # launch after it arrives. A failure keeps the settings as they are and retries next launch.
+    try { if ((Get-CivMigrationPlan $game $current).Due) { Install-CivPack $game $current $current } }
+    catch { Show-CivFailure "Pack settings could not be updated. Keeping your current settings.`n`n$($_.Exception.Message)" }
 }

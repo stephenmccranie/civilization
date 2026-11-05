@@ -61,7 +61,7 @@ public final class BackpackClient {
     @SubscribeEvent public static void tooltip(ItemTooltipEvent e){
         var stack=e.getItemStack();if(!stack.is(Backpack.ITEM))return;
         e.getToolTip().add(Component.literal(Backpack.slots(stack)+" slots · up to "+Backpack.blocks(stack)+" blocks").withStyle(ChatFormatting.GRAY));
-        e.getToolTip().add(Component.translatable("tooltip.civilization.backpack").withStyle(ChatFormatting.GRAY));
+        e.getToolTip().add(Component.translatable("tooltip.civilization.backpack",OPEN.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY));
         var s=stack.get(Backpack.SUPPLY.get());
         if(s!=null)e.getToolTip().add(Component.literal("Bound to a "+s.storeName()+" · supply "+(s.on()?"on":"off")).withStyle(ChatFormatting.GRAY));
     }

@@ -40,7 +40,7 @@ public final class BlockCarryRecovery extends SavedData {
                 entries.add(new Entry(child.copyWithCount(1),child.getCount()));entries.add(new Entry(shell,1));setDirty();return -1;
             }
             var e=entries.get(i);var offered=e.item.copyWithCount((int)Math.min(32,e.count));int n=BlockCarry.insert(player.getInventory(),offered);
-            if(!BlockCarry.block(e.item)){player.getInventory().add(offered);n=(int)Math.min(32,e.count)-offered.getCount();}
+            if(!BlockCarry.carried(e.item)){player.getInventory().add(offered);n=(int)Math.min(32,e.count)-offered.getCount();}
             if(n==0)continue;
             if(n==e.count)entries.remove(i);else entries.set(i,new Entry(e.item,e.count-n));
             if(entries.isEmpty())balances.remove(player.getUUID());setDirty();player.containerMenu.broadcastChanges();return n;

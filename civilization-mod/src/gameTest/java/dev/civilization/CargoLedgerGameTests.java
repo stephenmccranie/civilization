@@ -42,6 +42,13 @@ public final class CargoLedgerGameTests {
         new CargoMenu(1,p.getInventory(),stock).clicked(0,0,ClickType.QUICK_MOVE,p);
         h.assertTrue(stock.cargo().isEmpty()&&p.getOffhandItem().is(CookingContent.STATION_ITEM.get()),"Shift-click takes it back to the hand");h.succeed();
     }
+    @GameTest(template="industrial") public static void rightClickingAWheelbarrowLoadsWhatTheHandHolds(GameTestHelper h){
+        var wheel=barrow(h);var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
+        var tray=new net.minecraft.world.phys.Vec3(0,.8,0);
+        wheel.interactAt(p,tray,InteractionHand.MAIN_HAND);
+        h.assertTrue(p.getOffhandItem().isEmpty()&&wheel.cargo().count(0)==BlockCarry.LIMIT&&!(p.containerMenu instanceof CargoMenu),"Right-clicking the tray loads the held blocks, as a pallet stacks them");
+        h.assertTrue(!wheel.putHeld(p),"With nothing to load, right-click falls through to the cargo menu");h.succeed();
+    }
     @GameTest(template="industrial") public static void unknownContainersAndMalformedPiecesCannotEnterAsWeightless(GameTestHelper h){
         var store=new CargoLedger(()->32,()->{});
         var filled=new ItemStack(Items.SHULKER_BOX);filled.set(net.minecraft.core.component.DataComponents.CONTAINER,net.minecraft.world.item.component.ItemContainerContents.fromItems(java.util.List.of(new ItemStack(Items.STONE))));

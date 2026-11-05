@@ -40,6 +40,7 @@
     "civilization:kiln_part",
     "civilization:foundry_part",
     "civilization:fertilizer_furnace_part",
-    "civilization:smithy_part"
+    "civilization:smithy_part",
+    "civilization:tannery_part"
   ]
 }

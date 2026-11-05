@@ -9,3 +9,4 @@ biomeBlendRadius:0
 renderClouds:"false"
 resourcePacks:["vanilla","mod_resources","file/Patrix_1.21_32x_basic.zip"]
 incompatibleResourcePacks:[]
+key_key.journeymap.create_waypoint:key.keyboard.v

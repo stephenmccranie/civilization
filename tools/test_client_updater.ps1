@@ -32,11 +32,11 @@ function Assert-File([string]$Path,[string]$Source) { if ((Get-CivHash $Path) -n
 $civ=New-Archive 'civic.jar' "[[mods]]`nmodId=`"civilization`"`nversion=`"0.35.4-dev`"`n"
 $a1=New-Archive 'a1.jar' 'first';$a2=New-Archive 'a2.jar' 'second';$a3=New-Archive 'a3.jar' 'third'
 $b1=New-Archive 'b1.jar' 'retired';$c1=New-Archive 'c1.jar' 'added';$c2=New-Archive 'c2.jar' 'changed'
-$old=[pscustomobject]@{formatVersion=1;game='minecraft';channel='playtest';protocol='3/0.35.0-dev';versionId='playtest-0.35.4-1';dependencies=@{minecraft='1.21.1';neoforge='21.1.265'};configMigrations=@();files=@((Entry 'civilization' 'mods/civilization-0.35.4-dev.jar' $civ),(Entry 'alpha' 'mods/alpha-1.jar' $a1),(Entry 'retired' 'mods/retired.jar' $b1))}
+$old=[pscustomobject]@{formatVersion=1;game='minecraft';channel='playtest';protocol='3/0.35.0-dev';versionId='playtest-0.35.4-1';dependencies=@{minecraft='1.21.1';neoforge='21.1.265'};migrations=@();files=@((Entry 'civilization' 'mods/civilization-0.35.4-dev.jar' $civ),(Entry 'alpha' 'mods/alpha-1.jar' $a1),(Entry 'retired' 'mods/retired.jar' $b1))}
 foreach ($item in $old.files) { Copy-Item -LiteralPath (Join-Path $fixture ([uri]$item.downloads[0]).Segments[-1]) -Destination (Join-Path $game $item.path) }
 [IO.File]::WriteAllText("$homeDir/managed-pack.json",($old | ConvertTo-Json -Depth 15))
 $next=Clone $old;$next.versionId='playtest-0.35.4-2';$next.files=@($next.files[0],(Entry 'alpha' 'mods/alpha-2.jar' $a2),(Entry 'added' 'mods/added.jar' $c1))
-$next.configMigrations=@([pscustomobject]@{path='config/DistantHorizons.toml';section='server';key='playerBandwidthLimit';from='1024';value='100'},[pscustomobject]@{path='options.txt';section='';key='fov';from='0.5';value='0.25'})
+$next.migrations=@([pscustomobject]@{path='config/DistantHorizons.toml';section='server';key='playerBandwidthLimit';from='1024';value='100'},[pscustomobject]@{path='options.txt';section='';key='fov';from='0.5';value='0.25'})
 [IO.File]::WriteAllText("$game/config/DistantHorizons.toml","[server]`r`nplayerBandwidthLimit = 1024`r`ncustom = 17`r`n")
 [IO.File]::WriteAllText("$game/options.txt","fov:0.75`r`n")
 [IO.File]::WriteAllText("$game/mods/personal.jar",'personal mod')
@@ -53,7 +53,7 @@ if ((Test-Path "$game/mods/alpha-1.jar") -or (Test-Path "$game/mods/retired.jar"
 if ([IO.File]::ReadAllText("$game/mods/personal.jar") -ne 'personal mod' -or [IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`n") { throw 'Personal files modified' }
 if ([IO.File]::ReadAllText("$game/config/DistantHorizons.toml") -ne "[server]`r`nplayerBandwidthLimit = 100`r`ncustom = 17`r`n") { throw 'Config migration changed unrelated settings or newlines' }
 $receipt=[IO.File]::ReadAllText("$homeDir/managed-pack.json")
-$third=Clone $next;$third.versionId='playtest-0.35.4-3';$third.files=@($third.files[0],(Entry 'alpha' 'mods/alpha-2.jar' $a3),(Entry 'added' 'mods/added.jar' $c2));$third.configMigrations=@()
+$third=Clone $next;$third.versionId='playtest-0.35.4-3';$third.files=@($third.files[0],(Entry 'alpha' 'mods/alpha-2.jar' $a3),(Entry 'added' 'mods/added.jar' $c2));$third.migrations=@()
 $script:corrupt=$true;Must-Fail { Install-CivPack $game $next $third };$script:corrupt=$false
 Assert-File "$game/mods/alpha-2.jar" $a2
 if ([IO.File]::ReadAllText("$homeDir/managed-pack.json") -ne $receipt) { throw 'Failed staging changed receipt' }
@@ -66,12 +66,12 @@ function Set-CivTransactionFile([string]$Source,[string]$Target) {
 Must-Fail { Install-CivPack $game $next $third }
 Assert-File "$game/mods/alpha-2.jar" $a2;Assert-File "$game/mods/added.jar" $c1
 if ([IO.File]::ReadAllText("$homeDir/managed-pack.json") -ne $receipt) { throw 'Rollback changed managed receipt' }
-$third.configMigrations=@([pscustomobject]@{path='config/DistantHorizons.toml';section='server';key='playerBandwidthLimit';from='100';value='50'})
+$third.migrations=@([pscustomobject]@{path='config/DistantHorizons.toml';section='server';key='playerBandwidthLimit';from='100';value='50'})
 $script:applyCount=0;$script:failAt=4
 Must-Fail { Install-CivPack $game $next $third }
 if ([IO.File]::ReadAllText("$game/config/DistantHorizons.toml") -notmatch 'playerBandwidthLimit = 100') { throw 'Config migration did not roll back' }
 Assert-File "$game/mods/alpha-2.jar" $a2;Assert-File "$game/mods/added.jar" $c1
-$third.configMigrations=@();$script:failAt=-1
+$third.migrations=@();$script:failAt=-1
 # Model a process dying after replacement but before the commit marker.
 $folder="$homeDir/transaction";New-Item -ItemType Directory -Path $folder | Out-Null
 Copy-Item $a2 "$folder/0.old";Copy-Item $a3 "$game/mods/alpha-2.jar" -Force
@@ -127,7 +127,7 @@ $foreign=Clone $self2;$foreign.updaterFiles[0].downloads=@('https://cdn.modrinth
 Must-Fail { Assert-CivPack $foreign }
 # Each migration applies once: a missing setting waits until the game writes it, and a player who restores the old value keeps it.
 $chat=[pscustomobject]@{path='options.txt';section='';key='chatScale';from='1.0';value='0.75'}
-$once1=Next-Pack $self2 6;$once1.configMigrations=@($chat)
+$once1=Next-Pack $self2 6;$once1.migrations=@($chat)
 $count=$script:downloads;Install-CivPack $game $self2 $once1
 if ($script:downloads -ne $count) { throw 'Unchanged updater scripts were downloaded again' }
 if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`n" -or (Get-CivAppliedMigrations $game) -contains (Get-CivMigrationId $chat)) { throw 'A missing setting must stay pending' }
@@ -140,4 +140,11 @@ if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`nchatScale:1.0`r
 $fresh=Join-Path $fixture 'fresh';New-Item -ItemType Directory -Path "$fresh/civilization-updater" | Out-Null
 Save-CivInitialReceipt "$fresh/civilization-updater" $once3
 if (@(Get-CivAppliedMigrations $fresh) -notcontains (Get-CivMigrationId $chat)) { throw 'A fresh import must count the migrations its settings already hold' }
-Write-Host 'PASS: pack-only revisions, staged updates/additions/removals, config migration, personal mods/settings, bad download, partial-apply rollback, crash recovery, collisions, offline/no-downgrade, loader mismatch, visible progress stages, updater self-update and rollback, migrations applied once.'
+# Due migrations from the installed receipt apply at launch without a new release, including key bindings.
+$keys=[pscustomobject]@{path='options.txt';section='';key='key_key.journeymap.create_waypoint';from='key.keyboard.b';value='key.keyboard.v'}
+$bound=Clone $once3;$bound.migrations=@($chat,$keys);[IO.File]::WriteAllText("$homeDir/managed-pack.json",($bound | ConvertTo-Json -Depth 15))
+[IO.File]::WriteAllText("$game/options.txt","fov:0.75`r`nchatScale:1.0`r`nkey_key.journeymap.fullscreen_create_waypoint:key.keyboard.b`r`nkey_key.journeymap.create_waypoint:key.keyboard.b`r`n")
+$count=$script:downloads;$script:offline=$true;Invoke-CivPackUpdate $fixture;$script:offline=$false
+if ([IO.File]::ReadAllText("$game/options.txt") -ne "fov:0.75`r`nchatScale:1.0`r`nkey_key.journeymap.fullscreen_create_waypoint:key.keyboard.b`r`nkey_key.journeymap.create_waypoint:key.keyboard.v`r`n") { throw 'A due key-binding migration did not apply at launch' }
+if ($script:downloads -ne $count -or @(Get-CivAppliedMigrations $game) -notcontains (Get-CivMigrationId $keys)) { throw 'Applying a migration at launch must record it without downloading' }
+Write-Host 'PASS: pack-only revisions, staged updates/additions/removals, config migration, personal mods/settings, bad download, partial-apply rollback, crash recovery, collisions, offline/no-downgrade, loader mismatch, visible progress stages, updater self-update and rollback, migrations applied once and at launch.'
