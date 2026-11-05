@@ -40,7 +40,14 @@ public final class ThermalField extends SavedData {
         return l.getDataStorage().computeIfAbsent(new Factory<>(ThermalField::new,ThermalField::load),"civilization_heat");
     }
     public static boolean supported(Level l, BlockPos p) {
-        return ThermalConfig.enabled() && l.dimension().equals(Level.OVERWORLD) && p.getY() >= l.getMinBuildHeight() && p.getY() < l.getMaxBuildHeight() && l.hasChunkAt(p);
+        return ThermalConfig.enabled() && l.dimension().equals(Level.OVERWORLD) && p.getY() >= l.getMinBuildHeight() && p.getY() < l.getMaxBuildHeight() && loaded(l, p);
+    }
+    /**
+     * Whether p's chunk is fully loaded now. {@code hasChunkAt} only says a chunk is scheduled to be full, and reading
+     * one still generating makes the server thread wait for it, forever if its generation fails.
+     */
+    static boolean loaded(Level l, BlockPos p) {
+        return l.getChunkSource().getChunkNow(p.getX() >> 4, p.getZ() >> 4) != null;
     }
     public static double ambient(ServerLevel l, BlockPos p) {
         var biome=l.getBiome(p);
@@ -268,7 +275,7 @@ public final class ThermalField extends SavedData {
         if(!l.dimension().equals(Level.OVERWORLD)||p.getY()<l.getMinBuildHeight()||p.getY()>=l.getMaxBuildHeight())return false;
         long key=net.minecraft.world.level.ChunkPos.asLong(p.getX()>>4,p.getZ()>>4);
         byte value=chunks.get(key);
-        if(value==0){value=(byte)(l.hasChunkAt(p)?1:-1);chunks.put(key,value);}
+        if(value==0){value=(byte)(loaded(l,p)?1:-1);chunks.put(key,value);}
         return value==1;
     }
     private Exchange scheduled;

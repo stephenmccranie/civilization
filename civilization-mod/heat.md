@@ -60,7 +60,7 @@ Redstone torches give no heat. Extinguishing or removing a source ends emission 
 - A whole-field exchange runs every half second of game time in bounded batches under a **5 ms soft budget per server tick** and at most 65,536 operations per call; an overdue step can start immediately within that budget. Releases due in each interval are staged from a quarter-second timeline, so energy is never lost or doubled.
 - At equal simulated time the field is identical however the work is sliced, including across a mid-step save. Overload delays the field rather than changing it; the helmet and `/civilization heat` report solver age.
 - Per dimension: 262,144 active cells, 262,144 timed-release entries and 4,096 pending machine-source locations. Machine batches wait for release-queue room; natural inputs that do not fit, and weak settled cells, are retired to the atmosphere ledger.
-- Unloaded chunks are neither loaded nor simulated; their warmth and pending emissions wait for reload. Offline and heat-disabled time is not simulated. Flame and lava discovery is chunk-indexed with bounded queues.
+- Heat reads only fully loaded chunks: unloaded chunks, and chunks still loading or generating, are neither loaded nor simulated, and heat never waits for one; their warmth and pending emissions wait for reload. Offline and heat-disabled time is not simulated. Flame and lava discovery is chunk-indexed with bounded queues.
 - Exchanges use dense numeric arrays with section-local indices; block materials and face geometry are resolved once per exchange and nothing is cached across exchanges.
 - Not modelled: wind, smoke, radiation, oxygen, phase change, internal machine temperatures and moving vessels. Rates are deliberately coarse, not CFD or SI calibration.
 
