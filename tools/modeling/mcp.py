@@ -16,6 +16,7 @@ class Client:
     def __init__(self):
         self.session = None
         self.sequence = 0
+        self.projects = []
         self.protocol = '2024-11-05'
         result = self.request('initialize', {
             'protocolVersion': self.protocol,
@@ -66,9 +67,17 @@ class Client:
         result = self.request('tools/call', {'name': name, 'arguments': arguments})
         if result.get('isError'):
             raise RuntimeError(json.dumps(result))
+        if name == 'create_project':
+            self.projects.append(json.loads(self.call('risky_eval', {'code': 'Project.uuid'})['content'][0]['text']))
         return result
 
     def close(self):
+        # A script's projects are rebuilt from recipes or already exported, so their tabs close unsaved;
+        # projects the owner opened are left alone. The close runs after this eval's own undo step, which
+        # needs an open project.
+        if self.projects:
+            ids = json.dumps(self.projects)
+            self.call('risky_eval', {'code': f'setTimeout(() => ModelProject.all.filter(p => {ids}.includes(p.uuid)).forEach(p => p.close(true))); true'})
         if self.session:
             try:
                 with urlopen(Request(ENDPOINT, method='DELETE', headers={'Mcp-Session-Id': self.session}), timeout=5):
