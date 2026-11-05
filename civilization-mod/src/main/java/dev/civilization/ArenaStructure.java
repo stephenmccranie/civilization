@@ -29,11 +29,11 @@ public final class ArenaStructure {
     }
     public static String problem(Level level,ArenaData.Pit pit) {
         if(level instanceof net.minecraft.server.level.ServerLevel server&&(AirshipSystem.at(server,pit.at.pos())!=null||BoatSystem.at(server,pit.at.pos())!=null))return "A gladiator pit must be built on land";
-        if(!level.hasChunkAt(pit.at.pos()))return "Arena controller is unloaded";
+        if(!Chunks.loaded(level,pit.at.pos()))return "Arena controller is unloaded";
         if(!level.getBlockState(pit.at.pos()).is(ArenaContent.PIT.get()))return "Arena controller is missing";
         for(var part:PARTS) {
             var pos=MachineStructure.position(pit.at.pos(),pit.front,part);
-            if(!level.hasChunkAt(pos))return "Arena structure is unloaded";
+            if(!Chunks.loaded(level,pos))return "Arena structure is unloaded";
             if(!MachineStructure.matches(level,pos,part,pit.front))return "Finish or repair the arena walls, rooms and gates";
         }
         return "";
@@ -46,7 +46,7 @@ public final class ArenaStructure {
                 int y=pit.at.pos().getY()+1+dy;if(y>pit.at.pos().getY()+2||y<=level.getMinBuildHeight())continue;
                 for(int dx:new int[]{17,16,18,15,19})for(int z:new int[]{0,-1,1,-2,2}) {
                     var feet=position(pit.at.pos(),pit.front,sign*dx,y-pit.at.pos().getY(),z);
-                    if(!level.hasChunkAt(feet))continue;
+                    if(!Chunks.loaded(level,feet))continue;
                     var support=level.getBlockState(feet.below());
                     var target=Vec3.atBottomCenterOf(feet);
                     var box=player.getBoundingBox().move(target.subtract(player.position()));
@@ -60,7 +60,7 @@ public final class ArenaStructure {
     public static void gates(Level level,ArenaData.Pit pit,boolean open) {
         for(var p:ArenaLayout.GATES) {
             var at=position(pit.at.pos(),pit.front,p.x(),p.y(),p.z());
-            if(level.hasChunkAt(at)&&level.getBlockState(at).is(Blocks.OAK_FENCE_GATE)
+            if(Chunks.loaded(level,at)&&level.getBlockState(at).is(Blocks.OAK_FENCE_GATE)
                     &&(level.getBlockState(at).getValue(FenceGateBlock.OPEN)!=open||level.getBlockState(at).getValue(FenceGateBlock.POWERED)))
                 level.setBlockAndUpdate(at,level.getBlockState(at).setValue(FenceGateBlock.OPEN,open).setValue(FenceGateBlock.POWERED,false));
         }

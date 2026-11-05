@@ -13,5 +13,5 @@ public record OvenDialPayload(BlockPos pos,double delta) implements CustomPacket
     public static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,new StreamCodec<RegistryFriendlyByteBuf,OvenDialPayload>(){
         public OvenDialPayload decode(RegistryFriendlyByteBuf b){return new OvenDialPayload(b.readBlockPos(),b.readDouble());}
         public void encode(RegistryFriendlyByteBuf b,OvenDialPayload p){b.writeBlockPos(p.pos);b.writeDouble(p.delta);}
-    },(p,c)->{var player=c.player();var l=player.level();if(l.hasChunkAt(p.pos)&&player.distanceToSqr(p.pos.getCenter())<=64){var s=l.getBlockState(p.pos);var oven=BakingOvenBlock.owner(l,p.pos,s);if(oven!=null&&CivicAccess.allowed(l,p.pos,player)&&CivicAccess.allowed(l,oven.getBlockPos(),player))oven.turn(p.delta);}});}
+    },(p,c)->{var player=c.player();var l=player.level();if(Chunks.loaded(l,p.pos)&&player.distanceToSqr(p.pos.getCenter())<=64){var s=l.getBlockState(p.pos);var oven=BakingOvenBlock.owner(l,p.pos,s);if(oven!=null&&CivicAccess.allowed(l,p.pos,player)&&CivicAccess.allowed(l,oven.getBlockPos(),player))oven.turn(p.delta);}});}
 }

@@ -14,7 +14,7 @@ public final class IndustrialPort implements IFluidHandler {
         accepts=lube||machine.kind==Kind.TANK||!output&&side==machine.front().getOpposite()&&machine.kind==Kind.DRILL;
         extracts=machine.kind==Kind.TANK||output;
     }
-    private boolean allowed(){var l=machine.getLevel();var at=machine.getBlockPos();return l!=null&&!machine.isRemoved()&&l.hasChunkAt(at.relative(side))&&CivicAccess.boundary(l,at,at.relative(side));}
+    private boolean allowed(){var l=machine.getLevel();var at=machine.getBlockPos();return l!=null&&!machine.isRemoved()&&Chunks.loaded(l,at.relative(side))&&CivicAccess.boundary(l,at,at.relative(side));}
     @Override public int getTanks(){return 1;}
     @Override public FluidStack getFluidInTank(int i){return i==0?tank.getFluid().copy():FluidStack.EMPTY;}
     @Override public int getTankCapacity(int i){return i==0?tank.getCapacity():0;}

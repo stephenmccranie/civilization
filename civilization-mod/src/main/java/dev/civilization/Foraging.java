@@ -51,7 +51,7 @@ public final class Foraging {
                 && player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty()
                 && !player.isPassenger() && !player.getAbilities().flying
                 && player.position().distanceToSqr(Vec3.atCenterOf(pos)) <= 20.25
-                && player.serverLevel().hasChunkAt(pos) && player.serverLevel().mayInteract(player, pos)
+                && Chunks.loaded(player.serverLevel(), pos) && player.serverLevel().mayInteract(player, pos)
                 && player.level().getBlockState(pos).is(GROUND);
     }
 

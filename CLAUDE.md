@@ -25,7 +25,7 @@ Docs describe the current state. History lives in git: no changelogs, diaries, s
 - **Conservation:** stock, fuel and reserved payments cannot be spent twice; transformations explicitly consume their inputs.
 - **Authority:** the server resolves owner/whitelist access at action time, including automation and already-open menus.
 - **Persistence:** claims, inventories, reservations and deadlines commit consistently and survive retries and restarts. Diagnostic logs are never the source of truth.
-- **Bounded work:** inspection, map listings and claims never force-load the world; define active, unloaded and offline behaviour per consumer.
+- **Bounded work:** inspection, map listings and claims never force-load the world; define active, unloaded and offline behaviour per consumer. Server code tests chunk presence only with `Chunks.loaded`: `hasChunkAt` and `isLoaded` pass for chunks still generating, and reading one stalls the server thread.
 - **Migration:** live-world changes need an explicit migration. A fresh world is used only when the owner selects one, and the live server world is never reset without a new explicit request.
 - **Feedback:** show the useful requirement, state and failure reason; keep implementation identifiers out of ordinary play.
 

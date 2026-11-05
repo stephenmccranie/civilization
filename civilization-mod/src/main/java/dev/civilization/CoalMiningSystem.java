@@ -37,7 +37,7 @@ public final class CoalMiningSystem {
     public static boolean strike(ServerPlayer p){
         if(!p.getMainHandItem().is(CoalMiningContent.PICK.get())||!p.isAlive()||p.isSpectator())return false;
         var l=p.serverLevel();var eye=p.getEyePosition();double reach=Math.min(4.5,p.blockInteractionRange());var end=eye.add(p.getLookAngle().scale(reach));
-        for(int i=0;i<=10;i++)if(!l.hasChunkAt(BlockPos.containing(eye.lerp(end,i/10.0))))return false;
+        for(int i=0;i<=10;i++)if(!Chunks.loaded(l,BlockPos.containing(eye.lerp(end,i/10.0))))return false;
         var hit=l.clip(new ClipContext(eye,end,ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
         if(hit.getType()!=HitResult.Type.BLOCK)return false;var pos=hit.getBlockPos();var state=l.getBlockState(pos);
         if(!state.is(IndustrialContent.COAL_SEAM.get())&&!state.is(CoalMiningContent.FACE.get()))return false;

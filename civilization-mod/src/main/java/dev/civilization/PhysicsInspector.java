@@ -17,7 +17,7 @@ public final class PhysicsInspector {
             .then(Commands.argument("pos",BlockPosArgument.blockPos()).executes(c->inspect(c.getSource(),BlockPosArgument.getLoadedBlockPos(c,"pos"))))));
     }
     private static int inspect(CommandSourceStack source,BlockPos pos){
-        var level=source.getLevel();if(!level.hasChunkAt(pos)){source.sendFailure(Component.literal("Block must be loaded."));return 0;}
+        var level=source.getLevel();if(!Chunks.loaded(level,pos)){source.sendFailure(Component.literal("Block must be loaded."));return 0;}
         try{
             var at=SablePhysicalBridge.address(level,pos);var sample=PhysicalSample.at(level,pos);var state=level.getBlockState(pos);
             source.sendSuccess(()->Component.literal(String.format(java.util.Locale.ROOT,

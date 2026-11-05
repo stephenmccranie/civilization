@@ -19,13 +19,13 @@ public final class RefineryPortEntity extends BlockEntity {
     public void breakAssembly(){var m=owner();if(assembly&&m!=null&&!m.build().changing)section(m).ifPresent(part->ModeledMachine.removeSection(m,part,true));}
     public boolean keepAssemblyCheck(){
         if(!assembly||level==null||controller==null)return false;
-        if(!level.hasChunkAt(controller))return true;
+        if(!Chunks.loaded(level,controller))return true;
         var m=owner();if(m==null||section(m).stream().noneMatch(m.build()::has)){level.removeBlock(worldPosition,false);return false;}return true;
     }
     @Override public void onLoad(){super.onLoad();if(level!=null&&!level.isClientSide&&assembly)level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
     public RefineryPortEntity(BlockPos p,BlockState s){super(IndustrialContent.PORT_ENTITY.get(),p,s);}
     private IndustrialBlockEntity owner(){
-        if(level==null||controller==null||!level.hasChunkAt(controller)||!(level.getBlockEntity(controller) instanceof IndustrialBlockEntity m))return null;
+        if(level==null||controller==null||!Chunks.loaded(level,controller)||!(level.getBlockEntity(controller) instanceof IndustrialBlockEntity m))return null;
         for(var part:IndustrialStructure.parts(m.kind))if(part.material().equals(role)&&MachineStructure.position(controller,m.front(),part).equals(worldPosition))return m;
         return null;
     }
@@ -39,7 +39,7 @@ public final class RefineryPortEntity extends BlockEntity {
     }
     public IFluidHandler handler(Direction side){return new IFluidHandler(){
         private net.neoforged.neoforge.fluids.capability.templates.FluidTank tank(){
-            var m=owner();if(m==null||isRemoved()||side!=getBlockState().getValue(RefineryPortBlock.FACING)||!level.hasChunkAt(worldPosition.relative(side))||!CivicAccess.boundary(level,controller,worldPosition)||!CivicAccess.boundary(level,worldPosition,worldPosition.relative(side))||!IndustrialStructure.complete(level,controller,m.front(),m.kind))return null;
+            var m=owner();if(m==null||isRemoved()||side!=getBlockState().getValue(RefineryPortBlock.FACING)||!Chunks.loaded(level,worldPosition.relative(side))||!CivicAccess.boundary(level,controller,worldPosition)||!CivicAccess.boundary(level,worldPosition,worldPosition.relative(side))||!IndustrialStructure.complete(level,controller,m.front(),m.kind))return null;
             return role.equals("input_port")?m.input:role.equals("aux_port")?m.lubricant:m.output;
         }
         public int getTanks(){return 1;}

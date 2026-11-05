@@ -12,6 +12,6 @@ public final class MachineWeather {
     public static boolean wetWorkFace(Level level, BlockPos controller, BlockState state) {
         if (level == null || !ThermalConfig.enabled() || !state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) return false;
         BlockPos face = controller.relative(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
-        return level.hasChunkAt(face) && level.isRainingAt(face);
+        return Chunks.loaded(level, face) && level.isRainingAt(face);
     }
 }

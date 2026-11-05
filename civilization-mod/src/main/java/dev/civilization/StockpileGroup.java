@@ -22,7 +22,7 @@ final class StockpileGroup implements CargoInventory {
             var current=pending.removeFirst();
             for(var direction:Direction.Plane.HORIZONTAL){
                 var at=current.getBlockPos().relative(direction);
-                if(!found.containsKey(at)&&current.getLevel().hasChunkAt(at)&&current.getLevel().getBlockEntity(at) instanceof StockpileEntity next&&!next.isRemoved()){
+                if(!found.containsKey(at)&&Chunks.loaded(current.getLevel(),at)&&current.getLevel().getBlockEntity(at) instanceof StockpileEntity next&&!next.isRemoved()){
                     found.put(at,next);pending.add(next);
                 }
             }
@@ -39,7 +39,7 @@ final class StockpileGroup implements CargoInventory {
         for(var direction:Direction.Plane.HORIZONTAL)invalidateAt(level,at.relative(direction));
     }
     private static void invalidateAt(Level level,BlockPos at){
-        if(level.hasChunkAt(at)&&level.getBlockEntity(at) instanceof StockpileEntity s&&s.group!=null)s.group.invalidate();
+        if(Chunks.loaded(level,at)&&level.getBlockEntity(at) instanceof StockpileEntity s&&s.group!=null)s.group.invalidate();
     }
     void invalidate(){
         if(!valid)return;valid=false;

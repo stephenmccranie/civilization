@@ -10,7 +10,7 @@ public final class OilEngineStructure {
    if(!part.material().startsWith("engine_") || !MachineStructure.materialState(part.material()).is(component))continue;
    for(var front:List.of(preferred,preferred.getClockWise(),preferred.getOpposite(),preferred.getCounterClockWise())) {
     var controller=target.subtract(MachineStructure.position(BlockPos.ZERO,front,part));
-    if(!level.hasChunkAt(controller))continue;
+    if(!Chunks.loaded(level,controller))continue;
     var state=level.getBlockState(controller);
     if(state.getBlock() instanceof OilEngineBlock && state.getValue(CivicBlock.FACING)==front)return front;
    }
@@ -29,7 +29,7 @@ public final class OilEngineStructure {
   for(int x=-1;x<=0;x++)a.add(new MachineStructure.Part(x,2,1,"air",4,Direction.DOWN));
   return List.copyOf(a);
  }
- public static boolean complete(Level l,BlockPos at,Direction front){for(var part:PARTS){var p=MachineStructure.position(at,front,part);if(!l.hasChunkAt(p)||!MachineStructure.matches(l,p,part,front))return false;
+ public static boolean complete(Level l,BlockPos at,Direction front){for(var part:PARTS){var p=MachineStructure.position(at,front,part);if(!Chunks.loaded(l,p)||!MachineStructure.matches(l,p,part,front))return false;
   if(part.material().startsWith("engine_")&&l.getBlockState(p).getValue(CivicBlock.FACING)!=front)return false;
  }return true;}
 }

@@ -28,7 +28,7 @@ public final class CargoInspector {
 
     static int inspectContainer(net.minecraft.commands.CommandSourceStack source, BlockPos pos) {
         var level = source.getLevel();
-        if (!level.hasChunkAt(pos)) {
+        if (!Chunks.loaded(level, pos)) {
             source.sendFailure(Component.literal("Container must be loaded."));
             return 0;
         }

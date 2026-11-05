@@ -78,7 +78,7 @@ public final class MachineConstruction {
         for (var part : parts) {
             if (!supplies(stack, part)) continue;
             var pos = MachineStructure.position(controller, front, part);
-            if (!level.hasChunkAt(pos) || !present(level, pos, part, front)) return true;
+            if (!Chunks.loaded(level, pos) || !present(level, pos, part, front)) return true;
         }
         return false;
     }
@@ -91,7 +91,7 @@ public final class MachineConstruction {
         for (var part : parts) {
             if (stack.isEmpty() || !supplies(stack, part)) continue;
             var pos = MachineStructure.position(controller, front, part);
-            if (!level.hasChunkAt(pos)) { if (firstBlocked == null) firstBlocked = pos; continue; }
+            if (!Chunks.loaded(level, pos)) { if (firstBlocked == null) firstBlocked = pos; continue; }
             if (present(level, pos, part, front)) continue;
             // Construction never clears terrain, liquids, other machines, or an occupied guide cell.
             if (level.isOutsideBuildHeight(pos) || !level.getWorldBorder().isWithinBounds(pos)

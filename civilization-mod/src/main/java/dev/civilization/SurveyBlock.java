@@ -31,6 +31,6 @@ public final class SurveyBlock extends Block implements EntityBlock {
             else server.displayClientMessage(net.minecraft.network.chat.Component.literal("Build a 2×2 table: controller + 3 Survey Table Sections."),true);
         }return InteractionResult.sidedSuccess(l.isClientSide);
     }
-    private static BlockPos find(Level l,BlockPos pos){for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++){var a=pos.offset(x,0,z);if(l.hasChunkAt(a)&&l.getBlockState(a).is(CivicContent.TABLE.get())&&SurveyTable.positions(l,a).contains(pos))return a;}return null;}
+    private static BlockPos find(Level l,BlockPos pos){for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++){var a=pos.offset(x,0,z);if(Chunks.loaded(l,a)&&l.getBlockState(a).is(CivicContent.TABLE.get())&&SurveyTable.positions(l,a).contains(pos))return a;}return null;}
     @Override public void appendHoverText(net.minecraft.world.item.ItemStack stack,net.minecraft.world.item.Item.TooltipContext context,java.util.List<net.minecraft.network.chat.Component> lines,net.minecraft.world.item.TooltipFlag flag){if(controller)lines.add(net.minecraft.network.chat.Component.literal("2×2 build: add 3 Survey Table Sections").withStyle(net.minecraft.ChatFormatting.GRAY));}
 }

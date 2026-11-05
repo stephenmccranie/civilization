@@ -39,13 +39,13 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
     /** A cell whose controller is gone, or that no built section fills any more, removes itself once its controller's chunk is loaded. */
     @Override protected void tick(BlockState s,net.minecraft.server.level.ServerLevel l,BlockPos p,net.minecraft.util.RandomSource random){
         var at=controller(p,s);
-        if(l.hasChunkAt(at)&&(owner(l,p,s)==null||getShape(s,l,p,CollisionContext.empty()).isEmpty()))l.removeBlock(p,false);else l.scheduleTick(p,this,1200);
+        if(Chunks.loaded(l,at)&&(owner(l,p,s)==null||getShape(s,l,p,CollisionContext.empty()).isEmpty()))l.removeBlock(p,false);else l.scheduleTick(p,this,1200);
     }
     /** Where this cell's controller stands. */
     public BlockPos controller(BlockPos p,BlockState s){return p.subtract(ModeledMachine.position(BlockPos.ZERO,s.getValue(CivicBlock.FACING),cell(s)));}
     public static ModeledController owner(Level l,BlockPos p,BlockState s){
         if(!(s.getBlock() instanceof MachinePartBlock part))return null;
-        var at=part.controller(p,s);var c=l.hasChunkAt(at)?ModeledMachine.of(l.getBlockEntity(at)):null;
+        var at=part.controller(p,s);var c=Chunks.loaded(l,at)?ModeledMachine.of(l.getBlockEntity(at)):null;
         return c!=null&&c.model()==part.model&&c.front()==s.getValue(CivicBlock.FACING)?c:null;
     }
     @Override protected InteractionResult useWithoutItem(BlockState s,Level l,BlockPos p,Player player,BlockHitResult hit){

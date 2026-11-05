@@ -56,7 +56,7 @@ public final class BoatSystem {
             if(l.getFluidState(pos.below()).is(FluidTags.WATER)&&l.getFluidState(pos.below(2)).is(FluidTags.WATER))water++;
             for(var direction:Direction.values()){
                 var next=pos.relative(direction);if(found.contains(next))continue;
-                if(!l.hasChunkAt(next))throw new IllegalStateException("Load the complete boat and its surroundings first.");
+                if(!Chunks.loaded(l,next))throw new IllegalStateException("Load the complete boat and its surroundings first.");
                 if(l.getBlockState(next).isAir()||!l.getFluidState(next).isEmpty())continue;
                 if(found.size()>=MAX_BLOCKS)throw new IllegalStateException("Boat must be separate from terrain and contain at most 4,096 blocks.");
                 found.add(next.immutable());queue.add(next.immutable());
@@ -110,7 +110,7 @@ public final class BoatSystem {
             console(s,d.throttle);
             d.surface=Double.NaN;
             var base=BlockPos.containing(w);
-            boolean loaded=true;for(int x=-8;x<=8;x+=8)for(int z=-8;z<=8;z+=8)if(!l.hasChunkAt(base.offset(x,0,z)))loaded=false;
+            boolean loaded=true;for(int x=-8;x<=8;x+=8)for(int z=-8;z<=8;z+=8)if(!Chunks.loaded(l,base.offset(x,0,z)))loaded=false;
             if(loaded)for(int y=1;y>=-3;y--){var at=base.offset(0,y,0);var fluid=l.getFluidState(at);if(fluid.is(FluidTags.WATER)){d.surface=at.getY()+fluid.getHeight(l,at);break;}}
             double demand=l.getBlockState(helm(s)).is(BoatContent.HELM.get())&&Double.isFinite(d.surface)?(d.throttle==2?1:d.throttle==1?6.0/14:d.throttle==-1?3.0/14:0):0;
             var engines=engines(s);d.engines=engines.size();d.mass=Math.max(1,s.getMassTracker().getMass());d.power=0;

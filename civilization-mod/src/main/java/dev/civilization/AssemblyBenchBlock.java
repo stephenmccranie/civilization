@@ -25,12 +25,12 @@ public final class AssemblyBenchBlock extends WorkshopBlock implements MultiCell
     public static BlockPos other(BlockPos pos,BlockState state){return pos.relative(state.getValue(PART)?state.getValue(FACING).getCounterClockWise():state.getValue(FACING).getClockWise());}
     public static BlockPos root(BlockPos pos,BlockState state){return state.getValue(PART)?other(pos,state):pos;}
     private static boolean paired(BlockState a,BlockState b){return b.is(a.getBlock())&&b.getValue(WIDE)&&a.getValue(PART)!=b.getValue(PART)&&a.getValue(FACING)==b.getValue(FACING);}
-    public static boolean complete(Level level,BlockPos pos,BlockState state){return !state.getValue(WIDE)||level.hasChunkAt(other(pos,state))&&paired(state,level.getBlockState(other(pos,state)));}
-    public static boolean allowed(Level level,BlockPos pos,BlockState state,Player player){return CivicAccess.allowed(level,pos,player)&&(!state.getValue(WIDE)||level.hasChunkAt(other(pos,state))&&CivicAccess.allowed(level,other(pos,state),player));}
+    public static boolean complete(Level level,BlockPos pos,BlockState state){return !state.getValue(WIDE)||Chunks.loaded(level,other(pos,state))&&paired(state,level.getBlockState(other(pos,state)));}
+    public static boolean allowed(Level level,BlockPos pos,BlockState state,Player player){return CivicAccess.allowed(level,pos,player)&&(!state.getValue(WIDE)||Chunks.loaded(level,other(pos,state))&&CivicAccess.allowed(level,other(pos,state),player));}
     @Override public BlockState getStateForPlacement(BlockPlaceContext context){
         var state=defaultBlockState().setValue(FACING,context.getHorizontalDirection().getOpposite()).setValue(WIDE,true);
         var pos=context.getClickedPos();var mate=other(pos,state);var level=context.getLevel();
-        return level.hasChunkAt(mate)&&!level.isOutsideBuildHeight(mate)&&level.getWorldBorder().isWithinBounds(mate)
+        return Chunks.loaded(level,mate)&&!level.isOutsideBuildHeight(mate)&&level.getWorldBorder().isWithinBounds(mate)
             &&level.getBlockState(mate).canBeReplaced(context)&&allowed(level,pos,state,context.getPlayer())&&level.noCollision(new AABB(mate))?state:null;
     }
     @Override public java.util.List<Cell> cells(BlockPos pos,BlockState state){return java.util.List.of(new Cell(pos,state),new Cell(other(pos,state),state.setValue(PART,true)));}
@@ -41,18 +41,18 @@ public final class AssemblyBenchBlock extends WorkshopBlock implements MultiCell
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level,BlockState state,BlockEntityType<T> type){return state.getValue(PART)?null:super.getTicker(level,state,type);}
     @Override protected void openContainer(Level level,BlockPos pos,Player player){
         var state=level.getBlockState(pos);var owner=root(pos,state);
-        if(level.hasChunkAt(owner)&&allowed(level,pos,state,player))super.openContainer(level,owner,player);
+        if(Chunks.loaded(level,owner)&&allowed(level,pos,state,player))super.openContainer(level,owner,player);
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,InteractionHand hand,BlockHitResult hit){return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;}
     @Override public BlockState playerWillDestroy(Level level,BlockPos pos,BlockState state,Player player){
         // Creative breaking the extension removes the owner without producing a bench item.
-        if(!level.isClientSide&&player.isCreative()&&state.getValue(WIDE)&&state.getValue(PART)&&level.hasChunkAt(other(pos,state))&&paired(state,level.getBlockState(other(pos,state))))level.removeBlock(other(pos,state),false);
+        if(!level.isClientSide&&player.isCreative()&&state.getValue(WIDE)&&state.getValue(PART)&&Chunks.loaded(level,other(pos,state))&&paired(state,level.getBlockState(other(pos,state))))level.removeBlock(other(pos,state),false);
         return super.playerWillDestroy(level,pos,state,player);
     }
     @Override protected void onRemove(BlockState state,Level level,BlockPos pos,BlockState next,boolean moved){
         if(!level.isClientSide&&!state.is(next.getBlock())&&state.getValue(WIDE)){
             var mate=other(pos,state);
-            if(level.hasChunkAt(mate)&&paired(state,level.getBlockState(mate))){
+            if(Chunks.loaded(level,mate)&&paired(state,level.getBlockState(mate))){
                 if(state.getValue(PART))level.destroyBlock(mate,true);else level.removeBlock(mate,false);
             }
         }

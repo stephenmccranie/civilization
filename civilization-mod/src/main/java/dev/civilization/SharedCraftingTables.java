@@ -55,7 +55,7 @@ public final class SharedCraftingTables extends SavedData {
         }
         @Override public void clearContent(){board.items.clear();setChanged();}
         @Override public boolean stillValid(Player player){
-            return !board.removed&&player.level()==level&&level.hasChunkAt(board.pos)
+            return !board.removed&&player.level()==level&&Chunks.loaded(level,board.pos)
                     &&level.getBlockState(board.pos).is(Blocks.CRAFTING_TABLE)
                     &&player.distanceToSqr(CivicAccess.world(level,board.pos))<=64&&CivicAccess.allowed(level,board.pos,player);
         }

@@ -37,7 +37,7 @@ public final class BulkStructure {
     }
     public static boolean complete(Level level,BlockPos at,Direction front,boolean tank){
         for(var part:parts(tank)){var pos=MachineStructure.position(at,front,part);
-            if(!level.hasChunkAt(pos)||!MachineStructure.matches(level,pos,part,front))return false;
+            if(!Chunks.loaded(level,pos)||!MachineStructure.matches(level,pos,part,front))return false;
         }return true;
     }
 }

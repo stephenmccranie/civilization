@@ -167,7 +167,7 @@ public final class MachineStructure {
         Result missing=null;
         for (var part : parts) {
             var pos = position(controller, front, part);
-            if (!level.hasChunkAt(pos)) return new Result(UNLOADED, pos, "unloaded");
+            if (!Chunks.loaded(level, pos)) return new Result(UNLOADED, pos, "unloaded");
             if (missing==null && !matches(level, pos, part, front))
                 missing=new Result(INCOMPLETE, pos, part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : part.units()==3?"_eighth":"_quarter"));
         }

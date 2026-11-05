@@ -43,7 +43,7 @@ public final class OilSeepRetrofit {
         for (int i = 0; i < 32 && !queue.isEmpty(); i++) {
             long key = queue.removeFirstLong();
             int cx = net.minecraft.world.level.ChunkPos.getX(key), cz = net.minecraft.world.level.ChunkPos.getZ(key);
-            if (!level.hasChunk(cx, cz)) continue;
+            if (!Chunks.loaded(level, cx, cz)) continue;
             LevelChunk chunk = level.getChunk(cx, cz);
             Deposits.Site site = Deposits.candidate(level, Math.floorDiv(cx, 16), Math.floorDiv(cz, 16));
             if (site == null || site.kind() != Deposits.Kind.OIL

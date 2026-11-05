@@ -15,7 +15,7 @@ public final class PatersonBullet extends Projectile {
     public PatersonBullet(EntityType<? extends PatersonBullet> type,Level level){super(type,level);if(!level.isClientSide){damage=FirearmConfig.DAMAGE.get();gravity=FirearmConfig.GRAVITY.get();drag=FirearmConfig.DRAG.get();lifetime=FirearmConfig.LIFETIME.get();}}
     @Override protected void defineSynchedData(SynchedEntityData.Builder b){}
     @Override public void tick(){
-        super.tick();if(tickCount>lifetime||!level().hasChunkAt(blockPosition())){discard();return;}
+        super.tick();if(tickCount>lifetime||!Chunks.loaded(level(),blockPosition())){discard();return;}
         var hit=ProjectileUtil.getHitResultOnMoveVector(this,this::canHitEntity);
         if(!level().isClientSide&&hit.getType()!=HitResult.Type.MISS){
             if(hit instanceof EntityHitResult e&&getOwner() instanceof net.minecraft.world.entity.player.Player p&&(CivicAccess.allowed(level(),e.getEntity().blockPosition(),p)

@@ -13,5 +13,5 @@ public record StoveDialPayload(BlockPos pos,double value) implements CustomPacke
     public static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,new StreamCodec<RegistryFriendlyByteBuf,StoveDialPayload>(){
         public StoveDialPayload decode(RegistryFriendlyByteBuf b){return new StoveDialPayload(b.readBlockPos(),b.readDouble());}
         public void encode(RegistryFriendlyByteBuf b,StoveDialPayload p){b.writeBlockPos(p.pos);b.writeDouble(p.value);}
-    },(p,c)->{var player=c.player();if(player.level().hasChunkAt(p.pos)&&player.level().getBlockEntity(p.pos) instanceof PrototypeStoveEntity stove)stove.dial(player,p.value);});}
+    },(p,c)->{var player=c.player();if(Chunks.loaded(player.level(),p.pos)&&player.level().getBlockEntity(p.pos) instanceof PrototypeStoveEntity stove)stove.dial(player,p.value);});}
 }

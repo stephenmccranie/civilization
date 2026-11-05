@@ -155,7 +155,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         for(double side:new double[]{1,-1,0}){
             Vec3 at=new Vec3(feet.x,passenger.getY(),feet.z).add(new Vec3(side,0,0).yRot(-getYRot()*Mth.DEG_TO_RAD));
             var box=passenger.getBoundingBox().move(at.subtract(passenger.position()));
-            if(level().hasChunkAt(BlockPos.containing(at))&&level().noCollision(passenger,box))return at;
+            if(Chunks.loaded(level(),BlockPos.containing(at))&&level().noCollision(passenger,box))return at;
         }
         return super.getDismountLocationForPassenger(passenger);
     }
@@ -174,7 +174,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public boolean accessible(Player p,AABB box){
         for(int x=Mth.floor(box.minX);x<=Mth.floor(box.maxX);x++)for(int z=Mth.floor(box.minZ);z<=Mth.floor(box.maxZ);z++){
             var pos=BlockPos.containing(x,box.minY,z);
-            if(!level().hasChunkAt(pos)||!CivicAccess.allowed(level(),pos,p))return false;
+            if(!Chunks.loaded(level(),pos)||!CivicAccess.allowed(level(),pos,p))return false;
         }
         return level().getWorldBorder().isWithinBounds(box);
     }
@@ -246,9 +246,9 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         if(p!=null){
             if(turn!=0)shift(position(),getYRot()+turn*TURN,p);
             double speed=forward>0?(sprinting?PlayerMovement.SPRINT:PlayerMovement.WALK)/20:forward<0?-PlayerMovement.WALK/40:0;
-            if(speed!=0&&level().hasChunkAt(blockPosition()))shift(position().add(new Vec3(0,0,speed).yRot(-getYRot()*Mth.DEG_TO_RAD)),getYRot(),p);
+            if(speed!=0&&Chunks.loaded(level(),blockPosition()))shift(position().add(new Vec3(0,0,speed).yRot(-getYRot()*Mth.DEG_TO_RAD)),getYRot(),p);
         }
-        if(level().hasChunkAt(blockPosition()))fall();
+        if(Chunks.loaded(level(),blockPosition()))fall();
         entityData.set(HEADING,getYRot());
         double distance=position().subtract(before).horizontalDistance();
         if(distance>0){entityData.set(TRAVEL,(float)(travel()+Math.copySign(distance,forward==0?1:forward)));roll(distance);}

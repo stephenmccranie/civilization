@@ -40,7 +40,7 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider {
  public double requestWork(BlockPos consumer,double demand){
   if(level==null||level.isClientSide||!enabled||warmup<100||!Double.isFinite(demand)||demand<=0||workedTick==level.getGameTime())return 0;
   if(!consumer.equals(worldPosition)&&level.getBlockEntity(consumer)==null)return 0;
-  if(!level.hasChunkAt(consumer)||consumer.distSqr(worldPosition)>64||!CivicAccess.boundary(level,worldPosition,consumer)||!OilEngineStructure.complete(level,worldPosition,front()))return 0;
+  if(!Chunks.loaded(level,consumer)||consumer.distSqr(worldPosition)>64||!CivicAccess.boundary(level,worldPosition,consumer)||!OilEngineStructure.complete(level,worldPosition,front()))return 0;
   double beforeFuel=fuel.getFluidAmount()+fuelCredit;
   workedTick=level.getGameTime();var result=BoatEngine.step(fuel.getFluidAmount()+fuelCredit,oil.getFluidAmount()+oilCredit,condition,demand,.05);
   // Whole mB remain transferable; sub-mB credit stays inside the engine and is persisted.

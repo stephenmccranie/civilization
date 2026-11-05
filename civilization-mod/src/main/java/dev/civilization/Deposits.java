@@ -68,7 +68,7 @@ public final class Deposits {
                 boolean stock=false;
                 for(int px=cx<<4;px<=(cx<<4)+15&&!stock;px++)for(int pz=cz<<4;pz<=(cz<<4)+15;pz++)
                     if(footprint(new BlockPos(px,centerY(),pz))<=1){stock=true;break;}
-                if(stock&&!l.hasChunk(cx,cz))return false;
+                if(stock&&!Chunks.loaded(l,cx,cz))return false;
             }
             return true;
         }

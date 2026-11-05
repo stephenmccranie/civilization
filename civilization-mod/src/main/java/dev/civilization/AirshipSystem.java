@@ -76,7 +76,7 @@ public final class AirshipSystem {
             if(!supported(state)||!pos.equals(root)&&state.is(AirshipContent.CONTROLLER.get()))throw new IllegalStateException("Unsupported block or second controller in structure.");
             for(var direction:Direction.values()){
                 var next=pos.relative(direction);if(found.contains(next))continue;
-                if(!l.hasChunkAt(next))throw new IllegalStateException("Load the complete build and its surroundings first.");
+                if(!Chunks.loaded(l,next))throw new IllegalStateException("Load the complete build and its surroundings first.");
                 if(l.getBlockState(next).isAir())continue;
                 if(Math.abs(next.getX()-root.getX())>RADIUS||Math.abs(next.getY()-root.getY())>RADIUS||Math.abs(next.getZ()-root.getZ())>RADIUS||found.size()>=MAX_BLOCKS)throw new IllegalStateException("Build must be separate from terrain: max 1024 blocks, 12 from controller.");
                 found.add(next.immutable());queue.add(next.immutable());
@@ -133,7 +133,7 @@ public final class AirshipSystem {
         for(var l:e.getServer().getAllLevels())for(var s:ships(l)){
             live.add(s.getUniqueId());var d=drives.computeIfAbsent(s.getUniqueId(),key->new Drive());var p=d.pilot==null?null:e.getServer().getPlayerList().getPlayer(d.pilot);
             // Proximity is checked when acquiring control, not while rider positions catch up.
-            if(d.pilot!=null&&(!eligible(d,p)||!owner(s,p)||l.hasChunkAt(controller(s))&&!l.getBlockState(controller(s)).is(AirshipContent.CONTROLLER.get())))release(d,p);
+            if(d.pilot!=null&&(!eligible(d,p)||!owner(s,p)||Chunks.loaded(l,controller(s))&&!l.getBlockState(controller(s)).is(AirshipContent.CONTROLLER.get())))release(d,p);
             expireInput(d,l.getGameTime());
             if(d.pilot!=null&&p!=null)attachPilot(d,p);
             d.power=l.getBlockEntity(controller(s)) instanceof AirshipBlockEntity controller?controller.power():0;
