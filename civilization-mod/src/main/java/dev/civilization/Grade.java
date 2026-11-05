@@ -63,8 +63,8 @@ public record Grade(List<Integer> units) {
         return fitted;
     }
 
-    /** A freshly smelted unit: normally distributed about the standard with a 20-point deviation, unbounded. */
-    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 200); }
+    /** A freshly smelted unit: normally distributed about the standard with a 10-point deviation, unbounded. */
+    public static int roll(RandomSource random) { return (int)Math.round(STANDARD + random.nextGaussian() * 100); }
     /**
      * A hammering always raises a unit by at least a tenth of a point. Its gain is exponentially distributed, with a
      * mean of 4.5 points at the standard that falls with the fourth power of the distance left to the target, and it
@@ -82,6 +82,10 @@ public record Grade(List<Integer> units) {
     /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal or through a heat. */
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
         if (graded(product)) assign(product, graded(input) ? top(input, 1).getFirst() : roll(random));
+    }
+    /** Takes `tenths` from every unit of the stack. */
+    public static void lose(ItemStack stack, int tenths) {
+        if (tenths != 0) set(stack, top(stack, stack.getCount()).stream().map(unit -> unit - tenths).toList());
     }
     /** Gives every unit of the stack one grade. */
     public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }

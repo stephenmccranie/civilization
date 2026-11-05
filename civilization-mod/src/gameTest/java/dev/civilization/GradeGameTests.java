@@ -74,14 +74,16 @@ public final class GradeGameTests {
     }
     @GameTest(template = "industrial") public static void freshRollsAndRandomRefinement(GameTestHelper h) {
         var random = net.minecraft.util.RandomSource.create(987654321L);
-        int low = 0, high = 0; long total = 0;
+        int low = 0, high = 0; long total = 0, squares = 0;
         for (int i = 0; i < 20000; i++) {
-            int grade = Grade.roll(random); total += grade;
+            int grade = Grade.roll(random); total += grade; squares += (long)grade * grade;
             if (grade < 500) low++;
             if (grade >= 1000) high++;
         }
-        h.assertTrue(total / 20000.0 > 740 && total / 20000.0 < 760, "Fresh units centre on 75%");
-        h.assertTrue(low > 1600 && low < 2800 && high > 1600 && high < 2800, "Both low (<50%) and exceptional (100%+) units appear on roughly one in ten rolls");
+        double mean = total / 20000.0, deviation = Math.sqrt(squares / 20000.0 - mean * mean);
+        h.assertTrue(mean > 745 && mean < 755, "Fresh units centre on 75%");
+        h.assertTrue(deviation > 97 && deviation < 103, "Fresh units spread with a 10-point standard deviation, measured " + deviation / 10 + " points");
+        h.assertTrue(low > 70 && low < 190 && high > 70 && high < 190, "Both low (<50%) and exceptional (100%+) units appear on roughly one in 160 rolls");
         int lowest = Integer.MAX_VALUE, small = 0, large = 0; long gained = 0, gainedHigh = 0, passes = 0, slowPasses = 0;
         for (int i = 0; i < 20000; i++) {
             int gain = Grade.refined(750, random) - 750;
@@ -100,10 +102,10 @@ public final class GradeGameTests {
         h.succeed();
     }
 
-    static void select(FoundryBlockEntity f, String path) {
-        var recipes = f.recipes();
-        for (int i = 0; i < recipes.size(); i++) if (recipes.get(i).id().getPath().equals(path)) { f.selectRecipe(i); return; }
-        throw new IllegalStateException("No Foundry recipe " + path);
+    static void select(KilnBlockEntity k, Item output) {
+        int index = k.outputs().indexOf(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(output));
+        if (index < 0) throw new IllegalStateException("No recipe makes " + output);
+        k.select(index);
     }
     @GameTest(template = "industrial") public static void theFoundryGradesEachUnitItMakes(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);

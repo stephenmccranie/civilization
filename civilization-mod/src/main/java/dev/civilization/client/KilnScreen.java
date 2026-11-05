@@ -4,31 +4,39 @@ import dev.civilization.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 
 public final class KilnScreen extends MachineScreen<KilnMenu> {
     public KilnScreen(KilnMenu m,Inventory i,Component title){super(m,i,title);imageHeight=214;inventoryLabelY=120;}
     @Override protected List<RecipeEntry> recipes(){
-        var list=new ArrayList<RecipeEntry>();for(int i=0;i<menu.recipes.size();i++){
-            var recipe=menu.recipes.get(i).value();var output=recipe.getResultItem(minecraft.level.registryAccess());
-            var input=recipe.getIngredients().getFirst().getItems()[0];
-            var name=output.is(input.getItem())?Component.literal("Heat ").append(output.getHoverName()):output.getHoverName().copy().append(" — ").append(input.getHoverName());
-            list.add(new RecipeEntry(i,name,output,"Components",net.minecraft.world.item.Items.AIR));
+        var registries=minecraft.level.registryAccess();var list=new ArrayList<RecipeEntry>();
+        for(int i=0;i<menu.outputs.size();i++){
+            var made=KilnBlockEntity.candidates(menu.recipes,menu.outputs.get(i),registries);
+            var output=made.getFirst().value().getResultItem(registries);
+            // An output whose every recipe keeps its material is a heat.
+            boolean heat=made.stream().allMatch(r->output.is(r.value().getIngredients().getFirst().getItems()[0].getItem()));
+            var name=heat?Component.literal("Heat ").append(output.getHoverName()):output.getHoverName().copy();
+            list.add(new RecipeEntry(i,name,output,"Components",net.minecraft.world.item.Items.AIR,made.stream().map(r->input(r.value())).toList()));
         }return list;
+    }
+    private static Component input(AbstractCookingRecipe recipe){
+        return Component.literal(String.join(" or ",Arrays.stream(recipe.getIngredients().getFirst().getItems()).map(s->s.getHoverName().getString()).distinct().toList()));
     }
     @Override protected int chosen(){return menu.selection();}
     @Override protected void choose(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
-    private net.minecraft.world.item.crafting.AbstractCookingRecipe recipe(){
-        int selected=menu.selection();
-        if(selected>=0&&selected<menu.recipes.size())return menu.recipes.get(selected).value();
+    /** What the ghosts show: the recipe the loaded material runs, else the selected output's recipes, the first drawn and all named. */
+    private List<AbstractCookingRecipe> guide(){
         var actual=menu.getSlot(0).hasItem()?menu.getSlot(0).getItem():menu.getSlot(4).getItem();
-        if(!actual.isEmpty())return menu.recipes.stream().filter(r->r.value().getIngredients().getFirst().test(actual)).map(r->r.value()).findFirst().orElse(null);
-        return null;
+        var candidates=KilnBlockEntity.candidates(menu.recipes,menu.selectedOutput(),minecraft.level.registryAccess());
+        var running=candidates.stream().filter(r->r.value().getIngredients().getFirst().test(actual)).findFirst();
+        if(running.isPresent())return List.of(running.get().value());
+        return menu.selectedOutput()==null?List.of():candidates.stream().map(r->(AbstractCookingRecipe)r.value()).toList();
     }
     @Override protected void drawMachine(GuiGraphics g,float dt,int mx,int my){
-        var recipe=recipe();
+        var guide=guide();
         g.drawString(font,"Materials",leftPos+17,topPos+29,MachineUi.INK,false);g.drawString(font,"Output",leftPos+130,topPos+29,MachineUi.INK,false);
-        if(recipe!=null){
+        if(!guide.isEmpty()){
+            var recipe=guide.getFirst();
             for(int i:MachineInventory.KILN_INPUT)if(!menu.getSlot(i).hasItem())MachineUi.ghost(g,recipe.getIngredients().getFirst().getItems()[0],leftPos+menu.getSlot(i).x,topPos+43);
             for(int i:MachineInventory.KILN_OUTPUT)if(!menu.getSlot(i).hasItem())MachineUi.ghost(g,recipe.getResultItem(minecraft.level.registryAccess()),leftPos+menu.getSlot(i).x,topPos+43);
         }
@@ -42,8 +50,11 @@ public final class KilnScreen extends MachineScreen<KilnMenu> {
     }
     @Override public void render(GuiGraphics g,int x,int y,float dt){super.render(g,x,y,dt);
         for(int index:new int[]{0,1,2,3,4,5}){var slot=menu.getSlot(index);if(!slot.hasItem()&&isHovering(slot.x,slot.y,16,16,x,y)){
-            var r=recipe();ItemStack ghost=index==1||index==3?KilnContent.MINERAL_COAL.toStack():r==null?ItemStack.EMPTY:(index==0||index==4)?r.getIngredients().getFirst().getItems()[0]:r.getResultItem(minecraft.level.registryAccess());
-            g.renderTooltip(font,ghost.isEmpty()?Component.literal((index==0||index==4)?"Materials — choose a recipe for a guide":"Output"):ghost.getHoverName(),x,y);
+            boolean input=index==0||index==4;var guide=guide();
+            List<Component> lines=index==1||index==3?List.of(KilnContent.MINERAL_COAL.toStack().getHoverName())
+                :guide.isEmpty()?List.of(Component.literal(input?"Materials — choose an output for a guide":"Output"))
+                :input?guide.stream().map(KilnScreen::input).toList():List.of(guide.getFirst().getResultItem(minecraft.level.registryAccess()).getHoverName());
+            g.renderComponentTooltip(font,lines,x,y);
         }}
     }
 }

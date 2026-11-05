@@ -18,14 +18,17 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
     @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,new int[]{5},WorkshopJobs.result(menu.inventory,match));}}
     @Override protected int recipeCatalogKey(){return menu.kind();}
     @Override protected List<RecipeEntry> recipes(){
-        var list=new ArrayList<RecipeEntry>();var jobs=WorkshopJobs.jobs(menu.kind());
-        for(int i=0;i<jobs.size();i++){
-            var job=jobs.get(i);var output=job.output();var equipment=WorkshopJobs.equipment(output);
+        var list=new ArrayList<RecipeEntry>();
+        for(int i=0;i<WorkshopJobs.outputs(menu.kind()).size();i++){
+            var made=WorkshopJobs.jobs(menu.kind(),i);var job=made.getFirst();var output=job.output();var equipment=WorkshopJobs.equipment(output);
             String category=output.isEmpty()?"Repair":equipment==null?"Components":equipment.armor()||output.is(net.minecraft.world.item.Items.SHIELD)?"Armor":output.getItem() instanceof net.minecraft.world.item.SwordItem?"Weapons":"Tools";
             var name=Component.translatable(job.name());
             if(equipment!=null&&equipment.material()==net.minecraft.world.item.Items.NETHERITE_INGOT)name.append(" (upgrade)");
-            list.add(new RecipeEntry(i,name,output,category,equipment==null?net.minecraft.world.item.Items.AIR:equipment.material()));
+            list.add(new RecipeEntry(i,name,output,category,equipment==null?net.minecraft.world.item.Items.AIR:equipment.material(),made.stream().map(WorkshopScreen::inputs).toList()));
         }return list;
+    }
+    private static Component inputs(WorkshopJobs.Job job){
+        return Component.literal(String.join(", ",job.needs().stream().filter(n->n.count()>0).map(n->(n.count()>1?n.count()+" × ":"")+n.icon().getHoverName().getString()).toList()));
     }
     @Override protected int chosen(){return menu.selection();}
     @Override protected void choose(int id){minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
@@ -43,7 +46,7 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
         g.drawString(font,"Materials",leftPos+17,topPos+29,MachineUi.INK,false);g.drawString(font,"Output",leftPos+130,topPos+29,MachineUi.INK,false);
         for(int i=0;i<8;i++){var s=menu.getSlot(i);if(s.isActive()&&!s.hasItem())MachineUi.ghost(g,ghost(i),leftPos+s.x,topPos+s.y);}
         MachineUi.progress(g,leftPos+94,topPos+49,23,job==null?0:menu.data.get(2)/(float)job.ticks());
-        String state=switch(menu.data.get(3)){case MachineStatus.Workshop.INCOMPLETE->"Finish the structure";case MachineStatus.Workshop.NEEDS_MATERIALS->menu.kind()==3&&menu.selection()==0&&job==null?"Add damaged equipment":"Add materials";case MachineStatus.Workshop.OUTPUT_FULL->"Collect the output";case MachineStatus.Workshop.FIRE_UNLIT->"Add Coal and strike to light";case MachineStatus.Workshop.WARMING->"Warming up";case MachineStatus.Workshop.AMBIGUOUS->"Choose a matching recipe";case MachineStatus.Workshop.WET->"Shelter the work face from rain";case MachineStatus.Workshop.HAND_READY->"Choose a job and press Work";case MachineStatus.Workshop.NEEDS_FOOD->"Eat before continuing work";case MachineStatus.Workshop.POUR->"Pour a water bucket into the pit";default->menu.kind()==0?"Tanning, "+(int)Math.ceil((Tanning.TICKS-menu.data.get(2))/1200.0)+" min left":"Working";};
+        String state=switch(menu.data.get(3)){case MachineStatus.Workshop.INCOMPLETE->"Finish the structure";case MachineStatus.Workshop.NEEDS_MATERIALS->menu.kind()==3&&menu.selection()==0&&job==null?"Add damaged equipment":"Add materials";case MachineStatus.Workshop.OUTPUT_FULL->"Collect the output";case MachineStatus.Workshop.FIRE_UNLIT->"Add Coal and strike to light";case MachineStatus.Workshop.WARMING->"Warming up";case MachineStatus.Workshop.AMBIGUOUS->"Choose an output";case MachineStatus.Workshop.WET->"Shelter the work face from rain";case MachineStatus.Workshop.HAND_READY->"Choose a job and press Work";case MachineStatus.Workshop.NEEDS_FOOD->"Eat before continuing work";case MachineStatus.Workshop.POUR->"Pour a water bucket into the pit";case MachineStatus.Workshop.HOT_METAL->"Quench the hot metal first";default->menu.kind()==0?"Tanning, "+(int)Math.ceil((Tanning.TICKS-menu.data.get(2))/1200.0)+" min left":"Working";};
         g.drawString(font,state,leftPos+9,topPos+64,MachineUi.MUTED,false);
         if(menu.hasCoalFire()){g.drawString(font,"Coal",leftPos+17,topPos+76,MachineUi.INK,false);MachineUi.fire(g,leftPos+66,topPos+85,44,23,(menu.fireState()&1)!=0);}
         else g.drawString(font,menu.kind()==0?(menu.pit()>0?"Pit: "+menu.pit()+" hides steeping":"Pit: empty"):"Stay at the bench to work",leftPos+17,topPos+76,MachineUi.MUTED,false);

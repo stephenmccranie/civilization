@@ -53,6 +53,13 @@ public final class HotMetalGameTests {
         }
         return before - food.reserve().calories();
     }
+    /** The stack, `seconds` of cooling past the ideal moment to quench it: negative is hotter. */
+    private static ItemStack aged(ItemStack stack, long now, int seconds) {
+        stack.set(HotMetal.HOT.get(), now + HotMetal.COOL_TICKS - HotMetal.IDEAL_TICKS - seconds * 20L);
+        return stack;
+    }
+    /** Every unit's grade less `tenths`. */
+    private static List<Integer> less(List<Integer> grades, int tenths) { return grades.stream().map(grade -> grade - tenths).toList(); }
 
     @GameTest(template = "industrial") public static void theFoundryMakesRoughMetalAndKeepsItHot(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);
@@ -61,26 +68,30 @@ public final class HotMetalGameTests {
         FoundryGameTests.run(h, f, 3 * 200 + 40);
         long now = h.getLevel().getGameTime();
         var blooms = f.getItem(2);
-        h.assertTrue(blooms.is(KilnContent.IRON_BLOOM.get()) && blooms.getCount() == 3 && HotMetal.glowing(blooms, now) && Grade.of(blooms).units().size() > 1,
+        h.assertTrue(blooms.is(KilnContent.IRON_BLOOM.get()) && blooms.getCount() == 3 && HotMetal.workable(blooms, now) && Grade.of(blooms).units().size() > 1,
                 "Iron ore smelts into hot blooms that share one stack, each rolling its own grade");
         h.assertTrue(!f.canTakeItemThroughFace(2, blooms, Direction.DOWN), "Hoppers cannot take hot metal");
         long later = now + 10 * HotMetal.COOL_TICKS;
         HotMetal.tend(blooms, true, later);
-        h.assertTrue(HotMetal.glowing(blooms, later), "Metal in a hot furnace stays hot however long it waits");
+        h.assertTrue(HotMetal.age(blooms, later) < 20, "Metal in a hot furnace stays at full heat however long it waits");
+        var grades = GradeGameTests.grades(blooms);
+        HotMetal.tend(blooms, false, later + HotMetal.COOL_TICKS - 20);
+        h.assertTrue(HotMetal.hot(blooms, later + HotMetal.COOL_TICKS - 20) && GradeGameTests.grades(blooms).equals(grades), "Out of the fire it is still hot just under a minute later");
         HotMetal.tend(blooms, false, later + HotMetal.COOL_TICKS);
         h.assertTrue(!blooms.has(HotMetal.HOT.get()) && Grade.stacks(blooms, new ItemStack(KilnContent.IRON_BLOOM.get())), "Out of the fire it cools a minute later and stacks with cold metal");
+        h.assertTrue(GradeGameTests.grades(blooms).equals(less(grades, 100)), "Cooling in air costs every unit the full ten points: " + grades + " to " + GradeGameTests.grades(blooms));
         h.succeed();
     }
 
     @GameTest(template = "industrial") public static void aHeatTakesTheWholeLoad(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);
         f.setItem(1, KilnContent.MINERAL_COAL.toStack(16));
-        GradeGameTests.select(f, "heat_iron_ingot");
+        GradeGameTests.select(f, Items.IRON_INGOT);
         f.setItem(0, GradeGameTests.ingots(1100, 1000, 950, 900, 850, 800, 750, 700, 650, 600));
         FoundryGameTests.run(h, f, 400 + 40);
         long now = h.getLevel().getGameTime();
         var load = f.getItem(2);
-        h.assertTrue(load.is(Items.IRON_INGOT) && HotMetal.glowing(load, now) && GradeGameTests.grades(load).equals(List.of(1100, 1000, 950, 900, 850, 800, 750, 700)),
+        h.assertTrue(load.is(Items.IRON_INGOT) && HotMetal.workable(load, now) && GradeGameTests.grades(load).equals(List.of(1100, 1000, 950, 900, 850, 800, 750, 700)),
                 "One heat takes a whole load of eight, hot, each keeping its grade: " + GradeGameTests.grades(load));
         h.assertTrue(GradeGameTests.grades(f.getItem(0)).equals(List.of(650, 600)), "The rest wait for the next heat");
         h.assertTrue(!Grade.stacks(load, new ItemStack(Items.IRON_INGOT)), "Hot metal stays apart from cold");
@@ -111,12 +122,15 @@ public final class HotMetalGameTests {
         long now = level.getGameTime();
         h.assertTrue(bars.is(Items.IRON_INGOT) && bars.getCount() == 3 && grades.get(0) > 900 && grades.get(1) > 800 && grades.get(2) > 700,
                 "Five blows on an iron anvil beat the whole stack of blooms into ingots, each a grade step up: " + grades);
-        h.assertTrue(HotMetal.hot(bars, now) && !HotMetal.glowing(bars, now), "A hammering spends the working heat and leaves the bars to cool");
+        h.assertTrue(HotMetal.hot(bars, now) && !HotMetal.workable(bars, now), "A hammering spends the working heat and leaves the bars to cool");
         h.assertTrue(spent >= .8 * HotMetal.ANVIL_BLOWS * blow - 1e-6 && spent <= HotMetal.ANVIL_BLOWS * blow + 1e-6, "Every blow is paid labor for each unit: " + spent + " kcal");
-        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal too cool to glow can't be hammered again");
+        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal below working heat can't be hammered again");
         var cauldron = station(h, 4, Blocks.WATER_CAULDRON);
+        int loss = HotMetal.loss(HotMetal.age(player.getMainHandItem(), now));
         h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()) && Grade.stacks(player.getMainHandItem(), new ItemStack(Items.IRON_INGOT)),
                 "Water quenches the bars at once");
+        h.assertTrue(loss > 0 && GradeGameTests.grades(player.getMainHandItem()).equals(less(grades, loss)),
+                "Quenching straight off the anvil, before cherry red, costs every unit the same: " + grades + " to " + GradeGameTests.grades(player.getMainHandItem()));
         var stone = station(h, 6, KilnContent.STONE_ANVIL.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.units(KilnContent.BLISTER_STEEL.get(), 800), level.getGameTime()));
         work(h, player, stone, HotMetal.STONE_ANVIL_BLOWS - 1);
@@ -153,5 +167,74 @@ public final class HotMetalGameTests {
         item.setDeltaMovement(Vec3.ZERO);
         level.addFreshEntity(item);
         h.succeedWhen(() -> h.assertTrue(!item.getItem().has(HotMetal.HOT.get()), "Hot metal dropped into water cools at once"));
+    }
+
+    @GameTest(template = "industrial") public static void quenchingCostsGradeByDistanceFromCherryRed(GameTestHelper h) {
+        var cauldron = station(h, 2, Blocks.WATER_CAULDRON);
+        var player = smith(h, cauldron);
+        long now = h.getLevel().getGameTime();
+        var grades = List.of(900, 800, 700);
+        for (int seconds : new int[] {0, -2, 2, -10, 10}) {
+            player.setItemInHand(InteractionHand.MAIN_HAND, aged(GradeGameTests.units(Items.IRON_INGOT, 900, 800, 700), now, seconds));
+            h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()), "Water quenches the bars");
+            var after = GradeGameTests.grades(player.getMainHandItem());
+            int lost = grades.getFirst() - after.getFirst();
+            h.assertTrue(after.equals(less(grades, lost)), "Every unit loses the same: " + after);
+            h.assertTrue(seconds == 0 ? lost == 0 : Math.abs(seconds) == 2 ? lost > 0 && lost < 10 : lost > 70,
+                    "Quenching " + seconds + " s from cherry red costs " + lost / 10.0 + " points");
+        }
+        h.assertTrue(HotMetal.loss(HotMetal.COOL_TICKS) == 100, "Metal cooled in air has lost the full ten points");
+        player.setItemInHand(InteractionHand.MAIN_HAND, GradeGameTests.units(Items.IRON_INGOT, 900, 800));
+        h.assertTrue(!click(player, cauldron).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(List.of(900, 800)), "Cold metal takes nothing from water");
+        h.succeed();
+    }
+
+    @GameTest(template = "industrial") public static void aFoundrySettlesMetalThatCooledBeforeItCameIn(GameTestHelper h) {
+        var f = FoundryGameTests.build(h, Direction.NORTH);
+        var ingots = GradeGameTests.units(Items.IRON_INGOT, 900, 800);
+        ingots.set(HotMetal.HOT.get(), h.getLevel().getGameTime() - 1);
+        f.setItem(0, ingots);
+        h.succeedWhen(() -> h.assertTrue(!f.getItem(0).has(HotMetal.HOT.get()) && GradeGameTests.grades(f.getItem(0)).equals(List.of(800, 700)),
+                "Metal that cooled in air before reaching the Foundry takes its loss before any reheat"));
+    }
+
+    @GameTest(template = "industrial") public static void metalCooledInAirLosesTheFullTenOnce(GameTestHelper h) {
+        var level = h.getLevel();
+        long now = level.getGameTime();
+        var held = GradeGameTests.units(Items.IRON_INGOT, 900, 800);
+        held.set(HotMetal.HOT.get(), now - 1);
+        HotMetal.cool(held, now);
+        h.assertTrue(!held.has(HotMetal.HOT.get()) && GradeGameTests.grades(held).equals(List.of(800, 700)), "Metal gone cold in air loses ten points from every unit");
+        HotMetal.cool(held, now + HotMetal.COOL_TICKS);
+        HotMetal.heated(held, now);
+        HotMetal.quench(aged(held, now, 0), now);
+        h.assertTrue(GradeGameTests.grades(held).equals(List.of(800, 700)), "It loses them once, and a good reheat and quench does not restore them");
+        var smithy = WorkshopGameTests.build(h, 2, Direction.NORTH);
+        var plate = ManufacturingGameTests.job(2, ManufacturingContent.part("iron", "plate"));
+        ManufacturingGameTests.supply(smithy, plate);
+        smithy.setItem(4, KilnContent.MINERAL_COAL.toStack(4));
+        int slot = 0;
+        while (!smithy.getItem(slot).is(Items.IRON_INGOT)) slot++;
+        int count = smithy.getItem(slot).getCount();
+        var ingots = new ItemStack(Items.IRON_INGOT, count);
+        Grade.assign(ingots, 900);
+        smithy.setItem(slot, HotMetal.heated(ingots, now));
+        WorkshopGameTests.run(smithy, 10);
+        h.assertTrue(smithy.status == MachineStatus.Workshop.HOT_METAL && smithy.getItem(slot).getCount() == count && smithy.getItem(5).isEmpty(),
+                "A Smithy works no hot metal");
+        smithy.getItem(slot).set(HotMetal.HOT.get(), now - 1);
+        WorkshopGameTests.run(smithy, plate.ticks());
+        h.assertTrue(smithy.getItem(5).getCount() == plate.output().getCount() && Grade.value(smithy.getItem(5)) == 800,
+                "Metal that cooled in the Smithy takes its loss before it is worked: " + Grade.value(smithy.getItem(5)));
+        var floor = h.absolutePos(new BlockPos(1, 1, 1));
+        level.setBlockAndUpdate(floor.below(), Blocks.STONE.defaultBlockState());
+        var dropped = GradeGameTests.units(Items.COPPER_INGOT, 900);
+        dropped.set(HotMetal.HOT.get(), now + 20);
+        var item = new ItemEntity(level, floor.getX() + .5, floor.getY() + .1, floor.getZ() + .5, dropped);
+        item.setDeltaMovement(Vec3.ZERO);
+        item.setNeverPickUp();
+        level.addFreshEntity(item);
+        h.succeedWhen(() -> h.assertTrue(!item.getItem().has(HotMetal.HOT.get()) && GradeGameTests.grades(item.getItem()).equals(List.of(800)),
+                "Metal left on the ground settles once cold, ten points down"));
     }
 }

@@ -19,14 +19,12 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     @Inject(method="moveItemStackTo",at=@At("HEAD"),cancellable=true)
     private void civilization$shift(ItemStack stack,int from,int to,boolean reverse,CallbackInfoReturnable<Boolean> result){
         var menu=(AbstractContainerMenu)(Object)this;
-        if(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack)){
+        if(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack))
             for(int i=from;i<to;i++)if(menu.slots.get(i).container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
                 result.setReturnValue(BlockCarry.insert(inv,stack)>0);return;
             }
-            return;
-        }
-        // Ordinary goods fill the pockets, hotbar first, before the worn pack shown beside them, as pickups do. The Hand
-        // among the pockets is for building blocks.
+        // Ordinary goods, and in Creative everything, fill the pockets, hotbar first, before the worn pack shown beside
+        // them, as pickups do. The Hand among the pockets is filled only by the carrying route above.
         int hand=-1,pack=to;
         for(int i=from;i<to;i++){
             var slot=menu.slots.get(i);

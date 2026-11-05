@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -39,32 +40,57 @@ public class KilnGameTests {
         h.assertTrue(restored.canPlaceItemThroughFace(4,new ItemStack(Items.SAND),Direction.UP)&&restored.canTakeItemThroughFace(5,new ItemStack(Items.BRICK),Direction.DOWN),"Hoppers access both banks");h.succeed();
     }
     @GameTest(template="industrial")
-    public static void selectedClayRecipeControlsProductionAndSurvivesReload(GameTestHelper h) {
+    public static void selectedClayOutputControlsProductionAndSurvivesReload(GameTestHelper h) {
         var k=kiln(h);
         var player=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"kiln-selection"));
         player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(k.getBlockPos()));
         var menu=(KilnMenu)k.createMenu(0,player.getInventory(),player);
-        int bricks=-1,terracotta=-1;
-        for(int i=0;i<menu.recipes.size();i++){
-            var result=menu.recipes.get(i).value().getResultItem(h.getLevel().registryAccess());
-            if(result.is(Items.BRICK))bricks=i;
-            if(result.is(Items.TERRACOTTA))terracotta=i;
-        }
-        h.assertTrue(bricks>=0&&terracotta>=0,"Both clay recipes exist");
+        int bricks=menu.outputs.indexOf(BuiltInRegistries.ITEM.getKey(Items.BRICK)),terracotta=menu.outputs.indexOf(BuiltInRegistries.ITEM.getKey(Items.TERRACOTTA));
+        h.assertTrue(bricks>=0&&terracotta>=0,"Both clay outputs have their own row");
+        h.assertTrue(menu.outputs.size()==new java.util.HashSet<>(menu.outputs).size(),"The drawer lists each output once");
         k.setItem(0,new ItemStack(Items.CLAY,3));k.setItem(1,KilnContent.MINERAL_COAL.toStack(8));
         h.assertTrue(menu.clickMenuButton(player,terracotta),"Select terracotta through menu");
         ticks(h,k,50);
+        h.assertTrue(menu.getBurnProgress()>0,"Terracotta is under way");
         h.assertTrue(menu.clickMenuButton(player,bricks),"Switch an active batch to bricks");
+        h.assertTrue(menu.getBurnProgress()==0&&k.getItem(0).getCount()==3&&k.getItem(2).isEmpty(),"Switching resets the batch without consuming clay");
         var saved=k.saveWithFullMetadata(h.getLevel().registryAccess());
         var restored=new KilnBlockEntity(k.getBlockPos(),k.getBlockState());restored.setLevel(h.getLevel());
         restored.loadWithComponents(saved,h.getLevel().registryAccess());h.getLevel().setBlockEntity(restored);
         h.assertTrue(restored.selection()==bricks,"Selection persists");
         ticks(h,restored,200);
         h.assertTrue(restored.getItem(2).is(Items.BRICK)&&restored.getItem(2).getCount()==4,"Selected clay batch makes four bricks, never terracotta");
-        restored.removeItem(2,64);restored.selectRecipe(terracotta);ticks(h,restored,200);
+        restored.removeItem(2,64);restored.select(terracotta);ticks(h,restored,200);
         h.assertTrue(restored.getItem(2).is(Items.TERRACOTTA),"Terracotta is still explicitly available");
-        restored.removeItem(2,64);restored.selectRecipe(-1);ticks(h,restored,200);
+        restored.removeItem(2,64);restored.select(-1);ticks(h,restored,200);
         h.assertTrue(restored.getItem(2).is(Items.BRICK),"Automatic clay deterministically defaults to bricks");
+        h.succeed();
+    }
+    /** Iron Bloom is one output made from ore, raw iron or a reheated bloom: selecting it runs whichever is loaded, one recipe per batch. */
+    @GameTest(template="industrial")
+    public static void aSelectedOutputRunsFromAnyOfItsInputs(GameTestHelper h) {
+        var f=FoundryGameTests.build(h,Direction.NORTH);var bloom=KilnContent.IRON_BLOOM.get();
+        var player=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"foundry-selection"));
+        player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(f.getBlockPos()));
+        var menu=(KilnMenu)f.createMenu(0,player.getInventory(),player);
+        int blooms=menu.outputs.indexOf(BuiltInRegistries.ITEM.getKey(bloom));
+        h.assertTrue(blooms>=0&&KilnBlockEntity.candidates(menu.recipes,menu.outputs.get(blooms),h.getLevel().registryAccess()).size()>=4,"Iron Bloom is one row for ore, raw iron and a heat");
+        h.assertTrue(menu.outputs.size()==new java.util.HashSet<>(menu.outputs).size()&&menu.outputs.size()<menu.recipes.size(),"The drawer lists each output once");
+        h.assertTrue(menu.clickMenuButton(player,blooms),"Select Iron Bloom through the menu");
+        f.setItem(0,new ItemStack(Items.RAW_IRON));f.setItem(4,new ItemStack(Items.IRON_ORE));f.setItem(1,KilnContent.MINERAL_COAL.toStack(16));
+        FoundryGameTests.run(h,f,210);
+        h.assertTrue(f.getItem(2).is(bloom)&&f.getItem(2).getCount()==1&&MachineInventory.count(f,MachineInventory.KILN_INPUT)==1&&f.getItem(0).is(Items.IRON_ORE),"Raw iron makes one bloom; the ore is next, unconsumed");
+        FoundryGameTests.run(h,f,210);
+        h.assertTrue(f.getItem(2).getCount()==2&&f.getItem(0).isEmpty(),"Iron ore makes the next bloom under the same selection");
+        var restored=new FoundryBlockEntity(f.getBlockPos(),f.getBlockState());restored.setLevel(h.getLevel());
+        restored.loadWithComponents(f.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.getLevel().setBlockEntity(restored);
+        h.assertTrue(restored.selection()==blooms,"The selected output persists");
+        restored.setItem(2,ItemStack.EMPTY);restored.setItem(0,new ItemStack(Items.IRON_INGOT,2));FoundryGameTests.run(h,restored,840);
+        h.assertTrue(restored.getItem(2).isEmpty()&&restored.getItem(0).getCount()==2,"Iron ingots make no bloom, so they wait under Iron Bloom");
+        GradeGameTests.select(restored,Items.IRON_INGOT);FoundryGameTests.run(h,restored,440);
+        h.assertTrue(restored.getItem(2).is(Items.IRON_INGOT)&&restored.getItem(2).getCount()==2&&restored.getItem(0).isEmpty(),"Heat Iron Ingot heats the ingots");
+        restored.setItem(2,ItemStack.EMPTY);restored.setItem(0,new ItemStack(Items.IRON_INGOT));GradeGameTests.select(restored,KilnContent.BLISTER_STEEL.get());FoundryGameTests.run(h,restored,840);
+        h.assertTrue(restored.getItem(2).is(KilnContent.BLISTER_STEEL.get())&&restored.getItem(2).getCount()==1,"Blister Steel turns the same ingot into steel");
         h.succeed();
     }
     /** Hoppers reach the controller through the machine's cells: ingredients from above its top, coal from its side. */

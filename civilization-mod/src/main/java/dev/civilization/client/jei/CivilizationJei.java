@@ -57,7 +57,7 @@ public final class CivilizationJei implements IModPlugin {
         r.addGlobalGuiHandler(new mezz.jei.api.gui.handlers.IGlobalGuiHandler(){
             public Collection<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(){
                 var mc=Minecraft.getInstance();
-                if(mc.player==null||!BlockCarry.restricted(mc.player)||!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
+                if(!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
                 var areas=new java.util.ArrayList<net.minecraft.client.renderer.Rect2i>();
                 for(var slot:screen.getMenu().slots)if(slot instanceof BlockCarry.HandSlot)
                     areas.add(dev.civilization.client.MachineUi.handBounds(screen,slot));
@@ -132,7 +132,7 @@ public final class CivilizationJei implements IModPlugin {
             add(r,new String[]{"tannery","textile","smithy","assembly"}[kind],recipes);
         }
         industry(r);anvil(r);cutting(r);
-        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; place it and build the furnace from it with 3 stone and 20 brick blocks, no metal. Smelt iron, copper and gold ore here into rough metal, hammer it into ingots at an anvil while it glows, and reheat ingots here to refine them. The first anvil is a Stone Anvil. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
+        r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; place it and build the furnace from it with 3 stone and 20 brick blocks, no metal. Smelt iron, copper and gold ore here into rough metal, hammer it into ingots at an anvil while it glows white-yellow to orange, quench it in water at bright cherry red, and reheat ingots here to refine them. The first anvil is a Stone Anvil. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
         r.addItemStackInfo(KilnContent.RETORT_ITEM.toStack(),Component.literal("Fertilizer: refinery sulfur and gravel make Sulfur Blend, fired here into Mineral Fertilizer. Its controller is four brick blocks and four iron ingots around cobblestone; place it and build the works from it with 4 stone, 17 brick blocks, 6 planks and 8 steel plates."));
         r.addItemStackInfo(KilnContent.MINERAL_COAL.toStack(),Component.literal("Coal machines require manual ignition and keep burning while idle. Consumption depends on work, idle time and temperature; JEI shows baseline processing times, not a fixed Coal charge per recipe."));
     }
@@ -140,8 +140,8 @@ public final class CivilizationJei implements IModPlugin {
         var level=Minecraft.getInstance().level;
         var recipes=level.getRecipeManager().getAllRecipesFor(recipeType).stream().sorted(Comparator.comparing(h->h.id().toString())).map(h->{
             var recipe=h.value();var output=recipe.getResultItem(level.registryAccess()).copy();
-            String note=recipe.getIngredients().getFirst().test(output)?"Heats a load of up to "+HotMetal.LOAD+" for the same Coal. Hammer it at an anvil while it glows.":"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire."
-                    +(output.getItem() instanceof dev.civilization.RoughMetal?" Comes out hot: hammer it into an ingot at an anvil while it glows.":"");
+            String note=recipe.getIngredients().getFirst().test(output)?"Heats a load of up to "+HotMetal.LOAD+" for the same Coal. Hammer it at an anvil while it glows white-yellow to orange.":"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire."
+                    +(output.getItem() instanceof dev.civilization.RoughMetal?" Comes out hot: hammer it into an ingot at an anvil while it glows white-yellow to orange.":"");
             return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,output),coal()),recipe.getCookingTime(),note);
         }).toList();add(r,name,recipes);
     }
@@ -168,12 +168,12 @@ public final class CivilizationJei implements IModPlugin {
     private void anvil(IRecipeRegistration r){
         var anvils=new Slot(RecipeIngredientRole.CATALYST,List.of(KilnContent.STONE_ANVIL_ITEM.toStack(),new ItemStack(Items.ANVIL)),FluidStack.EMPTY,
                 "Any anvil: "+HotMetal.ANVIL_BLOWS+" blows on iron, "+HotMetal.STONE_ANVIL_BLOWS+" on stone.");
-        String labor=" Hold use with the stack in hand: a heavy blow a second, each paid in food for every unit. Every hammering raises each unit one random grade step and leaves it to cool.";
+        String labor=" Hold use with the stack in hand: a heavy blow a second, each paid in food for every unit. Every hammering raises each unit one random grade step and leaves it to cool: quench it in water at bright cherry red, as further off costs grade.";
         var work=new ArrayList<Process>();
         for(var rough:KilnContent.ROUGH_METALS){
             var ingot=rough.get().ingot();
-            work.add(process("anvil/"+rough.getId().getPath(),List.of(input(rough.get(),1),anvils,output(ingot,1)),HotMetal.ANVIL_BLOWS*20,"Hammer it into its ingot while it glows, within 40 s of leaving the Foundry."+labor));
-            work.add(process("anvil/"+BuiltInRegistries.ITEM.getKey(ingot).getPath(),List.of(input(ingot,1),anvils,output(ingot,1)),HotMetal.ANVIL_BLOWS*20,"Refining: heat it at the Foundry, then hammer it while it glows."+labor));
+            work.add(process("anvil/"+rough.getId().getPath(),List.of(input(rough.get(),1),anvils,output(ingot,1)),HotMetal.ANVIL_BLOWS*20,"Hammer it into its ingot while it glows white-yellow to orange."+labor));
+            work.add(process("anvil/"+BuiltInRegistries.ITEM.getKey(ingot).getPath(),List.of(input(ingot,1),anvils,output(ingot,1)),HotMetal.ANVIL_BLOWS*20,"Refining: heat it at the Foundry, then hammer it while it glows white-yellow to orange."+labor));
         }
         work.add(process("grindstone/diamond",List.of(input(Items.DIAMOND,1),new Slot(RecipeIngredientRole.CATALYST,List.of(new ItemStack(Items.GRINDSTONE)),FluidStack.EMPTY,""),output(Items.DIAMOND,1)),HotMetal.GRINDSTONE_STROKES*20,
                 "Cutting: hold use on a grindstone with diamonds in hand, a stroke a second, paid in food for every diamond; no heat or Coal. Every cutting raises each diamond one random grade step."));

@@ -59,7 +59,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         ModeledMachine.reconcile(this);return ModeledMachine.status(this);
     }
     public WorkshopJobs.Job job(){return MachineWork.job(this,kind,selected);}
-    public void select(int value){if(value< -1||value>=WorkshopJobs.jobs(kind).size()||value==selected)return;selected=value;progress=0;worker=null;workingResult=ItemStack.EMPTY;setChanged();}
+    public void select(int value){if(value< -1||value>=WorkshopJobs.outputs(kind).size()||value==selected)return;selected=value;progress=0;worker=null;workingResult=ItemStack.EMPTY;setChanged();}
     public void tick(){if(level!=null&&!level.isClientSide&&Math.floorMod(level.getGameTime()+worldPosition.asLong(),10)==0)process();}
     public void process(){
         if(level==null||level.isClientSide)return;
@@ -70,7 +70,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     private void processHandWork(){
         if(worker==null||!worker.isAlive()||worker.isSpectator()||!stillValid(worker)||!(worker.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this){worker=null;pause(MachineStatus.Workshop.HAND_READY,false);return;}
         if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState())){worker=null;pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
-        ensureInputIdentity();
+        if(settleInputs()){worker=null;pause(MachineStatus.Workshop.HOT_METAL,true);return;}
         var job=job();var match=MachineWork.match(this,job);
         if(match==null){worker=null;pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
@@ -130,8 +130,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(structure!=MachineStructure.COMPLETE){firePaused=structure==MachineStructure.UNLOADED;if(structure==MachineStructure.INCOMPLETE)fire.extinguish();pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         if(MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Workshop.WET,false);return;}
         if(!fire.hot()){pause(fire.lit()?MachineStatus.Workshop.WARMING:MachineStatus.Workshop.FIRE_UNLIT,false);return;}
-        ensureInputIdentity();
-        var job=job();if(job==null){pause(selected<0&&MachineWork.matches(this,kind).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
+        if(settleInputs()){pause(MachineStatus.Workshop.HOT_METAL,true);return;}
+        var job=job();if(job==null){pause(MachineWork.matches(this,kind,selected).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var match=MachineWork.match(this,job);if(match==null){pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
@@ -153,14 +153,21 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         EnergyLog.machine(level,worldPosition,"workshop_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
         level.playSound(null,worldPosition,kind==2?net.minecraft.sounds.SoundEvents.ANVIL_USE:net.minecraft.sounds.SoundEvents.WOOD_PLACE,net.minecraft.sounds.SoundSource.BLOCKS,.25f,1f);
     }
-    private void ensureInputIdentity(){
-        // Legacy/ungraded inputs acquire one stable identity before any repair/upgrade quotation.
+    /**
+     * Inputs settle before any quotation: legacy or ungraded equipment acquires one stable identity, and metal that has
+     * cooled in air takes its loss. Hot metal is not yet material; returns whether any input is still hot.
+     */
+    private boolean settleInputs(){
+        boolean hot=false;
         for(int i=0;i<4;i++){
             var input=items.get(i);
             boolean missing=EquipmentGrade.eligible(input)&&(!EquipmentGrade.hasGrade(input)||!input.has(EquipmentGrade.WEAR_SEED.get()));
             EquipmentGrade.ensure(input,level.random,level.registryAccess());
             if(missing)setChanged();
+            HotMetal.cool(input,level.getGameTime());
+            hot|=input.has(HotMetal.HOT.get());
         }
+        return hot;
     }
     private void pause(int state,boolean reset){status=state;if(reset&&progress!=0){progress=0;workingResult=ItemStack.EMPTY;setChanged();}working(false);}
     /** What the model's lit bones show: the fire burning, or the Tannery's pit holding a batch. */
@@ -170,8 +177,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->steeped()?steep:progress;case 3->status;case 4->fire.state();case 5->fire.heat();case 6->items.get(PIT_HIDES).getCount();default->0;};}
         public void set(int i,int v){}public int getCount(){return 7;}
     };
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);if(selected>=0)t.putString("jobId",WorkshopJobs.outputs(kind).get(selected));t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=WorkshopJobs.index(kind,t.getString("jobId"));progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0){progress=0;workingResult=ItemStack.EMPTY;}}
     /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=new CompoundTag();if(model()!=null)build.save(t,r);return t;}
     @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}

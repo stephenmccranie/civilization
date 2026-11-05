@@ -11,6 +11,8 @@ public final class KilnMenu extends AbstractContainerMenu implements CoalFireMen
     private final Container inventory;
     private final ContainerData data,states;
     public final List<RecipeHolder<? extends AbstractCookingRecipe>> recipes;
+    /** Each output once: the recipe drawer's rows, indexed by the synchronized selection. */
+    public final List<net.minecraft.resources.ResourceLocation> outputs;
     public KilnMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(6),new SimpleContainerData(4));}
     public KilnMenu(int id,Inventory inv,Container c,ContainerData d){this(KilnContent.MENU.get(),KilnContent.RECIPE_TYPE.get(),id,inv,c,d);}
     public static KilnMenu retort(int id,Inventory inv){return new KilnMenu(KilnContent.RETORT_MENU.get(),KilnContent.RETORT_RECIPE_TYPE.get(),id,inv,new SimpleContainer(6),new SimpleContainerData(4));}
@@ -19,6 +21,7 @@ public final class KilnMenu extends AbstractContainerMenu implements CoalFireMen
     public KilnMenu(MenuType<KilnMenu> type,RecipeType<? extends AbstractCookingRecipe> recipeType,int id,Inventory inv,Container c,ContainerData d){
         super(type,id);inventory=c;data=d;
         recipes=new ArrayList<>(inv.player.level().getRecipeManager().getAllRecipesFor(recipeType));recipes.sort(Comparator.comparing(r->r.id().toString()));
+        outputs=KilnBlockEntity.outputs(recipes,inv.player.level().registryAccess());
         addSlot(new Slot(c,0,17,43){@Override public boolean mayPlace(ItemStack s){return recipes.stream().anyMatch(r->r.value().getIngredients().getFirst().test(s));}});
         addSlot(new Slot(c,1,17,88){@Override public boolean mayPlace(ItemStack s){return KilnBlockEntity.acceptsFuel(s);}});
         addSlot(new FurnaceResultSlot(inv.player,c,2,125,43));
@@ -37,11 +40,12 @@ public final class KilnMenu extends AbstractContainerMenu implements CoalFireMen
     public int fireState(){return states.get(2);}
     public int heat(){return states.get(3);}
     public int selection(){return states.get(4);}
+    public net.minecraft.resources.ResourceLocation selectedOutput(){int s=selection();return s>=0&&s<outputs.size()?outputs.get(s):null;}
     @Override public boolean clickMenuButton(Player p,int id){
         if(!stillValid(p)||!(inventory instanceof KilnBlockEntity m))return false;
         if(id==CoalFire.BUTTON){boolean ok=m.fire.strike(p,m.checkStructure().status()==MachineStructure.COMPLETE);broadcastChanges();return ok;}
-        if(id < -1 || id >= recipes.size())return false;
-        m.selectRecipe(id);broadcastChanges();return true;
+        if(id < -1 || id >= outputs.size())return false;
+        m.select(id);broadcastChanges();return true;
     }
     public boolean isLit(){return (fireState()&1)!=0;}
     public float getLitProgress(){return data.get(0)/(float)Math.max(1,data.get(1));}

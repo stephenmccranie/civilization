@@ -37,7 +37,13 @@ public final class BlockCarry {
         var bundle=stack.get(net.minecraft.core.component.DataComponents.BUNDLE_CONTENTS);
         return bundle!=null&&!bundle.isEmpty();
     }
+    /** Under the carrying limits: Survival and Adventure. */
     public static boolean restricted(Player player){return !player.isCreative()&&!player.isSpectator();}
+    /**
+     * Menus show the Hand, and a worn pack's panel above it, to every player who can use them: all but a Spectator. The
+     * slot list is fixed when a menu opens, on server and client alike, so a later game-mode change applies on reopening.
+     */
+    public static boolean showsHand(Player player){return !player.isSpectator();}
     /** Into the hand, then on the server into the worn backpack. */
     public static int insert(Inventory inv,ItemStack offered){
         int n=hold(inv,offered);
@@ -74,7 +80,7 @@ public final class BlockCarry {
     }
     /** Expose the same hand slot in native chests, crafting and machine menus. */
     public static void attachMenu(AbstractContainerMenu menu,Inventory inv){
-        if(!restricted(inv.player))return;
+        if(!showsHand(inv.player))return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==OFFHAND)return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==0){
             ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new HandSlot(inv,slot.y));return;
