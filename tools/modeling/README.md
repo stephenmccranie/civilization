@@ -26,7 +26,7 @@ python tools/modeling/mcp.py call capture_screenshot --out .tools/modeling/view
 python tools/modeling/mcp.py call place_cube .tools/modeling/cube-arguments.json
 ```
 
-Read returned tool schemas before using a new operation. `--out` saves responses and extracted images; console output omits image bytes. The client handles initialisation, sessions, JSON/SSE and tool errors.
+Read returned tool schemas before using a new operation. `--out` saves responses and extracted images; console output omits image bytes. The client handles initialisation, sessions, JSON/SSE and tool errors. Projects a client creates close unsaved when it closes, so recipes, reviews and exports leave no tabs behind; projects opened any other way stay open.
 
 ## Asset records and commands
 

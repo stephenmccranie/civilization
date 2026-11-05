@@ -19,6 +19,7 @@ Make Civilization art in three stages: **Define → Build and refine → Verify 
 - Build the detail: real depth for frames, doors, hinges, latches and supports; fitted face islands with seams, fastener seats and purposeful wear; quiet areas between details. Reused material tiles are a base layer, not a finished surface. No generic noise, decorative machinery or overlapping surfaces.
 - Keep one current comparison sheet of target and actual asset at matching angle and scale. Fix the visible cause — shape, missing functional detail, UV placement or material — and ask what became flatter, smoother or disappeared.
 - Preserve manual edits and unrelated editor tabs.
+- Leave Blockbench as you found it. The `tools/modeling` scripts close the tabs they create; any project you open or create directly through MCP is saved to the asset's source if it holds work, otherwise closed, before the task ends. Check `ModelProject.all` for leftovers, and quit an editor you started once no art work is pending.
 
 ## Verify and publish
 
