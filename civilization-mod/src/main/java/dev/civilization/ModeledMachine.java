@@ -47,6 +47,8 @@ public final class ModeledMachine {
         for(int part=0;part<c.model().sections.size();part++)if(!c.build().has(part)&&c.model().section(part).accepts(held))return true;
         return false;
     }
+    /** The stack a right-click builds this machine from; see {@link MachineConstruction#material}. */
+    public static ItemStack material(ModeledController c,Player player,ItemStack held){return MachineConstruction.material(player,held,s->accepts(c,s));}
     private static boolean fail(Player p,String reason){p.displayClientMessage(Component.literal(reason),true);return false;}
     /** Development fixtures only: a creative player builds every section from the section's own sample stack. */
     public static boolean assemble(ModeledController c,Player creative){

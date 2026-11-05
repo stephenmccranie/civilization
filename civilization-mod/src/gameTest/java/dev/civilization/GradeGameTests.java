@@ -66,6 +66,12 @@ public final class GradeGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "industrial") public static void noCraftingRecipeMakesGradedMaterial(GameTestHelper h) {
+        // Graded metal and diamonds come only from the Foundry, the Smithy and their tools, so storage blocks and nuggets are one-way.
+        for (var holder : h.getLevel().getRecipeManager().getAllRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING))
+            h.assertTrue(!Grade.graded(holder.value().getResultItem(h.getLevel().registryAccess())), "No crafting recipe makes graded material: " + holder.id());
+        h.succeed();
+    }
     @GameTest(template = "industrial") public static void freshRollsAndRandomRefinement(GameTestHelper h) {
         var random = net.minecraft.util.RandomSource.create(987654321L);
         int low = 0, high = 0; long total = 0;
@@ -178,6 +184,12 @@ public final class GradeGameTests {
         var full = hopper(h, new BlockPos(9, 1, 9), new ItemStack(Items.DIRT), new ItemStack(Items.STONE), new ItemStack(Items.SAND), new ItemStack(Items.GRAVEL), new ItemStack(Items.COBBLESTONE));
         tick(h, full);
         h.assertTrue(grades(smithy.getItem(5)).equals(List.of(1000, 900, 800)), "A unit a hopper cannot take stays in the machine as itself");
+        var sourcePos = h.absolutePos(new BlockPos(5, 2, 9)); h.getLevel().setBlockAndUpdate(sourcePos, Blocks.CHEST.defaultBlockState());
+        var source = (ChestBlockEntity)h.getLevel().getBlockEntity(sourcePos); source.setItem(0, ingots(820, 820, 760, 760));
+        h.assertTrue(grades(new net.neoforged.neoforge.items.wrapper.InvWrapper(source).extractItem(0, 1, true)).equals(List.of(820)), "A simulated extraction names the top unit a real one takes");
+        var puller = hopper(h, new BlockPos(5, 1, 9), ingots(760)); tick(h, puller);
+        h.assertTrue(grades(puller.getItem(0)).equals(List.of(820, 760)) && grades(source.getItem(0)).equals(List.of(820, 760, 760)) && puller.getItem(1).isEmpty(),
+                "A hopper pulls the chest's top unit and joins it onto its own differing stack");
         h.succeed();
     }
 }

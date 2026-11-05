@@ -34,8 +34,9 @@ public class KilnBlock extends AbstractFurnaceBlock implements ModeledBlock {
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
         var modeled = ModeledMachine.of(level.getBlockEntity(pos));
         if (modeled != null) {
-            if (!ModeledMachine.accepts(modeled, stack)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            if (!level.isClientSide) ModeledMachine.build(modeled, player, stack);
+            var held = ModeledMachine.material(modeled, player, stack);
+            if (held.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (!level.isClientSide) ModeledMachine.build(modeled, player, held);
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
         return MachineConstruction.useOn(stack, state, level, pos, player);

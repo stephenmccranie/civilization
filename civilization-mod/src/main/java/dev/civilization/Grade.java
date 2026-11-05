@@ -120,6 +120,8 @@ public record Grade(List<Integer> units) {
         else set(stack, units.subList(taken, units.size()));
         return part;
     }
+    /** Cuts the stack to its top `n` units, the ones a split would hand out. */
+    public static void keepTop(ItemStack stack, int n) { set(stack, top(stack, n)); }
     /** Makes `units` exactly the stack's units, its count included. */
     private static void set(ItemStack stack, List<Integer> units) {
         put(stack, new Grade(units));

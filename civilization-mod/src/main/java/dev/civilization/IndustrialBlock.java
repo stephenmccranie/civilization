@@ -34,8 +34,9 @@ public final class IndustrialBlock extends Block implements EntityBlock, Modeled
             return ItemInteractionResult.sidedSuccess(l.isClientSide);
         }
         var modeled=ModeledMachine.of(l.getBlockEntity(pos));
-        if(modeled!=null&&ModeledMachine.accepts(modeled,stack)){
-            if(!l.isClientSide)ModeledMachine.build(modeled,p,stack);
+        var held=modeled==null?ItemStack.EMPTY:ModeledMachine.material(modeled,p,stack);
+        if(!held.isEmpty()){
+            if(!l.isClientSide)ModeledMachine.build(modeled,p,held);
             return ItemInteractionResult.sidedSuccess(l.isClientSide);
         }
         return MachineConstruction.useOn(stack,state,l,pos,p);

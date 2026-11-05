@@ -1,5 +1,7 @@
 package dev.civilization.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.civilization.Grade;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -30,5 +32,11 @@ public abstract class GradeInvWrapperMixin {
             getInv().setChanged();
         }
         left.setReturnValue(rest.isEmpty() ? ItemStack.EMPTY : rest);
+    }
+    // A simulated extraction names the units a real one would take: the top ones, not the worst a resize keeps.
+    @WrapOperation(method = "extractItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;setCount(I)V"))
+    private void civilization$top(ItemStack copy, int count, Operation<Void> original) {
+        if (Grade.graded(copy)) Grade.keepTop(copy, count);
+        else original.call(copy, count);
     }
 }

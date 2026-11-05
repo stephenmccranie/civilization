@@ -47,7 +47,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     @Override public boolean working(){return getBlockState().getValue(MachineFeedback.WORKING);}
     @Override public void sectionsChanged(){status=MachineStatus.Workshop.INCOMPLETE;}
     /** A forge built as a native model checks its sections; the other workshops check their block structures. */
-    private int structure(){
+    int structure(){
         if(model()==null)return MachineStructure.check(level,worldPosition,front()).status();
         ModeledMachine.reconcile(this);return ModeledMachine.status(this);
     }

@@ -156,17 +156,24 @@ public final class HotMetal {
     }
 
     /**
-     * One blow or stroke on the stack in hand, paid for each of its units. Paid labor counts on across pauses and
-     * toward whatever is worked next, and the work is done once it covers every blow on every unit in hand.
+     * One blow or stroke on the stack in hand, paid for each of its units at the smith's comfort, as bench work is; a
+     * smith who cannot pay is refused. Paid labor counts on across pauses and toward whatever is worked next, and the
+     * work is done once it covers every blow on every unit in hand.
      */
     static void strike(ServerPlayer player, BlockPos station, ItemStack stack, int blows) {
         if (player.getCooldowns().isOnCooldown(stack.getItem())) return;
         var level = player.serverLevel();
         boolean metal = stack.has(HOT.get());
         int units = stack.getCount(), work = WORK.getOrDefault(player.getUUID(), 0) + units;
+        var food = CalorieFoodData.of(player);
+        double labor = units * CalorieConfig.BLOW.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player));
+        if (CalorieFoodData.active(player) && (food.isDepleted() || !food.reserve().canAfford(labor))) {
+            player.displayClientMessage(Component.translatable("message.civilization.needs_food", stack.getHoverName()), true);
+            return;
+        }
         player.getCooldowns().addCooldown(stack.getItem(), STRIKE_TICKS);
         player.swing(InteractionHand.MAIN_HAND, true);
-        CalorieFoodData.of(player).spendOther(player, units * CalorieConfig.BLOW.get(), metal ? "anvil_strike" : "grindstone_cut", station.toShortString());
+        food.spendOther(player, labor, metal ? "anvil_strike" : "grindstone_cut", station.toShortString());
         double x = station.getX() + .5, y = station.getY() + 1.05, z = station.getZ() + .5;
         if (metal) {
             level.playSound(null, station, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, .7f, .75f + level.random.nextFloat() * .15f);
