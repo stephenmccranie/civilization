@@ -27,9 +27,13 @@ public class KilnBlock extends AbstractFurnaceBlock implements ModeledBlock {
     @Override protected MapCodec<? extends KilnBlock> codec() { return CODEC; }
     /** The Kiln is built as a native model; machines sharing this block keep block structures until theirs are drawn. */
     @Override public MachineModel model() { return MachineModel.KILN; }
-    /** A native model fills only part of its controller's cell, so the controller hides none of its neighbours' faces. */
+    /** A native model fills only part of its controller's cell, so the controller hides none of its neighbours' faces
+     *  and, like the model's other cells, passes light through undimmed. */
     @Override protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
         return model() != null ? net.minecraft.world.phys.shapes.Shapes.empty() : super.getOcclusionShape(state, level, pos);
+    }
+    @Override protected boolean propagatesSkylightDown(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
+        return model() != null || super.propagatesSkylightDown(state, level, pos);
     }
     @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
         var modeled = ModeledMachine.of(level.getBlockEntity(pos));
