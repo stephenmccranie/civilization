@@ -60,11 +60,18 @@ public final class MachineConstruction {
 
     public static ItemInteractionResult useOn(ItemStack stack, BlockState state, Level level, BlockPos controller, Player player) {
         var parts = MachineStructure.guideParts(state);
-        if (parts.isEmpty() || !hasMissing(level, controller, state.getValue(CivicBlock.FACING), parts, stack))
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if (level instanceof ServerLevel server)
-            build(server, controller, state.getValue(CivicBlock.FACING), parts, player, stack);
+        var front = state.getValue(CivicBlock.FACING);
+        var held = parts.isEmpty() ? ItemStack.EMPTY : material(player, stack, s -> hasMissing(level, controller, front, parts, s));
+        if (held.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level instanceof ServerLevel server) build(server, controller, front, parts, player, held);
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /** The stack a right-click builds from: the clicking hand's if the machine takes it, else the offhand's, where carried building material rides. */
+    public static ItemStack material(Player player, ItemStack held, java.util.function.Predicate<ItemStack> takes) {
+        if (takes.test(held)) return held;
+        var carried = player.getOffhandItem();
+        return takes.test(carried) ? carried : ItemStack.EMPTY;
     }
 
     public static boolean hasMissing(Level level, BlockPos controller, Direction front, List<MachineStructure.Part> parts, ItemStack stack) {

@@ -53,10 +53,11 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
         if(c!=null&&!l.isClientSide&&CivicAccess.allowed(l,p,player)&&CivicAccess.allowed(l,c.entity().getBlockPos(),player)&&c instanceof net.minecraft.world.MenuProvider menu)player.openMenu(menu);
         return InteractionResult.sidedSuccess(l.isClientSide);
     }
-    /** Held construction materials build from any cell, as from the controller. */
+    /** Construction materials in either hand build from any cell, as from the controller. */
     @Override protected ItemInteractionResult useItemOn(ItemStack stack,BlockState s,Level l,BlockPos p,Player player,InteractionHand hand,BlockHitResult hit){
-        var c=owner(l,p,s);if(c==null||!ModeledMachine.accepts(c,stack))return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if(!l.isClientSide)ModeledMachine.build(c,player,stack);
+        var c=owner(l,p,s);var held=c==null?ItemStack.EMPTY:ModeledMachine.material(c,player,stack);
+        if(held.isEmpty())return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if(!l.isClientSide)ModeledMachine.build(c,player,held);
         return ItemInteractionResult.sidedSuccess(l.isClientSide);
     }
     /** Hoppers reach the controller through any cell, with the face they touch: from above, the side or below, never across a claim boundary between that cell and the controller. */

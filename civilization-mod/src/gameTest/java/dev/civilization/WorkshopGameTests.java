@@ -270,12 +270,12 @@ public final class WorkshopGameTests {
         l.destroyBlock(top,false);
         w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));w.setItem(0,new ItemStack(Items.IRON_INGOT,3));w.setItem(4,KilnContent.MINERAL_COAL.toStack());w.process();
         h.assertTrue(w.status==MachineStatus.Workshop.INCOMPLETE&&w.getItem(4).getCount()==1,"Without its chimney the forge stops and spends no coal");
-        // A survival smith rebuilds it from the controller with the chimney's four bricks in hand.
+        // A survival smith rebuilds it from the controller with an empty main hand and the chimney's four bricks carried in the offhand.
         var pos=w.getBlockPos();var smith=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"smith"));
         smith.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);smith.setPos(pos.getX()+.5,pos.getY(),pos.getZ()-2.5);
-        var bricks=new ItemStack(Items.BRICKS,4);smith.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,bricks);
+        var bricks=new ItemStack(Items.BRICKS,4);smith.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,bricks);
         var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.NORTH,pos,false);
-        h.assertTrue(smith.gameMode.useItemOn(smith,l,bricks,net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()&&bricks.isEmpty()&&w.build().sections==w.model().all,"Four bricks from the hand rebuild the chimney");
+        h.assertTrue(smith.gameMode.useItemOn(smith,l,smith.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()&&bricks.isEmpty()&&w.build().sections==w.model().all,"Four bricks carried in the offhand rebuild the chimney");
         w.process();h.assertTrue(w.status!=MachineStatus.Workshop.INCOMPLETE,"Rebuilding the chimney restores the forge");h.succeed();
     }
     @GameTest(template="industrial") public static void unbuiltSmithyRefusesTheStriker(GameTestHelper h){
