@@ -1,0 +1,12 @@
+{
+  "type": "civilization:foundry",
+  "ingredient": {
+    "item": "civilization:blister_copper"
+  },
+  "result": {
+    "id": "civilization:blister_copper",
+    "count": 1
+  },
+  "cookingtime": 400,
+  "experience": 0.0
+}

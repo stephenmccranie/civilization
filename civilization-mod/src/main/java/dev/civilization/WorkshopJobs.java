@@ -26,7 +26,7 @@ public final class WorkshopJobs {
             var e=equipment(output);if(e==null)return ManufacturingContent.materialMultiplier(output);
             return e.material()==Items.NETHERITE_INGOT?8:e.material()==Items.DIAMOND?4:e.material()==Items.GOLD_INGOT?2:1;
         }
-        public String coalNote(){return String.format(Locale.ROOT,"Base coal: %.2f per batch%s. Temperature and idle burn affect usage.",heatSpent(ticks())/(double)ProductionEnergy.HEAT_TICKS,workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
+        public String coalNote(){double coal=heatSpent(ticks())/(double)ProductionEnergy.COAL;return String.format(Locale.ROOT,"Base coal: %.2f (%s) per batch%s, drawn from a hot fire; warming up and heat loss come on top.",coal,Energy.text(coal*Energy.COAL),workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
     }
     public record Equipment(Item item,Item material,int amount,boolean armor){}
     private static List<Job> smithy;
@@ -78,7 +78,7 @@ public final class WorkshopJobs {
         case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){
         int base=stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE,stack.getMaxDamage());
-        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*EquipmentGrade.value(stack)/100.0)):base;
+        return EquipmentGrade.hasGrade(stack)?Math.max(1,(int)Math.round(base*Grade.value(stack)/1000.0)):base;
     }
     public static Job repair(ItemStack stack){
         var e=equipment(stack);if(e==null||!stack.isDamaged()||stack.getCount()!=1)return null;
@@ -91,15 +91,23 @@ public final class WorkshopJobs {
         Item fitting=e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;
         return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material,count),need(fitting,1),empty()),200);
     }
-    public static ItemStack result(Job job,ItemStack first){
-        var out=job.output().copy();
-        if(first.getItem() instanceof TieredItem||first.getItem() instanceof ArmorItem){
-            if(!job.name().equals("Repair")&&BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().startsWith("netherite_")){
-                out.applyComponents(first.getComponentsPatch());
-                EquipmentGrade.apply(out,EquipmentGrade.value(first));
-                out.setDamageValue((int)Math.ceil(first.getDamageValue()/(double)first.getMaxDamage()*out.getMaxDamage()));
-            }
+    /**
+     * The output of a matched job. A repair is fully quoted and an upgrade keeps the item it upgrades; any other
+     * graded output takes the mean grade of the graded units it consumes, the top units of each input stack.
+     */
+    public static ItemStack result(net.minecraft.world.Container c,MachineWork.Match match){
+        var job=match.job();var out=job.output().copy();var first=match.first();
+        if(job.name().equals("Repair")||!EquipmentGrade.eligible(out)&&!Grade.graded(out))return out;
+        if(BuiltInRegistries.ITEM.getKey(out.getItem()).getPath().startsWith("netherite_")&&(first.getItem() instanceof TieredItem||first.getItem() instanceof ArmorItem)){
+            out.applyComponents(first.getComponentsPatch());
+            EquipmentGrade.apply(out,Grade.value(first));
+            out.setDamageValue((int)Math.ceil(first.getDamageValue()/(double)first.getMaxDamage()*out.getMaxDamage()));
+            return out;
         }
+        var units=new ArrayList<Integer>();
+        for(int i=0;i<4;i++)if(Grade.graded(c.getItem(i)))units.addAll(Grade.top(c.getItem(i),match.consumed()[i]));
+        if(units.isEmpty())return out;
+        if(Grade.graded(out))Grade.assign(out,Grade.mean(units));else EquipmentGrade.apply(out,Grade.mean(units));
         return out;
     }
 }

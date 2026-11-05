@@ -63,7 +63,7 @@ public final class Backpack {
 
     public static int slots(ItemStack pack){return scaled(SLOTS,pack);}
     public static int blocks(ItemStack pack){return scaled(BLOCKS,pack);}
-    private static int scaled(int full,ItemStack pack){return Math.max(0,(int)Math.round(full*EquipmentGrade.value(pack)/100.0));}
+    private static int scaled(int full,ItemStack pack){return Math.max(0,(int)Math.round(full*Grade.value(pack)/1000.0));}
     /** The live contents of the backpack the player wears, or null. */
     public static Contents worn(Player p){return p.getData(Accessories.INVENTORY).backpack();}
 
@@ -89,9 +89,9 @@ public final class Backpack {
         public void insert(ItemStack stack){
             if(!canPlaceItem(0,stack))return;
             for(int pass=0;pass<2;pass++)for(int i=0;i<getContainerSize()&&!stack.isEmpty();i++){
-                var held=getItem(i);if(pass==0?held.isEmpty()||!ItemStack.isSameItemSameComponents(held,stack):!held.isEmpty())continue;
+                var held=getItem(i);if(pass==0?held.isEmpty()||!Grade.stacks(held,stack):!held.isEmpty())continue;
                 int n=Math.min(stack.getCount(),limit(i,stack)-held.getCount());if(n<=0)continue;
-                if(held.isEmpty())setItem(i,stack.split(n));else{held.grow(n);stack.shrink(n);setChanged();}
+                if(held.isEmpty())setItem(i,stack.split(n));else{Grade.join(held,stack,n);setChanged();}
             }
         }
         /** Takes up to `n` of the item, from the last matching stack first. */

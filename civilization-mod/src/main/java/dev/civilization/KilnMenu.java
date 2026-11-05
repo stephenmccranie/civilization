@@ -26,7 +26,7 @@ public final class KilnMenu extends AbstractContainerMenu implements CoalFireMen
         addSlot(new Slot(c,4,35,43){@Override public boolean mayPlace(ItemStack s){return recipes.stream().anyMatch(r->r.value().getIngredients().getFirst().test(s));}});
         addSlot(new FurnaceResultSlot(inv.player,c,5,143,43));
         MachineMenus.playerSlots(this::addSlot,inv,132);addDataSlots(d);
-        states=c instanceof KilnBlockEntity machine?new ContainerData(){public int get(int i){return i==0?machine.structureStatus():i==1?machine.operatingStatus():i==2?machine.fire.state():i==3?machine.fire.remaining():machine.selection();}public void set(int i,int v){}public int getCount(){return 5;}}:new SimpleContainerData(5);
+        states=c instanceof KilnBlockEntity machine?new ContainerData(){public int get(int i){return i==0?machine.structureStatus():i==1?machine.operatingStatus():i==2?machine.fire.state():i==3?machine.fire.heat():machine.selection();}public void set(int i,int v){}public int getCount(){return 5;}}:new SimpleContainerData(5);
         addDataSlots(states);
     }
     @Override public boolean stillValid(Player p){return inventory.stillValid(p);}
@@ -35,7 +35,7 @@ public final class KilnMenu extends AbstractContainerMenu implements CoalFireMen
     public boolean requiresStructure(){return getType()!=CookingContent.MENU.get();}
     public int structureStatus(){return states.get(0);}public int operatingStatus(){return states.get(1);}
     public int fireState(){return states.get(2);}
-    public int coalRemaining(){return states.get(3);}
+    public int heat(){return states.get(3);}
     public int selection(){return states.get(4);}
     @Override public boolean clickMenuButton(Player p,int id){
         if(!stillValid(p)||!(inventory instanceof KilnBlockEntity m))return false;

@@ -81,8 +81,10 @@ class Model:
 def machine_cells(parts, controller=(0, 0, 0), exclude=()):
     """Collision cells of a machine model whose groups name its sections (`section_<n>_...`): each part's volume, split
     over the block cells it crosses, as [section, box...] in cell-local units. Rotated parts are sliced into pieces at
-    most 4 units long before taking bounds, so a diagonal brace stays close to its true shape. The controller's cell and
-    any `exclude` cells (ports) hold their own blocks and take no part cells."""
+    most 4 units long before taking bounds, so a diagonal brace stays close to its true shape. In each cell a section's
+    boxes rise from its lowest foot there to its highest top, so a leaning or stepped body has sheer faces and steps back
+    only at whole cells: a player climbs it by jumping, as onto blocks, never by walking up its courses. The controller's
+    cell and any `exclude` cells (ports) hold their own blocks and take no part cells."""
     cells = {}
     skip = {tuple(controller), *map(tuple, exclude)}
     for part in parts:
@@ -98,6 +100,11 @@ def machine_cells(parts, controller=(0, 0, 0), exclude=()):
                 if cell in skip: continue
                 box = [round(max(0, a[d] - cell[d]), 5) for d in range(3)] + [round(min(1, b[d] - cell[d]), 5) for d in range(3)]
                 if all(box[d + 3] > box[d] for d in range(3)): cells.setdefault(cell, []).append([section, *box])
+    for boxes in cells.values():
+        span = {}
+        for section, _, y0, _, _, y1, _ in boxes:
+            lo, hi = span.get(section, (1, 0)); span[section] = (min(lo, y0), max(hi, y1))
+        for box in boxes: box[2], box[5] = span[box[0]]
     return [{'offset': list(c), 'boxes': boxes} for c, boxes in sorted(cells.items(), key=lambda e: (e[0][1], e[0][2], e[0][0]))]
 
 
@@ -193,15 +200,18 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
 
 
 def save(client,folder,name,gecko=True):
+    # Exports are machine-written and read by machines, so they are written compact: a model of hundreds of cubes is
+    # one line a few hundred kilobytes long rather than tens of thousands of indented lines.
+    compact=lambda value:json.dumps(value,separators=(',',':'))
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     (folder/f'{name}.bbmodel').write_text(export(client,'project'),encoding='utf-8', newline='\n')
     data=json.loads(export(client,'bedrock' if gecko else 'java_block'))
     if not gecko:
         data['parent']='minecraft:block/block';data['textures']['particle']=next(iter(data['textures'].values()))
-    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(json.dumps(data,indent=2),encoding='utf-8', newline='\n')
+    (folder/f'{name}{".geo" if gecko else ""}.json').write_text(compact(data),encoding='utf-8', newline='\n')
     if gecko:
         a=evaluate(client,'Animator.buildFile(null, Animation.all.map(a=>a.name))')
-        (folder/f'{name}.animation.json').write_text(json.dumps(a,indent=2),encoding='utf-8', newline='\n')
+        (folder/f'{name}.animation.json').write_text(compact(a),encoding='utf-8', newline='\n')
 
 
 def capture(client,path,position,target,span=70,size=1000):

@@ -89,6 +89,9 @@ public class KilnGameTests {
     }
     static void ticks(GameTestHelper h, KilnBlockEntity kiln, int count) {
         CoalFireFixture.light(kiln);
+        run(h, kiln, count);
+    }
+    static void run(GameTestHelper h, KilnBlockEntity kiln, int count) {
         for (int i = 0; i < count; i++) KilnBlockEntity.tick(h.getLevel(), kiln.getBlockPos(), kiln.getBlockState(), kiln);
     }
     private static FertilizerRetortBlockEntity retort(GameTestHelper h) {
@@ -170,10 +173,11 @@ public class KilnGameTests {
         h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(IndustrialContent.ENRICHED_BLEND.toStack()), h.getLevel()).isEmpty(), "Blend cannot bypass finite fuel in a furnace");
         var kiln = retort(h);
         kiln.setItem(0, IndustrialContent.ENRICHED_BLEND.toStack(5));
-        kiln.setItem(1, KilnContent.MINERAL_COAL.toStack());
-        ticks(h, kiln, 1800);
-        h.assertTrue(kiln.getItem(2).is(FarmingContent.FERTILIZER.get()) && kiln.getItem(2).getCount() == 8, "One fuel makes exactly eight fertilizer");
-        h.assertTrue(kiln.getItem(0).getCount() == 4 && kiln.getItem(1).isEmpty(), "One blend and one fuel consumed");
+        // Heat for one and a quarter batches above working heat, with the fire out.
+        CoalFireFixture.aboveWorking(kiln.fire, 500);
+        run(h, kiln, 1800);
+        h.assertTrue(kiln.getItem(2).is(FarmingContent.FERTILIZER.get()) && kiln.getItem(2).getCount() == 8, "One Coal of stored heat makes exactly eight fertilizer");
+        h.assertTrue(kiln.getItem(0).getCount() == 4, "One blend consumed");
         var field = GeographyGameTests.region(h, "river");
         var player = new FakePlayer(field, new GameProfile(UUID.randomUUID(), "kiln-farmer"));
         var pos = new BlockPos(24, 64, 24);
@@ -203,9 +207,9 @@ public class KilnGameTests {
             ticks(h, machine, 450);
             h.assertTrue(machine.getItem(2).isEmpty() && machine.getItem(1).isEmpty(), "Wrong recipe produces nothing while lit fire idles");
         }
-        retort.fire.extinguish();retort.setItem(0, IndustrialContent.ENRICHED_BLEND.toStack());
+        retort.fire.extinguish();CoalFireFixture.set(retort.fire, true, 0);retort.setItem(0, IndustrialContent.ENRICHED_BLEND.toStack());
         retort.setItem(1, new ItemStack(Items.CHARCOAL));
-        ticks(h, retort, 450);
+        run(h, retort, 450);
         h.assertTrue(retort.getItem(2).isEmpty() && retort.getItem(1).getCount() == 1, "Retort also rejects renewable fuel when forced");
         h.succeed();
     }
@@ -246,13 +250,15 @@ public class KilnGameTests {
         h.succeed();
     }
     @GameTest(template = "industrial")
-    public static void oneFuelMakesExactlyTwoBatches(GameTestHelper h) {
+    public static void eachBatchDrawsHalfACoal(GameTestHelper h) {
         var kiln = kiln(h);
         kiln.setItem(0, new ItemStack(Items.CLAY, 9));
         kiln.setItem(1, KilnContent.MINERAL_COAL.toStack());
-        ticks(h, kiln, 1800);
-        h.assertTrue(kiln.getItem(2).is(Items.BRICK) && kiln.getItem(2).getCount() == 8, "One coal must fire two four-brick batches");
-        h.assertTrue(kiln.getItem(0).getCount() == 7 && kiln.getItem(1).isEmpty(), "No third batch or duplicate fuel");
+        // Heat for two and a half batches above working heat, with the fire out.
+        CoalFireFixture.aboveWorking(kiln.fire, 500);
+        run(h, kiln, 1800);
+        h.assertTrue(kiln.getItem(2).is(Items.BRICK) && kiln.getItem(2).getCount() == 8, "Each four-brick batch draws half a Coal of stored heat");
+        h.assertTrue(kiln.getItem(0).getCount() == 7 && kiln.getItem(1).getCount() == 1 && !kiln.fire.hot(), "Below working heat the kiln stops, and an unlit fire never burns its Coal");
         h.succeed();
     }
     @GameTest(template = "industrial")
@@ -267,7 +273,8 @@ public class KilnGameTests {
             h.assertTrue(!kiln.canPlaceItemThroughFace(1, stack, Direction.NORTH), "Hopper must reject " + item);
             h.assertTrue(!menu.getSlot(1).mayPlace(stack), "Manual slot must reject " + item);
             kiln.setItem(1, stack);
-            ticks(h, kiln, 201);
+            CoalFireFixture.set(kiln.fire, true, 0);
+            run(h, kiln, 201);
             h.assertTrue(kiln.getItem(1).getCount() == 1 && kiln.getItem(2).isEmpty(), "Even forced inventory fuel must not burn " + item);
         }
         h.succeed();
@@ -284,24 +291,24 @@ public class KilnGameTests {
         ticks(h, kiln, 200);
         h.assertTrue(kiln.getItem(2).getCount() == 32 && kiln.getItem(0).getCount() == 1, "Exactly fill the output slot");
         ticks(h, kiln, 1800);
-        h.assertTrue(kiln.getItem(1).isEmpty() && kiln.getItem(2).getCount() == 32, "Idle burn automatically feeds next coal without overflowing output");
+        h.assertTrue(kiln.getItem(1).getCount() == 1 && kiln.getItem(2).getCount() == 32 && kiln.fire.hot(), "A hot idle kiln burns only what it leaks and never overflows its output");
         h.succeed();
     }
     @GameTest(template = "industrial")
-    public static void reloadPreservesPartialBatchAndFuel(GameTestHelper h) {
+    public static void reloadPreservesPartialBatchAndStoredHeat(GameTestHelper h) {
         var kiln = kiln(h);
         kiln.setItem(0, new ItemStack(Items.CLAY, 8));
-        kiln.setItem(1, KilnContent.MINERAL_COAL.toStack());
-        ticks(h, kiln, 75);
+        CoalFireFixture.aboveWorking(kiln.fire, 500);
+        run(h, kiln, 75);
         var nbt = kiln.saveWithFullMetadata(h.getLevel().registryAccess());
         var restored = new KilnBlockEntity(kiln.getBlockPos(), kiln.getBlockState());
         restored.setLevel(h.getLevel());
         restored.loadWithComponents(nbt, h.getLevel().registryAccess());
         h.getLevel().setBlockEntity(restored);
-        ticks(h, restored, 125);
+        run(h, restored, 125);
         h.assertTrue(restored.getItem(2).getCount() == 4, "Reload must retain the first 75 work ticks");
-        ticks(h, restored, 1401);
-        h.assertTrue(restored.getItem(2).getCount() == 8 && restored.getItem(0).getCount() == 6, "Reload must not duplicate or erase fuel energy");
+        run(h, restored, 1401);
+        h.assertTrue(restored.getItem(2).getCount() == 8 && restored.getItem(0).getCount() == 6, "Reload must not duplicate or erase stored heat");
         h.succeed();
     }
     @GameTest(template = "industrial")

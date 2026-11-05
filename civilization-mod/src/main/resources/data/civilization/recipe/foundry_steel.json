@@ -4,7 +4,7 @@
     "item": "minecraft:iron_ingot"
   },
   "result": {
-    "id": "civilization:steel_ingot",
+    "id": "civilization:blister_steel",
     "count": 1
   },
   "cookingtime": 800,

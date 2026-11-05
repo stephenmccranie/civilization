@@ -35,11 +35,6 @@ public final class MachineWork {
         for(int i=0;i<4;i++){var stack=c.getItem(i);if(!stack.isEmpty()&&taken[i]==0&&job.needs().stream().noneMatch(n->n.count()>0&&n.ingredient().test(stack)))return null;}
         return new Match(job,taken,first);
     }
-    public static ItemStack first(Container c,WorkshopJobs.Job job){
-        if(job==null)return ItemStack.EMPTY;
-        for(int i=0;i<4;i++)if(job.needs().getFirst().ingredient().test(c.getItem(i)))return c.getItem(i);
-        return ItemStack.EMPTY;
-    }
     public static boolean accepts(Container c,int kind,int selection,ItemStack s){
         if(kind==ManufacturingJobs.BENCH&&WorkshopJobs.gated(s)&&s.isDamaged()&&(selection<=0))return true;
         if(selection>=0){var job=job(c,kind,selection);return job!=null&&job.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(s));}

@@ -24,7 +24,7 @@ public final class MachineStructure {
     public record Result(int status, BlockPos problem, String material) {}
     private MachineStructure() {}
 
-    /** The block structure of a town workshop; every other kiln-family machine is a native model. */
+    /** The block structure of the Tannery or Textile Workshop; every other kiln-family machine is a native model. */
     public static List<Part> parts(BlockState state) {return WorkshopStructure.parts(((WorkshopBlock)state.getBlock()).kind);}
     /** Every controller that exposes the contextual construction guide uses this blueprint. */
     public static List<Part> guideParts(BlockState state) {
@@ -44,7 +44,6 @@ public final class MachineStructure {
             case "arena_stone" -> state.is(Blocks.STONE_BRICKS);
             case "arena_gate" -> state.is(Blocks.OAK_FENCE_GATE);
             case "glass" -> state.is(Blocks.GLASS);
-            case "anvil" -> state.is(net.minecraft.tags.BlockTags.ANVIL);
             case "planks" -> state.is(net.minecraft.tags.BlockTags.PLANKS);
             case "guardrail" -> state.is(IndustrialContent.GUARDRAIL.get());
             case "cooling" -> state.is(IndustrialContent.COOLING.get());
@@ -73,7 +72,6 @@ public final class MachineStructure {
             case "arena_stone" -> Blocks.STONE_BRICKS.defaultBlockState();
             case "arena_gate" -> Blocks.OAK_FENCE_GATE.defaultBlockState();
             case "glass" -> Blocks.GLASS.defaultBlockState();
-            case "anvil" -> Blocks.ANVIL.defaultBlockState();
             case "planks" -> Blocks.OAK_PLANKS.defaultBlockState();
             case "guardrail" -> IndustrialContent.GUARDRAIL.get().defaultBlockState();
             case "cooling" -> IndustrialContent.COOLING.get().defaultBlockState();

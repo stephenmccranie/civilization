@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.QuartPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -308,7 +309,8 @@ final class PerfBenchmark {
     }
 
     /** One yard: the Oil Derrick, Kiln, Foundry and Fertilizer Furnace built and burning, with the Baking Oven and Cooking
-     *  Stove beside them, loaded pallets in front and loaded wheelbarrows among them. */
+     *  Stove beside them, the Smithy forging iron plates with its bellows working, loaded pallets in front and loaded
+     *  wheelbarrows among them. */
     private static void yard(ServerLevel l, BlockPos at) {
         machine(l, at.offset(-8, 0, 6), IndustrialContent.PUMP.get().defaultBlockState());
         int x = 0;
@@ -319,6 +321,10 @@ final class PerfBenchmark {
         }
         l.setBlockAndUpdate(at.offset(18, 0, 6), BakingOvenContent.OVEN.get().defaultBlockState());
         l.setBlockAndUpdate(at.offset(21, 0, 6), CookingContent.STATION.get().defaultBlockState());
+        // Sixty-four ingots keep it forging, one plate each five seconds, past the end of a run.
+        var smithy = (WorkshopBlockEntity) machine(l, at.offset(25, 0, 6), WorkshopContent.SMITHY.get().defaultBlockState().setValue(CivicBlock.FACING, Direction.NORTH));
+        smithy.select(WorkshopJobs.index(2, BuiltInRegistries.ITEM.getKey(ManufacturingContent.part("iron", "plate")).toString()));
+        smithy.setItem(0, new ItemStack(Items.IRON_INGOT, 64)); smithy.setItem(4, KilnContent.MINERAL_COAL.toStack(8)); CoalFireFixture.light(smithy);
         var goods = List.of(new ItemStack(Items.STONE), new ItemStack(Items.OAK_PLANKS), new ItemStack(Items.BRICKS), new ItemStack(Items.COBBLESTONE));
         for (int i = 0; i < 8; i++) {
             var pos = at.offset(i * 2, 0, 0);

@@ -15,12 +15,20 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
     /** The model whose cells this block is, set while the block is constructed so its state definition can size the cell property. */
     static final ThreadLocal<MachineModel> PENDING=new ThreadLocal<>();
     public final MachineModel model;
+    private Block controller;
     public MachinePartBlock(Properties p){
         super(p);model=PENDING.get();
         registerDefaultState(stateDefinition.any().setValue(CivicBlock.FACING,Direction.NORTH).setValue(model.cell,0));
     }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(CivicBlock.FACING,PENDING.get().cell);}
     private MachineModel.Cell cell(BlockState s){return model.cells.get(s.getValue(model.cell));}
+    /** The machine's controller block: every part shows its name, so Jade and pick-block name the machine, not the part. */
+    private Block controller(){
+        if(controller==null)controller=net.minecraft.core.registries.BuiltInRegistries.BLOCK.stream().filter(b->b instanceof ModeledBlock m&&m.model()==model).findFirst().orElseThrow();
+        return controller;
+    }
+    @Override public String getDescriptionId(){return controller().getDescriptionId();}
+    @Override public ItemStack getCloneItemStack(LevelReader l,BlockPos p,BlockState s){return new ItemStack(controller());}
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){
         Level world=l instanceof Level level?level:l instanceof net.minecraft.world.level.chunk.LevelChunk chunk?chunk.getLevel():null;
         if(world==null)return cell(s).shape(s.getValue(CivicBlock.FACING));

@@ -137,7 +137,7 @@ final class ThermalPhysicsExperiments {
         double[] workshops=new double[2];
         for(int shaft=0;shaft<2;shaft++){
             clear();ThermalGameTests.buildFoundryWorkshop(level,p,shaft==1);
-            var foundry=new ThermalField();double rate=ThermalRules.COAL_WASTE_HEAT*20/ProductionEnergy.HEAT_TICKS;
+            var foundry=new ThermalField();double rate=ThermalRules.COAL_WASTE_HEAT*20/ProductionEnergy.COAL;
             for(int second=1;second<=180;second++){
                 foundry.pending.put(p.asLong(),rate);foundry.step(level);
                 if(second%60==0)record("foundry_"+(shaft==1?"vented":"closed")+"_rise_"+second+"s",foundry.excess(level,p.north(2).above())*1.8,rate*second,

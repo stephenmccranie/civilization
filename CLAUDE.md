@@ -34,7 +34,7 @@ A feature is ready to build when it has a concrete interaction, agreed rules, da
 
 Pick the shortest check from `civilization-mod/testing.md`; be thorough but efficient. Documentation or configuration changes need no game launch. `dev.ps1 Deploy` already builds, and a passing check is not repeated unless relevant code changed.
 
-Visual checks run hidden at 1920x1080 with mouse capture disabled. Never launch a visible client. The owner's Prism instances are touched only by `.\dev.ps1 Deploy`, which installs into Civilization Dev. When appearance changes, look at the screenshots. Diagnose unexplained failures, including flaky fixtures; never retry until green or weaken an assertion.
+Visual checks run hidden and silent at 1920x1080 with mouse capture disabled. Never launch a visible client. The owner's Prism instances are touched only by `.\dev.ps1 Deploy`, which installs into Civilization Dev. When appearance changes, look at the screenshots. Diagnose unexplained failures, including flaky fixtures; never retry until green or weaken an assertion.
 
 Run directories under `civilization-mod/runs/` are rebuilt by each run, except `runs/server` (the owner's development world). `civilization-mod/run/` holds the client setup that visual checks copy. Scratch goes in `.tools/`, which is ignored and may be wiped at any time. Never delete user worlds, `art/`, `concept_art/` or local configuration, and preserve uncommitted work.
 

@@ -61,7 +61,7 @@ public final class LandScreen extends AbstractContainerScreen<LandMenu> {
         for (int i = 0; i < tiers.length; i++) {
             var t = ClaimTier.values()[i]; tiers[i].selected = s.tier() == i;
             tiers[i].active = (s.flags() & 8) != 0 && !tiers[i].selected;
-            tiers[i].setTooltip(Tooltip.create(Component.literal("Tier " + (i+1) + ": " + t.width + "×" + t.width + ", 64 tall\nUpkeep: " + t.upkeep + " coal/hour\nSwitch: " + (t.upkeep * dev.civilization.CivicConfig.TIER_SWITCH_HOURS) + " coal from reserve\n24-hour cooldown\n" + s.tierStatus())));
+            tiers[i].setTooltip(Tooltip.create(Component.literal("Tier " + (i+1) + ": " + t.width + "×" + t.width + ", 64 tall\nUpkeep: " + t.upkeep + " coal/hour (" + dev.civilization.Energy.text(t.upkeep * dev.civilization.Energy.COAL) + "/h)\nSwitch: " + (t.upkeep * dev.civilization.CivicConfig.TIER_SWITCH_HOURS) + " coal from reserve\n24-hour cooldown\n" + s.tierStatus())));
         }
         access.active = (s.flags() & 4) != 0;
         if (!access.active) editing = false;

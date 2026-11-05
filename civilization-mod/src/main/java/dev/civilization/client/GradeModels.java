@@ -3,6 +3,7 @@ package dev.civilization.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.civilization.Civilization;
 import dev.civilization.EquipmentGrade;
+import dev.civilization.Grade;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public final class GradeModels {
     }
 
     private static int layerCount(int grade) {
-        return grade >= 100 ? 0 : Math.min(8, Math.max(1, (int)Math.ceil((100 - grade) / 9.0)));
+        return grade >= 1000 ? 0 : Math.min(8, Math.max(1, (int)Math.ceil((1000 - grade) / 90.0)));
     }
 
     private static List<BakedModel> wearLayers(BakedModel[] overlays, long seed, int count) {
@@ -105,7 +106,7 @@ public final class GradeModels {
                 @Override public BakedModel resolve(BakedModel base, ItemStack stack, ClientLevel level, LivingEntity entity, int seed) {
                     BakedModel selected = delegate.resolve(originalModel, stack, level, entity, seed);
                     if (selected == null) selected = originalModel;
-                    int count = EquipmentGrade.hasGrade(stack) ? layerCount(EquipmentGrade.value(stack)) : 0;
+                    int count = EquipmentGrade.hasGrade(stack) ? layerCount(Grade.value(stack)) : 0;
                     return count == 0 ? selected : new GradeModel(selected, overlays,
                             wearLayers(overlays, EquipmentGrade.wearSeed(stack), count));
                 }

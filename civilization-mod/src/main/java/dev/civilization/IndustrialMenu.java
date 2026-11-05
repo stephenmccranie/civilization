@@ -18,7 +18,7 @@ public final class IndustrialMenu extends AbstractContainerMenu implements CoalF
         MachineMenus.playerSlots(this::addSlot,inv,132);addDataSlots(data);
     }
     public int fireState(){return data.get(11);}
-    public int coalRemaining(){return data.get(12);}
+    public int heat(){return data.get(6);}
     public boolean hasCoalFire(){return kind()==IndustrialBlock.Kind.PUMP||kind()==IndustrialBlock.Kind.REFINERY;}
     @Override public boolean clickMenuButton(Player p,int id){if(id!=CoalFire.BUTTON||!stillValid(p)||!(inventory instanceof IndustrialBlockEntity m)||!m.coalPowered())return false;boolean ok=m.fire.strike(p,IndustrialStructure.bind(m));broadcastChanges();return ok;}
     public IndustrialBlock.Kind kind(){return IndustrialBlock.Kind.values()[Math.clamp(data.get(0),0,IndustrialBlock.Kind.values().length-1)];}

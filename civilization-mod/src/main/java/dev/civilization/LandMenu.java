@@ -113,7 +113,7 @@ public final class LandMenu extends AbstractContainerMenu {
             int tier = -1; for (var t : ClaimTier.values()) if (claim.radius == t.radius() && claim.height == 64 && claim.upkeep == t.upkeep) tier = t.ordinal();
             long minutes = (claim.energy / claim.rate() + 59999) / 60000;
             String status = claim.energy == 0 ? "Unclaimed — add coal" : "Protected · " + (minutes >= 60 ? minutes / 60 + "h " : "") + minutes % 60 + "m fuel";
-            String details = claim.radius * 2 + " × " + claim.radius * 2 + " × " + claim.height + " · " + claim.rate() + " coal/h";
+            String details = claim.radius * 2 + " × " + claim.radius * 2 + " × " + claim.height + " · " + claim.rate() + " coal/h (" + Energy.text(claim.rate() * Energy.COAL) + "/h)";
             String buy = claim.buyer != null ? "Handover: " + Math.max(1, (claim.handoverAt - System.currentTimeMillis() + 3599999) / 3600000) + "h"
                     : System.currentTimeMillis() < claim.eligibleAt ? "Opens: " + Math.max(1, (claim.eligibleAt - System.currentTimeMillis() + 86399999) / 86400000) + "d"
                     : (confirmationUntil > System.currentTimeMillis() ? "Confirm " + confirmationPrice : "Buy: " + claim.price()) + " coal";

@@ -12,7 +12,8 @@ public final class KilnScreen extends MachineScreen<KilnMenu> {
         var list=new ArrayList<RecipeEntry>();for(int i=0;i<menu.recipes.size();i++){
             var recipe=menu.recipes.get(i).value();var output=recipe.getResultItem(minecraft.level.registryAccess());
             var input=recipe.getIngredients().getFirst().getItems()[0];
-            list.add(new RecipeEntry(i,output.getHoverName().copy().append(" — ").append(input.getHoverName()),output,"Components",net.minecraft.world.item.Items.AIR));
+            var name=output.is(input.getItem())?Component.literal("Heat ").append(output.getHoverName()):output.getHoverName().copy().append(" — ").append(input.getHoverName());
+            list.add(new RecipeEntry(i,name,output,"Components",net.minecraft.world.item.Items.AIR));
         }return list;
     }
     @Override protected int chosen(){return menu.selection();}
@@ -36,7 +37,7 @@ public final class KilnScreen extends MachineScreen<KilnMenu> {
         for(int index:new int[]{1,3})if(menu.getSlot(index).getItem().isEmpty())MachineUi.ghost(g,KilnContent.MINERAL_COAL.toStack(),leftPos+menu.getSlot(index).x,topPos+88);
         MachineUi.fire(g,leftPos+66,topPos+85,44,23,menu.isLit());
         boolean incomplete=menu.requiresStructure()&&menu.structureStatus()!=1;
-        var state=!incomplete&&!menu.isLit()&&menu.operatingStatus()!=7?Component.literal("Add Coal and strike to light"):Component.translatable(incomplete?"gui.civilization.structure_"+menu.structureStatus():"gui.civilization.operating_"+menu.operatingStatus());
+        var state=!incomplete&&!menu.isLit()&&!menu.hot()&&menu.operatingStatus()!=7?Component.literal("Add Coal and strike to light"):Component.translatable(incomplete?"gui.civilization.structure_"+menu.structureStatus():"gui.civilization.operating_"+menu.operatingStatus());
         g.drawString(font,font.plainSubstrByWidth(state.getString(),158),leftPos+9,topPos+64,MachineUi.MUTED,false);
     }
     @Override public void render(GuiGraphics g,int x,int y,float dt){super.render(g,x,y,dt);

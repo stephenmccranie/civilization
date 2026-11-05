@@ -34,17 +34,19 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
                 .map(r->r.value().getCookingTime()).orElse(200));
         setChanged();
     }
+    /** What one batch of `input` makes. Rough metal leaves hot, and so does a pass that keeps its material, a heat. */
+    private ItemStack product(net.minecraft.world.item.crafting.SingleRecipeInput input) {
+        var result=processingRecipe(input).map(recipe->recipe.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
+        return !result.isEmpty()&&(result.getItem() instanceof RoughMetal||result.is(input.item().getItem()))?HotMetal.heated(result,level.getGameTime()):result;
+    }
     public java.util.Optional<net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.AbstractCookingRecipe>> processingRecipe(net.minecraft.world.item.crafting.SingleRecipeInput input) {
         return recipes().stream().filter(r -> selectedRecipe==null || r.id().equals(selectedRecipe))
                 .filter(r -> r.value().matches(input,level)).findFirst();
     }
     public final CoalFire fire=new CoalFire(this);
-    public int fireHeat(){return dataAccess.get(0);}
-    public void fireHeat(int heat){dataAccess.set(0,heat);dataAccess.set(1,Math.max(FUEL_TICKS,heat));}
-    public int coalCapacity(){return ProductionEnergy.HEAT_TICKS;}
-    public int coalBudget(){return (int)Math.round(coalCapacity()*ThermalField.efficiency(level,worldPosition));}
     public int[] coalFuelSlots(){return MachineInventory.KILN_FUEL;}
-    public static final int FUEL_TICKS = ProductionEnergy.HEAT_TICKS;
+    /** The Kiln's fieldstone beehive; the Foundry, Fertilizer Furnace and Cooking Stove name their own. */
+    public int masonry(){return 17;}
     private MachineStructure.Result structure = new MachineStructure.Result(MachineStructure.INCOMPLETE, null, "");
     public int structureStatus() { return structure.status(); }
     public boolean requiresStructure() { return true; }
@@ -71,12 +73,10 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         if (MachineWeather.wetWorkFace(level, worldPosition, getBlockState())) return 7;
         if (!getItem(0).isEmpty() && !canPlaceItem(0, getItem(0))) return 5;
         if (getItem(0).isEmpty()) return MachineInventory.count(this,MachineInventory.KILN_OUTPUT)==0 ? 2 : 6;
-        var match = processingRecipe(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)));
-        if(match.isEmpty())return 5;
-        var recipe = match.get().value();
-        var result = recipe.assemble(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)), level.registryAccess());
+        var result = product(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)));
+        if (result.isEmpty()) return 5;
         if (!MachineInventory.room(this,MachineInventory.KILN_OUTPUT,result)) return 3;
-        return dataAccess.get(0) > 0 ? 2 : 4;
+        return fire.hot() ? 2 : fire.lit() ? 8 : 4;
     }
     private final net.minecraft.world.item.crafting.RecipeType<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe> processType;
     public KilnBlockEntity(BlockPos pos, BlockState state) { this(KilnContent.ENTITY.get(), pos, state, KilnContent.RECIPE_TYPE.get()); }
@@ -89,10 +89,12 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     }
     @Override public int getContainerSize(){return 6;}
     @Override public int[] getSlotsForFace(net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN?MachineInventory.KILN_OUTPUT:side==net.minecraft.core.Direction.UP?MachineInventory.KILN_INPUT:MachineInventory.KILN_FUEL;}
-    @Override public boolean canTakeItemThroughFace(int slot,ItemStack stack,net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN&&MachineInventory.contains(MachineInventory.KILN_OUTPUT,slot);}
+    /** Hot metal is taken by hand. */
+    @Override public boolean canTakeItemThroughFace(int slot,ItemStack stack,net.minecraft.core.Direction side){return side==net.minecraft.core.Direction.DOWN&&MachineInventory.contains(MachineInventory.KILN_OUTPUT,slot)&&!stack.has(HotMetal.HOT.get());}
     protected String auditPrefix() { return "kiln"; }
     public static boolean acceptsFuel(ItemStack stack) { return stack.is(KilnContent.MINERAL_COAL.get()); }
-    @Override protected int getBurnDuration(ItemStack stack) { return acceptsFuel(stack) ? (int)Math.round(FUEL_TICKS * ThermalField.efficiency(level, worldPosition)) : 0; }
+    /** The coal fire stokes the fuel; vanilla never burns it. */
+    @Override protected int getBurnDuration(ItemStack stack) { return 0; }
     @Override public boolean canPlaceItem(int slot, ItemStack stack) {
         return MachineInventory.contains(MachineInventory.KILN_FUEL,slot) ? acceptsFuel(stack) : MachineInventory.contains(MachineInventory.KILN_INPUT,slot) && level != null && level.getRecipeManager()
                 .getRecipeFor(processType, new net.minecraft.world.item.crafting.SingleRecipeInput(stack), level).isPresent();
@@ -111,8 +113,6 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         for(int i=tag.getBoolean("TwoMaterialSlots")?6:tag.getBoolean("TwoFuelSlots")?4:3;i<old.size();i++)if(!old.get(i).isEmpty())legacyOverflow.add(old.get(i));
         if(tag.contains("LegacyOverflow"))for(var entry:tag.getList("LegacyOverflow",10))
             ItemStack.parse(lookup,entry).ifPresent(legacyOverflow::add);
-        // Vanilla reconstructs duration from the fuel slot, which may be empty after ignition.
-        dataAccess.set(1, dataAccess.get(0) > 0 ? Math.max(FUEL_TICKS, dataAccess.get(0)) : 0);
     }
     private final java.util.List<ItemStack> legacyOverflow=new java.util.ArrayList<>();
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider lookup){
@@ -130,82 +130,58 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     }
     public static void tick(Level level, BlockPos pos, BlockState state, KilnBlockEntity kiln) {
         kiln.returnLegacyOverflow();
+        if (level.getGameTime() % 20 == 0) for (int slot : MachineInventory.KILN_OUTPUT) HotMetal.tend(kiln.getItem(slot), kiln.fire.hot(), level.getGameTime());
         MachineInventory.refill(kiln,MachineInventory.KILN_INPUT);
         // Active machines validate every work tick; idle ones stagger checks once per second.
-        if (kiln.dataAccess.get(0) > 0 || !kiln.getItem(0).isEmpty() || Math.floorMod(level.getGameTime() + pos.asLong(), 20) == 0)
+        if (kiln.fire.lit() || kiln.fire.heat() > 0 || !kiln.getItem(0).isEmpty() || Math.floorMod(level.getGameTime() + pos.asLong(), 20) == 0)
             kiln.checkStructure();
         if (kiln.structureStatus() != MachineStructure.COMPLETE) {
-            if (kiln.structureStatus() == MachineStructure.INCOMPLETE && (kiln.dataAccess.get(0) > 0 || kiln.dataAccess.get(2) > 0)) {
+            if (kiln.structureStatus() == MachineStructure.INCOMPLETE && (kiln.fire.lit() || kiln.fire.heat() > 0 || kiln.dataAccess.get(2) > 0)) {
                 kiln.fire.extinguish(); kiln.dataAccess.set(2, 0);
                 kiln.setChanged();
                 EnergyLog.machine(level, pos, kiln.auditPrefix() + "_structure_broken", null, 0, null, 0);
             }
-            if (state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT) || state.getValue(MachineFeedback.WORKING))
-                level.setBlock(pos, state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, false)
-                        .setValue(MachineFeedback.WORKING, false), 3);
+            feedback(level, pos, false, false);
             return;
-        }
-        if(!kiln.fire.lit()){
-            if(state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)||state.getValue(MachineFeedback.WORKING))
-                level.setBlock(pos,state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT,false).setValue(MachineFeedback.WORKING,false),3);
-            return;
-        }
-        if(MachineWeather.wetWorkFace(level,pos,state)){
-            kiln.fire.finish(1,false);
-            var current=kiln.getBlockState();
-            if(current.getValue(MachineFeedback.WORKING)||current.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)!=kiln.fire.lit())
-                level.setBlock(pos,current.setValue(MachineFeedback.WORKING,false)
-                        .setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT,kiln.fire.lit()),3);
-            return;
-        }
-        if(!kiln.fire.supply(1)){kiln.fire.finish(1,false);return;}
-        // Resume saved heat after a neighboring chunk reloads.
-        if (kiln.dataAccess.get(0) > 0 && !state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)) {
-            state = state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, true);
-            level.setBlock(pos, state, 3);
         }
         MachineInventory.refill(kiln,MachineInventory.KILN_FUEL);
+        int fuel = MachineInventory.count(kiln,MachineInventory.KILN_FUEL);
+        kiln.fire.tick(1);
+        if (MachineInventory.count(kiln,MachineInventory.KILN_FUEL) < fuel)
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 0.2f, 0.9f);
+        if (!kiln.fire.hot() || MachineWeather.wetWorkFace(level, pos, state)) { feedback(level, pos, kiln.fire.lit(), false); return; }
         var input=new net.minecraft.world.item.crafting.SingleRecipeInput(kiln.getItem(0));
-        var result=kiln.processingRecipe(input).map(recipe->recipe.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
-        // Vanilla cooks into slot 2 only. Briefly use it as a scratch output when a batch
-        // fits across the bank but not in slot 2; restore both original stacks in place.
-        boolean redirect=!result.isEmpty()&&!MachineInventory.room(kiln,MachineInventory.KILN_PRIMARY_OUTPUT,result)
-                &&MachineInventory.room(kiln,MachineInventory.KILN_OUTPUT,result);
+        var result=kiln.product(input);
+        boolean hot=result.has(HotMetal.HOT.get()),heat=hot&&result.is(kiln.getItem(0).getItem());
+        // Vanilla cooks into slot 2 only, one unit of the input at a time. Each batch cooks into an emptied
+        // slot 2; the product takes its grade from the input unit it used, a heat takes the rest of its load, then it joins the output bank.
+        boolean redirect=!result.isEmpty()&&MachineInventory.room(kiln,MachineInventory.KILN_OUTPUT,result);
         var originalOutput=redirect?kiln.items.set(2,ItemStack.EMPTY):ItemStack.EMPTY;
+        var inputUnits=kiln.getItem(0).copy();
         var inputItem = kiln.getItem(0).getItem();
         int inputCount = kiln.getItem(0).getCount();
         int outputCount = MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT);
-        int fuel = kiln.getItem(1).getCount();
         int progress = kiln.dataAccess.get(2);
-        int heat = kiln.dataAccess.get(0);
-        // Vanilla decrements before cooking; a sentinel keeps the final paid tick productive.
-        kiln.dataAccess.set(0,heat+1);
+        // Vanilla cooks only while lit and spends a tick of burn time first; the heat itself comes from the fire.
+        kiln.dataAccess.set(0,2);
         try{serverTick(level, pos, state, kiln);}
-        finally{if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty())MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}
+        finally{kiln.dataAccess.set(0,0);if(redirect){var produced=kiln.items.set(2,originalOutput);if(!produced.isEmpty()){Grade.smelted(produced,inputUnits,level.random);if(hot)HotMetal.heated(produced,level.getGameTime());if(heat)HotMetal.load(kiln,0,MachineInventory.KILN_OUTPUT,produced);MachineInventory.insert(kiln,MachineInventory.KILN_OUTPUT,produced);}}}
         boolean completed = kiln.getItem(0).getCount() < inputCount;
         boolean working = completed || kiln.dataAccess.get(2) > progress;
-        // Vanilla burns one tick while idle; restore it and charge the shared low idle rate instead.
-        kiln.dataAccess.set(0,Math.max(0,heat-(working?1:0)));
-        kiln.fire.spent(working?1:0);
-        kiln.fire.finish(1,working);
-        var current = kiln.getBlockState();
-        if(current.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT)!=kiln.fire.lit()){
-            level.setBlock(pos,current.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT,kiln.fire.lit()),3);current=kiln.getBlockState();
-        }
-        if (current.getValue(MachineFeedback.WORKING) != working)
-            level.setBlock(pos, current.setValue(MachineFeedback.WORKING, working), 3);
-        if (kiln.getItem(1).getCount() < fuel) {
-            EnergyLog.machine(level, pos, kiln.auditPrefix() + "_fuel", "civilization:mineral_coal", 1, null, 0);
-            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 0.2f, 0.9f);
-        }
+        if (working) kiln.fire.draw(1);
+        feedback(level, pos, kiln.fire.lit(), working);
         if (completed) {
             EnergyLog.machine(level, pos, kiln.auditPrefix() + "_batch", net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(inputItem).toString(),
-                    1, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(kiln.getItem(2).getItem()).toString(), MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT) - outputCount);
+                    inputCount - kiln.getItem(0).getCount(), net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(kiln.getItem(2).getItem()).toString(), MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT) - outputCount);
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.DECORATED_POT_PLACE,
                     net.minecraft.sounds.SoundSource.BLOCKS, 0.15f, 1.2f);
         }
-        // Mark work in progress dirty too, so a normal chunk save preserves elapsed fuel/work.
-        if (heat != kiln.dataAccess.get(0) || progress != kiln.dataAccess.get(2)) kiln.setChanged();
+        // Mark work in progress dirty too, so a normal chunk save preserves elapsed work.
+        if (progress != kiln.dataAccess.get(2)) kiln.setChanged();
+    }
+    private static void feedback(Level level, BlockPos pos, boolean lit, boolean working) {
+        var state = level.getBlockState(pos);
+        if (state.getValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT) != lit || state.getValue(MachineFeedback.WORKING) != working)
+            level.setBlock(pos, state.setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, lit).setValue(MachineFeedback.WORKING, working), 3);
     }
 }

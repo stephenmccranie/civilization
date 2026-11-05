@@ -8,7 +8,8 @@ import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class WorkshopBlock extends KilnBlock {
-    @Override public MachineModel model() { return null; }
+    /** The Smithy is a forge built as a native model; the other workshops keep block structures. */
+    @Override public MachineModel model() { return kind == 2 ? MachineModel.SMITHY : null; }
     public final int kind;
     public WorkshopBlock(Properties p,int kind){super(p);this.kind=kind;}
     private static final net.minecraft.world.phys.shapes.VoxelShape BENCH_SHAPE=net.minecraft.world.phys.shapes.Shapes.or(
@@ -22,15 +23,7 @@ public class WorkshopBlock extends KilnBlock {
         super.onRemove(old,l,p,next,moved);
     }
     @Override public void animateTick(BlockState s,Level l,BlockPos p,net.minecraft.util.RandomSource random){
-        if(kind==ManufacturingJobs.BENCH)return;
-        if(kind!=2){super.animateTick(s,l,p,random);return;}
-        if(!s.getValue(LIT))return;
-        var back=s.getValue(FACING).getOpposite();
-        var hearth=p.above();
-        if(random.nextFloat()<.2f)l.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE,hearth.getX()+.5,hearth.getY()+.4,hearth.getZ()+.5,0,.025,0);
-        var chimney=p.relative(back).above(4);
-        if(random.nextFloat()<.25f)l.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE,chimney.getX()+.5+s.getValue(FACING).getClockWise().getStepX()*.5,chimney.getY()+.55,chimney.getZ()+.5+s.getValue(FACING).getClockWise().getStepZ()*.5,0,.035,0);
-        if(random.nextFloat()<.035f)l.playLocalSound(hearth.getX()+.5,hearth.getY(),hearth.getZ()+.5,net.minecraft.sounds.SoundEvents.FURNACE_FIRE_CRACKLE,net.minecraft.sounds.SoundSource.BLOCKS,.22f,.8f,false);
+        if(kind!=ManufacturingJobs.BENCH)super.animateTick(s,l,p,random);
     }
     @Override protected void openContainer(Level l,BlockPos p,Player player){if(l.getBlockEntity(p) instanceof WorkshopBlockEntity w&&CivicAccess.allowed(l,p,player))player.openMenu(w);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> t){return l.isClientSide?null:createTickerHelper(t,WorkshopContent.ENTITY.get(),(world,pos,state,w)->w.tick());}

@@ -37,8 +37,8 @@ public final class PreviewVisualCheck {
         long window = mc.getWindow().getWindow();
         if (org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(window, org.lwjgl.glfw.GLFW.GLFW_VISIBLE) != 0
                 || org.lwjgl.glfw.GLFW.glfwGetWindowAttrib(window, org.lwjgl.glfw.GLFW.GLFW_FOCUSED) != 0
-                || mc.mouseHandler.isMouseGrabbed())
-            throw new IllegalStateException("Visual client must stay hidden, unfocused and unable to grab the mouse");
+                || mc.mouseHandler.isMouseGrabbed() || org.lwjgl.openal.AL10.alGetListenerf(org.lwjgl.openal.AL10.AL_GAIN) != 0)
+            throw new IllegalStateException("Visual client must stay hidden, unfocused, silent and unable to grab the mouse");
         if(CHECK.equals("weather-peer")){WeatherVisualCheck.peer(mc);return;}
         if(CHECK.equals("gladiator-peer")){ArenaVisualCheck.peer(mc);return;}
         if(CHECK.equals("perf")){PerfBenchmark.tick(mc);return;}

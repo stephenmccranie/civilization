@@ -181,6 +181,26 @@ def opening(mask, box):
     return found and (box[0]-1+found[0], box[1]-1+found[1], box[0]-1+found[2], box[1]-1+found[3])
 
 
+def solid(master, mask, box, size):
+    """A panel's pixels inside `box` reduced to `size` with the ground left out: each texel takes the mean of the panel
+    pixels it covers, the rim blended with the ground dropped as for sprites, and a texel the panel never reaches, as at a
+    rounded corner, takes its neighbours' colour, so the ground never tints a panel's edge."""
+    crop = master.crop(box).convert('RGBA'); rim = 2; pad = (box[0]-rim, box[1]-rim, box[2]+rim, box[3]+rim)
+    crop.putalpha(mask.crop(pad).filter(ImageFilter.MinFilter(2*rim+1)).crop((rim, rim, rim+crop.width, rim+crop.height)))
+    small = crop.convert('RGBa').resize(size, Image.Resampling.BOX).convert('RGBA'); pixels = small.load(); w, h = size
+    hollow = {(x, y) for y in range(h) for x in range(w) if not pixels[x, y][3]}
+    while hollow:
+        fill = {}
+        for x, y in hollow:
+            near = [pixels[i, j] for i in range(x-1, x+2) for j in range(y-1, y+2) if 0 <= i < w and 0 <= j < h and (i, j) not in hollow]
+            if near: fill[x, y] = tuple(sum(c[k] for c in near)//len(near) for k in range(3)) + (255,)
+        if not fill: raise ValueError('A panel has no pixels of its own to reduce')
+        for at, colour in fill.items(): pixels[at] = colour
+        hollow -= fill.keys()
+    small.putalpha(255)
+    return small
+
+
 def atlas(asset, folder):
     """Reduce each region's master subject into its image with one palette shared by all the layout's images, write the
     images, and draw the inspection sheet.
@@ -239,12 +259,12 @@ def atlas(asset, folder):
             # Cover every pixel the opening touches, so no ground-tinted edge survives.
             x0, y0 = math.floor(x+(hole[0]-p[0])*sx), math.floor(y+(hole[1]-p[1])*sy)
             x1, y1 = math.ceil(x+(hole[2]-p[0])*sx), math.ceil(y+(hole[3]-p[1])*sy)
-            placed[name] = master.crop(panel(region)).resize((x1-x0, y1-y0), Image.Resampling.BOX).convert('RGBA'), (x0, y0)
+            placed[name] = solid(master, mask, panel(region), (x1-x0, y1-y0)), (x0, y0)
             openings.append(hole)
         else:
             if name not in filled and opening(mask, box):
                 raise ValueError(f'The {name} panel shows the background inside it; draw it solid or declare an inset to fill its opening')
-            placed[name] = master.crop(panel(region)).resize(tuple(region['rect'][2:]), Image.Resampling.BOX).convert('RGBA'), tuple(region['rect'][:2])
+            placed[name] = solid(master, mask, panel(region), tuple(region['rect'][2:])), tuple(region['rect'][:2])
     for name, region in regions.items():
         if 'on' in region:
             small, at = placed[name]

@@ -1,13 +1,20 @@
 package dev.civilization;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.*;
 
@@ -44,6 +51,17 @@ public final class KilnContent {
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCookingSerializer<FoundryRecipe>> FOUNDRY_SERIALIZER =
             SERIALIZERS.register("foundry", () -> new SimpleCookingSerializer<>(FoundryRecipe::new, 400));
     public static final DeferredItem<Item> STEEL = ITEMS.registerSimpleItem("steel_ingot");
+    public static final DeferredItem<RoughMetal> IRON_BLOOM = ITEMS.register("iron_bloom", () -> new RoughMetal(() -> Items.IRON_INGOT));
+    public static final DeferredItem<RoughMetal> BLISTER_COPPER = ITEMS.register("blister_copper", () -> new RoughMetal(() -> Items.COPPER_INGOT));
+    public static final DeferredItem<RoughMetal> GOLD_DORE = ITEMS.register("gold_dore", () -> new RoughMetal(() -> Items.GOLD_INGOT));
+    public static final DeferredItem<RoughMetal> BLISTER_STEEL = ITEMS.register("blister_steel", () -> new RoughMetal(STEEL));
+    public static final java.util.List<DeferredItem<RoughMetal>> ROUGH_METALS = java.util.List.of(IRON_BLOOM, BLISTER_COPPER, GOLD_DORE, BLISTER_STEEL);
+    /** An anvil stone seated on a log stump, the first anvil, for hammering only. */
+    public static final DeferredBlock<Block> STONE_ANVIL = BLOCKS.register("stone_anvil", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.SMOOTH_STONE).noOcclusion()) {
+        private static final VoxelShape SHAPE = Shapes.or(box(2, 0, 2, 14, 9, 14), box(1, 9, 1, 15, 15, 15));
+        @Override protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) { return SHAPE; }
+    });
+    public static final DeferredItem<BlockItem> STONE_ANVIL_ITEM = ITEMS.registerSimpleBlockItem(STONE_ANVIL);
     public static final DeferredItem<Item> MACHINE_PARTS = ITEMS.registerSimpleItem("machine_parts");
     public static final DeferredItem<Item> MINERAL_COAL = ITEMS.registerSimpleItem("mineral_coal");
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<KilnBlockEntity>> ENTITY =

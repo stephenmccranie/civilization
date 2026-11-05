@@ -129,6 +129,9 @@ public final class CalorieHud {
             if (food != null) event.getToolTip().add(Component.translatable("tooltip.civilization.calories",
                     String.format(Locale.ROOT, "%,.0f", FoodCalories.of(event.getItemStack(), food)))
                     .withStyle(ChatFormatting.GOLD));
+            if (event.getItemStack().is(dev.civilization.KilnContent.MINERAL_COAL.get()))
+                event.getToolTip().add(Component.translatable("tooltip.civilization.coal_energy", dev.civilization.Energy.text(dev.civilization.Energy.COAL),
+                        String.format(Locale.ROOT, "%.0f", dev.civilization.Energy.COAL_KG)).withStyle(ChatFormatting.GOLD));
         }
     }
 }

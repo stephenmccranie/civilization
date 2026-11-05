@@ -7,6 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** Same finite-fuel and inventory rules as industry, without a multiblock shell. */
 public final class CookingStationBlockEntity extends KilnBlockEntity {
+    /** A single cast block with no masonry. */
+    @Override public int masonry(){return 0;}
     public CookingStationBlockEntity(BlockPos pos, BlockState state) {
         super(CookingContent.ENTITY.get(), pos, state, CookingContent.RECIPE_TYPE.get());
     }

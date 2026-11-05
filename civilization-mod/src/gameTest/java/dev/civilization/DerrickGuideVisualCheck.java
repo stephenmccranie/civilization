@@ -55,7 +55,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==465)shot(mc,"working-base");
         if(ticks==476)shot(mc,"working-next");
         if(ticks==480){mc.options.hideGui=false;check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),.5,102,-3,java.util.Set.of(),0,15);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(AT));});}
-        if(ticks==510){if(((IndustrialMenu)mc.player.containerMenu).data.get(13)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
+        if(ticks==510){if(((IndustrialMenu)mc.player.containerMenu).data.get(12)!=1)throw new IllegalStateException("Built flag did not reach cabinet");shot(mc,"assembled-cabinet");}
         if(ticks==520){mc.setScreen(null);mc.options.hideGui=true;mc.options.fov().set(70);check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-30);});}
         if(ticks==545)shot(mc,"crown-level-photon");
         if(ticks==550)check(mc,()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),.5,121,-1,java.util.Set.of(),0,-55));
