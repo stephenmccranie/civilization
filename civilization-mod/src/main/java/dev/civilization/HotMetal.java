@@ -58,7 +58,7 @@ public final class HotMetal {
     static final int WORST = 100, SPREAD = 5 * 20;
     /** The glow by age in seconds: white-yellow, orange, bright cherry red, dull red, faint, then none; alpha is its strength. */
     private static final int[] GLOW_AGES = {0, 12, 25, 35, 45, 52, 56};
-    private static final int[] GLOW = {0xFFFFF4D2, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
+    private static final int[] GLOW = {0xFFFFF8E0, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
     public static final int ANVIL_BLOWS = 5, STONE_ANVIL_BLOWS = 8, GRINDSTONE_STROKES = 5;
     /** A blow takes a second to swing again, shown as the stack's cooldown; uses sent sooner are ignored. */
     private static final int STRIKE_TICKS = 20;
