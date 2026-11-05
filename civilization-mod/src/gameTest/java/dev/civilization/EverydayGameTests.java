@@ -151,7 +151,8 @@ public class EverydayGameTests {
             h.assertTrue(!menu.getSlot(1).mayPlace(stack) && !machine.canPlaceItemThroughFace(1, stack, Direction.NORTH), "Reject fuel from menu/hopper: " + fuel);
             machine.setItem(0, new ItemStack(Items.BEEF));
             machine.setItem(1, stack);
-            ticks(h, machine, 201);
+            CoalFireFixture.set(machine.fire, true, 0);
+            KilnGameTests.run(h, machine, 201);
             h.assertTrue(machine.getItem(1).getCount() == 1 && machine.getItem(2).isEmpty(), "Forced invalid fuel cannot cook");
         }
         h.succeed();

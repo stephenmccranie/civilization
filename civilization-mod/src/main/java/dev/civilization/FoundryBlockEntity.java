@@ -6,6 +6,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class FoundryBlockEntity extends KilnBlockEntity {
+    /** Footing, walls, vault, chimney and trough. */
+    @Override public int masonry(){return 23;}
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
         super(KilnContent.FOUNDRY_ENTITY.get(), pos, state, KilnContent.FOUNDRY_RECIPE_TYPE.get());
     }

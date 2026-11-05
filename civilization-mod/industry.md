@@ -95,7 +95,7 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 
 One Oil Derrick is the throughput unit: **50 mB/s crude** feeds one heater and one column, then one condenser at **40 mB/s refined fuel**, plus **10 mB/s lubricant and one Sulfur per 20 seconds**. Two lubricated Coal Drills use 32 mB/s together, leaving 8 mB/s for engines. These are loaded rates with coal supplied and outputs clear; startup fills batch buffers first and downstream flow pulses with completed batches. Crude lines reach the 50 mB/s pipe capacity. Empty search stretches, depleted or unloaded deposits, missing coal or backed-up coproducts interrupt supply, so keep lubricant and sulfur moving as well as fuel.
 
-The Derrick and Heater burn Coal (250 mB each per Coal; [coal budget](machines.md#coal-budget)). Eight Coal plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
+The Derrick and Heater burn Coal (250 mB each per Coal drawn; [coal budget](machines.md#coal-budget)), after [warming up](machines.md#coal-fires) on about 4 and 11 Coal. Eight Coal drawn plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
 
 The products have distinct uses: **fuel powers machines, oil lubricates moving machinery, sulfur makes [fertilizer](machines.md#fertilizer-furnace)**. Heated crude and vapor are internal streams. Condensation is air-cooled: no water, pressure or electrical network. This is deliberately simplified petroleum processing: sulfur recovery and lubricant finishing are folded into the column, and ratios are game tuning rather than a chemical mass balance.
 
@@ -121,9 +121,9 @@ Remote ports expose only their assigned controller buffer, on the outward face, 
 
 ## Stops and limits
 
-A missing structure, wrong site, depleted or unloaded deposit, protected resource, missing input or coal, or full output pauses processing. Blocked batches consume no deposit stock or productive coal and reset partial progress; lit fires still idle. Productive coal is charged on completion. A coal block always yields 16 Coal and an oil step 125 mB; nothing is produced once the physical resource is gone.
+A missing structure, wrong site, depleted or unloaded deposit, protected resource, missing input or coal, or full output pauses processing. Blocked batches consume no deposit stock, draw no heat and reset partial progress; a lit fire keeps the machine hot. Work heat is drawn on completion. A coal block always yields 16 Coal and an oil step 125 mB; nothing is produced once the physical resource is gone.
 
-Inventory, fluid buffers, lubrication, remaining heat, in-progress work and the search cursor are saved in the block entity; depletion is saved as removed blocks and changed oil heights in ordinary chunks. Rebuilding starts a bounded search through what remains. **Breaking a controller drops its items but discards its fluids and heat — drain it first.** A tank item never carries liquid. There is no offline production, forced chunk loading or crash-atomic saving across player and resource chunks.
+Inventory, fluid buffers, lubrication, the fire and its stored heat, in-progress work and the search cursor are saved in the block entity; depletion is saved as removed blocks and changed oil heights in ordinary chunks. Rebuilding starts a bounded search through what remains. **Breaking a controller drops its items but discards its fluids and heat — drain it first.** A tank item never carries liquid. There is no offline production, forced chunk loading or crash-atomic saving across player and resource chunks.
 
 ## Hot-Bulb Engine
 

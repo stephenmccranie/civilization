@@ -6,6 +6,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class FertilizerRetortBlockEntity extends KilnBlockEntity {
+    /** Footing, burner, den and tower. */
+    @Override public int masonry(){return 21;}
     public FertilizerRetortBlockEntity(BlockPos pos, BlockState state) {
         super(KilnContent.RETORT_ENTITY.get(), pos, state, KilnContent.RETORT_RECIPE_TYPE.get());
     }

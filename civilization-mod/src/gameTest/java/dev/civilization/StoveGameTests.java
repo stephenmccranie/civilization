@@ -9,7 +9,7 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class StoveGameTests {
     private static PrototypeStoveEntity stove(GameTestHelper h){var pos=h.absolutePos(new BlockPos(4,1,4));h.getLevel().setBlockAndUpdate(pos,PrototypeStoveContent.STOVE.get().defaultBlockState());var s=(PrototypeStoveEntity)h.getLevel().getBlockEntity(pos);s.setItem(0,new ItemStack(Items.POTATO,2));s.setItem(1,new ItemStack(Items.CARROT,2));s.setItem(2,new ItemStack(Items.BREAD));return s;}
-    private static void state(GameTestHelper h,PrototypeStoveEntity s,double dial,double work,int heat,boolean lit){var tag=s.saveWithoutMetadata(h.getLevel().registryAccess());tag.putDouble("dial",dial);tag.putDouble("work",work);tag.putInt("heat",heat);var f=tag.getCompound("coalFire");f.putBoolean("lit",lit);f.putInt("budget",400);tag.put("coalFire",f);s.loadWithComponents(tag,h.getLevel().registryAccess());}
+    private static void state(GameTestHelper h,PrototypeStoveEntity s,double dial,double work,int heat,boolean lit){var tag=s.saveWithoutMetadata(h.getLevel().registryAccess());tag.putDouble("dial",dial);tag.putDouble("work",work);var f=tag.getCompound("coalFire");f.putBoolean("lit",lit);f.putDouble("stored",heat*CoalFire.UNIT);tag.put("coalFire",f);s.loadWithComponents(tag,h.getLevel().registryAccess());}
     @GameTest(template="industrial") public static void qualityPlateauAndContinuousHeat(GameTestHelper h){
         h.assertTrue(StoveCooking.rate(.301)>StoveCooking.rate(.300)&&StoveCooking.rate(1)==1&&StoveCooking.rate(Double.NaN)==0,"Heat responds continuously and rejects nonfinite values");
         for(double w:new double[]{800,850,900,950,1000})h.assertTrue(StoveCooking.quality(w)==1,"Broad plateau has equal maximum quality");
@@ -17,21 +17,19 @@ public final class StoveGameTests {
     }
     @GameTest(template="industrial") public static void batchFuelPersistenceAndConservation(GameTestHelper h){
         var s=stove(h);h.assertTrue(s.start()&&!s.start()&&s.getItem(0).isEmpty()&&s.getItem(1).isEmpty()&&s.getItem(2).isEmpty(),"Ingredients reserved exactly once");
-        h.assertTrue(!s.finish()&&s.batch(),"Raw batch remains after early finish");state(h,s,.6,0,10,true);
-        for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()+s.skillet().warmth()<=10.00001&&!s.fire.lit(),"Finite paid fuel stops progress");for(int i=0;i<2000;i++)s.tick();double work=s.work();for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()==work&&s.skillet().warmth()==0,"Stored heat finishes dissipating; truly cold food stops");
+        h.assertTrue(!s.finish()&&s.batch(),"Raw batch remains after early finish");state(h,s,.6,0,400,false);
+        for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()+s.skillet().warmth()>0&&s.work()+s.skillet().warmth()<=81&&!s.fire.lit(),"An unlit stove cooks on its stored heat only while it stays at working heat");for(int i=0;i<2000;i++)s.tick();double work=s.work();for(int i=0;i<100;i++)s.tick();h.assertTrue(s.work()==work&&s.skillet().warmth()==0,"Stored heat finishes dissipating; truly cold food stops");
         var saved=s.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new PrototypeStoveEntity(s.getBlockPos(),s.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(saved,h.getLevel().registryAccess());h.assertTrue(restored.batch()&&restored.work()==s.work()&&restored.dial()==s.dial(),"Cooking state survives reload");
         state(h,s,1,900,0,false);h.assertTrue(s.finish()&&!s.finish()&&s.getItem(4).getCount()==4,"Serving produces exactly four portions once");var out=s.getItem(4);double ceiling=2*food(Items.BAKED_POTATO)+2*food(Items.CARROT)+food(Items.BREAD);h.assertTrue(Math.abs(WorkMealItem.calories(out)*4-ceiling)<.00001&&WorkMealItem.quality(out)==1,"Best meal never exceeds configured ingredient budget");
         s.setItem(0,new ItemStack(Items.POTATO,2));s.setItem(1,new ItemStack(Items.CARROT,2));s.setItem(2,new ItemStack(Items.BREAD));h.assertTrue(!s.start()&&s.getItem(0).getCount()==2,"Occupied output rejects next batch without consuming inputs");h.succeed();
     }
     @GameTest(template="industrial") public static void savedStoveFuelEmitsGentleHeat(GameTestHelper h){
-        var s=stove(h);s.start();state(h,s,1,0,400,true);
-        var saved=s.saveWithoutMetadata(h.getLevel().registryAccess());
-        saved.getCompound("coalFire").putDouble("unspentWasteHeat",ThermalRules.COAL_WASTE_HEAT);
-        s.loadWithComponents(saved,h.getLevel().registryAccess());
-        var field=ThermalField.get(h.getLevel());long key=s.getBlockPos().asLong();double before=field.pending.get(key);
+        var s=stove(h);s.start();state(h,s,1,0,400,false);
+        var field=ThermalField.get(h.getLevel());long key=s.getBlockPos().asLong();double before=field.pending.get(key),start=CoalFireFixture.stored(s.fire);
         for(int i=0;i<400;i++)s.tick();
-        h.assertTrue(Math.abs(s.work()+s.skillet().warmth()-400)<.00001&&s.fireHeat()==0&&!s.fire.lit(),"Lower room heat preserves saved coal work and exhaustion");
-        h.assertTrue(Math.abs(field.pending.get(key)-before-650)<.001,"Already-loaded stove coal emits 5% of industrial waste heat");
+        double used=start-CoalFireFixture.stored(s.fire);
+        h.assertTrue(s.work()+s.skillet().warmth()>0&&s.work()+s.skillet().warmth()<=81&&!s.fire.lit(),"A full unlit stove cooks until its stored heat falls below working heat");
+        h.assertTrue(Math.abs(field.pending.get(key)-before-used*ThermalRules.COAL_WASTE_HEAT/Energy.COAL*ThermalRules.STOVE_WASTE_HEAT_FACTOR)<.001,"A stove releases 5% of industrial waste heat for the heat it uses");
         var p=s.getBlockPos();var l=h.getLevel();
         // Enclosed five-by-five kitchen, three air blocks below its roof.
         for(var q:BlockPos.betweenClosed(p.offset(-2,-1,-2),p.offset(2,4,2))){
@@ -40,8 +38,8 @@ public final class StoveGameTests {
         }
         var room=new ThermalField();var previous=new ThermalField();var torso=p.north().above();
         for(int second=0;second<120;second++){
-            room.pending.put(key,ThermalRules.COAL_WASTE_HEAT*s.coalWasteHeatFactor()*20/ProductionEnergy.HEAT_TICKS);room.step(l);
-            previous.pending.put(key,ThermalRules.COAL_WASTE_HEAT*.025*20/ProductionEnergy.HEAT_TICKS);previous.step(l);
+            room.pending.put(key,ThermalRules.COAL_WASTE_HEAT*s.coalWasteHeatFactor()*20/ProductionEnergy.COAL);room.step(l);
+            previous.pending.put(key,ThermalRules.COAL_WASTE_HEAT*.025*20/ProductionEnergy.COAL);previous.step(l);
         }
         double rise=room.excess(l,torso)*1.8,oldRise=previous.excess(l,torso)*1.8;
         System.out.printf(java.util.Locale.ROOT,"STOVE_ADJACENT_ROOM_F after=120s previous=%.2f rise=%.2f%n",oldRise,rise);
@@ -59,7 +57,7 @@ public final class StoveGameTests {
         d.workMeal(0);h.assertTrue(d.workFactor()==.9&&d.mealTicks()==36000,"A new meal replaces rather than stacks");double before=d.reserve().calories();d.spendOther(p,100,"sleep");h.assertTrue(d.reserve().calories()==before-100,"Sleep cost receives no discount");before=d.reserve().calories();d.spendOther(p,100,"fertilizer_labor");h.assertTrue(d.reserve().calories()==before-90,"Agricultural work receives discount");var saved=new CompoundTag();d.addAdditionalSaveData(saved);var restored=new CalorieFoodData();restored.readAdditionalSaveData(saved);h.assertTrue(restored.workFactor()==.9&&restored.mealTicks()==36000,"Benefit persists without offline time loss");d.tick(p);h.assertTrue(d.mealTicks()==35999,"Duration counts online ticks");h.succeed();
     }
     @GameTest(template="industrial") public static void carryoverUsesOnlyPaidHeatAndEarlyRemovalRecovers(GameTestHelper h){
-        var s=stove(h);s.start();state(h,s,1,0,400,true);for(int i=0;i<400;i++)s.tick();
+        var s=stove(h);s.setItem(3,KilnContent.MINERAL_COAL.toStack(3));s.start();state(h,s,1,0,400,true);for(int i=0;i<400;i++)s.tick();
         double work=s.work(),warmth=s.skillet().warmth();h.assertTrue(work<400&&warmth>100,"Cold cookware stores some paid energy instead of cooking instantly");
         var item=s.liftSkillet();h.assertTrue(!s.batch()&&!s.hasSkillet()&&s.liftSkillet().isEmpty(),"Lifting transfers the batch exactly once");
         s.setItem(0,new ItemStack(Items.POTATO,2));s.setItem(1,new ItemStack(Items.CARROT,2));s.setItem(2,new ItemStack(Items.BREAD));
@@ -69,7 +67,7 @@ public final class StoveGameTests {
         h.assertTrue(pan.work()>work&&pan.work()<=work+warmth&&pan.warmth()==0,"Off-fire cooking draws solely on stored heat and stops");
         h.assertTrue(pan.serve().isEmpty(),"Early removal is an intact undercooked batch, not a lost batch");
         SkilletItem.contents(item,pan);h.assertTrue(s.putSkillet(item)&&item.isEmpty()&&s.batch(),"Undercooked vessel can return to the stove without cloning");
-        state(h,s,1,s.work(),800,true);for(int i=0;i<700;i++)s.tick();
+        state(h,s,1,s.work(),400,true);for(int i=0;i<700;i++)s.tick();
         h.assertTrue(s.finish()&&s.getItem(4).getCount()==4,"Recovering an early batch yields four portions");h.succeed();
     }
     @GameTest(template="industrial") public static void actualLiftRestServeAndSupportLossPreserveOneVessel(GameTestHelper h){

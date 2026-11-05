@@ -56,6 +56,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - The full day/night cycle is 60 minutes with vanilla proportions; the tick rate is unchanged.
 
 **Open**
+- Labor and food in real energy: labor is game-scaled (assembly's 5 kcal/s is about 21 kW, far above real human output), while food comes fast, since a whole cow is about 1,000 MJ in two seconds. Real metabolic labor would need a slower food supply.
 - Spawn, starting items and subsistence: a fresh solo player must reach food, tools and claim inputs without existing buyers.
 - Death recovery in hazardous or inaccessible places, repeated deaths, XP and respawn health.
 
@@ -127,11 +128,12 @@ Terrain makes opportunity understandable. One shared region/biome foundation dri
 
 Calories support people throughout and are not a tier. Lower-tier goods and fuels stay useful; oil stays useful for mobile work after reactors.
 
+- **Energy is measured in joules.** Fuel, food, stored heat and machine work share one unit (kJ, MJ, GJ; power in kW), with real-world values: coal 25 MJ/kg, refined fuel about 43 MJ/kg, crude about 42 MJ/kg, and food its real energy, which players read in kcal (1 kcal is 4.184 kJ). A **Coal** item is a 10 kg scuttle of 250 MJ; a dense coal block prepares into 16 Coal, the 160 kg of fuel-grade coal screened from its rock partings and dust. A common unit measures and compares; it never converts one fuel into another.
 - No renewable industrial power or biomass fuel; food, cranks and animals never become industrial energy. Conversions have explicit inputs and losses. Uranium fuels reactors, not furnaces. No universal fuel conversion or fixed exchange rate.
 - Coal is the heat fuel; oil the mobile mechanical fuel and source of lubricant and sulfur. Per mass, petroleum should eventually hold only moderately more energy than coal.
 - Each stage builds the next from what is already available, with no circular recipes: ordinary coal starts industry, coal opens oil, oil processes hand-found uranium.
 - **One Coal** serves crafting, fuel and claim reserves; charcoal, renewable coal and coal blocks are removed. Kilns fire nonmetals, Foundries metals and ore, stoves food; vanilla furnaces, blast furnaces and smokers retire, and no controller needs one.
-- **Coal demand.** Production burns four times the original coal baseline, with speeds, outputs and claim upkeep unchanged. Every coal machine is lit by hand with a paced, random-chance flint-and-steel button (each accepted strike costs a little labour), then feeds itself, idling far cheaper than working, until it runs out. Coal machines have two fuel slots.
+- **Fired machines store heat.** Every coal machine is lit by hand with a paced, random-chance flint-and-steel button (each accepted strike costs a little labour), then stokes itself from two fuel slots. The fire heats the machine's masonry first: warming a cold machine is the big cost, about one dense block of Coal for a Foundry and less for smaller machines, over about two minutes. Work needs working heat and draws a little per job; a hot machine leaks slowly into the air around it, so unfed it stays hot for about twenty minutes, longer when sheltered and walled, shorter in cold or rain. Heat once and work a lot: a busy shared furnace pays one warm-up.
 - Heat machines cannot ignite or work while rain reaches their work face; a roof shelters them.
 - **Refining.** Coal powers the first pump and heater. Heater, distillation and condenser multiblocks connect through basic pipes, balanced one-to-one with an extractor, producing refined fuel, lubricating oil and sulfur. One extractor fills a basic pipe; branching never multiplies capacity. Lubrication wears with work, not idle time; running dry gradually cuts efficiency. Pipes have no valves; glass inspection strips show the moving fluid.
 - Refined fuel drives transport and machinery and is not needed for coal. **No oil dependency may block building the first oil chain.**
@@ -139,9 +141,9 @@ Calories support people throughout and are not a tier. Lower-tier goods and fuel
 
 **Open**
 - Oil and uranium processing beyond the refinery; uranium fuel packaging and yield; oil freight quantities.
-- Whether furnace-style burning and workshop heat converge into one policy.
 - The remaining vanilla boundary: resource farms, special equipment and loot, enchanting, food shortcuts, mobs, redstone, automation, and storage or travel that bypasses freight; stonecutter overlap with saws.
-- Coal and oil balance rebuilt from mining, hauling and transport rather than the retired drill ratio.
+- Coal and oil balance rebuilt from mining, hauling and transport rather than the retired drill ratio. With real energy per item, what goods cost is set by how fast coal and oil are mined, drilled and hauled: a dense block yields 4 GJ, so mining and drilling rates per block need rethinking alongside heat-and-hammer refining.
+- How powers are shown while the day runs 24 times faster than real time, so real energies per job meet compressed hours.
 
 ## Manual coal mining
 
@@ -166,7 +168,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 
 | Workplace | Input → output |
 | --- | --- |
-| Foundry | Ore + Coal → metals and steel |
+| Foundry | Ore + Coal → metals and steel; refining |
 | Tannery | Raw Hide → Leather; brick, stone and wood, no iron |
 | Textile Workshop | Wool → Cloth |
 | Smithy | Metals → forged heads, Plates, Rods, Fasteners |
@@ -181,16 +183,21 @@ Towns concentrate production, customers and services: rural farms, mines and for
 - Gold is a real tier between iron and diamond, keeping its enchantability.
 - Coal-era workshops make iron equipment and everything for the first oil chain; later powered works use fuel and lubricant for throughput. Lubricant services machines; it is never a recipe ingredient.
 - **Density** comes from shared landings and warehouses, short transfers and concentrated customers — no city designation, proximity buff or forced residence.
-- **Grade.** Every damageable item gets a permanent grade from a normal distribution centred on 75% (20-point deviation, no limits) that scales its base stats; 100% equals vanilla. A backpack's grade scales its capacity instead. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
+- **Grade.** Grade belongs to each unit of metal. Smelting rolls every unit of rough metal, a 10 kg bar's worth, a permanent grade, to a tenth of a percent, from a normal distribution centred on 75% (20-point deviation, no limits); each hammering always raises it, by a random step that shrinks as grade rises. Steel keeps its iron's grade, and diamonds are cut rather than hammered. Parts take the mean grade of the metal they use and equipment the mean of its metal parts. A backpack rolls its grade when made; other gear without graded material is standard 75%. Stacks mix grades, show their average and keep each unit's grade, handing out their best units first. Grade scales equipment's base stats; 100% equals vanilla. A backpack's grade scales its capacity instead. Grade is the single permanent wear measure: use never drains it, repairs lower it. The durability bar shows remaining, spent, grade-lost and exceptional capacity; a persistent wear pattern appears below 100%, and 100%+ items get an automatic trim (Smithing Table trims are disabled).
 - **Repairs** at the Assembly Bench consume materials and lower grade, keeping names and enchantments, with no XP or prior-work penalty. No idle decay.
 - Mending and villager equipment trades are disabled. Completed production grants modest XP; hand assembly and repairs grant none. Crafting, repair and other acquisition routes may not bypass workshop production, though finite exploration finds stay usable.
 - **Maker's marks** (approved, deferred): colour accents and player-drawn pixel signatures on equipment.
 
+- **Smelt, hammer and quench.** Every metal is made hot and finished by hand. The Foundry smelts ore into rough metal, which iron never melts into but copper and gold are cast as: **Iron Bloom**, **Blister Copper** and **Gold Doré**; cemented iron ingots become **Blister Steel**. Metal stays hot while it sits in a hot Foundry, glows, and cools about a minute after leaving it, wherever it is. A few slow, heavy blows at an anvil beat a hot stack of rough metal into ingots, and hammering a hot ingot refines it; every hammering is the player's own labor, paid for each unit, and raises each unit one random grade step. Water quenches hot metal at once, without changing its grade. Cold metal goes back into the Foundry, which heats a whole load for the same coal, so full loads are cheapest. The first anvil is a **Stone Anvil**, a heavy anvil stone seated on a log stump, as early smiths worked blooms on stone; it takes more blows than the iron anvil that its first ingots make, and the Smithy needs the iron one. Diamonds burn rather than forge, so they are cut at a grindstone with the same slow labor and no heat. High grades cost a great deal of both coal and food, so mines and kitchens both serve metalworkers, and a fire tender and a hammerer can work together.
+
 **Open**
+- Smelt-and-hammer tuning: coal per load, load size, blows per anvil and kcal per blow, cooling time, and whether hammering wears the anvil.
+- A powered hammer that takes metal past the Foundry without hand labor; until one exists, hot metal leaves the Foundry only by hand.
 - Gates for ranged and special equipment, horse armour and tools; renewable treasure and other metal sources.
 - Where coal smithing ends and oil-powered manufacturing begins.
 - Head and handle damage or disassembly; separate woodworking or assembly sites at scale; further product families.
 - Non-numeric grade effects and nonpositive grades.
+- Grade in trade offers, and through nuggets and storage blocks.
 - Maker's mark details (a 6×6 grid is a candidate).
 
 ## Construction
@@ -245,10 +252,10 @@ One environmental temperature field connects buildings, machines and people.
 
 ## Physical foundation
 
-Mass, heat capacity and stored fuel energy are separate quantities drawn from shared material and shape properties; machine work credit is separate again. Sable owns rigid-body motion; Civilization supplies narrow adapters, energy accounting and gameplay policy. Controls stay simple, with no hidden engineering chores, and the foundation comes before any cargo penalty or machine-temperature rule.
+Mass, heat capacity and stored fuel energy are separate quantities drawn from shared material and shape properties, all in real units; heat and fuel energy are joules, and the heat field stores joules from the real material data. Machine work credit is separate again. Sable owns rigid-body motion; Civilization supplies narrow adapters, energy accounting and gameplay policy. Controls stay simple, with no hidden engineering chores, and the foundation comes before any cargo penalty or machine-temperature rule.
 
 **Open**
-- Dynamic cargo mass, heat aboard moving vessels and unified fuel → work + heat accounting.
+- Dynamic cargo mass and heat aboard moving vessels.
 - Cargo penalties and machine-temperature rules each need approval.
 
 ## Transport

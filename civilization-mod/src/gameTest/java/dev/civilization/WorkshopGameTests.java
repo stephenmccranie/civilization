@@ -13,19 +13,6 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class WorkshopGameTests {
-    @GameTest(template="industrial") public static void widerEquipmentGradeRollHasBothTails(GameTestHelper h){
-        var random=net.minecraft.util.RandomSource.create(987654321L);
-        int low=0,high=0;long total=0;
-        for(int i=0;i<20000;i++){
-            int grade=EquipmentGrade.roll(random);total+=grade;
-            if(grade<50)low++;
-            if(grade>=100)high++;
-        }
-        h.assertTrue(total/20000.0>74&&total/20000.0<76,"The wider roll stays centered near 75%");
-        h.assertTrue(low>1600&&low<2800&&high>1600&&high<2800,
-                "Both low (<50%) and exceptional (100%+) grades appear on roughly one in ten rolls");
-        h.succeed();
-    }
     @GameTest(template="industrial") public static void pairedWorkshopStorageAndSmithySingleOutput(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack());w.setItem(1,WorkshopContent.HIDE.toStack());w.setItem(5,new ItemStack(Items.LEATHER,31));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
         h.assertTrue(w.getItem(5).getCount()==32&&w.getItem(7).getCount()==1&&w.getItem(0).isEmpty()&&w.getItem(1).isEmpty(),"Two input stacks feed both output stacks");
@@ -71,28 +58,18 @@ public final class WorkshopGameTests {
         emissions[2]=field.pending.get(idle.getBlockPos().asLong());
         h.assertTrue(emissions[0]>0&&Math.abs(emissions[1]/emissions[0]-1)<.01,
                 "Diamond and iron work emit the same heat per second: "+Arrays.toString(emissions));
-        h.assertTrue(Math.abs(emissions[0]/emissions[2]-10)<.01,
-                "Idle fire emits one tenth of base productive heat, not a full coal pulse");
+        h.assertTrue(emissions[2]>0&&emissions[2]<emissions[0]/10,
+                "An idle hot fire emits only its masonry's slow leak: "+Arrays.toString(emissions));
         h.succeed();
     }
-    @GameTest(template="industrial") public static void coalHeatLedgerSurvivesReloadWithoutReemittingOldFuel(GameTestHelper h){
-        var l=h.getLevel();var w=build(h,2,Direction.NORTH);var field=ThermalField.get(l);
-        field.pending.remove(w.getBlockPos().asLong());
-        w.setItem(4,KilnContent.MINERAL_COAL.toStack());CoalFireFixture.light(w);
-        h.assertTrue(w.fire.supply(1),"A lit fire can buy one coal reserve");
-        h.assertTrue(field.pending.get(w.getBlockPos().asLong())==0,"Buying coal does not release heat before burning it");
-        int first=w.heat/2;w.heat-=first;w.fire.spent(first);
-        double half=field.pending.get(w.getBlockPos().asLong());
-        h.assertTrue(Math.abs(half-ThermalRules.COAL_WASTE_HEAT*first/(double)(first+w.heat))<.001,"The spent half queues only its share of heat");
-        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(l);
-        copy.loadWithComponents(w.saveWithFullMetadata(l.registryAccess()),l.registryAccess());
-        int rest=copy.heat;copy.heat=0;copy.fire.spent(rest);
-        h.assertTrue(Math.abs(field.pending.get(w.getBlockPos().asLong())-ThermalRules.COAL_WASTE_HEAT)<.001,
-                "Reloaded reserve releases exactly one coal's total heat");
-        var legacy=new net.minecraft.nbt.CompoundTag();var oldFire=new net.minecraft.nbt.CompoundTag();oldFire.putBoolean("lit",true);legacy.put("coalFire",oldFire);
-        copy.fire.load(legacy);copy.heat=100;copy.heat=0;copy.fire.spent(100);
-        h.assertTrue(Math.abs(field.pending.get(w.getBlockPos().asLong())-ThermalRules.COAL_WASTE_HEAT)<.001,
-                "Old saves have no unspent ledger and cannot emit the same coal twice");
+    @GameTest(template="industrial") public static void storedHeatPersistsAndIsReleasedOnce(GameTestHelper h){
+        var l=h.getLevel();var w=build(h,2,Direction.NORTH);var field=ThermalField.get(l);long key=w.getBlockPos().asLong();
+        field.pending.remove(key);CoalFireFixture.light(w);
+        h.assertTrue(field.pending.get(key)==0,"Heat held in the masonry is not yet released");
+        h.assertTrue(w.fire.draw(100),"A hot fire supplies work");double released=field.pending.get(key);
+        h.assertTrue(Math.abs(released-100*ThermalRules.COAL_WASTE_HEAT/ProductionEnergy.COAL)<1e-6,"Work releases exactly its own heat into the air");
+        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(l);copy.loadWithComponents(w.saveWithFullMetadata(l.registryAccess()),l.registryAccess());
+        h.assertTrue(copy.fire.lit()&&CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(w.fire)&&field.pending.get(key)==released,"Reloading keeps the fire and its heat without releasing them again");
         h.succeed();
     }
     @GameTest(template="industrial") public static void materialCoalRatesAndDiamondRepair(GameTestHelper h){
@@ -100,26 +77,26 @@ public final class WorkshopGameTests {
             var forged=ManufacturingGameTests.job(2,ManufacturingContent.head(metal,"pickaxe"));int multiplier=metal.equals("diamond")?4:metal.equals("gold")?2:1;
             h.assertTrue(forged.materialMultiplier()==multiplier&&forged.ticks()==500*multiplier,"Material scales the forging duration and total Coal");
         }
-        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(tool,100,44);tool.setDamageValue(300);
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(tool,1000,44);tool.setDamageValue(300);
         var job=WorkshopJobs.repair(tool);w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());
-        run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.heat==0,"Diamond repair completes by hand without Coal");h.succeed();
+        run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.fire.heat()==0,"Diamond repair completes by hand without Coal");h.succeed();
     }
     @GameTest(template="industrial") public static void tanningClothProductiveCoal(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
-        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==2&&w.heat==200&&w.getItem(4).getCount()==3,"Two hides use half a coal of productive heat");
+        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==2&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two hides draw half a Coal from the hot fire, which stokes one to top up");
         h.assertTrue(WorkshopJobs.jobs(0).getFirst().coalNote().contains("0.25"),"Tannery quote shows the lower coal cost");
-        run(w,1600);h.assertTrue(w.heat==40&&w.getItem(4).getCount()==3,"Idle consumes remaining coal at ten percent rate");
+        run(w,1600);h.assertTrue(w.fire.hot()&&w.getItem(4).getCount()==3,"A hot idle fire only replaces what its masonry leaks");
         w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.RED_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,190);
         h.assertTrue(w.getItem(5).isEmpty(),"Weaving needs the full ten seconds");
         run(w,210);
-        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==4&&w.heat==200&&w.getItem(4).getCount()==3,"Two colored wool yield four Cloth in twenty seconds for half a coal");
+        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==4&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two colored wool yield four Cloth in twenty seconds, drawing half a Coal");
         h.assertTrue(WorkshopJobs.jobs(1).getFirst().coalNote().contains("0.25"),"Textile quote shows the lower coal cost");
         h.assertTrue(!w.canPlaceItem(0,new ItemStack(Items.WHEAT))&&!w.canPlaceItem(4,new ItemStack(Items.CHARCOAL)),"No plant cloth or biomass fuel");h.succeed();
     }
     @GameTest(template="industrial") public static void everyEquipmentJobConservesIngredients(GameTestHelper h){
         var w=build(h,2,Direction.NORTH);var jobs=WorkshopJobs.smithy();
         for(int n=0;n<jobs.size();n++){
-            w.clearContent();w.select(n);w.heat=0;var j=jobs.get(n);
+            w.clearContent();w.select(n);w.fire.extinguish();var j=jobs.get(n);
             for(int i=0;i<4;i++)w.setItem(i,j.needs().get(i).icon());
             int supplied=0;CoalFireFixture.light(w);
             for(int tick=0;tick<j.ticks();tick+=10){
@@ -128,21 +105,22 @@ public final class WorkshopGameTests {
             }
             h.assertTrue(w.getItem(5).is(j.output().getItem()),"Output for "+j.name());
             for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Exact input consumption "+j.name());
-            h.assertTrue(w.heat==(400-j.ticks()%400)%400 && w.getItem(4).getCount()==supplied-(j.ticks()+399)/400,"Exact productive coal for "+j.name());
+            int burned=supplied-w.getItem(4).getCount(),draw=(j.ticks()+399)/400;
+            h.assertTrue(burned>=draw&&burned<=draw+1,"Each job burns its own draw, plus at most one Coal of leakage, for "+j.name()+": "+burned);
         }h.succeed();
     }
     @GameTest(template="industrial") public static void repairLowersGradeAndRetainsIdentity(GameTestHelper h){
-        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,75);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
+        var w=build(h,3,Direction.NORTH);w.select(0);var tool=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(tool,750,4242L);tool.setDamageValue(165);tool.set(DataComponents.CUSTOM_NAME,Component.literal("Townsmith"));
         var unbreaking=h.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);tool.enchant(unbreaking,2);
         long originalWearSeed=EquipmentGrade.wearSeed(tool);
         w.setItem(0,tool);w.setItem(1,new ItemStack(ManufacturingContent.part("iron","plate"),2));w.setItem(2,ManufacturingContent.HANDLE.toStack());run(w,200);
-        var out=w.getItem(5);h.assertTrue(EquipmentGrade.value(out)==70&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
+        var out=w.getItem(5);h.assertTrue(Grade.value(out)==700&&out.getMaxDamage()==175&&out.getDamageValue()==0,"Repair lowers 75% grade to 70%, which determines maximum durability");
         h.assertTrue(out.getHoverName().getString().equals("Townsmith")&&EnchantmentHelper.getItemEnchantmentLevel(unbreaking,out)==2&&EquipmentGrade.wearSeed(out)==originalWearSeed,"Name, enchantment and personal wear pattern retained");
         out.setDamageValue(174);var quote=WorkshopJobs.repair(out);
-        h.assertTrue(EquipmentGrade.value(quote.output())==63&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
+        h.assertTrue(Grade.value(quote.output())==630&&quote.output().getMaxDamage()==158,"The next repair lowers grade further, with no old durability floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeScalesEquipmentStatsAndLowGradeRepairsEnd(GameTestHelper h){
-        var sword=new ItemStack(Items.IRON_SWORD);var base=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);EquipmentGrade.apply(sword,70);
+        var sword=new ItemStack(Items.IRON_SWORD);var base=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);EquipmentGrade.apply(sword,700);
         var scaled=sword.get(DataComponents.ATTRIBUTE_MODIFIERS);
         var baseDamage=base.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)).findFirst().orElseThrow().modifier().amount();
         var damage=scaled.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)).findFirst().orElseThrow().modifier().amount();
@@ -150,12 +128,12 @@ public final class WorkshopGameTests {
         var speedMod=scaled.modifiers().stream().filter(e->e.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)).findFirst().orElseThrow().modifier().amount();
         h.assertTrue(sword.getMaxDamage()==175&&Math.abs((1+damage)-(1+baseDamage)*.7)<.001,"Durability and final attack damage scale together");
         h.assertTrue(Math.abs((4+speedMod)-(4+baseSpeed)*.7)<.001,"Negative attack-speed modifiers do not invert grade");
-        var pick=new ItemStack(Items.IRON_PICKAXE);float speed=pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());EquipmentGrade.apply(pick,70);
+        var pick=new ItemStack(Items.IRON_PICKAXE);float speed=pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());EquipmentGrade.apply(pick,700);
         h.assertTrue(Math.abs(pick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState())-speed*.7)<.001,"Mining speed scales directly");
-        EquipmentGrade.apply(pick,50);pick.setDamageValue(pick.getMaxDamage()-1);var first=WorkshopJobs.repair(pick).output();
+        EquipmentGrade.apply(pick,500);pick.setDamageValue(pick.getMaxDamage()-1);var first=WorkshopJobs.repair(pick).output();
         first.setDamageValue(first.getMaxDamage()-1);var second=WorkshopJobs.repair(first).output();
         second.setDamageValue(second.getMaxDamage()-1);
-        h.assertTrue(EquipmentGrade.value(first)==35&&EquipmentGrade.value(second)==8&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
+        h.assertTrue(Grade.value(first)==350&&Grade.value(second)==80&&WorkshopJobs.repair(second)==null,"Weak gear exhausts its repair life without a grade floor");h.succeed();
     }
     @GameTest(template="industrial") public static void gradeChangesActualBlockBreakingRate(GameTestHelper h){
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GradeMiner"));
@@ -170,22 +148,22 @@ public final class WorkshopGameTests {
         for(var entry:materials.entrySet()){
             var state=entry.getValue().defaultBlockState();h.getLevel().setBlockAndUpdate(pos,state);
             float base=new ItemStack(entry.getKey()).getDestroySpeed(state),lowProgress=0,normalProgress=0;
-            for(int grade:new int[]{50,100,125}){
+            for(int grade:new int[]{500,1000,1250}){
                 var tool=new ItemStack(entry.getKey());EquipmentGrade.apply(tool,grade);
                 player.getInventory().setItem(0,tool);
-                h.assertTrue(Math.abs(tool.getDestroySpeed(state)-base*grade/100.0)<.001,"The held tool's mining speed follows its grade");
+                h.assertTrue(Math.abs(tool.getDestroySpeed(state)-base*grade/1000.0)<.001,"The held tool's mining speed follows its grade");
                 float progress=state.getDestroyProgress(player,h.getLevel(),pos);
                 h.assertTrue(progress>0,"The player can mine the test block");
-                if(grade==50)lowProgress=progress;
-                if(grade==100){normalProgress=progress;h.assertTrue(Math.abs(lowProgress-normalProgress*.5)<.001,"Actual block-breaking progress decreases with grade");}
-                if(grade==125)h.assertTrue(Math.abs(progress-normalProgress*1.25)<.001,"Actual block-breaking progress increases with grade");
+                if(grade==500)lowProgress=progress;
+                if(grade==1000){normalProgress=progress;h.assertTrue(Math.abs(lowProgress-normalProgress*.5)<.001,"Actual block-breaking progress decreases with grade");}
+                if(grade==1250)h.assertTrue(Math.abs(progress-normalProgress*1.25)<.001,"Actual block-breaking progress increases with grade");
             }
         }
         h.succeed();
     }
     @GameTest(template="industrial") public static void goldIsAUsefulIntermediateTierAndArmorGradeAffectsProtection(GameTestHelper h){
         var ironPick=new ItemStack(Items.IRON_PICKAXE);var goldPick=new ItemStack(Items.GOLDEN_PICKAXE);var diamondPick=new ItemStack(Items.DIAMOND_PICKAXE);
-        EquipmentGrade.apply(goldPick,100);
+        EquipmentGrade.apply(goldPick,1000);
         h.assertTrue(ironPick.getMaxDamage()<goldPick.getMaxDamage()&&goldPick.getMaxDamage()<diamondPick.getMaxDamage(),"Gold tool durability sits between iron and diamond");
         float ironSpeed=ironPick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());
         float goldSpeed=goldPick.get(DataComponents.TOOL).getMiningSpeed(Blocks.STONE.defaultBlockState());
@@ -193,7 +171,7 @@ public final class WorkshopGameTests {
         h.assertTrue(ironSpeed<goldSpeed&&goldSpeed<diamondSpeed,"Gold mining speed sits between iron and diamond");
         h.assertTrue(goldPick.get(DataComponents.TOOL).isCorrectForDrops(Blocks.DIAMOND_ORE.defaultBlockState())
                 &&!goldPick.get(DataComponents.TOOL).isCorrectForDrops(Blocks.OBSIDIAN.defaultBlockState()),"Gold harvests iron-tier ores, not diamond-tier blocks");
-        var goldSword=new ItemStack(Items.GOLDEN_SWORD);EquipmentGrade.apply(goldSword,100);
+        var goldSword=new ItemStack(Items.GOLDEN_SWORD);EquipmentGrade.apply(goldSword,1000);
         double ironDamage=stat(new ItemStack(Items.IRON_SWORD),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
         double goldDamage=stat(goldSword,net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
         double diamondDamage=stat(new ItemStack(Items.DIAMOND_SWORD),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)+1;
@@ -201,7 +179,7 @@ public final class WorkshopGameTests {
         for(var tier:List.of(List.of(Items.IRON_AXE,Items.GOLDEN_AXE,Items.DIAMOND_AXE),
                 List.of(Items.IRON_SHOVEL,Items.GOLDEN_SHOVEL,Items.DIAMOND_SHOVEL),
                 List.of(Items.IRON_HOE,Items.GOLDEN_HOE,Items.DIAMOND_HOE))){
-            var middle=new ItemStack(tier.get(1));EquipmentGrade.apply(middle,100);
+            var middle=new ItemStack(tier.get(1));EquipmentGrade.apply(middle,1000);
             double low=stat(new ItemStack(tier.get(0)),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
             double mid=stat(middle,net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
             double high=stat(new ItemStack(tier.get(2)),net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
@@ -213,18 +191,18 @@ public final class WorkshopGameTests {
                 List.of(Items.IRON_BOOTS,Items.GOLDEN_BOOTS,Items.DIAMOND_BOOTS));
         for(var tier:armorTiers){
             Item armor=tier.get(1);
-            var item=new ItemStack(armor);EquipmentGrade.apply(item,100);
+            var item=new ItemStack(armor);EquipmentGrade.apply(item,1000);
             double defense=stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR);
             h.assertTrue(stat(new ItemStack(tier.get(0)),net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)<defense
                     &&defense<stat(new ItemStack(tier.get(2)),net.minecraft.world.entity.ai.attributes.Attributes.ARMOR),"Gold armor protection is intermediate on each piece");
             h.assertTrue(defense>0&&Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-1)<.001,"Gold armor has defense and intermediate toughness");
-            EquipmentGrade.apply(item,70);
+            EquipmentGrade.apply(item,700);
             h.assertTrue(Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-defense*.7)<.001
                     &&Math.abs(stat(item,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-.7)<.001,"Grade scales every gold armor piece's protection and toughness");
         }
-        var ironArmor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(ironArmor,70);
+        var ironArmor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(ironArmor,700);
         h.assertTrue(Math.abs(stat(ironArmor,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)-4.2)<.001,"Armor without a component still grades its vanilla defense");
-        var netherite=new ItemStack(Items.NETHERITE_CHESTPLATE);EquipmentGrade.apply(netherite,70);
+        var netherite=new ItemStack(Items.NETHERITE_CHESTPLATE);EquipmentGrade.apply(netherite,700);
         h.assertTrue(Math.abs(stat(netherite,net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS)-2.1)<.001
                 &&Math.abs(stat(netherite,net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)-.07)<.001,"Grade scales netherite armor's special stats");h.succeed();
     }
@@ -232,15 +210,15 @@ public final class WorkshopGameTests {
         return stack.getAttributeModifiers().modifiers().stream().filter(e->e.attribute().is(attribute)).mapToDouble(e->e.modifier().amount()).sum();
     }
     @GameTest(template="industrial") public static void exceptionalArmorTrimsComeFromGradeNotSmithing(GameTestHelper h){
-        var armor=new ItemStack(Items.LEATHER_CHESTPLATE);EquipmentGrade.apply(armor,105,12345L);
+        var armor=new ItemStack(Items.LEATHER_CHESTPLATE);EquipmentGrade.apply(armor,1050,12345L);
         EquipmentGrade.ensure(armor,h.getLevel().random,h.getLevel().registryAccess());
         var trim=armor.get(DataComponents.TRIM);
         h.assertTrue(trim!=null&&trim.pattern().unwrapKey().orElseThrow().location().getNamespace().equals("minecraft")
                 &&trim.material().unwrapKey().orElseThrow().location().getNamespace().equals("minecraft"),"100%+ leather armor receives a random vanilla trim");
         EquipmentGrade.ensure(armor,h.getLevel().random,h.getLevel().registryAccess());
         h.assertTrue(trim.equals(armor.get(DataComponents.TRIM)),"The trim is stable across inventory scans");
-        EquipmentGrade.apply(armor,99);h.assertTrue(!armor.has(DataComponents.TRIM),"Falling below 100% removes the status trim");
-        var ordinary=new ItemStack(Items.DIAMOND_CHESTPLATE);EquipmentGrade.apply(ordinary,99);
+        EquipmentGrade.apply(armor,990);h.assertTrue(!armor.has(DataComponents.TRIM),"Falling below 100% removes the status trim");
+        var ordinary=new ItemStack(Items.DIAMOND_CHESTPLATE);EquipmentGrade.apply(ordinary,990);
         EquipmentGrade.ensure(ordinary,h.getLevel().random,h.getLevel().registryAccess());
         h.assertTrue(!ordinary.has(DataComponents.TRIM),"Lower grade armor stays untrimmed");
         long active=h.getLevel().getRecipeManager().getRecipes().stream().filter(recipe->recipe.value() instanceof SmithingTrimRecipe).count();
@@ -249,14 +227,14 @@ public final class WorkshopGameTests {
     @GameTest(template="industrial") public static void projectileDamageUsesFiredWeaponsGrade(GameTestHelper h){
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GradeArcher"));
         var target=h.spawn(net.minecraft.world.entity.EntityType.ZOMBIE,new BlockPos(4,2,2));
-        for(int grade:new int[]{50,120}){
+        for(int grade:new int[]{500,1200}){
             var bow=new ItemStack(Items.BOW);EquipmentGrade.apply(bow,grade);
             var arrow=new net.minecraft.world.entity.projectile.Arrow(h.getLevel(),player,new ItemStack(Items.ARROW),bow);
             var source=h.getLevel().damageSources().arrow(arrow,player);
             var hit=new net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent(target,
                     new net.neoforged.neoforge.common.damagesource.DamageContainer(source,8));
             EquipmentGrade.projectileDamage(hit);
-            h.assertTrue(Math.abs(hit.getAmount()-8*grade/100.0)<.001,"Fired bow grade scales damage before armor mitigation");
+            h.assertTrue(Math.abs(hit.getAmount()-8*grade/1000.0)<.001,"Fired bow grade scales damage before armor mitigation");
         }
         h.succeed();
     }
@@ -272,13 +250,13 @@ public final class WorkshopGameTests {
     @GameTest(template="industrial") public static void blockedStructureAndSaveResume(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);w.setItem(0,WorkshopContent.HIDE.toStack());w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,100);
         var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(saved,h.getLevel().registryAccess());
-        h.assertTrue(copy.progress==100&&copy.heat==350&&copy.getItem(0).getCount()==1,"Saved work and fuel retained");
-        copy.setItem(5,new ItemStack(Items.STONE,32));copy.setItem(7,new ItemStack(Items.STONE,32));run(copy,200);h.assertTrue(copy.progress==100&&copy.heat==330,"Blocked output preserves work but spends idle heat");copy.setItem(5,ItemStack.EMPTY);copy.setItem(7,ItemStack.EMPTY);
-        var wall=w.getBlockPos().east();h.getLevel().removeBlock(wall,false);run(copy,200);h.assertTrue(copy.getItem(0).getCount()==1&&copy.heat==0&&!copy.fire.lit(),"Broken shell extinguishes fire");
-        h.getLevel().setBlockAndUpdate(wall,Blocks.BRICKS.defaultBlockState());run(copy,100);h.assertTrue(copy.getItem(5).is(Items.LEATHER)&&copy.heat==350,"Relit shell finishes saved job once");
+        h.assertTrue(copy.progress==100&&copy.fire.lit()&&CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(w.fire)&&copy.getItem(0).getCount()==1,"Saved work and stored heat retained");
+        copy.setItem(5,new ItemStack(Items.STONE,32));copy.setItem(7,new ItemStack(Items.STONE,32));int coal=copy.getItem(4).getCount();run(copy,200);h.assertTrue(copy.progress==100&&copy.fire.hot()&&copy.getItem(4).getCount()==coal,"Blocked output preserves work; the hot fire only replaces leakage");copy.setItem(5,ItemStack.EMPTY);copy.setItem(7,ItemStack.EMPTY);
+        var wall=w.getBlockPos().east();h.getLevel().removeBlock(wall,false);run(copy,200);h.assertTrue(copy.getItem(0).getCount()==1&&copy.fire.heat()==0&&!copy.fire.lit(),"A broken shell loses its fire and stored heat");
+        h.getLevel().setBlockAndUpdate(wall,Blocks.BRICKS.defaultBlockState());run(copy,100);h.assertTrue(copy.getItem(5).is(Items.LEATHER)&&copy.getItem(0).isEmpty(),"Relit shell finishes saved job once");
         var oldProgress=build(h,0,Direction.NORTH);oldProgress.setItem(0,WorkshopContent.HIDE.toStack());oldProgress.setItem(4,KilnContent.MINERAL_COAL.toStack());run(oldProgress,100);
-        oldProgress.progress=300;int remaining=oldProgress.heat;oldProgress.process();
-        h.assertTrue(oldProgress.getItem(5).is(Items.LEATHER)&&oldProgress.heat==remaining,"Previously saved tanning work beyond the shorter duration completes without extra heat");h.succeed();
+        oldProgress.progress=300;CoalFireFixture.set(oldProgress.fire,false,oldProgress.fire.capacity());double stored=CoalFireFixture.stored(oldProgress.fire);oldProgress.process();
+        h.assertTrue(oldProgress.getItem(5).is(Items.LEATHER)&&stored-CoalFireFixture.stored(oldProgress.fire)<CoalFire.UNIT,"Previously saved tanning work beyond the shorter duration completes without drawing heat");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopsRotateAndProtectSlots(GameTestHelper h){
         for(int kind=0;kind<3;kind++)for(var dir:Direction.Plane.HORIZONTAL){var w=build(h,kind,dir);h.assertTrue(MachineFixture.status(h.getLevel(),w.getBlockPos())==MachineStructure.COMPLETE,"Complete rotated workshop");}
@@ -314,16 +292,16 @@ public final class WorkshopGameTests {
         h.assertTrue(h.getLevel().getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.parse("minecraft:shield")).isEmpty(),"Vanilla shield crafting stays disabled");
         var jobs=WorkshopJobs.jobs(3);var job=ManufacturingGameTests.job(3,Items.SHIELD);var w=build(h,3,Direction.NORTH);w.select(jobs.indexOf(job));
         w.setItem(0,new ItemStack(ManufacturingContent.part("iron","plate")));w.setItem(1,new ItemStack(Items.OAK_PLANKS,3));w.setItem(2,new ItemStack(Items.SPRUCE_PLANKS,3));w.setItem(3,new ItemStack(Items.LEATHER));run(w,200);
-        h.assertTrue(w.getItem(5).is(Items.SHIELD)&&EquipmentGrade.hasGrade(w.getItem(5))&&w.heat==0,"Mixed timber and prepared metal assemble a graded shield without Coal");
+        h.assertTrue(w.getItem(5).is(Items.SHIELD)&&EquipmentGrade.hasGrade(w.getItem(5))&&w.fire.heat()==0,"Mixed timber and prepared metal assemble a graded shield without Coal");
         for(int i=0;i<4;i++)h.assertTrue(w.getItem(i).isEmpty(),"Shield pays each supplied material");
         h.assertTrue(jobs.stream().map(WorkshopJobs.Job::id).distinct().count()==jobs.size(),"Bench output IDs are unique");
         var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());saved.putInt("job",1);var restored=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());restored.setLevel(h.getLevel());restored.loadWithComponents(saved,h.getLevel().registryAccess());
         h.assertTrue(restored.selected==jobs.indexOf(job),"Saved job ID wins over reordered numerical indices");h.succeed();
     }
     @GameTest(template="industrial") public static void netheriteUpgradeRetainsWear(GameTestHelper h){
-        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,75);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
-        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(job,old);
-        h.assertTrue(EquipmentGrade.value(out)==75&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
+        var old=new ItemStack(Items.DIAMOND_PICKAXE);EquipmentGrade.apply(old,750,777L);old.setDamageValue(old.getMaxDamage()/2);old.set(DataComponents.CUSTOM_NAME,Component.literal("Old pick"));
+        var job=WorkshopJobs.jobs(3).stream().filter(j->j.output().is(Items.NETHERITE_PICKAXE)).findFirst().orElseThrow();var out=WorkshopJobs.result(new net.minecraft.world.SimpleContainer(4),new MachineWork.Match(job,new int[4],old));
+        h.assertTrue(Grade.value(out)==750&&out.getMaxDamage()==(int)Math.round(2031*.75)&&out.getDamageValue()==(int)Math.ceil(old.getDamageValue()/(double)old.getMaxDamage()*out.getMaxDamage())&&EquipmentGrade.wearSeed(out)==EquipmentGrade.wearSeed(old),"Upgrade preserves grade, personal wear pattern and proportional damage");
         h.assertTrue(out.getHoverName().getString().equals("Old pick"),"Upgrade keeps identity");h.succeed();
     }
     @GameTest(template="industrial") public static void vanillaRepairMenusKeepWorkshopBoundary(GameTestHelper h){
@@ -357,9 +335,9 @@ public final class WorkshopGameTests {
     }
     @GameTest(template="industrial") public static void automaticRecipesAndTwoCoalSlots(GameTestHelper h){
         var w=build(h,2,Direction.NORTH);w.select(WorkshopJobs.index(2,"civilization:iron_plate"));w.setItem(3,new ItemStack(Items.IRON_INGOT));w.setItem(1,new ItemStack(Items.IRON_INGOT));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,200);
-        h.assertTrue(w.getItem(5).is(ManufacturingContent.part("iron","plate"))&&w.getItem(5).getCount()==2&&w.getItem(6).isEmpty()&&w.getItem(4).getCount()==3&&w.heat==200,"Selected forging aggregates unordered split stock and draws backup Coal");
-        w.clearContent();w.heat=0;w.select(-1);w.setItem(2,new ItemStack(Items.IRON_INGOT,3));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,600);
-        h.assertTrue(w.status==5&&w.getItem(5).isEmpty()&&w.getItem(4).getCount()+w.getItem(6).getCount()==3&&w.heat==340,"Ambiguous forging idles instead of guessing");
+        h.assertTrue(w.getItem(5).is(ManufacturingContent.part("iron","plate"))&&w.getItem(5).getCount()==2&&w.getItem(6).isEmpty()&&w.getItem(4).getCount()==3,"Selected forging aggregates unordered split stock and draws backup Coal");
+        w.clearContent();w.select(-1);w.setItem(2,new ItemStack(Items.IRON_INGOT,3));w.setItem(6,KilnContent.MINERAL_COAL.toStack(4));run(w,600);
+        h.assertTrue(w.status==5&&w.getItem(5).isEmpty()&&w.getItem(4).getCount()+w.getItem(6).getCount()==4,"Ambiguous forging idles instead of guessing; the hot fire covers its leakage from the Coal already burning");
         w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));run(w,500);h.assertTrue(w.getItem(5).is(ManufacturingContent.head("iron","pickaxe"))&&w.getItem(2).isEmpty(),"Explicit selection resolves ambiguous ingots");
         w.setItem(6,KilnContent.MINERAL_COAL.toStack(7));var tag=w.saveWithFullMetadata(h.getLevel().registryAccess());var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.loadWithComponents(tag,h.getLevel().registryAccess());
         h.assertTrue(copy.getItem(6).getCount()==7&&copy.selected==w.selected,"Backup Coal and stable forging selection survive reload");h.succeed();

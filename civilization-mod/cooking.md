@@ -42,7 +42,7 @@ The dial supplies `dial^0.7` paid heat units per tick. The skillet's reserve hol
 | 60% | About 65 seconds | About 14 seconds |
 | 100% | About 48 seconds | 10 seconds |
 
-These assume a cold skillet and uninterrupted cooking at 20 TPS; a warm skillet starts faster. Productive coal follows supplied heat with a saved fractional remainder: reaching the plateau from cold spends about 2.17, 2.28 and 2.40 Coal budgets at 30%, 60% and 100%, part of which stays in the skillet. Heat is paid once, so moving cookware never creates fuel credit. Without coal, stored heat simply dissipates. Both stoves warm the room ([heat sources](heat.md#sources)).
+These assume a cold skillet and uninterrupted cooking at 20 TPS; a warm skillet starts faster. The stove first [warms up](machines.md#coal-fires) like any coal machine; the pan then draws its supplied heat from the stove's store, so reaching the plateau from cold draws about 2.17, 2.28 and 2.40 Coal at 30%, 60% and 100%, part of which stays in the skillet. Heat is paid once, so moving cookware never creates fuel credit. Without coal, stored heat simply dissipates. Both stoves warm the room ([heat sources](heat.md#sources)).
 
 The batch reserves its ingredients once. Its calorie ceiling is set at loading from the configured values of **two baked potatoes, two carrots and one bread** (1,600 kcal by default), and each of the four portions receives 80–100% of a quarter of it by quality: **320–400 kcal** by default. Portions keep their values through storage and trade.
 

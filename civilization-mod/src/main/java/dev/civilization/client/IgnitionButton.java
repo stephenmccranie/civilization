@@ -18,7 +18,7 @@ final class IgnitionButton extends Button {
         super(x,y,24,24,Component.literal("Strike to light"),b->Minecraft.getInstance().gameMode.handleInventoryButtonClick(menu.containerId,CoalFire.BUTTON),DEFAULT_NARRATION);
         this.fire=fire;
     }
-    @Override public void onPress(){if((fire.fireState()&1)!=0||(fire.fireState()>>1)>0||net.minecraft.Util.getMillis()-clicked<1000)return;clicked=net.minecraft.Util.getMillis();super.onPress();}
+    @Override public void onPress(){if((fire.fireState()&1)!=0||(fire.fireState()>>1&31)>0||net.minecraft.Util.getMillis()-clicked<1000)return;clicked=net.minecraft.Util.getMillis();super.onPress();}
     @Override public void playDownSound(SoundManager sound){} // Real flint/ignition audio comes from the server.
     @Override protected void renderWidget(GuiGraphics g,int mx,int my,float dt){
         visible=fire.hasCoalFire();if(!visible)return;

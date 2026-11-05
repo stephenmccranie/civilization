@@ -22,13 +22,13 @@ final class InventoryVisualCheck {
                 p.getData(Accessories.INVENTORY).setStackInSlot(0, FrontierContent.GEIGER_COUNTER.toStack());
                 p.getInventory().setItem(20, FrontierContent.RAW_URANIUM.toStack());
                 p.getInventory().setItem(21, FrontierContent.URANIUM_ORE.toStack());
-                int[] grades={45,45,60,75,90,100,115};
+                int[] grades={450,450,600,750,900,1000,1150};
                 for(int i=0;i<grades.length;i++){var item=new ItemStack(Items.IRON_SWORD);EquipmentGrade.apply(item,grades[i],1001L+i*991L);p.getInventory().setItem(11+i,item);}
-                var armor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(armor,55,9017L);armor.setDamageValue(armor.getMaxDamage()/3);p.getInventory().setItem(18,armor);
-                var exceptional=new ItemStack(Items.GOLDEN_CHESTPLATE);EquipmentGrade.apply(exceptional,105,5031L);EquipmentGrade.updateTrim(exceptional,l.registryAccess());p.getInventory().setItem(19,exceptional);
-                var usedAverage=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(usedAverage,75,5033L);usedAverage.setDamageValue(usedAverage.getMaxDamage()/3);p.getInventory().setItem(22,usedAverage);
-                var usedExceptional=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(usedExceptional,115,5034L);usedExceptional.setDamageValue((usedExceptional.getMaxDamage()-usedExceptional.getItem().components().getOrDefault(net.minecraft.core.component.DataComponents.MAX_DAMAGE,1))/2);p.getInventory().setItem(23,usedExceptional);
-                var helmet=new ItemStack(Items.GOLDEN_HELMET);EquipmentGrade.apply(helmet,110,5032L);EquipmentGrade.updateTrim(helmet,l.registryAccess());p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,helmet);
+                var armor=new ItemStack(Items.IRON_CHESTPLATE);EquipmentGrade.apply(armor,550,9017L);armor.setDamageValue(armor.getMaxDamage()/3);p.getInventory().setItem(18,armor);
+                var exceptional=new ItemStack(Items.GOLDEN_CHESTPLATE);EquipmentGrade.apply(exceptional,1050,5031L);EquipmentGrade.updateTrim(exceptional,l.registryAccess());p.getInventory().setItem(19,exceptional);
+                var usedAverage=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(usedAverage,750,5033L);usedAverage.setDamageValue(usedAverage.getMaxDamage()/3);p.getInventory().setItem(22,usedAverage);
+                var usedExceptional=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(usedExceptional,1150,5034L);usedExceptional.setDamageValue((usedExceptional.getMaxDamage()-usedExceptional.getItem().components().getOrDefault(net.minecraft.core.component.DataComponents.MAX_DAMAGE,1))/2);p.getInventory().setItem(23,usedExceptional);
+                var helmet=new ItemStack(Items.GOLDEN_HELMET);EquipmentGrade.apply(helmet,1100,5032L);EquipmentGrade.updateTrim(helmet,l.registryAccess());p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,helmet);
                 p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND,new ItemStack(Items.TORCH,16));
                 p.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION,1200));
                 p.inventoryMenu.broadcastChanges();
@@ -36,12 +36,12 @@ final class InventoryVisualCheck {
         }
         if(ticks==130){mc.setScreen(new InventoryScreen(mc.player));var s=(InventoryScreen)mc.screen;if(s.getRecipeBookComponent().isVisible())toggle(mc);}
         if(ticks==150){
-            if(EquipmentGrade.value(mc.player.getInventory().getItem(11))!=45||EquipmentGrade.value(mc.player.getInventory().getItem(17))!=115||EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))!=1992L
+            if(Grade.value(mc.player.getInventory().getItem(11))!=450||Grade.value(mc.player.getInventory().getItem(17))!=1150||EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))!=1992L
                     ||!mc.player.getInventory().getItem(19).has(net.minecraft.core.component.DataComponents.TRIM)
                     ||!mc.player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).has(net.minecraft.core.component.DataComponents.TRIM)
                     ||!mc.player.inventoryMenu.getSlot(46).getItem().is(FrontierContent.GEIGER_COUNTER.get()))
                 throw new IllegalStateException("Inventory fixture did not synchronize: grades="
-                        +EquipmentGrade.value(mc.player.getInventory().getItem(11))+","+EquipmentGrade.value(mc.player.getInventory().getItem(17))
+                        +Grade.value(mc.player.getInventory().getItem(11))+","+Grade.value(mc.player.getInventory().getItem(17))
                         +" seed="+EquipmentGrade.wearSeed(mc.player.getInventory().getItem(12))
                         +" trim="+mc.player.getInventory().getItem(19).has(net.minecraft.core.component.DataComponents.TRIM)
                         +" helmet="+mc.player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).has(net.minecraft.core.component.DataComponents.TRIM)

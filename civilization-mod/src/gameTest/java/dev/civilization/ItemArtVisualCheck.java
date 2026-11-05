@@ -26,7 +26,7 @@ final class ItemArtVisualCheck {
     var items=items(scene);
     var frames=scene.equals("components")?java.util.List.of(items.get(0),items.get(1),items.get(2),items.get(3),items.get(4),items.get(11),items.get(18),items.get(24)):items;
     for(int i=0;i<items.size();i++){
-     player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components")){var worn=new ItemStack(items.get(i));if(EquipmentGrade.eligible(worn))EquipmentGrade.apply(worn,40,7001L+i);player.getInventory().setItem(9+i,worn);}
+     player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components")){var worn=new ItemStack(items.get(i));if(EquipmentGrade.eligible(worn))EquipmentGrade.apply(worn,400,7001L+i);player.getInventory().setItem(9+i,worn);}
     }
     for(int i=0;i<frames.size();i++){
      for(int y=100;y<=103;y++)l.setBlockAndUpdate(new BlockPos(i*2, y,0),IndustrialContent.CASING.get().defaultBlockState());

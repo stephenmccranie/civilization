@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.HolderLookup;
@@ -28,12 +27,10 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** One manufacturing roll; repairs lower grade while ordinary damage remains separate. */
+/** How a grade shapes equipment: it scales base stats, repairs lower it, and ordinary damage stays separate. */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class EquipmentGrade {
     private static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Civilization.MOD_ID);
-    public static final net.neoforged.neoforge.registries.DeferredHolder<net.minecraft.core.component.DataComponentType<?>, net.minecraft.core.component.DataComponentType<Integer>> GRADE =
-            COMPONENTS.registerComponentType("equipment_grade", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
     public static final net.neoforged.neoforge.registries.DeferredHolder<net.minecraft.core.component.DataComponentType<?>, net.minecraft.core.component.DataComponentType<Long>> WEAR_SEED =
             COMPONENTS.registerComponentType("equipment_wear_seed", builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
 
@@ -41,17 +38,18 @@ public final class EquipmentGrade {
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
     /** Damageable equipment, and the backpack, whose grade sets its capacity. */
     public static boolean eligible(ItemStack stack) { return !stack.isEmpty() && (stack.isDamageableItem() || stack.is(Backpack.ITEM)); }
-    public static int value(ItemStack stack) { return stack.getOrDefault(GRADE.get(), 100); }
-    public static boolean hasGrade(ItemStack stack) { return stack.has(GRADE.get()); }
+    /** Equipment with a grade has its stats scaled; equipment without one has not been graded yet. */
+    public static boolean hasGrade(ItemStack stack) { return stack.has(Grade.GRADE.get()); }
     public static long wearSeed(ItemStack stack) { return stack.getOrDefault(WEAR_SEED.get(), 0L); }
 
-    /** Whole-percent normal roll, mean 75 and standard deviation 20; the grade itself is uncapped. */
-    public static int roll(RandomSource random) { return (int)Math.round(75 + random.nextGaussian() * 20); }
-
+    /**
+     * Equipment made without graded material, found or crafted by hand, is standard, except a backpack, which rolls
+     * its grade when made as an ingot does; each item gets its own wear pattern.
+     */
     public static void ensure(ItemStack stack, RandomSource random) {
         if (!eligible(stack)) return;
-        if (!hasGrade(stack)) apply(stack, roll(random), random.nextLong());
-        else if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), random.nextLong());
+        if (!hasGrade(stack)) apply(stack, stack.is(Backpack.ITEM) ? Grade.roll(random) : Grade.STANDARD);
+        if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), random.nextLong());
     }
 
     public static void ensure(ItemStack stack, RandomSource random, HolderLookup.Provider registries) {
@@ -62,7 +60,7 @@ public final class EquipmentGrade {
     /** A top-grade armor trim is tied to the item's saved identity, never rerolled on inventory ticks. */
     public static void updateTrim(ItemStack stack, HolderLookup.Provider registries) {
         if (!stack.is(ItemTags.TRIMMABLE_ARMOR) || !hasGrade(stack)) return;
-        if (value(stack) < 100) { stack.remove(DataComponents.TRIM); return; }
+        if (Grade.value(stack) < 1000) { stack.remove(DataComponents.TRIM); return; }
         if (stack.has(DataComponents.TRIM)) return;
         var patterns = registries.lookupOrThrow(Registries.TRIM_PATTERN).listElements()
                 .filter(holder -> holder.key().location().getNamespace().equals("minecraft"))
@@ -76,16 +74,16 @@ public final class EquipmentGrade {
                 patterns.get(choice.nextInt(patterns.size()))));
     }
 
-    public static void apply(ItemStack stack, int grade) {
-        apply(stack, grade, ThreadLocalRandom.current().nextLong());
+    public static void apply(ItemStack stack, int grade, long wearSeed) {
+        apply(stack, grade);
+        if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), wearSeed);
     }
 
-    public static void apply(ItemStack stack, int grade, long newWearSeed) {
+    public static void apply(ItemStack stack, int grade) {
         if (!eligible(stack)) return;
-        double factor = grade / 100.0;
-        stack.set(GRADE.get(), grade);
-        if (grade < 100 && stack.is(ItemTags.TRIMMABLE_ARMOR)) stack.remove(DataComponents.TRIM);
-        if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), newWearSeed);
+        double factor = grade / 1000.0;
+        stack.set(Grade.GRADE.get(), new Grade(List.of(grade)));
+        if (grade < 1000 && stack.is(ItemTags.TRIMMABLE_ARMOR)) stack.remove(DataComponents.TRIM);
         if (stack.isDamageableItem()) {
             int oldMax = stack.getMaxDamage();
             int oldDamage = stack.getDamageValue();
@@ -129,12 +127,12 @@ public final class EquipmentGrade {
         }
     }
 
-    /** A full repair erodes a weak item quickly; small repairs consume a proportional fraction. */
+    /** A full repair erodes a weak item quickly; small repairs consume a proportional fraction, in whole points. */
     public static int afterRepair(ItemStack stack) {
-        int grade = value(stack);
+        int grade = Grade.value(stack);
         double restored = stack.getDamageValue() / (double)Math.max(1, stack.getMaxDamage());
-        double wear = 2 * restored * Math.exp((100.0 - grade) / 25.0);
-        return grade - Math.max(1, (int)Math.ceil(wear));
+        double wear = 2 * restored * Math.exp((1000 - grade) / 250.0);
+        return grade - 10 * Math.max(1, (int)Math.ceil(wear));
     }
 
     @SubscribeEvent public static void projectileDamage(LivingIncomingDamageEvent event) {
@@ -142,7 +140,7 @@ public final class EquipmentGrade {
         ItemStack weapon = projectile.getWeaponItem();
         if (weapon == null || !hasGrade(weapon)
                 || !(weapon.getItem() instanceof ProjectileWeaponItem || weapon.is(Items.TRIDENT))) return;
-        event.setAmount((float)(event.getAmount() * (value(weapon) / 100.0)));
+        event.setAmount((float)(event.getAmount() * (Grade.value(weapon) / 1000.0)));
     }
 
     @SubscribeEvent public static void crafted(PlayerEvent.ItemCraftedEvent event) {

@@ -45,6 +45,7 @@ public final class WeatherGameTests {
    h.assertTrue(!MachineWeather.wetWorkFace(l,p,state),"A roof over the work face stops direct rain");
    MachineFixture.spark(l,true);
    h.assertTrue(kiln.fire.strike(true)&&kiln.fire.lit(),"Sheltered kiln lights during district rain");
+   CoalFireFixture.light(kiln);
    l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());
    for(int i=0;i<250;i++)KilnBlockEntity.tick(l,p,kiln.getBlockState(),kiln);
    h.assertTrue(kiln.getItem(0).getCount()==1&&kiln.getItem(2).isEmpty(),"Exposed kiln retains ingredients without completing work");

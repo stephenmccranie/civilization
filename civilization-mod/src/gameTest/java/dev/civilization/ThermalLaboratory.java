@@ -158,7 +158,7 @@ public final class ThermalLaboratory {
             int coal=-1,reserve=-1,out=-1;
             if(s.machine()){
                 var kiln=(KilnBlockEntity)l.getBlockEntity(s.source());
-                coal=MachineInventory.count(kiln,MachineInventory.KILN_FUEL);reserve=kiln.fireHeat();
+                coal=MachineInventory.count(kiln,MachineInventory.KILN_FUEL);reserve=kiln.fire.heat();
                 out=MachineInventory.count(kiln,MachineInventory.KILN_OUTPUT);
             }
             var probes=List.of(s.source().north(2).above(),s.source().above(4),s.source().east(4).above(),s.source().above(10));

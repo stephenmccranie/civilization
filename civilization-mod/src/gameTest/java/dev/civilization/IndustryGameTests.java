@@ -137,9 +137,9 @@ public final class IndustryGameTests {
     }
     @GameTest(template="empty") public static void coalBootstrapsOilAndIndustrialCoal(GameTestHelper h){
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var oil=site(pump,Deposits.Kind.OIL,1);bind(pump,oil);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(pump,100);
-        h.assertTrue(pump.output.getFluidAmount()==1000&&pump.getItem(0).isEmpty()&&pump.heat==0&&stock(h,oil)==0,"Four coal pump precisely one physical 1,000 mB block");
-        var ref=machine(h,IndustrialContent.REFINERY.get(),7);ref.input.fill(pump.output.drain(1000,EXECUTE),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(ref,40);
-        h.assertTrue(ref.input.isEmpty()&&ref.output.getFluidAmount()==1000&&ref.getItem(0).isEmpty()&&ref.heat==0,"Four coal heat 1,000 crude");
+        h.assertTrue(pump.output.getFluidAmount()==1000&&pump.getItem(0).isEmpty()&&!pump.fire.lit()&&pump.fire.hot()&&stock(h,oil)==0,"Four Coal pump one physical 1,000 mB block; the fire burns out while the footings stay hot");
+        var ref=machine(h,IndustrialContent.REFINERY.get(),7);ref.input.fill(pump.output.drain(1000,EXECUTE),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(ref,50);
+        h.assertTrue(ref.input.isEmpty()&&ref.output.getFluidAmount()==1000&&ref.getItem(0).isEmpty()&&!ref.fire.lit()&&ref.fire.hot(),"Four Coal heat 1,000 crude; the fire burns out while the hearth stays hot");
         var column=machine(h,IndustrialContent.COLUMN.get(),24);column.input.fill(ref.output.drain(1000,EXECUTE),EXECUTE);run(column,40);
         h.assertTrue(column.output.getFluidAmount()==800&&column.lubricant.getFluidAmount()==200&&column.getItem(1).is(IndustrialContent.SULFUR.get()),"Column separates vapor, lubricating oil and sulfur");
         var condenser=machine(h,IndustrialContent.CONDENSER.get(),34);condenser.input.fill(column.output.drain(800,EXECUTE),EXECUTE);run(condenser,40);
@@ -150,7 +150,7 @@ public final class IndustryGameTests {
     }
     @GameTest(template="empty") public static void blockedOrBrokenMachineSpendsNothing(GameTestHelper h){
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(2));pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),4000),EXECUTE);run(pump,12);
-        h.assertTrue(pump.getItem(0).getCount()==1&&pump.heat==243&&stock(h,s)==1000&&pump.status==4,"Full output preserves oil while burning idle coal");
+        h.assertTrue(pump.getItem(0).getCount()==1&&pump.fire.hot()&&stock(h,s)==1000&&pump.status==4,"Full output preserves oil; the hot fire only replaces leakage");
         pump.output.drain(4000,EXECUTE);var frame=IndustrialStructure.parts(pump.kind).stream().filter(p->!p.material().equals("air")).findFirst().orElseThrow();
         var area=new net.minecraft.world.phys.AABB(pump.getBlockPos()).inflate(3);
         int coal=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
@@ -162,7 +162,7 @@ public final class IndustryGameTests {
         var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack());run(pump,5);
         h.assertTrue(stock(h,s)==875,"First completed batch lowers actual fluid height");
         var copy=new IndustrialBlockEntity(pump.getBlockPos(),pump.getBlockState());copy.loadWithComponents(pump.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());copy.setLevel(h.getLevel());h.getLevel().setBlockEntity(copy);bind(copy,s);
-        h.assertTrue(copy.heat==125&&copy.output.getFluidAmount()==125,"Part-used coal and extracted liquid persist");
+        h.assertTrue(CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(pump.fire)&&copy.output.getFluidAmount()==125,"Stored heat and extracted liquid persist");
         copy.setItem(0,KilnContent.MINERAL_COAL.toStack(3));run(copy,100);h.assertTrue(copy.output.getFluidAmount()==1000&&stock(h,s)==0,"Restored cursor extracts only remaining physical oil");
         h.getLevel().removeBlock(pump.getBlockPos(),false);var rebuilt=machine(h,IndustrialContent.PUMP.get(),2);bind(rebuilt,s);rebuilt.setItem(0,KilnContent.MINERAL_COAL.toStack());run(rebuilt,100);
         h.assertTrue(rebuilt.status==3&&rebuilt.getItem(0).isEmpty()&&rebuilt.output.isEmpty(),"Rebuilding cannot refresh an empty reservoir");h.succeed();

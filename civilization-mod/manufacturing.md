@@ -8,12 +8,13 @@ Craft the **Foundry** controller from **8 brick blocks around cobblestone**. Pla
 
 | Input | Output | Time |
 | --- | --- | --- |
-| Raw iron, copper or gold, or their ores | 1 ingot | 10 seconds |
-| 1 iron ingot | 1 Steel Ingot | 40 seconds |
+| Raw iron, copper or gold, or their ores | 1 Iron Bloom, Blister Copper or Gold Doré, hot for [hammering](#grade) | 10 seconds |
+| 1 iron ingot | 1 Blister Steel, hot | 40 seconds |
 | Silk-touched coal, diamond, emerald, lapis, redstone and quartz ores | Their usual drop | 10 seconds |
 | Ancient debris | Netherite scrap | 10 seconds |
+| Rough metal, or an iron, copper, gold or steel ingot | The same items, hot, up to 8 at once | 20 seconds |
 
-Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbon source; there is no coke. Vanilla metal smelting and equipment-to-nugget recycling are disabled.
+Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbon source; there is no coke. On Automatic, iron ingots make blister steel; select **Heat Iron Ingot** to heat them. Rough metal and the other ingots have no other Foundry job, so Automatic heats them. Heating awards no XP. Vanilla metal smelting and equipment-to-nugget recycling are disabled.
 
 ## Town workshops
 
@@ -35,7 +36,7 @@ Controller crafting needs no leather, cloth, shears, anvil or oil. The Tannery a
 | Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
 | Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
 
-Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire idles. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
+Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire keeps the Smithy hot. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
 
 Ordinary leather-producing animal drops and piglin leather barter yield **Raw Hide**; four rabbit hides craft one Raw Hide. Existing Leather and treasure leather remain usable. Cloth comes only from wool at the Textile Workshop.
 
@@ -60,7 +61,7 @@ Inputs are consumed only when the whole output fits. Hoppers may supply inputs f
 | Iron Fasteners | 1 iron ingot | 8 | 5 seconds | Smithy |
 | Machine Parts | 2 Steel Plates + 4 Copper Rods | 2 | 10 seconds | Assembly Bench |
 
-Plates and Rods come in iron, copper, steel and gold; gold takes twice as long. Fasteners stand for nails, rivets, bolts, hinges and latches. A Tool Handle includes the wood, leather grip and binding, so tools never need extra leather. A Wheel includes hub, spokes and rim. Machine Parts abstract bearings, gears and fittings. At neutral efficiency a Plate, Rod or Fasteners batch uses 0.25 Coal before ignition, idle burn and temperature.
+Plates and Rods come in iron, copper, steel and gold; gold takes twice as long. Fasteners stand for nails, rivets, bolts, hinges and latches. A Tool Handle includes the wood, leather grip and binding, so tools never need extra leather. A Wheel includes hub, spokes and rim. Machine Parts abstract bearings, gears and fittings. A Plate, Rod or Fasteners batch draws 0.25 Coal from a hot Smithy; warming up and heat loss come on top.
 
 ## Equipment
 
@@ -80,7 +81,21 @@ The catalog covers iron, gold and diamond pickaxes, axes, shovels, hoes, swords 
 
 ### Grade
 
-Every damageable item, and every [Backpack](physics.md#backpack), entering a player's inventory without a grade receives one persistent whole-percent roll (normal distribution, mean 75%, standard deviation 20 points, no floor or ceiling); finished products roll on completion, parts never. At 100% an item has its base stats; a Backpack's grade scales its slots and block cap instead, and it has no durability. The grade multiplies maximum durability, mining speed, armor, toughness and knockback resistance (including vanilla armor's default attributes), melee damage and attack speed, and the pre-mitigation damage of projectiles from graded bows, crossbows and thrown tridents. An iron pickaxe's mining speed 6 becomes 3 at 50% and 7.5 at 125%. Enchantments are separate. Minecraft requires durability of at least one and positive mining speed, so nonpositive grades keep their true value in data while those two engine values use the smallest legal amount. Special behaviors and discrete harvest levels are not scaled.
+Grade belongs to each unit of metal. Every unit of rough metal the Foundry smelts from ore or raw metal, and every diamond from silk-touched ore, rolls a persistent grade, kept to a tenth of a percent (normal distribution, mean 75%, standard deviation 20 points, no floor or ceiling). Blister steel keeps the grade of the iron ingot it was made from. Metal is **smelted, hammered and quenched**:
+
+- **Smelt and heat.** The Foundry smelts ore into rough metal: an **Iron Bloom**, **Blister Copper** or **Gold Doré**; iron ingots become **Blister Steel**. A heat takes a whole load of up to eight units of rough metal or ingots from its first input slot, as many as the output has room for, and draws one Coal in 20 seconds whatever the load, so full loads are cheapest. Metal leaves hot and stays hot while it sits in a hot Foundry, so a run of output shares one stack. Out of the fire it glows for 40 seconds, cools for 20 more and is cold a minute after leaving, wherever it is; its slot glows and its tooltip counts down. Hot metal stays apart from cold metal, and hoppers cannot take it from the Foundry.
+- **Hammer.** Hold use on an anvil with glowing metal in your main hand to strike a heavy blow once a second; the metal's cooldown sweep shows the swing recovering. Each blow works the whole stack. The fifth on an iron anvil, or the eighth on a Stone Anvil, beats rough metal into its ingot, raises every unit one grade step and leaves the stack below working heat to cool. Each blow costs `blowKcal` (8 kcal at neutral comfort) for every unit. Paid blows count on across pauses and toward whatever is worked next; logging out resets them. Metal that no longer glows goes back into the Foundry, losing only the heat; an anvil turns it away with that reminder.
+- **Quench.** Use hot metal on water or a water cauldron, or drop it in water, and it cools at once with a hiss and steam, ready to stack and store. Grade is unchanged.
+- **Stone Anvil.** The first anvil needs no metal: a heavy anvil stone seated on a log stump, crafted from three smooth stone over three cobblestone (any stone crafting material) over one log. It only hammers. The iron anvil, made from the first ingots, takes fewer blows and keeps its repair and naming screen, and the Smithy needs one.
+- **Cut.** Diamonds burn rather than forge. Hold use on a grindstone with diamonds in your main hand: five strokes a second apart, paid like blows, raise every diamond one grade step with no heat or Coal.
+
+Every hammering or cutting raises each unit by at least a tenth of a point, by a random amount that shrinks steeply as the unit nears 150%: exponentially distributed, with a mean of 4.5 points at 75% that falls with the fourth power of the distance left to 150%, and never past it. From 75% one hammering in five gains a point or less and one in nine gains 10 or more. The mean gain is 1.8 points at 90%, 0.9 at 100%, 0.4 at 110% and 0.1 at 125%, where nearly every hammering adds a tenth. Reaching 100% takes about 12 hammerings from 75% (7 to 17 in most cases), the first of them making the ingot, and 14 from 50%; 100% to 125% takes about 100 more, and 125% to 150% about 250. With full loads on an iron anvil, an ingot reaches 100% for about 1.9 Coal and 480 kcal, smelting included, and 120% for about 9 Coal and 2,900 kcal, on top of [warming up](machines.md#coal-fires) the Foundry. Metal and diamonds from anywhere else, such as mined diamonds, loot or nuggets, are standard 75%.
+
+Smithy parts (Plates, Rods, Fasteners, heads and blades) take the mean grade of the units they consume, rounded, and every part of a batch shares it. At the Assembly Bench, tools, swords and saws take their head's grade; armor, shears and shields take the mean of their Plates or diamonds. A [Backpack](physics.md#backpack) rolls its grade when made, as an ingot does. Other equipment made at a crafting table or without graded material, such as leather armor and wooden or stone tools, and found equipment such as loot are standard 75%. Netherite upgrades keep the diamond item's grade. Other products, such as Machine Parts, rails and doors, carry none.
+
+**Stacks.** Units of one material stack whatever their grades. A stack keeps every unit's grade, best first, and its tooltip shows the average and range, such as "Grade: 83.4% average, 52.1–118.6%". Units leave from the top: taking half, placing one, dragging across slots, dropping and machine work hand over or use the best units first, so spreading a stack out gives each unit back its own grade. Clicking, shift-clicking, double-click collecting, pickups, machine outputs and hoppers filling chests, barrels, shulker boxes, hoppers and machines join differing grades onto one stack. Paths that cannot say which units they move, such as droppers, the recipe book's auto-fill and other mods' inventories, keep a stack's worst units, so they can lower grade but never raise it. Trade counters match goods by their exact grades, and ingots crafted into nuggets or storage blocks and back come out standard.
+
+At 100% an item has its base stats; a Backpack's grade scales its slots and block cap instead, and it has no durability. The grade multiplies maximum durability, mining speed, armor, toughness and knockback resistance (including vanilla armor's default attributes), melee damage and attack speed, and the pre-mitigation damage of projectiles from graded bows, crossbows and thrown tridents. An iron pickaxe's mining speed 6 becomes 3 at 50% and 7.5 at 125%. Enchantments are separate. Minecraft requires durability of at least one and positive mining speed, so nonpositive grades keep their true value in data while those two engine values use the smallest legal amount. Special behaviors and discrete harvest levels are not scaled.
 
 The tooltip prints the grade. The 13-pixel durability bar shows remaining durability in green, durability spent since repair in black and capacity unavailable at the item's grade in gray. Above 100%, one or two cyan pixels at the right end show bonus capacity (about the first 10% of exceptional grade); it drains first. Each item has a saved wear seed choosing up to eight of 16 generated scuff and corrosion layers for its type as grade falls, so equal items can wear differently; repairs and upgrades keep the pattern. Layers follow the Faithful 32× item silhouette and leave the base art visible; at 100% or above the icon is pristine, and worn armor on the player model is unchanged. At 100% or above, trimmable armor (leather included) gets one seed-chosen vanilla trim pattern and material; below 100% it has none, so a repair that drops grade below 100% removes the trim.
 
@@ -113,7 +128,7 @@ Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithin
 | Rail | 12 Iron Rods + 1 Stick | 16 / 5 seconds |
 | Powered Rail | 12 Gold Rods + 1 Stick + 1 Redstone | 6 / 5 seconds |
 
-Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. Crafting-table chests and barrels stay available for early storage. Primitive tools, the Kiln, Foundry, Tannery, Textile Workshop and Smithy controllers and the anvil stay craftable, so no workshop needs its own output to be built.
+Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. Crafting-table chests and barrels stay available for early storage. Primitive tools, the Kiln, Foundry, Tannery, Textile Workshop and Smithy controllers, the Stone Anvil and the anvil stay craftable, so no workshop needs its own output to be built.
 
 ## Other bench jobs
 

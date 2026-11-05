@@ -8,7 +8,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class ThermalGameTests {
-    private static double productiveHeatPerSecond(){return ThermalRules.COAL_WASTE_HEAT*20/ProductionEnergy.HEAT_TICKS;}
+    private static double productiveHeatPerSecond(){return ThermalRules.COAL_WASTE_HEAT*20/ProductionEnergy.COAL;}
     @GameTest(template="empty") public static void surveyPacketPreservesPositionsAndTemperatures(GameTestHelper h){
         var origin=new BlockPos(100,70,-50);
         var packet=new ThermalPayload(21,20,.8f,2,true,java.util.List.of(
@@ -559,7 +559,8 @@ public final class ThermalGameTests {
         h.assertTrue(ThermalRules.efficiency(100,true)==1.1&&ThermalRules.efficiency(-100,false)==.7,"Machine gain/loss bounded");
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(5,4,5));var kiln=new KilnBlockEntity(p,KilnContent.KILN.get().defaultBlockState());kiln.setLevel(l);
         var f=ThermalField.get(l);for(var d:Direction.values()){var q=p.relative(d);l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());f.energy.put(q.asLong(),100d);}
-        h.assertTrue(kiln.getBurnDuration(KilnContent.MINERAL_COAL.toStack())==440,"Warm surroundings affect actual thermal fuel budget");h.succeed();
+        CoalFireFixture.set(kiln.fire,false,kiln.fire.capacity());kiln.fire.tick(20);
+        h.assertTrue(kiln.fire.minutesHot()>20,"Warm surroundings slow a hot machine's heat loss: "+kiln.fire.minutesHot()+" min");h.succeed();
     }
 
     @GameTest(template="empty") public static void vanillaOverworldClimateAudit(GameTestHelper h){
