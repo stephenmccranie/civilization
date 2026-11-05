@@ -7,7 +7,7 @@ import net.minecraft.world.item.*;
 
 public final class WorkshopMenu extends AbstractContainerMenu implements CoalFireMenu {
     public final Container inventory;public final ContainerData data;
-    public WorkshopMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(7));}
+    public WorkshopMenu(int id,Inventory inv){this(id,inv,new SimpleContainer(8),new SimpleContainerData(6));}
     public WorkshopMenu(int id,Inventory inv,Container container,ContainerData data){
         super(WorkshopContent.MENU.get(),id);this.inventory=container;this.data=data;
         for(int i=0;i<4;i++){final int index=i;addSlot(new Slot(container,i,17+i*18,43){@Override public boolean mayPlace(ItemStack s){return container.canPlaceItem(index,s);}@Override public boolean isActive(){return index<2||kind()>=2;}});}
@@ -24,7 +24,7 @@ public final class WorkshopMenu extends AbstractContainerMenu implements CoalFir
     public int kind(){return data.get(0);}public int selection(){return data.get(1);}
     public WorkshopJobs.Job job(){return MachineWork.job(inventory,kind(),selection());}
     @Override public boolean stillValid(Player p){return inventory.stillValid(p);}
-    @Override public boolean clickMenuButton(Player p,int id){if(!stillValid(p)||!(inventory instanceof WorkshopBlockEntity w))return false;if(id==WorkshopBlockEntity.WORK_BUTTON){boolean ok=w.beginWork(p);broadcastChanges();return ok;}if(id==CoalFire.BUTTON){if(!hasCoalFire())return false;boolean ok=w.fire.strike(p,MachineStructure.check(w.getLevel(),w.getBlockPos(),w.getBlockState().getValue(WorkshopBlock.FACING)).status()==MachineStructure.COMPLETE);broadcastChanges();return ok;}if(id< -1||id>=WorkshopJobs.jobs(kind()).size())return false;w.select(id);broadcastChanges();return true;}
+    @Override public boolean clickMenuButton(Player p,int id){if(!stillValid(p)||!(inventory instanceof WorkshopBlockEntity w))return false;if(id==WorkshopBlockEntity.WORK_BUTTON){boolean ok=w.beginWork(p);broadcastChanges();return ok;}if(id==CoalFire.BUTTON){if(!hasCoalFire())return false;boolean ok=w.fire.strike(p,w.structure()==MachineStructure.COMPLETE);broadcastChanges();return ok;}if(id< -1||id>=WorkshopJobs.jobs(kind()).size())return false;w.select(id);broadcastChanges();return true;}
     @Override public void clicked(int slot,int button,ClickType type,Player p){if(!stillValid(p)){p.closeContainer();return;}super.clicked(slot,button,type,p);}
     @Override public ItemStack quickMoveStack(Player p,int index){return MachineMenus.quickMove(this,p,index,8,new int[]{4,6,0,1,2,3},this::moveItemStackTo);}
 }

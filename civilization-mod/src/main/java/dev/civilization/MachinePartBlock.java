@@ -59,9 +59,10 @@ public final class MachinePartBlock extends Block implements WorldlyContainerHol
         if(!l.isClientSide)ModeledMachine.build(c,player,stack);
         return ItemInteractionResult.sidedSuccess(l.isClientSide);
     }
-    /** Hoppers reach the controller through any cell, with the face they touch: from above, the side or below. */
+    /** Hoppers reach the controller through any cell, with the face they touch: from above, the side or below, never across a claim boundary between that cell and the controller. */
     @Override public WorldlyContainer getContainer(BlockState s,LevelAccessor l,BlockPos p){
-        return l instanceof Level level&&owner(level,p,s) instanceof WorldlyContainer container?container:null;
+        if(!(l instanceof Level level))return null;var c=owner(level,p,s);
+        return c instanceof WorldlyContainer container&&CivicAccess.boundary(level,p,c.entity().getBlockPos())?container:null;
     }
     @Override protected void onRemove(BlockState s,Level l,BlockPos p,BlockState next,boolean moving){
         if(!l.isClientSide&&!s.is(next.getBlock())){var c=owner(l,p,s);if(c!=null&&!c.build().changing)ModeledMachine.builtSection(c,cell(s)).ifPresent(part->ModeledMachine.removeSection(c,part,true));}

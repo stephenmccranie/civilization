@@ -20,6 +20,6 @@ public final class LitControllerModel extends BakedModelWrapper<BakedModel> {
     }
     @SubscribeEvent public static void models(ModelEvent.ModifyBakingResult event) {
         event.getModels().replaceAll((id,model)->id.id().getNamespace().equals("civilization")
-                && java.util.Set.of("tannery","textile_workshop","smithy","cooking_station").contains(id.id().getPath())?new LitControllerModel(model):model);
+                && java.util.Set.of("tannery","textile_workshop","cooking_station").contains(id.id().getPath())?new LitControllerModel(model):model);
     }
 }

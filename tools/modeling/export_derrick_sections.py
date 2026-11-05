@@ -73,7 +73,7 @@ def main():
         for part,cubes in groups.items():
             children.append({'name':f'section_{part}_{bone["name"]}','parent':bone['name'],'pivot':bone.get('pivot',[0,0,0]),'cubes':cubes})
     bones.extend(children)
-    (OUT/'assets/civilization/geo/oil_derrick.geo.json').write_text(json.dumps(geo,indent=2)+'\n',encoding='utf-8', newline='\n')
+    (OUT/'assets/civilization/geo/oil_derrick.geo.json').write_text(json.dumps(geo,separators=(',',':')),encoding='utf-8', newline='\n')
     assert {b[0] for c in data for b in c['boxes']} == set(range(28))
     print(f'Exported 28 native sections and {len(data)} collision cells')
 

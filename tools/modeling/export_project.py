@@ -37,11 +37,11 @@ def main():
             raise ValueError('Choose Java Block/Item or GeckoLib format before export')
         data = {f'{args.name}.bbmodel': export(client, 'project').encode()}
         if info['format'] == 'java_block':
-            data[f'{args.name}.json'] = export(client, 'java_block').encode()
+            data[f'{args.name}.json'] = json.dumps(json.loads(export(client, 'java_block')), separators=(',', ':')).encode()
         else:
-            data[f'{args.name}.geo.json'] = export(client, 'bedrock').encode()
+            data[f'{args.name}.geo.json'] = json.dumps(json.loads(export(client, 'bedrock')), separators=(',', ':')).encode()
             animation = evaluate(client, 'Animator.buildFile(null, Animation.all.map(a => a.name))')
-            data[f'{args.name}.animation.json'] = json.dumps(animation, indent=2).encode()
+            data[f'{args.name}.animation.json'] = json.dumps(animation, separators=(',', ':')).encode()
         textures = evaluate(client, 'Texture.all.map(t => ({name:t.name, data:t.getDataURL()}))')
         for index, texture in enumerate(textures):
             texture_name = args.name if len(textures) == 1 else f'{args.name}_{index}'

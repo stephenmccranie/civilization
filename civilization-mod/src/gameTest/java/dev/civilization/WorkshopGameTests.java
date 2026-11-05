@@ -278,6 +278,16 @@ public final class WorkshopGameTests {
         h.assertTrue(smith.gameMode.useItemOn(smith,l,bricks,net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()&&bricks.isEmpty()&&w.build().sections==w.model().all,"Four bricks from the hand rebuild the chimney");
         w.process();h.assertTrue(w.status!=MachineStatus.Workshop.INCOMPLETE,"Rebuilding the chimney restores the forge");h.succeed();
     }
+    @GameTest(template="industrial") public static void unbuiltSmithyRefusesTheStriker(GameTestHelper h){
+        var w=build(h,2,Direction.NORTH);var l=h.getLevel();var pos=w.getBlockPos();
+        l.removeBlock(pos,false);l.setBlockAndUpdate(pos,WorkshopContent.SMITHY.get().defaultBlockState().setValue(WorkshopBlock.FACING,Direction.NORTH));
+        w=(WorkshopBlockEntity)l.getBlockEntity(pos);w.setItem(4,KilnContent.MINERAL_COAL.toStack());
+        var smith=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"unbuilt-smith"));
+        smith.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);smith.setPos(pos.getX()+.5,pos.getY()+1,pos.getZ()+.5);
+        var data=CalorieFoodData.of(smith);data.reserve().set(1000);MachineFixture.spark(l,true);
+        h.assertTrue(w.build().sections==0&&!new WorkshopMenu(0,smith.getInventory(),w,w.data).clickMenuButton(smith,CoalFire.BUTTON)&&!w.fire.lit()&&data.reserve().calories()==1000,"A Smithy with no sections built refuses the striker and costs nothing");
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void recipesAndMendingCannotBypassWorkshops(GameTestHelper h){
         var manager=h.getLevel().getRecipeManager();
         for(var holder:manager.getRecipes())if(holder.value().getType()==RecipeType.CRAFTING||holder.value() instanceof SmithingTransformRecipe)
