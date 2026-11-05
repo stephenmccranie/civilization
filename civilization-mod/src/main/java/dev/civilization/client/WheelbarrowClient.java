@@ -31,7 +31,7 @@ public final class WheelbarrowClient {
         }
         int forward=active?(mc.options.keyUp.isDown()?1:0)-(mc.options.keyDown.isDown()?1:0):0;
         int turn=active?(mc.options.keyRight.isDown()?1:0)-(mc.options.keyLeft.isDown()?1:0):0;
-        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,turn,mc.options.keyShift.isDown()||!active));
+        PacketDistributor.sendToServer(new WheelbarrowPayload(forward,turn,active&&mc.options.keySprint.isDown(),mc.options.keyShift.isDown()||!active));
     }
     /** The handler walks, so their actual travel drives vanilla's walk distance and bob exactly as walking does. */
     private static void walk(Player p){

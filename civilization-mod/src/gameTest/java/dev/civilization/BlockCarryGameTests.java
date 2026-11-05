@@ -84,6 +84,12 @@ public final class BlockCarryGameTests {
         p.getInventory().setItem(1,ItemStack.EMPTY);var food=new ItemStack(Items.APPLE,4);p.getInventory().add(food);
         h.assertTrue(food.isEmpty()&&p.getInventory().getItem(1).is(Items.APPLE),"Non-block goods retain ordinary inventory behavior");h.succeed();
     }
+    @GameTest(template="industrial") public static void shiftClickedGoodsFillTheHotbarNotTheHand(GameTestHelper h){
+        var p=player(h);var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.STONE_PICKAXE));
+        var menu=ChestMenu.threeRows(1,p.getInventory(),chest);BlockCarry.attachMenu(menu,p.getInventory());menu.quickMoveStack(p,0);
+        int at=-1;for(int i=0;i<36;i++)if(p.getInventory().getItem(i).is(Items.STONE_PICKAXE))at=i;
+        h.assertTrue(chest.getItem(0).isEmpty()&&p.getOffhandItem().isEmpty()&&net.minecraft.world.entity.player.Inventory.isHotbarSlot(at),"A shift-clicked tool fills the hotbar, never the empty Hand: slot "+at);h.succeed();
+    }
     @GameTest(template="industrial") public static void menuClicksShiftDragAndSwapCannotPutBlocksInPockets(GameTestHelper h){
         var p=player(h);var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.STONE,32));chest.setItem(1,new ItemStack(Items.STONE,32));
         var menu=ChestMenu.threeRows(1,p.getInventory(),chest);menu.quickMoveStack(p,0);menu.quickMoveStack(p,1);

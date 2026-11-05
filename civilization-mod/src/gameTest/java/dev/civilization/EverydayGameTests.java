@@ -138,8 +138,15 @@ public class EverydayGameTests {
                 Items.COD, Items.SALMON, Items.POTATO, Items.KELP)) {
             var input = new SingleRecipeInput(new ItemStack(item));
             h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(CookingContent.RECIPE_TYPE.get(), input, h.getLevel()).isPresent(), "Stove cooks " + item);
-            for (var type : List.of(RecipeType.SMELTING, RecipeType.SMOKING, RecipeType.CAMPFIRE_COOKING, RecipeType.BLASTING))
+            for (var type : List.of(RecipeType.SMELTING, RecipeType.SMOKING, RecipeType.BLASTING))
                 h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(type, input, h.getLevel()).isEmpty(), "No vanilla heat bypass for " + item);
+            var campfire = h.getLevel().getRecipeManager().getRecipeFor(RecipeType.CAMPFIRE_COOKING, input, h.getLevel()).orElseThrow().value();
+            var roast = campfire.assemble(input, h.getLevel().registryAccess());
+            var cooked = new ItemStack(roast.getItem());
+            h.assertTrue(campfire.getCookingTime() == 600 && roast.get(CookingContent.ROASTED_FROM.get()) == item && !ItemStack.isSameItemSameComponents(roast, cooked),
+                    "A campfire roasts " + item + " in 30 seconds, apart from stove-cooked food");
+            double raw = FoodCalories.of(input.item(), input.item().getFoodProperties(null)), stove = FoodCalories.of(cooked, cooked.getFoodProperties(null));
+            h.assertTrue(FoodCalories.of(roast, roast.getFoodProperties(null)) == (raw + stove) / 2, "Roast " + item + " is worth halfway between raw and stove-cooked");
         }
         h.assertTrue(h.getLevel().getRecipeManager().getRecipeFor(RecipeType.SMELTING,
                 new SingleRecipeInput(new ItemStack(Items.SAND)), h.getLevel()).isEmpty(), "Glass moves to the kiln");
@@ -160,10 +167,10 @@ public class EverydayGameTests {
 
     @GameTest(template = "industrial")
     public static void stoveCraftsAndCooksWithoutShell(GameTestHelper h) {
-        var copper = new ItemStack(Items.COPPER_INGOT);
+        var brick = new ItemStack(Items.BRICK);
         var stone = new ItemStack(Items.COBBLESTONE);
-        var result = craft(h, CraftingInput.of(3, 3, List.of(copper, copper, copper, stone, new ItemStack(Items.COBBLESTONE), stone, stone, stone, stone)));
-        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Copper top, six cobble make stove");
+        var result = craft(h, CraftingInput.of(3, 3, List.of(brick, brick, brick, stone, new ItemStack(Items.COBBLESTONE), stone, stone, stone, stone)));
+        h.assertTrue(result.is(CookingContent.STATION_ITEM.get()), "Brick top, six cobble make stove");
         var machine = stove(h);
         machine.setItem(0, new ItemStack(Items.BEEF, 9));
         machine.setItem(1, KilnContent.MINERAL_COAL.toStack());

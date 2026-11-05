@@ -9,6 +9,7 @@
   "itemGroup.civilization": "Civilization",
   "command.civilization.status": "Civilization %s is loaded. Calorie food system active. Use /civilization calories.",
   "tooltip.civilization.calories": "+%s kcal",
+  "tooltip.civilization.campfire_roasted": "Campfire-roasted: half the calories a stove adds",
   "tooltip.civilization.coal_energy": "Fuel: %s (%s kg)",
   "item.civilization.foraged_morsel": "Foraged Morsel",
   "hud.civilization.depleted": "Depleted",

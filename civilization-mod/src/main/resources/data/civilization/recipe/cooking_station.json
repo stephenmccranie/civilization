@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "CCC",
+    "BBB",
     "SFS",
     "SSS"
   ],
   "key": {
-    "C": {
-      "item": "minecraft:copper_ingot"
+    "B": {
+      "item": "minecraft:brick"
     },
     "S": {
       "item": "minecraft:cobblestone"

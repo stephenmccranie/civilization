@@ -72,7 +72,8 @@ public final class ManufacturingGameTests {
         h.succeed();
     }
     @GameTest(template="industrial") public static void bundledHandleAndRepairCannotMintGradeOrLeather(GameTestHelper h){
-        var handle=job(3,ManufacturingContent.HANDLE.get());h.assertTrue(handle.needs().get(1).ingredient().test(new ItemStack(Items.LEATHER))&&handle.output().getCount()==4,"One leather supplies four complete handles");
+        var handle=job(3,ManufacturingContent.HANDLE.get());h.assertTrue(handle.needs().get(1).ingredient().test(new ItemStack(Items.LEATHER))&&handle.output().getCount()==1,"One leather makes one complete handle");
+        var door=job(3,Items.OAK_DOOR);var trapdoor=job(3,Items.OAK_TRAPDOOR);var fasteners=new ItemStack(ManufacturingContent.FASTENERS.get());h.assertTrue(door.output().getCount()==3&&door.needs().stream().noneMatch(n->n.ingredient().test(fasteners))&&trapdoor.needs().stream().noneMatch(n->n.ingredient().test(fasteners)),"Wooden doors and trapdoors need no iron fasteners");
         for(var item:List.of(Items.IRON_PICKAXE,Items.IRON_AXE,Items.IRON_SHOVEL)){
             var tool=job(3,item);h.assertTrue(tool.needs().stream().noneMatch(n->n.count()>0&&n.ingredient().test(new ItemStack(Items.LEATHER))),"Final tool does not bill leather again");
         }

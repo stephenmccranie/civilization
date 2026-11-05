@@ -36,6 +36,11 @@ public final class CookingContent {
             () -> new RecipeType<>() { @Override public String toString() { return "civilization:cooking"; } });
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCookingSerializer<CookingRecipe>> SERIALIZER = SERIALIZERS.register("cooking",
             () -> new SimpleCookingSerializer<>(CookingRecipe::new, 200));
+    private static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Civilization.MOD_ID);
+    /** The raw food a campfire roasted: worth halfway between it and the stove-cooked food. */
+    public static final DeferredHolder<net.minecraft.core.component.DataComponentType<?>, net.minecraft.core.component.DataComponentType<Item>> ROASTED_FROM =
+            COMPONENTS.registerComponentType("campfire_roasted_from", builder -> builder.persistent(net.minecraft.core.registries.BuiltInRegistries.ITEM.byNameCodec())
+                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.registry(Registries.ITEM)));
 
     private static Item.Properties edible(int nutrition) {
         return new Item.Properties().food(new FoodProperties.Builder().nutrition(nutrition).saturationModifier(0).build());
@@ -50,6 +55,6 @@ public final class CookingContent {
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus);
-        MENUS.register(bus); RECIPES.register(bus); SERIALIZERS.register(bus);
+        MENUS.register(bus); RECIPES.register(bus); SERIALIZERS.register(bus); COMPONENTS.register(bus);
     }
 }

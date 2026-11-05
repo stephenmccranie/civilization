@@ -65,7 +65,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Farming and uncooked food sustain a person without industrial fuel; river crops supply staple calories. Fishing and gathering add subsistence and variety while purchased provisions stay useful.
 - Livestock kills yield one meat portion, with no Looting bonus.
 - Future husbandry uses farm feed at breeding and production, with no animal-hunger simulation or livestock region.
-- Household cooking uses one coal-fired station. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
+- Household cooking uses one coal-fired station; a campfire also roasts raw food, three times slower and for half the calories the stove adds. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
 - **Tier 2 cooking** grows into a kitchen workshop of distinct multiblocks. Mastery is the player learning — no cooking XP — and pays off in higher-calorie meals and stronger work bonuses. Chopping is not a mastery mechanic.
 - Mastery means reading colour and sound cues that change continuously, with a forgiving optimal plateau. A frying sound runs under every active phase, with distinct textures for the plateau and overcooking; loudness follows pan heat.
 - Heat is a continuous physical dial, no presets. Stronger heat cooks faster and narrows the optimal window.
@@ -83,7 +83,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - **Eligibility.** Farmland follows the local natural river elevation, including high valleys, within a bounded reach of the water surface. Sea level is not a ceiling; sky platforms gain nothing from being above a river; placed water creates neither eligibility nor the rain bonus.
 - **Growth.** Soil holds the water: river soil gives 50% growth, stored rainwater 100%. Full-speed planting to harvest averages two hours (four at baseline), normalised by growth stage, without vanilla moisture or row multipliers.
 - **Rain reserve.** 30 minutes of open-sky rain charges a farmland block's reserve to 120 minutes; it grows at full speed and recharges while rain falls, then drains a minute per minute. Roofs block rain; the crop does not. No lateral spread or pipe irrigation. Breaking soil cannot refill it; replanting keeps it.
-- Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval.
+- Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval. Sweet berry bushes ripen on the same clock and water reserve wherever they grow, a full interval per picking, with their native picking yield and no fertilizer.
 - **Fertilizer** raises yield, not speed: one non-stacking dose per cycle tripling harvest output after replanting material (wheat keeps its 1→3). Fortune and alternative paths cannot bypass yields. Mineral Fertilizer comes only from refinery sulfur plus gravel. Bone meal is disabled.
 - Trees grow anywhere suitable, substantially faster in woodland. Every other growable needs its own habitat policy rather than inheriting wheat rules.
 - **Regional weather.** Weather runs in fixed 512×512-block districts — atmosphere, not claims — through one authoritative server query that natural rain, the Rain Caller and later towers all feed. Overworld only. Sleeping changes time, not weather.
@@ -93,8 +93,9 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Wet soil darkens; hoe inspection reports suitability, growth rate and stored water; failed planting explains why. Photon is the primary shader target.
 
 **Open**
-- Habitat policy for cocoa, berries, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
+- Habitat policy for cocoa, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
 - Meltwater and cold-region farming.
+- Tree felling: chopping a tree one log at a time was the strongest playtest complaint, and the owner wants a more advanced felling and timber-hauling system, designed later.
 - The Rain Caller's eventual form; tower energy and Survival access; offline production.
 - Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
 
@@ -220,7 +221,7 @@ Progression expands the quantities, distances and areas a player handles: person
 - **Personal carrying.** Building material travels as one offhand stack of up to 8 blocks or cut pieces; matching pickups fill it. Tools, seeds, crops, small placeables and empty pallets use normal inventory. Old extra stock is recovered, never deleted.
 - **Backpack.** An early leather pack worn in an accessory slot adds grade-scaled room for goods and building blocks: 9 slots and 24 blocks at 100% grade. It comes off only empty.
 - Chests keep 32-item stacks for tools, food and components; building stock belongs in stockpiles and cargo spaces. Containers must be empty to carry; ender storage is disabled.
-- The **wheelbarrow** is pushed over the ground at walking speed, paying handling calories and climbing one-block rises, carrying eight hands: half a pallet. The coal minecart keeps its separate rail role.
+- The **wheelbarrow** is pushed over the ground at walking or sprinting speed, paying handling calories and climbing one-block rises, carrying eight hands: half a pallet. The coal minecart keeps its separate rail role.
 - **Supply-fed building.** Placement draws only from explicitly selected nearby supplies: a backpack bound to one wheelbarrow or Pallet group keeps the hand, and the block stacks already in the pack, topped up from it while the wearer builds within 16 blocks. It never adds new kinds of block. Supply is switched by the player, shown beside the hotbar, and checks access at every pull; out of reach, the pack alone refills the hand.
 - New limits follow an audit and explicit migration; inventories are never shrunk or discarded.
 

@@ -22,10 +22,17 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
             }
             return;
         }
-        // Ordinary goods fill the pockets before the worn pack shown beside them, as pickups do.
-        for(int i=from+1;i<to;i++)if(menu.slots.get(i) instanceof dev.civilization.Backpack.PackSlot&&!(menu.slots.get(i-1) instanceof dev.civilization.Backpack.PackSlot)){
-            result.setReturnValue(civilization$move(stack,from,i,reverse)|civilization$move(stack,i,to,reverse));return;
+        // Ordinary goods fill the pockets, hotbar first, before the worn pack shown beside them, as pickups do. The Hand
+        // among the pockets is for building blocks.
+        int hand=-1,pack=to;
+        for(int i=from;i<to;i++){
+            var slot=menu.slots.get(i);
+            if(slot instanceof dev.civilization.Backpack.PackSlot){if(i>from&&!(menu.slots.get(i-1) instanceof dev.civilization.Backpack.PackSlot))pack=i;}
+            else if(to-from>1&&slot.container instanceof Inventory&&slot.getContainerSlot()==BlockCarry.OFFHAND)hand=i;
         }
+        if(hand<0&&pack==to)return;
+        boolean pockets=hand<0?civilization$move(stack,from,pack,reverse):civilization$move(stack,from,hand,reverse)|civilization$move(stack,hand+1,pack,reverse);
+        result.setReturnValue(pockets|civilization$move(stack,pack,to,reverse));
     }
     @Inject(method="clicked",at=@At("HEAD"),cancellable=true)
     private void civilization$click(int index,int button,ClickType type,Player player,CallbackInfo ci){

@@ -54,7 +54,7 @@ Inputs are consumed only when the whole output fits. Hoppers may supply inputs f
 
 | Product | Input | Output | Base time | Workplace |
 | --- | --- | --- | --- | --- |
-| Tool Handle | 1 plank + 1 Leather | 4 | 5 seconds | Assembly Bench |
+| Tool Handle | 1 plank + 1 Leather | 1 | 5 seconds | Assembly Bench |
 | Wooden Wheel | 1 plank + 2 Iron Fasteners | 1 | 10 seconds | Assembly Bench |
 | Metal Plate | 1 matching ingot | 1 | 5 seconds | Smithy |
 | Metal Rod | 1 matching ingot | 2 | 5 seconds | Smithy |
@@ -113,8 +113,8 @@ Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithin
 
 | Product | Assembly Bench bill | Output / base time |
 | --- | --- | --- |
-| Wooden doors | 6 matching species planks + 3 Fasteners | 3 / 5 seconds |
-| Wooden trapdoors | 6 matching species planks + 2 Fasteners | 2 / 5 seconds |
+| Wooden doors | 6 matching species planks | 3 / 5 seconds |
+| Wooden trapdoors | 6 matching species planks | 2 / 5 seconds |
 | Wooden fence gate | 2 matching species planks + 4 Sticks + 2 Fasteners | 1 / 5 seconds |
 | Chest / Barrel | 8 / 7 mixed planks | 1 / 5 seconds |
 | Wheelbarrow | 3 mixed planks + 1 Wooden Wheel + 1 Iron Rod + 4 Fasteners | 1 / 10 seconds |

@@ -1,7 +1,15 @@
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:false"
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "cookingtime": 600,
+  "experience": 0.35,
+  "ingredient": {
+    "item": "minecraft:kelp"
+  },
+  "result": {
+    "id": "minecraft:dried_kelp",
+    "components": {
+      "civilization:campfire_roasted_from": "minecraft:kelp"
     }
-  ]
+  }
 }

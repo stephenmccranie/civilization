@@ -71,11 +71,11 @@ public final class WheelbarrowGameTests {
     }
     @GameTest(template="industrial") public static void serverInputMovesStopsTurnsAndKeepsOneHandler(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var other=player(h);
-        other.setYRot(90);e.input(other,new WheelbarrowPayload(1,0,false));var start=e.position();e.tick();
+        other.setYRot(90);e.input(other,new WheelbarrowPayload(1,0,false,false));var start=e.position();e.tick();
         h.assertTrue(e.position().distanceTo(start)<.001&&e.getYRot()==0,"Non-handler input and facing cannot move a carrier");
-        e.input(p,new WheelbarrowPayload(127,0,false));for(int i=0;i<10;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(127,0,false,false));for(int i=0;i<10;i++)e.tick();
         h.assertTrue(Math.abs(e.getZ()-start.z-PlayerMovement.WALK/2)<.001,"Server clamps input and pushes at normal walking speed");
-        float wheel=e.travel();e.input(p,new WheelbarrowPayload(0,1,false));e.tick();
+        float wheel=e.travel();e.input(p,new WheelbarrowPayload(0,1,false,false));e.tick();
         h.assertTrue(e.getYRot()>0&&e.travel()==wheel,"Stationary turning does not spin the wheel");
         h.assertTrue(!other.startRiding(e),"Two handlers cannot take one carrier");
         p.stopRiding();var parked=e.position();for(int i=0;i<5;i++)e.tick();
@@ -132,42 +132,52 @@ public final class WheelbarrowGameTests {
         // Inside the axis-aligned bounds of the turned body, yet clear of the body itself.
         var beside=BlockPos.containing(e.position().add(1,0,1));h.getLevel().setBlockAndUpdate(beside,Blocks.STONE.defaultBlockState());
         h.assertTrue(e.getBoundingBox().intersects(new AABB(beside))&&!e.body().overlaps(Solid.of(new AABB(beside))),"The block lies in the empty corner");
-        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<3;i++)e.tick();
+        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<3;i++)e.tick();
         h.assertTrue(Math.abs(e.getY()-y)<1e-6&&e.position().distanceTo(start)>.4,"A block beside the body neither lifts nor stops it: "+e.position());h.succeed();
     }
     @GameTest(template="industrial") public static void forwardMotionKeepsExactFractionalHeadingWithoutSideDrift(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var center=e.position();
         for(float yaw:new float[]{0,17.125f,33.333f,89.875f,135.25f,225.125f,315.375f}){
-            e.setYRot(yaw);e.setPos(center);p.setYRot(yaw);e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<10;i++)e.tick();
+            e.setYRot(yaw);e.setPos(center);p.setYRot(yaw);e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<10;i++)e.tick();
             var delta=e.position().subtract(center);var forward=new Vec3(0,0,1).yRot(-yaw*net.minecraft.util.Mth.DEG_TO_RAD);
             h.assertTrue(Math.abs(delta.x*forward.z-delta.z*forward.x)<1e-6&&Math.abs(delta.horizontalDistance()-PlayerMovement.WALK/2)<.001,"W follows its precise fractional heading without a lateral component: "+yaw);
         }h.succeed();
     }
     @GameTest(template="industrial") public static void pushingCostsWalkingCaloriesForActualHandleTravel(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
-        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<10;i++)e.tick();
+        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<10;i++)e.tick();
         double distance=e.position().subtract(start).horizontalDistance();
         double factor=ThermalRules.calorieFactor(ThermalSystem.comfort(p))*data.workFactor();
         h.assertTrue(Math.abs(data.reserve().calories()-(1000-distance*CalorieConfig.WALK.get()*factor))<1e-6,"Forward travel spends exactly walking calories, once");
         double spent=data.travelSpent;var grip=e.handlerPosition(e.position(),e.getYRot());
-        e.input(p,new WheelbarrowPayload(0,1,false));e.tick();
+        e.input(p,new WheelbarrowPayload(0,1,false,false));e.tick();
         double arc=e.handlerPosition(e.position(),e.getYRot()).subtract(grip).horizontalDistance();
         h.assertTrue(arc>.05&&Math.abs(data.travelSpent-spent-arc*CalorieConfig.WALK.get()*factor)<1e-6,"Turning charges the handler's actual walk around the handles");
-        p.setYRot(e.getYRot());double before=data.reserve().calories();e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();
+        p.setYRot(e.getYRot());double before=data.reserve().calories();e.input(p,new WheelbarrowPayload(0,0,false,false));for(int i=0;i<5;i++)e.tick();
         h.assertTrue(data.reserve().calories()==before,"Holding still spends no pushing calories");
-        p.setGameMode(GameType.CREATIVE);e.input(p,new WheelbarrowPayload(-1,0,false));e.tick();
+        p.setGameMode(GameType.CREATIVE);e.input(p,new WheelbarrowPayload(-1,0,false,false));e.tick();
         h.assertTrue(data.reserve().calories()==before,"Creative handling is exempt");
         p.setGameMode(GameType.SURVIVAL);data.reserve().set(.001);e.tick();
         h.assertTrue(data.reserve().calories()==0&&data.isDepleted(),"Pushing uses shared depletion without calorie debt");h.succeed();
+    }
+    @GameTest(template="industrial") public static void sprintingPushesAtSprintSpeedForSprintCalories(GameTestHelper h){
+        var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
+        var start=e.position();e.input(p,new WheelbarrowPayload(1,0,true,false));for(int i=0;i<5;i++)e.tick();
+        double distance=e.position().subtract(start).horizontalDistance();
+        double factor=ThermalRules.calorieFactor(ThermalSystem.comfort(p))*data.workFactor();
+        h.assertTrue(Math.abs(distance-PlayerMovement.SPRINT/4)<.01,"Five sprinting ticks push at sprint speed: "+distance);
+        h.assertTrue(Math.abs(data.reserve().calories()-(1000-distance*CalorieConfig.WALK.get()*CalorieConfig.SPRINT_MULTIPLIER.get()*factor))<1e-6,"Sprinting spends sprint calories");
+        data.reserve().set(CalorieConfig.SPRINT_MINIMUM.get()-1);start=e.position();for(int i=0;i<5;i++)e.tick();
+        h.assertTrue(Math.abs(e.position().subtract(start).horizontalDistance()-PlayerMovement.WALK/4)<.01,"Below the sprint minimum it walks");h.succeed();
     }
     @GameTest(template="industrial") public static void blockedPushingCostsNothingAndReverseUsesActualDistance(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var data=CalorieFoodData.of(p);data.reserve().set(1000);
         double wallZ=e.getZ()+2.5;
         for(int x=-2;x<=2;x++)for(int y=0;y<2;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<30;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<30;i++)e.tick();
         double stopped=data.reserve().calories();for(int i=0;i<5;i++)e.tick();
         h.assertTrue(data.reserve().calories()==stopped,"Holding forward against a wall costs no travel calories");
-        var start=e.position();e.input(p,new WheelbarrowPayload(-1,0,false));for(int i=0;i<10;i++)e.tick();
+        var start=e.position();e.input(p,new WheelbarrowPayload(-1,0,false,false));for(int i=0;i<10;i++)e.tick();
         double distance=e.position().subtract(start).horizontalDistance();
         h.assertTrue(Math.abs(distance-PlayerMovement.WALK/4)<.001,"Backing up uses half walking speed");
         h.assertTrue(data.reserve().calories()<stopped&&Math.abs(data.walkDistance-data.travelSpent/(CalorieConfig.WALK.get()*ThermalRules.calorieFactor(ThermalSystem.comfort(p))))<1e-5,"Reverse travel spends positive walking calories");
@@ -176,14 +186,14 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void bodyAndHandlerCannotPassSolidWalls(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double wallZ=e.getZ()+2.5;
         for(int x=-2;x<=2;x++)for(int y=0;y<2;y++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,e.getY()+y,wallZ),Blocks.STONE.defaultBlockState());
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<35;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<35;i++)e.tick();
         h.assertTrue(e.body().bounds().maxZ<=Math.floor(wallZ)+1e-6,"The body stops at a wall");
-        e.input(p,new WheelbarrowPayload(0,0,false));var pos=e.position();e.tick();h.assertTrue(e.position().distanceTo(pos)<.001,"Blocked carrier remains parked");h.succeed();
+        e.input(p,new WheelbarrowPayload(0,0,false,false));var pos=e.position();e.tick();h.assertTrue(e.position().distanceTo(pos)<.001,"Blocked carrier remains parked");h.succeed();
     }
     @GameTest(template="industrial") public static void halfStepStillClimbs(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int z=(int)Math.floor(e.getZ()+2);
         for(int x=-2;x<=2;x++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y,z),Blocks.STONE_SLAB.defaultBlockState());
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<10;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<10;i++)e.tick();
         h.assertTrue(Math.abs(e.getY()-y-.5)<.001,"The wheel climbs a slab and the body rests on it: "+e.getY());h.succeed();
     }
     @GameTest(template="industrial") public static void climbsSuccessiveOneBlockInclines(GameTestHelper h){
@@ -195,8 +205,8 @@ public final class WheelbarrowGameTests {
         var p=player(h);take(h,e,p);double y=e.getY();int first=(int)Math.floor(e.getZ()+2);
         for(int x=-3;x<=3;x++)for(int z=first;z<=first+5;z++)for(int height=0;height<=Math.min(2,(z-first)/2);height++)
             h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y+height,z),Blocks.STONE.defaultBlockState());
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<30;i++)e.tick();
-        e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();e.positionRider(p);
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<30;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(0,0,false,false));for(int i=0;i<5;i++)e.tick();e.positionRider(p);
         h.assertTrue(e.getY()>y+2.9&&e.getY()<y+3.1,"Successive one-block rises climb without jumping");
         // The handler walks the same rises a step behind, on their own ground.
         h.assertTrue(p.getY()<e.getY()-.9&&h.getLevel().noCollision(p,p.getBoundingBox())&&!h.getLevel().noCollision(p,p.getBoundingBox().move(0,-.05,0)),"Handler stands on the incline behind the carrier: "+p.position()+" / "+e.position());h.succeed();
@@ -207,7 +217,7 @@ public final class WheelbarrowGameTests {
         // The carrier fits under this upper-slab ceiling on the step; its handler does not.
         var ceiling=Blocks.STONE_SLAB.defaultBlockState().setValue(net.minecraft.world.level.block.SlabBlock.TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP);
         for(int x=-1;x<=1;x++)for(int z=first;z<=first+3;z++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y+2,z),ceiling);
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<40;i++)e.tick();e.positionRider(p);
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<40;i++)e.tick();e.positionRider(p);
         var stopped=e.position();e.tick();
         h.assertTrue(Math.abs(e.getY()-y-1)<.001&&e.position().distanceTo(stopped)<.001,"The carrier climbs and then waits for its handler: "+e.position());
         h.assertTrue(p.getY()<y+.01&&h.getLevel().noCollision(p,p.getBoundingBox()),"A low ceiling over the step keeps the handler below instead of embedding them");h.succeed();
@@ -215,17 +225,17 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void neverPushedOffADeeperDrop(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);double y=e.getY();int edge=(int)Math.floor(e.getZ()+2);
         for(int x=-3;x<=3;x++)for(int z=edge;z<=edge+3;z++)for(int d=1;d<=2;d++)h.getLevel().setBlockAndUpdate(BlockPos.containing(e.getX()+x,y-d,z),Blocks.AIR.defaultBlockState());
-        e.input(p,new WheelbarrowPayload(1,0,false));for(int i=0;i<40;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(1,0,false,false));for(int i=0;i<40;i++)e.tick();
         // It stops within a step of where the tyre's whole footprint, which ends 10/16 behind the centre, would leave the edge.
         h.assertTrue(Math.abs(e.getY()-y)<.001&&e.getZ()>edge-.625-PlayerMovement.WALK/20-1e-6&&e.getZ()<=edge-.625+1e-6&&e.onGround()&&p.getVehicle()==e,"The wheel stops at a two-block drop, still held: "+e.position());h.succeed();
     }
     @GameTest(template="industrial") public static void keysSteerAtTurnRateAndTheLookStaysOnTheHandles(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);
-        p.setYRot(30);e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();
+        p.setYRot(30);e.input(p,new WheelbarrowPayload(0,0,false,false));for(int i=0;i<5;i++)e.tick();
         h.assertTrue(e.getYRot()==0,"Looking away never steers: "+e.getYRot());
-        e.input(p,new WheelbarrowPayload(0,1,false));for(int i=0;i<5;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(0,1,false,false));for(int i=0;i<5;i++)e.tick();
         h.assertTrue(Math.abs(e.getYRot()-5*WheelbarrowEntity.TURN)<1e-4,"D pivots the carrier at the turn rate: "+e.getYRot());
-        e.input(p,new WheelbarrowPayload(0,-1,false));for(int i=0;i<2;i++)e.tick();e.input(p,new WheelbarrowPayload(0,0,false));for(int i=0;i<5;i++)e.tick();
+        e.input(p,new WheelbarrowPayload(0,-1,false,false));for(int i=0;i<2;i++)e.tick();e.input(p,new WheelbarrowPayload(0,0,false,false));for(int i=0;i<5;i++)e.tick();
         h.assertTrue(Math.abs(e.getYRot()-3*WheelbarrowEntity.TURN)<1e-4&&e.travel()==0,"A turns it back, it holds its heading once the keys are up, and the wheel never rolls: "+e.getYRot());
         p.setYRot(e.getYRot()+150);e.positionRider(p);
         h.assertTrue(Math.abs(net.minecraft.util.Mth.wrapDegrees(p.getYRot()-e.getYRot())-WheelbarrowEntity.LOOK)<1e-3&&p.yBodyRot==e.getYRot(),"The handler's look stops short of turning their back on the handles");h.succeed();
@@ -251,7 +261,7 @@ public final class WheelbarrowGameTests {
         h.assertTrue(WheelbarrowContent.ITEM.get().useOn(ctx).consumesAction()&&p.getMainHandItem().isEmpty(),"Successful placement consumes one item");h.succeed();
     }
     @GameTest(template="industrial") public static void saveReloadKeepsIdentityAndClearsDriveInput(GameTestHelper h){
-        var e=barrow(h);var p=player(h);take(h,e,p);e.input(p,new WheelbarrowPayload(1,0,false));e.tick();
+        var e=barrow(h);var p=player(h);take(h,e,p);e.input(p,new WheelbarrowPayload(1,0,false,false));e.tick();
         var tag=new CompoundTag();e.saveWithoutId(tag);var restored=new WheelbarrowEntity(WheelbarrowContent.ENTITY.get(),h.getLevel());restored.load(tag);
         h.assertTrue(restored.getUUID().equals(e.getUUID())&&restored.travel()==e.travel(),"Native persistence retains identity and wheel distance");
         var pos=restored.position();restored.tick();h.assertTrue(restored.position().subtract(pos).horizontalDistance()<.001&&!restored.held(),"Reload never restores stale pushing input");h.succeed();
@@ -259,7 +269,7 @@ public final class WheelbarrowGameTests {
     @GameTest(template="industrial") public static void accessRevocationReleasesHandlerAndDeniesRecovery(GameTestHelper h){
         var e=barrow(h);var p=player(h);take(h,e,p);var data=CivicData.get(h.getLevel().getServer());var claim=new CivicData.Claim();
         claim.at=new CivicData.Address(h.getLevel().dimension().location().toString(),e.blockPosition());claim.owner=new CivicData.Owner(UUID.randomUUID(),false);claim.radius=8;claim.height=32;claim.upkeep=1;claim.coalUnit=3600000;claim.energy=claim.coalUnit*200;claim.lastUpdate=System.currentTimeMillis();data.claims.put(claim.at,claim);data.rebuildIndex();
-        try{e.input(p,new WheelbarrowPayload(1,0,false));e.tick();h.assertTrue(!p.isPassenger()&&!e.held(),"Access loss releases the current handler");p.setShiftKeyDown(true);e.interact(p,InteractionHand.MAIN_HAND);h.assertTrue(!e.isRemoved()&&p.getInventory().countItem(WheelbarrowContent.ITEM.get())==0,"Denied recovery cannot steal a carrier");}
+        try{e.input(p,new WheelbarrowPayload(1,0,false,false));e.tick();h.assertTrue(!p.isPassenger()&&!e.held(),"Access loss releases the current handler");p.setShiftKeyDown(true);e.interact(p,InteractionHand.MAIN_HAND);h.assertTrue(!e.isRemoved()&&p.getInventory().countItem(WheelbarrowContent.ITEM.get())==0,"Denied recovery cannot steal a carrier");}
         finally{data.claims.remove(claim.at);data.rebuildIndex();}h.succeed();
     }
 }

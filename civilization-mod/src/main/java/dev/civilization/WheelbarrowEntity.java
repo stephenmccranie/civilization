@@ -49,6 +49,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     private final CargoLedger cargo=new CargoLedger(GRID::capacity,this::cargoChanged);
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
     private int forward,turn,lerpSteps;
+    private boolean sprint;
     private long lastInput=Long.MIN_VALUE;
     private double targetX,targetY,targetZ;
     private float lastHeading=Float.NaN;
@@ -97,7 +98,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
     public void input(Player p,WheelbarrowPayload input){
         if(level().isClientSide||getFirstPassenger()!=p)return;
         if(input.release()){p.stopRiding();forward=turn=0;return;}
-        forward=Integer.signum(input.forward());turn=Integer.signum(input.turn());lastInput=level().getGameTime();
+        forward=Integer.signum(input.forward());turn=Integer.signum(input.turn());sprint=input.sprint();lastInput=level().getGameTime();
     }
     @Override public InteractionResult interact(Player p,InteractionHand hand){
         if(isRemoved())return InteractionResult.FAIL;
@@ -239,11 +240,12 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         }
         if(p!=null&&(!p.isAlive()||p.isSpectator()||isInWater()||!handlerFits(p,position(),getYRot()))){p.stopRiding();p=null;}
         entityData.set(HELD,p!=null);
-        if(p==null||lastInput==Long.MIN_VALUE||level().getGameTime()-lastInput>10)forward=turn=0;
+        if(p==null||lastInput==Long.MIN_VALUE||level().getGameTime()-lastInput>10){forward=turn=0;sprint=false;}
+        boolean sprinting=p!=null&&forward>0&&sprint&&CalorieFoodData.of(p).maySprint(p);
         Vec3 before=position();
         if(p!=null){
             if(turn!=0)shift(position(),getYRot()+turn*TURN,p);
-            double speed=forward>0?PlayerMovement.WALK/20:forward<0?-PlayerMovement.WALK/40:0;
+            double speed=forward>0?(sprinting?PlayerMovement.SPRINT:PlayerMovement.WALK)/20:forward<0?-PlayerMovement.WALK/40:0;
             if(speed!=0&&level().hasChunkAt(blockPosition()))shift(position().add(new Vec3(0,0,speed).yRot(-getYRot()*Mth.DEG_TO_RAD)),getYRot(),p);
         }
         if(level().hasChunkAt(blockPosition()))fall();
@@ -253,7 +255,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         support(p);
         if(p!=null){
             Vec3 walked=handlerPosition(position(),getYRot()).with(Direction.Axis.Y,rear).subtract(feet);
-            CalorieFoodData.of(p).pushWheelbarrow(p,walked.x,walked.y,walked.z);
+            CalorieFoodData.of(p).pushWheelbarrow(p,walked.x,walked.y,walked.z,sprinting);
         }
     }
     /** The native step sound of the ground, as rolling entities make it. */
