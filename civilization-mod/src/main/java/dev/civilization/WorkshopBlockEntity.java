@@ -113,9 +113,9 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     private void processSteep(){
         if(structure()!=MachineStructure.COMPLETE){pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         var pit=items.get(PIT_HIDES);
-        if(pit.isEmpty()){status=count(WorkshopContent.HIDE.get())>0&&count(WorkshopContent.TANBARK.get())>0?MachineStatus.Workshop.POUR:MachineStatus.Workshop.NEEDS_MATERIALS;return;}
+        if(pit.isEmpty()){pause(count(WorkshopContent.HIDE.get())>0&&count(WorkshopContent.TANBARK.get())>0?MachineStatus.Workshop.POUR:MachineStatus.Workshop.NEEDS_MATERIALS,false);return;}
         if(steep<Tanning.TICKS){steep=Math.min(Tanning.TICKS,steep+10);setChanged();}
-        if(steep<Tanning.TICKS){status=MachineStatus.Workshop.WORKING;return;}
+        if(steep<Tanning.TICKS){status=MachineStatus.Workshop.WORKING;working(true);return;}
         var leather=new ItemStack(Items.LEATHER,pit.getCount());
         if(!MachineInventory.room(this,outputSlots(),leather)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
         MachineInventory.insert(this,outputSlots(),leather);
@@ -123,7 +123,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         EnergyLog.machine(level,worldPosition,"workshop_batch","Tanning",1,"minecraft:leather",pit.getCount());
         items.set(PIT_HIDES,ItemStack.EMPTY);items.set(PIT_BARK,ItemStack.EMPTY);steep=0;
         level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.BUCKET_FILL,net.minecraft.sounds.SoundSource.BLOCKS,.4f,.8f);
-        status=MachineStatus.Workshop.NEEDS_MATERIALS;setChanged();
+        pause(MachineStatus.Workshop.NEEDS_MATERIALS,false);setChanged();
     }
     private void processWork(){
         if(level==null||level.isClientSide)return;

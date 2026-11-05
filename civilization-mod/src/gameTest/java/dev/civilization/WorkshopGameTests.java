@@ -37,9 +37,9 @@ public final class WorkshopGameTests {
         h.assertTrue(w.getItem(WorkshopBlockEntity.PIT_HIDES).getCount()==5&&w.getItem(WorkshopBlockEntity.PIT_BARK).getCount()==5&&w.getItem(0).getCount()==5&&w.getItem(1).isEmpty(),"One Tanbark per hide goes into the pit");
         p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));
         h.assertTrue(!w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.WATER_BUCKET),"A busy pit refuses more water");
-        run(w,Tanning.TICKS-10);h.assertTrue(w.getItem(5).isEmpty()&&w.getItem(7).isEmpty()&&w.fire.heat()==0,"The batch is not done before twenty minutes and burns nothing");
+        run(w,Tanning.TICKS-10);h.assertTrue(w.getItem(5).isEmpty()&&w.getItem(7).isEmpty()&&w.fire.heat()==0&&w.working(),"The batch is not done before twenty minutes and burns nothing");
         w.setItem(0,ItemStack.EMPTY);run(w,10);
-        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==5&&w.getItem(WorkshopBlockEntity.PIT_HIDES).isEmpty()&&w.getItem(WorkshopBlockEntity.PIT_BARK).isEmpty()&&w.pendingExperience==5,"Changing the inputs leaves the pit alone; twenty minutes make five Leather");
+        h.assertTrue(w.getItem(5).is(Items.LEATHER)&&w.getItem(5).getCount()==5&&w.getItem(WorkshopBlockEntity.PIT_HIDES).isEmpty()&&w.getItem(WorkshopBlockEntity.PIT_BARK).isEmpty()&&w.pendingExperience==5&&!w.working(),"Changing the inputs leaves the pit alone; twenty minutes make five Leather and the pit stops working");
         w.setItem(0,WorkshopContent.HIDE.toStack(3));
         h.assertTrue(!w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.WATER_BUCKET),"Without Tanbark the pit is not filled");h.succeed();
     }
