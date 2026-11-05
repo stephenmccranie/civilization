@@ -17,6 +17,14 @@ import net.neoforged.neoforge.gametest.*;
 public final class BlockCarryGameTests {
     private static FakePlayer player(GameTestHelper h){var p=new FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"block-carry"));p.setGameMode(GameType.SURVIVAL);p.setPos(h.absolutePos(new BlockPos(4,2,4)).getCenter());return p;}
     private static ItemEntity drop(GameTestHelper h,ItemStack stack){var d=new ItemEntity(h.getLevel(),0,2,0,stack);d.setNoPickUpDelay();return d;}
+    @GameTest(template="industrial") public static void dropThrowsFromTheHandBeforeTheMainHand(GameTestHelper h){
+        var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));p.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.STICK));
+        h.assertTrue(p.drop(false)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT-1&&p.getMainHandItem().is(Items.STICK),"Drop throws one block from the hand before the main hand");
+        h.assertTrue(p.drop(true)&&p.getOffhandItem().isEmpty()&&p.getMainHandItem().is(Items.STICK),"Ctrl+drop throws the whole stack");
+        h.assertTrue(p.drop(false)&&p.getMainHandItem().isEmpty(),"With the hand empty, drop throws the main hand's item");
+        int thrown=h.getLevel().getEntitiesOfClass(ItemEntity.class,new AABB(p.blockPosition()).inflate(3)).stream().mapToInt(e->e.getItem().is(Items.STONE)?e.getItem().getCount():0).sum();
+        h.assertTrue(thrown==BlockCarry.LIMIT,"Every thrown block lands in the world: "+thrown);h.succeed();
+    }
     @GameTest(template="industrial") public static void smallPlaceablesUseNormalPocketsAndHandControls(GameTestHelper h){
         var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,BlockCarry.LIMIT));
         for(var item:new Item[]{Items.WHEAT_SEEDS,Items.BEETROOT_SEEDS,Items.PUMPKIN_SEEDS,Items.MELON_SEEDS,Items.TORCHFLOWER_SEEDS,Items.PITCHER_POD,

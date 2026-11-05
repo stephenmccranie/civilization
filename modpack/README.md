@@ -21,7 +21,7 @@ These are starting defaults; adjust them for your hardware.
 | Setting | Pack default |
 | --- | --- |
 | GUI scale / FOV | Auto: one step per 360 px of window height (3× at 1080p, 4× at 1440p, 6× at 4K) / 90° |
-| Chat text size / width / closed height | 75% / 264 GUI px (about 41% of the screen width at any resolution) / 20 lines |
+| Chat text size / width / closed height | 100% / 320 GUI px (half a 16:9 screen at any resolution) / 20 lines |
 | Grassier Grass blade particles / grass plants as blades | Off / Off |
 | Grassier Grass blades per block / blade height / height variation | 32 / 0.45 / 0.35 |
 | DH distance | 128 chunks |
@@ -37,6 +37,7 @@ These are starting defaults; adjust them for your hardware.
 | DH automatic updates | Off, to keep the tested version |
 | DH garbage-collector chat warning | Off |
 | Vanilla render / simulation distance | 12 / 5 chunks |
+| JourneyMap Create Waypoint key | V, leaving B for the backpack |
 | Shader | Photon v1.3b, Medium profile |
 | Shader materials | Normal and specular mapping on for Patrix; handheld lighting on |
 | Shader clouds | High-terrain cloud altitudes kept; vanilla clouds off |

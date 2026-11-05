@@ -1,6 +1,6 @@
 # Geography and weather
 
-Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Deposits of coal and oil are in [industry](industry.md#deposits).
+Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Deposits of coal and oil are in [industry](industry.md#deposits).
 
 ## Farmland and woodland
 

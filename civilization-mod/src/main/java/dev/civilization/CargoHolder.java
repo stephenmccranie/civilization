@@ -15,4 +15,13 @@ public interface CargoHolder {
     boolean cargoValid(Player player,double reach);
     default boolean cargoValid(Player player){return cargoValid(player,REACH);}
     Component cargoName();
+    /** A right-click puts the first held goods the store accepts onto it, main hand first. False when nothing fits, and the click opens the store. */
+    default boolean putHeld(Player p){
+        for(var hand:net.minecraft.world.InteractionHand.values()){
+            var held=p.getItemInHand(hand);var name=held.getHoverName();
+            int n=(int)cargo().insert(held,held.getCount());
+            if(n>0){held.shrink(n);p.displayClientMessage(Component.literal("Stacked "+n+" ").append(name).append(" · "+CargoInventory.blocks(cargo().load(),cargo().capacity())),true);return true;}
+        }
+        return false;
+    }
 }

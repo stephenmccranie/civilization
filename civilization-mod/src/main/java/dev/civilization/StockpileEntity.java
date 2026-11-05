@@ -51,15 +51,6 @@ public final class StockpileEntity extends BlockEntity implements CargoHolder,Me
     private StockpileGroup group(){if(group==null)group=StockpileGroup.find(this);return group;}
     @Override public CargoInventory cargo(){return level==null||level.isClientSide||isRemoved()?stack:group();}
     public int palletCount(){return level==null||level.isClientSide||isRemoved()?1:group().pallets();}
-    /** Puts the first held goods the pallets accept onto them, main hand first. False when nothing fits. */
-    boolean putHeld(Player p){
-        for(var hand:InteractionHand.values()){
-            var held=p.getItemInHand(hand);var name=held.getHoverName();
-            int n=(int)cargo().insert(held,held.getCount());
-            if(n>0){held.shrink(n);p.displayClientMessage(Component.literal("Stacked "+n+" ").append(name).append(" · "+CargoInventory.blocks(cargo().load(),cargo().capacity())),true);return true;}
-        }
-        return false;
-    }
     @Override public void onLoad(){super.onLoad();if(group!=null)group.invalidate();StockpileGroup.invalidateAround(level,worldPosition);}
     @Override public void setRemoved(){if(group!=null)group.invalidate();super.setRemoved();}
     @Override public Level cargoLevel(){return level;}

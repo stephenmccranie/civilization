@@ -98,6 +98,9 @@ public final class BlockCarry {
         if(event.getEntity() instanceof ServerPlayer p&&normalize(p)==0&&BlockCarryRecovery.get(p.server).pending(p.getUUID())>0)
             p.displayClientMessage(Component.literal("Saved block recovery is available: /civilization recoverblocks"),false);
     }
+    /** Drop throws from the hand's building stack before the main hand: one block, or the whole stack with Ctrl. */
+    public static boolean dropsFromHand(Player p){return restricted(p)&&block(p.getOffhandItem());}
+    public static ItemStack takeDrop(Player p,boolean all){var hand=p.getOffhandItem();return hand.split(all?hand.getCount():1);}
     @SubscribeEvent public static void swap(LivingSwapItemsEvent.Hands event){
         if(event.getEntity() instanceof Player p&&restricted(p)&&(block(event.getItemSwappedToMainHand())||filledContainer(event.getItemSwappedToOffHand())))event.setCanceled(true);
     }

@@ -233,7 +233,7 @@
   "item.civilization.geiger_counter": "Geiger Counter",
   "tooltip.civilization.geiger_counter": "Accessory · faster clicks near uranium",
   "item.civilization.backpack": "Backpack",
-  "tooltip.civilization.backpack": "Accessory · B opens it · bind it in a wheelbarrow or Pallet menu to build from that store",
+  "tooltip.civilization.backpack": "Accessory · %s opens it · bind it in a wheelbarrow or Pallet menu to build from that store",
   "block.civilization.prototype_stove": "Prototype Stove",
   "item.civilization.vegetable_skillet": "Vegetable Skillet Portion",
   "item.civilization.skillet": "Skillet",

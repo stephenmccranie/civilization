@@ -81,7 +81,7 @@ public final class WheelbarrowEntity extends Entity implements GeoEntity,CargoHo
         if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
         // Transform the actual hit into the model frame: the rear wall and the handles behind it take the handles.
         if(p.isShiftKeyDown()||hit.yRot((getYRot()-180)*Mth.DEG_TO_RAD).z>.5)return interact(p,hand);
-        if(!level().isClientSide&&cargoValid(p))p.openMenu(this);
+        if(!level().isClientSide&&cargoValid(p)&&!putHeld(p))p.openMenu(this);
         return InteractionResult.sidedSuccess(level().isClientSide);
     }
     public float travel(){return entityData.get(TRAVEL);}

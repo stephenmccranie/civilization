@@ -1,7 +1,5 @@
 renderDistance:12
 guiScale:0
-chatScale:0.75
-chatWidth:0.8
 chatHeightUnfocused:1.0
 fov:0.5
 simulationDistance:5
@@ -9,3 +7,4 @@ biomeBlendRadius:0
 renderClouds:"false"
 resourcePacks:["vanilla","mod_resources","file/Patrix_1.21_32x_basic.zip"]
 incompatibleResourcePacks:[]
+key_key.journeymap.create_waypoint:key.keyboard.v

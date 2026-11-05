@@ -17,7 +17,7 @@ public final class Welcome {
     static final List<Component> MESSAGE = List.of(
             Component.empty().append(rule()).append(Component.literal(" Welcome to Civilization ").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)).append(rule()),
             item("• ", "Building blocks ride in your *offhand*, "+BlockCarry.LIMIT+" at a time."),
-            item("• ", "Your food bar counts *calories*; work and travel spend them."),
+            item("• ", "Your food bar counts *calories*; work and travel use them."),
             item("• ", "Furnaces and campfires don't work. Start with a *Kiln*."),
             heading("First steps"),
             item("1", "*Stone Saw*: 3 cobblestone + 2 sticks; cuts blocks to size."),
@@ -28,7 +28,7 @@ public final class Welcome {
             item("6", "*Foundry*: 8 brick blocks around cobblestone; smelts ore."),
             heading("Good to know"),
             item("• ", "Raw food is fine; cooking needs a *Cooking Stove* (copper)."),
-            item("• ", "Starving? Crouch empty-handed and right-click the ground."),
+            item("• ", "Starving? Crouch empty-handed, right-click the ground."),
             item("• ", "Iron tools come from the *Smithy* and *Assembly Bench*."),
             item("• ", "Claim land with a *Land Controller*; it burns Coal hourly."),
             item("• ", "Press *R* on any item for its recipe, *U* for its uses."),
