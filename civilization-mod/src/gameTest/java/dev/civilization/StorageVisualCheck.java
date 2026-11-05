@@ -4,7 +4,7 @@ import net.minecraft.client.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.*;
 
-/** Short real-menu snapshot of paired material storage, then hot metal through its colours in slots, in hand and dropped, by day and night. */
+/** Short real-menu snapshot of paired material storage, then hot metal through its colours in slots, in hand (white-hot and cherry) and dropped, by day and night. */
 final class StorageVisualCheck {
     private static int ticks;
     /** Seconds out of the fire of the hotbar's iron ingots, from white-yellow to cold (-1), and of the three dropped ingots. */
@@ -64,12 +64,14 @@ final class StorageVisualCheck {
         });
         if(ticks==195)mc.player.getInventory().selected=3;
         if(ticks==192||ticks==212||ticks==242||ticks==262)age(server);
-        if(ticks==200){mc.gui.getChat().clearMessages(false);shot(mc,"hot-day");}
-        if(ticks==205){mc.options.hideGui=true;mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);mc.player.setXRot(0);}
+        if(ticks==200){mc.gui.getChat().clearMessages(false);shot(mc,"hot-day");mc.player.getInventory().selected=0;}
+        if(ticks==208){shot(mc,"hot-day-held");mc.player.getInventory().selected=3;}
+        if(ticks==210){mc.options.hideGui=true;mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);mc.player.setXRot(0);}
         if(ticks==220)shot(mc,"hot-day-front");
         if(ticks==225){mc.options.hideGui=false;mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);mc.player.setXRot(40);server.execute(()->server.overworld().setDayTime(18000));}
-        if(ticks==250)shot(mc,"hot-night");
-        if(ticks==252){mc.options.hideGui=true;mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);mc.player.setXRot(0);}
+        if(ticks==250){shot(mc,"hot-night");mc.player.getInventory().selected=0;}
+        if(ticks==258){shot(mc,"hot-night-held");mc.player.getInventory().selected=3;}
+        if(ticks==260){mc.options.hideGui=true;mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);mc.player.setXRot(0);}
         if(ticks==270)shot(mc,"hot-night-front");
         if(ticks>280)mc.stop();
     }

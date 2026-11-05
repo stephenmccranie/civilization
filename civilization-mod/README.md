@@ -50,7 +50,7 @@ This is a compatibility gate, not authentication or anti-cheat: a modified clien
 
 Install JDK 21 and a Prism instance named Civilization Dev, then copy `dev.local.example.json` to the ignored `dev.local.json` and set `javaHome` and `prismInstance`.
 
-Gradle resolves GeckoLib (required at runtime) and JEI (optional and compile-only; never bundle it). `dev.ps1` downloads the pinned Sable release into the ignored `.dev-libs` folder: its version is in `gradle.properties` and its SHA-512 is pinned in `dev.ps1`.
+Gradle resolves GeckoLib (required at runtime), and JEI and the Iris API (optional and compile-only; never bundle them). `dev.ps1` downloads the pinned Sable release into the ignored `.dev-libs` folder: its version is in `gradle.properties` and its SHA-512 is pinned in `dev.ps1`.
 
 `run/` is the development client. Visual checks copy its world, mods, shader and resource packs and options, so optional client mods for those checks (JEI, Iris with Photon, Distant Horizons) go in `run/mods`. Blockbench and its MCP server are authoring tools only: see the [modeling workflow](../tools/modeling/README.md).
 
