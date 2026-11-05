@@ -11,6 +11,7 @@
     "BlockCarryInventoryMixin",
     "BlockCarrySlotMixin",
     "BlockCarryMenuMixin",
+    "ChestArmfulMixin",
     "InventoryMenuMixin",
     "SharedCraftingMenuMixin",
     "SharedCraftingTableRemovalMixin",

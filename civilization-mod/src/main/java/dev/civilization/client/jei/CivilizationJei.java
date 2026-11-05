@@ -59,7 +59,7 @@ public final class CivilizationJei implements IModPlugin {
                 var mc=Minecraft.getInstance();
                 if(mc.player==null||!BlockCarry.restricted(mc.player)||!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
                 var areas=new java.util.ArrayList<net.minecraft.client.renderer.Rect2i>();
-                for(var slot:screen.getMenu().slots)if(slot.x<0&&slot.container==mc.player.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND)
+                for(var slot:screen.getMenu().slots)if(slot instanceof BlockCarry.HandSlot)
                     areas.add(dev.civilization.client.MachineUi.handBounds(screen,slot));
                 if(dev.civilization.client.MachineUi.packLayout(screen.getMenu()) instanceof net.minecraft.client.renderer.Rect2i pack)
                     areas.add(new net.minecraft.client.renderer.Rect2i(screen.getGuiLeft()+pack.getX(),screen.getGuiTop()+pack.getY(),pack.getWidth(),pack.getHeight()));

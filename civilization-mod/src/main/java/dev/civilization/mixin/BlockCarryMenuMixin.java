@@ -1,6 +1,9 @@
 package dev.civilization.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import dev.civilization.BlockCarry;
+import dev.civilization.ChestArmful;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +40,13 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     @Inject(method="clicked",at=@At("HEAD"),cancellable=true)
     private void civilization$click(int index,int button,ClickType type,Player player,CallbackInfo ci){
         if(BlockCarry.forbiddenClick((AbstractContainerMenu)(Object)this,index,button,type,player))ci.cancel();
+    }
+    @WrapMethod(method="clicked")
+    private void civilization$chestArmful(int index,int button,ClickType type,Player player,Operation<Void> original){
+        var menu=(AbstractContainerMenu)(Object)this;
+        var offered=ChestArmful.offered(menu,index,button,type,player).copy();
+        original.call(index,button,type,player);
+        ChestArmful.explain(menu,index,button,type,player,offered);
     }
     @Inject(method="canDragTo",at=@At("RETURN"),cancellable=true)
     private void civilization$drag(Slot slot,CallbackInfoReturnable<Boolean> result){

@@ -14,7 +14,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 /** One physical stack in the arms, the offhand: building blocks and buckets. Other inventory goods retain native behavior. */
 @EventBusSubscriber(modid="civilization")
 public final class BlockCarry {
-    public static final int OFFHAND=40,HAND_SLOT_X=-36;
+    public static final int OFFHAND=40;
     /** An armful: an eighth of a block of space at cargo density (CargoGrid), so eight blocks, cut pieces or buckets. */
     public static final int LIMIT=8;
     public static final net.minecraft.tags.TagKey<Item> INVENTORY_PLACEABLES=net.minecraft.tags.TagKey.create(
@@ -68,12 +68,16 @@ public final class BlockCarry {
         }
         return false;
     }
+    /** The offhand shown beside a menu at hotbar height; the client stands it against the menu's side. */
+    public static final class HandSlot extends Slot {
+        public HandSlot(Inventory inv,int y){super(inv,OFFHAND,0,y);}
+    }
     /** Expose the same hand slot in native chests, crafting and machine menus. */
     public static void attachMenu(AbstractContainerMenu menu,Inventory inv){
         if(!restricted(inv.player))return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==OFFHAND)return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==0){
-            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new Slot(inv,OFFHAND,HAND_SLOT_X,slot.y));return;
+            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new HandSlot(inv,slot.y));return;
         }
     }
     /** Runs only between transactions; old/foreign misplaced stock is saved, never silently deleted. */

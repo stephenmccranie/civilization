@@ -24,16 +24,14 @@ public abstract class BlockCarryScreenMixin {
     private void civilization$handLayout(GuiGraphics g,int mouseX,int mouseY,float partial,CallbackInfo ci){
         var p=Minecraft.getInstance().player;if(p==null||!BlockCarry.restricted(p))return;
         int x=MachineUi.handSlotX((AbstractContainerScreen<?>)(Object)this);
-        for(var slot:menu.slots)if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0)((SlotPositionAccess)slot).civilization$setX(x);
+        for(var slot:menu.slots)if(slot instanceof BlockCarry.HandSlot)((SlotPositionAccess)slot).civilization$setX(x);
         MachineUi.packLayout(menu);
     }
     @Inject(method="renderSlot",at=@At("HEAD"))
     private void civilization$handPanel(GuiGraphics g,Slot slot,CallbackInfo ci){
         var p=Minecraft.getInstance().player;
-        if(p!=null&&BlockCarry.restricted(p)&&slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0){
-            // renderSlot already runs inside the screen's left/top translation.
-            MachineUi.handPanel(g,slot.x,slot.y);
-        }
+        // renderSlot already runs inside the screen's left/top translation.
+        if(p!=null&&BlockCarry.restricted(p)&&slot instanceof BlockCarry.HandSlot)MachineUi.handPanel(g,slot.x,slot.y);
         if(slot instanceof Backpack.PackSlot){
             if(slot.getContainerSlot()==0&&MachineUi.packLayout(menu) instanceof net.minecraft.client.renderer.Rect2i panel)MachineUi.packPanel(g,panel);
             MachineUi.slot(g,slot.x,slot.y);
@@ -42,7 +40,7 @@ public abstract class BlockCarryScreenMixin {
     @Inject(method="hasClickedOutside",at=@At("RETURN"),cancellable=true)
     private void civilization$handInside(double x,double y,int left,int top,int button,CallbackInfoReturnable<Boolean> result){
         var p=Minecraft.getInstance().player;if(p==null||!BlockCarry.restricted(p))return;
-        for(var slot:menu.slots)if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND&&slot.x<0&&x>=left+slot.x-MachineUi.HAND_LEFT&&x<left+slot.x-MachineUi.HAND_LEFT+MachineUi.HAND_WIDTH&&y>=top+slot.y-MachineUi.HAND_TOP&&y<top+slot.y-MachineUi.HAND_TOP+MachineUi.HAND_HEIGHT)result.setReturnValue(false);
+        for(var slot:menu.slots)if(slot instanceof BlockCarry.HandSlot&&x>=left+slot.x-MachineUi.HAND_LEFT&&x<left+slot.x-MachineUi.HAND_LEFT+MachineUi.HAND_WIDTH&&y>=top+slot.y-MachineUi.HAND_TOP&&y<top+slot.y-MachineUi.HAND_TOP+MachineUi.HAND_HEIGHT)result.setReturnValue(false);
         if(MachineUi.packLayout(menu) instanceof net.minecraft.client.renderer.Rect2i panel&&panel.contains((int)x-left,(int)y-top))result.setReturnValue(false);
     }
 }
