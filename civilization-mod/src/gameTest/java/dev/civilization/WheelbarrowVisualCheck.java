@@ -200,9 +200,10 @@ final class WheelbarrowVisualCheck {
             if(mc.player.containerMenu.getSlot(0).getItem().getCount()!=5||mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT)throw new IllegalStateException("Chest shift-click bypassed a full offhand");
             mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,63,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
         }
-        if(t==836)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
+        // The chest's 5 dirt leave room for 3 of the Hand's stone in its armful; the rest stays in the Hand.
         if(t==845){
-            if(!mc.player.getOffhandItem().is(Blocks.DIRT.asItem())||mc.player.getOffhandItem().getCount()!=5||mc.player.containerMenu.getSlot(1).getItem().getCount()!=BlockCarry.LIMIT)throw new IllegalStateException("Native chest/hand transfers did not conserve the two block types");
+            int room=BlockCarry.LIMIT-5;
+            if(!mc.player.getOffhandItem().is(Blocks.STONE.asItem())||mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT-room||!mc.player.containerMenu.getSlot(1).getItem().is(Blocks.STONE.asItem())||mc.player.containerMenu.getSlot(1).getItem().getCount()!=room||mc.player.containerMenu.getSlot(0).getItem().getCount()!=5)throw new IllegalStateException("Native chest/hand transfers did not conserve the two block types within the chest's armful");
             for(int i=0;i<36;i++)if(BlockCarry.block(mc.player.getInventory().getItem(i)))throw new IllegalStateException("Blocks escaped into normal player pockets");
             dev.civilization.client.CarryUiCheck.assertLayout(mc,false);shot(mc,"offhand-chest");handMenuVerified=true;
         }
