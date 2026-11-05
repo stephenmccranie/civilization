@@ -178,6 +178,17 @@ public class CivicGameTests {
         } finally { d.claims.remove(c.at); d.rebuildIndex(); }
         h.succeed();
     }
+    @GameTest(template = "empty") public static void outsidersPeelNoTanbarkInsideAClaim(GameTestHelper h) {
+        var level = h.getLevel(); var d = CivicData.get(level.getServer()); var outsider = player(h);
+        var pos = new BlockPos(205000, 64, 200000); var c = claim(d, UUID.randomUUID(), pos, System.currentTimeMillis());
+        try {
+            level.setBlockAndUpdate(pos, Blocks.OAK_LOG.defaultBlockState()); outsider.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.IRON_AXE));
+            Items.IRON_AXE.useOn(new net.minecraft.world.item.context.UseOnContext(outsider, InteractionHand.MAIN_HAND, new net.minecraft.world.phys.BlockHitResult(pos.getCenter(), net.minecraft.core.Direction.UP, pos, false)));
+            var bark = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(2), e -> e.getItem().is(WorkshopContent.TANBARK.get()));
+            h.assertTrue(level.getBlockState(pos).is(Blocks.OAK_LOG) && bark.isEmpty(), "A strip the claim refuses peels no Tanbark");
+        } finally { d.claims.remove(c.at); d.rebuildIndex(); level.removeBlock(pos, false); }
+        h.succeed();
+    }
     @GameTest(template = "empty") public static void coalSlotsConserveFuelAndRejectUnauthorizedMoves(GameTestHelper h) {
         var d = CivicData.get(h.getLevel().getServer()); var p = player(h); var pos = new BlockPos(210000, 64, 200000);
         long now = System.currentTimeMillis(); var c = claim(d, p.getUUID(), pos, now);
