@@ -124,7 +124,7 @@ def install(config, ssh, changed):
             tar.addfile(info, io.BytesIO(data))
     subprocess.run(ssh + ['sudo', 'tar', '-C', '/', '-xzpf', '-', '--same-owner'], input=archive.getvalue(), check=True)
     if any(p.startswith('/etc/systemd/') for p in changed): subprocess.run(ssh + ['sudo', 'systemctl', 'daemon-reload'], check=True)
-    if any(p.startswith('/etc/nginx/') for p in changed): subprocess.run(ssh + ['sudo', 'sh', '-c', 'nginx -t && systemctl reload nginx'], check=True)
+    if any(p.startswith('/etc/nginx/') for p in changed): subprocess.run(ssh + ['sudo nginx -t && sudo systemctl reload nginx'], check=True)
     if any(p.startswith('/etc/sysctl.d/') for p in changed): subprocess.run(ssh + ['sudo', 'sysctl', '--system'], check=True, capture_output=True)
 
 
