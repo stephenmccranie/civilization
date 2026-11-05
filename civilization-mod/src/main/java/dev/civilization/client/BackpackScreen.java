@@ -31,7 +31,7 @@ public final class BackpackScreen extends MachineScreen<BackpackMenu> {
         g.drawString(font,status,leftPos+8,topPos+24,MachineUi.INK,false);
         var pack=Backpack.worn(minecraft.player);
         if(pack!=null){
-            int blocks=0;for(int i=0;i<menu.size();i++)if(BlockCarry.block(menu.getSlot(i).getItem()))blocks+=menu.getSlot(i).getItem().getCount();
+            int blocks=0;for(int i=0;i<menu.size();i++)if(BlockCarry.carried(menu.getSlot(i).getItem()))blocks+=menu.getSlot(i).getItem().getCount();
             g.drawString(font,blocks+" / "+Backpack.blocks(pack.pack())+" blocks",leftPos+8,topPos+BackpackMenu.PACK_Y-12,MachineUi.MUTED,false);
         }
     }

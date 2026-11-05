@@ -21,7 +21,7 @@ public final class BlockCarryClient {
         if(!e.isUseItem())return;
         mainLast=e.getHand()==InteractionHand.MAIN_HAND;
         var player=Minecraft.getInstance().player;
-        if(!mainLast&&mainActed&&player!=null&&BlockCarry.block(player.getOffhandItem())){e.setCanceled(true);e.setSwingHand(false);}
+        if(!mainLast&&mainActed&&player!=null&&BlockCarry.carried(player.getOffhandItem())){e.setCanceled(true);e.setSwingHand(false);}
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         mainActed=Minecraft.getInstance().options.keyUse.isDown()&&(mainActed||mainLast);

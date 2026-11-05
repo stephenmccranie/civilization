@@ -43,6 +43,20 @@ public final class WorkshopGameTests {
         w.setItem(0,WorkshopContent.HIDE.toStack(3));
         h.assertTrue(!w.pour(p,net.minecraft.world.InteractionHand.MAIN_HAND)&&p.getMainHandItem().is(Items.WATER_BUCKET),"Without Tanbark the pit is not filled");h.succeed();
     }
+    @GameTest(template="industrial") public static void tanneryPoursTheBucketCarriedInTheOffhand(GameTestHelper h){
+        var w=build(h,0,Direction.NORTH);var l=h.getLevel();var pos=w.getBlockPos();
+        w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(1,WorkshopContent.TANBARK.toStack(2));
+        var tanner=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"offhand-tanner"));
+        tanner.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);tanner.setPos(pos.getX()+.5,pos.getY(),pos.getZ()-2.5);
+        tanner.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.WATER_BUCKET));
+        var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),Direction.NORTH,pos,false);
+        h.assertTrue(tanner.gameMode.useItemOn(tanner,l,tanner.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()
+                &&tanner.getOffhandItem().is(Items.BUCKET)&&w.getItem(WorkshopBlockEntity.PIT_HIDES).getCount()==2,"An empty main hand pours the water bucket carried in the offhand");
+        tanner.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.WATER_BUCKET));
+        h.assertTrue(tanner.gameMode.useItemOn(tanner,l,tanner.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()
+                &&tanner.getOffhandItem().is(Items.WATER_BUCKET)&&w.getItem(WorkshopBlockEntity.PIT_HIDES).getCount()==2,"A busy pit takes nothing and the bucket keeps its water");
+        h.succeed();
+    }
     @GameTest(template="industrial",timeoutTicks=60) public static void tanneryPitKeepsItsBatchThroughSaveAndBreaking(GameTestHelper h){
         var w=build(h,0,Direction.NORTH);var p=ManufacturingGameTests.operator(w);
         w.setItem(0,WorkshopContent.HIDE.toStack(8));w.setItem(1,WorkshopContent.TANBARK.toStack(8));

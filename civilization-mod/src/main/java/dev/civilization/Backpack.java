@@ -78,12 +78,12 @@ public final class Backpack {
         public ItemStack pack(){return pack;}
         @Override public void setChanged(){super.setChanged();pack.set(DataComponents.CONTAINER,ItemContainerContents.fromItems(getItems()));}
         /** How many more building blocks the pack takes. */
-        public int blockRoom(){int n=0;for(var s:getItems())if(BlockCarry.block(s))n+=s.getCount();return Math.max(0,blocks(pack)-n);}
-        @Override public boolean canPlaceItem(int slot,ItemStack stack){return !stack.is(ITEM)&&!BlockCarry.filledContainer(stack)&&(!BlockCarry.block(stack)||blockRoom()>0);}
+        public int blockRoom(){int n=0;for(var s:getItems())if(BlockCarry.carried(s))n+=s.getCount();return Math.max(0,blocks(pack)-n);}
+        @Override public boolean canPlaceItem(int slot,ItemStack stack){return !stack.is(ITEM)&&!BlockCarry.filledContainer(stack)&&(!BlockCarry.carried(stack)||blockRoom()>0);}
         /** The most of `stack` that a slot holds, building blocks counting against the cap. */
         public int limit(int slot,ItemStack stack){
             int max=Math.min(getMaxStackSize(),stack.getMaxStackSize());var held=getItem(slot);
-            return BlockCarry.block(stack)?Math.min(max,(ItemStack.isSameItemSameComponents(held,stack)?held.getCount():0)+blockRoom()):max;
+            return BlockCarry.carried(stack)?Math.min(max,(ItemStack.isSameItemSameComponents(held,stack)?held.getCount():0)+blockRoom()):max;
         }
         /** Puts what fits of `stack` onto matching stacks, then into empty slots; `stack` keeps the rest. */
         public void insert(ItemStack stack){
@@ -160,7 +160,7 @@ public final class Backpack {
         var store=supplying(p,pack);if(store==null){p.displayClientMessage(Component.literal(shortage(p,pack,null)),true);return;}
         long moved=0;
         for(int i=0;i<pack.getContainerSize();i++){
-            var held=pack.getItem(i);if(!BlockCarry.block(held))continue;
+            var held=pack.getItem(i);if(!BlockCarry.carried(held))continue;
             int n=(int)store.insert(held,held.getCount());if(n>0){held.shrink(n);moved+=n;pack.setChanged();}
         }
         p.displayClientMessage(Component.literal(moved>0?"Unloaded "+moved+" blocks · "+CargoInventory.blocks(store.load(),store.capacity()):"The bound store takes none of these blocks"),true);
@@ -184,7 +184,7 @@ public final class Backpack {
     @SubscribeEvent(priority=EventPriority.LOW) public static void tick(PlayerTickEvent.Post e){
         if(!(e.getEntity() instanceof ServerPlayer p))return;
         if(BUILT.remove(p.getUUID()))refill(p,HAND.get(p.getUUID()));
-        var hand=p.getOffhandItem();if(BlockCarry.block(hand))HAND.put(p.getUUID(),hand.copyWithCount(1));
+        var hand=p.getOffhandItem();if(BlockCarry.carried(hand))HAND.put(p.getUUID(),hand.copyWithCount(1));
     }
     @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent e){HAND.remove(e.getEntity().getUUID());BUILT.remove(e.getEntity().getUUID());}
     /**
@@ -195,14 +195,14 @@ public final class Backpack {
         var pack=worn(p);if(pack==null)return;
         var inv=p.getInventory();var hand=inv.getItem(BlockCarry.OFFHAND);var want=hand.isEmpty()?last:hand;
         var store=supplying(p,pack);
-        if(want!=null&&BlockCarry.block(want)){
+        if(want!=null&&BlockCarry.carried(want)){
             int room=Math.min(BlockCarry.LIMIT,want.getMaxStackSize())-hand.getCount(),got=0;
             if(store!=null){int at=store.indexOf(want);if(at>=0)got=(int)store.remove(at,room);}
             got+=pack.take(want,room-got);
             if(got>0){if(hand.isEmpty())inv.setItem(BlockCarry.OFFHAND,want.copyWithCount(got));else hand.grow(got);inv.setChanged();}
         }
         if(store!=null)for(int i=0;i<pack.getContainerSize();i++){
-            var held=pack.getItem(i);if(!BlockCarry.block(held))continue;
+            var held=pack.getItem(i);if(!BlockCarry.carried(held))continue;
             int at=store.indexOf(held);if(at<0)continue;
             int n=(int)store.remove(at,pack.limit(i,held)-held.getCount());if(n>0){held.grow(n);pack.setChanged();}
         }

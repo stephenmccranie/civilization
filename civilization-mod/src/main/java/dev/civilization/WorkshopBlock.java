@@ -25,11 +25,13 @@ public class WorkshopBlock extends KilnBlock {
     @Override public void animateTick(BlockState s,Level l,BlockPos p,net.minecraft.util.RandomSource random){
         if(WorkshopBlockEntity.fired(kind))super.animateTick(s,l,p,random);
     }
-    /** A water bucket fills the Tannery's pit and starts its batch. */
+    /** A water bucket, in the clicking hand or carried in the offhand, fills the Tannery's empty pit and starts its batch;
+     * when the pit cannot take it, the click opens the menu, which says why. */
     @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,net.minecraft.world.InteractionHand hand,net.minecraft.world.phys.BlockHitResult hit){
-        if(kind!=0||!stack.is(net.minecraft.world.item.Items.WATER_BUCKET))return super.useItemOn(stack,state,level,pos,player,hand,hit);
-        if(!level.isClientSide&&level.getBlockEntity(pos) instanceof WorkshopBlockEntity w)w.pour(player,hand);
-        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
+        var bucket=kind==0?MachineConstruction.material(player,stack,s->s.is(net.minecraft.world.item.Items.WATER_BUCKET)):net.minecraft.world.item.ItemStack.EMPTY;
+        if(!bucket.isEmpty()&&!level.isClientSide&&level.getBlockEntity(pos) instanceof WorkshopBlockEntity w&&w.pour(player,bucket==stack?hand:net.minecraft.world.InteractionHand.OFF_HAND))
+            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        return super.useItemOn(stack,state,level,pos,player,hand,hit);
     }
     @Override protected void openContainer(Level l,BlockPos p,Player player){if(l.getBlockEntity(p) instanceof WorkshopBlockEntity w&&CivicAccess.allowed(l,p,player))player.openMenu(w);}
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level l,BlockState s,BlockEntityType<T> t){return l.isClientSide?null:createTickerHelper(t,WorkshopContent.ENTITY.get(),(world,pos,state,w)->w.tick());}

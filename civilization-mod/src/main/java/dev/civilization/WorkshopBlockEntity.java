@@ -90,13 +90,12 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.WOOD_PLACE,net.minecraft.sounds.SoundSource.BLOCKS,.35f,1f);
         worker=null;progress=0;workingResult=ItemStack.EMPTY;status=MachineStatus.Workshop.HAND_READY;setChanged();
     }
-    /** Pouring a water bucket into the Tannery's empty pit starts a batch: up to eight hides, one Tanbark each. */
+    /** Pouring a water bucket into the Tannery's empty pit starts a batch: up to eight hides, one Tanbark each. A pit that
+     * is busy, unfinished or unloaded takes nothing; its menu shows why. */
     public boolean pour(Player p,InteractionHand hand){
-        if(!steeped()||!stillValid(p))return false;
-        if(!items.get(PIT_HIDES).isEmpty()){p.displayClientMessage(Component.literal("The pit is already tanning: "+minutesLeft()+" min left"),true);return false;}
-        if(structure()!=MachineStructure.COMPLETE){p.displayClientMessage(Component.literal("Finish the Tannery before filling its pit"),true);return false;}
+        if(!steeped()||!stillValid(p)||!items.get(PIT_HIDES).isEmpty()||structure()!=MachineStructure.COMPLETE)return false;
         int batch=Math.min(Tanning.PIT,Math.min(count(WorkshopContent.HIDE.get()),count(WorkshopContent.TANBARK.get())));
-        if(batch==0){p.displayClientMessage(Component.literal("Load Raw Hide and Tanbark before pouring water"),true);return false;}
+        if(batch==0)return false;
         items.set(PIT_HIDES,take(WorkshopContent.HIDE.get(),batch));items.set(PIT_BARK,take(WorkshopContent.TANBARK.get(),batch));steep=0;
         p.setItemInHand(hand,ItemUtils.createFilledResult(p.getItemInHand(hand),p,new ItemStack(Items.BUCKET)));
         level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.BUCKET_EMPTY,net.minecraft.sounds.SoundSource.BLOCKS,1f,1f);

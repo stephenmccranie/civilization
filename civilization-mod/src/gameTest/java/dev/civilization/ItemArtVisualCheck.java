@@ -26,6 +26,8 @@ final class ItemArtVisualCheck {
     var items=items(scene);
     var frames=scene.equals("components")?java.util.List.of(items.get(0),items.get(1),items.get(2),items.get(3),items.get(4),items.get(11),items.get(18),items.get(24)):items;
     for(int i=0;i<items.size();i++){
+     // Carried goods ride in the offhand, one stack, as survival keeps them; the frames still show every item.
+     if(BlockCarry.carried(new ItemStack(items.get(i)))){if(player.getOffhandItem().isEmpty())player.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(items.get(i)));continue;}
      player.getInventory().setItem(i,new ItemStack(items.get(i)));if(!scene.equals("components")){var worn=new ItemStack(items.get(i));if(EquipmentGrade.eligible(worn))EquipmentGrade.apply(worn,400,7001L+i);player.getInventory().setItem(9+i,worn);}
     }
     for(int i=0;i<frames.size();i++){

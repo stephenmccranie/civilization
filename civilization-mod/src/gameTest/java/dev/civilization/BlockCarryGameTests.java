@@ -61,7 +61,7 @@ public final class BlockCarryGameTests {
         try{
             var rows=new java.util.ArrayList<String>();
             for(var item:net.minecraft.core.registries.BuiltInRegistries.ITEM)if(item instanceof BlockItem)
-                rows.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item)+"\t"+(BlockCarry.block(item.getDefaultInstance())?"offhand":"inventory"));
+                rows.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item)+"\t"+(BlockCarry.carried(item.getDefaultInstance())?"offhand":"inventory"));
             java.nio.file.Files.write(java.nio.file.Path.of("block-carry-classification.tsv"),rows);
         }catch(java.io.IOException e){throw new RuntimeException(e);}
         h.succeed();
@@ -74,7 +74,7 @@ public final class BlockCarryGameTests {
         h.assertTrue(!more.isRemoved()&&more.getItem().getCount()==17&&p.getOffhandItem().getCount()==BlockCarry.LIMIT,"Only matching space is collected; overflow remains on the ground");
         var dirt=drop(h,new ItemStack(Items.DIRT,12));dirt.playerTouch(p);
         h.assertTrue(!dirt.isRemoved()&&dirt.getItem().getCount()==12,"Different blocks remain on the ground");
-        for(int i=0;i<40;i++)h.assertTrue(!BlockCarry.block(p.getInventory().getItem(i)),"No second building stack enters another inventory slot");h.succeed();
+        for(int i=0;i<40;i++)h.assertTrue(!BlockCarry.carried(p.getInventory().getItem(i)),"No second building stack enters another inventory slot");h.succeed();
     }
     @GameTest(template="industrial") public static void occupiedOffhandAndFullPocketsRespectTheRule(GameTestHelper h){
         var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.SHIELD));var block=drop(h,new ItemStack(Items.STONE,3));block.playerTouch(p);

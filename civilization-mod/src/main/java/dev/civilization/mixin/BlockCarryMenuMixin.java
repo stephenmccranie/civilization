@@ -16,7 +16,7 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     @Inject(method="moveItemStackTo",at=@At("HEAD"),cancellable=true)
     private void civilization$shift(ItemStack stack,int from,int to,boolean reverse,CallbackInfoReturnable<Boolean> result){
         var menu=(AbstractContainerMenu)(Object)this;
-        if(BlockCarry.block(stack)||BlockCarry.filledContainer(stack)){
+        if(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack)){
             for(int i=from;i<to;i++)if(menu.slots.get(i).container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
                 result.setReturnValue(BlockCarry.insert(inv,stack)>0);return;
             }
@@ -42,7 +42,7 @@ public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarry
     private void civilization$drag(Slot slot,CallbackInfoReturnable<Boolean> result){
         if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
             var item=((AbstractContainerMenu)(Object)this).getCarried();
-            if(BlockCarry.filledContainer(item)||BlockCarry.block(item)&&slot.getContainerSlot()!=BlockCarry.OFFHAND)result.setReturnValue(false);
+            if(BlockCarry.filledContainer(item)||BlockCarry.carried(item)&&slot.getContainerSlot()!=BlockCarry.OFFHAND)result.setReturnValue(false);
         }
     }
 }
