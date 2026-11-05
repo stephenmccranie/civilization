@@ -14,8 +14,10 @@ public final class IndustrialBlock extends Block implements EntityBlock, Modeled
     public enum Kind { PUMP, REFINERY, DRILL, TANK, COLUMN, CONDENSER }
     public final Kind kind;
     @Override public MachineModel model(){return kind==Kind.PUMP?MachineModel.OIL_DERRICK:null;}
-    /** A native model fills only part of its controller's cell, so the controller hides none of its neighbours' faces. */
+    /** A native model fills only part of its controller's cell, so the controller hides none of its neighbours' faces
+     *  and, like the model's other cells, passes light through undimmed. */
     @Override protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState s,BlockGetter l,BlockPos p){return model()!=null?net.minecraft.world.phys.shapes.Shapes.empty():super.getOcclusionShape(s,l,p);}
+    @Override protected boolean propagatesSkylightDown(BlockState s,BlockGetter l,BlockPos p){return model()!=null||super.propagatesSkylightDown(s,l,p);}
     public IndustrialBlock(Properties p,Kind kind){super(p);this.kind=kind;registerDefaultState(stateDefinition.any().setValue(CivicBlock.FACING,Direction.NORTH).setValue(MachineFeedback.WORKING,false).setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT,false));}
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(CivicBlock.FACING,MachineFeedback.WORKING,net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT);}
     @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){return defaultBlockState().setValue(CivicBlock.FACING,c.getHorizontalDirection().getOpposite());}
