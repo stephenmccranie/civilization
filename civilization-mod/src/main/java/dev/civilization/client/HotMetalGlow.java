@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.Iris;
+import net.irisshaders.iris.pbr.loader.PBRTextureLoaderRegistry;
+import net.irisshaders.iris.pipeline.ShaderRenderingPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -68,12 +70,11 @@ public final class HotMetalGlow {
     /** Each glowing model pass's quads, by side, tint, light and heat. */
     private record Quads(BakedModel model, Direction side, int tint, int light, int heat) {}
     private static final Map<Quads, List<BakedQuad>> QUADS = new ConcurrentHashMap<>();
-
     private static final boolean IRIS = ModList.get().isLoaded("iris");
     private HotMetalGlow() {}
 
-    /** Whether a shader pack draws the world. */
-    private static boolean shaders() { return IRIS && IrisApi.getInstance().isShaderPackInUse(); }
+    /** Whether a shader pack is drawing what is being drawn now. */
+    private static boolean shaders() { return IRIS && Shaders.drawing(); }
     private static List<Item> metals() { return BuiltInRegistries.ITEM.stream().filter(HotMetal::forgeable).toList(); }
     private static int glow(ItemStack stack) {
         var level = Minecraft.getInstance().level;
@@ -124,8 +125,25 @@ public final class HotMetalGlow {
             laid.put(sprite, new Column(x0 / (float)width, (x0 + w) / (float)width, h / (float)(height * HEAT_STEPS)));
             x0 += w;
         }
-        Minecraft.getInstance().getTextureManager().register(SHEET, new DynamicTexture(image));
+        if (IRIS) Shaders.emit();
+        Minecraft.getInstance().getTextureManager().register(SHEET, new Sheet(image));
         columns = laid;
+    }
+    /** The sheet's texture, a class of its own so shaders can find its emission. */
+    private static final class Sheet extends DynamicTexture {
+        Sheet(NativeImage image) { super(image); }
+    }
+    /** What hot metal asks of Iris, loaded only with it. */
+    private static final class Shaders {
+        static boolean drawing() { return Iris.getPipelineManager().getPipelineNullable() instanceof ShaderRenderingPipeline pipeline && pipeline.shouldOverrideShaders(); }
+        /** Gives the sheet a LabPBR specular map in which every texel emits its own colour in full. */
+        static void emit() {
+            PBRTextureLoaderRegistry.INSTANCE.register(Sheet.class, (sheet, resources, maps) -> {
+                var emissive = new NativeImage(1, 1, false);
+                emissive.setPixelRGBA(0, 0, 0xFE000000);
+                maps.acceptSpecularTexture(new DynamicTexture(emissive));
+            });
+        }
     }
 
     /** The heat step at the glow. */
@@ -153,27 +171,29 @@ public final class HotMetalGlow {
             @Override public BakedModel resolve(BakedModel model, ItemStack stack, ClientLevel level, LivingEntity entity, int seed) {
                 var resolved = originalModel.getOverrides().resolve(originalModel, stack, level, entity, seed);
                 int glow = glow(stack), strength = glow >>> 24;
-                return resolved == null || strength == 0 ? resolved : new Hot(resolved, (strength * 4 + 254) / 255 * 15 / 4, heat(glow), List.of(TINT, LIGHT));
+                return resolved == null || strength == 0 ? resolved : new Hot(resolved, (strength * 4 + 254) / 255 * 15 / 4, heat(glow));
             }
         };
         Metal(BakedModel model) { super(model); }
         @Override public ItemOverrides getOverrides() { return overrides; }
     }
     /**
-     * A glowing stack's model, lit from within at block light `light` and lifted to heat step `heat`: each of its passes
-     * drawn once per tint in `tints`. Shaders light the glow as emissive and show it over the metal, except in first
-     * person, where Iris draws held metal with its solid hand program over the glow; there the glow is drawn alone.
+     * A glowing stack's model, lit from within at block light `light` and lifted to heat step `heat`: each of its passes,
+     * tinted, then its light. A shader pack draws the light alone, emitting its colour through the sheet's emission map:
+     * it would show the light over the metal in the world anyway, and in hand Iris would draw the metal over the light.
      */
     private static final class Hot extends BakedModelWrapper<BakedModel> {
         private final int light, heat;
-        private final List<Integer> tints;
-        Hot(BakedModel model, int light, int heat, List<Integer> tints) { super(model); this.light = light; this.heat = heat; this.tints = tints; }
+        Hot(BakedModel model, int light, int heat) { super(model); this.light = light; this.heat = heat; }
         @Override public BakedModel applyTransform(ItemDisplayContext context, PoseStack pose, boolean leftHand) {
-            return new Hot(originalModel.applyTransform(context, pose, leftHand), light, heat, context.firstPerson() && shaders() ? List.of(LIGHT) : tints);
+            return new Hot(originalModel.applyTransform(context, pose, leftHand), light, heat);
         }
         @Override public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
-            return originalModel.getRenderPasses(stack, fabulous).stream()
-                    .<BakedModel>mapMulti((pass, passes) -> tints.forEach(tint -> passes.accept(new Pass(pass, tint, light, heat)))).toList();
+            boolean shaders = shaders();
+            return originalModel.getRenderPasses(stack, fabulous).stream().<BakedModel>mapMulti((pass, passes) -> {
+                if (!shaders) passes.accept(new Pass(pass, TINT, light, heat));
+                passes.accept(new Pass(pass, LIGHT, light, heat));
+            }).toList();
         }
     }
     /** One pass drawn from the sheet with every quad tinted `tint` and lit at least to `light`; the light pass is added over what is drawn. */

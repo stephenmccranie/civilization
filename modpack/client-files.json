@@ -178,6 +178,18 @@
       "id": "modrinth-ufdDoWPd"
     },
     {
+      "path": "mods/lambdynamiclights-4.8.11+1.21.1.jar",
+      "hashes": {
+        "sha1": "7b5afc75a094b4e8a7118f9856eec959b10f2422",
+        "sha512": "0286076e8b2922dfbe90cd4544a0d16e6d07d7249c732a37479ea4281e9cf96c86dd2e1ce5261489bd5553ceba33044bc550a04b9eb582645eb97f15c9c6a64c"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/yBW8D80W/versions/ksaGCvSu/lambdynamiclights-4.8.11%2B1.21.1.jar"
+      ],
+      "fileSize": 2023375,
+      "id": "modrinth-yBW8D80W"
+    },
+    {
       "path": "mods/lithium-neoforge-0.15.4+mc1.21.1.jar",
       "hashes": {
         "sha1": "97212e45c963730bbfc7c44780df99317814c21b",

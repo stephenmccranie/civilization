@@ -63,6 +63,22 @@ function Install-Sable {
     finally { $zip.Dispose() }
 }
 
+# LambDynamicLights as the player pack pins it, downloaded once into .dev-libs; test clients and Deploy install it.
+function Install-DynamicLights {
+    $item = (Get-Content -LiteralPath (Join-Path $root '../modpack/client-files.json') -Raw | ConvertFrom-Json).files | Where-Object id -eq 'modrinth-yBW8D80W'
+    $jar = Join-Path $root ".dev-libs/$(Split-Path $item.path -Leaf)"
+    if (-not (Test-Path -LiteralPath $jar)) {
+        $download = "$jar.download"
+        Invoke-WebRequest $item.downloads[0] -OutFile $download
+        if ((Get-FileHash -LiteralPath $download -Algorithm SHA512).Hash -ne $item.hashes.sha512) {
+            Remove-Item -LiteralPath $download
+            throw 'LambDynamicLights download does not match the pack manifest SHA-512.'
+        }
+        Move-Item -LiteralPath $download -Destination $jar
+    }
+    $jar
+}
+
 # A hidden test client built from the development client in run/; never from the owner's Prism instance.
 function New-TestClient([string]$path) {
     Reset-Directory $path
@@ -73,6 +89,7 @@ function New-TestClient([string]$path) {
             Get-ChildItem -LiteralPath $source -File | Copy-Item -Destination (Join-Path $path $dir)
         }
     }
+    Copy-Item -LiteralPath $dynamicLights -Destination (Join-Path $path 'mods')
     $iris = Join-Path $root 'run/config/iris.properties'
     if (Test-Path -LiteralPath $iris) { Copy-Item -LiteralPath $iris -Destination (Join-Path $path 'config') }
     # Nobody can dismiss Distant Horizons' update prompt or NeoForge's separate splash window here.
@@ -110,6 +127,7 @@ Push-Location $root
 try {
     $env:JAVA_HOME = $devConfig.javaHome
     Install-Sable
+    $dynamicLights = Install-DynamicLights
     switch ($Task) {
         'Build' { Invoke-Gradle build }
         'Client' { Invoke-Gradle runClient }
@@ -212,6 +230,7 @@ try {
             }
             Copy-Item -LiteralPath (Join-Path $root "build/runtimeMods/$geckoName") -Destination $modsPath -Force
             Copy-Item -LiteralPath (Join-Path $root ".dev-libs/$sableJarName") -Destination $modsPath -Force
+            Copy-Item -LiteralPath $dynamicLights -Destination $modsPath -Force
             # Replace only our own JAR, archiving previous builds outside the loaded mods folder.
             $existing = @(Get-ChildItem -LiteralPath $modsPath -Filter "$($properties.mod_id)-*.jar" -File)
             if ($existing.Count) {

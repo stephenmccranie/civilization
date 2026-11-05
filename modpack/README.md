@@ -63,7 +63,7 @@ The pre-launch hook manages the complete tested pack outside the running game: C
 
 ## Included files
 
-The [manifest](client-files.json) is the authoritative list of pinned files: Civilization, GeckoLib, Sable, Jade, JEI, JourneyMap, Kiwi, Snow! Real Magic!, Distant Horizons, Sodium, Iris, Lithium, FerriteCore, C2ME, Lithostitched, Grassier Grass, Continuity, Entity Texture Features and Entity Model Features (both needed for Patrix's entity textures and models), plus Photon and Patrix. Dependencies embedded by their authors stay inside the original JARs.
+The [manifest](client-files.json) is the authoritative list of pinned files: Civilization, GeckoLib, Sable, Jade, JEI, JourneyMap, Kiwi, LambDynamicLights (held and dropped light sources such as hot metal light their surroundings), Snow! Real Magic!, Distant Horizons, Sodium, Iris, Lithium, FerriteCore, C2ME, Lithostitched, Grassier Grass, Continuity, Entity Texture Features and Entity Model Features (both needed for Patrix's entity textures and models), plus Photon and Patrix. Dependencies embedded by their authors stay inside the original JARs.
 
 This is a snapshot of the reviewed development client, not a minimal list: client performance and presentation mods may differ from the server's, and C2ME and Lithostitched are kept for parity rather than needed to join. Terrain generation runs only on the server. The ZIP contains no worlds, LOD caches, waypoints, saved servers, credentials, account data or machine-specific Java settings. Keep the third-party versions pinned together.
 
