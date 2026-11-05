@@ -32,7 +32,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `guide` | Textured multiblock build guide, including a wrong block and its removal |
 | `placement` | Held Kiln, Fertilizer Furnace, Smithy, Oil Derrick, Assembly Bench and Baking Oven previews facing three ways, mostly from the offhand as survival carries them: a refused bench, an obstructed shell and a controller held up to a finished shell. Each real right-click must place exactly the previewed cells, or nothing |
 | `modular` | Mixed-material and irregular cut-block assemblies |
-| `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings, at 1080p and 1440p (closed and open chat); fails if a line would wrap or the card outgrows the closed chat |
+| `welcome` | The join welcome card with the pack's Auto GUI scale and chat settings at 1080p, with GUI scale 2 there, in a 768p window and at 1440p (closed and open chat); fails if the chat text is not the expected size, a line would wrap or the card outgrows the closed chat |
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |

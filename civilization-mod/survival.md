@@ -88,7 +88,9 @@ All custom items are in the **Civilization** creative tab, marked with the kiln 
 
 ### Interface scale
 
-With GUI Scale set to **Auto**, Civilization picks one scale step per 360 pixels of window height (3× at 1080p, 4× at 1440p, 6× at 4K, never more than fits), so the interface keeps the same share of the screen at every resolution; vanilla Auto would take the largest scale that fits. Explicit GUI scales and the slider's range are unchanged. This is client-only.
+With GUI Scale set to **Auto**, Civilization picks one scale step per 360 pixels of window height (3× at 1080p, 4× at 1440p, 6× at 4K, never more than fits), so the interface keeps the same share of the screen at every resolution; vanilla Auto would take the largest scale that fits. Explicit GUI scales and the slider's range are unchanged.
+
+Chat is sized from the window rather than the GUI scale: its text size and width options apply as if the GUI scale were the window height over 360 without rounding (3 at 1080p, 4 at 1440p), never below 1080p's 3 and never wider than the window allows. Chat therefore looks the same at every GUI scale setting, keeps its 1080p size in smaller windows such as a 768p laptop or a windowed game, and grows with larger ones. Both rules are client-only.
 
 ### Welcome message
 

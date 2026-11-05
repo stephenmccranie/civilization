@@ -283,15 +283,15 @@
       "path": "options.txt",
       "section": "",
       "key": "chatScale",
-      "from": "0.75",
-      "value": "1.0"
+      "from": "1.0",
+      "value": "0.75"
     },
     {
       "path": "options.txt",
       "section": "",
       "key": "chatWidth",
-      "from": "0.8",
-      "value": "1.0"
+      "from": "1.0",
+      "value": "0.8"
     },
     {
       "path": "options.txt",
