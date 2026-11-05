@@ -16,7 +16,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public final class Welcome {
     static final List<Component> MESSAGE = List.of(
             Component.empty().append(rule()).append(Component.literal(" Welcome to Civilization ").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)).append(rule()),
-            item("• ", "Blocks and buckets ride in your *offhand*, "+BlockCarry.LIMIT+" at a time."),
+            item("• ", "Your *offhand* carries "+BlockCarry.LIMIT+" blocks or one bucket."),
             item("• ", "Your food bar counts *calories*; work and travel spend them."),
             item("• ", "Furnaces don't work. Start with a *Kiln*."),
             heading("First steps"),

@@ -334,9 +334,11 @@ public class EverydayGameTests {
             h.assertTrue(BlockCarry.carried(new ItemStack(bucket)) && !BlockCarry.block(new ItemStack(bucket)) && Double.isNaN(CargoMass.volume(new ItemStack(bucket))), "Buckets ride in the offhand or a backpack but are not building cargo: " + bucket);
         var carrier = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "bucket-carrier"));
         carrier.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-        var empties = new ItemStack(Items.BUCKET, 12);
-        h.assertTrue(carrier.getInventory().add(empties) && carrier.getOffhandItem().is(Items.BUCKET) && carrier.getOffhandItem().getCount() == BlockCarry.LIMIT && empties.getCount() == 4
-                && carrier.getInventory().items.stream().noneMatch(s -> s.is(Items.BUCKET)), "Picked-up buckets fill the offhand to an armful and never enter the pockets");
+        h.assertTrue(new ItemStack(Items.BUCKET).getMaxStackSize() == 1, "Empty buckets do not stack");
+        var empty = new ItemStack(Items.BUCKET);
+        h.assertTrue(carrier.getInventory().add(empty) && empty.isEmpty() && carrier.getOffhandItem().is(Items.BUCKET)
+                && !carrier.getInventory().add(new ItemStack(Items.BUCKET)) && carrier.getOffhandItem().getCount() == 1
+                && carrier.getInventory().items.stream().noneMatch(s -> s.is(Items.BUCKET)), "A picked-up bucket rides alone in the offhand and a second never enters the pockets");
         h.getLevel().setBlockAndUpdate(lava, Blocks.AIR.defaultBlockState());
         h.succeed();
     }
