@@ -66,6 +66,12 @@ public final class GradeGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "industrial") public static void noCraftingRecipeMakesGradedMaterial(GameTestHelper h) {
+        // Graded metal and diamonds come only from the Foundry, the Smithy and their tools, so storage blocks and nuggets are one-way.
+        for (var holder : h.getLevel().getRecipeManager().getAllRecipesFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING))
+            h.assertTrue(!Grade.graded(holder.value().getResultItem(h.getLevel().registryAccess())), "No crafting recipe makes graded material: " + holder.id());
+        h.succeed();
+    }
     @GameTest(template = "industrial") public static void freshRollsAndRandomRefinement(GameTestHelper h) {
         var random = net.minecraft.util.RandomSource.create(987654321L);
         int low = 0, high = 0; long total = 0;
