@@ -5,11 +5,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,7 +40,10 @@ public final class TreeFelling {
         try {
             for (var pos : logs) {
                 if (!affordable(player.getMainHandItem())) return;
-                if (level.mayInteract(player, pos)) player.gameMode.destroyBlock(pos);
+                // A break plays its particles and sound for everyone but the breaker, whose client predicted it;
+                // the cutter's client predicted only the cut, so it is sent each felled log's break too.
+                var effect = new ClientboundLevelEventPacket(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(level.getBlockState(pos)), false);
+                if (level.mayInteract(player, pos) && player.gameMode.destroyBlock(pos)) player.connection.send(effect);
             }
         } finally {
             felling = false;

@@ -4,6 +4,13 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -13,6 +20,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -52,7 +60,15 @@ public final class TreeFellingGameTests {
 
     @GameTest(template = CUBE) public static void oakFellsFromTheCutUpAndLeavesTheStump(GameTestHelper h) {
         oak(h, 6, NATURAL); var p = player(h, GameType.SURVIVAL, new ItemStack(Items.IRON_AXE));
+        var effects = new java.util.ArrayList<BlockPos>();
+        p.connection = new ServerGamePacketListenerImpl(h.getLevel().getServer(), new Connection(PacketFlow.SERVERBOUND), p, CommonListenerCookie.createInitial(p.getGameProfile(), false)) {
+            @Override public void send(Packet<?> packet, PacketSendListener listener) {
+                if (packet instanceof ClientboundLevelEventPacket e && e.getType() == LevelEvent.PARTICLES_DESTROY_BLOCK && e.getData() == Block.getId(Blocks.OAK_LOG.defaultBlockState())) effects.add(e.getPos());
+            }
+        };
         cut(h, p, 5, 2, 5);
+        h.assertTrue(effects.equals(java.util.stream.IntStream.rangeClosed(3, 6).mapToObj(y -> h.absolutePos(new BlockPos(5, y, 5))).toList()),
+                "The cutter sees and hears each felled log break, but not the cut their client already showed");
         h.assertTrue(is(h, Blocks.OAK_LOG, 5, 1, 5) && logs(h, Blocks.OAK_LOG) == 1, "Every log from the cut up falls and the stump stays");
         h.assertTrue(is(h, Blocks.OAK_LEAVES, 4, 6, 5), "Leaves are left to decay");
         h.assertTrue(dropped(h, Items.OAK_LOG) == 5, "Each removed log drops itself once");
