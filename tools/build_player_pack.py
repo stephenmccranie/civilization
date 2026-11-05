@@ -79,11 +79,11 @@ def inputs():
                     'https://github.com/stephenmccranie/civilization/releases/download/' + index['versionId'] + '/'):
                 raise ValueError('Civilization asset must belong to this release')
     migrations = set()
-    for patch in index['configMigrations']:
+    for patch in index['migrations']:
         key = (patch['path'], patch['section'], patch['key'])
         if key in migrations or not (patch['path'] == 'options.txt' or re.fullmatch(r'config/[a-zA-Z0-9_-]+\.toml', patch['path'])):
             raise ValueError('Unsafe or duplicate configuration migration')
-        if not re.fullmatch(r'[a-zA-Z0-9_]+', patch['key']) or not re.fullmatch(r'[a-zA-Z0-9_.]*', patch['section']):
+        if not re.fullmatch(r'[a-zA-Z0-9_.]+', patch['key']) or not re.fullmatch(r'[a-zA-Z0-9_.]*', patch['section']):
             raise ValueError('Unsafe configuration migration key')
         if patch['path'] == 'options.txt' and patch['section']:
             raise ValueError('options.txt has no sections')
@@ -93,6 +93,8 @@ def inputs():
             if patch['path'] != 'options.txt' and not re.fullmatch(r'(true|false|-?\d+(\.\d+)?|"[^"\r\n]*")', value):
                 raise ValueError('Configuration migrations need scalar TOML values')
         migrations.add(key)
+    # Updaters from before key-binding migrations read only this field and reject a key with dots in it.
+    index['configMigrations'] = [patch for patch in index['migrations'] if re.fullmatch(r'[a-zA-Z0-9_]+', patch['key'])]
     cfg = (SOURCE / 'instance.cfg').read_bytes()
     public_text(cfg)
     components = {'formatVersion': 1, 'components': [

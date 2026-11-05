@@ -22,7 +22,7 @@ New-TestArchive $dependency 'fixture dependency'
 function New-Entry([string]$Path,[string]$File,[string]$Url) {
     @{id=$(if ($Path -like 'mods/civilization-*') {'civilization'} else {'dependency'});path=$Path; fileSize=(Get-Item $File).Length; hashes=@{sha1=(Get-FileHash $File -Algorithm SHA1).Hash.ToLowerInvariant();sha512=(Get-FileHash $File -Algorithm SHA512).Hash.ToLowerInvariant()};downloads=@($Url)}
 }
-$manifest=@{formatVersion=1;game='minecraft';channel='playtest';protocol='3/0.35.0-dev';configMigrations=@();versionId='playtest-0.35.4-1';files=@(
+$manifest=@{formatVersion=1;game='minecraft';channel='playtest';protocol='3/0.35.0-dev';migrations=@();versionId='playtest-0.35.4-1';files=@(
     (New-Entry 'mods/civilization-0.35.4-dev.jar' $civ 'https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.4-1/civilization-0.35.4-dev.jar'),
     (New-Entry 'mods/dependency.jar' $dependency 'https://cdn.modrinth.com/data/fixture.jar')
 )}

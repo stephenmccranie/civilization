@@ -264,7 +264,7 @@
   ],
   "channel": "playtest",
   "protocol": "3/0.35.0-dev",
-  "configMigrations": [
+  "migrations": [
     {
       "path": "config/DistantHorizons.toml",
       "section": "server",
@@ -327,6 +327,13 @@
       "key": "bladeHeight",
       "from": "0.65",
       "value": "0.45"
+    },
+    {
+      "path": "options.txt",
+      "section": "",
+      "key": "key_key.journeymap.create_waypoint",
+      "from": "key.keyboard.b",
+      "value": "key.keyboard.v"
     }
   ]
 }
