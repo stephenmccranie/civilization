@@ -145,8 +145,13 @@ public final class BlockCarryGameTests {
         h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&cut.getCount()==40-BlockCarry.LIMIT,"Small cut pieces still use the hand allowance regardless of mass");
         p.setGameMode(GameType.CREATIVE);p.getInventory().setItem(0,ItemStack.EMPTY);var dirt=new ItemStack(Items.DIRT,32);p.getInventory().add(dirt);
         h.assertTrue(dirt.isEmpty()&&p.getInventory().getItem(0).is(Items.DIRT),"Creative authoring stays unrestricted");
-        var menu=ChestMenu.threeRows(1,p.getInventory());int size=menu.slots.size();BlockCarry.attachMenu(menu,p.getInventory());
-        h.assertTrue(menu.slots.size()==size&&p.inventoryMenu.getSlot(36).mayPlace(new ItemStack(Items.STONE)),"Creative keeps native menu slot counts and hotbar admission");
+        p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);int full=new ItemStack(Items.STONE).getMaxStackSize();var chest=new net.minecraft.world.SimpleContainer(27);chest.setItem(0,new ItemStack(Items.STONE,full));
+        var menu=ChestMenu.threeRows(1,p.getInventory(),chest);int size=menu.slots.size();BlockCarry.attachMenu(menu,p.getInventory());var hand=menu.getSlot(size);
+        h.assertTrue(menu.slots.size()==size+1&&hand instanceof BlockCarry.HandSlot&&hand.mayPlace(new ItemStack(Items.STONE))&&hand.getMaxStackSize(new ItemStack(Items.STONE))==full&&full>BlockCarry.LIMIT&&p.inventoryMenu.getSlot(36).mayPlace(new ItemStack(Items.STONE)),"Creative menus show the Hand after their native slots, holding a full stack, and keep hotbar admission");
+        menu.quickMoveStack(p,0);int at=-1;for(int i=0;i<36;i++)if(p.getInventory().getItem(i).is(Items.STONE))at=i;
+        h.assertTrue(chest.getItem(0).isEmpty()&&p.getOffhandItem().isEmpty()&&net.minecraft.world.entity.player.Inventory.isHotbarSlot(at)&&p.getInventory().getItem(at).getCount()==full,"Creative shift-click treats blocks as ordinary goods: slot "+at);
+        p.setGameMode(GameType.SPECTATOR);var watched=ChestMenu.threeRows(2,p.getInventory());int seen=watched.slots.size();BlockCarry.attachMenu(watched,p.getInventory());
+        h.assertTrue(watched.slots.size()==seen,"Spectators see no Hand");p.setGameMode(GameType.CREATIVE);
         var swap=new net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent.Hands(p);BlockCarry.swap(swap);h.assertTrue(!swap.isCanceled(),"Creative hand swap is unrestricted");
         h.assertTrue(BlockCarry.normalize(p)==0&&p.getInventory().getItem(0).is(Items.DIRT),"Creative inventory is not migrated to recovery");h.succeed();
     }

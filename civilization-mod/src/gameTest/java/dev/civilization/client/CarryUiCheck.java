@@ -32,10 +32,12 @@ public final class CarryUiCheck {
     }
     private static boolean overlap(Rect2i a,Rect2i b){return a.getX()<b.getX()+b.getWidth()&&b.getX()<a.getX()+a.getWidth()&&a.getY()<b.getY()+b.getHeight()&&b.getY()<a.getY()+a.getHeight();}
     public static void clickSlot(Minecraft mc,int index){var s=screen(mc);var slot=s.getMenu().getSlot(index);click(mc,s.getGuiLeft()+slot.x+8,s.getGuiTop()+slot.y+8);}
+    public static void clickHand(Minecraft mc){var s=screen(mc);var hand=hand(mc);click(mc,s.getGuiLeft()+hand.x+8,s.getGuiTop()+hand.y+8);}
     public static void clickLabel(Minecraft mc){var s=screen(mc);var hand=hand(mc);click(mc,s.getGuiLeft()+hand.x+8,s.getGuiTop()+hand.y-8);}
     private static void click(Minecraft mc,double x,double y){var s=screen(mc);s.mouseClicked(x,y,0);s.mouseReleased(x,y,0);}
-    public static void openRecipes(Minecraft mc){
-        var s=(net.minecraft.client.gui.screens.inventory.CraftingScreen)mc.screen;
-        if(!s.getRecipeBookComponent().isVisible())s.children().stream().filter(w->w instanceof net.minecraft.client.gui.components.ImageButton).map(w->(net.minecraft.client.gui.components.ImageButton)w).findFirst().orElseThrow().onPress();
+    /** Presses the screen's recipe panel switch: the recipe book's button, or a machine's Recipes tab. */
+    public static void toggleRecipes(Minecraft mc){
+        screen(mc).children().stream().filter(w->w instanceof net.minecraft.client.gui.components.ImageButton||w instanceof net.minecraft.client.gui.components.Button b&&b.getMessage().getString().equals("Recipes"))
+                .map(w->(net.minecraft.client.gui.components.Button)w).findFirst().orElseThrow().onPress();
     }
 }
