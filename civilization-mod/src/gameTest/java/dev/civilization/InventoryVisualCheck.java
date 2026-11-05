@@ -18,7 +18,7 @@ final class InventoryVisualCheck {
                 var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();
                 var l=server.overworld();l.setBlockAndUpdate(new BlockPos(0,100,0),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
                 p.teleportTo(l,.5,101,.5,java.util.Set.of(),0,0);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
-                p.getInventory().clearContent();p.getInventory().setItem(9,new ItemStack(Items.OAK_LOG,3));
+                p.getInventory().clearContent();p.getInventory().setItem(9,new ItemStack(Items.BONE,3));
                 p.getData(Accessories.INVENTORY).setStackInSlot(0, FrontierContent.GEIGER_COUNTER.toStack());
                 p.getInventory().setItem(20, FrontierContent.RAW_URANIUM.toStack());
                 p.getInventory().setItem(21, FrontierContent.URANIUM_ORE.toStack());
@@ -50,12 +50,12 @@ final class InventoryVisualCheck {
         }
         if(ticks==158)click(mc,1);
         if(ticks==170){
-            if(!mc.player.inventoryMenu.getSlot(0).getItem().is(Items.OAK_PLANKS))throw new IllegalStateException("Native inventory crafting did not update");
+            if(!mc.player.inventoryMenu.getSlot(0).getItem().is(Items.BONE_MEAL))throw new IllegalStateException("Native inventory crafting did not update");
             shot(mc,"crafting");click(mc,0);
         }
         if(ticks==178)click(mc,10);
         if(ticks==190){
-            if(!mc.player.inventoryMenu.getSlot(10).getItem().is(Items.OAK_PLANKS)||mc.player.inventoryMenu.getSlot(1).getItem().getCount()!=2||!mc.player.inventoryMenu.getCarried().isEmpty())throw new IllegalStateException("Native crafting custody changed");
+            if(!mc.player.inventoryMenu.getSlot(10).getItem().is(Items.BONE_MEAL)||mc.player.inventoryMenu.getSlot(1).getItem().getCount()!=2||!mc.player.inventoryMenu.getCarried().isEmpty())throw new IllegalStateException("Native crafting custody changed");
             toggle(mc);
         }
         if(ticks==205){if(!((InventoryScreen)mc.screen).getRecipeBookComponent().isVisible())throw new IllegalStateException("Recipe book toggle failed");shot(mc,"recipes");}
