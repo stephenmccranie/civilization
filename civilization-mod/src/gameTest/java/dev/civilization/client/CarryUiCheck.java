@@ -34,7 +34,18 @@ public final class CarryUiCheck {
     public static void clickSlot(Minecraft mc,int index){var s=screen(mc);var slot=s.getMenu().getSlot(index);click(mc,s.getGuiLeft()+slot.x+8,s.getGuiTop()+slot.y+8);}
     public static void clickHand(Minecraft mc){var s=screen(mc);var hand=hand(mc);click(mc,s.getGuiLeft()+hand.x+8,s.getGuiTop()+hand.y+8);}
     public static void clickLabel(Minecraft mc){var s=screen(mc);var hand=hand(mc);click(mc,s.getGuiLeft()+hand.x+8,s.getGuiTop()+hand.y-8);}
-    private static void click(Minecraft mc,double x,double y){var s=screen(mc);s.mouseClicked(x,y,0);s.mouseReleased(x,y,0);}
+    /** Vanilla reads a second click on a slot within this many real milliseconds as a double-click, which gathers instead of placing. */
+    private static final long DOUBLE_CLICK=250;
+    private static long lastClick;
+    /**
+     * One single click. Scene ticks run faster than real time while the client catches up, so a click waits out what
+     * is left of the double-click window since the last one.
+     */
+    private static void click(Minecraft mc,double x,double y){
+        long wait=lastClick+DOUBLE_CLICK-net.minecraft.Util.getMillis();
+        if(wait>0)try{Thread.sleep(wait);}catch(InterruptedException e){throw new IllegalStateException(e);}
+        var s=screen(mc);s.mouseClicked(x,y,0);s.mouseReleased(x,y,0);lastClick=net.minecraft.Util.getMillis();
+    }
     /** Presses the screen's recipe panel switch: the recipe book's button, or a machine's Recipes tab. */
     public static void toggleRecipes(Minecraft mc){
         screen(mc).children().stream().filter(w->w instanceof net.minecraft.client.gui.components.ImageButton||w instanceof net.minecraft.client.gui.components.Button b&&b.getMessage().getString().equals("Recipes"))
