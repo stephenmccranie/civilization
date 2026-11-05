@@ -130,7 +130,11 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     }
     public static void tick(Level level, BlockPos pos, BlockState state, KilnBlockEntity kiln) {
         kiln.returnLegacyOverflow();
-        if (level.getGameTime() % 20 == 0) for (int slot : MachineInventory.KILN_OUTPUT) HotMetal.tend(kiln.getItem(slot), kiln.fire.hot(), level.getGameTime());
+        // Once a second the fire keeps its output hot, and metal that cooled before it came in settles.
+        if (level.getGameTime() % 20 == 0) {
+            for (int slot : MachineInventory.KILN_OUTPUT) HotMetal.tend(kiln.getItem(slot), kiln.fire.hot(), level.getGameTime());
+            for (int slot : MachineInventory.KILN_INPUT) HotMetal.cool(kiln.getItem(slot), level.getGameTime());
+        }
         MachineInventory.refill(kiln,MachineInventory.KILN_INPUT);
         // Active machines validate every work tick; idle ones stagger checks once per second.
         if (kiln.fire.lit() || kiln.fire.heat() > 0 || !kiln.getItem(0).isEmpty() || Math.floorMod(level.getGameTime() + pos.asLong(), 20) == 0)

@@ -70,7 +70,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     private void processHandWork(){
         if(worker==null||!worker.isAlive()||worker.isSpectator()||!stillValid(worker)||!(worker.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this){worker=null;pause(MachineStatus.Workshop.HAND_READY,false);return;}
         if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState())){worker=null;pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
-        ensureInputIdentity();
+        if(settleInputs()){worker=null;pause(MachineStatus.Workshop.HOT_METAL,true);return;}
         var job=job();var match=MachineWork.match(this,job);
         if(match==null){worker=null;pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
@@ -130,7 +130,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(structure!=MachineStructure.COMPLETE){firePaused=structure==MachineStructure.UNLOADED;if(structure==MachineStructure.INCOMPLETE)fire.extinguish();pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         if(MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Workshop.WET,false);return;}
         if(!fire.hot()){pause(fire.lit()?MachineStatus.Workshop.WARMING:MachineStatus.Workshop.FIRE_UNLIT,false);return;}
-        ensureInputIdentity();
+        if(settleInputs()){pause(MachineStatus.Workshop.HOT_METAL,true);return;}
         var job=job();if(job==null){pause(selected<0&&MachineWork.matches(this,kind).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var match=MachineWork.match(this,job);if(match==null){pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
@@ -153,14 +153,21 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         EnergyLog.machine(level,worldPosition,"workshop_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
         level.playSound(null,worldPosition,kind==2?net.minecraft.sounds.SoundEvents.ANVIL_USE:net.minecraft.sounds.SoundEvents.WOOD_PLACE,net.minecraft.sounds.SoundSource.BLOCKS,.25f,1f);
     }
-    private void ensureInputIdentity(){
-        // Legacy/ungraded inputs acquire one stable identity before any repair/upgrade quotation.
+    /**
+     * Inputs settle before any quotation: legacy or ungraded equipment acquires one stable identity, and metal that has
+     * cooled in air takes its loss. Hot metal is not yet material; returns whether any input is still hot.
+     */
+    private boolean settleInputs(){
+        boolean hot=false;
         for(int i=0;i<4;i++){
             var input=items.get(i);
             boolean missing=EquipmentGrade.eligible(input)&&(!EquipmentGrade.hasGrade(input)||!input.has(EquipmentGrade.WEAR_SEED.get()));
             EquipmentGrade.ensure(input,level.random,level.registryAccess());
             if(missing)setChanged();
+            HotMetal.cool(input,level.getGameTime());
+            hot|=input.has(HotMetal.HOT.get());
         }
+        return hot;
     }
     private void pause(int state,boolean reset){status=state;if(reset&&progress!=0){progress=0;workingResult=ItemStack.EMPTY;setChanged();}working(false);}
     /** What the model's lit bones show: the fire burning, or the Tannery's pit holding a batch. */

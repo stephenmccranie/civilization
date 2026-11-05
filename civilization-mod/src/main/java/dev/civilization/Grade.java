@@ -83,6 +83,10 @@ public record Grade(List<Integer> units) {
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
         if (graded(product)) assign(product, graded(input) ? top(input, 1).getFirst() : roll(random));
     }
+    /** Takes `tenths` from every unit of the stack. */
+    public static void lose(ItemStack stack, int tenths) {
+        if (tenths != 0) set(stack, top(stack, stack.getCount()).stream().map(unit -> unit - tenths).toList());
+    }
     /** Gives every unit of the stack one grade. */
     public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }
 

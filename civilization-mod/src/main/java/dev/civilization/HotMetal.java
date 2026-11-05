@@ -41,16 +41,24 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Smelt, hammer and quench. Metal leaves the Foundry hot until a game time a minute later, so it cools on time
- * wherever it is, and a hot furnace keeps the metal in it hot. Holding use on an anvil with glowing metal in hand
- * strikes the whole stack with a heavy blow a second, each the player's labor for every unit struck; the hammering's
- * last blow beats rough metal into its ingot, raises every unit one random grade step and leaves the stack too cool
- * to work again. A grindstone cuts diamonds the same way, cold. Water takes all of a stack's heat at once.
+ * Smelt, hammer and quench. A stack's temperature is its age out of the fire, counted from the game time it goes
+ * cold a minute after leaving the Foundry, so it cools on time wherever it is; a hot furnace keeps the metal in it at
+ * full heat. Everything that shows hot metal takes its colour from that age. Holding use on an anvil with metal at
+ * working heat in hand strikes the whole stack with a heavy blow a second, each the player's labor for every unit
+ * struck; the hammering's last blow beats rough metal into its ingot, raises every unit one random grade step and
+ * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out costs
+ * every unit grade along a bell curve about the ideal age: water takes it at once, and metal left to cool in air
+ * takes the worst cost once it is next seen cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
-    /** Metal stays hot a minute; it glows hot enough to work for the first forty seconds. */
-    public static final int LOAD = 8, COOL_TICKS = 60 * 20, DULL_TICKS = 20 * 20;
+    /** Metal is cold a minute out of the fire. It can be worked for its first 25 s, and quenches best at 35 s, bright cherry red. */
+    public static final int LOAD = 8, COOL_TICKS = 60 * 20, WORKING_TICKS = 25 * 20, IDEAL_TICKS = 35 * 20;
+    /** A quench costs each unit up to `WORST` tenths of a point, along a bell curve `SPREAD` ticks (5 s) wide about the ideal. */
+    static final int WORST = 100, SPREAD = 5 * 20;
+    /** The glow by age in seconds: white-yellow, orange, bright cherry red, dull red, faint, then none; alpha is its strength. */
+    private static final int[] GLOW_AGES = {0, 12, 25, 35, 45, 52, 56};
+    private static final int[] GLOW = {0xFFFFF4D2, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
     public static final int ANVIL_BLOWS = 5, STONE_ANVIL_BLOWS = 8, GRINDSTONE_STROKES = 5;
     /** A blow takes a second to swing again, shown as the stack's cooldown; uses sent sooner are ignored. */
     private static final int STRIKE_TICKS = 20;
@@ -64,13 +72,31 @@ public final class HotMetal {
     private HotMetal() {}
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
 
-    /** Ticks until the stack cools, zero once it has. */
-    public static long heatLeft(ItemStack stack, long now) {
+    /** The stack's temperature, as ticks since it left the fire: `COOL_TICKS` once cold. */
+    public static long age(ItemStack stack, long now) {
         Long until = stack.get(HOT.get());
-        return until == null ? 0 : Math.max(0, until - now);
+        return until == null ? COOL_TICKS : Math.clamp(now - until + COOL_TICKS, 0, COOL_TICKS);
     }
-    public static boolean hot(ItemStack stack, long now) { return heatLeft(stack, now) > 0; }
-    public static boolean glowing(ItemStack stack, long now) { return heatLeft(stack, now) > DULL_TICKS; }
+    public static boolean hot(ItemStack stack, long now) { return age(stack, now) < COOL_TICKS; }
+    public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS; }
+    /** Tenths of a point a quench at `age` costs every unit: none at the ideal, the worst once cold. */
+    public static int loss(long age) {
+        double off = (age - IDEAL_TICKS) / (double)SPREAD;
+        return (int)Math.round(WORST * (1 - Math.exp(-off * off / 2)));
+    }
+    /** The glow's colour at the stack's temperature, its alpha the glow's strength. */
+    public static int glow(ItemStack stack, long now) {
+        double seconds = age(stack, now) / 20.0;
+        int key = 1;
+        while (key < GLOW_AGES.length - 1 && seconds > GLOW_AGES[key]) key++;
+        double t = Math.clamp((seconds - GLOW_AGES[key - 1]) / (GLOW_AGES[key] - GLOW_AGES[key - 1]), 0, 1);
+        int colour = 0;
+        for (int shift = 0; shift < 32; shift += 8) {
+            int from = GLOW[key - 1] >>> shift & 0xFF, to = GLOW[key] >>> shift & 0xFF;
+            colour |= (int)Math.round(from + (to - from) * t) << shift;
+        }
+        return colour;
+    }
     /** Heat is counted from whole seconds, so metal heated within the same second stacks. */
     private static long second(long now) { return now - Math.floorMod(now, 20); }
     /** Gives the stack a full heat from `now`. */
@@ -78,11 +104,19 @@ public final class HotMetal {
         stack.set(HOT.get(), second(now) + COOL_TICKS);
         return stack;
     }
-    /** Drops spent heat, so cooled metal stacks with cold metal again. */
-    static void cool(ItemStack stack, long now) {
-        if (stack.has(HOT.get()) && !hot(stack, now)) stack.remove(HOT.get());
+    /** Takes all of the stack's heat, costing every unit the loss at its temperature. The only way heat leaves metal. */
+    static void quench(ItemStack stack, long now) {
+        Grade.lose(stack, loss(age(stack, now)));
+        stack.remove(HOT.get());
     }
-    /** Once a second for a furnace's output: hot metal in a hot furnace keeps a full heat, elsewhere spent heat goes. */
+    /**
+     * Settles metal that has gone cold in air, at the worst cost, so it stacks with cold metal again. A settlement that
+     * is never saved comes out the same when the stack is next seen, so containers need not be marked changed.
+     */
+    static void cool(ItemStack stack, long now) {
+        if (stack.has(HOT.get()) && !hot(stack, now)) quench(stack, now);
+    }
+    /** Once a second for a furnace's output: hot metal in a hot furnace keeps a full heat, elsewhere it settles once cold. */
     static void tend(ItemStack stack, boolean inFire, long now) {
         if (inFire && stack.has(HOT.get())) heated(stack, now);
         else cool(stack, now);
@@ -96,7 +130,7 @@ public final class HotMetal {
     }
 
     /** Rough metal and the ingots it is beaten into. */
-    static boolean forgeable(Item item) {
+    public static boolean forgeable(Item item) {
         return item instanceof RoughMetal || KilnContent.ROUGH_METALS.stream().anyMatch(rough -> rough.get().ingot() == item);
     }
     /** Blows a hammering takes on this block, zero if it isn't an anvil. */
@@ -112,7 +146,7 @@ public final class HotMetal {
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
         boolean metal = forgeable(stack.getItem());
         int anvil = metal ? anvil(block) : 0;
-        int blows = anvil > 0 && glowing(stack, now) ? anvil : stack.is(Items.DIAMOND) && block.is(Blocks.GRINDSTONE) ? GRINDSTONE_STROKES : 0;
+        int blows = anvil > 0 && workable(stack, now) ? anvil : stack.is(Items.DIAMOND) && block.is(Blocks.GRINDSTONE) ? GRINDSTONE_STROKES : 0;
         Vec3 water = hot(stack, now) ? block.is(Blocks.WATER_CAULDRON) ? Vec3.atCenterOf(event.getPos()) : water(event.getEntity()) : null;
         if (blows == 0 && anvil == 0 && water == null) return;
         event.setCanceled(true);
@@ -138,21 +172,27 @@ public final class HotMetal {
         return hit.getType() == HitResult.Type.BLOCK && player.level().getFluidState(hit.getBlockPos()).is(FluidTags.WATER) ? hit.getLocation() : null;
     }
     private static void quench(ServerPlayer player, ItemStack stack, Vec3 water) {
-        stack.remove(HOT.get());
+        int before = Grade.value(stack);
+        quench(stack, player.level().getGameTime());
         player.swing(InteractionHand.MAIN_HAND, true);
         hiss(player.serverLevel(), water);
+        player.displayClientMessage(Component.translatable("message.civilization.quenched",
+                stack.getHoverName(), Grade.percent(before), Grade.percent(Grade.value(stack))), true);
     }
     private static void hiss(ServerLevel level, Vec3 at) {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, .6f, 1.2f);
         level.sendParticles(ParticleTypes.CLOUD, at.x, at.y + .1, at.z, 8, .15, .05, .15, .02);
     }
+    /** Dropped metal quenches in water and settles once cold. */
     @SubscribeEvent public static void drop(EntityTickEvent.Post event) {
-        if (!(event.getEntity() instanceof ItemEntity item) || !item.isInWater() || !(item.level() instanceof ServerLevel level)
-                || !hot(item.getItem(), level.getGameTime())) return;
-        var cooled = item.getItem().copy();
-        cooled.remove(HOT.get());
-        item.setItem(cooled);
-        hiss(level, item.position());
+        if (!(event.getEntity() instanceof ItemEntity item) || !item.getItem().has(HOT.get()) || !(item.level() instanceof ServerLevel level)) return;
+        long now = level.getGameTime();
+        boolean hot = hot(item.getItem(), now);
+        if (hot && !item.isInWater()) return;
+        var settled = item.getItem().copy();
+        quench(settled, now);
+        item.setItem(settled);
+        if (hot) hiss(level, item.position());
     }
 
     /**
@@ -192,14 +232,14 @@ public final class HotMetal {
         WORK.remove(player.getUUID());
         int before = Grade.value(stack);
         var done = stack.getItem() instanceof RoughMetal rough ? stack.transmuteCopy(rough.ingot(), units) : stack.copy();
-        if (metal) done.set(HOT.get(), Math.min(stack.get(HOT.get()), second(level.getGameTime()) + DULL_TICKS));
+        if (metal) done.set(HOT.get(), Math.min(stack.get(HOT.get()), second(level.getGameTime()) + COOL_TICKS - WORKING_TICKS));
         Grade.refine(done, level.random);
         player.setItemInHand(InteractionHand.MAIN_HAND, done);
         player.displayClientMessage(Component.translatable(metal ? "message.civilization.hammered" : "message.civilization.cut",
                 done.getHoverName(), Grade.percent(before), Grade.percent(Grade.value(done))), true);
     }
 
-    /** Once a second, spent heat leaves what a player carries and has open. */
+    /** Once a second, metal that has cooled in what a player carries and has open settles. */
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player) || player.tickCount % 20 != 0) return;
         long now = player.level().getGameTime();
