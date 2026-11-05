@@ -65,7 +65,7 @@ public final class HotMetalGlow {
      * a buffer of its own, drawn with the other item sheets, so its added light falls under it as before.
      */
     private static final ResourceLocation SHEET = ResourceLocation.fromNamespaceAndPath(Civilization.MOD_ID, "hot_metal");
-    private static final RenderType METAL = RenderType.entityTranslucentCull(SHEET), GLOW = Glow.TYPE;
+    private static final RenderType METAL = RenderType.entityTranslucentCull(SHEET);
     /** Each sprite's column on the sheet, as fractions of its size: its left and right edges and each step's height. */
     private record Column(float u0, float u1, float height) {}
     private static Map<TextureAtlasSprite, Column> columns = Map.of();
@@ -132,13 +132,18 @@ public final class HotMetalGlow {
         columns = laid;
     }
     /**
-     * Minecraft's eyes type, light added over what is drawn, that also writes depth: under a shader pack the glow is
-     * the item's only surface, so block outlines and whatever is drawn after it must stay behind it.
+     * The glow: light added over what is drawn, writing depth because under a shader pack it is the item's only surface,
+     * so block outlines and whatever is drawn after it stay behind it. In the world it lights only the metal; in a slot
+     * Minecraft's eyes shader also lights the sprite's empty texels, which hold the metal's colour, so the slot glows.
      */
     private static final class Glow extends RenderType {
-        static final RenderType TYPE = create("civilization_hot_metal_glow", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, true,
-                CompositeState.builder().setShaderState(RENDERTYPE_EYES_SHADER).setTextureState(new TextureStateShard(SHEET, false, false))
-                        .setTransparencyState(ADDITIVE_TRANSPARENCY).setWriteMaskState(COLOR_DEPTH_WRITE).createCompositeState(false));
+        static final RenderType WORLD = create("civilization_hot_metal_glow", RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER);
+        static final RenderType SLOT = create("civilization_hot_metal_slot_glow", RENDERTYPE_EYES_SHADER);
+        private static RenderType create(String name, ShaderStateShard shader) {
+            return create(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, true, CompositeState.builder()
+                    .setShaderState(shader).setTextureState(new TextureStateShard(SHEET, false, false)).setOverlayState(OVERLAY)
+                    .setTransparencyState(ADDITIVE_TRANSPARENCY).setWriteMaskState(COLOR_DEPTH_WRITE).createCompositeState(false));
+        }
         private Glow() { super("unused", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, false, () -> {}, () -> {}); }
     }
     /** The sheet's texture, a class of its own so shaders can find its emission. */
@@ -183,7 +188,7 @@ public final class HotMetalGlow {
             @Override public BakedModel resolve(BakedModel model, ItemStack stack, ClientLevel level, LivingEntity entity, int seed) {
                 var resolved = originalModel.getOverrides().resolve(originalModel, stack, level, entity, seed);
                 int glow = glow(stack), strength = glow >>> 24;
-                return resolved == null || strength == 0 ? resolved : new Hot(resolved, (strength * 4 + 254) / 255 * 15 / 4, heat(glow));
+                return resolved == null || strength == 0 ? resolved : new Hot(resolved, (strength * 4 + 254) / 255 * 15 / 4, heat(glow), Glow.WORLD);
             }
         };
         Metal(BakedModel model) { super(model); }
@@ -191,27 +196,30 @@ public final class HotMetalGlow {
     }
     /**
      * A glowing stack's model, lit from within at block light `light` and lifted to heat step `heat`: each of its passes,
-     * tinted, then its light. A shader pack draws the light alone, emitting its colour through the sheet's emission map:
-     * it would show the light over the metal in the world anyway, and in hand Iris would draw the metal over the light.
+     * tinted, then its light, drawn as `glow`. A shader pack draws the light alone, emitting its colour through the
+     * sheet's emission map: it would show the light over the metal in the world anyway, and in hand Iris would draw the
+     * metal over the light.
      */
     private static final class Hot extends BakedModelWrapper<BakedModel> {
         private final int light, heat;
-        Hot(BakedModel model, int light, int heat) { super(model); this.light = light; this.heat = heat; }
+        private final RenderType glow;
+        Hot(BakedModel model, int light, int heat, RenderType glow) { super(model); this.light = light; this.heat = heat; this.glow = glow; }
         @Override public BakedModel applyTransform(ItemDisplayContext context, PoseStack pose, boolean leftHand) {
-            return new Hot(originalModel.applyTransform(context, pose, leftHand), light, heat);
+            return new Hot(originalModel.applyTransform(context, pose, leftHand), light, heat, context == ItemDisplayContext.GUI ? Glow.SLOT : Glow.WORLD);
         }
         @Override public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
             boolean shaders = shaders();
             return originalModel.getRenderPasses(stack, fabulous).stream().<BakedModel>mapMulti((pass, passes) -> {
-                if (!shaders) passes.accept(new Pass(pass, TINT, light, heat));
-                passes.accept(new Pass(pass, LIGHT, light, heat));
+                if (!shaders) passes.accept(new Pass(pass, TINT, light, heat, METAL));
+                passes.accept(new Pass(pass, LIGHT, light, heat, glow));
             }).toList();
         }
     }
-    /** One pass drawn from the sheet with every quad tinted `tint` and lit at least to `light`; the light pass is added over what is drawn. */
+    /** One pass drawn as `type` from the sheet with every quad tinted `tint` and lit at least to `light`. */
     private static final class Pass extends BakedModelWrapper<BakedModel> {
         private final int tint, light, heat;
-        Pass(BakedModel model, int tint, int light, int heat) { super(model); this.tint = tint; this.light = light; this.heat = heat; }
+        private final RenderType type;
+        Pass(BakedModel model, int tint, int light, int heat, RenderType type) { super(model); this.tint = tint; this.light = light; this.heat = heat; this.type = type; }
         @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
             return QUADS.computeIfAbsent(new Quads(originalModel, side, tint, light, heat), key -> {
                 var lit = QuadTransformers.applyingLightmap(light, 0);
@@ -221,7 +229,7 @@ public final class HotMetalGlow {
         @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random, ModelData data, RenderType type) {
             return getQuads(state, side, random);
         }
-        @Override public List<RenderType> getRenderTypes(ItemStack stack, boolean fabulous) { return List.of(tint == TINT ? METAL : GLOW); }
+        @Override public List<RenderType> getRenderTypes(ItemStack stack, boolean fabulous) { return List.of(type); }
         @Override public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) { return List.of(this); }
     }
 }
