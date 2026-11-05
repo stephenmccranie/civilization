@@ -57,7 +57,7 @@ public final class CivilizationJei implements IModPlugin {
         r.addGlobalGuiHandler(new mezz.jei.api.gui.handlers.IGlobalGuiHandler(){
             public Collection<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(){
                 var mc=Minecraft.getInstance();
-                if(mc.player==null||!BlockCarry.restricted(mc.player)||!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
+                if(!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
                 var areas=new java.util.ArrayList<net.minecraft.client.renderer.Rect2i>();
                 for(var slot:screen.getMenu().slots)if(slot instanceof BlockCarry.HandSlot)
                     areas.add(dev.civilization.client.MachineUi.handBounds(screen,slot));

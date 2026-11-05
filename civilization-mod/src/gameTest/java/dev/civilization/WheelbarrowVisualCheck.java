@@ -14,6 +14,8 @@ import net.minecraft.world.phys.*;
 final class WheelbarrowVisualCheck {
     // The cargo, pallet and Hand checks keep their own clock, which starts where handling ends.
     private static final int REST=520;
+    /** A full stack of dirt, more than the Survival armful. */
+    private static final int FULL=new ItemStack(Blocks.DIRT).getMaxStackSize();
     private static int ticks;
     private static volatile String failure;
     private static volatile boolean verified;
@@ -198,10 +200,10 @@ final class WheelbarrowVisualCheck {
             if(mc.player.containerMenu.getSlot(0).getItem().getCount()!=5||mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT)throw new IllegalStateException("Chest shift-click bypassed a full offhand");
             mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,63,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
         }
-        if(t==836)mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
+        // The chest's 5 dirt leave room for 3 of the Hand's stone in its armful; the rest stays in the Hand.
         if(t==845){
-            // The chest already holds 5 dirt, so only 3 stone fit its armful; the Hand keeps 5 and takes no dirt back.
-            if(!mc.player.getOffhandItem().is(Blocks.STONE.asItem())||mc.player.getOffhandItem().getCount()!=5||mc.player.containerMenu.getSlot(0).getItem().getCount()!=5||mc.player.containerMenu.getSlot(1).getItem().getCount()!=BlockCarry.LIMIT-5)throw new IllegalStateException("Native chest/hand transfers did not stop at the chest's armful and conserve both block types");
+            int room=BlockCarry.LIMIT-5;
+            if(!mc.player.getOffhandItem().is(Blocks.STONE.asItem())||mc.player.getOffhandItem().getCount()!=BlockCarry.LIMIT-room||!mc.player.containerMenu.getSlot(1).getItem().is(Blocks.STONE.asItem())||mc.player.containerMenu.getSlot(1).getItem().getCount()!=room||mc.player.containerMenu.getSlot(0).getItem().getCount()!=5)throw new IllegalStateException("Native chest/hand transfers did not conserve the two block types within the chest's armful");
             for(int i=0;i<36;i++)if(BlockCarry.block(mc.player.getInventory().getItem(i)))throw new IllegalStateException("Blocks escaped into normal player pockets");
             dev.civilization.client.CarryUiCheck.assertLayout(mc,false);shot(mc,"offhand-chest");handMenuVerified=true;
         }
@@ -242,15 +244,33 @@ final class WheelbarrowVisualCheck {
             p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),3.5,100,1,java.util.Set.of(),0,20);server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),Blocks.CRAFTING_TABLE.defaultBlockState());
         });
         if(t==1185)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
-        if(t==1200)dev.civilization.client.CarryUiCheck.openRecipes(mc);
+        if(t==1200)dev.civilization.client.CarryUiCheck.toggleRecipes(mc);
         if(t>=1210&&t<1290)handLayouts(mc,t-1210,"hand-crafting-recipes");
         if(t==1290)mc.player.closeContainer();
         if(t==1295)check(server,()->server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),KilnContent.KILN.get().defaultBlockState()));
         if(t==1310)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
         if(t==1325&&!(mc.player.containerMenu instanceof KilnMenu))throw new IllegalStateException("Native machine menu did not open for Hand-layout review: "+mc.player.containerMenu.getClass().getSimpleName());
         if(t>=1325&&t<1405)handLayouts(mc,t-1325,"hand-machine-recipes");
-        if(t==1405)handLayoutsVerified=true;
-        if(t>1410){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!palletViewsVerified||!handLayoutsVerified)throw new IllegalStateException("Wheelbarrow/pallet/Hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: handle hits, movement/camera/gait, normal main-hand pallet placement and icon/held views, mined offhand pickup, cargo/chest/Creative conservation, full Hand frame cursor safety, crafting and machine recipe clearance, Photon/shaders-disabled views");mc.stop();}
+        // Creative shows the same Hand and Pack panel, and its Hand takes a full stack by real clicks.
+        if(t==1405){mc.player.closeContainer();check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.DIRT,FULL));p.inventoryMenu.broadcastFullState();});}
+        if(t==1420)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));
+        if(t==1435){
+            if(!(mc.player.containerMenu instanceof KilnMenu)||!mc.player.isCreative())throw new IllegalStateException("Creative Kiln menu did not open: "+mc.player.containerMenu.getClass().getSimpleName());
+            dev.civilization.client.CarryUiCheck.assertLayout(mc,true);shot(mc,"creative-machine-recipes");
+            dev.civilization.client.CarryUiCheck.clickHand(mc);
+        }
+        if(t==1440){
+            if(mc.player.containerMenu.getCarried().getCount()!=FULL)throw new IllegalStateException("Creative Hand click did not pick up its full stack: "+mc.player.containerMenu.getCarried());
+            dev.civilization.client.CarryUiCheck.clickHand(mc);
+        }
+        if(t==1445){
+            if(!mc.player.containerMenu.getCarried().isEmpty()||mc.player.getOffhandItem().getCount()!=FULL)throw new IllegalStateException("Creative Hand did not take back its full stack");
+            check(server,()->{var p=server.getPlayerList().getPlayers().getFirst();if(p.getOffhandItem().getCount()!=FULL||!p.containerMenu.getCarried().isEmpty())throw new IllegalStateException("Server capped the Creative Hand: "+p.getOffhandItem());});
+            dev.civilization.client.CarryUiCheck.toggleRecipes(mc);
+        }
+        if(t==1450){dev.civilization.client.CarryUiCheck.assertLayout(mc,false);shot(mc,"creative-machine");}
+        if(t==1455){mc.player.closeContainer();handLayoutsVerified=true;}
+        if(t>1460){if(!verified||!cargoVerified||!handMenuVerified||!creativeVerified||!palletViewsVerified||!handLayoutsVerified)throw new IllegalStateException("Wheelbarrow/pallet/Hand acceptance missing");com.mojang.logging.LogUtils.getLogger().info("WHEELBARROW VISUAL VERIFIED: handle hits, movement/camera/gait, normal main-hand pallet placement and icon/held views, mined offhand pickup, cargo/chest/Creative conservation, full Hand frame cursor safety, crafting and machine recipe clearance in Survival and Creative, Creative full-stack Hand, Photon/shaders-disabled views");mc.stop();}
     }
     /** The open menu's Hand and Pack panel at 1080p, at GUI scale 2 there, in a 768p window and at 1440p, then back to 1080p. */
     private static void handLayouts(Minecraft mc,int t,String name){
