@@ -15,3 +15,6 @@ __pycache__/
 # Art working files stay local; finished art ships as runtime resources.
 /art/
 /concept_art/
+
+# The live server host, key and map port
+server/deploy.local.json

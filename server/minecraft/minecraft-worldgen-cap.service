@@ -1,0 +1,12 @@
+[Unit]
+Description=Cap Minecraft world generation at 8 CPUs
+BindsTo=minecraft.service
+After=minecraft.service
+
+[Service]
+ExecStart=/usr/local/sbin/minecraft-worldgen-cap
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=minecraft.service

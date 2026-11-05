@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terrain map</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#10171b;color:#e3ecee}
+*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:256px minmax(0,1fr);height:100dvh}
+aside{padding:20px 18px;border-right:1px solid #2b3b42;overflow:auto}h1{font-size:20px;font-weight:600;margin:0 0 20px}
+aside section+section{border-top:1px solid #293d46;margin-top:18px;padding-top:16px}
+h2,legend,.label{font-size:14px;font-weight:400;color:#9cb0b7}h2{margin:0 0 10px}
+fieldset{margin:14px 0 0;padding:0;border:0;min-width:0}legend{padding:0;margin-bottom:6px}
+.choice{display:flex;align-items:center;gap:8px;margin:0;min-height:27px;font-size:14px;cursor:pointer}.choice input{width:auto;margin:0;accent-color:#b6e77c}.choice .count{margin-left:auto;color:#9cb0b7;font-variant-numeric:tabular-nums}
+#showVillages{accent-color:#9bd4f5}#contours{accent-color:#d6c791}.legend{display:flex;gap:16px;margin:4px 0 0 22px;font-size:13px;color:#9cb0b7}.coal{color:#e1e4e8}.oil{color:#e5b76a}
+.feed-status{font-size:13px;color:#9cb0b7;line-height:1.4;margin-top:6px}.feed-status:empty{display:none}
+button,input{font:inherit;color:inherit;border:1px solid #3c535d;background:#1b2a31;border-radius:6px;padding:8px;min-width:0}button{cursor:pointer}button:hover{background:#2b414b}
+.buttons,form{display:flex;gap:6px;margin-top:10px}.buttons button{flex:1}form input{width:0;flex:1}
+#playerStatus{font-size:14px;color:#9cb0b7;margin:0}.metric{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;line-height:1.7}.metric span{color:#9cb0b7}.metric output{font-variant-numeric:tabular-nums;white-space:nowrap}
+#count{font-size:18px;font-variant-numeric:tabular-nums}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.value{font-size:21px;white-space:nowrap;font-variant-numeric:tabular-nums;margin-top:3px}
+#job{font-size:13px;color:#a8c5b3;margin-top:10px}#job:empty{display:none}#error{font-size:14px;color:#ffbd83;line-height:1.5;margin-top:14px}#error:empty{display:none}
+.map{position:relative;overflow:hidden;background:#18252c;min-height:0}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}#playerCanvas{position:absolute;inset:0;pointer-events:none;touch-action:auto}
+#coords{position:absolute;bottom:16px;left:16px;max-width:calc(100% - 32px);white-space:normal;line-height:1.5;background:#101b23e6;padding:8px 10px;border:1px solid #38505c;border-radius:6px;font:12px ui-monospace,monospace;pointer-events:none}#compass{position:absolute;top:16px;right:18px;color:#b4c7ce;font-size:12px;text-align:center;pointer-events:none}
+@media(max-width:700px){main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}aside{padding:12px 16px;border-right:0;border-bottom:1px solid #2b3b42;max-height:45dvh}h1{font-size:18px;margin-bottom:14px}aside section+section{margin-top:14px;padding-top:12px}}
+</style>
+<main><aside>
+<h1>Terrain map</h1>
+<section class="controls" aria-labelledby="controlsTitle">
+<h2 id="controlsTitle">Map controls</h2>
+<fieldset id="view"><legend>View</legend>
+<label class="choice"><input type="radio" name="view" value="relief" checked>Shaded terrain</label>
+<label class="choice"><input type="radio" name="view" value="elevation">Elevation</label>
+</fieldset>
+<fieldset class="layers"><legend>Layers</legend>
+<label class="choice"><input id="showVillages" type="checkbox" checked>Villages <span class="count" id="villageCount">&mdash;</span></label>
+<label class="choice"><input id="showDeposits" type="checkbox" checked>Deposits</label>
+<div class="legend"><span><b class="coal">&#9679;</b> Coal <span id="coalCount">&mdash;</span></span><span><b class="oil">&#9670;</b> Oil <span id="oilCount">&mdash;</span></span></div>
+<label class="choice"><input id="contours" type="checkbox">Contours</label>
+<label class="choice"><input id="grid" type="checkbox" checked>Coordinate grid</label>
+<div id="villageStatus" class="feed-status" role="status"></div><div id="depositStatus" class="feed-status" role="status"></div>
+</fieldset>
+<div class="buttons"><button id="fit">Fit map</button><button id="origin">0, 0</button></div>
+<form id="goto"><input aria-label="X coordinate" id="x" placeholder="X" inputmode="numeric"><input aria-label="Z coordinate" id="z" placeholder="Z" inputmode="numeric"><button>Go</button></form>
+</section>
+<section class="players" aria-labelledby="playersTitle"><h2 id="playersTitle">Players</h2><div id="playerStatus">Connecting&hellip;</div><div id="playerList"></div></section>
+<section class="world-stats" aria-labelledby="worldTitle"><h2 id="worldTitle">World data</h2>
+<div class="metric"><span>Generated chunks</span><output id="count">&mdash;</output></div>
+<div class="stats"><div title="Saved world and terrain cache across all dimensions, excluding Distant Horizons LOD files. Updated every 5 minutes."><div class="label">World</div><div class="value" id="worldSize">&mdash;</div></div><div title="Distant Horizons databases and their WAL/SHM files across all dimensions. Updated every 5 minutes."><div class="label">LODs</div><div class="value" id="lodSize">&mdash;</div></div></div>
+<div id="job" role="status"></div></section>
+<section class="server-stats" aria-labelledby="serverMetricsTitle" title="Usage across the server VM, including Minecraft, generation and the map. Refreshes every 5 seconds."><h2 id="serverMetricsTitle">Server usage</h2>
+<div class="metric"><span>CPU</span><output id="cpuUsage"></output></div>
+<div class="metric" title="Used RAM excludes reclaimable memory; decimal GB."><span>RAM</span><output id="ramUsage"></output></div>
+<div class="metric" title="Traffic received on the primary network interface; decimal MB per second."><span>Network &#8595;</span><output id="networkRx"></output></div>
+<div class="metric" title="Traffic sent on the primary network interface; decimal MB per second."><span>Network &#8593;</span><output id="networkTx"></output></div></section>
+<div id="error" role="status"></div>
+</aside><section class="map"><canvas id="map" aria-label="Generated terrain map"></canvas><canvas id="playerCanvas" aria-hidden="true"></canvas><div id="compass">N<br>&uarr;</div><div id="coords">X 0 &middot; Z 0</div></section></main>
+<script src="/map.js"></script></html>

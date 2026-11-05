@@ -1,0 +1,21 @@
+[Unit]
+Description=Expanding Minecraft full chunks and DH LOD pregeneration while no players are online
+Wants=minecraft.service
+After=minecraft.service
+
+[Service]
+Type=simple
+User=minecraft
+Group=minecraft
+ExecStart=/usr/local/libexec/minecraft-pregenerate
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=15
+KillMode=mixed
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/minecraft/pregeneration /run/minecraft
+
+[Install]
+WantedBy=minecraft.service

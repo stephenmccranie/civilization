@@ -15,6 +15,7 @@ Each fact has one home. Update it in the same change as the code or decision, re
 | Which check to run for which change | `civilization-mod/testing.md` |
 | Version | `civilization-mod/gradle.properties` |
 | Player pack, client/server settings, releases | `modpack/README.md` |
+| Live server services, scripts, settings and deployment | `server/README.md` |
 | Art pipeline | `tools/modeling/README.md` and the `civilization-art` skill |
 
 Docs describe the current state. History lives in git: no changelogs, diaries, status logs or per-build test counts in docs. Proposals stay in their design section's Open list until the owner decides; never promote one silently. Link only to tracked files, and run `python tools/check_docs.py` after doc or path changes.
