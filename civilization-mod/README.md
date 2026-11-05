@@ -50,7 +50,7 @@ This is a compatibility gate, not authentication or anti-cheat: a modified clien
 
 Install JDK 21 and a Prism instance named Civilization Dev, then copy `dev.local.example.json` to the ignored `dev.local.json` and set `javaHome` and `prismInstance`.
 
-Gradle resolves GeckoLib (required at runtime) and JEI (optional and compile-only; never bundle it). `dev.ps1` downloads the pinned Sable release into the ignored `.dev-libs` folder: its version is in `gradle.properties` and its SHA-512 is pinned in `dev.ps1`.
+Gradle resolves GeckoLib (required at runtime), and JEI, Iris and the LambDynamicLights API (optional and compile-only; never bundle them). `dev.ps1` downloads LambDynamicLights as the [player pack](../modpack/client-files.json) pins it into `.dev-libs` and adds it to test clients and Civilization Dev. `dev.ps1` downloads the pinned Sable release into the ignored `.dev-libs` folder: its version is in `gradle.properties` and its SHA-512 is pinned in `dev.ps1`.
 
 `run/` is the development client. Visual checks copy its world, mods, shader and resource packs and options, so optional client mods for those checks (JEI, Iris with Photon, Distant Horizons) go in `run/mods`. Blockbench and its MCP server are authoring tools only: see the [modeling workflow](../tools/modeling/README.md).
 
@@ -71,7 +71,7 @@ Run from this folder:
 
 [Development checks](testing.md) says which check a change needs and lists every scene and fixture.
 
-Deploy refuses while the Civilization Dev game is running or when Prism's Minecraft or NeoForge version differs from `gradle.properties`. It installs the resolved GeckoLib and Sable jars, refusing a conflicting GeckoLib version, moves earlier Civilization jars to the instance's `mod-backups` folder and installs the new jar. Other mods, including JEI, are left untouched.
+Deploy refuses while the Civilization Dev game is running or when Prism's Minecraft or NeoForge version differs from `gradle.properties`. It installs the resolved GeckoLib, Sable and LambDynamicLights jars, refusing a conflicting GeckoLib version, moves earlier Civilization jars to the instance's `mod-backups` folder and installs the new jar. Other mods, including JEI, are left untouched.
 
 Server keeps its world in `runs/server` and copies `server.local.example.properties` on first start. Run it in an interactive terminal and type `stop` to shut down.
 

@@ -300,5 +300,5 @@ final class WheelbarrowVisualCheck {
     private static WheelbarrowEntity barrow(MinecraftServer s){return (WheelbarrowEntity)s.overworld().getEntity(entityId);}
     private static void check(MinecraftServer s,Runnable action){s.execute(()->{try{action.run();}catch(Throwable e){failure=e.toString();}});}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"wheelbarrow-"+name+".png",mc.getMainRenderTarget(),m->{});}
-    private static void shaders(boolean enabled){try{var iris=Class.forName("net.irisshaders.iris.Iris");var config=iris.getMethod("getIrisConfig").invoke(null);config.getClass().getMethod("setShadersEnabled",boolean.class).invoke(config,enabled);config.getClass().getMethod("save").invoke(config);iris.getMethod("reload").invoke(null);}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}}
+    static void shaders(boolean enabled){try{var iris=Class.forName("net.irisshaders.iris.Iris");var config=iris.getMethod("getIrisConfig").invoke(null);config.getClass().getMethod("setShadersEnabled",boolean.class).invoke(config,enabled);config.getClass().getMethod("save").invoke(config);iris.getMethod("reload").invoke(null);}catch(ReflectiveOperationException e){throw new IllegalStateException(e);}}
 }
