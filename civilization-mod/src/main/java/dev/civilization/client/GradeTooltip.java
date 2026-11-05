@@ -25,6 +25,7 @@ public final class GradeTooltip {
         event.getToolTip().add(1, Component.literal("Grade: " + Grade.percent(grade)
                 + (units.size() > 1 ? " average, " + Grade.percent(units.getLast()) + "–" + Grade.percent(units.getFirst()) : "")).withStyle(color));
         long heat = event.getEntity() == null ? 0 : HotMetal.heatLeft(stack, event.getEntity().level().getGameTime());
-        if (heat > 0) event.getToolTip().add(2, Component.literal("Hot: hammer it at an anvil within " + (heat + 19) / 20 + " s").withStyle(ChatFormatting.GOLD));
+        if (heat > HotMetal.DULL_TICKS) event.getToolTip().add(2, Component.literal("Glowing: hammer it at an anvil within " + (heat - HotMetal.DULL_TICKS + 19) / 20 + " s").withStyle(ChatFormatting.GOLD));
+        else if (heat > 0) event.getToolTip().add(2, Component.literal("Cooling: quench it in water or wait " + (heat + 19) / 20 + " s").withStyle(ChatFormatting.RED));
     }
 }

@@ -102,9 +102,9 @@ public final class GradeGameTests {
     @GameTest(template = "industrial") public static void theFoundryGradesEachUnitItMakes(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);
         f.setItem(0, new ItemStack(Items.RAW_IRON, 8)); f.setItem(1, KilnContent.MINERAL_COAL.toStack(16)); FoundryGameTests.run(h, f, 8 * 200 + 40);
-        h.assertTrue(f.getItem(2).is(Items.IRON_INGOT) && f.getItem(2).getCount() == 8 && Grade.of(f.getItem(2)).units().size() > 1, "Each smelted ingot rolls its own grade and the ingots share one stack");
+        h.assertTrue(f.getItem(2).is(KilnContent.IRON_BLOOM.get()) && f.getItem(2).getCount() == 8 && Grade.of(f.getItem(2)).units().size() > 1, "Each smelted bloom rolls its own grade and the blooms share one stack");
         f.setItem(2, ItemStack.EMPTY); f.setItem(1, KilnContent.MINERAL_COAL.toStack(16)); f.setItem(0, ingots(1000, 900, 700)); FoundryGameTests.run(h, f, 3 * 800 + 40);
-        h.assertTrue(f.getItem(2).is(KilnContent.STEEL.get()) && grades(f.getItem(2)).equals(List.of(1000, 900, 700)), "On Automatic, iron still becomes steel, each ingot keeping its grade");
+        h.assertTrue(f.getItem(2).is(KilnContent.BLISTER_STEEL.get()) && grades(f.getItem(2)).equals(List.of(1000, 900, 700)), "On Automatic, iron still becomes blister steel, each ingot keeping its grade");
         h.succeed();
     }
 

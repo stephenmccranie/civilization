@@ -1,10 +1,10 @@
 {
   "type": "civilization:foundry",
   "ingredient": {
-    "item": "minecraft:diamond"
+    "item": "civilization:gold_dore"
   },
   "result": {
-    "id": "minecraft:diamond",
+    "id": "civilization:gold_dore",
     "count": 1
   },
   "cookingtime": 400,

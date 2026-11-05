@@ -6,7 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class CalorieConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.DoubleValue CAPACITY, WALK, ROW, ASCENT, SPRINT_MULTIPLIER, BREAK, PLACE,
-            JUMP, ATTACK, IGNITE, HAMMER, HEAL, SLEEP, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
+            JUMP, ATTACK, IGNITE, BLOW, HEAL, SLEEP, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
             RECOVERY, DEPLETED_SPEED, STARVATION_FLOOR, FORAGE_KCAL, LIGHT_BREAK, HARVEST, PLANT, FERTILIZE,
             COLD_EXPOSURE;
     public static final ModConfigSpec.IntValue FORAGE_TICKS;
@@ -36,8 +36,8 @@ public final class CalorieConfig {
         ATTACK = b.defineInRange("successfulAttackKcal", 3.0, 0.0, 1000.0);
         IGNITE = b.comment("Calories spent for each accepted strike of a coal-fired machine, whether or not it lights.")
                 .defineInRange("machineIgnitionKcal", 1.0, 0.0, 1000.0);
-        HAMMER = b.comment("Calories spent hammering one unit of hot metal at an anvil, paid in equal parts with each of the blows that refine it.")
-                .defineInRange("hammeringKcal", 40.0, 0.0, 1000.0);
+        BLOW = b.comment("Calories spent on each unit in an accepted hammer blow on glowing metal at an anvil or stroke cutting diamonds at a grindstone.")
+                .defineInRange("blowKcal", 8.0, 0.0, 1000.0);
         HEAL = b.comment("kcal per health point (half heart), every 4 seconds while hurt; respects naturalRegeneration.")
                 .defineInRange("healKcalPerHealthPoint", 40.0, 1.0, 1000.0);
         SPRINT_MINIMUM = b.defineInRange("minimumSprintKcal", 100.0, 1.0, 100000.0);

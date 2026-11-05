@@ -18,9 +18,9 @@ public class FoundryGameTests {
     static void run(GameTestHelper h,FoundryBlockEntity f,int ticks) {CoalFireFixture.light(f);for(int i=0;i<ticks;i++)KilnBlockEntity.tick(h.getLevel(),f.getBlockPos(),f.getBlockState(),f);}
     @GameTest(template="industrial") public static void oreSteelAndPartsProgression(GameTestHelper h) {
         var f=build(h,Direction.NORTH);f.setItem(0,new ItemStack(Items.RAW_IRON));f.setItem(1,KilnContent.MINERAL_COAL.toStack());run(h,f,200);
-        h.assertTrue(f.getItem(2).is(Items.IRON_INGOT),"Foundry smelts raw iron");
-        f.setItem(0,f.removeItemNoUpdate(2));f.setItem(1,KilnContent.MINERAL_COAL.toStack(2));run(h,f,800);
-        h.assertTrue(f.getItem(2).is(KilnContent.STEEL.get())&&f.getItem(2).getCount()==1,"Longer coal-fired batch makes one steel");
+        h.assertTrue(f.getItem(2).is(KilnContent.IRON_BLOOM.get()),"Foundry smelts raw iron into a bloom");
+        f.setItem(2,ItemStack.EMPTY);f.setItem(0,new ItemStack(Items.IRON_INGOT));f.setItem(1,KilnContent.MINERAL_COAL.toStack(2));run(h,f,800);
+        h.assertTrue(f.getItem(2).is(KilnContent.BLISTER_STEEL.get())&&f.getItem(2).getCount()==1,"Longer coal-fired batch makes one blister steel");
         var smithy=WorkshopGameTests.build(h,2,Direction.NORTH);var plate=ManufacturingGameTests.job(2,ManufacturingContent.part("steel","plate"));ManufacturingGameTests.supply(smithy,plate);smithy.setItem(4,KilnContent.MINERAL_COAL.toStack());WorkshopGameTests.run(smithy,plate.ticks());
         h.assertTrue(smithy.getItem(5).is(ManufacturingContent.part("steel","plate")),"Steel is shaped at the Smithy");
         var bench=WorkshopGameTests.build(h,3,Direction.NORTH);var parts=ManufacturingGameTests.job(3,KilnContent.MACHINE_PARTS.get());ManufacturingGameTests.supply(bench,parts);WorkshopGameTests.run(bench,parts.ticks());

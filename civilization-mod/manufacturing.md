@@ -8,13 +8,13 @@ Craft the **Foundry** controller from **8 brick blocks around cobblestone**. Pla
 
 | Input | Output | Time |
 | --- | --- | --- |
-| Raw iron, copper or gold, or their ores | 1 ingot | 10 seconds |
-| 1 iron ingot | 1 Steel Ingot | 40 seconds |
+| Raw iron, copper or gold, or their ores | 1 Iron Bloom, Blister Copper or Gold Doré, hot for [hammering](#grade) | 10 seconds |
+| 1 iron ingot | 1 Blister Steel, hot | 40 seconds |
 | Silk-touched coal, diamond, emerald, lapis, redstone and quartz ores | Their usual drop | 10 seconds |
 | Ancient debris | Netherite scrap | 10 seconds |
-| Iron, copper, gold or steel ingot, or a diamond | The same items, hot for [hammering](#grade), up to 8 at once | 20 seconds |
+| Rough metal, or an iron, copper, gold or steel ingot | The same items, hot, up to 8 at once | 20 seconds |
 
-Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbon source; there is no coke. On Automatic, iron ingots make steel; select **Heat Iron Ingot** to heat them. The other ingots and diamonds have no other Foundry job, so Automatic heats them. Heating awards no XP. Vanilla metal smelting and equipment-to-nugget recycling are disabled.
+Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbon source; there is no coke. On Automatic, iron ingots make blister steel; select **Heat Iron Ingot** to heat them. Rough metal and the other ingots have no other Foundry job, so Automatic heats them. Heating awards no XP. Vanilla metal smelting and equipment-to-nugget recycling are disabled.
 
 ## Town workshops
 
@@ -81,12 +81,15 @@ The catalog covers iron, gold and diamond pickaxes, axes, shovels, hoes, swords 
 
 ### Grade
 
-Grade belongs to each unit of metal. Every ingot the Foundry smelts from ore or raw metal, and every diamond from silk-touched ore, rolls a persistent grade, kept to a tenth of a percent (normal distribution, mean 75%, standard deviation 20 points, no floor or ceiling). Steel keeps the grade of the iron ingot it was made from. **Refining** is heat and hammer:
+Grade belongs to each unit of metal. Every unit of rough metal the Foundry smelts from ore or raw metal, and every diamond from silk-touched ore, rolls a persistent grade, kept to a tenth of a percent (normal distribution, mean 75%, standard deviation 20 points, no floor or ceiling). Blister steel keeps the grade of the iron ingot it was made from. Metal is **smelted, hammered and quenched**:
 
-- **Heat.** A heat at the Foundry takes a whole load of up to eight units from its first input slot, as many as the output has room for, and draws one Coal in 20 seconds whatever the load, so full loads are cheapest. The load leaves hot: it glows in its slot, its tooltip counts down the seconds left, and it cools a minute later wherever it is. Hot metal stays apart from cold metal, and hoppers cannot take it from the Foundry.
-- **Hammer.** Hold use on any anvil with hot metal in your main hand to strike a heavy blow once a second; the metal's cooldown sweep shows the swing recovering. Each blow works the whole stack, and the fifth, about four seconds of hammering, refines every unit and leaves the stack cold. Hammering costs `hammeringKcal` (40 kcal at neutral comfort) for every unit, paid a fifth with each blow. Paid blows count on across pauses and toward whatever hot metal you strike next; logging out resets them. Metal that cools unhammered goes back into the fire, losing only the heat.
+- **Smelt and heat.** The Foundry smelts ore into rough metal: an **Iron Bloom**, **Blister Copper** or **Gold Doré**; iron ingots become **Blister Steel**. A heat takes a whole load of up to eight units of rough metal or ingots from its first input slot, as many as the output has room for, and draws one Coal in 20 seconds whatever the load, so full loads are cheapest. Metal leaves hot and stays hot while it sits in a hot Foundry, so a run of output shares one stack. Out of the fire it glows for 40 seconds, cools for 20 more and is cold a minute after leaving, wherever it is; its slot glows and its tooltip counts down. Hot metal stays apart from cold metal, and hoppers cannot take it from the Foundry.
+- **Hammer.** Hold use on an anvil with glowing metal in your main hand to strike a heavy blow once a second; the metal's cooldown sweep shows the swing recovering. Each blow works the whole stack. The fifth on an iron anvil, or the eighth on a Stone Anvil, beats rough metal into its ingot, raises every unit one grade step and leaves the stack below working heat to cool. Each blow costs `blowKcal` (8 kcal at neutral comfort) for every unit. Paid blows count on across pauses and toward whatever is worked next; logging out resets them. Metal that no longer glows goes back into the Foundry, losing only the heat; an anvil turns it away with that reminder.
+- **Quench.** Use hot metal on water or a water cauldron, or drop it in water, and it cools at once with a hiss and steam, ready to stack and store. Grade is unchanged.
+- **Stone Anvil.** The first anvil needs no metal: three smooth stone over one cobblestone over three cobblestone (any stone crafting material). It only hammers. The iron anvil, made from the first ingots, takes fewer blows and keeps its repair and naming screen, and the Smithy needs one.
+- **Cut.** Diamonds burn rather than forge. Hold use on a grindstone with diamonds in your main hand: five strokes a second apart, paid like blows, raise every diamond one grade step with no heat or Coal.
 
-Every hammering raises each unit by at least a tenth of a point, by a random amount that shrinks steeply as the unit nears 150%: exponentially distributed, with a mean of 4.5 points at 75% that falls with the fourth power of the distance left to 150%, and never past it. From 75% one hammering in five gains a point or less and one in nine gains 10 or more. The mean gain is 1.8 points at 90%, 0.9 at 100%, 0.4 at 110% and 0.1 at 125%, where nearly every hammering adds a tenth. Reaching 100% takes about 12 heats and hammerings from 75% (7 to 17 in most cases) and 14 from 50%; 100% to 125% takes about 100 more, and 125% to 150% about 250. With full loads, an ingot reaches 100% from 75% for about 1.5 Coal and 490 kcal and 120% for about 9 Coal and 2,900 kcal, on top of [warming up](machines.md#coal-fires) the Foundry. Metal and diamonds from anywhere else, such as mined diamonds, loot or nuggets, are standard 75%.
+Every hammering or cutting raises each unit by at least a tenth of a point, by a random amount that shrinks steeply as the unit nears 150%: exponentially distributed, with a mean of 4.5 points at 75% that falls with the fourth power of the distance left to 150%, and never past it. From 75% one hammering in five gains a point or less and one in nine gains 10 or more. The mean gain is 1.8 points at 90%, 0.9 at 100%, 0.4 at 110% and 0.1 at 125%, where nearly every hammering adds a tenth. Reaching 100% takes about 12 hammerings from 75% (7 to 17 in most cases), the first of them making the ingot, and 14 from 50%; 100% to 125% takes about 100 more, and 125% to 150% about 250. With full loads on an iron anvil, an ingot reaches 100% for about 1.9 Coal and 480 kcal, smelting included, and 120% for about 9 Coal and 2,900 kcal, on top of [warming up](machines.md#coal-fires) the Foundry. Metal and diamonds from anywhere else, such as mined diamonds, loot or nuggets, are standard 75%.
 
 Smithy parts (Plates, Rods, Fasteners, heads and blades) take the mean grade of the units they consume, rounded, and every part of a batch shares it. At the Assembly Bench, tools, swords and saws take their head's grade; armor, shears and shields take the mean of their Plates or diamonds. A [Backpack](physics.md#backpack) rolls its grade when made, as an ingot does. Other equipment made at a crafting table or without graded material, such as leather armor and wooden or stone tools, and found equipment such as loot are standard 75%. Netherite upgrades keep the diamond item's grade. Other products, such as Machine Parts, rails and doors, carry none.
 
@@ -125,7 +128,7 @@ Vanilla crafting for catalog items, netherite upgrade recipes and all 18 Smithin
 | Rail | 12 Iron Rods + 1 Stick | 16 / 5 seconds |
 | Powered Rail | 12 Gold Rods + 1 Stick + 1 Redstone | 6 / 5 seconds |
 
-Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. Crafting-table chests and barrels stay available for early storage. Primitive tools, the Kiln, Foundry, Tannery, Textile Workshop and Smithy controllers and the anvil stay craftable, so no workshop needs its own output to be built.
+Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry, bamboo, crimson and warped. Crafting-table chests and barrels stay available for early storage. Primitive tools, the Kiln, Foundry, Tannery, Textile Workshop and Smithy controllers, the Stone Anvil and the anvil stay craftable, so no workshop needs its own output to be built.
 
 ## Other bench jobs
 

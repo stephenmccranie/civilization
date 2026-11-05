@@ -16,15 +16,18 @@ final class JeiVisualCheck {
         var runtime=CivilizationJei.runtime();var manager=runtime.getRecipeManager();
         if(ticks==40){
             mc.options.hideGui=false;mc.options.guiScale().set(3);
-            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","assembly","oil_pump","heater","column","condenser","coal_drill","canisters","cutting","recombining");
+            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","assembly","oil_pump","heater","column","condenser","coal_drill","canisters","anvil","cutting","recombining");
             for(var type:types){
                 var recipeType=CivilizationJei.type(type);var category=manager.getRecipeCategory(recipeType);
                 if(category==null||manager.createRecipeLookup(recipeType).get().findAny().isEmpty())throw new IllegalStateException("Missing JEI recipes: "+type);
                 if(manager.createRecipeCatalystLookup(recipeType).getItemStack().findAny().isEmpty())throw new IllegalStateException("Missing controller catalyst: "+type);
             }
             var iron=focus(RecipeIngredientRole.OUTPUT,new ItemStack(Items.IRON_INGOT));
-            var foundry=manager.createRecipeLookup(CivilizationJei.type("foundry")).limitFocus(List.of(iron)).get().toList();
-            if(foundry.stream().noneMatch(r->r.slots().stream().anyMatch(s->s.items().stream().anyMatch(i->i.is(Items.RAW_IRON)))))throw new IllegalStateException("Iron lookup does not lead to raw-iron Foundry processing");
+            var hammered=manager.createRecipeLookup(CivilizationJei.type("anvil")).limitFocus(List.of(iron)).get().toList();
+            if(hammered.stream().noneMatch(r->r.slots().stream().anyMatch(s->s.items().stream().anyMatch(i->i.is(KilnContent.IRON_BLOOM.get())))))throw new IllegalStateException("Iron lookup does not lead to hammering an iron bloom");
+            var bloom=focus(RecipeIngredientRole.OUTPUT,KilnContent.IRON_BLOOM.toStack());
+            var foundry=manager.createRecipeLookup(CivilizationJei.type("foundry")).limitFocus(List.of(bloom)).get().toList();
+            if(foundry.stream().noneMatch(r->r.slots().stream().anyMatch(s->s.items().stream().anyMatch(i->i.is(Items.RAW_IRON)))))throw new IllegalStateException("Bloom lookup does not lead to raw-iron Foundry processing");
             if(manager.createRecipeLookup(RecipeTypes.SMELTING).limitFocus(List.of(iron)).get().findAny().isPresent())throw new IllegalStateException("Retired iron smelting is still shown");
             var raw=focus(RecipeIngredientRole.INPUT,new ItemStack(Items.RAW_IRON));
             if(manager.createRecipeLookup(CivilizationJei.type("foundry")).limitFocus(List.of(raw)).get().findAny().isEmpty())throw new IllegalStateException("Raw iron uses missing");
@@ -33,10 +36,10 @@ final class JeiVisualCheck {
             var pieces=CuttingContent.stack(net.minecraft.world.level.block.Blocks.OAK_PLANKS.defaultBlockState(),1,1);
             var cuts=manager.createRecipeLookup(CivilizationJei.type("cutting")).limitFocus(List.of(focus(RecipeIngredientRole.OUTPUT,pieces))).get().toList();
             if(cuts.isEmpty()||cuts.stream().anyMatch(r->r.slots().stream().filter(s->s.role()==RecipeIngredientRole.OUTPUT).flatMap(s->s.items().stream()).anyMatch(s->!ItemStack.isSameItemSameComponents(s,pieces))))throw new IllegalStateException("Cut-piece material/shape subtypes mixed together");
-            System.out.println("JEI check: all 16 categories, controller catalysts, iron recipes/uses, recipe parity and cut-piece identities passed.");
+            System.out.println("JEI check: all 17 categories, controller catalysts, iron recipes/uses, recipe parity and cut-piece identities passed.");
             runtime.getRecipesGui().show(iron);
         }
-        if(ticks==50)showCategory("foundry",new ItemStack(Items.IRON_INGOT));
+        if(ticks==50)showCategory("foundry",KilnContent.IRON_BLOOM.toStack());
         if(ticks==65)shot(mc,"iron-foundry");
         if(ticks==70)runtime.getRecipesGui().show(focus(RecipeIngredientRole.OUTPUT,IndustrialContent.SULFUR.toStack()));
         if(ticks==90)shot(mc,"sulfur-column");
