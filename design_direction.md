@@ -86,6 +86,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval. Sweet berry bushes ripen on the same clock and water reserve wherever they grow, a full interval per picking, with their native picking yield and no fertilizer.
 - **Fertilizer** raises yield, not speed: one non-stacking dose per cycle tripling harvest output after replanting material (wheat keeps its 1→3). Fortune and alternative paths cannot bypass yields. Mineral Fertilizer comes only from refinery sulfur plus gravel. Bone meal is disabled.
 - Trees grow anywhere suitable, substantially faster in woodland. Every other growable needs its own habitat policy rather than inheriting wheat rules.
+- **Basic felling.** Cutting a log of a natural tree drops every log of that tree at and above the cut, each as if broken by hand; the stump stays and leaves decay. Log buildings never fall. It answers the strongest playtest complaint, chopping one log at a time.
 - **Regional weather.** Weather runs in fixed 512×512-block districts — atmosphere, not claims — through one authoritative server query that natural rain, the Rain Caller and later towers all feed. Overworld only. Sleeping changes time, not weather.
 - Natural rain lasts 25–35 minutes. Clear spells end with a constant chance over time (mean 12 real hours) and no minimum or maximum, so back-to-back storms and multi-day droughts both happen. Rain only: no lightning, wind, floods or destructive storms; snow is not irrigation.
 - Crops and soil advance only while loaded; district schedules advance with server time; no offline catch-up or forced loading.
@@ -95,7 +96,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 **Open**
 - Habitat policy for cocoa, sugar cane, bamboo, cactus, kelp, mushrooms, vines, Nether wart and spreaders.
 - Meltwater and cold-region farming.
-- Tree felling: chopping a tree one log at a time was the strongest playtest complaint, and the owner wants a more advanced felling and timber-hauling system, designed later.
+- Advanced felling and timber hauling, to be designed later; basic felling stands in until then.
 - The Rain Caller's eventual form; tower energy and Survival access; offline production.
 - Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
 

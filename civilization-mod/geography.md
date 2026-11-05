@@ -1,6 +1,6 @@
 # Geography and weather
 
-Natural river bands decide where crops grow and woodland decides how fast trees grow; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Deposits of coal and oil are in [industry](industry.md#deposits).
+Natural river bands decide where crops grow and woodland decides how fast trees grow; cut trees fall from the cut up; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Deposits of coal and oil are in [industry](industry.md#deposits).
 
 ## Farmland and woodland
 
@@ -15,6 +15,15 @@ Natural river bands decide where crops grow and woodland decides how fast trees 
 | Trees | Saplings keep vanilla random-tick speed in woodland and get one quarter as many attempts elsewhere |
 
 Vanilla light, support, space and species requirements still apply. River farmland and woodland can overlap; felling trees does not remove woodland and planting does not create it. Crops planted outside the band show a warning and do not grow; existing crops are never destroyed, so mature ones can be harvested and immature ones stay dormant. Placed water creates no eligibility. The Nether and End cannot grow these crops.
+
+### Tree felling
+
+When a Survival or Adventure player breaks a log of a tree, every log of that tree at the cut's height or above breaks too; logs below the cut stay as a stump and leaves are left to decay. Creative breaks only the clicked log.
+
+- **A tree** is the logs (`#minecraft:logs`, so stems and wood blocks too) joined to the cut through faces, edges or corners without passing below the cut's height, so acacia and dark-oak branches count and a log joined only through the stump does not. It counts only if one of those logs touches natural foliage: leaves a tree grew (not persistent, so never player-placed) or nether and warped wart blocks. Log houses and walls therefore stand.
+- **Each log breaks as the player would break it by hand:** the same claim, whitelist and spawn-protection checks at that position (protected logs stay), the ordinary breaking calories, one point of tool wear and the tool's normal loot (Silk Touch and Fortune apply), with the drop landing at the log's own position and following the [block-carrying](physics.md#personal-block-carrying) pickup rules. Any tool or a bare hand fells; mining speed already makes the cut itself slow without an axe.
+- **Tool wear:** felling stops before the tool could break, keeping enough durability for the cut, so a tool can break only on the cut itself. The logs nearest the cut fall first; the rest stay standing.
+- **Limits:** the search reads only loaded blocks and at most 256 logs, enough for a giant jungle tree. A larger connected structure fells nothing beyond the cut log. Nearby players see and hear each felled log break; the cutting player sees the felled logs vanish without break particles or sound.
 
 ## Weather
 
