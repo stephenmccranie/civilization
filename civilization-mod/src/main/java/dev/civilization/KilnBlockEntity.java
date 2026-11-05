@@ -13,22 +13,32 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** Reuses vanilla persistence, sided inventory, output limits and recipe completion. */
 public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalFireHost, ModeledController {
-    private net.minecraft.resources.ResourceLocation selectedRecipe;
+    /** The selected output, or null on Automatic. A selection names an output, never one of its recipes. */
+    private net.minecraft.resources.ResourceLocation selectedOutput;
     public java.util.List<net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.AbstractCookingRecipe>> recipes() {
         return level.getRecipeManager().getAllRecipesFor((net.minecraft.world.item.crafting.RecipeType<net.minecraft.world.item.crafting.AbstractCookingRecipe>)processType)
                 .stream().sorted(java.util.Comparator.comparing(r -> r.id().toString())).toList();
     }
-    public int selection() {
-        var recipes=recipes();
-        for(int i=0;i<recipes.size();i++)if(recipes.get(i).id().equals(selectedRecipe))return i;
-        return -1;
+    public static net.minecraft.resources.ResourceLocation output(net.minecraft.world.item.crafting.RecipeHolder<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe> recipe, HolderLookup.Provider registries) {
+        return net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(recipe.value().getResultItem(registries).getItem());
     }
-    public void selectRecipe(int index) {
-        var recipes=recipes();
-        if(index < -1 || index >= recipes.size())return;
-        var next=index<0?null:recipes.get(index).id();
-        if(java.util.Objects.equals(next,selectedRecipe))return;
-        selectedRecipe=next;
+    /** Each output once, in recipe-ID order: the recipe drawer's rows and the values a selection may take. */
+    public static java.util.List<net.minecraft.resources.ResourceLocation> outputs(java.util.List<? extends net.minecraft.world.item.crafting.RecipeHolder<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe>> recipes, HolderLookup.Provider registries) {
+        return recipes.stream().map(r -> output(r, registries)).distinct().toList();
+    }
+    /** The recipes a batch may run, in recipe-ID order: the selected output's, or all of them on Automatic. An output no recipe makes any more is Automatic. */
+    public static <R extends net.minecraft.world.item.crafting.RecipeHolder<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe>> java.util.List<R> candidates(java.util.List<R> recipes, net.minecraft.resources.ResourceLocation output, HolderLookup.Provider registries) {
+        var made = recipes.stream().filter(r -> output(r, registries).equals(output)).toList();
+        return made.isEmpty() ? recipes : made;
+    }
+    public java.util.List<net.minecraft.resources.ResourceLocation> outputs() { return outputs(recipes(), level.registryAccess()); }
+    public int selection() { return outputs().indexOf(selectedOutput); }
+    public void select(int index) {
+        var outputs=outputs();
+        if(index < -1 || index >= outputs.size())return;
+        var next=index<0?null:outputs.get(index);
+        if(java.util.Objects.equals(next,selectedOutput))return;
+        selectedOutput=next;
         dataAccess.set(2,0);
         dataAccess.set(3,processingRecipe(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)))
                 .map(r->r.value().getCookingTime()).orElse(200));
@@ -40,8 +50,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         return !result.isEmpty()&&(result.getItem() instanceof RoughMetal||result.is(input.item().getItem()))?HotMetal.heated(result,level.getGameTime()):result;
     }
     public java.util.Optional<net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.AbstractCookingRecipe>> processingRecipe(net.minecraft.world.item.crafting.SingleRecipeInput input) {
-        return recipes().stream().filter(r -> selectedRecipe==null || r.id().equals(selectedRecipe))
-                .filter(r -> r.value().matches(input,level)).findFirst();
+        return candidates(recipes(), selectedOutput, level.registryAccess()).stream().filter(r -> r.value().matches(input,level)).findFirst();
     }
     public final CoalFire fire=new CoalFire(this);
     public int[] coalFuelSlots(){return MachineInventory.KILN_FUEL;}
@@ -104,7 +113,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     @Override protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookup) {
         super.loadAdditional(tag, lookup);fire.load(tag);
         if (model() != null) { int before = build.sections; build.load(tag, lookup, model()); if (level != null && level.isClientSide && build.sections != before) ModeledMachine.redraw(this); }
-        selectedRecipe=tag.contains("SelectedRecipe")?net.minecraft.resources.ResourceLocation.tryParse(tag.getString("SelectedRecipe")):null;
+        selectedOutput=tag.contains("SelectedOutput")?net.minecraft.resources.ResourceLocation.tryParse(tag.getString("SelectedOutput")):null;
         legacyOverflow.clear();
         var old=net.minecraft.core.NonNullList.withSize(12,ItemStack.EMPTY);
         net.minecraft.world.ContainerHelper.loadAllItems(tag,old,lookup);
@@ -119,7 +128,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         super.saveAdditional(tag,lookup);fire.save(tag);tag.putBoolean("TwoFuelSlots",true);
         if(model()!=null)build.save(tag,lookup);
         tag.putBoolean("TwoMaterialSlots",true);
-        if(selectedRecipe!=null)tag.putString("SelectedRecipe",selectedRecipe.toString());
+        if(selectedOutput!=null)tag.putString("SelectedOutput",selectedOutput.toString());
         if(!legacyOverflow.isEmpty()){var list=new net.minecraft.nbt.ListTag();for(var item:legacyOverflow)list.add(item.save(lookup));tag.put("LegacyOverflow",list);}
     }
     @Override public void onLoad(){super.onLoad();returnLegacyOverflow();}

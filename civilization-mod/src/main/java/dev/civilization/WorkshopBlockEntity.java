@@ -59,7 +59,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         ModeledMachine.reconcile(this);return ModeledMachine.status(this);
     }
     public WorkshopJobs.Job job(){return MachineWork.job(this,kind,selected);}
-    public void select(int value){if(value< -1||value>=WorkshopJobs.jobs(kind).size()||value==selected)return;selected=value;progress=0;worker=null;workingResult=ItemStack.EMPTY;setChanged();}
+    public void select(int value){if(value< -1||value>=WorkshopJobs.outputs(kind).size()||value==selected)return;selected=value;progress=0;worker=null;workingResult=ItemStack.EMPTY;setChanged();}
     public void tick(){if(level!=null&&!level.isClientSide&&Math.floorMod(level.getGameTime()+worldPosition.asLong(),10)==0)process();}
     public void process(){
         if(level==null||level.isClientSide)return;
@@ -131,7 +131,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Workshop.WET,false);return;}
         if(!fire.hot()){pause(fire.lit()?MachineStatus.Workshop.WARMING:MachineStatus.Workshop.FIRE_UNLIT,false);return;}
         ensureInputIdentity();
-        var job=job();if(job==null){pause(selected<0&&MachineWork.matches(this,kind).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
+        var job=job();if(job==null){pause(MachineWork.matches(this,kind,selected).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var match=MachineWork.match(this,job);if(match==null){pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
@@ -170,8 +170,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->steeped()?steep:progress;case 3->status;case 4->fire.state();case 5->fire.heat();case 6->items.get(PIT_HIDES).getCount();default->0;};}
         public void set(int i,int v){}public int getCount(){return 7;}
     };
-    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);t.putInt("partsCatalog",1);t.putInt("job",selected);if(selected>=0)t.putString("jobId",WorkshopJobs.jobs(kind).get(selected).id());t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
-    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=t.contains("jobId")?WorkshopJobs.index(kind,t.getString("jobId")):t.contains("job")?t.getInt("job"):-1;if(selected< -1||selected>=WorkshopJobs.jobs(kind).size())selected=-1;progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0||kind==2&&!t.contains("partsCatalog")){selected=-1;progress=0;workingResult=ItemStack.EMPTY;}}
+    @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);if(selected>=0)t.putString("jobId",WorkshopJobs.outputs(kind).get(selected));t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
+    @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=WorkshopJobs.index(kind,t.getString("jobId"));progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0){progress=0;workingResult=ItemStack.EMPTY;}}
     /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=new CompoundTag();if(model()!=null)build.save(t,r);return t;}
     @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}

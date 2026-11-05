@@ -75,7 +75,7 @@ public final class HotMetalGameTests {
     @GameTest(template = "industrial") public static void aHeatTakesTheWholeLoad(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);
         f.setItem(1, KilnContent.MINERAL_COAL.toStack(16));
-        GradeGameTests.select(f, "heat_iron_ingot");
+        GradeGameTests.select(f, Items.IRON_INGOT);
         f.setItem(0, GradeGameTests.ingots(1100, 1000, 950, 900, 850, 800, 750, 700, 650, 600));
         FoundryGameTests.run(h, f, 400 + 40);
         long now = h.getLevel().getGameTime();

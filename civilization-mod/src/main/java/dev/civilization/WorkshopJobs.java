@@ -71,7 +71,15 @@ public final class WorkshopJobs {
     }
     public static Equipment equipment(ItemStack s){equipmentJobs();return EQUIPMENT.get(s.getItem());}
     public static boolean gated(ItemStack s){return equipment(s)!=null;}
-    public static int index(int kind,String id){var jobs=jobs(kind);for(int i=0;i<jobs.size();i++)if(jobs.get(i).id().equals(id))return i;return -1;}
+    private static final Map<Integer,List<String>> OUTPUTS=new java.util.concurrent.ConcurrentHashMap<>();
+    /** Each output once, in catalog order: the recipe drawer's rows and the values a selection may take. */
+    public static List<String> outputs(int kind){return OUTPUTS.computeIfAbsent(kind,k->jobs(k).stream().map(Job::id).distinct().toList());}
+    public static int index(int kind,String id){return outputs(kind).indexOf(id);}
+    /** The catalog's jobs a selection may run, in catalog order: the selected output's, or all of them on Automatic (-1). */
+    public static List<Job> jobs(int kind,int selection){
+        var outputs=outputs(kind);if(selection>=outputs.size())return List.of();
+        return jobs(kind).stream().filter(j->selection<0||j.id().equals(outputs.get(selection))).toList();
+    }
     public static List<Job> jobs(int kind){return switch(kind){
         case 0->List.of(new Job("Tanning",new ItemStack(Items.LEATHER,Tanning.PIT),List.of(need(WorkshopContent.HIDE.get(),Tanning.PIT),need(WorkshopContent.TANBARK.get(),Tanning.PIT),empty(),empty()),Tanning.TICKS));
         case 1->List.of(new Job("Weaving",WorkshopContent.CLOTH.toStack(2),List.of(new Need(Ingredient.of(ItemTags.WOOL),1),empty(),empty(),empty()),200,2));

@@ -100,10 +100,10 @@ public final class GradeGameTests {
         h.succeed();
     }
 
-    static void select(FoundryBlockEntity f, String path) {
-        var recipes = f.recipes();
-        for (int i = 0; i < recipes.size(); i++) if (recipes.get(i).id().getPath().equals(path)) { f.selectRecipe(i); return; }
-        throw new IllegalStateException("No Foundry recipe " + path);
+    static void select(KilnBlockEntity k, Item output) {
+        int index = k.outputs().indexOf(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(output));
+        if (index < 0) throw new IllegalStateException("No recipe makes " + output);
+        k.select(index);
     }
     @GameTest(template = "industrial") public static void theFoundryGradesEachUnitItMakes(GameTestHelper h) {
         var f = FoundryGameTests.build(h, Direction.NORTH);

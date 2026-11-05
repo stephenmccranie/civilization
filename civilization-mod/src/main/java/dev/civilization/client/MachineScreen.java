@@ -12,7 +12,14 @@ import net.minecraft.world.item.*;
 
 /** Shared cabinet and contextual recipe catalog. Processing remains entirely server-owned. */
 public abstract class MachineScreen<M extends AbstractContainerMenu> extends AbstractContainerScreen<M> {
-    protected record RecipeEntry(int id,Component name,ItemStack icon,String category,Item material) {}
+    /**
+     * One drawer row: an output, selected by its index `id`, with one line of inputs for each recipe that makes it.
+     * The tooltip lists those lines and search reads them with the name.
+     */
+    protected record RecipeEntry(int id,Component name,ItemStack icon,String category,Item material,List<Component> inputs) {
+        Component tooltip(){var text=name.copy();for(var line:inputs)text.append("\n").append(line.copy().withStyle(net.minecraft.ChatFormatting.GRAY));return text;}
+        boolean found(String term){return java.util.stream.Stream.concat(java.util.stream.Stream.of(name),inputs.stream()).anyMatch(c->c.getString().toLowerCase(Locale.ROOT).contains(term));}
+    }
     private EditBox search;
     private final List<RecipeWidget> rows=new ArrayList<>(),categories=new ArrayList<>(),materials=new ArrayList<>();
     private final List<String> categoryKeys=new ArrayList<>();
@@ -75,14 +82,14 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     }
     private void ignition(){if(menu instanceof dev.civilization.CoalFireMenu fire)addRenderableWidget(new IgnitionButton(leftPos+132,topPos+84,menu,fire));}
     private String materialName(Item item){return item==Items.AIR?"All materials":item==Items.IRON_INGOT?"Iron":item==Items.GOLD_INGOT?"Gold":item==Items.DIAMOND?"Diamond":"Netherite";}
-    private List<RecipeEntry> filtered(){String term=search==null?"":search.getValue().toLowerCase(Locale.ROOT);return catalog.stream().filter(r->!r.category().equals("Repair")&&(category.equals("All")||category.equals(r.category()))&&(material==Items.AIR||material==r.material())&&r.name().getString().toLowerCase(Locale.ROOT).contains(term)).toList();}
+    private List<RecipeEntry> filtered(){String term=search==null?"":search.getValue().toLowerCase(Locale.ROOT);return catalog.stream().filter(r->!r.category().equals("Repair")&&(category.equals("All")||category.equals(r.category()))&&(material==Items.AIR||material==r.material())&&r.found(term)).toList();}
     private void updateDrawer(){
         if(search==null)return;var list=filtered();offset=Math.clamp(offset,0,Math.max(0,list.size()-rowCount));
         search.visible=automatic.visible=drawer;automatic.selected=chosen()==-1;if(!drawer)search.setFocused(false);
         if(repair!=null){repair.visible=drawer;repair.selected=catalog.stream().anyMatch(r->r.category().equals("Repair")&&r.id()==chosen());}
         for(int i=0;i<categories.size();i++){var b=categories.get(i);b.visible=drawer;b.selected=categoryKeys.get(i).equals(category);}
         for(int i=0;i<materials.size();i++){var b=materials.get(i);b.visible=drawer;b.selected=materialKeys.get(i)==material;}
-        for(int i=0;i<rows.size();i++){var b=rows.get(i);int index=offset+i;b.visible=drawer&&index<list.size();if(b.visible){var r=list.get(index);b.setMessage(r.name());b.icon=r.icon();b.setTooltip(Tooltip.create(r.name()));b.selected=chosen()==r.id();}}
+        for(int i=0;i<rows.size();i++){var b=rows.get(i);int index=offset+i;b.visible=drawer&&index<list.size();if(b.visible){var r=list.get(index);b.setMessage(r.name());b.icon=r.icon();b.setTooltip(Tooltip.create(r.tooltip()));b.selected=chosen()==r.id();}}
         toggle.setX(drawer?drawerX-23:leftPos-22);toggle.icon=drawer?ItemStack.EMPTY:new ItemStack(Items.BOOK);toggle.symbol=drawer?"close":"";
     }
     @Override protected void containerTick(){super.containerTick();for(var child:children())if(child instanceof IgnitionButton b&&menu instanceof dev.civilization.CoalFireMenu fire)b.visible=fire.hasCoalFire();if(catalogKey!=recipeCatalogKey())rebuildWidgets();updateDrawer();}
