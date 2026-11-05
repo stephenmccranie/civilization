@@ -9,16 +9,21 @@ public final class MachineWork {
     public record Match(WorkshopJobs.Job job,int[] consumed,ItemStack first) {}
     private MachineWork(){}
     public static ItemStack target(Container c){for(int i=0;i<4;i++)if(WorkshopJobs.gated(c.getItem(i))&&c.getItem(i).isDamaged())return c.getItem(i);return ItemStack.EMPTY;}
+    /** The jobs a selection may run. The catalog's Repair entry stands for repairing the loaded damaged equipment, if any. */
+    static List<WorkshopJobs.Job> candidates(Container c,int kind,int selection){
+        return WorkshopJobs.jobs(kind,selection).stream().map(j->j.output().isEmpty()?WorkshopJobs.repair(target(c)):j).filter(Objects::nonNull).toList();
+    }
+    /**
+     * The job a batch runs: the one candidate the loaded materials satisfy. Several matches wait for a narrower selection.
+     * With none, a selection or a single-job workshop still names its first job, whose requirements the ghosts show.
+     */
     public static WorkshopJobs.Job job(Container c,int kind,int selection){
-        if(selection<0){var matches=matches(c,kind);return matches.size()==1?matches.getFirst().job():kind<2?WorkshopJobs.jobs(kind).getFirst():null;}
-        if(selection>=WorkshopJobs.jobs(kind).size())return null;
-        return kind==ManufacturingJobs.BENCH&&selection==0?WorkshopJobs.repair(target(c)):WorkshopJobs.jobs(kind).get(selection);
+        var candidates=candidates(c,kind,selection);
+        var matched=candidates.stream().filter(j->match(c,j)!=null).toList();
+        if(matched.size()==1)return matched.getFirst();
+        return matched.isEmpty()&&!candidates.isEmpty()&&(selection>=0||candidates.size()==1)?candidates.getFirst():null;
     }
-    public static List<Match> matches(Container c,int kind){
-        var result=new ArrayList<Match>();var jobs=WorkshopJobs.jobs(kind);
-        for(int i=0;i<jobs.size();i++){var job=kind==ManufacturingJobs.BENCH&&i==0?WorkshopJobs.repair(target(c)):jobs.get(i);var match=match(c,job);if(match!=null)result.add(match);}
-        return result;
-    }
+    public static List<Match> matches(Container c,int kind,int selection){return candidates(c,kind,selection).stream().map(j->match(c,j)).filter(Objects::nonNull).toList();}
     public static Match match(Container c,WorkshopJobs.Job job){
         if(job==null||job.needs().size()!=4)return null;
         int[] taken=new int[4];ItemStack first=ItemStack.EMPTY;
@@ -35,10 +40,9 @@ public final class MachineWork {
         for(int i=0;i<4;i++){var stack=c.getItem(i);if(!stack.isEmpty()&&taken[i]==0&&job.needs().stream().noneMatch(n->n.count()>0&&n.ingredient().test(stack)))return null;}
         return new Match(job,taken,first);
     }
+    /** Inputs any candidate job uses; on the Assembly Bench's Automatic or Repair, also damaged equipment to repair. */
     public static boolean accepts(Container c,int kind,int selection,ItemStack s){
-        if(kind==ManufacturingJobs.BENCH&&WorkshopJobs.gated(s)&&s.isDamaged()&&(selection<=0))return true;
-        if(selection>=0){var job=job(c,kind,selection);return job!=null&&job.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(s));}
-        return WorkshopJobs.jobs(kind).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(s)))
-            ||kind==ManufacturingJobs.BENCH&&(s.is(net.minecraft.world.item.Items.LEATHER)||s.is(WorkshopContent.CLOTH.get()));
+        if(kind==ManufacturingJobs.BENCH&&WorkshopJobs.gated(s)&&s.isDamaged()&&selection<=0)return true;
+        return candidates(c,kind,selection).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(s)));
     }
 }
