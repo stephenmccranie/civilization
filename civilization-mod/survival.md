@@ -35,6 +35,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 
 - **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 30 sprinting or 5 rowing. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming and the rising part of a jump; descending refunds nothing. Movement is measured from server-accepted displacement.
 - **Rowing** is charged only to the controlling player of a vanilla boat or chest boat while its paddles are active; passengers, drifting boats and powered Civilization vessels pay nothing. Rowing has its own distance counter.
+- **River steps.** A vanilla boat or chest boat meeting water that stands at most a block above its top with open air over it, as at a step in a river's surface or up a rapid, floats up onto it instead of sinking under it; deeper water, or water under a ceiling, still sinks it and drops its rider.
 - **Wheelbarrow handling** charges the walking rate for actual handle travel, including reversing and turning, plus normal ascent; idle or blocked drive is free.
 - **Not charged:** other riding, creative flight, elytra, teleports and abnormal large movement deltas; tool transformations, buckets, ranged attacks and automated or fake-player work.
 - **Placement** of a cut piece costs the full-block rate × its volume; native slabs count as half blocks.
