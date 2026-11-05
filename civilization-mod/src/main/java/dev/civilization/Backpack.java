@@ -125,7 +125,7 @@ public final class Backpack {
     static CargoHolder store(ServerPlayer p,Supply s){
         if(s==null||p.level().dimension()!=s.dimension())return null;
         var level=p.serverLevel();
-        return s.store().<CargoHolder>map(at->level.hasChunkAt(at)&&level.getBlockEntity(at) instanceof StockpileEntity e?e:null,id->level.getEntity(id) instanceof WheelbarrowEntity w?w:null);
+        return s.store().<CargoHolder>map(at->Chunks.loaded(level,at)&&level.getBlockEntity(at) instanceof StockpileEntity e?e:null,id->level.getEntity(id) instanceof WheelbarrowEntity w?w:null);
     }
     private static Either<BlockPos,UUID> address(CargoHolder store){return store instanceof WheelbarrowEntity w?Either.right(w.getUUID()):Either.left(BlockPos.containing(store.cargoPosition()));}
     /** The bound store's goods while supply is on and the player may use the store from where they stand, otherwise null. */

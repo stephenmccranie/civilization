@@ -33,12 +33,12 @@ public final class ModeledMachine {
         if(l==null||c.build().sections!=model.all)return MachineStructure.INCOMPLETE;
         for(int i=0;i<model.cells.size();i++){
             var p=position(at(c),c.front(),model.cells.get(i));
-            if(!l.hasChunkAt(p))return MachineStructure.UNLOADED;
+            if(!Chunks.loaded(l,p))return MachineStructure.UNLOADED;
             if(!l.getBlockState(p).equals(cellState(model,i,c.front())))return MachineStructure.INCOMPLETE;
         }
         for(var port:model.ports){
             var p=MachineStructure.position(at(c),c.front(),port.part());
-            if(!l.hasChunkAt(p))return MachineStructure.UNLOADED;
+            if(!Chunks.loaded(l,p))return MachineStructure.UNLOADED;
             if(!MachineStructure.matches(l,p,port.part(),c.front()))return MachineStructure.INCOMPLETE;
         }
         return MachineStructure.COMPLETE;
@@ -84,7 +84,7 @@ public final class ModeledMachine {
             }
             for(int i=0;i<positions.size();i++){
                 var p=positions.get(i);var old=l.getBlockState(p);
-                if(!l.hasChunkAt(p)||l.isOutsideBuildHeight(p)||!l.getWorldBorder().isWithinBounds(p))return fail(player,"Load the section's construction space first.");
+                if(!Chunks.loaded(l,p)||l.isOutsideBuildHeight(p)||!l.getWorldBorder().isWithinBounds(p))return fail(player,"Load the section's construction space first.");
                 // A cell other sections already fill may take another piece; anything else must be cleared.
                 if(!old.isAir()&&!old.equals(states.get(i))||!l.getFluidState(p).isEmpty())return fail(player,"Clear construction space: "+p.toShortString());
                 if(!CivicAccess.allowed(l,p,player)||!CivicAccess.boundary(l,at(c),p)||!l.mayInteract(player,p)||!player.mayUseItemAt(p,Direction.UP,new ItemStack(c.entity().getBlockState().getBlock()))||AirshipSystem.at(l,p)!=null)
@@ -116,10 +116,10 @@ public final class ModeledMachine {
     public static void reconcile(ModeledController c){
         var l=c.entity().getLevel();var model=c.model();int lost=0;
         for(int i=0;i<model.cells.size();i++){
-            var cell=model.cells.get(i);var p=position(at(c),c.front(),cell);if(!l.hasChunkAt(p))continue;
+            var cell=model.cells.get(i);var p=position(at(c),c.front(),cell);if(!Chunks.loaded(l,p))continue;
             if(!l.getBlockState(p).equals(cellState(model,i,c.front())))for(int part:cell.pieces().keySet())if(c.build().has(part))lost|=1<<part;
         }
-        for(var port:model.ports){var p=MachineStructure.position(at(c),c.front(),port.part());if(c.build().has(port.section())&&l.hasChunkAt(p)&&!MachineStructure.matches(l,p,port.part(),c.front()))lost|=1<<port.section();}
+        for(var port:model.ports){var p=MachineStructure.position(at(c),c.front(),port.part());if(c.build().has(port.section())&&Chunks.loaded(l,p)&&!MachineStructure.matches(l,p,port.part(),c.front()))lost|=1<<port.section();}
         for(int part=0;part<model.sections.size();part++)if((lost&(1<<part))!=0)removeSection(c,part,true);
     }
     /** Removes a section if it is built and refunds everything paid toward it, built or not, once. */
@@ -131,10 +131,10 @@ public final class ModeledMachine {
             try{
                 for(int i=0;i<model.cells.size();i++){
                     var cell=model.cells.get(i);if(!cell.pieces().containsKey(part))continue;
-                    var p=position(at(c),c.front(),cell);if(!l.hasChunkAt(p))continue;var old=l.getBlockState(p);
+                    var p=position(at(c),c.front(),cell);if(!Chunks.loaded(l,p))continue;var old=l.getBlockState(p);
                     if(old.isAir()||old.equals(cellState(model,i,c.front()))){if(cell.shape(c.front(),build.sections).isEmpty())l.removeBlock(p,false);else l.setBlock(p,cellState(model,i,c.front()),3);}
                 }
-                for(var port:model.ports)if(port.section()==part){var p=MachineStructure.position(at(c),c.front(),port.part());if(l.hasChunkAt(p)&&MachineStructure.matches(l,p,port.part(),c.front()))l.removeBlock(p,false);}
+                for(var port:model.ports)if(port.section()==part){var p=MachineStructure.position(at(c),c.front(),port.part());if(Chunks.loaded(l,p)&&MachineStructure.matches(l,p,port.part(),c.front()))l.removeBlock(p,false);}
             }finally{build.changing=false;}
         }
         var paid=build.paid.remove(part);var o=at(c);

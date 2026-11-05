@@ -19,7 +19,7 @@ public final class ArenaEvents {
             var level=ArenaService.level(e.getServer(),p);
             if(p.phase==ArenaData.RESULT){if(level==null||level.getGameTime()>=p.deadline)d.reset(p);continue;}
             if(e.getServer().getTickCount()%20!=0)continue;
-            if(level==null||!level.hasChunkAt(p.at.pos())){ArenaService.finish(d,p,level,-1,"Arena unloaded: stakes refunded");continue;}
+            if(level==null||!Chunks.loaded(level,p.at.pos())){ArenaService.finish(d,p,level,-1,"Arena unloaded: stakes refunded");continue;}
             if(!level.getBlockState(p.at.pos()).is(ArenaContent.PIT.get())||!ArenaStructure.problem(level,p).isEmpty()){ArenaService.finish(d,p,level,-1,"Arena damaged: stakes refunded");continue;}
             boolean invalid=false;
             for(int i=0;i<2;i++)if(p.fighters[i]!=null){

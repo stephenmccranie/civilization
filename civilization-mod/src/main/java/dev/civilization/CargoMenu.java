@@ -103,7 +103,7 @@ public final class CargoMenu extends AbstractContainerMenu {
         if(source instanceof WheelbarrowEntity){
             var center=BlockPos.containing(source.cargoPosition());CargoHolder best=null;double distance=REACH*REACH;
             for(var at:BlockPos.betweenClosed(center.offset(-REACH,-REACH,-REACH),center.offset(REACH,REACH,REACH))){
-                if(!source.cargoLevel().hasChunkAt(at))continue;
+                if(!Chunks.loaded(source.cargoLevel(),at))continue;
                 if(source.cargoLevel().getBlockEntity(at) instanceof StockpileEntity s&&s.cargoValid(p)){
                     double d=s.cargoPosition().distanceToSqr(source.cargoPosition());if(d<distance){distance=d;best=s;}
                 }

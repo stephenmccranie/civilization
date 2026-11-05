@@ -33,7 +33,7 @@ public final class SoilSystem {
  public static boolean fertilizable(BlockState s){return crop(s)&&!s.is(Blocks.SWEET_BERRY_BUSH);}
  private static boolean soil(ServerLevel l,BlockPos p){return l.getBlockState(p).getBlock() instanceof FarmBlock||l.getBlockState(p.above()).is(Blocks.SWEET_BERRY_BUSH);}
  public static boolean mature(BlockState s){if(s.getBlock() instanceof CropBlock c)return c.isMaxAge(s);return s.is(Blocks.TORCHFLOWER)||s.is(Blocks.PITCHER_CROP)&&s.getValue(PitcherCropBlock.AGE)==4||s.is(Blocks.SWEET_BERRY_BUSH)&&s.getValue(SweetBerryBushBlock.AGE)==SweetBerryBushBlock.MAX_AGE;}
- public static SoilChunk.Soil observe(ServerLevel l,BlockPos p){if(!l.hasChunkAt(p)||!soil(l,p))return null;var chunk=l.getChunkAt(p);var data=chunk.getData(SoilChunk.TYPE);var existing=data.soils.get(p.asLong());if(existing!=null)return existing;var soil=new SoilChunk.Soil();data.soils.put(p.asLong(),soil);chunk.setUnsaved(true);return soil;}
+ public static SoilChunk.Soil observe(ServerLevel l,BlockPos p){if(!Chunks.loaded(l,p)||!soil(l,p))return null;var chunk=l.getChunkAt(p);var data=chunk.getData(SoilChunk.TYPE);var existing=data.soils.get(p.asLong());if(existing!=null)return existing;var soil=new SoilChunk.Soil();data.soils.put(p.asLong(),soil);chunk.setUnsaved(true);return soil;}
  public static boolean randomTick(ServerLevel l,BlockPos p,BlockState state){
   if(state.getBlock() instanceof FarmBlock&&Geography.canFarm(l,p)){observe(l,p);return true;}
   if(crop(state)&&!state.is(Blocks.TORCHFLOWER)){if(Geography.canFarm(l,p.below()))observe(l,p.below());return true;}return false;
@@ -91,7 +91,7 @@ public final class SoilSystem {
    int age=s.fruitMade?7:Math.min(7,(int)(s.work*8/s.target));if(age>state.getValue(StemBlock.AGE)){state=state.setValue(StemBlock.AGE,age);l.setBlock(p,state,2);}
    if(s.work<s.target)return;
    var directions=new ArrayList<Direction>();Direction.Plane.HORIZONTAL.forEach(directions::add);Collections.rotate(directions,l.random.nextInt(4));
-   for(var direction:directions){var fruit=p.relative(direction);if(!l.hasChunkAt(fruit))continue;var ground=l.getBlockState(fruit.below());if(l.isEmptyBlock(fruit)&&(ground.getBlock() instanceof FarmBlock||ground.is(BlockTags.DIRT))&&CivicAccess.boundary(l,p,fruit)){
+   for(var direction:directions){var fruit=p.relative(direction);if(!Chunks.loaded(l,fruit))continue;var ground=l.getBlockState(fruit.below());if(l.isEmptyBlock(fruit)&&(ground.getBlock() instanceof FarmBlock||ground.is(BlockTags.DIRT))&&CivicAccess.boundary(l,p,fruit)){
     l.setBlockAndUpdate(fruit,(kind.equals("melon")?Blocks.MELON:Blocks.PUMPKIN).defaultBlockState());
     l.getChunkAt(fruit).getData(SoilChunk.TYPE).fruitYields.put(fruit.asLong(),s.fertilized?3:1);l.getChunkAt(fruit).setUnsaved(true);
     l.setBlockAndUpdate(p,(kind.equals("melon")?Blocks.ATTACHED_MELON_STEM:Blocks.ATTACHED_PUMPKIN_STEM).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING,direction));

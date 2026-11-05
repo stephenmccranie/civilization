@@ -45,7 +45,7 @@ public final class GrassWearSystem {
         // Normal jumps rise about 1.25 blocks. Stop at the first physical surface, never
         // project through a roof/bridge or down a cliff, and never request unloaded terrain.
         for(int dy=0;dy<3;dy++){
-            var at=top.below(dy);if(!level.hasChunkAt(at))return null;
+            var at=top.below(dy);if(!Chunks.loaded(level,at))return null;
             var state=level.getBlockState(at);
             if(!state.getFluidState().isEmpty())return null;
             if(!state.getCollisionShape(level,at).isEmpty())
@@ -54,7 +54,7 @@ public final class GrassWearSystem {
         return null;
     }
     public static boolean record(ServerLevel level,net.minecraft.core.BlockPos foot){
-        if(!level.hasChunkAt(foot)||!level.getBlockState(foot).is(Blocks.GRASS_BLOCK))return false;
+        if(!Chunks.loaded(level,foot)||!level.getBlockState(foot).is(Blocks.GRASS_BLOCK))return false;
         var chunk=level.getChunkAt(foot);var wear=chunk.getData(GrassWearChunk.TYPE).wear;long key=GrassWear.key(foot.getX(),foot.getY(),foot.getZ());int before=GrassWear.stage(wear.steps(key));
         if(!wear.step(key))return false;
         chunk.setUnsaved(true);int after=GrassWear.stage(wear.steps(key));

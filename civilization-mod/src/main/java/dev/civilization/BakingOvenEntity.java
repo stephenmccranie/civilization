@@ -23,7 +23,7 @@ public final class BakingOvenEntity extends BlockEntity implements GeoBlockEntit
     public void serverTick(){
         if(!resizePending)return;
         var front=getBlockState().getValue(CivicBlock.FACING);
-        for(int i=12;i<16;i++)if(!level.hasChunkAt(worldPosition.offset(BakingOvenBlock.offset(front,i))))return;
+        for(int i=12;i<16;i++)if(!Chunks.loaded(level,worldPosition.offset(BakingOvenBlock.offset(front,i))))return;
         removing=true;
         try{for(int i=12;i<16;i++){var p=worldPosition.offset(BakingOvenBlock.offset(front,i));var s=level.getBlockState(p);if(s.is(BakingOvenContent.OVEN.get())&&s.getValue(BakingOvenBlock.CELL)==i&&s.getValue(CivicBlock.FACING)==front)level.removeBlock(p,false);}}
         finally{removing=false;}

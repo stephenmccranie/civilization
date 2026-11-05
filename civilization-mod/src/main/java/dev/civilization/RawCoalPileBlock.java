@@ -20,12 +20,12 @@ public final class RawCoalPileBlock extends Block {
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){return SHAPES[stage(s.getValue(UNITS))];}
     @Override protected VoxelShape getOcclusionShape(BlockState s,BlockGetter l,BlockPos p){return Shapes.empty();}
     @Override protected void neighborChanged(BlockState s,Level l,BlockPos p,Block source,BlockPos from,boolean moving){if(!l.isClientSide&&!supported(l,p))l.scheduleTick(p,this,1);}
-    public static boolean supported(Level l,BlockPos p){return l.hasChunkAt(p.below())&&l.getBlockState(p.below()).isFaceSturdy(l,p.below(),net.minecraft.core.Direction.UP);}
+    public static boolean supported(Level l,BlockPos p){return Chunks.loaded(l,p.below())&&l.getBlockState(p.below()).isFaceSturdy(l,p.below(),net.minecraft.core.Direction.UP);}
     @Override protected void tick(BlockState s,ServerLevel l,BlockPos p,net.minecraft.util.RandomSource r){
         if(!supported(l,p)&&LooseCoalEntity.spawn(l,p.getCenter(),s.getValue(UNITS)))l.removeBlock(p,false);
     }
     public static int insert(ServerLevel l,BlockPos p,int offered){
-        if(offered<=0||!l.hasChunkAt(p)||l.isOutsideBuildHeight(p)||!l.getWorldBorder().isWithinBounds(p)||!supported(l,p))return 0;
+        if(offered<=0||!Chunks.loaded(l,p)||l.isOutsideBuildHeight(p)||!l.getWorldBorder().isWithinBounds(p)||!supported(l,p))return 0;
         var s=l.getBlockState(p);int old=s.is(CoalMiningContent.PILE.get())?s.getValue(UNITS):0;
         if(old==0&&(!s.isAir()||!l.getFluidState(p).isEmpty()))return 0;
         int n=Math.min(64-old,offered);if(n<=0)return 0;

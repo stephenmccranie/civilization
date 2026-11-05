@@ -26,7 +26,7 @@ final class SurfaceOilFlow {
         int localX = Math.floorMod(cx, 16), localZ = Math.floorMod(cz, 16);
         if (localX < 5 || localX > 10 || localZ < 5 || localZ > 10) return;
         level.getServer().execute(() -> {
-            if (!level.hasChunk(cx, cz)) return;
+            if (!Chunks.loaded(level, cx, cz)) return;
             var site = Deposits.candidate(level, Math.floorDiv(cx, 16), Math.floorDiv(cz, 16));
             if (site != null && site.kind() == Deposits.Kind.OIL && site.x() >> 4 == cx && site.z() >> 4 == cz)
                 activate(level, new BlockPos(site.x(), site.y(), site.z()));

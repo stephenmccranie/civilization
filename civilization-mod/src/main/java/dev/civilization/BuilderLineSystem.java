@@ -82,7 +82,7 @@ public final class BuilderLineSystem {
         }
         var cells=line(j.a,pos);if(cells.isEmpty()){message(p,"Align endpoints on one axis; maximum 16 blocks");return;}
         if(!matches(p,j)){finish(p,"Working item changed");return;}
-        for(var cell:cells)if(!j.level.hasChunkAt(cell)){message(p,"Line crosses unloaded terrain");return;}
+        for(var cell:cells)if(!Chunks.loaded(j.level,cell)){message(p,"Line crosses unloaded terrain");return;}
         j.cells=cells;j.original=cells.stream().map(j.level::getBlockState).toList();sync(p,j);
         step(p); // The second mark starts actual work immediately, with no held-input gate.
     }
@@ -92,14 +92,14 @@ public final class BuilderLineSystem {
             && ItemStack.isSameItemSameComponents(working(p),j.working);
     }
     private static boolean allowed(ServerPlayer p,BlockPos pos){
-        var l=p.serverLevel();return l.hasChunkAt(pos)&&!l.isOutsideBuildHeight(pos)&&l.getWorldBorder().isWithinBounds(pos)
+        var l=p.serverLevel();return Chunks.loaded(l,pos)&&!l.isOutsideBuildHeight(pos)&&l.getWorldBorder().isWithinBounds(pos)
             && l.mayInteract(p,pos)&&CivicAccess.allowed(l,pos,p)&&BoatSystem.at(l,pos)==null&&AirshipSystem.at(l,pos)==null;
     }
     private static boolean visible(ServerPlayer p,BlockPos pos){
         if(p.getEyePosition().distanceToSqr(pos.getCenter())>WORK_REACH*WORK_REACH)return false;
         var eye=p.getEyePosition();var end=pos.getCenter();
         // Check every traversed chunk before ClipContext can inspect terrain.
-        int samples=(int)Math.ceil(eye.distanceTo(end)*2);for(int i=0;i<=samples;i++)if(!p.serverLevel().hasChunkAt(BlockPos.containing(eye.lerp(end,(double)i/Math.max(1,samples)))))return false;
+        int samples=(int)Math.ceil(eye.distanceTo(end)*2);for(int i=0;i<=samples;i++)if(!Chunks.loaded(p.serverLevel(),BlockPos.containing(eye.lerp(end,(double)i/Math.max(1,samples)))))return false;
         var hit=p.serverLevel().clip(new ClipContext(eye,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
         return hit.getType()==HitResult.Type.MISS||hit.getBlockPos().equals(pos);
     }

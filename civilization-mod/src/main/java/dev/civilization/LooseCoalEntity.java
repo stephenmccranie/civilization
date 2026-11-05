@@ -20,11 +20,11 @@ public final class LooseCoalEntity extends Entity {
         if(units<=0)return null;var e=new LooseCoalEntity(CoalMiningContent.LOOSE.get(),l);e.entityData.set(UNITS,units);e.setPos(at);return l.addFreshEntity(e)?e:null;
     }
     @Override public void tick(){
-        super.tick();if(!level().hasChunkAt(blockPosition()))return;
+        super.tick();if(!Chunks.loaded(level(),blockPosition()))return;
         if(getY()<level().getMinBuildHeight()+.1){setPos(getX(),level().getMinBuildHeight()+.1,getZ());setDeltaMovement(Vec3.ZERO);}
         else {
             // Recheck collision every tick: a previously landed chunk can lose its support.
-            var v=getDeltaMovement().add(0,-.04,0);if(!level().hasChunkAt(BlockPos.containing(position().add(v)))){setDeltaMovement(Vec3.ZERO);return;}
+            var v=getDeltaMovement().add(0,-.04,0);if(!Chunks.loaded(level(),BlockPos.containing(position().add(v)))){setDeltaMovement(Vec3.ZERO);return;}
             setDeltaMovement(v);move(MoverType.SELF,v);setDeltaMovement(getDeltaMovement().scale(.96));
         }
         if(!level().isClientSide&&(onGround()||getY()<level().getMinBuildHeight()+1)&&tickCount%10==0){
@@ -43,7 +43,7 @@ public final class LooseCoalEntity extends Entity {
         for(int i=0;i<8;i++){
             double angle=(first+i)*Math.PI/4,dx=Math.cos(angle)*.55,dz=Math.sin(angle)*.55;
             var at=BlockPos.containing(getX()+dx,getY(),getZ()+dz);
-            if(!level().hasChunkAt(at))continue;
+            if(!Chunks.loaded(level(),at))continue;
             if(level().noCollision(this,getBoundingBox().move(dx,-.125,dz))){
                 setDeltaMovement(Math.cos(angle)*.07,0,Math.sin(angle)*.07);return;
             }

@@ -15,7 +15,7 @@ public final class RoadSurface {
         if (!player.onGround() || player.getAbilities().flying || player.isPassenger() || player.isInWater()) return false;
         var pos = player.getOnPos();
         var level = player.level();
-        if (!level.hasChunkAt(pos)) return false;
+        if (!Chunks.loaded(level, pos)) return false;
         var state = level.getBlockState(pos);
         if (state.is(BLOCKS)) return true;
         if (!(state.getBlock() instanceof CutBlock) || !(level.getBlockEntity(pos) instanceof CutBlockEntity cut)) return false;

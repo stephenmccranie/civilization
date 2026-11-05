@@ -11,13 +11,13 @@ public final class PipeRouting {
     private record Edge(BlockPos pos,Direction side){}
     public static int transfer(Level l,BlockPos start,Direction side,FluidTank tank,boolean push){
         var parent=new HashMap<BlockPos,BlockPos>();var queue=new ArrayDeque<BlockPos>();var visited=new HashSet<BlockPos>();var endpoints=new LinkedHashSet<Edge>();
-        var first=start.relative(side);if(!l.hasChunkAt(first)||!CivicAccess.boundary(l,start,first))return 0;
+        var first=start.relative(side);if(!Chunks.loaded(l,first)||!CivicAccess.boundary(l,start,first))return 0;
         if(l.getBlockState(first).is(IndustrialContent.PIPE.get())){queue.add(first);parent.put(first,start);}else endpoints.add(new Edge(first,side.getOpposite()));
         while(!queue.isEmpty()){
             var at=queue.removeFirst();if(!visited.add(at))continue;if(visited.size()>128)return 0;
             var s=l.getBlockState(at);if(!s.is(IndustrialContent.PIPE.get()))continue;
             for(var d:Direction.values()){
-                var n=at.relative(d);if(n.equals(start)||!l.hasChunkAt(n)||!CivicAccess.boundary(l,at,n))continue;
+                var n=at.relative(d);if(n.equals(start)||!Chunks.loaded(l,n)||!CivicAccess.boundary(l,at,n))continue;
                 if(l.getBlockState(n).is(IndustrialContent.PIPE.get())){if(!parent.containsKey(n)){parent.put(n,at);queue.add(n);}}
                 else if(l.getBlockState(n).is(IndustrialContent.PORT.get())||l.getBlockState(n).getBlock() instanceof BulkBlock||l.getBlockState(n).getBlock() instanceof OilEngineBlock||l.getBlockState(n).getBlock() instanceof IndustrialBlock)endpoints.add(new Edge(n,d.getOpposite()));
             }

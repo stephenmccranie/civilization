@@ -30,7 +30,7 @@ final class AirshipTerrain {
         boolean refresh=level.getGameTime()%20==0;
         for(long cell:next)if(refresh||!d.tickets.contains(cell))level.getChunkSource().addRegionTicket(TICKET,new ChunkPos(cell),0,id);
         d.ticketLevel=level;d.ticketId=id;d.tickets=LongSets.unmodifiable(next);
-        d.terrain=FlightTerrain.capture(cells,cell->level.getChunkSource().getChunkNow(FlightTerrain.x(cell),FlightTerrain.z(cell))!=null);
+        d.terrain=FlightTerrain.capture(cells,cell->Chunks.loaded(level,FlightTerrain.x(cell),FlightTerrain.z(cell)));
         long now=System.nanoTime();double delay=Math.max(.15,d.preparationSeconds-.01);
         var pending=d.preparing.long2LongEntrySet().fastIterator();
         while(pending.hasNext()){
@@ -70,7 +70,7 @@ final class AirshipTerrain {
                 if(section.hasOnlyAir())continue;
                 if(++solid>128)return false;
                 // Sable's neighborhood baker can consult adjacent chunks; never make it synchronously load one.
-                for(int a=x-1;a<=x+1;a++)for(int b=z-1;b<=z+1;b++)if(level.getChunkSource().getChunkNow(a,b)==null)return false;
+                for(int a=x-1;a<=x+1;a++)for(int b=z-1;b<=z+1;b++)if(!Chunks.loaded(level,a,b))return false;
                 system.getTicketManager().addSectionIfNotTracked(level,section,SectionPos.of(x,y,z),system.getPipeline());
                 // Empty sections cost no block scans. Cap dense/diagonal work rather than stall the server.
                 int x0=Math.max(x*16,(int)Math.floor(swept.minX)-1),x1=Math.min(x*16+15,(int)Math.floor(swept.maxX)+1);

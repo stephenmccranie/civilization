@@ -17,12 +17,12 @@ public final class EngineFlywheelBlock extends EnginePieceBlock {
         super.createBlockStateDefinition(builder); builder.add(LINKED);
     }
     public static void refresh(ServerLevel level, BlockPos pos) {
-        if (!level.hasChunkAt(pos)) return;
+        if (!Chunks.loaded(level, pos)) return;
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof EngineFlywheelBlock block)) return;
         var front = state.getValue(CivicBlock.FACING);
         var controller = pos.relative(front.getClockWise()).relative(front).below();
-        boolean linked = level.hasChunkAt(controller)
+        boolean linked = Chunks.loaded(level, controller)
                 && level.getBlockEntity(controller) instanceof OilEngineEntity engine && engine.front() == front;
         if (state.getValue(LINKED) != linked) level.setBlock(pos, state.setValue(LINKED, linked), Block.UPDATE_CLIENTS);
         // Restore the static model after controller removal without scans or forced chunks.

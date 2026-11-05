@@ -44,7 +44,7 @@ final class AirshipDisassembly {
             var destination=transform.apply(source);
             if(SubLevelContainer.getContainer(level).inBounds(destination)||level.isOutsideBuildHeight(destination)||!level.getWorldBorder().isWithinBounds(destination))
                 throw new IllegalStateException("The ship would extend outside the buildable world.");
-            if(!level.hasChunkAt(destination))throw new IllegalStateException("Load the whole destination before disassembling.");
+            if(!Chunks.loaded(level,destination))throw new IllegalStateException("Load the whole destination before disassembling.");
             if(!CivicAccess.allowed(level,destination,player))throw new IllegalStateException("The destination crosses protected land.");
             if(!level.getBlockState(destination).isAir())throw new IllegalStateException("Destination obstructed. Move the ship into clear space.");
             var be=level.getBlockEntity(source);CompoundTag tag=be==null?null:be.saveWithFullMetadata(level.registryAccess());

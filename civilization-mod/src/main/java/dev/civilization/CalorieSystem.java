@@ -73,7 +73,7 @@ final class CalorieSystem {
         for (Action action : actions) {
             if (action.level != event.getServer().getLevel(action.level.dimension())
                     || action.player.serverLevel() != action.level || !CalorieFoodData.active(action.player)
-                    || !action.level.hasChunkAt(action.pos)) continue;
+                    || !Chunks.loaded(action.level, action.pos)) continue;
             boolean cancelled = action.mining
                     ? ((BlockEvent.BreakEvent) action.event).isCanceled()
                     : ((BlockEvent.EntityPlaceEvent) action.event).isCanceled();

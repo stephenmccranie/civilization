@@ -10,7 +10,7 @@ public final class DepositWork {
     public Target find(ServerLevel l,Deposits.Site site,BlockPos machine){
         for(int n=0;n<1024&&cursor<site.workSize();n++,cursor++){
             var p=site.workCell(cursor);if(!site.body(p))continue;
-            if(!l.hasChunkAt(p))continue;
+            if(!Chunks.loaded(l,p))continue;
             var state=l.getBlockState(p);
             boolean coal=site.kind()==Deposits.Kind.COAL&&state.is(IndustrialContent.COAL_SEAM.get());
             boolean oil=site.kind()==Deposits.Kind.OIL&&state.is(IndustrialContent.RESERVOIR_OIL.get());
@@ -27,7 +27,7 @@ public final class DepositWork {
     }
     public static boolean allowed(ServerLevel l,BlockPos machine,BlockPos target){var claim=CivicAccess.claim(l,target);if(claim==null)return true;var source=CivicAccess.claim(l,machine);return source!=null&&source.owner.equals(claim.owner);}
     public boolean extract(ServerLevel l,Deposits.Site site,BlockPos machine,Target target){
-        if(target.pos()==null||!l.hasChunkAt(target.pos())||!allowed(l,machine,target.pos()))return false;
+        if(target.pos()==null||!Chunks.loaded(l,target.pos())||!allowed(l,machine,target.pos()))return false;
         var state=l.getBlockState(target.pos());
         if(site.kind()==Deposits.Kind.COAL){
             if(!state.is(IndustrialContent.COAL_SEAM.get())||!l.setBlock(target.pos(),Blocks.AIR.defaultBlockState(),3))return false;

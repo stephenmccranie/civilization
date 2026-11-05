@@ -62,7 +62,7 @@ public final class TreeFelling {
         while (!open.isEmpty()) {
             var log = open.poll();
             for (var near : BlockPos.betweenClosed(log.offset(-1, -1, -1), log.offset(1, 1, 1))) {
-                if (near.getY() < cut.getY() || !level.isLoaded(near)) continue;
+                if (near.getY() < cut.getY() || !Chunks.loaded(level, near)) continue;
                 var state = level.getBlockState(near);
                 var next = near.immutable();
                 if (!state.is(BlockTags.LOGS)) natural |= foliage(state);

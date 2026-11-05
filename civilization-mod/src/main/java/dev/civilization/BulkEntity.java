@@ -32,7 +32,7 @@ public final class BulkEntity extends BlockEntity implements MenuProvider {
     public static boolean supported(FluidStack s){return s.is(IndustrialContent.CRUDE.get())||s.is(IndustrialContent.FUEL.get())||s.is(IndustrialContent.LUBE.get());}
     public boolean ready(){return level!=null&&!isRemoved()&&level.getBlockEntity(worldPosition)==this&&BulkStructure.complete(level,worldPosition,front(),liquid);}
     public boolean valid(Player p){return level!=null&&!isRemoved()&&level.getBlockEntity(worldPosition)==this&&p.distanceToSqr(CivicAccess.world(level,worldPosition))<=64&&CivicAccess.allowed(level,worldPosition,p);}
-    private boolean automation(Direction side){return ready()&&level.hasChunkAt(worldPosition.relative(side))&&CivicAccess.boundary(level,worldPosition,worldPosition.relative(side));}
+    private boolean automation(Direction side){return ready()&&Chunks.loaded(level,worldPosition.relative(side))&&CivicAccess.boundary(level,worldPosition,worldPosition.relative(side));}
     private void changed(){setChanged();dirty=true;}
     public void tick(){
         if(level.getGameTime()%10!=0)return;
