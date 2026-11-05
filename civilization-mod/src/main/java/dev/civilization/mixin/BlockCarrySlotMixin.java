@@ -1,6 +1,7 @@
 package dev.civilization.mixin;
 
 import dev.civilization.BlockCarry;
+import dev.civilization.ChestArmful;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -14,11 +15,13 @@ public abstract class BlockCarrySlotMixin {
     private void civilization$blockSlot(ItemStack stack,CallbackInfoReturnable<Boolean> result){
         var slot=(Slot)(Object)this;
         if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.filledContainer(stack)){result.setReturnValue(false);return;}
-        if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.carried(stack)&&slot.getContainerSlot()!=BlockCarry.OFFHAND)result.setReturnValue(false);
+        if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.carried(stack)&&slot.getContainerSlot()!=BlockCarry.OFFHAND){result.setReturnValue(false);return;}
+        if(!ChestArmful.takes(slot.container,slot.getContainerSlot(),stack,1))result.setReturnValue(false);
     }
     @Inject(method="getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I",at=@At("RETURN"),cancellable=true)
     private void civilization$handLimit(ItemStack stack,CallbackInfoReturnable<Integer> result){
         var slot=(Slot)(Object)this;
         if(slot.container instanceof Inventory inv&&BlockCarry.restricted(inv.player)&&BlockCarry.carried(stack))result.setReturnValue(Math.min(BlockCarry.LIMIT,result.getReturnValue()));
+        else result.setReturnValue(Math.min(ChestArmful.room(slot.container,slot.getContainerSlot(),stack),result.getReturnValue()));
     }
 }
