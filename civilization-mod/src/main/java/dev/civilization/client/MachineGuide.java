@@ -20,7 +20,8 @@ import net.neoforged.neoforge.client.event.*;
  */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class MachineGuide {
-    private record Site(BlockPos at,BlockState controller,MachineModel model,int built,boolean placed) {
+    /** `paid` lists what each section has been paid so far, empty for a controller not yet placed. */
+    private record Site(BlockPos at,BlockState controller,MachineModel model,int built,List<Integer> paid,boolean placed) {
         Direction front(){return controller.getValue(CivicBlock.FACING);}
     }
     private record UpdateKey(Site site,PlacementPlan plan) {}
@@ -40,8 +41,8 @@ public final class MachineGuide {
     private static void reset(){selected=null;plan=null;site=null;geometry=null;blocked=List.of();outlineCells=List.of();visible=false;focus.reset();refresh.reset();}
     private static MachineModel model(BlockState state){return state.getBlock() instanceof ModeledBlock b?b.model():null;}
 
-    private static Geometry geometry(Site site){return geometry(site.at(),site.front(),site.model(),site.built());}
-    public static Geometry geometry(BlockPos at,Direction front,MachineModel model,int built){
+    private static Geometry geometry(Site site){return geometry(site.at(),site.front(),site.model(),site.built(),site.paid());}
+    public static Geometry geometry(BlockPos at,Direction front,MachineModel model,int built,List<Integer> paid){
         var area=new AABB(at);var cells=new ArrayList<Cell>();int missing=model.all^built;
         for(int i=0;i<model.cells.size();i++){
             var cell=model.cells.get(i);var pos=ModeledMachine.position(at,front,cell);
@@ -53,7 +54,7 @@ public final class MachineGuide {
         }
         for(var port:model.ports)if((missing&(1<<port.section()))!=0){var pos=MachineStructure.position(at,front,port.part());cells.add(new Cell(-1,pos,new AABB(pos)));}
         var materials=new LinkedHashMap<String,Integer>();
-        for(int part=0;part<model.sections.size();part++)if((missing&(1<<part))!=0)materials.merge(model.section(part).material(),model.section(part).count(),Integer::sum);
+        for(int part=0;part<model.sections.size();part++)if((missing&(1<<part))!=0)materials.merge(model.section(part).material(),model.section(part).count()-(part<paid.size()?paid.get(part):0),Integer::sum);
         return new Geometry(area,List.copyOf(cells),materials);
     }
 
@@ -67,8 +68,9 @@ public final class MachineGuide {
             if(c!=null)selected=c;
         }
         if(selected!=null){var e=selected.entity();if(e.getLevel()!=mc.level||e.isRemoved()||e.getBlockPos().distToCenterSqr(mc.player.position())>32*32)selected=null;}
-        var next=plan!=null?new Site(plan.at(),plan.state(),model(plan.state()),0,false)
-                :selected!=null?new Site(selected.entity().getBlockPos(),selected.entity().getBlockState(),selected.model(),selected.build().sections,true):null;
+        var next=plan!=null?new Site(plan.at(),plan.state(),model(plan.state()),0,List.of(),false)
+                :selected!=null?new Site(selected.entity().getBlockPos(),selected.entity().getBlockState(),selected.model(),selected.build().sections,
+                        java.util.stream.IntStream.range(0,selected.model().sections.size()).mapToObj(selected.build()::paidCount).toList(),true):null;
         if(next==null){reset();return;}
         if(!next.equals(site)){site=next;geometry=geometry(site);focus.reset();outlineCells=geometry.cells();}
         if(refresh.due(new UpdateKey(site,plan))){

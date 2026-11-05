@@ -47,13 +47,13 @@ public final class IndustryGameTests {
             var port=MachineStructure.position(at,front,MachineModel.OIL_DERRICK.ports.getFirst().part());l.setBlockAndUpdate(port,Blocks.AIR.defaultBlockState());
             player.getInventory().clearContent();player.getInventory().setItem(1,new ItemStack(Items.OAK_PLANKS,64));
             var held=new ItemStack(Items.OAK_PLANKS,5);
-            h.assertTrue(!ModeledMachine.build(m,player,held)&&held.getCount()==5&&player.getInventory().getItem(1).getCount()==64,"Never draw missing materials from another inventory slot");
+            h.assertTrue(ModeledMachine.build(m,player,held)&&held.isEmpty()&&m.build().sections==0&&m.build().paidCount(1)==5&&player.getInventory().getItem(1).getCount()==64,"Part of a section is paid from the held stack alone, never another inventory slot");
             var blocked=MachineModel.OIL_DERRICK.cells.stream().filter(c->c.pieces().containsKey(0)).findFirst().orElseThrow();var blockedAt=ModeledMachine.position(at,front,blocked);l.setBlockAndUpdate(blockedAt,Blocks.DIAMOND_BLOCK.defaultBlockState());held=new ItemStack(Items.COBBLESTONE,7);
             h.assertTrue(!ModeledMachine.build(m,player,held)&&held.getCount()==7&&m.build().sections==0,"Obstruction preserves held stock and terrain");l.removeBlock(blockedAt,false);
             double labor=CalorieFoodData.of(player).laborSpent;
             h.assertTrue(ModeledMachine.build(m,player,held)&&held.isEmpty()&&m.build().sections==1&&!IndustrialStructure.bind(m),"Footings are visible and solid before completion");
             var partial=new IndustrialBlockEntity(at,m.getBlockState());partial.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(partial.build().sections==1&&partial.build().paid.get(0).getFirst().is(Items.COBBLESTONE),"Partial construction and paid material identity survive save/load");
-            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,29),new ItemStack(Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledMachine.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
+            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,24),new ItemStack(Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledMachine.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
             h.assertTrue(m.build().sections==MachineModel.OIL_DERRICK.all&&IndustrialStructure.bind(m)&&player.getInventory().getItem(1).getCount()==64,"Complete all rotations without touching inventory reserves");
             h.assertTrue(CalorieFoodData.of(player).laborSpent-labor>0&&CalorieFoodData.of(player).laborSpent-labor<500,"Charge material labor, not hidden cells");
             int dropped=derrickDrops(l,at);l.destroyBlock(port,true);

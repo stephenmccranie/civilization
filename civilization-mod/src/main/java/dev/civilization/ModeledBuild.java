@@ -5,7 +5,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
 
-/** A controller's progress on its native model: the sections built and the exact stacks each cost, refunded once. */
+/** A controller's progress on its native model: the sections built and the exact stacks paid toward each section, built
+ * or still being paid for, refunded once. */
 public final class ModeledBuild {
     public int sections;
     /** Set while the machine itself changes its cells, so their removal is not read as damage. */
@@ -13,6 +14,14 @@ public final class ModeledBuild {
     public final Map<Integer,List<ItemStack>> paid=new HashMap<>();
 
     public boolean has(int part){return (sections&(1<<part))!=0;}
+    /** How many items have been paid toward a section. */
+    public int paidCount(int part){var stacks=paid.get(part);return stacks==null?0:stacks.stream().mapToInt(ItemStack::getCount).sum();}
+    /** Records a payment toward a section, merged with the same item so the refund returns whole stacks. */
+    public void pay(int part,ItemStack stack){
+        var stacks=paid.computeIfAbsent(part,k->new ArrayList<>());
+        for(var s:stacks)if(ItemStack.isSameItemSameComponents(s,stack)&&s.getCount()+stack.getCount()<=s.getMaxStackSize()){s.grow(stack.getCount());return;}
+        stacks.add(stack);
+    }
     public void save(CompoundTag t,HolderLookup.Provider r){
         var build=new CompoundTag();build.putInt("sections",sections);var list=new ListTag();
         for(var entry:paid.entrySet()){

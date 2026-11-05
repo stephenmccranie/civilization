@@ -316,6 +316,24 @@ public final class WorkshopGameTests {
         h.assertTrue(smith.gameMode.useItemOn(smith,l,smith.getMainHandItem(),net.minecraft.world.InteractionHand.MAIN_HAND,hit).consumesAction()&&bricks.isEmpty()&&w.build().sections==w.model().all,"Four bricks carried in the offhand rebuild the chimney");
         w.process();h.assertTrue(w.status!=MachineStatus.Workshop.INCOMPLETE,"Rebuilding the chimney restores the forge");h.succeed();
     }
+    @GameTest(template="industrial") public static void sectionsTakeAnyAmountAtATime(GameTestHelper h){
+        var w=build(h,0,Direction.NORTH);var l=h.getLevel();var pos=w.getBlockPos();
+        ModeledMachine.removeSection(w,1,false);ModeledMachine.removeSection(w,3,false);
+        var tanner=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"tanner"));
+        tanner.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);tanner.setPos(pos.getX()+.5,pos.getY(),pos.getZ()-2.5);
+        var bricks=new ItemStack(Items.BRICKS,3);
+        h.assertTrue(ModeledMachine.build(w,tanner,bricks)&&bricks.isEmpty()&&!w.build().has(1)&&w.build().paidCount(1)==3,"Three bricks are paid toward the curb without building it");
+        var copy=new WorkshopBlockEntity(pos,w.getBlockState());copy.loadWithComponents(w.saveWithFullMetadata(l.registryAccess()),l.registryAccess());
+        h.assertTrue(copy.build().paidCount(1)==3,"A partial payment survives save and load");
+        bricks=new ItemStack(Items.BRICKS,8);
+        h.assertTrue(ModeledMachine.build(w,tanner,bricks)&&bricks.getCount()==3&&w.build().has(1)&&w.build().paidCount(1)==8,"The curb takes only the five bricks it still needs and is built");
+        var plank=new ItemStack(Items.OAK_PLANKS);
+        h.assertTrue(ModeledMachine.build(w,tanner,plank)&&plank.isEmpty()&&!w.build().has(3)&&w.build().paidCount(3)==1,"One plank is paid toward the bark bin");
+        ModeledMachine.removeSection(w,3,true);
+        h.assertTrue(w.build().paidCount(3)==0&&l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(pos).inflate(2)).stream()
+                .filter(e->e.getItem().is(Items.OAK_PLANKS)).mapToInt(e->e.getItem().getCount()).sum()==1,"A partial payment is refunded once");
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void unbuiltSmithyRefusesTheStriker(GameTestHelper h){
         var w=build(h,2,Direction.NORTH);var l=h.getLevel();var pos=w.getBlockPos();
         l.removeBlock(pos,false);l.setBlockAndUpdate(pos,WorkshopContent.SMITHY.get().defaultBlockState().setValue(WorkshopBlock.FACING,Direction.NORTH));
