@@ -18,8 +18,9 @@ final class StorageVisualCheck {
             var now=l.getGameTime();p.getInventory().setItem(0,HotMetal.heated(new ItemStack(Items.IRON_INGOT,8),now));
             p.getInventory().setItem(1,HotMetal.heated(new ItemStack(Items.COPPER_INGOT,8),now-HotMetal.COOL_TICKS*3/4));p.getInventory().setItem(2,new ItemStack(Items.IRON_INGOT,8));p.openMenu(k);
         });}
+        // Each menu holds its native slots plus the Hand.
         if(ticks==95){
-            if(!(mc.player.containerMenu instanceof KilnMenu m)||m.slots.size()!=42||m.getSlot(4).getItem().getCount()!=32||m.getSlot(5).getItem().getCount()!=32)throw new IllegalStateException("Paired kiln storage failed menu sync");
+            if(!(mc.player.containerMenu instanceof KilnMenu m)||m.slots.size()!=42+1||m.getSlot(4).getItem().getCount()!=32||m.getSlot(5).getItem().getCount()!=32)throw new IllegalStateException("Paired kiln storage failed menu sync");
             shot(mc,"kiln");
         }
         if(ticks==105)server.execute(()->{
@@ -28,7 +29,7 @@ final class StorageVisualCheck {
             w.setItem(0,new ItemStack(Items.WHITE_WOOL,32));w.setItem(1,new ItemStack(Items.WHITE_WOOL,32));w.setItem(4,KilnContent.MINERAL_COAL.toStack(32));w.setItem(6,KilnContent.MINERAL_COAL.toStack(32));w.setItem(5,WorkshopContent.CLOTH.toStack(32));w.setItem(7,WorkshopContent.CLOTH.toStack(32));p.openMenu(w);
         });
         if(ticks==135){
-            if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.slots.size()!=44||!m.getSlot(1).isActive()||m.getSlot(7).getItem().getCount()!=32)throw new IllegalStateException("Paired workshop storage failed menu sync");
+            if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.slots.size()!=44+1||!m.getSlot(1).isActive()||m.getSlot(7).getItem().getCount()!=32)throw new IllegalStateException("Paired workshop storage failed menu sync");
             shot(mc,"workshop");
         }
         if(ticks==145)server.execute(()->{
