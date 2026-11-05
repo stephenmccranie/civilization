@@ -137,7 +137,7 @@ public final class CivilizationJei implements IModPlugin {
         var level=Minecraft.getInstance().level;
         var recipes=level.getRecipeManager().getAllRecipesFor(recipeType).stream().sorted(Comparator.comparing(h->h.id().toString())).map(h->{
             var recipe=h.value();var output=recipe.getResultItem(level.registryAccess()).copy();
-            String note=recipe.getIngredients().getFirst().test(output)?"Heats a load of up to "+dev.civilization.HotMetal.LOAD+" for the same Coal. Hammer each hot unit at an anvil within a minute to refine it.":"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire.";
+            String note=recipe.getIngredients().getFirst().test(output)?"Heats a load of up to "+dev.civilization.HotMetal.LOAD+" for the same Coal. Hammer the hot load at an anvil within a minute to refine it.":"Draws one Coal (250 MJ) per 20 s of work from a hot machine; warming up comes first. Select the recipe in the controller; light its fire.";
             return new Process(h.id(),List.of(ingredient(recipe.getIngredients().getFirst(),1),item(RecipeIngredientRole.OUTPUT,output),coal()),recipe.getCookingTime(),note);
         }).toList();add(r,name,recipes);
     }

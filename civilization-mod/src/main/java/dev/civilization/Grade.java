@@ -75,6 +75,10 @@ public record Grade(List<Integer> units) {
         double mean = 45 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
         return grade + Math.max(1, Math.min(gap, (int)Math.round(-mean * Math.log(1 - random.nextDouble()))));
     }
+    /** A hammering of the whole stack: every unit takes its own step. */
+    public static void refine(ItemStack stack, RandomSource random) {
+        set(stack, top(stack, stack.getCount()).stream().map(unit -> refined(unit, random)).toList());
+    }
     /** The unit a furnace makes from the top unit of `input`: rolled from ore, carried into another metal or through a heat. */
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
         if (graded(product)) assign(product, graded(input) ? top(input, 1).getFirst() : roll(random));

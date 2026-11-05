@@ -36,7 +36,7 @@ public final class CalorieConfig {
         ATTACK = b.defineInRange("successfulAttackKcal", 3.0, 0.0, 1000.0);
         IGNITE = b.comment("Calories spent for each accepted strike of a coal-fired machine, whether or not it lights.")
                 .defineInRange("machineIgnitionKcal", 1.0, 0.0, 1000.0);
-        STRIKE = b.comment("Calories spent for each accepted hammer strike on hot metal at an anvil; twenty strikes refine one unit.")
+        STRIKE = b.comment("Calories spent on each unit of hot metal in an accepted hammer strike at an anvil; twenty strikes refine the stack.")
                 .defineInRange("anvilStrikeKcal", 2.0, 0.0, 1000.0);
         HEAL = b.comment("kcal per health point (half heart), every 4 seconds while hurt; respects naturalRegeneration.")
                 .defineInRange("healKcalPerHealthPoint", 40.0, 1.0, 1000.0);

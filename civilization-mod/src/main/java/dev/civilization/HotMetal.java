@@ -30,7 +30,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Heat and hammer. A Foundry pass that keeps its material heats a whole load at once, and the load stays hot until a
  * game time a minute later, so it cools on time wherever it is. Holding use on an anvil with hot metal in hand strikes
- * it; every strike is the player's labor, and each twentieth refines the top unit one random step and leaves it cold.
+ * the whole stack; every strike is the player's labor for each unit struck, and twenty strikes refine every unit one
+ * random step and leave the stack cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
@@ -41,7 +42,8 @@ public final class HotMetal {
     /** The game time a stack's heat lasts until. Every dimension shares game time, and it passes only while the world runs. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> HOT = COMPONENTS.registerComponentType("hot_until",
             builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
-    private record Hammering(long last, int strikes) {}
+    /** A player's last strike and the labor paid since their last finished hammering, in strikes on one unit. */
+    private record Hammering(long last, int work) {}
     private static final Map<UUID, Hammering> HAMMERING = new HashMap<>();
 
     private HotMetal() {}
@@ -78,30 +80,31 @@ public final class HotMetal {
         event.setCancellationResult(InteractionResult.SUCCESS);
         if (event.getEntity() instanceof ServerPlayer player) strike(player, event.getPos(), event.getItemStack());
     }
-    /** One paid strike on the hot stack in hand; strikes count on across pauses until a hammering is done. */
+    /**
+     * One strike on the hot stack in hand, paid for each of its units. Paid labor counts on across pauses and toward
+     * whatever hot metal is struck next, and the hammering is done once it covers twenty strikes on every unit in hand.
+     */
     static void strike(ServerPlayer player, BlockPos anvil, ItemStack stack) {
         var level = player.serverLevel();
         long now = level.getGameTime();
         var last = HAMMERING.get(player.getUUID());
         if (last != null && now - last.last() < STRIKE_TICKS) return;
-        int strikes = (last == null ? 0 : last.strikes()) + 1;
-        CalorieFoodData.of(player).spendOther(player, CalorieConfig.STRIKE.get(), "anvil_strike", anvil.toShortString());
+        int units = stack.getCount(), work = (last == null ? 0 : last.work()) + units;
+        CalorieFoodData.of(player).spendOther(player, units * CalorieConfig.STRIKE.get(), "anvil_strike", anvil.toShortString());
         level.playSound(null, anvil, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, .25f, 1.1f + level.random.nextFloat() * .3f);
         level.sendParticles(ParticleTypes.SMALL_FLAME, anvil.getX() + .5, anvil.getY() + 1.05, anvil.getZ() + .5, 4, .15, .02, .15, .04);
-        if (strikes < STRIKES) {
-            HAMMERING.put(player.getUUID(), new Hammering(now, strikes));
-            player.displayClientMessage(Component.translatable("message.civilization.hammering", stack.getHoverName(), strikes, STRIKES), true);
+        if (work < STRIKES * units) {
+            HAMMERING.put(player.getUUID(), new Hammering(now, work));
+            player.displayClientMessage(Component.translatable("message.civilization.hammering", stack.getHoverName(), work / units, STRIKES), true);
             return;
         }
         HAMMERING.put(player.getUUID(), new Hammering(now, 0));
-        var unit = stack.split(1);
-        unit.remove(HOT.get());
-        int before = Grade.value(unit);
-        Grade.assign(unit, Grade.refined(before, level.random));
+        int before = Grade.value(stack);
+        stack.remove(HOT.get());
+        Grade.refine(stack, level.random);
         level.playSound(null, anvil, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, .3f, 1.4f);
-        player.displayClientMessage(Component.translatable("message.civilization.hammered", unit.getHoverName(),
-                Grade.percent(before), Grade.percent(Grade.value(unit))), true);
-        player.getInventory().placeItemBackInInventory(unit);
+        player.displayClientMessage(Component.translatable("message.civilization.hammered", stack.getHoverName(),
+                Grade.percent(before), Grade.percent(Grade.value(stack))), true);
     }
 
     /** Once a second, spent heat leaves what a player carries and has open. */

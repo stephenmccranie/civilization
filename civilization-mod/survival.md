@@ -26,7 +26,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Jump | 2 kcal plus horizontal movement |
 | Successful melee attack | 3 kcal |
 | Accepted coal-machine ignition strike | 1 kcal; failed spark still costs labor |
-| Accepted anvil strike on hot metal | 2 kcal; 20 strikes refine one unit ([grade](manufacturing.md#grade)) |
+| Accepted anvil strike on hot metal | 2 kcal per unit in the stack; 20 strikes refine the stack ([grade](manufacturing.md#grade)) |
 | Natural healing | 40 kcal per half-heart, every 4 seconds |
 | Minimum reserve to sprint | 100 kcal |
 | Hunger effect | 2 kcal/second per level |

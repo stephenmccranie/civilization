@@ -51,7 +51,7 @@ public final class HotMetalGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "industrial", timeoutTicks = 200) public static void hammeringRefinesOneHotUnitForItsLabor(GameTestHelper h) {
+    @GameTest(template = "industrial", timeoutTicks = 200) public static void hammeringRefinesTheWholeLoadForItsLabor(GameTestHelper h) {
         var level = h.getLevel();
         var anvil = h.absolutePos(new BlockPos(2, 1, 2));
         // An anvil falls without a floor.
@@ -65,7 +65,8 @@ public final class HotMetalGameTests {
         player.setItemInHand(InteractionHand.MAIN_HAND, GradeGameTests.ingots(900));
         h.assertTrue(!click(player, anvil).isCanceled() && food.reserve().calories() == 2000, "A cold ingot leaves the anvil to its ordinary use, free");
         player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.ingots(1000, 900, 800), level.getGameTime()));
-        double strike = CalorieConfig.STRIKE.get();
+        // Every strike works all three units.
+        double strike = 3 * CalorieConfig.STRIKE.get();
         for (int i = 0; i < HotMetal.STRIKES; i++) {
             int n = i;
             h.runAfterDelay(1 + 4 * i, () -> {
@@ -75,17 +76,17 @@ public final class HotMetalGameTests {
                     click(player, anvil);
                     h.assertTrue(before - food.reserve().calories() <= strike + 1e-9, "A second strike in the same moment is ignored");
                 }
-                if (n == HotMetal.STRIKES - 2) h.assertTrue(player.getMainHandItem().getCount() == 3, "Nineteen strikes finish nothing");
+                if (n == HotMetal.STRIKES - 2) h.assertTrue(HotMetal.hot(player.getMainHandItem(), level.getGameTime())
+                        && GradeGameTests.grades(player.getMainHandItem()).equals(List.of(1000, 900, 800)), "Nineteen strikes finish nothing");
             });
         }
         h.runAfterDelay(2 + 4 * HotMetal.STRIKES, () -> {
             var hand = player.getMainHandItem();
-            h.assertTrue(hand.getCount() == 2 && HotMetal.hot(hand, level.getGameTime()) && GradeGameTests.grades(hand).equals(List.of(900, 800)),
-                    "The twentieth strike takes the top unit and the rest stay hot");
-            var done = player.getInventory().items.stream().filter(s -> s.is(Items.IRON_INGOT) && !s.has(HotMetal.HOT.get())).findFirst().orElseThrow();
-            h.assertTrue(done.getCount() == 1 && Grade.value(done) > 1000, "The hammered unit is refined one step and cold: " + Grade.value(done));
+            var grades = GradeGameTests.grades(hand);
+            h.assertTrue(hand.getCount() == 3 && !hand.has(HotMetal.HOT.get()) && grades.get(0) > 1000 && grades.get(1) > 900 && grades.get(2) > 800,
+                    "The twentieth strike refines every unit of the load and leaves it cold: " + grades);
             double spent = 2000 - food.reserve().calories();
-            h.assertTrue(spent >= .8 * HotMetal.STRIKES * strike - 1e-6 && spent <= HotMetal.STRIKES * strike + 1e-6, "Every strike is paid labor: " + spent + " kcal");
+            h.assertTrue(spent >= .8 * HotMetal.STRIKES * strike - 1e-6 && spent <= HotMetal.STRIKES * strike + 1e-6, "Every strike is paid labor for each unit: " + spent + " kcal");
             h.succeed();
         });
     }
