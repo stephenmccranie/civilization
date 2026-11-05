@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "game": "minecraft",
-  "versionId": "playtest-0.35.18-1",
+  "versionId": "playtest-0.35.19-1",
   "name": "Civilization Playtest",
   "summary": "Civilization playtest for Prism with automatic managed-pack updates.",
   "dependencies": {
@@ -22,15 +22,15 @@
       "id": "modrinth-COlSi5iR"
     },
     {
-      "path": "mods/civilization-0.35.18-dev.jar",
+      "path": "mods/civilization-0.35.19-dev.jar",
       "hashes": {
-        "sha1": "0d7366a44e245081b1e91b08e42e9253449ea054",
-        "sha512": "3c4be52bfb379115c2373d7be8fb8330bf86890b2fb6dd11a46b3aea59913e5a9db8dab9a9aefc1c0f651239ea9118c086ab353969c14319cd3e4bf498a50df5"
+        "sha1": "5f23eba6b075f3dfdc42f09fae3ad4c91864f6ed",
+        "sha512": "64f190df5907397b1eaf9f63091bf343fe44f172543498688e78e34fcebb52db3fa37756fec862f70122b3c621d39f01de1c7f87a36053103820745df066f0d3"
       },
       "downloads": [
-        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.18-1/civilization-0.35.18-dev.jar"
+        "https://github.com/stephenmccranie/civilization/releases/download/playtest-0.35.19-1/civilization-0.35.19-dev.jar"
       ],
-      "fileSize": 5855331,
+      "fileSize": 5858909,
       "id": "civilization"
     },
     {
