@@ -51,7 +51,7 @@ public final class HotMetalGameTests {
         h.succeed();
     }
 
-    @GameTest(template = "industrial", timeoutTicks = 200) public static void hammeringRefinesTheWholeLoadForItsLabor(GameTestHelper h) {
+    @GameTest(template = "industrial") public static void hammeringRefinesTheWholeLoadForItsLabor(GameTestHelper h) {
         var level = h.getLevel();
         var anvil = h.absolutePos(new BlockPos(2, 1, 2));
         // An anvil falls without a floor.
@@ -65,29 +65,23 @@ public final class HotMetalGameTests {
         player.setItemInHand(InteractionHand.MAIN_HAND, GradeGameTests.ingots(900));
         h.assertTrue(!click(player, anvil).isCanceled() && food.reserve().calories() == 2000, "A cold ingot leaves the anvil to its ordinary use, free");
         player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.ingots(1000, 900, 800), level.getGameTime()));
-        // Every strike works all three units.
-        double strike = 3 * CalorieConfig.STRIKE.get();
+        // Every blow works all three units.
+        double blow = 3 * CalorieConfig.HAMMER.get() / HotMetal.STRIKES;
         for (int i = 0; i < HotMetal.STRIKES; i++) {
-            int n = i;
-            h.runAfterDelay(1 + 4 * i, () -> {
-                double before = food.reserve().calories();
-                h.assertTrue(click(player, anvil).isCanceled(), "A hot ingot is struck instead of opening the anvil");
-                if (n == 0) {
-                    click(player, anvil);
-                    h.assertTrue(before - food.reserve().calories() <= strike + 1e-9, "A second strike in the same moment is ignored");
-                }
-                if (n == HotMetal.STRIKES - 2) h.assertTrue(HotMetal.hot(player.getMainHandItem(), level.getGameTime())
-                        && GradeGameTests.grades(player.getMainHandItem()).equals(List.of(1000, 900, 800)), "Nineteen strikes finish nothing");
-            });
+            double before = food.reserve().calories();
+            h.assertTrue(click(player, anvil).isCanceled(), "A hot ingot is struck instead of opening the anvil");
+            if (i == 0) h.assertTrue(click(player, anvil).isCanceled() && before - food.reserve().calories() <= blow + 1e-9, "A blow takes a second to swing again");
+            if (i == HotMetal.STRIKES - 2) h.assertTrue(HotMetal.hot(player.getMainHandItem(), level.getGameTime())
+                    && GradeGameTests.grades(player.getMainHandItem()).equals(List.of(1000, 900, 800)), "Four blows finish nothing");
+            // The swing recovers here instead of over a second.
+            player.getCooldowns().removeCooldown(Items.IRON_INGOT);
         }
-        h.runAfterDelay(2 + 4 * HotMetal.STRIKES, () -> {
-            var hand = player.getMainHandItem();
-            var grades = GradeGameTests.grades(hand);
-            h.assertTrue(hand.getCount() == 3 && !hand.has(HotMetal.HOT.get()) && grades.get(0) > 1000 && grades.get(1) > 900 && grades.get(2) > 800,
-                    "The twentieth strike refines every unit of the load and leaves it cold: " + grades);
-            double spent = 2000 - food.reserve().calories();
-            h.assertTrue(spent >= .8 * HotMetal.STRIKES * strike - 1e-6 && spent <= HotMetal.STRIKES * strike + 1e-6, "Every strike is paid labor for each unit: " + spent + " kcal");
-            h.succeed();
-        });
+        var hand = player.getMainHandItem();
+        var grades = GradeGameTests.grades(hand);
+        h.assertTrue(hand.getCount() == 3 && !hand.has(HotMetal.HOT.get()) && grades.get(0) > 1000 && grades.get(1) > 900 && grades.get(2) > 800,
+                "The fifth blow refines every unit of the load and leaves it cold: " + grades);
+        double spent = 2000 - food.reserve().calories();
+        h.assertTrue(spent >= .8 * HotMetal.STRIKES * blow - 1e-6 && spent <= HotMetal.STRIKES * blow + 1e-6, "Every blow is paid labor for each unit: " + spent + " kcal");
+        h.succeed();
     }
 }

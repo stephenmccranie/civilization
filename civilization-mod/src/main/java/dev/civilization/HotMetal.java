@@ -30,21 +30,20 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Heat and hammer. A Foundry pass that keeps its material heats a whole load at once, and the load stays hot until a
  * game time a minute later, so it cools on time wherever it is. Holding use on an anvil with hot metal in hand strikes
- * the whole stack; every strike is the player's labor for each unit struck, and twenty strikes refine every unit one
- * random step and leave the stack cold.
+ * the whole stack with a heavy blow a second; every blow is the player's labor for each unit struck, and five blows
+ * refine every unit one random step and leave the stack cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
-    public static final int LOAD = 8, COOL_TICKS = 60 * 20, STRIKES = 20;
-    /** Holding use repeats a strike every four ticks; strikes sent faster are ignored. */
-    private static final int STRIKE_TICKS = 3;
+    public static final int LOAD = 8, COOL_TICKS = 60 * 20, STRIKES = 5;
+    /** A blow takes a second to swing again, shown as the metal's cooldown; uses sent sooner are ignored. */
+    private static final int STRIKE_TICKS = 20;
     private static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Civilization.MOD_ID);
     /** The game time a stack's heat lasts until. Every dimension shares game time, and it passes only while the world runs. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> HOT = COMPONENTS.registerComponentType("hot_until",
             builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
-    /** A player's last strike and the labor paid since their last finished hammering, in strikes on one unit. */
-    private record Hammering(long last, int work) {}
-    private static final Map<UUID, Hammering> HAMMERING = new HashMap<>();
+    /** Labor each player has paid since their last finished hammering, in strikes on one unit. */
+    private static final Map<UUID, Integer> WORK = new HashMap<>();
 
     private HotMetal() {}
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
@@ -77,28 +76,31 @@ public final class HotMetal {
         if (event.getHand() != InteractionHand.MAIN_HAND || !hot(event.getItemStack(), level.getGameTime())
                 || !level.getBlockState(event.getPos()).is(BlockTags.ANVIL)) return;
         event.setCanceled(true);
-        event.setCancellationResult(InteractionResult.SUCCESS);
+        // The hand swings with each landed blow, not with every repeat of held use.
+        event.setCancellationResult(InteractionResult.CONSUME);
         if (event.getEntity() instanceof ServerPlayer player) strike(player, event.getPos(), event.getItemStack());
     }
     /**
-     * One strike on the hot stack in hand, paid for each of its units. Paid labor counts on across pauses and toward
-     * whatever hot metal is struck next, and the hammering is done once it covers twenty strikes on every unit in hand.
+     * One blow on the hot stack in hand, paid for each of its units. Paid labor counts on across pauses and toward
+     * whatever hot metal is struck next, and the hammering is done once it covers five blows on every unit in hand.
      */
     static void strike(ServerPlayer player, BlockPos anvil, ItemStack stack) {
+        if (player.getCooldowns().isOnCooldown(stack.getItem())) return;
         var level = player.serverLevel();
-        long now = level.getGameTime();
-        var last = HAMMERING.get(player.getUUID());
-        if (last != null && now - last.last() < STRIKE_TICKS) return;
-        int units = stack.getCount(), work = (last == null ? 0 : last.work()) + units;
-        CalorieFoodData.of(player).spendOther(player, units * CalorieConfig.STRIKE.get(), "anvil_strike", anvil.toShortString());
-        level.playSound(null, anvil, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, .25f, 1.1f + level.random.nextFloat() * .3f);
-        level.sendParticles(ParticleTypes.SMALL_FLAME, anvil.getX() + .5, anvil.getY() + 1.05, anvil.getZ() + .5, 4, .15, .02, .15, .04);
+        int units = stack.getCount(), work = WORK.getOrDefault(player.getUUID(), 0) + units;
+        player.getCooldowns().addCooldown(stack.getItem(), STRIKE_TICKS);
+        player.swing(InteractionHand.MAIN_HAND, true);
+        CalorieFoodData.of(player).spendOther(player, units * CalorieConfig.HAMMER.get() / STRIKES, "anvil_strike", anvil.toShortString());
+        level.playSound(null, anvil, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, .7f, .75f + level.random.nextFloat() * .15f);
+        double x = anvil.getX() + .5, y = anvil.getY() + 1.05, z = anvil.getZ() + .5;
+        level.sendParticles(ParticleTypes.SMALL_FLAME, x, y, z, 16, .2, .02, .2, .12);
+        level.sendParticles(ParticleTypes.LAVA, x, y, z, 2, .1, 0, .1, 0);
         if (work < STRIKES * units) {
-            HAMMERING.put(player.getUUID(), new Hammering(now, work));
+            WORK.put(player.getUUID(), work);
             player.displayClientMessage(Component.translatable("message.civilization.hammering", stack.getHoverName(), work / units, STRIKES), true);
             return;
         }
-        HAMMERING.put(player.getUUID(), new Hammering(now, 0));
+        WORK.remove(player.getUUID());
         int before = Grade.value(stack);
         stack.remove(HOT.get());
         Grade.refine(stack, level.random);
@@ -116,5 +118,5 @@ public final class HotMetal {
         for (var slot : player.containerMenu.slots) cool(slot.getItem(), now);
         cool(player.containerMenu.getCarried(), now);
     }
-    @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) { HAMMERING.remove(event.getEntity().getUUID()); }
+    @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) { WORK.remove(event.getEntity().getUUID()); }
 }
