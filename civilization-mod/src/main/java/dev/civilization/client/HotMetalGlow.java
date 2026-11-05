@@ -1,6 +1,8 @@
 package dev.civilization.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.civilization.Civilization;
 import dev.civilization.HotMetal;
@@ -63,7 +65,7 @@ public final class HotMetalGlow {
      * a buffer of its own, drawn with the other item sheets, so its added light falls under it as before.
      */
     private static final ResourceLocation SHEET = ResourceLocation.fromNamespaceAndPath(Civilization.MOD_ID, "hot_metal");
-    private static final RenderType METAL = RenderType.entityTranslucentCull(SHEET), GLOW = RenderType.eyes(SHEET);
+    private static final RenderType METAL = RenderType.entityTranslucentCull(SHEET), GLOW = Glow.TYPE;
     /** Each sprite's column on the sheet, as fractions of its size: its left and right edges and each step's height. */
     private record Column(float u0, float u1, float height) {}
     private static Map<TextureAtlasSprite, Column> columns = Map.of();
@@ -128,6 +130,16 @@ public final class HotMetalGlow {
         if (IRIS) Shaders.emit();
         Minecraft.getInstance().getTextureManager().register(SHEET, new Sheet(image));
         columns = laid;
+    }
+    /**
+     * Minecraft's eyes type, light added over what is drawn, that also writes depth: under a shader pack the glow is
+     * the item's only surface, so block outlines and whatever is drawn after it must stay behind it.
+     */
+    private static final class Glow extends RenderType {
+        static final RenderType TYPE = create("civilization_hot_metal_glow", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, true,
+                CompositeState.builder().setShaderState(RENDERTYPE_EYES_SHADER).setTextureState(new TextureStateShard(SHEET, false, false))
+                        .setTransparencyState(ADDITIVE_TRANSPARENCY).setWriteMaskState(COLOR_DEPTH_WRITE).createCompositeState(false));
+        private Glow() { super("unused", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, false, false, () -> {}, () -> {}); }
     }
     /** The sheet's texture, a class of its own so shaders can find its emission. */
     private static final class Sheet extends DynamicTexture {
