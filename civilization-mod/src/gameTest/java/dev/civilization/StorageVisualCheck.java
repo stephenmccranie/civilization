@@ -32,15 +32,15 @@ final class StorageVisualCheck {
             shot(mc,"workshop");
         }
         if(ticks==145)server.execute(()->{
-            var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();var pos=new BlockPos(84,101,0);l.setDayTime(6000);
+            var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();var pos=new BlockPos(84,101,0);l.setDayTime(6000);l.setWeatherParameters(6000,0,false,false);
             // The smelt-hammer-quench stations, and rough metal from glowing to cold in the hotbar.
-            l.setBlockAndUpdate(pos,KilnContent.STONE_ANVIL.get().defaultBlockState());l.setBlockAndUpdate(pos.east().below(),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());l.setBlockAndUpdate(pos.east(),net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState());
+            l.setBlockAndUpdate(pos,KilnContent.STONE_ANVIL.get().defaultBlockState());for(int x=-2;x<=2;x++)for(int z=-1;z<=1;z++)l.setBlockAndUpdate(pos.offset(x,-1,z),net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState());l.setBlockAndUpdate(pos.east(),net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState());
             l.setBlockAndUpdate(pos.west(),net.minecraft.world.level.block.Blocks.WATER_CAULDRON.defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL,3));
             var now=l.getGameTime();var inventory=p.getInventory();
             inventory.setItem(0,HotMetal.heated(KilnContent.IRON_BLOOM.toStack(8),now));inventory.setItem(1,KilnContent.BLISTER_COPPER.toStack(8));
             inventory.setItem(2,KilnContent.GOLD_DORE.toStack(4));inventory.setItem(3,KilnContent.BLISTER_STEEL.toStack(4));inventory.setItem(4,KilnContent.STONE_ANVIL_ITEM.toStack());
             inventory.setItem(5,HotMetal.heated(new ItemStack(Items.IRON_INGOT,8),now-HotMetal.COOL_TICKS+HotMetal.DULL_TICKS/2));inventory.setItem(6,new ItemStack(Items.DIAMOND,2));inventory.selected=0;
-            p.teleportTo(l,84.5,101,-1.6,java.util.Set.of(),0,32);
+            p.teleportTo(l,86.0,101,2.4,java.util.Set.of(),142,8);
         });
         if(ticks==180){mc.gui.getChat().clearMessages(false);mc.getToasts().clear();}
         if(ticks==185)shot(mc,"forge");

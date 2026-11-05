@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "SSS",
-    " C ",
-    "CCC"
+    "CCC",
+    " L "
   ],
   "key": {
     "S": {
@@ -11,6 +11,9 @@
     },
     "C": {
       "tag": "minecraft:stone_crafting_materials"
+    },
+    "L": {
+      "tag": "minecraft:logs"
     }
   },
   "result": {
