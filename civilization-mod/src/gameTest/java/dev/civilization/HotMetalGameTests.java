@@ -95,7 +95,7 @@ public final class HotMetalGameTests {
         var level = h.getLevel();
         var anvil = station(h, 2, Blocks.ANVIL);
         var player = smith(h, anvil);
-        double blow = 3 * CalorieConfig.BLOW.get();
+        double blow = 3 * CalorieConfig.BLOW.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player));
         player.setItemInHand(InteractionHand.MAIN_HAND, GradeGameTests.units(KilnContent.IRON_BLOOM.get(), 900, 800, 700));
         h.assertTrue(click(player, anvil).isCanceled() && player.getMainHandItem().is(KilnContent.IRON_BLOOM.get()) && CalorieFoodData.of(player).reserve().calories() == 2000,
                 "Cold rough metal is turned away from the anvil, free");
@@ -131,6 +131,19 @@ public final class HotMetalGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "industrial") public static void aSmithWhoCannotPayStrikesNothing(GameTestHelper h) {
+        var anvil = station(h, 6, Blocks.ANVIL);
+        var player = smith(h, anvil);
+        CalorieFoodData.of(player).reserve().set(0);
+        player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.units(KilnContent.IRON_BLOOM.get(), 900, 800), h.getLevel().getGameTime()));
+        for (int i = 0; i < HotMetal.ANVIL_BLOWS; i++) {
+            h.assertTrue(click(player, anvil).isCanceled(), "The anvil takes the click, not its own screen");
+            player.getCooldowns().removeCooldown(KilnContent.IRON_BLOOM.get());
+        }
+        h.assertTrue(player.getMainHandItem().is(KilnContent.IRON_BLOOM.get()) && GradeGameTests.grades(player.getMainHandItem()).equals(List.of(900, 800)),
+                "A smith with no food left hammers nothing out of the metal");
+        h.succeed();
+    }
     @GameTest(template = "industrial") public static void hotMetalDroppedInWaterIsQuenched(GameTestHelper h) {
         var level = h.getLevel();
         var pool = h.absolutePos(new BlockPos(2, 1, 2));

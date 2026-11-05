@@ -81,6 +81,7 @@
   "message.civilization.hammering": "Hammering %s: %s/%s blows",
   "message.civilization.hammered": "Hammered %s: %s → %s",
   "message.civilization.too_cool": "%s must glow to be hammered: heat it at the Foundry",
+  "message.civilization.needs_food": "Eat before working %s",
   "message.civilization.cutting": "Cutting %s: %s/%s strokes",
   "message.civilization.cut": "Cut %s: %s → %s",
   "tooltip.civilization.cooking_fuel": "Warms up before it cooks, and burns Coal while lit, even when idle",
