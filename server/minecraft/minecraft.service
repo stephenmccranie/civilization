@@ -1,0 +1,29 @@
+[Unit]
+Description=Minecraft 1.21.1 NeoForge Server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=minecraft
+Group=minecraft
+WorkingDirectory=/srv/minecraft
+# minecraft-start feeds the server's console from /run/minecraft/console
+RuntimeDirectory=minecraft
+RuntimeDirectoryMode=0750
+ExecStart=/usr/local/libexec/minecraft-start
+Restart=on-failure
+RestartSec=10
+KillSignal=SIGINT
+TimeoutStopSec=300
+SuccessExitStatus=130 143
+UMask=0022
+# minecraft-worldgen-cap.service caps world generation through the server's CPU controller
+Delegate=cpu
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/srv/minecraft
+
+[Install]
+WantedBy=multi-user.target

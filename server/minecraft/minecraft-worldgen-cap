@@ -1,0 +1,29 @@
+#!/bin/sh
+# Holds the Minecraft server's world-generation threads (terrain model and river regions, C2ME chunk
+# workers, Distant Horizons) in a threaded cgroup capped at 8 CPUs, so pregeneration takes at most half
+# of the host while the server thread and everything else run uncapped. A new thread lands in the
+# cgroup of the thread that starts it, so the few worldgen threads started from the server thread are
+# moved on the next pass.
+set -eu
+SERVICE=/sys/fs/cgroup/system.slice/minecraft.service
+WORLDGEN=$SERVICE/worldgen
+CAP="800000 100000"
+
+while :; do
+    pid=$(systemctl show -p MainPID --value minecraft.service)
+    if [ "$pid" -gt 0 ] && [ -d "$SERVICE" ]; then
+        if [ ! -d "$WORLDGEN" ]; then
+            mkdir "$WORLDGEN"
+            echo threaded > "$WORLDGEN/cgroup.type"
+        fi
+        grep -qw cpu "$SERVICE/cgroup.subtree_control" || echo +cpu > "$SERVICE/cgroup.subtree_control"
+        [ "$(cat "$WORLDGEN/cpu.max")" = "$CAP" ] || echo "$CAP" > "$WORLDGEN/cpu.max"
+        for task in /proc/"$pid"/task/*; do
+            case "$(cat "$task/comm" 2>/dev/null)" in
+                # A thread may exit between listing and moving; that one needs no cap
+                terrain-diffusi*|c2me-worker*|DH-*) echo "${task##*/}" > "$WORLDGEN/cgroup.threads" 2>/dev/null || true ;;
+            esac
+        done
+    fi
+    sleep 30
+done

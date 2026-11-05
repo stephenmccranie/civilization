@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+pipe=/run/minecraft/console
+[ -p "$pipe" ] || mkfifo -m 600 "$pipe"
+exec 3<>"$pipe"
+exec /usr/lib/jvm/java-21-openjdk-amd64/bin/java @user_jvm_args.txt @libraries/net/neoforged/neoforge/21.1.265/unix_args.txt nogui <&3

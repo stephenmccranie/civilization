@@ -1,0 +1,35 @@
+# Circular outward pregeneration
+
+The dedicated server controller builds saved Overworld chunks and their Distant Horizons LODs in **1024-block tiles** grouped into 1024-block circular bands around **0, 0**. It completes a band before moving outward, sweeping neighbouring tiles in angle order inside that band. Viewable terrain remains truthful on the web map; the map does not clip the existing world to a circular mask.
+
+The tile is DH's minimum pregeneration footprint: the installed DH command requires a radius of at least 32 chunks, a 65 by 65 chunk square. Chunky 1.4.23 rounds square radius 511 up to the same 65 by 65 chunks, so each tile runs Chunky and then DH over exactly one footprint, sharing one boundary chunk with its neighbours. Chunky generates every chunk while keeping many in flight, so terrain inference and C2ME stages overlap within the tile; DH then builds LODs from saved chunks in seconds. Smaller patches let DH's wider footprint request terrain ahead of the front on its own, serialising inference with chunk generation and repeating inference evicted from Terrain Diffusion's cache before the next band arrived.
+
+`radial.py` enumerates one band of tile centres at a time and sorts them by angle, caching only recent band geometry. Arc order keeps consecutive tiles adjacent, which reuses Terrain Diffusion's six-region river cache and roughly 4 by 4 km tile cache. Tile centres sit halfway between grid lines so the layout is symmetric around the origin. Chunky's built-in concentric/spiral patterns use square rings; the controller confines its spiral pattern to one tile. Terrain/structure dependencies and player exploration can extend generation beyond a selected tile, so the visible edge is circular at tile scale rather than smooth. [Upstream pattern definitions](https://github.com/pop4959/Chunky/wiki/Patterns).
+
+## Checkpoint migration and recovery
+
+The runtime state stays in the existing ignored server pregeneration directory. Version 4 records the band, offset, current phase, a completed-tile counter and `completeRadius`: everything within that distance of 0,0 was generated before this checkpoint began, and tiles lying wholly inside it are skipped. A fresh world starts at radius 0. The one-time upgrade from the 256-block version 3 controller sets `completeRadius` to that controller's current band radius less the 256-block patch half-diagonal, because every point inside lies in a patch whose chunk and LOD phases both finished, then resumes at the first tile reaching beyond it. Partly finished tiles are revisited; Chunky's `forceLoadExistingChunks: false` policy and DH skip existing chunks and LODs, so the overlap costs only checks. Any other checkpoint version is rejected. Full-chunk and LOD data, player builds, seed and world border are not changed.
+
+Stop the controller before replacing it or changing its checkpoint. [`server/deploy.py`](../deploy.py) installs `pregenerate.py` as `/usr/local/libexec/minecraft-pregenerate`, with `radial.py` and `pregen_log.py` alongside it, and [`minecraft-pregenerate.service`](minecraft-pregenerate.service). The unprivileged service owns its checkpoint directory and writes commands to the Minecraft console pipe. It is enabled with `WantedBy=minecraft.service`, so it starts whenever the server does. Do not run another Chunky/DH controller against the same Overworld at the same time.
+
+## Players first
+
+Pregeneration runs only while nobody is online. The controller follows who is online from the console `list` reply and the join and leave lines after it (chat, which starts with `<name>`, never matches), and the first join pauses Chunky and stops DH pregeneration at once; Distant Horizons then generates around the players itself. When the last player leaves, the same tile is selected again and Chunky and DH skip what already exists. A server shutdown is not a generation failure: after `Stopping the server` the controller waits for the restart and resumes its tile, so it need not be stopped first.
+
+On startup or resume, the controller issues its selected Chunky start and handles a replacement confirmation only when that start explicitly requests one. It waits/retries while an old Chunky worker drains after pause, and never blindly continues an older selection. A matching start acknowledgement (center and radius) is required before accepting a chunk-completion message. Both chunk and LOD phases persist before advancing; shutdown pauses Chunky and stops DH. A failed chunk (`Failed to load chunk`) can never complete its Chunky or DH job, so, like the other recognized generation failures, it pauses the controller with the failing message in the checkpoint `status`; restarting the service after fixing the cause resumes the same tile. Existing disk-space and world-boundary safeguards remain. `pregen_log.py` follows log rotation without replaying old completion messages.
+
+## Work scheduling and CPU use
+
+Terrain Diffusion produces every terrain tile on a single `terrain-diffusion-inference` thread with a priority queue. Only ONNX inference inside it fans out to about 16 native threads; river hydrology and tensor work are serial. C2ME defaults to 16 workers, one per physical core of the 16-core, 32-vCPU VM, and DH keeps four workers at 0.75 duty. Throughput therefore depends on keeping inference and C2ME busy at the same time, which a whole-tile Chunky task does. One fresh tile measured 51.6% busy CPU. On fresh terrain, thread dumps show all 16 C2ME workers parked on Terrain Diffusion tile futures while its inference thread runs ONNX, so that thread bounds throughput; Chunky's 50-chunk in-flight default and C2ME's worker count are not the constraint. Beyond about half of the vCPUs, extra work lands on SMT siblings that add far less throughput than physical cores. Judge changes by new chunks per second over whole tiles, not CPU percentage or short samples.
+
+Completion checks run every 0.25 seconds, while the Minecraft PID is refreshed at most once per second. A completed phase checkpoints and immediately hands off to the next stage without sleeping.
+
+## Focused verification
+
+Run on Linux (the deployed platform; the log-rotation fixture relies on renaming an open Linux log):
+
+```sh
+python3 -m unittest discover -s server/pregeneration -v
+```
+
+The checks cover complete circular band coverage, symmetry/uniqueness, arc locality, version 3 migration soundness and resume, Chunky selection matching the DH footprint with shared boundaries, confirmed job replacement, delayed old-worker shutdown and rejection of an unrelated old completion, chunk-before-LOD progression, failed-chunk pause, pausing while players are online and resuming once they leave, riding through a server restart, and log rotation. After deployment, inspect the actual Chunky start center/radius and completion before accepting the new checkpoint; observe a complete chunk/LOD cycle and verify pause/resume. A short live check does not prove long-run throughput or a finished circular world.

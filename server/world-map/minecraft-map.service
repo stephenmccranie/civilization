@@ -1,0 +1,39 @@
+[Unit]
+Description=Read-only Minecraft world map
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=minecraft-map
+Group=minecraft
+ExecStart=/usr/bin/python3 /opt/minecraft-map/surface_server.py
+Restart=on-failure
+RestartSec=5
+# Draws regions in worker processes, at low priority beside the game server
+Nice=10
+CPUQuota=900%
+MemoryMax=1G
+StateDirectory=minecraft-map
+StateDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+CapabilityBoundingSet=
+# Serves only nginx on this host
+RestrictAddressFamilies=AF_INET AF_UNIX
+IPAddressDeny=any
+IPAddressAllow=localhost
+InaccessiblePaths=-/srv/minecraft/server.properties -/srv/minecraft/ops.json -/srv/minecraft/whitelist.json -/srv/minecraft/usercache.json -/srv/minecraft/logs -/srv/minecraft/config -/srv/minecraft/mods -/srv/minecraft/backups
+
+[Install]
+WantedBy=multi-user.target

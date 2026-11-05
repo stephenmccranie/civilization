@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#terralith:reference/forest",
+    "#terralith:reference/taiga",
+    "#terralith:reference/jungle"
+  ]
+}
