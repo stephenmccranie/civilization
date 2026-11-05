@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class WorkshopBlock extends KilnBlock {
     /** The Smithy is a forge built as a native model; the other workshops keep block structures. */
-    @Override public MachineModel model() { return kind == 2 ? MachineModel.SMITHY : null; }
+    @Override public MachineModel model() { return switch (kind) { case 0 -> MachineModel.TANNERY; case 2 -> MachineModel.SMITHY; default -> null; }; }
     public final int kind;
     public WorkshopBlock(Properties p,int kind){super(p);this.kind=kind;}
     private static final net.minecraft.world.phys.shapes.VoxelShape BENCH_SHAPE=net.minecraft.world.phys.shapes.Shapes.or(
@@ -23,7 +23,7 @@ public class WorkshopBlock extends KilnBlock {
         super.onRemove(old,l,p,next,moved);
     }
     @Override public void animateTick(BlockState s,Level l,BlockPos p,net.minecraft.util.RandomSource random){
-        if(kind!=ManufacturingJobs.BENCH)super.animateTick(s,l,p,random);
+        if(WorkshopBlockEntity.fired(kind))super.animateTick(s,l,p,random);
     }
     /** A water bucket fills the Tannery's pit and starts its batch. */
     @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,net.minecraft.world.InteractionHand hand,net.minecraft.world.phys.BlockHitResult hit){

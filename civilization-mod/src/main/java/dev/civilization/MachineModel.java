@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.*;
  * cubes fill and the ports it places, read once from the definition its Blockbench source exports.
  */
 public final class MachineModel {
-    public static final MachineModel OIL_DERRICK=load("oil_derrick"), KILN=load("kiln"), FOUNDRY=load("foundry"), FERTILIZER_FURNACE=load("fertilizer_furnace"), SMITHY=load("smithy");
+    public static final MachineModel OIL_DERRICK=load("oil_derrick"), KILN=load("kiln"), FOUNDRY=load("foundry"), FERTILIZER_FURNACE=load("fertilizer_furnace"), TANNERY=load("tannery"), SMITHY=load("smithy");
 
     /** Accepts any listed item or tag; `material` names them together on the guide. */
     public record Section(String name,List<String> items,String material,int count,int labor) {
@@ -66,7 +66,8 @@ public final class MachineModel {
 
     /** `like` names the vanilla block whose sound, hardness and tool the part cells copy. */
     public final String id,geo,partBlock,like,animation;
-    /** Whether the machine's fire warms its whole body, as a masonry kiln's does, rather than only its controller. */
+    /** Whether the machine's fire warms its whole body, as a masonry kiln's does, rather than only its controller; its
+     * lit bones are that fire and glow. */
     public final boolean heated;
     public final List<Section> sections;
     public final List<Cell> cells;
@@ -122,7 +123,7 @@ public final class MachineModel {
             return new MachineModel(id,JsonParser.parseReader(new InputStreamReader(in,StandardCharsets.UTF_8)).getAsJsonObject());
         }catch(IOException e){throw new ExceptionInInitializerError(e);}
     }
-    public static List<MachineModel> all(){return List.of(OIL_DERRICK,KILN,FOUNDRY,FERTILIZER_FURNACE,SMITHY);}
+    public static List<MachineModel> all(){return List.of(OIL_DERRICK,KILN,FOUNDRY,FERTILIZER_FURNACE,TANNERY,SMITHY);}
     public Section section(int part){return sections.get(part);}
     /** Everything the model can occupy around a controller at `at`, in any facing. */
     public AABB area(net.minecraft.core.BlockPos at){return new AABB(at).inflate(reach,0,reach).setMinY(at.getY()+bottom).setMaxY(at.getY()+top);}

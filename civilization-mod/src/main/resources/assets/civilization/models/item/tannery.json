@@ -1,3 +1,6 @@
 {
-  "parent": "civilization:block/tannery"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "civilization:item/tannery"
+  }
 }

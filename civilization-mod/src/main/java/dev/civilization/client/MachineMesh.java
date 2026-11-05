@@ -21,13 +21,14 @@ import software.bernie.geckolib.util.RenderUtil;
 /**
  * A machine model's still geometry as block quads, worked out once per resource load with GeckoLib's own transforms, so
  * the cells draw exactly what {@link ModeledMachineRenderer} would. For each facing and cell it holds the quads of each
- * section, of the controller and of the fire's lit and cold bones, placed relative to that cell's block with texture
+ * section, of the controller and of its lit and cold bones, placed relative to that cell's block with texture
  * coordinates in the model's own texture. A cube is drawn from the cell nearest its centre among those its section
  * fills, the controller's from the controller's, so it takes that cell's light. Bones the model animates are left out:
  * the block entity renderer draws them.
  */
 final class MachineMesh {
-    /** Groups besides the sections, numbered 0 up: the controller's bones and the fire's lit and cold bones. */
+    /** Groups besides the sections, numbered 0 up: the controller's bones and the lit and cold bones that follow its lit
+     * state; a heated machine's lit bones are its fire and glow. */
     static final int CONTROLLER = -1, LIT = -2, COLD = -3;
     /** The controller's cell, which is not one of the model's part cells. */
     static final int CONTROLLER_CELL = -1;
@@ -108,7 +109,7 @@ final class MachineMesh {
                 points[i] = new Vector3f(at.x(), at.y(), at.z()); centre.add(points[i]); corners++;
                 uv[2 * i] = v.texU(); uv[2 * i + 1] = v.texV();
             }
-            placed.add(new Quad(points, uv, normal, group == LIT));
+            placed.add(new Quad(points, uv, normal, group == LIT && model.heated));
         }
         pose.popPose();
         if (placed.isEmpty()) return;

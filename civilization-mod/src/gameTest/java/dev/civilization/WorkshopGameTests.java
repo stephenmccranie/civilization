@@ -277,9 +277,9 @@ public final class WorkshopGameTests {
         h.succeed();
     }
     @GameTest(template="industrial") public static void cheapTanneryPrecedesMetalworking(GameTestHelper h){
-        long stone=WorkshopStructure.parts(0).stream().filter(part->part.material().equals("stone")&&part.y()==0).count();
-        long brick=WorkshopStructure.parts(0).stream().filter(part->part.material().equals("brick")&&part.y()==0).count();
-        h.assertTrue(stone==6&&brick==2,"Tannery has a cobblestone plinth with just two brick accents");
+        var sections=MachineModel.TANNERY.sections;
+        h.assertTrue(sections.stream().allMatch(s->s.accepts(new ItemStack(Items.COBBLESTONE))||s.accepts(new ItemStack(Items.BRICKS))||s.accepts(new ItemStack(Items.OAK_PLANKS)))
+                &&sections.stream().noneMatch(s->s.accepts(new ItemStack(Items.IRON_INGOT))),"The Tannery is built of stone, brick and planks, with no metal");
         var recipe=h.getLevel().getRecipeManager().getRecipes().stream().filter(holder->holder.id().toString().equals("civilization:tannery")).findFirst().orElseThrow().value();
         var ingredients=recipe.getIngredients();
         h.assertTrue(ingredients.stream().noneMatch(ingredient->ingredient.test(new ItemStack(Items.IRON_INGOT)))

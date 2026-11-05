@@ -100,6 +100,9 @@ final class WorkshopVisualCheck {
         if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);ModeledMachine.removeSection(ModeledMachine.of(server.overworld().getBlockEntity(at(2))),3,false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
         if(ticks==409)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
         if(ticks==415)shot(mc,"smithy-guide");
+        // The Tannery still steeps the batch poured at tick 187: its liquor and hides show from the front left.
+        if(ticks==416){mc.options.hideGui=true;server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
+        if(ticks==423){shot(mc,"tannery-steeping");mc.options.hideGui=false;}
         if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
             var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(1));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
             var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,37.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);

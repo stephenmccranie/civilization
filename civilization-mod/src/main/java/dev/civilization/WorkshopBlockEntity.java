@@ -164,7 +164,9 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         }
     }
     private void pause(int state,boolean reset){status=state;if(reset&&progress!=0){progress=0;workingResult=ItemStack.EMPTY;setChanged();}working(false);}
-    private void working(boolean value){if(getBlockState().getValue(MachineFeedback.WORKING)!=value||getBlockState().getValue(WorkshopBlock.LIT)!=fire.lit())level.setBlock(worldPosition,getBlockState().setValue(MachineFeedback.WORKING,value).setValue(WorkshopBlock.LIT,fire.lit()),3);}
+    /** What the model's lit bones show: the fire burning, or the Tannery's pit holding a batch. */
+    private boolean lit(){return steeped()?!items.get(PIT_HIDES).isEmpty():fire.lit();}
+    private void working(boolean value){if(getBlockState().getValue(MachineFeedback.WORKING)!=value||getBlockState().getValue(WorkshopBlock.LIT)!=lit())level.setBlock(worldPosition,getBlockState().setValue(MachineFeedback.WORKING,value).setValue(WorkshopBlock.LIT,lit()),3);}
     public final ContainerData data=new ContainerData(){
         public int get(int i){return switch(i){case 0->kind;case 1->selected;case 2->steeped()?steep:progress;case 3->status;case 4->fire.state();case 5->fire.heat();case 6->items.get(PIT_HIDES).getCount();default->0;};}
         public void set(int i,int v){}public int getCount(){return 7;}
