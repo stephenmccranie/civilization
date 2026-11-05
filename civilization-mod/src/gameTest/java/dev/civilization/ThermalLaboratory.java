@@ -120,9 +120,9 @@ public final class ThermalLaboratory {
                 require(kiln.checkStructure().status()==MachineStructure.COMPLETE,"Lab foundry must form");
                 kiln.setItem(0,new ItemStack(Items.RAW_IRON,32));
                 kiln.setItem(1,KilnContent.MINERAL_COAL.toStack(8));
-                // Seed ignition only; supply() still purchases actual coal and tickers spend it normally.
-                var seed=new net.minecraft.nbt.CompoundTag();var fire=new net.minecraft.nbt.CompoundTag();
-                fire.putBoolean("lit",true);seed.put("coalFire",fire);kiln.fire.load(seed);
+                // Seed a lit fire with warm masonry so work starts inside the heating phase (warming from cold takes
+                // two minutes); supply() still purchases actual coal and tickers spend it normally.
+                CoalFireFixture.set(kiln.fire,true,kiln.fire.capacity());
             } else {
                 Block block=switch(s.name()){
                     case "torch"->Blocks.TORCH;case "fire"->Blocks.FIRE;
