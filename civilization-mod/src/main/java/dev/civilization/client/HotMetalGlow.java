@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.civilization.Civilization;
 import dev.civilization.HotMetal;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -26,17 +28,22 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
+import net.neoforged.neoforge.client.model.QuadTransformers;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 /**
  * Hot metal glows in its temperature's colour wherever it is drawn: in slots, in hand, dropped and in frames. Each
- * pass of its model is drawn tinted by the glow, then again as light added over it at full brightness, so it shows
- * at night.
+ * pass of its model is drawn tinted by the glow and lit from within by its strength, then again as light added over
+ * it, so it shows at night. The glow's colour is the items' tint each frame; its strength lights the quads in four
+ * steps, kept per model.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class HotMetalGlow {
     /** Tint indices of the two passes, clear of the small indices models use for their own tints. */
     private static final int TINT = 0x484F54, LIGHT = TINT + 1;
+    /** Each glowing model pass's quads, by side, tint and light. */
+    private record Quads(BakedModel model, Direction side, int tint, int light) {}
+    private static final Map<Quads, List<BakedQuad>> QUADS = new ConcurrentHashMap<>();
     private HotMetalGlow() {}
 
     private static List<Item> metals() { return BuiltInRegistries.ITEM.stream().filter(HotMetal::forgeable).toList(); }
@@ -59,6 +66,7 @@ public final class HotMetalGlow {
         }, metals().toArray(Item[]::new));
     }
     @SubscribeEvent public static void models(ModelEvent.ModifyBakingResult event) {
+        QUADS.clear();
         for (var item : metals())
             event.getModels().computeIfPresent(ModelResourceLocation.inventory(BuiltInRegistries.ITEM.getKey(item)), (location, model) -> new Metal(model));
     }
@@ -68,35 +76,38 @@ public final class HotMetalGlow {
         private final ItemOverrides overrides = new ItemOverrides() {
             @Override public BakedModel resolve(BakedModel model, ItemStack stack, ClientLevel level, LivingEntity entity, int seed) {
                 var resolved = originalModel.getOverrides().resolve(originalModel, stack, level, entity, seed);
-                return resolved == null || glow(stack) >>> 24 == 0 ? resolved : new Hot(resolved);
+                int strength = glow(stack) >>> 24;
+                return resolved == null || strength == 0 ? resolved : new Hot(resolved, (strength * 4 + 254) / 255 * 15 / 4);
             }
         };
         Metal(BakedModel model) { super(model); }
         @Override public ItemOverrides getOverrides() { return overrides; }
     }
-    /** A glowing stack's model: each of its passes, tinted, then its light. */
+    /** A glowing stack's model, lit from within at block light `light`: each of its passes, tinted, then its light. */
     private static final class Hot extends BakedModelWrapper<BakedModel> {
-        Hot(BakedModel model) { super(model); }
+        private final int light;
+        Hot(BakedModel model, int light) { super(model); this.light = light; }
         @Override public BakedModel applyTransform(ItemDisplayContext context, PoseStack pose, boolean leftHand) {
-            return new Hot(originalModel.applyTransform(context, pose, leftHand));
+            return new Hot(originalModel.applyTransform(context, pose, leftHand), light);
         }
         @Override public List<BakedModel> getRenderPasses(ItemStack stack, boolean fabulous) {
             return originalModel.getRenderPasses(stack, fabulous).stream()
-                    .<BakedModel>mapMulti((pass, passes) -> { passes.accept(new Pass(pass, TINT)); passes.accept(new Pass(pass, LIGHT)); }).toList();
+                    .<BakedModel>mapMulti((pass, passes) -> { passes.accept(new Pass(pass, TINT, light)); passes.accept(new Pass(pass, LIGHT, light)); }).toList();
         }
     }
-    /** One pass with every quad tinted `tint`; the light pass is added over what is drawn and ignores the world's light. */
+    /** One pass with every quad tinted `tint` and lit at least to `light`; the light pass is added over what is drawn. */
     private static final class Pass extends BakedModelWrapper<BakedModel> {
-        private final int tint;
-        Pass(BakedModel model, int tint) { super(model); this.tint = tint; }
-        private List<BakedQuad> tinted(List<BakedQuad> quads) {
-            return quads.stream().map(quad -> new BakedQuad(quad.getVertices(), tint, quad.getDirection(), quad.getSprite(), quad.isShade(), quad.hasAmbientOcclusion())).toList();
-        }
+        private final int tint, light;
+        Pass(BakedModel model, int tint, int light) { super(model); this.tint = tint; this.light = light; }
         @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random) {
-            return tinted(originalModel.getQuads(state, side, random));
+            return QUADS.computeIfAbsent(new Quads(originalModel, side, tint, light), key -> {
+                var lit = QuadTransformers.applyingLightmap(light, 0);
+                return originalModel.getQuads(state, side, random).stream().map(lit::process)
+                        .map(quad -> new BakedQuad(quad.getVertices(), tint, quad.getDirection(), quad.getSprite(), quad.isShade(), quad.hasAmbientOcclusion())).toList();
+            });
         }
         @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource random, ModelData data, RenderType type) {
-            return tinted(originalModel.getQuads(state, side, random, data, type));
+            return getQuads(state, side, random);
         }
         @Override public List<RenderType> getRenderTypes(ItemStack stack, boolean fabulous) {
             return tint == TINT ? originalModel.getRenderTypes(stack, fabulous) : List.of(RenderType.eyes(TextureAtlas.LOCATION_BLOCKS));
