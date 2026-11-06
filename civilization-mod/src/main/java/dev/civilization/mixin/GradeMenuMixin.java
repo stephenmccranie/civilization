@@ -20,6 +20,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+
 /**
  * Menus combine a graded material's stacks whatever their units' grades, and move the actual units: placing,
  * collecting, dragging and shift-clicking all hand over the top units of the stack they take from.
@@ -62,6 +65,10 @@ public abstract class GradeMenuMixin {
             ci.cancel();
         }
     }
+
+    /** A drag remembers its slots in the order they were dragged across, so the first slot receives the best units. */
+    @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Sets;newHashSet()Ljava/util/HashSet;"))
+    private HashSet<Slot> civilization$dragOrder(Operation<HashSet<Slot>> original) { return new LinkedHashSet<>(); }
 
     @ModifyReturnValue(method = "canItemQuickReplace", at = @At("RETURN"))
     private static boolean civilization$quickReplace(boolean same, Slot slot, ItemStack stack, boolean sizeMatters) {
