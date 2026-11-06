@@ -19,6 +19,8 @@ button,input{font:inherit;color:inherit;border:1px solid #3c535d;background:#1b2
 #count{font-size:18px;font-variant-numeric:tabular-nums}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}.value{font-size:21px;white-space:nowrap;font-variant-numeric:tabular-nums;margin-top:3px}
 #job{font-size:13px;color:#a8c5b3;margin-top:10px}#job:empty{display:none}#error{font-size:14px;color:#ffbd83;line-height:1.5;margin-top:14px}#error:empty{display:none}
 .map{position:relative;overflow:hidden;background:#18252c;min-height:0}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}#playerCanvas{position:absolute;inset:0;pointer-events:none;touch-action:auto}
+.horizon{display:flex;align-items:center;gap:6px;font-size:14px;color:#9cb0b7}.horizon .choice{flex:1;color:#e3ecee;white-space:nowrap}#horizonChunks{width:60px;padding:2px 6px;font-size:14px}
+#horizonShade{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--x) var(--y),transparent calc(var(--r) - 1px),rgb(4 9 12/.5) var(--r))}
 #coords{position:absolute;bottom:16px;left:16px;max-width:calc(100% - 32px);white-space:normal;line-height:1.5;background:#101b23e6;padding:8px 10px;border:1px solid #38505c;border-radius:6px;font:12px ui-monospace,monospace;pointer-events:none}#compass{position:absolute;top:16px;right:18px;color:#b4c7ce;font-size:12px;text-align:center;pointer-events:none}
 @media(max-width:700px){main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}aside{padding:12px 16px;border-right:0;border-bottom:1px solid #2b3b42;max-height:45dvh}h1{font-size:18px;margin-bottom:14px}aside section+section{margin-top:14px;padding-top:12px}}
 </style>
@@ -36,6 +38,7 @@ button,input{font:inherit;color:inherit;border:1px solid #3c535d;background:#1b2
 <div class="legend"><span><b class="coal">&#9679;</b> Coal <span id="coalCount">&mdash;</span></span><span><b class="oil">&#9670;</b> Oil <span id="oilCount">&mdash;</span></span></div>
 <label class="choice"><input id="contours" type="checkbox">Contours</label>
 <label class="choice"><input id="grid" type="checkbox" checked>Coordinate grid</label>
+<div class="horizon" title="Shades ground beyond this Distant Horizons LOD radius from the pointer."><label class="choice"><input id="showHorizon" type="checkbox">LOD range</label><input id="horizonChunks" type="number" aria-label="LOD range in chunks" value="128" min="1" step="1">chunks</div>
 <div id="villageStatus" class="feed-status" role="status"></div><div id="depositStatus" class="feed-status" role="status"></div>
 </fieldset>
 <div class="buttons"><button id="fit">Fit map</button><button id="origin">0, 0</button></div>
@@ -52,5 +55,5 @@ button,input{font:inherit;color:inherit;border:1px solid #3c535d;background:#1b2
 <div class="metric" title="Traffic received on the primary network interface; decimal MB per second."><span>Network &#8595;</span><output id="networkRx"></output></div>
 <div class="metric" title="Traffic sent on the primary network interface; decimal MB per second."><span>Network &#8593;</span><output id="networkTx"></output></div></section>
 <div id="error" role="status"></div>
-</aside><section class="map"><canvas id="map" aria-label="Generated terrain map"></canvas><canvas id="playerCanvas" aria-hidden="true"></canvas><div id="compass">N<br>&uarr;</div><div id="coords">X 0 &middot; Z 0</div></section></main>
+</aside><section class="map"><canvas id="map" aria-label="Generated terrain map"></canvas><div id="horizonShade" hidden></div><canvas id="playerCanvas" aria-hidden="true"></canvas><div id="compass">N<br>&uarr;</div><div id="coords">X 0 &middot; Z 0</div></section></main>
 <script src="/map.js"></script></html>
