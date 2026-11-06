@@ -41,9 +41,9 @@ public final class ThermalRules {
     // Clothing pulls felt temperature toward the skin by a full set's share. Metal armor is padded with the same
     // leather and cloth whatever its plates are, so it insulates alike and less than a full leather suit.
     public static final double SKIN_C = 33;
-    private static final Map<Holder<ArmorMaterial>, Double> SET_INSULATION = Map.of(ArmorMaterials.LEATHER, .20,
-            ArmorMaterials.CHAIN, .10, ArmorMaterials.IRON, .10, ArmorMaterials.GOLD, .10, ArmorMaterials.DIAMOND, .10,
-            ArmorMaterials.NETHERITE, .10);
+    private static final Map<Holder<ArmorMaterial>, Double> SET_INSULATION = Map.of(ArmorMaterials.LEATHER, .40,
+            ArmorMaterials.CHAIN, .25, ArmorMaterials.IRON, .25, ArmorMaterials.GOLD, .25, ArmorMaterials.DIAMOND, .25,
+            ArmorMaterials.NETHERITE, .25);
     private static final Map<EquipmentSlot, Double> COVERAGE = Map.of(EquipmentSlot.HEAD, .15, EquipmentSlot.CHEST, .40,
             EquipmentSlot.LEGS, .30, EquipmentSlot.FEET, .15);
     private static final double SUN_PATH_TILT = Math.toRadians(-35); // Photon's default, so shade matches its shadows.

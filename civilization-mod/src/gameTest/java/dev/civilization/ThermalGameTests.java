@@ -585,11 +585,11 @@ public final class ThermalGameTests {
             p.setItemSlot(p.getEquipmentSlotForItem(new net.minecraft.world.item.ItemStack(piece)),new net.minecraft.world.item.ItemStack(piece));
         double leather=ThermalRules.insulation(p);
         double evening=(50-32)/1.8,leatherEvening=ThermalRules.felt(evening,evening,leather)*1.8+32;
-        h.assertTrue(Math.abs(leather-.2)<1e-9&&leatherEvening>58&&leatherEvening<59,"A leather suit makes a 50°F evening feel about 58°F: "+leatherEvening);
+        h.assertTrue(Math.abs(leather-.4)<1e-9&&leatherEvening>66&&leatherEvening<67,"A leather suit makes a 50°F evening feel about 67°F: "+leatherEvening);
         p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_CHESTPLATE));
-        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.16)<1e-9,"A metal chestplate keeps only its padding's warmth");
+        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.34)<1e-9,"A metal chestplate is padded less warmly than leather");
         p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new net.minecraft.world.item.ItemStack(ThermalContent.HELMET.get()));
-        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.145)<1e-9,"The thermal helmet is padded like iron armor, less warmly than leather");
+        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.3175)<1e-9,"The thermal helmet is padded like iron armor, less warmly than leather");
         h.assertTrue(ThermalRules.felt(30,30,leather)>30&&ThermalRules.felt(40,40,leather)<40,
                 "Clothing adds to warm weather and shields from heat above skin temperature");
         h.succeed();
