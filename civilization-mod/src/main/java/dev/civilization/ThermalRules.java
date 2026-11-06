@@ -1,11 +1,18 @@
 package dev.civilization;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Map;
 import java.util.Set;
 
 /** Initial game tuning, not SI thermodynamics. Energy is in air-block degree units. */
@@ -31,6 +38,14 @@ public final class ThermalRules {
     // Climate temperatures are shade air; direct sun is felt on top. A body absorbs about an eighth of the sun's beam
     // per unit of its surface, and a clear sky's scattered light (per sine of sun height) offsets its cold by day.
     public static final double SUN_ABSORBED = .125, SKY_DIFFUSE = 110, MIN_SUN_HEIGHT = .05, SUN_REACH = 64;
+    // Clothing pulls felt temperature toward the skin by a full set's share. Metal armor is padded with the same
+    // leather and cloth whatever its plates are, so it insulates alike and less than a full leather suit.
+    public static final double SKIN_C = 33;
+    private static final Map<Holder<ArmorMaterial>, Double> SET_INSULATION = Map.of(ArmorMaterials.LEATHER, .20,
+            ArmorMaterials.CHAIN, .10, ArmorMaterials.IRON, .10, ArmorMaterials.GOLD, .10, ArmorMaterials.DIAMOND, .10,
+            ArmorMaterials.NETHERITE, .10);
+    private static final Map<EquipmentSlot, Double> COVERAGE = Map.of(EquipmentSlot.HEAD, .15, EquipmentSlot.CHEST, .40,
+            EquipmentSlot.LEGS, .30, EquipmentSlot.FEET, .15);
     private static final double SUN_PATH_TILT = Math.toRadians(-35); // Photon's default, so shade matches its shadows.
     private static final double COLD_MIN = 2, COLD_COMFORT = 18;
     // Per quarter-second exchange step. Sum of outward air fractions stays below one.
@@ -126,7 +141,19 @@ public final class ThermalRules {
         double distance=(c-COMFORT_CENTER_C)/COMFORT_SPREAD_C;
         return Math.exp(-.5*distance*distance);
     }
-    public static double felt(double air, double radiant) { return air + RADIANT_SHARE * (radiant - air); }
+    /** Felt temperature: air blended with surroundings, then pulled toward the skin by the clothing's insulation share. */
+    public static double felt(double air, double radiant, double insulation) {
+        double bare = air + RADIANT_SHARE * (radiant - air);
+        return bare + insulation * (SKIN_C - bare);
+    }
+    /** Clothing's share of a body's warmth: each worn piece adds its coverage of its material's full-set insulation. */
+    public static double insulation(LivingEntity body) {
+        double total = 0;
+        for (var piece : COVERAGE.entrySet())
+            if (body.getItemBySlot(piece.getKey()).getItem() instanceof ArmorItem armor)
+                total += piece.getValue() * SET_INSULATION.getOrDefault(armor.getMaterial(), 0d);
+        return total;
+    }
     /** Unit vector toward the sun for a vanilla time of day, which is 0 at noon. */
     public static Vec3 sun(double timeOfDay) {
         double angle = timeOfDay * Math.TAU;

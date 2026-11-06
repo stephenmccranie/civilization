@@ -196,20 +196,20 @@ public final class ThermalGameTests {
         var noon=new ThermalExposure.Sky(ThermalRules.sun(0),0,0);
         var sunny=ThermalExposure.sample(l,field,torso,air,noon);
         h.assertTrue(sunny.sunlight()==1,"Nothing shades the open fixture at noon");
-        double sun=ThermalRules.felt(air,sunny.radiant());
+        double sun=ThermalRules.felt(air,sunny.radiant(),0);
         h.assertTrue(sun>air+3,"Noon sun feels warmer than the shade air: "+sun+" vs "+air);
         var overcast=ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(noon.sun(),1,1));
         h.assertTrue(overcast.sunlight()==0&&Math.abs(overcast.radiant()-air)<1,"Overcast hides the sun and radiates like the air");
-        double night=ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant());
+        double night=ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant(),0);
         h.assertTrue(night<air-1.5,"A clear night sky draws warmth from the open: "+night+" vs "+air);
         h.assertTrue(ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.26),0,0)).sunlight()==0,"No direct sun once it has set");
         // A stone roof over the player.
         for(var q:BlockPos.betweenClosed(p.offset(-4,3,-4),p.offset(4,3,4)))l.setBlockAndUpdate(q,Blocks.STONE.defaultBlockState());
         var shaded=ThermalExposure.sample(l,field,torso,air,noon);
         h.assertTrue(shaded.sunlight()==0,"A roof shades the noon sun");
-        double shade=ThermalRules.felt(air,shaded.radiant());
+        double shade=ThermalRules.felt(air,shaded.radiant(),0);
         h.assertTrue(sun>shade+3&&Math.abs(shade-air)<2,"Shade under a roof feels close to the air: "+shade);
-        h.assertTrue(ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant())>night+1,"A roof keeps off the cold night sky");
+        h.assertTrue(ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant(),0)>night+1,"A roof keeps off the cold night sky");
         h.succeed();
     }
     @GameTest(template="industrial") public static void flamesWarmWhoeverSeesThem(GameTestHelper h){
@@ -223,7 +223,7 @@ public final class ThermalGameTests {
         l.setBlockAndUpdate(p.east(),Blocks.CAMPFIRE.defaultBlockState());
         double beside=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
         h.assertTrue(beside>open+20,"A campfire beside you warms what you feel: "+open+" -> "+beside);
-        h.assertTrue(ThermalRules.felt(air,beside)>air+8,"Felt temperature follows the fire, not only the air");
+        h.assertTrue(ThermalRules.felt(air,beside,0)>air+8,"Felt temperature follows the fire, not only the air");
         h.assertTrue(Math.abs(field.localTemperature(l,BlockPos.containing(torso))-air)<.001,"Seeing a flame warms the body, not the air");
         l.setBlockAndUpdate(p.east(),Blocks.TORCH.defaultBlockState());
         double torch=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
@@ -253,10 +253,10 @@ public final class ThermalGameTests {
         double capacity=ThermalField.capacity(Blocks.BRICKS.defaultBlockState());
         for(var q:shell)field.energy.put(q.asLong(),20*capacity);
         double warm=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
-        h.assertTrue(warm>air+15&&ThermalRules.felt(air,warm)>air+6,"Warm masonry makes a room feel warmer than its air: "+warm);
+        h.assertTrue(warm>air+15&&ThermalRules.felt(air,warm,0)>air+6,"Warm masonry makes a room feel warmer than its air: "+warm);
         for(var q:shell)field.energy.put(q.asLong(),-15*capacity);
         double cold=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
-        h.assertTrue(cold<air-10&&ThermalRules.felt(air,cold)<air-4,"Cold walls make a room feel cooler than its air: "+cold);
+        h.assertTrue(cold<air-10&&ThermalRules.felt(air,cold,0)<air-4,"Cold walls make a room feel cooler than its air: "+cold);
         h.succeed();
     }
     @GameTest(template="industrial") public static void torchesWarmAndStopWhenRemoved(GameTestHelper h){
@@ -574,6 +574,25 @@ public final class ThermalGameTests {
             h.assertTrue(Math.abs(sunset-highWet-(4.5+3*profile.rainFactor()))<1e-9,"Altitude and rain retain their independent corrections: "+key);
             if(key==Biomes.LUSH_CAVES)h.assertTrue(peak==dawn&&peak==noon,"Cave climate has no surface daily swing");
         }h.succeed();
+    }
+    @GameTest(template="empty") public static void wornClothingWarmsTheColdAndTempersTheHeat(GameTestHelper h){
+        var p=h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        h.assertTrue(ThermalRules.insulation(p)==0,"A bare player has no insulation");
+        p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TURTLE_HELMET));
+        p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ELYTRA));
+        h.assertTrue(ThermalRules.insulation(p)==0,"A turtle shell and elytra are not clothing");
+        for(var piece:new net.minecraft.world.item.Item[]{net.minecraft.world.item.Items.LEATHER_HELMET,net.minecraft.world.item.Items.LEATHER_CHESTPLATE,net.minecraft.world.item.Items.LEATHER_LEGGINGS,net.minecraft.world.item.Items.LEATHER_BOOTS})
+            p.setItemSlot(p.getEquipmentSlotForItem(new net.minecraft.world.item.ItemStack(piece)),new net.minecraft.world.item.ItemStack(piece));
+        double leather=ThermalRules.insulation(p);
+        double evening=(50-32)/1.8,leatherEvening=ThermalRules.felt(evening,evening,leather)*1.8+32;
+        h.assertTrue(Math.abs(leather-.2)<1e-9&&leatherEvening>58&&leatherEvening<59,"A leather suit makes a 50°F evening feel about 58°F: "+leatherEvening);
+        p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_CHESTPLATE));
+        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.16)<1e-9,"A metal chestplate keeps only its padding's warmth");
+        p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD,new net.minecraft.world.item.ItemStack(ThermalContent.HELMET.get()));
+        h.assertTrue(Math.abs(ThermalRules.insulation(p)-.145)<1e-9,"The thermal helmet is padded like iron armor, less warmly than leather");
+        h.assertTrue(ThermalRules.felt(30,30,leather)>30&&ThermalRules.felt(40,40,leather)<40,
+                "Clothing adds to warm weather and shields from heat above skin temperature");
+        h.succeed();
     }
     @GameTest(template="industrial") public static void comfortAndMachineEfficiencyHaveLimits(GameTestHelper h){
         double rising=ThermalRules.exchangeRate(true,true,Direction.UP,30,20,1,1);
