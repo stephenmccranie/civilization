@@ -48,20 +48,21 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * full heat. Everything that shows hot metal takes its colour from that age. Holding use on an anvil with metal at
  * working heat in hand strikes the whole stack with a heavy blow a second, each the player's labor for every unit
  * struck; the hammering's last blow beats rough metal into its ingot, raises every unit one random grade step and
- * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out costs
- * every unit grade along a bell curve about the ideal age, and quenching hammered metal within a second or so of it adds
- * up to another hammering's step: water takes the heat at once, and metal left to cool in air takes the worst cost once it is next
- * seen cold.
+ * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out right at
+ * the ideal age rewards hammered metal with another hammering's step, a little off it neither helps nor harms, and
+ * further off costs every unit grade along a bell curve: water takes the heat at once, and metal left to cool in air
+ * takes the worst cost once it is next seen cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
     /** Metal is cold a minute out of the fire. It can be worked for its first 25 s, and quenches best at 35 s, bright cherry red. */
     public static final int LOAD = 8, COOL_TICKS = 60 * 20, WORKING_TICKS = 25 * 20, IDEAL_TICKS = 35 * 20;
     /**
-     * A quench costs each unit up to `WORST` tenths of a point along a bell curve `SPREAD` ticks (5 s) wide about the
-     * ideal, and rewards it with up to one mean hammering step along a curve `MASTERY` ticks (1 s) wide.
+     * A quench of hammered metal within `MASTERY` ticks (1 s) of the ideal rewards each unit with up to one mean hammering
+     * step; within `FORGIVEN` ticks (3 s) it costs nothing; beyond, each unit loses up to `WORST` tenths of a point along
+     * a bell curve `SPREAD` ticks (5 s) wide from there.
      */
-    static final int WORST = 100, SPREAD = 5 * 20, MASTERY = 20;
+    static final int MASTERY = 20, FORGIVEN = 3 * 20, WORST = 100, SPREAD = 5 * 20;
     /** The glow by age in seconds: white-yellow, orange, bright cherry red, dull red, faint, then none; alpha is its strength. */
     private static final int[] GLOW_AGES = {0, 12, 25, 35, 45, 52, 56};
     private static final int[] GLOW = {0xFFFFF8E0, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
@@ -88,16 +89,13 @@ public final class HotMetal {
     }
     public static boolean hot(ItemStack stack, long now) { return age(stack, now) < COOL_TICKS; }
     public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS; }
-    /** Tenths of a point a quench at `age` costs every unit: none at the ideal, the worst once cold. */
+    /** Tenths of a point a quench at `age` costs every unit: none near the ideal, the worst once cold. */
     public static int loss(long age) {
-        double off = (age - IDEAL_TICKS) / (double)SPREAD;
+        double off = Math.max(0, Math.abs(age - IDEAL_TICKS) - FORGIVEN) / (double)SPREAD;
         return (int)Math.round(WORST * (1 - Math.exp(-off * off / 2)));
     }
-    /** The share of a mean hammering step quenching hammered metal at `age` adds to every unit: all of it at the ideal, little a second or two off. */
-    public static double reward(long age) {
-        double off = (age - IDEAL_TICKS) / (double)MASTERY;
-        return Math.exp(-off * off / 2);
-    }
+    /** The share of a mean hammering step quenching hammered metal at `age` adds to every unit: all of it at the ideal, none a second off. */
+    public static double reward(long age) { return Math.max(0, 1 - Math.abs(age - IDEAL_TICKS) / (double)MASTERY); }
     /** The glow's colour at the stack's temperature, its alpha the glow's strength. */
     public static int glow(ItemStack stack, long now) {
         double seconds = age(stack, now) / 20.0;

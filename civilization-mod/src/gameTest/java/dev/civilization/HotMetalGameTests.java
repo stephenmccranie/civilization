@@ -175,7 +175,7 @@ public final class HotMetalGameTests {
         var player = smith(h, cauldron);
         long now = h.getLevel().getGameTime();
         var grades = List.of(900, 800, 700);
-        for (int seconds : new int[] {0, -1, 1, -3, 3, -10, 10}) {
+        for (int seconds : new int[] {0, -2, 2, -5, 5, -10, 10}) {
             long age = HotMetal.IDEAL_TICKS + seconds * 20L;
             var bars = aged(GradeGameTests.units(Items.IRON_INGOT, 900, 800, 700), now, seconds);
             bars.set(HotMetal.WORKED.get(), net.minecraft.util.Unit.INSTANCE);
@@ -186,8 +186,8 @@ public final class HotMetalGameTests {
             h.assertTrue(after.equals(grades.stream().map(grade -> Grade.tempered(grade, HotMetal.reward(age), HotMetal.loss(age))).toList()),
                     "Each unit gains its share of its own hammering step and loses the timing's cost: " + after);
             int change = after.getFirst() - grades.getFirst();
-            h.assertTrue(seconds == 0 ? change == Math.round(Grade.step(900)) : Math.abs(seconds) == 1 ? change > 0 && change < Grade.step(900)
-                    : Math.abs(seconds) == 3 ? change < 0 && change > -20 : change < -70,
+            h.assertTrue(seconds == 0 ? change == Math.round(Grade.step(900)) : Math.abs(seconds) == 2 ? change == 0
+                    : Math.abs(seconds) == 5 ? change < 0 && change > -10 : change < -50,
                     "Quenching " + seconds + " s from cherry red changes the best bar by " + change / 10.0 + " points");
         }
         h.assertTrue(HotMetal.loss(HotMetal.COOL_TICKS) == 100, "Metal cooled in air has lost the full ten points");
