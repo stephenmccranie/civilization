@@ -47,8 +47,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * cold a minute after leaving the Foundry, so it cools on time wherever it is; a hot furnace keeps the metal in it at
  * full heat. Everything that shows hot metal takes its colour from that age. Holding use on an anvil with metal at
  * working heat in hand strikes the whole stack with a heavy blow a second, each the player's labor for every unit
- * struck; the hammering's last blow beats rough metal into its ingot, raises every unit one random grade step and
- * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out right at
+ * struck; the hammering's last blow beats rough metal into its ingot and raises every unit one random grade step, and
+ * the stack cools on as before but cannot be worked again until it has been back in the fire. A grindstone cuts diamonds the same way, cold. Taking the heat out right at
  * the ideal age rewards hammered metal with another hammering's step, a little off it neither helps nor harms, and
  * further off costs every unit grade along a bell curve: water takes the heat at once, and metal left to cool in air
  * takes the worst cost once it is next seen cold.
@@ -73,7 +73,7 @@ public final class HotMetal {
     /** The game time a stack's heat lasts until. Every dimension shares game time, and it passes only while the world runs. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> HOT = COMPONENTS.registerComponentType("hot_until",
             builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
-    /** Marks metal hammered this heat, whose quench can earn the mastery reward; a quench takes the mark with the heat. */
+    /** Marks metal hammered this heat, which cannot be hammered again and whose quench can earn the mastery reward; a quench takes the mark with the heat. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> WORKED = COMPONENTS.registerComponentType("worked",
             builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
     /** Labor each player has paid since their last finished hammering or cutting, in blows on one unit. */
@@ -88,7 +88,8 @@ public final class HotMetal {
         return until == null ? COOL_TICKS : Math.clamp(now - until + COOL_TICKS, 0, COOL_TICKS);
     }
     public static boolean hot(ItemStack stack, long now) { return age(stack, now) < COOL_TICKS; }
-    public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS; }
+    /** Whether the stack can be hammered: at working heat and not yet hammered this heat. */
+    public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS && !stack.has(WORKED.get()); }
     /** Tenths of a point a quench at `age` costs every unit: none near the ideal, the worst once cold. */
     public static int loss(long age) {
         double off = Math.max(0, Math.abs(age - IDEAL_TICKS) - FORGIVEN) / (double)SPREAD;
@@ -169,7 +170,7 @@ public final class HotMetal {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         if (blows > 0) strike(player, event.getPos(), stack, blows);
         else if (water != null) quench(player, stack, water);
-        else player.displayClientMessage(Component.translatable("message.civilization.too_cool", stack.getHoverName()), true);
+        else player.displayClientMessage(Component.translatable(stack.has(WORKED.get()) ? "message.civilization.worked" : "message.civilization.too_cool", stack.getHoverName()), true);
     }
     @SubscribeEvent public static void use(PlayerInteractEvent.RightClickItem event) {
         var water = hot(event.getItemStack(), event.getLevel().getGameTime()) ? water(event.getEntity()) : null;
@@ -253,10 +254,7 @@ public final class HotMetal {
         WORK.remove(player.getUUID());
         int before = Grade.value(stack);
         var done = stack.getItem() instanceof RoughMetal rough ? stack.transmuteCopy(rough.ingot(), units) : stack.copy();
-        if (metal) {
-            done.set(HOT.get(), Math.min(stack.get(HOT.get()), level.getGameTime() + COOL_TICKS - WORKING_TICKS));
-            done.set(WORKED.get(), Unit.INSTANCE);
-        }
+        if (metal) done.set(WORKED.get(), Unit.INSTANCE);
         Grade.refine(done, level.random);
         player.setItemInHand(InteractionHand.MAIN_HAND, done);
         player.displayClientMessage(Component.translatable(metal ? "message.civilization.hammered" : "message.civilization.cut",

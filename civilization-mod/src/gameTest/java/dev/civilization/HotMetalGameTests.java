@@ -122,16 +122,16 @@ public final class HotMetalGameTests {
         long now = level.getGameTime();
         h.assertTrue(bars.is(Items.IRON_INGOT) && bars.getCount() == 3 && grades.get(0) > 900 && grades.get(1) > 800 && grades.get(2) > 700,
                 "Five blows on an iron anvil beat the whole stack of blooms into ingots, each a grade step up: " + grades);
-        h.assertTrue(HotMetal.hot(bars, now) && !HotMetal.workable(bars, now) && bars.has(HotMetal.WORKED.get()) && HotMetal.age(bars, now) == HotMetal.WORKING_TICKS,
-                "A hammering spends the working heat, exactly ten seconds short of cherry red, and leaves the bars worked and cooling");
+        h.assertTrue(HotMetal.hot(bars, now) && HotMetal.age(bars, now) < HotMetal.WORKING_TICKS && bars.has(HotMetal.WORKED.get()) && !HotMetal.workable(bars, now),
+                "A hammering leaves the bars cooling as they were, marked as worked this heat");
         h.assertTrue(spent >= .8 * HotMetal.ANVIL_BLOWS * blow - 1e-6 && spent <= HotMetal.ANVIL_BLOWS * blow + 1e-6, "Every blow is paid labor for each unit: " + spent + " kcal");
-        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal below working heat can't be hammered again");
+        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal hammered this heat can't be hammered again until it is reheated");
         var cauldron = station(h, 4, Blocks.WATER_CAULDRON);
         int loss = HotMetal.loss(HotMetal.age(player.getMainHandItem(), now));
         h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()) && Grade.stacks(player.getMainHandItem(), new ItemStack(Items.IRON_INGOT)),
                 "Water quenches the bars at once");
         h.assertTrue(loss > 0 && GradeGameTests.grades(player.getMainHandItem()).equals(less(grades, loss)),
-                "Quenching straight off the anvil, before cherry red, costs every unit the same: " + grades + " to " + GradeGameTests.grades(player.getMainHandItem()));
+                "Quenching straight off the anvil, long before cherry red, costs every unit the same: " + grades + " to " + GradeGameTests.grades(player.getMainHandItem()));
         var stone = station(h, 6, KilnContent.STONE_ANVIL.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.units(KilnContent.BLISTER_STEEL.get(), 800), level.getGameTime()));
         work(h, player, stone, HotMetal.STONE_ANVIL_BLOWS - 1);

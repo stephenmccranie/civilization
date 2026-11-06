@@ -168,7 +168,7 @@ public final class CivilizationJei implements IModPlugin {
     private void anvil(IRecipeRegistration r){
         var anvils=new Slot(RecipeIngredientRole.CATALYST,List.of(KilnContent.STONE_ANVIL_ITEM.toStack(),new ItemStack(Items.ANVIL)),FluidStack.EMPTY,
                 "Any anvil: "+HotMetal.ANVIL_BLOWS+" blows on iron, "+HotMetal.STONE_ANVIL_BLOWS+" on stone.");
-        String labor=" Hold use with the stack in hand: a heavy blow a second, each paid in food for every unit. Every hammering raises each unit one random grade step and leaves it to cool: quench it in water at bright cherry red, as further off costs grade.";
+        String labor=" Hold use with the stack in hand: a heavy blow a second, each paid in food for every unit. Every hammering raises each unit one random grade step, once per heat: quench it in water at bright cherry red for a bonus, as far off costs grade.";
         var work=new ArrayList<Process>();
         for(var rough:KilnContent.ROUGH_METALS){
             var ingot=rough.get().ingot();
