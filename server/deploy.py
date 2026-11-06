@@ -46,7 +46,7 @@ SETTINGS = {
     '/srv/minecraft/config/DistantHorizons.toml': {
         'chunkGeneratorMode': '"INTERNAL_SERVER"', 'generatorPlan': '"CHUNKS_ONLY"', 'generationRequestRateLimit': '16',
         'maxGenerationRequestDistance': '256', 'maxSyncOnLoadRequestDistance': '256',
-        'realTimeUpdateDistanceRadiusInChunks': '128', 'playerBandwidthLimit': '100',
+        'realTimeUpdateDistanceRadiusInChunks': '128', 'playerBandwidthLimit': '2000',
         'numberOfThreads': '4', 'threadRunTimeRatio': '"0.75"', 'threadPriority': '3',
         'levelKeyPrefix': '"climate-scale4-20261102t022132z"'},
 }
