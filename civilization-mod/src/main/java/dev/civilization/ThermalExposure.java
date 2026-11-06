@@ -44,7 +44,9 @@ final class ThermalExposure {
             if (sun.y >= ThermalRules.MIN_SUN_HEIGHT && torso.y < CloudCover.SHADOW_Y) {
                 var at = torso.add(sun.scale((CloudCover.SHADOW_Y - torso.y) / sun.y));
                 float local = CloudCover.cloudiness(grid, (float) (at.x - cornerX), (float) (at.z - cornerZ));
-                cover = CloudCover.shade(CloudCover.density(CloudCover.shift(at.x, CloudCover.WIND_X, weather.clock),
+                // Photon fades cloud shadows out between sun heights 0.05 and 0.15.
+                double t = Math.clamp((sun.y - .05) / .1, 0, 1);
+                cover = t * t * (3 - 2 * t) * CloudCover.shade(CloudCover.density(CloudCover.shift(at.x, CloudCover.WIND_X, weather.clock),
                         CloudCover.shift(at.z, CloudCover.WIND_Z, weather.clock), local));
             }
             return new Sky(sun, cloud, cover);
@@ -84,9 +86,10 @@ final class ThermalExposure {
     /** Radiant power along one sight line: the first surface it meets, else the sky or the air where it ends. */
     private static double seen(ServerLevel level, ThermalField field, Vec3 torso, Vec3 direction, double skyPower) {
         var end = torso.add(direction.scale(ThermalRules.RADIANT_REACH));
+        var body = BlockPos.containing(torso);
         return BlockGetter.traverseBlocks(torso, end, field, (f, pos) -> {
             var state = level.getBlockState(pos);
-            if (!opaque(level, pos, state)) return null;
+            if (pos.equals(body) || !opaque(level, pos, state)) return null;
             // Flames and lava radiate only as emitters, so a sight line meeting one counts it as ambient.
             return emission(BlockHeatSources.source(state) ? ThermalField.ambient(level, pos) : f.localTemperature(level, pos));
         }, f -> {
@@ -119,12 +122,13 @@ final class ThermalExposure {
         return power;
     }
 
-    /** Whether the sun is up and no block stands between it and the torso; unloaded ground counts as open. */
+    /** Whether the sun is up and no block beyond the torso's own stands in its way; unloaded ground counts as open. */
     private static boolean sunlit(ServerLevel level, Vec3 torso, Vec3 sun) {
         if (sun.y < ThermalRules.MIN_SUN_HEIGHT) return false;
+        var body = BlockPos.containing(torso);
         return BlockGetter.traverseBlocks(torso, torso.add(sun.scale(ThermalRules.SUN_REACH)), level, (l, pos) -> {
             if (pos.getY() >= l.getMaxBuildHeight() || !Chunks.loaded(l, pos)) return true;
-            return opaque(l, pos, l.getBlockState(pos)) ? false : null;
+            return !pos.equals(body) && opaque(l, pos, l.getBlockState(pos)) ? false : null;
         }, l -> true);
     }
 }
