@@ -174,13 +174,13 @@ public final class HotMetalGameTests {
         var player = smith(h, cauldron);
         long now = h.getLevel().getGameTime();
         var grades = List.of(900, 800, 700);
-        for (int seconds : new int[] {0, -2, 2, -10, 10}) {
+        for (int seconds : new int[] {0, -2, 2, -4, 4, -10, 10}) {
             player.setItemInHand(InteractionHand.MAIN_HAND, aged(GradeGameTests.units(Items.IRON_INGOT, 900, 800, 700), now, seconds));
             h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()), "Water quenches the bars");
             var after = GradeGameTests.grades(player.getMainHandItem());
             int lost = grades.getFirst() - after.getFirst();
             h.assertTrue(after.equals(less(grades, lost)), "Every unit loses the same: " + after);
-            h.assertTrue(seconds == 0 ? lost == 0 : Math.abs(seconds) == 2 ? lost > 0 && lost < 10 : lost > 70,
+            h.assertTrue(Math.abs(seconds) <= 2 ? lost == 0 : Math.abs(seconds) == 4 ? lost > 0 && lost < 10 : lost > 70,
                     "Quenching " + seconds + " s from cherry red costs " + lost / 10.0 + " points");
         }
         h.assertTrue(HotMetal.loss(HotMetal.COOL_TICKS) == 100, "Metal cooled in air has lost the full ten points");

@@ -47,15 +47,18 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * working heat in hand strikes the whole stack with a heavy blow a second, each the player's labor for every unit
  * struck; the hammering's last blow beats rough metal into its ingot, raises every unit one random grade step and
  * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out costs
- * every unit grade along a bell curve about the ideal age: water takes it at once, and metal left to cool in air
- * takes the worst cost once it is next seen cold.
+ * nothing near the ideal age and every unit grade along a bell curve beyond it: water takes it at once, and metal left
+ * to cool in air takes the worst cost once it is next seen cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
     /** Metal is cold a minute out of the fire. It can be worked for its first 25 s, and quenches best at 35 s, bright cherry red. */
     public static final int LOAD = 8, COOL_TICKS = 60 * 20, WORKING_TICKS = 25 * 20, IDEAL_TICKS = 35 * 20;
-    /** A quench costs each unit up to `WORST` tenths of a point, along a bell curve `SPREAD` ticks (5 s) wide about the ideal. */
-    static final int WORST = 100, SPREAD = 5 * 20;
+    /**
+     * A quench within `PLATEAU` ticks (2 s) of the ideal costs nothing; beyond that, each unit loses up to `WORST` tenths of
+     * a point along a bell curve `SPREAD` ticks (5 s) wide.
+     */
+    static final int WORST = 100, PLATEAU = 2 * 20, SPREAD = 5 * 20;
     /** The glow by age in seconds: white-yellow, orange, bright cherry red, dull red, faint, then none; alpha is its strength. */
     private static final int[] GLOW_AGES = {0, 12, 25, 35, 45, 52, 56};
     private static final int[] GLOW = {0xFFFFF8E0, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
@@ -79,9 +82,9 @@ public final class HotMetal {
     }
     public static boolean hot(ItemStack stack, long now) { return age(stack, now) < COOL_TICKS; }
     public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS; }
-    /** Tenths of a point a quench at `age` costs every unit: none at the ideal, the worst once cold. */
+    /** Tenths of a point a quench at `age` costs every unit: none near the ideal, the worst once cold. */
     public static int loss(long age) {
-        double off = (age - IDEAL_TICKS) / (double)SPREAD;
+        double off = Math.max(0, Math.abs(age - IDEAL_TICKS) - PLATEAU) / (double)SPREAD;
         return (int)Math.round(WORST * (1 - Math.exp(-off * off / 2)));
     }
     /** The glow's colour at the stack's temperature, its alpha the glow's strength. */
@@ -173,11 +176,18 @@ public final class HotMetal {
     }
     private static void quench(ServerPlayer player, ItemStack stack, Vec3 water) {
         int before = Grade.value(stack);
+        long age = age(stack, player.level().getGameTime());
         quench(stack, player.level().getGameTime());
         player.swing(InteractionHand.MAIN_HAND, true);
         hiss(player.serverLevel(), water);
         player.displayClientMessage(Component.translatable("message.civilization.quenched",
-                stack.getHoverName(), Grade.percent(before), Grade.percent(Grade.value(stack))), true);
+                stack.getHoverName(), timing(age), Grade.percent(before), Grade.percent(Grade.value(stack))), true);
+    }
+    /** How a quench at `age` was timed: at cherry red when it cost nothing, otherwise how many seconds early or late. */
+    private static Component timing(long age) {
+        if (loss(age) == 0) return Component.translatable("message.civilization.quench_ideal");
+        long seconds = Math.round(Math.abs(age - IDEAL_TICKS) / 20.0);
+        return Component.translatable(age < IDEAL_TICKS ? "message.civilization.quench_early" : "message.civilization.quench_late", seconds);
     }
     private static void hiss(ServerLevel level, Vec3 at) {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, .6f, 1.2f);
