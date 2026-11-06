@@ -171,8 +171,8 @@ public final class TemperatureWash {
     @SubscribeEvent
     public static void camera(ViewportEvent.ComputeCameraAngles event) {
         double shiver = past(-strain, .5), sway = past(strain, .5);
-        // One quick shudder that dies away in about a third of a second.
-        double shudder = Math.exp(-sinceShiver / .12) * Math.sin(sinceShiver * Math.TAU * 9);
+        // One quick shudder that dies away in about half a second.
+        double shudder = Math.exp(-sinceShiver / .18) * Math.sin(sinceShiver * Math.TAU * 9);
         double roll = shiver * shudder * 1.4 + sway * Math.sin(seconds * .8) * 1.6;
         event.setRoll(event.getRoll() + (float) (roll * motion()));
     }
