@@ -1,6 +1,5 @@
 package dev.civilization;
 
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,7 +37,6 @@ public final class GradeGameTests {
     }
     static ItemStack ingots(int... grades) { return units(Items.IRON_INGOT, grades); }
     static List<Integer> grades(ItemStack stack) { return Grade.top(stack, stack.getCount()); }
-    static List<Integer> sorted(List<Integer> grades) { var list = new ArrayList<>(grades); list.sort(java.util.Comparator.reverseOrder()); return list; }
 
     @GameTest(template = "industrial") public static void unitsLeaveFromTheTopAndNeverMultiply(GameTestHelper h) {
         var stack = ingots(600, 1000, 800, 900);
@@ -142,11 +140,11 @@ public final class GradeGameTests {
     @GameTest(template = "industrial") public static void menusMoveTheActualUnits(GameTestHelper h) {
         var p = h.makeMockPlayer(GameType.SURVIVAL); var menu = p.inventoryMenu; var inventory = p.getInventory(); p.containerMenu = menu;
         menu.setCarried(ingots(1000, 900, 800));
-        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(0, 0), ClickType.QUICK_CRAFT, p);
-        for (int slot = 9; slot < 12; slot++) menu.clicked(slot, AbstractContainerMenu.getQuickcraftMask(1, 0), ClickType.QUICK_CRAFT, p);
-        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 0), ClickType.QUICK_CRAFT, p);
-        var spread = new ArrayList<Integer>();for (int i = 9; i < 12; i++) spread.addAll(grades(inventory.getItem(i)));
-        h.assertTrue(menu.getCarried().isEmpty() && sorted(spread).equals(List.of(1000, 900, 800)), "Spreading a stack gives each slot one of its own units");
+        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(0, 1), ClickType.QUICK_CRAFT, p);
+        for (int slot : new int[]{20, 9, 31, 14}) menu.clicked(slot, AbstractContainerMenu.getQuickcraftMask(1, 1), ClickType.QUICK_CRAFT, p);
+        menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 1), ClickType.QUICK_CRAFT, p);
+        h.assertTrue(menu.getCarried().isEmpty() && grades(inventory.getItem(20)).equals(List.of(1000)) && grades(inventory.getItem(9)).equals(List.of(900))
+                && grades(inventory.getItem(31)).equals(List.of(800)) && inventory.getItem(14).isEmpty(), "A right-drag deals the best units into the slots in the order dragged");
         inventory.clearContent(); inventory.setItem(9, ingots(1000, 900)); menu.setCarried(ingots(700));
         menu.clicked(9, 0, ClickType.PICKUP, p);
         h.assertTrue(menu.getCarried().isEmpty() && grades(inventory.getItem(9)).equals(List.of(1000, 900, 700)), "Clicking joins differing grades onto one stack");

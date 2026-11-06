@@ -6,6 +6,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.civilization.Grade;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -62,6 +64,10 @@ public abstract class GradeMenuMixin {
             ci.cancel();
         }
     }
+
+    /** A drag remembers its slots in the order they were dragged across, so the first slot receives the best units. */
+    @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/Sets;newHashSet()Ljava/util/HashSet;"))
+    private HashSet<Slot> civilization$dragOrder(Operation<HashSet<Slot>> original) { return new LinkedHashSet<>(); }
 
     @ModifyReturnValue(method = "canItemQuickReplace", at = @At("RETURN"))
     private static boolean civilization$quickReplace(boolean same, Slot slot, ItemStack stack, boolean sizeMatters) {
