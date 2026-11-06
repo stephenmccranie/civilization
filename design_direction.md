@@ -48,7 +48,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 ## People: calories, movement and recovery
 
 - One calorie reserve replaces hunger, saturation and exhaustion. Work, movement, healing and sleep have explicit costs; cut-piece placement scales with volume, and sleep pays for elapsed in-game time. No idle or offline drain; cold adds a bounded passive cost while an active Survival player is online.
-- On level ground, walking is 3.2 blocks/s and sprinting 4.6, with jumps scaled to match; sprint-jumping gives about 20% over sprinting. Sprinting costs three times walking per block, at a constant rate per gait. Ascent costs 1 kcal per vertical block, separate from the 2 kcal jump charge, with no descent refund.
+- On level ground, walking is 3.2 blocks/s and sprinting 4.6, with jumps scaled to match; sprint-jumping gives about 20% over sprinting. Sprinting costs three times walking per block, at a constant rate per gait. Ascent costs 1 kcal per vertical block, including the rise of a jump, which has no charge of its own; there is no descent refund.
 - Rowing a vanilla boat costs less per block than sprinting, and only for the paddling player.
 - **Street Pavers** — gray, muted red and brown long-paver brick, distinct from structural bricks — give 25% faster ground movement, including their slabs, stairs and cut pieces; ordinary bricks do not. No stored buff, airborne boost or calorie change.
 - At depletion, walking and basic actions work; mining slows, sprinting and natural healing stop. Starvation alone has a health floor. Hand-foraging is a slow recovery route. Death and relog never refill calories.

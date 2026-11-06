@@ -160,14 +160,15 @@ def uv_faces(part, regions, density=2):
     return result
 
 
-def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None,density=2):
+def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None,density=2,parents=None):
+    """`pivots` sets a group's pivot and `parents` nests a group inside another, so a bone turns with the bones above it."""
     image=Image.open(atlas)
     for region in regions.values():
         u,v,w,h=region['rect']
         if min(u,v)<0 or min(w,h)<=0 or u+w>image.width or v+h>image.height:
             raise ValueError('Atlas region outside texture')
     pieces=[dict(p,uvs=(uvs:=uv_faces(p,regions,density)),turns={f:face_spec(p,f)[3] for f in uvs}) for p in parts]
-    cfg=dict(name=name,pieces=pieces,offset=offset,pivots=pivots or {},size=image.size,texture_name=Path(atlas).name,
+    cfg=dict(name=name,pieces=pieces,offset=offset,pivots=pivots or {},parents=parents or {},size=image.size,texture_name=Path(atlas).name,
              texture='data:image/png;base64,'+base64.b64encode(Path(atlas).read_bytes()).decode(),gecko=gecko)
     client.call('create_project',{'name':name,'format':'geckolib_model' if gecko else 'java_block'})
     script='''(() => {
@@ -177,9 +178,12 @@ def create(client,name,parts,atlas,regions,offset=(0,0,0),gecko=True,pivots=None
       if(c.gecko) Project.geckolib_model_type='block';
       const t=new Texture({name:c.texture_name,folder:'block',namespace:'civilization'}).fromDataURL(c.texture).add(false);
       const groups={};const sub=v=>v.map((n,i)=>n-c.offset[i]);
+      const group=name=>{
+        if(!groups[name]){groups[name]=new Group({name,origin:sub(c.pivots[name]||c.offset)}).init();if(c.parents[name]) groups[name].addTo(group(c.parents[name]));}
+        return groups[name];
+      };
       for(const p of c.pieces){
-        if(!groups[p.group]) groups[p.group]=new Group({name:p.group,origin:sub(c.pivots[p.group]||c.offset)}).init();
-        const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation:p.rotation,autouv:0,box_uv:false}).addTo(groups[p.group]).init();
+        const cube=new Cube({name:p.name,from:sub(p.start),to:sub(p.end),origin:sub(p.pivot),rotation:p.rotation,autouv:0,box_uv:false}).addTo(group(p.group)).init();
         for(const [face,f] of Object.entries(cube.faces)){
           if(p.uvs[face]){f.texture=t.uuid;f.uv=p.uvs[face];f.rotation=p.turns[face];}else f.texture=null;
         }

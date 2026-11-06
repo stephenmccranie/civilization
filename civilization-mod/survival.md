@@ -23,17 +23,16 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Place block / plant crop / apply fertilizer | 2 / 1 / 1 kcal |
 | Place cut slab / quarter beam / eighth cube | 1 / 0.5 / 0.25 kcal |
 | Sleep | 50 kcal per in-game hour actually slept, including skipped hours |
-| Jump | 2 kcal plus horizontal movement |
 | Successful melee attack | 3 kcal |
 | Accepted coal-machine ignition strike | 1 kcal; failed spark still costs labor |
-| Accepted anvil blow on metal at working heat, or grindstone stroke on diamonds | `blowKcal` (8 kcal) per unit in the stack; 5 blows on an iron anvil, 8 on a Stone Anvil or 5 strokes work it ([grade](manufacturing.md#grade)) |
-| Natural healing | 40 kcal per half-heart, every 4 seconds |
+| Accepted anvil blow on metal at working heat, or grindstone stroke on diamonds | `blowKcal` (6 kcal) per unit in the stack; 5 blows on an iron anvil, 8 on a Stone Anvil or 5 strokes work it ([grade](manufacturing.md#grade)) |
+| Natural healing | 20 kcal per half-heart, every 4 seconds |
 | Minimum reserve to sprint | 100 kcal |
 | Hunger effect | 2 kcal/second per level |
 | Cold exposure | Up to 0.20 kcal/second ([rule](heat.md#comfort-and-cold)) |
 | Depletion recovery threshold | 200 kcal |
 
-- **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 30 sprinting or 5 rowing. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming and the rising part of a jump; descending refunds nothing. Movement is measured from server-accepted displacement.
+- **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 30 sprinting or 5 rowing. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming and the rising part of a jump, which is all a jump costs; descending refunds nothing. Movement is measured from server-accepted displacement.
 - **Rowing** is charged only to the controlling player of a vanilla boat or chest boat while its paddles are active; passengers, drifting boats and powered Civilization vessels pay nothing. Rowing has its own distance counter.
 - **River steps.** A vanilla boat or chest boat meeting water that stands at most a block above its top with open air over it, as at a step in a river's surface or up a rapid, floats up onto it instead of sinking under it; deeper water, or water under a ceiling, still sinks it and drops its rider.
 - **Wheelbarrow handling** charges the walking rate, or the sprinting rate while sprinting, for actual handle travel, including reversing and turning, plus normal ascent; idle or blocked drive is free.

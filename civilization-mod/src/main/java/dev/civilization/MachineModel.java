@@ -75,6 +75,9 @@ public final class MachineModel {
     /** Horizontal reach and vertical span of the cells around the controller, for culling and guides. */
     public final int reach,bottom,top;
     public final int all;
+    /** The part cell that draws the machine's water, beside the controller so it redraws whenever the controller's lit
+     * state changes, and drawing nothing else; -1 for a machine without water. */
+    public final int water;
     public final IntegerProperty cell;
 
     private MachineModel(String id,JsonObject o){
@@ -115,6 +118,13 @@ public final class MachineModel {
         }
         this.cells=List.copyOf(cells);this.reach=reach;this.bottom=bottom;this.top=top;
         cell=IntegerProperty.create("cell",0,Math.max(1,cells.size()-1));
+        int host=-1;
+        if(o.has("water")){
+            var at=o.getAsJsonArray("water");int x=at.get(0).getAsInt(),y=at.get(1).getAsInt(),z=at.get(2).getAsInt();
+            for(int i=0;i<this.cells.size();i++){var c=this.cells.get(i);if(c.x==x&&c.y==y&&c.z==z)host=i;}
+            if(host<0||Math.max(Math.abs(x),Math.max(Math.abs(y),Math.abs(z)))>1)throw new IllegalStateException(id+": water must be drawn by a part cell beside the controller");
+        }
+        water=host;
     }
 
     private static MachineModel load(String id){

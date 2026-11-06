@@ -2,6 +2,7 @@ package dev.civilization;
 
 import java.util.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.*;
@@ -19,5 +20,11 @@ public final class MachineParts {
     }
     private MachineParts() {}
     public static MachinePartBlock block(MachineModel model){return PARTS.get(model).get();}
+    /** Every part state that draws its machine's water, which a shader pack may shade as its own water. */
+    public static List<BlockState> water(){
+        var states=new ArrayList<BlockState>();
+        for(var model:MachineModel.all())if(model.water>=0)for(var state:block(model).getStateDefinition().getPossibleStates())if(state.getValue(model.cell)==model.water)states.add(state);
+        return states;
+    }
     public static void register(IEventBus bus){BLOCKS.register(bus);}
 }
