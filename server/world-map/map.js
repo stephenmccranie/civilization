@@ -30,6 +30,7 @@ function paint(){
     if(terrainDirty){terrainDirty=false;paintTerrain()}
     if(markersDirty){markersDirty=false;drawPlayers()}
     if(hoverDirty){hoverDirty=false;paintHover()}
+    paintHorizon();
 }
 function resize(){
     const r=canvas.getBoundingClientRect();viewRect=r;
@@ -298,6 +299,12 @@ function paintHover(){
         heightTimer=setTimeout(()=>loadHeight(t,key),120);
     }
 }
+function paintHorizon(){
+    const shade=$('horizonShade'),chunks=Number($('horizonChunks').value);
+    shade.hidden=!$('showHorizon').checked||!hoverPoint||!(chunks>0);
+    if(shade.hidden)return;
+    shade.style.setProperty('--x',hoverPoint[0]+'px');shade.style.setProperty('--y',hoverPoint[1]+'px');shade.style.setProperty('--r',chunks*16*zoom+'px');
+}
 async function loadHeight(t,key){
     const controller=new AbortController();heightRequest=controller;
     try{
@@ -381,6 +388,7 @@ function endPointer(e){if(pointers.delete(e.pointerId))resetGesture();const r=vi
 canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);canvas.addEventListener('lostpointercapture',endPointer);
 $('view').onchange=terrainChanged;
 $('contours').onchange=$('grid').onchange=terrainChanged;
+$('showHorizon').onchange=$('horizonChunks').oninput=schedule;
 $('showDeposits').onchange=$('showVillages').onchange=()=>{hoverDirty=true;markersChanged()};
 $('fit').onclick=fit;$('origin').onclick=()=>{followPlayer=null;center=[0,0];zoom=.4;draw()};
 $('goto').onsubmit=e=>{e.preventDefault();const x=Number($('x').value),z=Number($('z').value);if(Number.isFinite(x)&&Number.isFinite(z)){followPlayer=null;center=[x,z];zoom=.4;draw()}};
