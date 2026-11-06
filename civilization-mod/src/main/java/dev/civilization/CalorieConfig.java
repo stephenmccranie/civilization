@@ -6,7 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class CalorieConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.DoubleValue CAPACITY, WALK, ROW, ASCENT, SPRINT_MULTIPLIER, BREAK, PLACE,
-            JUMP, ATTACK, IGNITE, BLOW, HEAL, SLEEP, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
+            ATTACK, IGNITE, BLOW, HEAL, SLEEP, SPRINT_MINIMUM, HUNGER, FOOD_FALLBACK, CAKE,
             RECOVERY, DEPLETED_SPEED, STARVATION_FLOOR, FORAGE_KCAL, LIGHT_BREAK, HARVEST, PLANT, FERTILIZE,
             COLD_EXPOSURE;
     public static final ModConfigSpec.IntValue FORAGE_TICKS;
@@ -20,7 +20,7 @@ public final class CalorieConfig {
                 .defineInRange("walkKcalPerBlock", 0.1, 0.001, 100.0);
         ROW = b.comment("Controlling a paddled vanilla boat or chest boat costs this many kcal per horizontal block traveled; drifting and passengers cost nothing.")
                 .defineInRange("rowKcalPerBlock", 0.05, 0.0, 100.0);
-        ASCENT = b.comment("Additional kcal per block gained vertically, independent of gait; jumps still pay their separate charge.")
+        ASCENT = b.comment("Additional kcal per block gained vertically, independent of gait, including the rise of a jump.")
                 .defineInRange("ascentKcalPerBlock", 1.0, 0.0, 100.0);
         SPRINT_MULTIPLIER = b.comment("Sprinting costs this many times the walking rate per block; road/effect speed does not change that rate.")
                 .defineInRange("sprintMultiplier", 3.0, 1.0, 20.0);
@@ -32,14 +32,13 @@ public final class CalorieConfig {
         PLACE = b.defineInRange("placeKcal", 2.0, 0.0, 1000.0);
         SLEEP = b.comment("Calories per in-game hour actually slept, including hours skipped when the night advances.")
                 .defineInRange("sleepKcalPerGameHour", 50.0, 0.0, 1000.0);
-        JUMP = b.defineInRange("jumpKcal", 2.0, 0.0, 1000.0);
         ATTACK = b.defineInRange("successfulAttackKcal", 3.0, 0.0, 1000.0);
         IGNITE = b.comment("Calories spent for each accepted strike of a coal-fired machine, whether or not it lights.")
                 .defineInRange("machineIgnitionKcal", 1.0, 0.0, 1000.0);
         BLOW = b.comment("Calories spent on each unit in an accepted hammer blow on glowing metal at an anvil or stroke cutting diamonds at a grindstone.")
-                .defineInRange("blowKcal", 8.0, 0.0, 1000.0);
+                .defineInRange("blowKcal", 6.0, 0.0, 1000.0);
         HEAL = b.comment("kcal per health point (half heart), every 4 seconds while hurt; respects naturalRegeneration.")
-                .defineInRange("healKcalPerHealthPoint", 40.0, 1.0, 1000.0);
+                .defineInRange("healKcalPerHealthPoint", 20.0, 1.0, 1000.0);
         SPRINT_MINIMUM = b.defineInRange("minimumSprintKcal", 100.0, 1.0, 100000.0);
         HUNGER = b.comment("Hunger status effect drain per second per effect level.")
                 .defineInRange("hungerEffectKcalPerSecond", 2.0, 0.0, 1000.0);

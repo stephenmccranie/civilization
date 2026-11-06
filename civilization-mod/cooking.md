@@ -58,7 +58,7 @@ Lifting frees the stove for another empty skillet (`civilization:skillet` from C
 
 ### Meal benefit
 
-An eaten portion gives a **10–15% discount on active work calorie costs** for **30 online minutes**, scaled by quality. Mining, placing, movement and ascent, rowing, jumping, melee, ignition and fertilizer labor use it; sleep, natural healing, hunger effects, cold exposure and machine fuel do not. Eating another portion replaces its strength and refreshes its duration without stacking. The benefit survives logout, restart and death; offline time does not count down. Eating shows strength and duration, and meal tooltips show quality, calories and benefit.
+An eaten portion gives a **10–15% discount on active work calorie costs** for **30 online minutes**, scaled by quality. Mining, placing, movement and ascent, rowing, melee, ignition and fertilizer labor use it; sleep, natural healing, hunger effects, cold exposure and machine fuel do not. Eating another portion replaces its strength and refreshes its duration without stacking. The benefit survives logout, restart and death; offline time does not count down. Eating shows strength and duration, and meal tooltips show quality, calories and benefit.
 
 One dish, one heated position and one pan per resting block; no cooking XP, spills or cooking aboard moving vessels.
 
