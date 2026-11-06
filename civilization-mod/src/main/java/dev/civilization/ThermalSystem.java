@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid="civilization")
 public final class ThermalSystem {
-    @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){e.getDispatcher().register(net.minecraft.commands.Commands.literal("civilization").then(net.minecraft.commands.Commands.literal("heat").executes(c->{if(!ThermalConfig.enabled()){c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal("Heat simulation is disabled for this instance."),false);return 1;}var l=c.getSource().getLevel();var p=BlockPos.containing(c.getSource().getPosition());double air=airTemperature(l,c.getSource().getPosition());double radiant=ThermalExposure.radiant(l,ThermalField.get(l),torso(c.getSource().getPosition()),air);var player=c.getSource().getPlayer();double felt=player==null?ThermalRules.felt(air,radiant):currentPlayerTemperature(player,air);var field=ThermalField.get(l);c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT,"Air %.1f °F | Surroundings %.1f °F | Feels %.1f °F | Comfort %.0f%% | Thermal efficiency %.0f%% | Heat cells %,d | Solver age %.1fs | Queued sources %d | Timed releases %d",ThermalDisplay.fahrenheit(air),ThermalDisplay.fahrenheit(radiant),ThermalDisplay.fahrenheit(felt),ThermalRules.comfort(felt)*100,ThermalField.efficiency(l,p)*100,field.activeCells(),field.simulationAgeSeconds(l),field.queuedSources(),field.timedReleases())),false);return 1;})));}
+    @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){e.getDispatcher().register(net.minecraft.commands.Commands.literal("civilization").then(net.minecraft.commands.Commands.literal("heat").executes(c->{if(!ThermalConfig.enabled()){c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal("Heat simulation is disabled for this instance."),false);return 1;}var l=c.getSource().getLevel();var p=BlockPos.containing(c.getSource().getPosition());double air=airTemperature(l,c.getSource().getPosition());var exposure=ThermalExposure.sample(l,ThermalField.get(l),torso(c.getSource().getPosition()),air,ThermalExposure.Sky.at(l,p));double radiant=exposure.radiant();var player=c.getSource().getPlayer();double felt=player==null?ThermalRules.felt(air,radiant):currentPlayerTemperature(player,air);var field=ThermalField.get(l);c.getSource().sendSuccess(()->net.minecraft.network.chat.Component.literal(String.format(java.util.Locale.ROOT,"Air %.1f °F | Surroundings %.1f °F | Direct sun %.0f%% | Feels %.1f °F | Comfort %.0f%% | Thermal efficiency %.0f%% | Heat cells %,d | Solver age %.1fs | Queued sources %d | Timed releases %d",ThermalDisplay.fahrenheit(air),ThermalDisplay.fahrenheit(radiant),exposure.sunlight()*100,ThermalDisplay.fahrenheit(felt),ThermalRules.comfort(felt)*100,ThermalField.efficiency(l,p)*100,field.activeCells(),field.simulationAgeSeconds(l),field.queuedSources(),field.timedReleases())),false);return 1;})));}
     private static final ResourceLocation SPEED=ResourceLocation.parse("civilization:thermal_comfort");
     private record PlayerHeat(ServerLevel level,long tick,double temperature){}
     private static final WeakHashMap<Player,PlayerHeat> PLAYER_HEAT=new WeakHashMap<>();
@@ -51,8 +51,8 @@ public final class ThermalSystem {
             if(Math.floorMod(p.getId(),20)!=Math.floorMod(l.getGameTime(),20))continue;
             boolean supported=ThermalField.supported(l,p.blockPosition().above());
             float air=supported?(float)airTemperature(l,p.position()):18;
-            float radiant=supported?(float)ThermalExposure.radiant(l,ThermalField.get(l),torso(p.position()),air):18;
-            float felt=supported?(float)updatePlayerTemperature(p,l,ThermalRules.felt(air,radiant)):18;
+            var exposure=supported?ThermalExposure.sample(l,ThermalField.get(l),torso(p.position()),air,ThermalExposure.Sky.at(l,p.blockPosition())):new ThermalExposure.Exposure(18,0);
+            float felt=supported?(float)updatePlayerTemperature(p,l,ThermalRules.felt(air,exposure.radiant())):18;
             if(!supported)PLAYER_HEAT.remove(p);
             float c=supported?(float)ThermalRules.comfort(felt):0;
             if(supported)chargeCold(p,felt);
@@ -67,7 +67,7 @@ public final class ThermalSystem {
                 for(int x=-ThermalPayload.VIEW_RADIUS;x<=ThermalPayload.VIEW_RADIUS;x++)for(int y=-ThermalPayload.VIEW_RADIUS;y<=ThermalPayload.VIEW_RADIUS;y++)for(int z=-ThermalPayload.VIEW_RADIUS;z<=ThermalPayload.VIEW_RADIUS;z++){var at=base.offset(x,y,z);if(at.distSqr(base.above())<=100&&ThermalField.supported(l,at))list.add(new ThermalPayload.Sample(at,(float)ThermalField.temperature(l,at)));}
             }
             float solverAge=ThermalConfig.enabled()&&supported?(float)ThermalField.get(l).simulationAgeSeconds(l):0;
-            PacketDistributor.sendToPlayer(p,new ThermalPayload(air,radiant,felt,c,solverAge,supported,List.copyOf(list)));
+            PacketDistributor.sendToPlayer(p,new ThermalPayload(air,(float)exposure.radiant(),(float)exposure.sunlight(),felt,c,solverAge,supported,List.copyOf(list)));
         }
     }
 }

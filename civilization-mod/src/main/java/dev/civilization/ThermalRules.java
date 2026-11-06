@@ -4,6 +4,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -27,6 +28,10 @@ public final class ThermalRules {
     public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8, MAX_RADIANT_C = 100;
     // Radiant output as bodies feel it, softened over about a block. Tuning, not SI.
     public static final double FLAME_RADIANCE = 30000, TORCH_RADIANCE = 3000, LAVA_RADIANCE = 60000;
+    // Climate temperatures are shade air; direct sun is felt on top. A body absorbs about an eighth of the sun's beam
+    // per unit of its surface, and a clear sky's scattered light (per sine of sun height) offsets its cold by day.
+    public static final double SUN_ABSORBED = .125, SKY_DIFFUSE = 110, MIN_SUN_HEIGHT = .05, SUN_REACH = 64;
+    private static final double SUN_PATH_TILT = Math.toRadians(-35); // Photon's default, so shade matches its shadows.
     private static final double COLD_MIN = 2, COLD_COMFORT = 18;
     // Per quarter-second exchange step. Sum of outward air fractions stays below one.
     public static final double AIR_MIXING = .15, EXPOSED_AIR_MIXING = .10, UPWARD_MIXING = .19, OUTDOOR_EXCHANGE = .0045;
@@ -122,6 +127,15 @@ public final class ThermalRules {
         return Math.exp(-.5*distance*distance);
     }
     public static double felt(double air, double radiant) { return air + RADIANT_SHARE * (radiant - air); }
+    /** Unit vector toward the sun for a vanilla time of day, which is 0 at noon. */
+    public static Vec3 sun(double timeOfDay) {
+        double angle = timeOfDay * Math.TAU;
+        return new Vec3(-Math.sin(angle), Math.cos(angle) * Math.cos(SUN_PATH_TILT), -Math.cos(angle) * Math.sin(SUN_PATH_TILT));
+    }
+    /** Clear-sky direct sunlight in W/m² for the sine of the sun's height, thinning through more air near the horizon. */
+    public static double directSun(double height) {
+        return height < MIN_SUN_HEIGHT ? 0 : 1353 * Math.pow(.7, Math.pow(1 / height, .678));
+    }
     public static double calorieFactor(double comfort) { return 1 - .20 * comfort; }
     /** A player's thermal state follows the sampled air, without changing the air field. */
     public static double playerTemperature(double previous, double air, double seconds) {

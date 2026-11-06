@@ -36,13 +36,13 @@ final class ThermalVisualCheck {
         if(ticks==250)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
         if(ticks==265)Screenshot.grab(mc.gameDirectory,"comfort-inventory.png",mc.getMainRenderTarget(),m->{});
         if(ticks==272){mc.setScreen(null);server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();server.overworld().setBlockAndUpdate(p.blockPosition().below(),Blocks.STONE.defaultBlockState());});}
-        if(ticks>=275&&ticks<=315)dev.civilization.client.ThermalVision.accept(new ThermalPayload(0,0,0,0,0,true,java.util.List.of()));
+        if(ticks>=275&&ticks<=315)dev.civilization.client.ThermalVision.accept(new ThermalPayload(0,0,0,0,0,0,true,java.util.List.of()));
         if(ticks==315)Screenshot.grab(mc.gameDirectory,"comfort-cold.png",mc.getMainRenderTarget(),m->{});
-        if(ticks>=320&&ticks<=360)dev.civilization.client.ThermalVision.accept(new ThermalPayload(22,22,22,1,0,true,java.util.List.of()));
+        if(ticks>=320&&ticks<=360)dev.civilization.client.ThermalVision.accept(new ThermalPayload(22,22,0,22,1,0,true,java.util.List.of()));
         if(ticks==360)Screenshot.grab(mc.gameDirectory,"comfort-warm.png",mc.getMainRenderTarget(),m->{});
-        if(ticks>=365&&ticks<=410)dev.civilization.client.ThermalVision.accept(new ThermalPayload(38,38,38,.17f,0,true,java.util.List.of()));
+        if(ticks>=365&&ticks<=410)dev.civilization.client.ThermalVision.accept(new ThermalPayload(38,38,0,38,.17f,0,true,java.util.List.of()));
         if(ticks==410)Screenshot.grab(mc.gameDirectory,"comfort-hot.png",mc.getMainRenderTarget(),m->{});
-        if(ticks>=415&&ticks<=500)dev.civilization.client.ThermalVision.accept(new ThermalPayload(12,12,12,.1f,0,true,java.util.List.of()));
+        if(ticks>=415&&ticks<=500)dev.civilization.client.ThermalVision.accept(new ThermalPayload(12,12,0,12,.1f,0,true,java.util.List.of()));
         if(ticks==500)Screenshot.grab(mc.gameDirectory,"comfort-cool.png",mc.getMainRenderTarget(),m->{});
         if(ticks>505){com.mojang.logging.LogUtils.getLogger().info("THERMAL VISUAL VERIFIED");mc.stop();}
     }
