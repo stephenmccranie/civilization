@@ -38,7 +38,7 @@ public final class TemperatureWash {
     private static final Tone COMFORT = new Tone(240, 179, 116, .10);
     private static final Tone HOT = new Tone(215, 72, 68, .13);
     private static final Tone ICE_EDGE = new Tone(214, 236, 255, .40);
-    private static final Tone EMBER_EDGE = new Tone(255, 92, 28, .36);
+    private static final Tone EMBER_EDGE = new Tone(255, 104, 24, .55);
     private static final ResourceLocation FROST = ResourceLocation.withDefaultNamespace("textures/misc/powder_snow_outline.png");
     /** Every effect is at full strength this far from comfort: 36°F and 104°F felt. */
     private static final double FULL_STRAIN_C = 19;
@@ -157,7 +157,7 @@ public final class TemperatureWash {
         }
         if (heat > 0) {
             double beatNow = pulse();
-            vignette(graphics, EMBER_EDGE, heat * (.7 + .3 * beatNow) * presence, .6 - .06 * beatNow);
+            vignette(graphics, EMBER_EDGE, heat * (.7 + .3 * beatNow) * presence, .5 - .08 * beatNow);
         }
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
