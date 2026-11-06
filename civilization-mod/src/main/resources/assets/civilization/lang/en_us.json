@@ -83,7 +83,7 @@
   "message.civilization.hammered": "Hammered %s: %s → %s",
   "message.civilization.too_cool": "%s is too cool to hammer: work it white-yellow to orange, or reheat it at the Foundry",
   "message.civilization.quenched": "Quenched %s %s: %s → %s",
-  "message.civilization.quench_ideal": "at cherry red",
+  "message.civilization.quench_ideal": "right at cherry red",
   "message.civilization.quench_early": "%s s early",
   "message.civilization.quench_late": "%s s late",
   "message.civilization.needs_food": "Eat before working %s",

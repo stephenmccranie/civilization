@@ -11,12 +11,14 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -47,18 +49,19 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * working heat in hand strikes the whole stack with a heavy blow a second, each the player's labor for every unit
  * struck; the hammering's last blow beats rough metal into its ingot, raises every unit one random grade step and
  * leaves the stack too cool to work again. A grindstone cuts diamonds the same way, cold. Taking the heat out costs
- * nothing near the ideal age and every unit grade along a bell curve beyond it: water takes it at once, and metal left
- * to cool in air takes the worst cost once it is next seen cold.
+ * every unit grade along a bell curve about the ideal age, and quenching hammered metal within a second or so of it adds
+ * up to another hammering's step: water takes the heat at once, and metal left to cool in air takes the worst cost once it is next
+ * seen cold.
  */
 @EventBusSubscriber(modid = Civilization.MOD_ID)
 public final class HotMetal {
     /** Metal is cold a minute out of the fire. It can be worked for its first 25 s, and quenches best at 35 s, bright cherry red. */
     public static final int LOAD = 8, COOL_TICKS = 60 * 20, WORKING_TICKS = 25 * 20, IDEAL_TICKS = 35 * 20;
     /**
-     * A quench within `PLATEAU` ticks (2 s) of the ideal costs nothing; beyond that, each unit loses up to `WORST` tenths of
-     * a point along a bell curve `SPREAD` ticks (5 s) wide.
+     * A quench costs each unit up to `WORST` tenths of a point along a bell curve `SPREAD` ticks (5 s) wide about the
+     * ideal, and rewards it with up to one mean hammering step along a curve `MASTERY` ticks (1 s) wide.
      */
-    static final int WORST = 100, PLATEAU = 2 * 20, SPREAD = 5 * 20;
+    static final int WORST = 100, SPREAD = 5 * 20, MASTERY = 20;
     /** The glow by age in seconds: white-yellow, orange, bright cherry red, dull red, faint, then none; alpha is its strength. */
     private static final int[] GLOW_AGES = {0, 12, 25, 35, 45, 52, 56};
     private static final int[] GLOW = {0xFFFFF8E0, 0xFFFFAE3C, 0xFFFF6A18, 0xFFE81E1E, 0xB4901410, 0x50600C08, 0x00400806};
@@ -69,6 +72,9 @@ public final class HotMetal {
     /** The game time a stack's heat lasts until. Every dimension shares game time, and it passes only while the world runs. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> HOT = COMPONENTS.registerComponentType("hot_until",
             builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+    /** Marks metal hammered this heat, whose quench can earn the mastery reward; a quench takes the mark with the heat. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> WORKED = COMPONENTS.registerComponentType("worked",
+            builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
     /** Labor each player has paid since their last finished hammering or cutting, in blows on one unit. */
     private static final Map<UUID, Integer> WORK = new HashMap<>();
 
@@ -82,10 +88,15 @@ public final class HotMetal {
     }
     public static boolean hot(ItemStack stack, long now) { return age(stack, now) < COOL_TICKS; }
     public static boolean workable(ItemStack stack, long now) { return age(stack, now) < WORKING_TICKS; }
-    /** Tenths of a point a quench at `age` costs every unit: none near the ideal, the worst once cold. */
+    /** Tenths of a point a quench at `age` costs every unit: none at the ideal, the worst once cold. */
     public static int loss(long age) {
-        double off = Math.max(0, Math.abs(age - IDEAL_TICKS) - PLATEAU) / (double)SPREAD;
+        double off = (age - IDEAL_TICKS) / (double)SPREAD;
         return (int)Math.round(WORST * (1 - Math.exp(-off * off / 2)));
+    }
+    /** The share of a mean hammering step quenching hammered metal at `age` adds to every unit: all of it at the ideal, little a second or two off. */
+    public static double reward(long age) {
+        double off = (age - IDEAL_TICKS) / (double)MASTERY;
+        return Math.exp(-off * off / 2);
     }
     /** The glow's colour at the stack's temperature, its alpha the glow's strength. */
     public static int glow(ItemStack stack, long now) {
@@ -109,8 +120,10 @@ public final class HotMetal {
     }
     /** Takes all of the stack's heat, costing every unit the loss at its temperature. The only way heat leaves metal. */
     static void quench(ItemStack stack, long now) {
-        Grade.lose(stack, loss(age(stack, now)));
+        long age = age(stack, now);
+        Grade.temper(stack, stack.has(WORKED.get()) ? reward(age) : 0, loss(age));
         stack.remove(HOT.get());
+        stack.remove(WORKED.get());
     }
     /**
      * Settles metal that has gone cold in air, at the worst cost, so it stacks with cold metal again. A settlement that
@@ -183,11 +196,11 @@ public final class HotMetal {
         player.displayClientMessage(Component.translatable("message.civilization.quenched",
                 stack.getHoverName(), timing(age), Grade.percent(before), Grade.percent(Grade.value(stack))), true);
     }
-    /** How a quench at `age` was timed: at cherry red when it cost nothing, otherwise how many seconds early or late. */
+    /** How a quench at `age` was timed, to a tenth of a second: at cherry red, or how far early or late. */
     private static Component timing(long age) {
-        if (loss(age) == 0) return Component.translatable("message.civilization.quench_ideal");
-        long seconds = Math.round(Math.abs(age - IDEAL_TICKS) / 20.0);
-        return Component.translatable(age < IDEAL_TICKS ? "message.civilization.quench_early" : "message.civilization.quench_late", seconds);
+        long tenths = Math.round(Math.abs(age - IDEAL_TICKS) / 2.0);
+        if (tenths == 0) return Component.translatable("message.civilization.quench_ideal");
+        return Component.translatable(age < IDEAL_TICKS ? "message.civilization.quench_early" : "message.civilization.quench_late", tenths / 10 + "." + tenths % 10);
     }
     private static void hiss(ServerLevel level, Vec3 at) {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, .6f, 1.2f);
@@ -242,7 +255,10 @@ public final class HotMetal {
         WORK.remove(player.getUUID());
         int before = Grade.value(stack);
         var done = stack.getItem() instanceof RoughMetal rough ? stack.transmuteCopy(rough.ingot(), units) : stack.copy();
-        if (metal) done.set(HOT.get(), Math.min(stack.get(HOT.get()), second(level.getGameTime()) + COOL_TICKS - WORKING_TICKS));
+        if (metal) {
+            done.set(HOT.get(), Math.min(stack.get(HOT.get()), level.getGameTime() + COOL_TICKS - WORKING_TICKS));
+            done.set(WORKED.get(), Unit.INSTANCE);
+        }
         Grade.refine(done, level.random);
         player.setItemInHand(InteractionHand.MAIN_HAND, done);
         player.displayClientMessage(Component.translatable(metal ? "message.civilization.hammered" : "message.civilization.cut",
