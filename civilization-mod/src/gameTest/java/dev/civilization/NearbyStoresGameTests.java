@@ -69,18 +69,16 @@ public final class NearbyStoresGameTests {
         h.succeed();
     }
 
-    @GameTest(template="industrial") public static void recipePlacementTakesTheItemItAsksForAfterTheListChanged(GameTestHelper h){
-        var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.OAK_PLANKS),4);pallet.cargo().insert(new ItemStack(Items.STICK),4);
+    @GameTest(template="industrial") public static void craftingTakesTheItemItAsksForAfterTheListChanged(GameTestHelper h){
+        var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.OAK_PLANKS),4);pallet.cargo().insert(new ItemStack(Items.COBBLESTONE),4);
         var barrow=barrow(h);barrow.cargo().insert(new ItemStack(Items.STONE),1);
-        var p=player(h);var at=h.absolutePos(new BlockPos(7,1,9));h.getLevel().setBlockAndUpdate(at,Blocks.CRAFTING_TABLE.defaultBlockState());
-        p.openMenu(new SimpleMenuProvider((id,inv,player)->new CraftingMenu(id,inv,ContainerLevelAccess.create(h.getLevel(),at)),Component.literal("Crafting")));
-        var menu=(CraftingMenu)p.containerMenu;menu.broadcastChanges();
-        // Another player empties the nearer wheelbarrow, so every later entry of the list last seen moves up one.
-        barrow.cargo().remove(barrow.cargo().indexOf(new ItemStack(Items.STONE)),1);
-        @SuppressWarnings("unchecked") var table=(RecipeHolder<CraftingRecipe>)h.getLevel().getRecipeManager().byKey(ResourceLocation.withDefaultNamespace("crafting_table")).orElseThrow();
-        menu.handlePlacement(false,table,p);
-        int placed=0;for(int i=1;i<10;i++)if(menu.getSlot(i).getItem().is(Items.OAK_PLANKS))placed+=menu.getSlot(i).getItem().getCount();
-        h.assertTrue(placed==4&&stored(pallet.cargo(),Items.OAK_PLANKS)==0&&stored(pallet.cargo(),Items.STICK)==4,"The grid's planks came from the Pallet's planks and its sticks stayed: "+placed);
+        var p=player(h);var menu=chest(p);menu.broadcastChanges();
+        h.assertTrue(NearbyStores.of(menu).indexOf(new ItemStack(Items.OAK_PLANKS))==1,"The list holds the wheelbarrow's stone, then the Pallet's planks and cobblestone");
+        // The nearer wheelbarrow leaves before the next synchronization, so every later entry of the list last seen moves up one.
+        barrow.discard();
+        int taken=CraftingSources.take(p,new ItemStack(Items.OAK_PLANKS),2);
+        h.assertTrue(taken==2&&stored(pallet.cargo(),Items.OAK_PLANKS)==2&&stored(pallet.cargo(),Items.COBBLESTONE)==4,
+                "Planks for the grid come from the Pallet's planks and its cobblestone stays: took "+taken+", planks "+stored(pallet.cargo(),Items.OAK_PLANKS)+", cobblestone "+stored(pallet.cargo(),Items.COBBLESTONE));
         h.succeed();
     }
 }
