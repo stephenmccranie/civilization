@@ -1,9 +1,10 @@
 package dev.civilization;
 
 /**
- * The one cloud field: cumulus cover over block x/z, drifting with the weather clock. The server shades players with
- * it, and {@code assets/civilization/shaders/cloud_cover.glsl}, its exact mirror in float arithmetic, is what Photon
- * draws. Change both together.
+ * The one cloud field: cumulus density over block x/z, drifting with the weather clock, in the form Photon's own
+ * cumulus coverage takes. {@code assets/civilization/shaders/cloud_cover.glsl}, its exact mirror in float arithmetic,
+ * is what Photon draws, and the server shades players where that density casts Photon's cloud shadow. Change both
+ * together.
  */
 public final class CloudCover {
     /** The field repeats every this many blocks, so shader positions stay small enough for floats. */
@@ -13,8 +14,9 @@ public final class CloudCover {
     /** Photon's cumulus shadow layer at the pack's 2400 m cloud altitude: Y 63 + 1.25 × 2400 / 10. */
     public static final double SHADOW_Y = 363;
     public static final int DISTRICT = RegionalWeather.SIZE;
-    private static final int[] SIZES = {512, 256, 128};
-    private static final float[] WEIGHTS = {.5f, .3f, .2f};
+    // Fitted to the spatial correlation of Photon's cloud shape noise at the pack's cloud scale.
+    private static final int[] SIZES = {128, 64, 32, 16};
+    private static final float[] WEIGHTS = {.55f, .25f, .15f, .05f};
 
     private CloudCover() {}
 
@@ -23,12 +25,24 @@ public final class CloudCover {
         return (float) (((block + wind * clock) % PERIOD + PERIOD) % PERIOD);
     }
 
-    /** Cover from 0 (clear sky) to 1 (cloud) at a noise position, where the district cloudiness is {@code cloudiness}. */
-    public static float cover(float x, float z, float cloudiness) {
+    /**
+     * Cumulus density at a noise position, where the district cloudiness is {@code cloudiness}: Photon's
+     * {@code linear_step(1 - coverage, 1, shape)} with this field's noise rescaled to the mean and spread of Photon's
+     * shape noise, and the threshold set so that about {@code cloudiness} of the sky holds visible cloud.
+     */
+    public static float density(float x, float z, float cloudiness) {
         float noise = 0;
         for (int octave = 0; octave < SIZES.length; octave++) noise += WEIGHTS[octave] * value(x, z, SIZES[octave], octave);
-        float edge = 1.05f - 1.1f * cloudiness;
-        float t = Math.clamp((noise - (edge - .06f)) / .12f, 0, 1);
+        float shape = .535f + .64f * (noise - .5f), threshold = .71f - .5f * cloudiness;
+        return Math.clamp((shape - threshold) / (1 - threshold), 0, 1);
+    }
+
+    /**
+     * Share of direct sun a cloud of this density stops: Photon's shadow pass carves its detail out of the density and
+     * shadows steeply above what remains, so shade begins near 0.13 and is nearly whole by 0.21.
+     */
+    public static float shade(float density) {
+        float t = Math.clamp((density - .13f) / .08f, 0, 1);
         return t * t * (3 - 2 * t);
     }
 

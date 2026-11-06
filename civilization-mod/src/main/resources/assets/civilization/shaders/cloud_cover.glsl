@@ -39,11 +39,11 @@ float civilization_cloudiness(vec2 g) {
     return north * (1.0 - fv) + south * fv;
 }
 
-// Cover from 0 (clear sky) to 1 (cloud) at a block offset from the camera.
-float civilization_cloud_cover(vec2 offset) {
+// Cumulus density at a block offset from the camera, as Photon's own coverage would give it.
+float civilization_cloud_density(vec2 offset) {
     vec2 p = civilizationCloudShift + offset;
-    float noise = 0.5 * civilization_value(p, 512, 0u) + 0.3 * civilization_value(p, 256, 1u) + 0.2 * civilization_value(p, 128, 2u);
-    float edge = 1.05 - 1.1 * civilization_cloudiness(civilizationCloudGrid + offset);
-    float t = clamp((noise - (edge - 0.06)) / 0.12, 0.0, 1.0);
-    return t * t * (3.0 - 2.0 * t);
+    float noise = 0.55 * civilization_value(p, 128, 0u) + 0.25 * civilization_value(p, 64, 1u)
+            + 0.15 * civilization_value(p, 32, 2u) + 0.05 * civilization_value(p, 16, 3u);
+    float shape = 0.535 + 0.64 * (noise - 0.5), threshold = 0.71 - 0.5 * civilization_cloudiness(civilizationCloudGrid + offset);
+    return clamp((shape - threshold) / (1.0 - threshold), 0.0, 1.0);
 }

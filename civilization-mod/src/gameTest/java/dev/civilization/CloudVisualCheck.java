@@ -47,7 +47,9 @@ final class CloudVisualCheck {
         if(ticks==240)shadeLight=grab(mc,"clouds-shaded.png");
         if(ticks==245)server.execute(()->{var l=server.overworld();RegionalWeather.get(l).clock=sunClock;WeatherEvents.sync(l);});
         if(ticks==385)sunLight=grab(mc,"clouds-sunlit.png");
-        if(ticks==390)server.execute(()->{var l=server.overworld();server.getPlayerList().getPlayers().getFirst().teleportTo(l,.5,200,.5,java.util.Set.of(),0,-45);});
+        // The sky as a player on the ground sees it, looking up toward the horizon.
+        if(ticks==390)server.execute(()->{var l=server.overworld();int ground=l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,40,40);
+            server.getPlayerList().getPlayers().getFirst().teleportTo(l,40.5,ground,40.5,java.util.Set.of(),0,-25);});
         if(ticks==470)grab(mc,"clouds-partly.png");
         if(ticks==475)server.execute(()->{var l=server.overworld();districts(l,1);WeatherEvents.sync(l);});
         if(ticks==595)grab(mc,"clouds-overcast.png");

@@ -42,7 +42,7 @@ public final class PhotonClouds {
             patched.add("coverage");
             // Photon's own coverage stays below under another name, so its callers further down see the shared field.
             return source.substring(0, match.start()) + FIELD
-                    + "\nfloat clouds_cumulus_local_coverage(vec2 pos) { return civilization_cloud_cover(pos / CLOUDS_SCALE); }\n"
+                    + "\nfloat clouds_cumulus_local_coverage(vec2 pos) { return civilization_cloud_density(pos / CLOUDS_SCALE); }\n"
                     + "float civilization_photon_local_coverage(vec2 pos)" + source.substring(match.end());
         }
         if (path.endsWith("/include/lighting/cloud_shadows.glsl")) {

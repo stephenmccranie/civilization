@@ -44,8 +44,8 @@ final class ThermalExposure {
             if (sun.y >= ThermalRules.MIN_SUN_HEIGHT && torso.y < CloudCover.SHADOW_Y) {
                 var at = torso.add(sun.scale((CloudCover.SHADOW_Y - torso.y) / sun.y));
                 float local = CloudCover.cloudiness(grid, (float) (at.x - cornerX), (float) (at.z - cornerZ));
-                cover = CloudCover.cover(CloudCover.shift(at.x, CloudCover.WIND_X, weather.clock),
-                        CloudCover.shift(at.z, CloudCover.WIND_Z, weather.clock), local);
+                cover = CloudCover.shade(CloudCover.density(CloudCover.shift(at.x, CloudCover.WIND_X, weather.clock),
+                        CloudCover.shift(at.z, CloudCover.WIND_Z, weather.clock), local));
             }
             return new Sky(sun, cloud, cover);
         }

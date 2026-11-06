@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class CloudCoverTest {
     private static float share(float cloudiness){
         int covered=0,n=0;
-        for(int x=0;x<8192;x+=37)for(int z=0;z<8192;z+=41){n++;if(CloudCover.cover(x,z,cloudiness)>.5f)covered++;}
+        for(int x=0;x<8192;x+=37)for(int z=0;z<8192;z+=41){n++;if(CloudCover.shade(CloudCover.density(x,z,cloudiness))>.5f)covered++;}
         return covered/(float)n;
     }
     @Test void cloudinessSetsHowMuchSkyIsCovered(){
-        assertEquals(0,share(0),"A clear district has no cloud");
-        assertEquals(1,share(1),"An overcast district is covered");
+        assertTrue(share(0)<.01,"A clear district has next to no cloud: "+share(0));
+        assertTrue(share(1)>.99,"An overcast district is covered: "+share(1));
         float half=share(.5f);
         assertTrue(half>.3&&half<.7,"Half cloudiness covers about half the sky: "+half);
         assertTrue(share(.3f)<half&&half<share(.7f),"More cloudiness, more cover");
@@ -18,8 +18,8 @@ class CloudCoverTest {
         // Whole blocks, so a position and the same one a period on are both exact in float.
         for(int x=-3000;x<3000;x+=413){
             int z=x*7/10;
-            assertEquals(CloudCover.cover(x+CloudCover.PERIOD,z,.5f),CloudCover.cover(x,z,.5f),"Periodic in x at "+x);
-            assertEquals(CloudCover.cover(x,z+CloudCover.PERIOD,.5f),CloudCover.cover(x,z,.5f),"Periodic in z at "+x);
+            assertEquals(CloudCover.density(x+CloudCover.PERIOD,z,.5f),CloudCover.density(x,z,.5f),"Periodic in x at "+x);
+            assertEquals(CloudCover.density(x,z+CloudCover.PERIOD,.5f),CloudCover.density(x,z,.5f),"Periodic in z at "+x);
         }
         assertEquals(CloudCover.shift(-10,CloudCover.WIND_X,0),CloudCover.PERIOD-10,1e-3,"Negative coordinates wrap into the period");
         assertEquals(CloudCover.shift(100,CloudCover.WIND_X,1000),100+CloudCover.WIND_X*1000,1e-3,"The field drifts with the weather clock");
