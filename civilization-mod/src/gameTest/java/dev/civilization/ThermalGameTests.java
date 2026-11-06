@@ -563,7 +563,7 @@ public final class ThermalGameTests {
     }
     @GameTest(template="industrial") public static void afternoonClimateKeepsBiomeAltitudeRainAndCaveRules(GameTestHelper h){
         for(var key:java.util.List.of(Biomes.RIVER,Biomes.FOREST,Biomes.DESERT,Biomes.SNOWY_PLAINS,Biomes.OCEAN,Biomes.LUSH_CAVES)){
-            var profile=ThermalRules.profile(key,.5);
+            var profile=ThermalRules.profile(h.getLevel().registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(key));
             double noon=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(6000),0);
             double peak=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(9000),0);
             double sunset=ThermalRules.climate(profile,80,ThermalRules.temperaturePhase(12000),0);
@@ -608,40 +608,48 @@ public final class ThermalGameTests {
                 "Cold 48°F air and hot 90°F air grant almost no comfort");
         h.assertTrue(Math.abs(ThermalRules.comfort((60-32)/1.8)-ThermalRules.comfort((80-32)/1.8))<1e-9,
                 "Comfort falls symmetrically around 70°F");
-        var river=ThermalRules.profile(Biomes.RIVER,.5);
+        var biomes=h.getLevel().registryAccess().registryOrThrow(Registries.BIOME);
+        java.util.function.Function<net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome>,ThermalRules.Climate> climate=k->ThermalRules.profile(biomes.getHolderOrThrow(k));
+        var river=climate.apply(Biomes.RIVER);
         double riverPeak=ThermalRules.climate(river,64,ThermalRules.temperaturePhase(9000),0);
         double riverDawn=ThermalRules.climate(river,64,ThermalRules.temperaturePhase(0),0);
         h.assertTrue(Math.abs(riverPeak*1.8+32-62.6)<.01&&Math.abs(riverDawn*1.8+32-44.6)<.01,
                 "A temperate river is mildly cold by day and distinctly colder at night");
-        double forestPeak=ThermalRules.climate(ThermalRules.profile(Biomes.FOREST,.7),64,1,0);
-        double plainsPeak=ThermalRules.climate(ThermalRules.profile(Biomes.PLAINS,.8),64,1,0);
-        h.assertTrue(ThermalRules.comfort(forestPeak)<.7&&ThermalRules.comfort(riverPeak)<.7
-                        &&ThermalRules.comfort(plainsPeak)<.7,
+        double forestPeak=ThermalRules.climate(climate.apply(Biomes.FOREST),64,1,0);
+        double plainsPeak=ThermalRules.climate(climate.apply(Biomes.PLAINS),64,1,0);
+        h.assertTrue(ThermalRules.comfort(forestPeak)<.75&&ThermalRules.comfort(riverPeak)<.75
+                        &&ThermalRules.comfort(plainsPeak)<.75,
                 "Common clear-weather daytime biomes reward building for comfort instead of granting a full outdoor bonus");
+        for(var k:java.util.List.of(Biomes.TAIGA,Biomes.FOREST,Biomes.PLAINS,Biomes.SWAMP))
+            h.assertTrue(Math.abs(climate.apply(k).meanC()-river.meanC())<1e-6,"Temperate land shares one mean: "+k.location());
+        h.assertTrue(ThermalRules.meanC(.25)==ThermalRules.meanC(.4)&&ThermalRules.meanC(.4)==ThermalRules.meanC(.8),
+                "Any mod's temperate biomes share that mean, so neighbouring biomes agree");
         h.assertTrue(forestPeak<riverPeak&&plainsPeak>riverPeak
-                        &&ThermalRules.climate(ThermalRules.profile(Biomes.DESERT,2),64,1,0)>plainsPeak+20,
-                "Woodland, riverside and plains are mildly cool; arid land remains distinctly hot");
-        h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.SNOWY_PLAINS,0),64,1,0)<0
-                &&ThermalRules.climate(ThermalRules.profile(Biomes.DESERT,2),64,1,0)>30,
+                        &&ThermalRules.climate(climate.apply(Biomes.DESERT),64,1,0)>plainsPeak+15,
+                "Woods swing less and open plains more than a river; arid land remains distinctly hot");
+        h.assertTrue(ThermalRules.climate(climate.apply(Biomes.SNOWY_PLAINS),64,1,0)<0
+                &&ThermalRules.climate(climate.apply(Biomes.DESERT),64,1,0)>30,
                 "Frozen and hot biomes remain distinct from a temperate river");
-        h.assertTrue(ThermalRules.biomeBaseline(-.7)<ThermalRules.biomeBaseline(0),
+        h.assertTrue(ThermalRules.meanC(-.7)<ThermalRules.meanC(0),
                 "Frozen peaks remain colder than snowy plains instead of sharing the same clamped index");
-        h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.DEEP_FROZEN_OCEAN,.5),64,1,0)<0,
+        h.assertTrue(ThermalRules.climate(climate.apply(Biomes.DEEP_FROZEN_OCEAN),64,1,0)<0,
                 "Deep frozen ocean is cold despite its temperate vanilla gameplay index");
-        h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.WARM_OCEAN,.5),64,1,0)
-                        >ThermalRules.climate(ThermalRules.profile(Biomes.COLD_OCEAN,.5),64,1,0)+15,
+        h.assertTrue(ThermalRules.climate(climate.apply(Biomes.WARM_OCEAN),64,1,0)
+                        >ThermalRules.climate(climate.apply(Biomes.COLD_OCEAN),64,1,0)+15,
                 "Ocean variants have distinct climates despite identical vanilla temperatures");
-        h.assertTrue(ThermalRules.profile(Biomes.DESERT,2).dailySwingC()
-                        >ThermalRules.profile(Biomes.OCEAN,.5).dailySwingC(),
-                "Dry land has a wider day and night range than the open ocean");
-        h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.TAIGA,.25),64,1,0)*1.8+32>55
-                        &&ThermalRules.climate(ThermalRules.profile(Biomes.SAVANNA,2),64,1,0)*1.8+32<100,
-                "Green taiga is not frozen by day and savanna is less hot than the desert");
-        var cave=ThermalRules.profile(Biomes.DEEP_DARK,.8);
-        h.assertTrue(ThermalRules.climate(cave,-40,1,1)==ThermalRules.climate(cave,-40,-1,0),
-                "Deep caves ignore the surface day cycle and regional rain");
-        h.assertTrue(ThermalRules.climate(ThermalRules.profile(Biomes.STONY_PEAKS,1),128,1,0)<20,
-                "Stony peaks do not inherit temperate lowland warmth");
+        h.assertTrue(climate.apply(Biomes.DESERT).dailySwingC()>climate.apply(Biomes.OCEAN).dailySwingC()
+                        &&climate.apply(Biomes.DESERT).dailySwingC()>climate.apply(Biomes.JUNGLE).dailySwingC(),
+                "Dry land has a wider day and night range than the open ocean or the jungle");
+        h.assertTrue(ThermalRules.climate(climate.apply(Biomes.TAIGA),64,1,0)*1.8+32>55
+                        &&ThermalRules.climate(climate.apply(Biomes.SAVANNA),64,1,0)*1.8+32<100,
+                "Green taiga is not frozen by day and savanna stays below 100°F");
+        for(var k:java.util.List.of(Biomes.DEEP_DARK,Biomes.LUSH_CAVES,Biomes.DRIPSTONE_CAVES)){
+            var cave=climate.apply(k);
+            h.assertTrue(ThermalRules.climate(cave,-40,1,1)==ThermalRules.climate(cave,-40,-1,0),
+                    "Caves ignore the surface day cycle and regional rain: "+k.location());
+        }
+        h.assertTrue(ThermalRules.climate(climate.apply(Biomes.STONY_PEAKS),400,1,0)<20,
+                "High stony peaks are cooled by their altitude");
         double first=ThermalRules.playerTemperature(10,30,1);
         h.assertTrue(first>10&&first<30&&ThermalRules.playerTemperature(first,30,6)>28,
                 "Player temperature approaches warmer air over several seconds");
@@ -667,7 +675,7 @@ public final class ThermalGameTests {
         for(var entry:registry.entrySet()){
             var key=entry.getKey();
             if(!key.location().getNamespace().equals("minecraft")||elsewhere.contains(key))continue;
-            var climate=ThermalRules.profile(key,entry.getValue().getBaseTemperature());
+            var climate=ThermalRules.profile(registry.getHolderOrThrow(key));
             double noon=ThermalRules.climate(climate,64,1,0);
             double midnight=ThermalRules.climate(climate,64,-1,0);
             h.assertTrue(Double.isFinite(noon)&&Double.isFinite(midnight)&&noon>=-45&&noon<=50

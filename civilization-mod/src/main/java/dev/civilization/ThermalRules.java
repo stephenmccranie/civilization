@@ -3,6 +3,7 @@ package dev.civilization;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
-import java.util.Set;
+import net.neoforged.neoforge.common.Tags;
 
 /** Initial game tuning, not SI thermodynamics. Energy is in air-block degree units. */
 public final class ThermalRules {
@@ -54,52 +55,28 @@ public final class ThermalRules {
     public static final double EXPOSED_BUOYANT_RISE = .16; // Open-to-sky columns carry a stronger rising plume.
     public static final double COMFORT_CENTER_C = (70-32)/1.8;
     private static final double COMFORT_SPREAD_C = 8/1.8;
-    /** Minecraft biome temperatures are gameplay indices, not degrees Celsius. */
-    public static double biomeBaseline(double biome){
-        double index=Math.clamp(biome,-1,2);
-        return index<0?-10+12*index:index<=.5?-10+52*index:16+(index-.5)*(28d/3);
-    }
     public record Climate(double meanC, double dailySwingC, double rainFactor) {}
-    private static final Set<ResourceKey<Biome>> DRY=Set.of(
-            Biomes.DESERT,Biomes.BADLANDS,Biomes.ERODED_BADLANDS,Biomes.WOODED_BADLANDS);
-    private static final Set<ResourceKey<Biome>> SAVANNA=Set.of(
-            Biomes.SAVANNA,Biomes.SAVANNA_PLATEAU,Biomes.WINDSWEPT_SAVANNA);
-    private static final Set<ResourceKey<Biome>> TAIGA=Set.of(
-            Biomes.TAIGA,Biomes.OLD_GROWTH_PINE_TAIGA,Biomes.OLD_GROWTH_SPRUCE_TAIGA);
-    private static final Set<ResourceKey<Biome>> HUMID=Set.of(
-            Biomes.JUNGLE,Biomes.SPARSE_JUNGLE,Biomes.BAMBOO_JUNGLE,Biomes.SWAMP,Biomes.MANGROVE_SWAMP);
-    private static final Set<ResourceKey<Biome>> WOODLAND=Set.of(
-            Biomes.FOREST,Biomes.FLOWER_FOREST,Biomes.BIRCH_FOREST,Biomes.OLD_GROWTH_BIRCH_FOREST,
-            Biomes.DARK_FOREST,Biomes.CHERRY_GROVE,Biomes.MEADOW);
-    private static final Set<ResourceKey<Biome>> OPEN_PLAINS=Set.of(Biomes.PLAINS,Biomes.SUNFLOWER_PLAINS);
-    private static final Set<ResourceKey<Biome>> COAST=Set.of(
-            Biomes.BEACH,Biomes.SNOWY_BEACH,Biomes.STONY_SHORE,Biomes.MUSHROOM_FIELDS);
-    private static final Set<ResourceKey<Biome>> OCEAN=Set.of(Biomes.OCEAN,Biomes.DEEP_OCEAN);
-    private static final Set<ResourceKey<Biome>> COLD_OCEAN=Set.of(Biomes.COLD_OCEAN,Biomes.DEEP_COLD_OCEAN);
-    private static final Set<ResourceKey<Biome>> LUKEWARM_OCEAN=Set.of(Biomes.LUKEWARM_OCEAN,Biomes.DEEP_LUKEWARM_OCEAN);
-    private static final Set<ResourceKey<Biome>> FROZEN_OCEAN=Set.of(Biomes.FROZEN_OCEAN,Biomes.DEEP_FROZEN_OCEAN);
-    /** A few keyed exceptions correct vanilla values that cannot describe local climate. */
-    public static Climate profile(ResourceKey<Biome> key,double vanillaTemperature){
-        if(key==null)return new Climate(biomeBaseline(vanillaTemperature),5,1);
-        if(key==Biomes.LUSH_CAVES)return new Climate(16,0,0);
-        if(key==Biomes.DRIPSTONE_CAVES)return new Climate(14,0,0);
-        if(key==Biomes.DEEP_DARK)return new Climate(10,0,0);
-        if(key==Biomes.WARM_OCEAN)return new Climate(27,3,.5);
-        if(LUKEWARM_OCEAN.contains(key))return new Climate(23,3,.5);
-        if(OCEAN.contains(key))return new Climate(16,3,.5);
-        if(COLD_OCEAN.contains(key))return new Climate(8,3,.5);
-        if(FROZEN_OCEAN.contains(key))return new Climate(-8,3,.5);
-        if(SAVANNA.contains(key))return new Climate(key==Biomes.WINDSWEPT_SAVANNA?24:25,7,.8);
-        if(TAIGA.contains(key))return new Climate(12,5,1);
-        double mean=biomeBaseline(vanillaTemperature);
-        if(key==Biomes.STONY_PEAKS)mean-=7;
-        if(DRY.contains(key))return new Climate(mean,9,.8);
-        if(HUMID.contains(key))return new Climate(mean+4,3,.6);
-        if(WOODLAND.contains(key))return new Climate(11.5+(vanillaTemperature-.5)*2,5,1);
-        if(key==Biomes.RIVER)return new Climate(12,5,1);
-        if(OPEN_PLAINS.contains(key))return new Climate(12.2,5,1);
-        if(COAST.contains(key))return new Climate(mean,3,.5);
-        return new Climate(mean,5,1);
+    // A biome's game temperature is an index, not degrees. One curve turns it into mean air, so every
+    // biome of any mod with the same index shares a climate; all temperate land lies on one 12 C band.
+    private static final double[] INDEX = {-1, 0, .25, .8, .95, 1.2, 2};
+    private static final double[] MEAN_C = {-22, -10, 12, 12, 24, 25, 30};
+    // The game gives every ocean the same index, so oceans name the warmth of their water.
+    private static final Map<ResourceKey<Biome>, Double> OCEAN_C = Map.of(Biomes.WARM_OCEAN, 27d,
+            Biomes.LUKEWARM_OCEAN, 23d, Biomes.DEEP_LUKEWARM_OCEAN, 23d, Biomes.OCEAN, 16d, Biomes.DEEP_OCEAN, 16d,
+            Biomes.COLD_OCEAN, 8d, Biomes.DEEP_COLD_OCEAN, 8d, Biomes.FROZEN_OCEAN, -8d, Biomes.DEEP_FROZEN_OCEAN, -8d);
+    public static double meanC(double index) {
+        double i = Math.clamp(index, INDEX[0], INDEX[INDEX.length - 1]);
+        int k = 1;
+        while (i > INDEX[k]) k++;
+        return MEAN_C[k - 1] + (MEAN_C[k] - MEAN_C[k - 1]) * (i - INDEX[k - 1]) / (INDEX[k] - INDEX[k - 1]);
+    }
+    /** Dry air swings further between day and night; water and caves hold their warmth. */
+    public static Climate profile(Holder<Biome> biome) {
+        var settings = biome.value().getModifiedClimateSettings();
+        double mean = biome.unwrapKey().map(OCEAN_C::get).orElse(meanC(settings.temperature()));
+        if (biome.is(Tags.Biomes.IS_CAVE)) return new Climate(mean, 0, 0);
+        if (biome.is(BiomeTags.IS_OCEAN) || biome.is(Tags.Biomes.IS_BEACH)) return new Climate(mean, 3, .5);
+        return new Climate(mean, 3 + 4 * (1 - Math.clamp(settings.downfall(), 0, 1)), 1);
     }
     public static double temperaturePhase(long dayTime){
         return DailyTemperatureCycle.phase(dayTime);

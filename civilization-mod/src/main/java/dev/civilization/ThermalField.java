@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.core.*;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -32,7 +31,7 @@ public final class ThermalField extends SavedData {
     // Biome identity is stable during normal play. Bound this transient cache and expire it
     // for /fillbiome and reload changes; sunlight and regional rain are never cached here.
     private final Long2ObjectOpenCustomHashMap<ThermalRules.Climate> biomeClimates=new Long2ObjectOpenCustomHashMap<>(HeatMaps.POSITIONS);
-    private final Map<ResourceKey<Biome>,ThermalRules.Climate> profiles=new HashMap<>();
+    private final Map<Holder<Biome>,ThermalRules.Climate> profiles=new HashMap<>();
     private long climateExpires=Long.MIN_VALUE;
     private static final Direction[] NEIGHBORS=Direction.values();
     private static final int[] OPEN_AIR={15,15,15,15,15,15},CLOSED={0,0,0,0,0,0};
@@ -43,9 +42,7 @@ public final class ThermalField extends SavedData {
         return ThermalConfig.enabled() && l.dimension().equals(Level.OVERWORLD) && p.getY() >= l.getMinBuildHeight() && p.getY() < l.getMaxBuildHeight() && Chunks.loaded(l, p);
     }
     public static double ambient(ServerLevel l, BlockPos p) {
-        var biome=l.getBiome(p);
-        var profile=ThermalRules.profile(biome.unwrapKey().orElse(null),biome.value().getBaseTemperature());
-        return ThermalRules.climate(profile,p.getY(),ThermalRules.temperaturePhase(l.getDayTime()),RegionalWeather.cooling(l,p));
+        return ThermalRules.climate(ThermalRules.profile(l.getBiome(p)),p.getY(),ThermalRules.temperaturePhase(l.getDayTime()),RegionalWeather.cooling(l,p));
     }
     public static double conductance(BlockState s) {return PhysicalMaterials.legacyConductance(s);}
     public static double capacity(BlockState s) {return PhysicalMaterials.legacyCapacity(s);}
@@ -489,10 +486,7 @@ public final class ThermalField extends SavedData {
                     :materials.computeIfAbsent(state,s->material(level,p,s));
             var profile=biomeClimates.get(key);
             if(profile==null){
-                var biome=level.getBiome(p);
-                var biomeKey=biome.unwrapKey().orElse(null);
-                profile=biomeKey==null?ThermalRules.profile(null,biome.value().getBaseTemperature())
-                        :profiles.computeIfAbsent(biomeKey,k->ThermalRules.profile(k,biome.value().getBaseTemperature()));
+                profile=profiles.computeIfAbsent(level.getBiome(p),ThermalRules::profile);
                 if(biomeClimates.size()<131072)biomeClimates.put(key,profile);
             }
             long district=RegionalWeather.key(p.getX(),p.getZ());

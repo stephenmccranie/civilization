@@ -251,6 +251,7 @@ One environmental temperature field connects buildings, machines and people.
 - Architecture matters through physical relationships — shelter, heat, access, scale — not room types or proximity bonuses; outdoor life stays viable.
 
 **Open**
+- Elevation (proposal): air cools 0.045°C per block above Y80 on top of the biome, but Terrain Diffusion already picks colder biomes for higher model ground, so high country is cooled twice. Reading the fork's own air temperature per column (its model climate cooled 6.5°C/km for the raised ground) would give continuous cooling with height and no biome steps.
 - Cadence (owner direction, still a proposal): about one update per second where changing, two to five seconds where settled, sleeping when negligible. Unverified targets: under 2 ms per tick and at most 3 s behind at 200 players.
 - Heat transport, greenhouses, internal machine temperatures, radiant exchange between blocks and oxygen-limited burning.
 - Architecture proposals: workshops warming homes, greenhouses on waste heat, ventilated engine rooms; heat aboard moving vessels.
