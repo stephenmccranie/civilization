@@ -59,10 +59,14 @@ public final class NearbyStores implements CargoInventory {
         }
         entries=List.copyOf(merged);
     }
-    /** Sends the list when it differs from the last one sent, from the menu's own synchronization each tick. */
+    /**
+     * Sends the list when it differs from the last one sent, from the menu's own synchronization each tick. Client menus
+     * also synchronize (anvils and stonecutters, for one); their received copy has no player and sends nothing.
+     */
     public void sync(int containerId){
+        if(!(player instanceof ServerPlayer p))return;
         refresh();if(seen.equals(sent))return;
-        sent=seen;PacketDistributor.sendToPlayer((ServerPlayer)player,new Sync(containerId,stores,entries));
+        sent=seen;PacketDistributor.sendToPlayer(p,new Sync(containerId,stores,entries));
     }
 
     @Override public double capacity(){return seen.stream().mapToDouble(s->s.cargo.capacity()).sum();}
@@ -77,10 +81,12 @@ public final class NearbyStores implements CargoInventory {
         for(var s:seen)if(moved<offered)moved+=s.cargo.insert(item,offered-moved);
         refresh();return moved;
     }
-    /** From the nearest stores holding the item first. */
     @Override public long remove(int index,long requested){
-        refresh();if(index<0||index>=entries.size())return 0;
-        var item=entries.get(index).item();long taken=0;
+        refresh();return index<0||index>=entries.size()?0:take(entries.get(index).item(),requested);
+    }
+    /** Up to requested of the item, from the nearest stores holding it first, resolved against the stores as they are now. */
+    public long take(ItemStack item,long requested){
+        refresh();long taken=0;
         for(var s:seen)if(taken<requested){int at=s.cargo.indexOf(item);if(at>=0)taken+=s.cargo.remove(at,requested-taken);}
         refresh();return taken;
     }

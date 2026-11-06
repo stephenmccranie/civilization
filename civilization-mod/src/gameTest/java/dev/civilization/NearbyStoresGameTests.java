@@ -68,4 +68,19 @@ public final class NearbyStoresGameTests {
         h.assertTrue(p.getOffhandItem().isEmpty()&&Backpack.worn(p).isEmpty()&&stored(pallet.cargo(),Items.OAK_PLANKS)==0,"The planks came from the Hand, the pack and the Pallet, none duplicated");
         h.succeed();
     }
+
+    @GameTest(template="industrial") public static void recipePlacementTakesTheItemItAsksForAfterTheListChanged(GameTestHelper h){
+        var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.OAK_PLANKS),4);pallet.cargo().insert(new ItemStack(Items.STICK),4);
+        var barrow=barrow(h);barrow.cargo().insert(new ItemStack(Items.STONE),1);
+        var p=player(h);var at=h.absolutePos(new BlockPos(7,1,9));h.getLevel().setBlockAndUpdate(at,Blocks.CRAFTING_TABLE.defaultBlockState());
+        p.openMenu(new SimpleMenuProvider((id,inv,player)->new CraftingMenu(id,inv,ContainerLevelAccess.create(h.getLevel(),at)),Component.literal("Crafting")));
+        var menu=(CraftingMenu)p.containerMenu;menu.broadcastChanges();
+        // Another player empties the nearer wheelbarrow, so every later entry of the list last seen moves up one.
+        barrow.cargo().remove(barrow.cargo().indexOf(new ItemStack(Items.STONE)),1);
+        @SuppressWarnings("unchecked") var table=(RecipeHolder<CraftingRecipe>)h.getLevel().getRecipeManager().byKey(ResourceLocation.withDefaultNamespace("crafting_table")).orElseThrow();
+        menu.handlePlacement(false,table,p);
+        int placed=0;for(int i=1;i<10;i++)if(menu.getSlot(i).getItem().is(Items.OAK_PLANKS))placed+=menu.getSlot(i).getItem().getCount();
+        h.assertTrue(placed==4&&stored(pallet.cargo(),Items.OAK_PLANKS)==0&&stored(pallet.cargo(),Items.STICK)==4,"The grid's planks came from the Pallet's planks and its sticks stayed: "+placed);
+        h.succeed();
+    }
 }

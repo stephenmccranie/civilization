@@ -24,7 +24,7 @@ public final class CraftingSources {
         int taken=0;var hand=p.getOffhandItem();
         if(ItemStack.isSameItemSameComponents(hand,item)){taken=Math.min(n,hand.getCount());hand.shrink(taken);}
         var pack=Backpack.worn(p);if(pack!=null&&taken<n)taken+=pack.take(item,n-taken);
-        var near=NearbyStores.of(p.containerMenu);if(near!=null&&taken<n)taken+=(int)near.remove(near.indexOf(item),n-taken);
+        var near=NearbyStores.of(p.containerMenu);if(near!=null&&taken<n)taken+=(int)near.take(item,n-taken);
         if(taken>0)p.getInventory().setChanged();
         return taken;
     }
