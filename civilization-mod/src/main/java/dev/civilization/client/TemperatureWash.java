@@ -45,7 +45,7 @@ public final class TemperatureWash {
 
     private static Level lastWorld;
     private static long lastFrameNanos;
-    private static double strain, presence, seconds, beat;
+    private static double strain, presence, seconds, beat, sinceShiver, nextShiver;
 
     private TemperatureWash() {}
 
@@ -97,6 +97,11 @@ public final class TemperatureWash {
         strain += (desired - strain) * step;
         presence += ((active ? TemperatureWashConfig.INTENSITY.get() : 0) - presence) * step;
         seconds += elapsed;
+        sinceShiver += elapsed;
+        if (sinceShiver > nextShiver) {
+            sinceShiver = 0;
+            nextShiver = 12 - 6 * past(-strain, .5) + 3 * Math.random();
+        }
         beat += elapsed * (70 + 60 * Math.max(0, strain)) / 60;
     }
 
@@ -166,9 +171,9 @@ public final class TemperatureWash {
     @SubscribeEvent
     public static void camera(ViewportEvent.ComputeCameraAngles event) {
         double shiver = past(-strain, .5), sway = past(strain, .5);
-        double burst = Math.pow(Math.max(0, Math.sin(seconds * 1.4)), 2);
-        double roll = shiver * burst * (.6 * Math.sin(seconds * 43) + .4 * Math.sin(seconds * 71)) * .9
-                + sway * Math.sin(seconds * .8) * 1.6;
+        // One quick shudder that dies away in about a third of a second.
+        double shudder = Math.exp(-sinceShiver / .12) * Math.sin(sinceShiver * Math.TAU * 9);
+        double roll = shiver * shudder * 1.4 + sway * Math.sin(seconds * .8) * 1.6;
         event.setRoll(event.getRoll() + (float) (roll * motion()));
     }
 
