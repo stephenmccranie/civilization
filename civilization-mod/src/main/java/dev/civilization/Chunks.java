@@ -1,7 +1,9 @@
 package dev.civilization;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The mod's one chunk-presence test. {@code hasChunkAt} and {@code isLoaded} only say a server chunk is scheduled to be
@@ -14,5 +16,12 @@ public final class Chunks {
     }
     public static boolean loaded(Level level, int chunkX, int chunkZ) {
         return level.getChunkSource().getChunkNow(chunkX, chunkZ) != null;
+    }
+    /** Whether every chunk within {@code reach} blocks of a point, horizontally, has finished loading. */
+    public static boolean loadedAround(Level level, Vec3 at, double reach) {
+        for (int x = Mth.floor(at.x - reach) >> 4; x <= Mth.floor(at.x + reach) >> 4; x++)
+            for (int z = Mth.floor(at.z - reach) >> 4; z <= Mth.floor(at.z + reach) >> 4; z++)
+                if (!loaded(level, x, z)) return false;
+        return true;
     }
 }

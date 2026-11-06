@@ -23,6 +23,10 @@ public final class ThermalRules {
     public static final double RAIN_RECOVERY_TICKS = 48000; // Forty-minute thermal recovery after rain.
     public static final double MACHINE_TOP_SHARE = .80;
     public static final double PLAYER_RESPONSE_SECONDS = 2.5;
+    // Felt temperature blends torso air with the mean radiant temperature of what a body sees.
+    public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8, MAX_RADIANT_C = 100;
+    // Radiant output as bodies feel it, softened over about a block. Tuning, not SI.
+    public static final double FLAME_RADIANCE = 30000, TORCH_RADIANCE = 3000, LAVA_RADIANCE = 60000;
     private static final double COLD_MIN = 2, COLD_COMFORT = 18;
     // Per quarter-second exchange step. Sum of outward air fractions stays below one.
     public static final double AIR_MIXING = .15, EXPOSED_AIR_MIXING = .10, UPWARD_MIXING = .19, OUTDOOR_EXCHANGE = .0045;
@@ -117,6 +121,7 @@ public final class ThermalRules {
         double distance=(c-COMFORT_CENTER_C)/COMFORT_SPREAD_C;
         return Math.exp(-.5*distance*distance);
     }
+    public static double felt(double air, double radiant) { return air + RADIANT_SHARE * (radiant - air); }
     public static double calorieFactor(double comfort) { return 1 - .20 * comfort; }
     /** A player's thermal state follows the sampled air, without changing the air field. */
     public static double playerTemperature(double previous, double air, double seconds) {

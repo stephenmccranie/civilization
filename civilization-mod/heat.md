@@ -1,6 +1,6 @@
 # Heat
 
-Every loaded block cell has a temperature: the regional climate plus local thermal energy stored in the cell. Fires, lava and machines add energy; materials, openings and the open sky move it. Players feel the air at torso height, which sets their comfort and cold calorie cost, and temperature changes how much work machine coal buys. Player-facing temperatures are Fahrenheit; simulation and saves use Celsius and game heat units.
+Every loaded block cell has a temperature: the regional climate plus local thermal energy stored in the cell. Fires, lava and machines add energy; materials, openings and the open sky move it. Players feel the air at torso height together with the warmth or chill of what they can see, which sets their comfort and cold calorie cost, and temperature changes how much work machine coal buys. Player-facing temperatures are Fahrenheit; simulation and saves use Celsius and game heat units.
 
 ## Switch
 
@@ -62,13 +62,13 @@ Redstone torches give no heat. Extinguishing or removing a source ends emission 
 - Per dimension: 262,144 active cells, 262,144 timed-release entries and 4,096 pending machine-source locations. Machine batches wait for release-queue room; natural inputs that do not fit, and weak settled cells, are retired to the atmosphere ledger.
 - Heat reads only fully loaded chunks: unloaded chunks, and chunks still loading or generating, are neither loaded nor simulated, and heat never waits for one; their warmth and pending emissions wait for reload. Offline and heat-disabled time is not simulated. Flame and lava discovery is chunk-indexed with bounded queues.
 - Exchanges use dense numeric arrays with section-local indices; block materials and face geometry are resolved once per exchange and nothing is cached across exchanges.
-- Not modelled: wind, smoke, radiation, oxygen, phase change, internal machine temperatures and moving vessels. Rates are deliberately coarse, not CFD or SI calibration.
+- Not modelled: wind, smoke, radiation between blocks (only bodies feel radiant warmth), oxygen, phase change, internal machine temperatures and moving vessels. Rates are deliberately coarse, not CFD or SI calibration.
 
 The thermal laboratory is a server fixture with physics reference checks (energy conservation, conduction, door and roof airflow, source budgets, room warm-up and cool-down, vented and closed Foundries). Run it with `dev.ps1 Fixture -Name thermal` after changing the solver or thermal rules ([development checks](testing.md)).
 
 ## Comfort and cold
 
-The server updates air and felt temperature once per second; felt temperature follows torso-height air with a 2.5-second response. There is no proximity warmth: flames and shelter help only by warming the air.
+The server updates air and felt temperature once per second. Felt temperature follows, with a 2.5-second response, a blend of 60% torso-height air and 40% the radiant temperature of what the player sees within 8 blocks. 32 evenly spread sight lines each take the temperature of the first block they meet, or of the air where they end; flames and the surface of lava with a clear line to the torso add their warmth, falling off with distance. On a 59°F evening a lit campfire or fire beside you feels about 88°F, about 73°F two blocks away and 66°F three away; a torch adds a few degrees close up, and lava is much hotter (capped). Walls, closed doors and water block that warmth, and warm or cold masonry makes a room feel warmer or cooler than its air. Being seen never changes the heat field. Only loaded chunks are read: where any chunk within 8 blocks is not loaded, felt temperature follows the air alone. `ThermalRules` owns the tuning.
 
 **Comfort** follows a Gaussian curve centered on 70°F with an 8°F spread: 100% at 70°F, about 46% at 60°F or 80°F and about 2% at 48°F. At full comfort an active Survival player gets up to 20% cheaper block labor, travel, jumping and attacks, 15% faster block breaking and 5% more movement speed. Healing and hunger-effect costs are unchanged, depletion suspends the benefits, and sprinting stays three times walking per block.
 
@@ -82,11 +82,11 @@ A hot machine's masonry leaks at a temperature-adjusted rate: unchanged from 32�
 
 ## Player display
 
-A small brass-and-glass thermometer between the health and calorie bars shows felt temperature in Fahrenheit. Its glass shifts continuously from muted blue (cold) through sage green (comfortable) to amber-red (hot), with a four-second breathing highlight that strengthens with actual comfort bonuses and disappears while depleted. A small brick chevron appears while [street paving](survival.md#street-paving) is speeding you. The display follows Survival HUD visibility and hides with F1, in Creative or Spectator and when data is missing or stale. Hover the thermometer in the inventory for air and felt temperatures, comfort, current cold drain, labor and travel savings, mining speed, comfort movement and the separate road bonus (not added together).
+A small brass-and-glass thermometer between the health and calorie bars shows felt temperature in Fahrenheit. Its glass shifts continuously from muted blue (cold) through sage green (comfortable) to amber-red (hot), with a four-second breathing highlight that strengthens with actual comfort bonuses and disappears while depleted. A small brick chevron appears while [street paving](survival.md#street-paving) is speeding you. The display follows Survival HUD visibility and hides with F1, in Creative or Spectator and when data is missing or stale. Hover the thermometer in the inventory for air, surroundings and felt temperatures, comfort, current cold drain, labor and travel savings, mining speed, comfort movement and the separate road bonus (not added together).
 
 Felt temperature also shows on screen, every effect settling over a few seconds and fading out on stale samples. A translucent color wash covers the finished world and interface, including screens and tooltips: warm golden tan near 70°F, deepening to blue below about 53°F and to red above about 87°F. Over the world view, below about 61°F the screen edges glow icy white and from about 55°F frost creeps in from the corners; above about 78°F the edges glow ember-orange and throb with a lub-dub heartbeat that quickens with heat. Below about 53°F the camera gives a quick shiver every 12 to 15 seconds, every 6 to 9 seconds in the hardest cold; above about 87°F it sways slowly and the view throbs slightly with the heartbeat. Everything reaches full strength at 36°F or 104°F. Camera motion also follows the vanilla Distortion Effects setting. The wash and edges are drawn after shader rendering and do not change shader settings. `config/civilization-temperature-wash.toml` has client `enabled` (default true) and `intensity` (default 1, range 0–2), which scale all of it.
 
-`/civilization heat` reports local air and felt temperatures, comfort, thermal efficiency, solver age and timed-release count.
+`/civilization heat` reports local air, surroundings and felt temperatures, comfort, thermal efficiency, solver age and timed-release count.
 
 ## Thermal Survey Helmet
 
