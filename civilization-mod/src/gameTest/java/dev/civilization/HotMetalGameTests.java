@@ -122,15 +122,16 @@ public final class HotMetalGameTests {
         long now = level.getGameTime();
         h.assertTrue(bars.is(Items.IRON_INGOT) && bars.getCount() == 3 && grades.get(0) > 900 && grades.get(1) > 800 && grades.get(2) > 700,
                 "Five blows on an iron anvil beat the whole stack of blooms into ingots, each a grade step up: " + grades);
-        h.assertTrue(HotMetal.hot(bars, now) && !HotMetal.workable(bars, now), "A hammering spends the working heat and leaves the bars to cool");
+        h.assertTrue(HotMetal.hot(bars, now) && HotMetal.age(bars, now) < HotMetal.WORKING_TICKS && bars.has(HotMetal.WORKED.get()) && !HotMetal.workable(bars, now),
+                "A hammering leaves the bars cooling as they were, marked as worked this heat");
         h.assertTrue(spent >= .8 * HotMetal.ANVIL_BLOWS * blow - 1e-6 && spent <= HotMetal.ANVIL_BLOWS * blow + 1e-6, "Every blow is paid labor for each unit: " + spent + " kcal");
-        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal below working heat can't be hammered again");
+        h.assertTrue(click(player, anvil).isCanceled() && GradeGameTests.grades(player.getMainHandItem()).equals(grades), "Metal hammered this heat can't be hammered again until it is reheated");
         var cauldron = station(h, 4, Blocks.WATER_CAULDRON);
         int loss = HotMetal.loss(HotMetal.age(player.getMainHandItem(), now));
         h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()) && Grade.stacks(player.getMainHandItem(), new ItemStack(Items.IRON_INGOT)),
                 "Water quenches the bars at once");
         h.assertTrue(loss > 0 && GradeGameTests.grades(player.getMainHandItem()).equals(less(grades, loss)),
-                "Quenching straight off the anvil, before cherry red, costs every unit the same: " + grades + " to " + GradeGameTests.grades(player.getMainHandItem()));
+                "Quenching straight off the anvil, long before cherry red, costs every unit the same: " + grades + " to " + GradeGameTests.grades(player.getMainHandItem()));
         var stone = station(h, 6, KilnContent.STONE_ANVIL.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(GradeGameTests.units(KilnContent.BLISTER_STEEL.get(), 800), level.getGameTime()));
         work(h, player, stone, HotMetal.STONE_ANVIL_BLOWS - 1);
@@ -174,14 +175,20 @@ public final class HotMetalGameTests {
         var player = smith(h, cauldron);
         long now = h.getLevel().getGameTime();
         var grades = List.of(900, 800, 700);
-        for (int seconds : new int[] {0, -2, 2, -10, 10}) {
-            player.setItemInHand(InteractionHand.MAIN_HAND, aged(GradeGameTests.units(Items.IRON_INGOT, 900, 800, 700), now, seconds));
-            h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()), "Water quenches the bars");
+        for (int seconds : new int[] {0, -2, 2, -5, 5, -10, 10}) {
+            long age = HotMetal.IDEAL_TICKS + seconds * 20L;
+            var bars = aged(GradeGameTests.units(Items.IRON_INGOT, 900, 800, 700), now, seconds);
+            bars.set(HotMetal.WORKED.get(), net.minecraft.util.Unit.INSTANCE);
+            player.setItemInHand(InteractionHand.MAIN_HAND, bars);
+            h.assertTrue(click(player, cauldron).isCanceled() && !player.getMainHandItem().has(HotMetal.HOT.get()) && !player.getMainHandItem().has(HotMetal.WORKED.get()),
+                    "Water quenches the bars and ends their work");
             var after = GradeGameTests.grades(player.getMainHandItem());
-            int lost = grades.getFirst() - after.getFirst();
-            h.assertTrue(after.equals(less(grades, lost)), "Every unit loses the same: " + after);
-            h.assertTrue(seconds == 0 ? lost == 0 : Math.abs(seconds) == 2 ? lost > 0 && lost < 10 : lost > 70,
-                    "Quenching " + seconds + " s from cherry red costs " + lost / 10.0 + " points");
+            h.assertTrue(after.equals(grades.stream().map(grade -> Grade.tempered(grade, HotMetal.reward(age), HotMetal.loss(age))).toList()),
+                    "Each unit gains its share of its own hammering step and loses the timing's cost: " + after);
+            int change = after.getFirst() - grades.getFirst();
+            h.assertTrue(seconds == 0 ? change == Math.round(Grade.step(900)) : Math.abs(seconds) == 2 ? change == 0
+                    : Math.abs(seconds) == 5 ? change < 0 && change > -10 : change < -50,
+                    "Quenching " + seconds + " s from cherry red changes the best bar by " + change / 10.0 + " points");
         }
         h.assertTrue(HotMetal.loss(HotMetal.COOL_TICKS) == 100, "Metal cooled in air has lost the full ten points");
         player.setItemInHand(InteractionHand.MAIN_HAND, GradeGameTests.units(Items.IRON_INGOT, 900, 800));
@@ -208,7 +215,7 @@ public final class HotMetalGameTests {
         HotMetal.cool(held, now + HotMetal.COOL_TICKS);
         HotMetal.heated(held, now);
         HotMetal.quench(aged(held, now, 0), now);
-        h.assertTrue(GradeGameTests.grades(held).equals(List.of(800, 700)), "It loses them once, and a good reheat and quench does not restore them");
+        h.assertTrue(GradeGameTests.grades(held).equals(List.of(800, 700)), "It loses them once, and a reheat quenched right at cherry red without hammering neither restores nor adds grade");
         var smithy = WorkshopGameTests.build(h, 2, Direction.NORTH);
         var plate = ManufacturingGameTests.job(2, ManufacturingContent.part("iron", "plate"));
         ManufacturingGameTests.supply(smithy, plate);

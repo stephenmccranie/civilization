@@ -71,10 +71,10 @@ public record Grade(List<Integer> units) {
      * never carries a unit past the target; from there on each pass adds a tenth.
      */
     public static int refined(int grade, RandomSource random) {
-        int gap = TARGET - grade;
-        double mean = 45 * Math.pow(Math.max(0, gap) / (double)(TARGET - STANDARD), 4);
-        return grade + Math.max(1, Math.min(gap, (int)Math.round(-mean * Math.log(1 - random.nextDouble()))));
+        return grade + Math.max(1, Math.min(TARGET - grade, (int)Math.round(-step(grade) * Math.log(1 - random.nextDouble()))));
     }
+    /** A hammering's mean gain for a unit at `grade`, in tenths: 45 at the standard, none at the target. */
+    public static double step(int grade) { return 45 * Math.pow(Math.max(0, TARGET - grade) / (double)(TARGET - STANDARD), 4); }
     /** A hammering of the whole stack: every unit takes its own step. */
     public static void refine(ItemStack stack, RandomSource random) {
         set(stack, top(stack, stack.getCount()).stream().map(unit -> refined(unit, random)).toList());
@@ -83,10 +83,11 @@ public record Grade(List<Integer> units) {
     public static void smelted(ItemStack product, ItemStack input, RandomSource random) {
         if (graded(product)) assign(product, graded(input) ? top(input, 1).getFirst() : roll(random));
     }
-    /** Takes `tenths` from every unit of the stack. */
-    public static void lose(ItemStack stack, int tenths) {
-        if (tenths != 0) set(stack, top(stack, stack.getCount()).stream().map(unit -> unit - tenths).toList());
+    /** Gives every unit `reward` of its own mean hammering step and takes `tenths` from it. */
+    public static void temper(ItemStack stack, double reward, int tenths) {
+        set(stack, top(stack, stack.getCount()).stream().map(unit -> tempered(unit, reward, tenths)).toList());
     }
+    public static int tempered(int grade, double reward, int tenths) { return grade + (int)Math.round(reward * step(grade)) - tenths; }
     /** Gives every unit of the stack one grade. */
     public static void assign(ItemStack stack, int grade) { put(stack, new Grade(List.of(grade))); }
 
