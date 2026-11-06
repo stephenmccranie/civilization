@@ -37,6 +37,27 @@ public final class BlockHeatSources {
     }
     public static boolean flame(net.minecraft.world.level.block.state.BlockState state){return torch(state)||campfire(state)||fire(state);}
     public static boolean source(net.minecraft.world.level.block.state.BlockState state){return flame(state)||state.getFluidState().is(FluidTags.LAVA);}
+    /** Radiant output seen by bodies, tuned per source rather than derived from the heat it gives the air. */
+    static double radiance(net.minecraft.world.level.block.state.BlockState state){
+        if(state.getFluidState().is(FluidTags.LAVA))return ThermalRules.LAVA_RADIANCE*state.getFluidState().getAmount()/8d;
+        return fire(state)||campfire(state)?ThermalRules.FLAME_RADIANCE:torch(state)?ThermalRules.TORCH_RADIANCE:0;
+    }
+    /** Indexed flames and lava within reach of a point, nearest first. Callers check that those chunks are loaded. */
+    static long[] near(ServerLevel level,net.minecraft.world.phys.Vec3 at,double reach){
+        var sources=SOURCES.get(level);if(sources==null)return new long[0];
+        var found=new LongArrayList();
+        for(int cx=net.minecraft.util.Mth.floor(at.x-reach)>>4;cx<=net.minecraft.util.Mth.floor(at.x+reach)>>4;cx++)
+            for(int cz=net.minecraft.util.Mth.floor(at.z-reach)>>4;cz<=net.minecraft.util.Mth.floor(at.z+reach)>>4;cz++){
+            var index=sources.chunks.get(net.minecraft.world.level.ChunkPos.asLong(cx,cz));if(index==null)continue;
+            for(long key:index)if(distanceSqr(key,at)<=reach*reach)found.add(key);
+        }
+        var keys=found.toLongArray();
+        LongArrays.quickSort(keys,(a,b)->Double.compare(distanceSqr(a,at),distanceSqr(b,at)));
+        return keys;
+    }
+    private static double distanceSqr(long key,net.minecraft.world.phys.Vec3 at){
+        return at.distanceToSqr(BlockPos.getX(key)+.5,BlockPos.getY(key)+.5,BlockPos.getZ(key)+.5);
+    }
     private static final int LIMIT=4096;
     public static final double TEMPERATURE=1000; // Celsius internally; displays use Fahrenheit.
     public static void changed(ServerLevel level,BlockPos pos) {

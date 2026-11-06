@@ -10,9 +10,9 @@ public final class TemperatureWashConfig {
 
     static {
         var builder = new ModConfigSpec.Builder();
-        ENABLED = builder.comment("Tint the world, HUD and open screens according to the player's temperature, which gradually follows local air.")
+        ENABLED = builder.comment("Show the player's temperature, which gradually follows local air: tint the world, HUD and open screens, frost or glow at the screen edges, and shiver or sway the camera (also scaled by Distortion Effects).")
                 .define("enabled", true);
-        INTENSITY = builder.comment("Local strength of the temperature color wash. Zero disables it.")
+        INTENSITY = builder.comment("Local strength of all temperature screen effects. Zero disables them.")
                 .defineInRange("intensity", 1.0, 0.0, 2.0);
         SPEC = builder.build();
     }

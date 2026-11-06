@@ -13,6 +13,21 @@ public final class WeatherGameTests {
  private static void harvestAsPlayer(GameTestHelper h,ServerLevel l,BlockPos p){var player=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"weather-farmer"));player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(p.above()));h.assertTrue(player.gameMode.destroyBlock(p),"Manual harvest succeeds");}
  private static ServerLevel river(GameTestHelper h){return GeographyGameTests.region(h,"river");}
  private static SoilChunk.Soil plant(ServerLevel l,BlockPos p,net.minecraft.world.level.block.Block b){l.setChunkForced(p.getX()>>4,p.getZ()>>4,true);l.getChunkAt(p);for(var e:l.getEntitiesOfClass(ItemEntity.class,new AABB(p).inflate(4)))e.discard();l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());l.setBlockAndUpdate(p.above(),Blocks.AIR.defaultBlockState());l.setBlockAndUpdate(p.below(),Blocks.FARMLAND.defaultBlockState());l.setBlockAndUpdate(p,b.defaultBlockState());l.setBlockAndUpdate(p.above(3),Blocks.GLOWSTONE.defaultBlockState());var s=SoilSystem.observe(l,p.below());s.target=7200;return s;}
+ @GameTest(template="empty") public static void cloudCoverDriftsAndRainBringsOvercast(GameTestHelper h){
+  var l=h.getLevel();var w=RegionalWeather.get(l);var p=new BlockPos(9000,64,-9000);long key=RegionalWeather.key(p.getX(),p.getZ());
+  w.clear(l,p);var d=w.district(l,key);
+  h.assertTrue(d.cloudStart<=w.clock&&d.cloudEnd>w.clock&&d.cloudEnd-d.cloudStart>=72000&&d.cloudEnd-d.cloudStart<=288000,"Cloud cover drifts toward its next amount over one to four hours");
+  h.assertTrue(d.cloudFrom>=0&&d.cloudFrom<=1&&d.cloudTo>=0&&d.cloudTo<=1,"Cloud amounts are shares of the sky");
+  double clear=w.cloudiness(l,key);h.assertTrue(clear>=0&&clear<=1,"Cloudiness is a share of the sky");
+  var copy=RegionalWeather.load(w.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess()),l.registryAccess());
+  var restored=copy.district(l,key);
+  h.assertTrue(restored.cloudFrom==d.cloudFrom&&restored.cloudTo==d.cloudTo&&restored.cloudEnd==d.cloudEnd&&restored.cloudSequence==d.cloudSequence,"Cloud schedule survives reload");
+  int x=Math.floorDiv(p.getX(),512),z=Math.floorDiv(p.getZ(),512);
+  h.assertTrue(w.cloudGrid(l,x,z)[4]==(float)w.cloudiness(l,key),"The grid's centre is the district itself");
+  d.rain=true;d.cooling=1;d.coolingAt=w.clock;
+  h.assertTrue(w.cloudiness(l,key)==1,"Rain brings overcast");
+  w.clear(l,p);h.succeed();
+ }
  @GameTest(template="empty") public static void regionalRainPersistsAndDoesNotStack(GameTestHelper h){var l=h.getLevel();var p=new BlockPos(-2049,64,2048);var w=RegionalWeather.get(l);var n=p.east(512);h.assertTrue(RegionalWeather.key(-1,-1)==RegionalWeather.key(-512,-512)&&RegionalWeather.key(-513,-1)!=RegionalWeather.key(-512,-1),"Negative district boundaries");w.clear(l,p);w.clear(l,n);h.assertTrue(w.call(l,p),"First call starts rain");long end=w.district(l,RegionalWeather.key(p.getX(),p.getZ())).end;h.assertTrue(!w.call(l,p)&&end==w.district(l,RegionalWeather.key(p.getX(),p.getZ())).end,"Repeated call cannot extend rain");h.assertTrue(!w.district(l,RegionalWeather.key(n.getX(),n.getZ())).rain,"Neighbor unchanged");var copy=RegionalWeather.load(w.save(new net.minecraft.nbt.CompoundTag(),l.registryAccess()),l.registryAccess());h.assertTrue(copy.district(l,RegionalWeather.key(p.getX(),p.getZ())).end==end,"Schedule survives reload");h.assertTrue(RegionalWeather.waitTicks(.000001,12)<20&&RegionalWeather.waitTicks(.9999,12)>48*72000L,"No cooldown or maximum drought");h.succeed();}
  @GameTest(template="empty") public static void rainfallCoolsThenRecoversWithoutResettingOnReload(GameTestHelper h){
   var l=h.getLevel();var p=new BlockPos(1024,70,1024);var neighbor=p.east(512);var weather=new RegionalWeather();

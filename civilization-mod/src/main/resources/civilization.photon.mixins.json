@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.civilization.mixin.compat",
+  "plugin": "dev.civilization.mixin.compat.PhotonCloudPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["IrisCloudSourceMixin", "IrisCloudUniformMixin"]
+}

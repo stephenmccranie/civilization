@@ -11,14 +11,15 @@ public final class ThermalGameTests {
     private static double productiveHeatPerSecond(){return ThermalRules.COAL_WASTE_HEAT*20/ProductionEnergy.COAL;}
     @GameTest(template="empty") public static void surveyPacketPreservesPositionsAndTemperatures(GameTestHelper h){
         var origin=new BlockPos(100,70,-50);
-        var packet=new ThermalPayload(21,20,.8f,2,true,java.util.List.of(
+        var packet=new ThermalPayload(21,30,.5f,20,.8f,2,true,java.util.List.of(
                 new ThermalPayload.Sample(origin,-4.26f),
                 new ThermalPayload.Sample(origin.offset(16,12,16),1537.24f)));
         var buffer=new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(),h.getLevel().registryAccess());
         try{
             ThermalPayload.write(buffer,packet);
-            h.assertTrue(buffer.readableBytes()<40,"Compact survey stores one origin and short readings");
+            h.assertTrue(buffer.readableBytes()<48,"Compact survey stores one origin and short readings");
             var restored=ThermalPayload.read(buffer);
+            h.assertTrue(restored.radiantTemperature()==30&&restored.sunlight()==.5f,"Surroundings and sunlight survive the packet");
             h.assertTrue(restored.samples().get(1).pos().equals(origin.offset(16,12,16)),"Relative samples retain world positions");
             h.assertTrue(Math.abs(restored.samples().get(0).temperature()+4.3f)<.001f
                     &&Math.abs(restored.samples().get(1).temperature()-1537.2f)<.001f,"Survey keeps useful tenth-degree precision");
@@ -163,7 +164,7 @@ public final class ThermalGameTests {
         }
         h.succeed();
     }
-    @GameTest(template="industrial") public static void playerTemperatureUsesOnlyTorsoAir(GameTestHelper h){
+    @GameTest(template="industrial") public static void torsoAirChangesOnlyWithStoredHeat(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
         for(var q:BlockPos.betweenClosed(p.offset(-2,-1,-2),p.offset(2,3,2)))l.setBlockAndUpdate(q,Blocks.AIR.defaultBlockState());
         l.setBlockAndUpdate(p.below(),Blocks.STONE.defaultBlockState());
@@ -171,7 +172,7 @@ public final class ThermalGameTests {
         double before=ThermalSystem.airTemperature(l,feet);
         l.setBlockAndUpdate(p,Blocks.TORCH.defaultBlockState());
         h.assertTrue(Math.abs(ThermalSystem.airTemperature(l,feet)-before)<.001,
-                "A newly lit torch gives no separate instant player warmth");
+                "A newly lit torch does not change the torso air");
         l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());
         var field=new ThermalField();double cool=field.localTemperature(l,p.above());
         field.add(l,p.above(),30);
@@ -181,6 +182,81 @@ public final class ThermalGameTests {
         l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());
         h.assertTrue(Math.abs(field.localTemperature(l,p.above())-warm)<.001,
                 "Removing a source does not erase already-warm air");
+        h.succeed();
+    }
+    /** A sky that radiates like the air, so only flames and surfaces change what a body feels. */
+    private static final ThermalExposure.Sky OVERCAST_NIGHT=new ThermalExposure.Sky(new net.minecraft.world.phys.Vec3(0,-1,0),1,1);
+    @GameTest(template="industrial") public static void sunWarmsTheOpenAndShadeAndNightCool(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
+        for(var q:BlockPos.betweenClosed(p.offset(-4,-1,-4),p.offset(4,3,4)))
+            l.setBlockAndUpdate(q,q.getY()<p.getY()?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
+        var field=new ThermalField();var torso=ThermalSystem.torso(net.minecraft.world.phys.Vec3.atBottomCenterOf(p));
+        double air=field.localTemperature(l,BlockPos.containing(torso));
+        h.assertTrue(BlockPos.containing(torso).getY()>=l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ()),"Fixture stands under open sky");
+        var noon=new ThermalExposure.Sky(ThermalRules.sun(0),0,0);
+        var sunny=ThermalExposure.sample(l,field,torso,air,noon);
+        h.assertTrue(sunny.sunlight()==1,"Nothing shades the open fixture at noon");
+        double sun=ThermalRules.felt(air,sunny.radiant());
+        h.assertTrue(sun>air+3,"Noon sun feels warmer than the shade air: "+sun+" vs "+air);
+        var overcast=ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(noon.sun(),1,1));
+        h.assertTrue(overcast.sunlight()==0&&Math.abs(overcast.radiant()-air)<1,"Overcast hides the sun and radiates like the air");
+        double night=ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant());
+        h.assertTrue(night<air-1.5,"A clear night sky draws warmth from the open: "+night+" vs "+air);
+        h.assertTrue(ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.26),0,0)).sunlight()==0,"No direct sun once it has set");
+        // A stone roof over the player.
+        for(var q:BlockPos.betweenClosed(p.offset(-4,3,-4),p.offset(4,3,4)))l.setBlockAndUpdate(q,Blocks.STONE.defaultBlockState());
+        var shaded=ThermalExposure.sample(l,field,torso,air,noon);
+        h.assertTrue(shaded.sunlight()==0,"A roof shades the noon sun");
+        double shade=ThermalRules.felt(air,shaded.radiant());
+        h.assertTrue(sun>shade+3&&Math.abs(shade-air)<2,"Shade under a roof feels close to the air: "+shade);
+        h.assertTrue(ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant())>night+1,"A roof keeps off the cold night sky");
+        h.succeed();
+    }
+    @GameTest(template="industrial") public static void flamesWarmWhoeverSeesThem(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
+        for(var q:BlockPos.betweenClosed(p.offset(-4,-1,-4),p.offset(4,3,4)))
+            l.setBlockAndUpdate(q,q.getY()<p.getY()?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
+        var field=new ThermalField();var torso=ThermalSystem.torso(net.minecraft.world.phys.Vec3.atBottomCenterOf(p));
+        double air=field.localTemperature(l,BlockPos.containing(torso));
+        double open=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(Math.abs(open-air)<1,"Surroundings at ambient feel like the air: "+open+" vs "+air);
+        l.setBlockAndUpdate(p.east(),Blocks.CAMPFIRE.defaultBlockState());
+        double beside=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(beside>open+20,"A campfire beside you warms what you feel: "+open+" -> "+beside);
+        h.assertTrue(ThermalRules.felt(air,beside)>air+8,"Felt temperature follows the fire, not only the air");
+        h.assertTrue(Math.abs(field.localTemperature(l,BlockPos.containing(torso))-air)<.001,"Seeing a flame warms the body, not the air");
+        l.setBlockAndUpdate(p.east(),Blocks.TORCH.defaultBlockState());
+        double torch=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(torch>open+1&&torch<beside-10,"A torch warms far less than a campfire: "+torch);
+        l.setBlockAndUpdate(p.east(),Blocks.AIR.defaultBlockState());l.setBlockAndUpdate(p.east(3),Blocks.CAMPFIRE.defaultBlockState());
+        double far=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(far>open+2&&far<beside-10,"Warmth falls with distance: "+far);
+        for(int y=0;y<=1;y++)l.setBlockAndUpdate(p.offset(2,y,0),Blocks.STONE.defaultBlockState());
+        double walled=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        l.setBlockAndUpdate(p.east(3),Blocks.CAMPFIRE.defaultBlockState().setValue(CampfireBlock.LIT,false));
+        double walledCold=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(Math.abs(walled-walledCold)<.5,"A wall between you and a fire blocks its warmth: "+walled+" vs "+walledCold);
+        h.succeed();
+    }
+    @GameTest(template="industrial") public static void roomSurfacesSetHowWarmItFeels(GameTestHelper h){
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
+        var shell=new java.util.ArrayList<BlockPos>();
+        // A closed brick room, three by three inside and three high.
+        for(var q:BlockPos.betweenClosed(p.offset(-2,-1,-2),p.offset(2,3,2))){
+            boolean wall=Math.abs(q.getX()-p.getX())==2||Math.abs(q.getZ()-p.getZ())==2||q.getY()==p.getY()-1||q.getY()==p.getY()+3;
+            l.setBlockAndUpdate(q,wall?Blocks.BRICKS.defaultBlockState():Blocks.AIR.defaultBlockState());
+            if(wall)shell.add(q.immutable());
+        }
+        var field=new ThermalField();var torso=ThermalSystem.torso(net.minecraft.world.phys.Vec3.atBottomCenterOf(p));
+        double air=field.localTemperature(l,BlockPos.containing(torso));
+        h.assertTrue(Math.abs(ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant()-air)<1,"Walls at ambient feel like the air");
+        double capacity=ThermalField.capacity(Blocks.BRICKS.defaultBlockState());
+        for(var q:shell)field.energy.put(q.asLong(),20*capacity);
+        double warm=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(warm>air+15&&ThermalRules.felt(air,warm)>air+6,"Warm masonry makes a room feel warmer than its air: "+warm);
+        for(var q:shell)field.energy.put(q.asLong(),-15*capacity);
+        double cold=ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant();
+        h.assertTrue(cold<air-10&&ThermalRules.felt(air,cold)<air-4,"Cold walls make a room feel cooler than its air: "+cold);
         h.succeed();
     }
     @GameTest(template="industrial") public static void torchesWarmAndStopWhenRemoved(GameTestHelper h){

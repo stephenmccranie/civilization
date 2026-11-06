@@ -58,6 +58,9 @@ public final class ComfortHud {
         if(Math.abs(mouseX-x)>18||mouseY<y-19||mouseY>y+8)return;
         var data=ThermalVision.current();double c=comfort();var lines=new ArrayList<Component>();
         lines.add(Component.literal(String.format(Locale.ROOT,"Air temperature: %.1f°F",ThermalDisplay.fahrenheit(data.temperature()))));
+        lines.add(Component.literal(String.format(Locale.ROOT,"Surroundings: %.1f°F",ThermalDisplay.fahrenheit(data.radiantTemperature()))));
+        if(ThermalRules.sun(Minecraft.getInstance().level.getTimeOfDay(1)).y>=ThermalRules.MIN_SUN_HEIGHT)
+            lines.add(Component.literal(data.sunlight()>0?String.format(Locale.ROOT,"Direct sun: %.0f%%",data.sunlight()*100):"Direct sun: none (shade or cloud)"));
         lines.add(Component.literal(String.format(Locale.ROOT,"Felt temperature: %.1f°F",ThermalDisplay.fahrenheit(data.playerTemperature()))));
         lines.add(Component.literal(String.format(Locale.ROOT,"Comfort: %.0f%%",data.comfort()*100)));
         double cold=ThermalRules.coldKcalPerSecond(data.playerTemperature(),CalorieConfig.COLD_EXPOSURE.get());

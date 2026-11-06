@@ -98,7 +98,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Meltwater and cold-region farming.
 - Advanced felling and timber hauling, to be designed later; basic felling stands in until then.
 - The Rain Caller's eventual form; tower energy and Survival access; offline production.
-- Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
+- Weather fronts that carry rain and cloud across districts.
 
 ## Land, deposits and geography
 
@@ -242,15 +242,16 @@ One environmental temperature field connects buildings, machines and people.
 - Climate, altitude, weather and time set ambient air, with a mid-afternoon peak, warm evenings and a dawn low.
 - Blocks slow heat without stopping it; glass and doors pass more, openings more again. Wood insulates, masonry stores, air mixes. Heat eventually escapes.
 - Burning machines heat their shell and exhaust, warming nearby air; enclosure and insulation still matter. Torches give modest heat, campfires more, lava much more. Passive exchange conserves heat and never invents hotspots.
-- **Comfort.** Players feel the air around them with a short delay. Comfort peaks at 70°F, lowering calorie costs and speeding work, with a smaller movement benefit. Ordinary daylight is mildly cool, so shelter helps; hot biomes are their own challenge. Cold adds a capped passive calorie cost, never damage.
-- A brass thermometer between health and calories shows comfort and road speed; felt temperature gently tints the view, with a disable option.
+- **Comfort.** Players feel the air around them blended with the warmth or chill of what they can see — fires, lava, warm or cold walls, the sun and a sky that is colder when clear — with a short delay; walls and roofs block it. Comfort peaks at 70°F, lowering calorie costs and speeding work, with a smaller movement benefit. Ordinary daylight is mildly cool, so shelter helps; hot biomes are their own challenge. Cold adds a capped passive calorie cost, never damage.
+- A brass thermometer between health and calories shows comfort and road speed; felt temperature shows on screen as a tint, frost or glowing edges and a shiver or sway, with a disable option.
 - Cold, exposed machines lose energy; sheltered, warm workshops are efficient. Recovered waste heat comes only from consumed fuel and never duplicates energy used for work; engines make waste heat without gaining furnace efficiency. Architectural heat reuse comes before ducts.
+- Cloud cover is server weather per district, the same for every player; shaders draw those clouds and their shadows, which shade players from the sun.
 - Cheap, readable heat beats precise prediction: batching and approximation are fine while warmth, insulation and cooling stay understandable and fuel accounting stays finite.
 - Architecture matters through physical relationships — shelter, heat, access, scale — not room types or proximity bonuses; outdoor life stays viable.
 
 **Open**
 - Cadence (owner direction, still a proposal): about one update per second where changing, two to five seconds where settled, sleeping when negligible. Unverified targets: under 2 ms per tick and at most 3 s behind at 200 players.
-- Clothing, heat transport, greenhouses, internal machine temperatures, radiant exchange and oxygen-limited burning.
+- Clothing, heat transport, greenhouses, internal machine temperatures, radiant exchange between blocks and oxygen-limited burning.
 - Architecture proposals: workshops warming homes, greenhouses on waste heat, ventilated engine rooms; heat aboard moving vessels.
 
 ## Physical foundation

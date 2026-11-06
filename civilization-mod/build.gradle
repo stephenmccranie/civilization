@@ -31,6 +31,7 @@ dependencies {
     compileOnly fileTree(dir: '.dev-libs', include: ['sable-companion-*.jar', 'veil-*.jar'])
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testImplementation 'it.unimi.dsi:fastutil:8.5.12'
+    testImplementation 'org.slf4j:slf4j-api:2.0.9'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
 }
 tasks.named('test') { useJUnitPlatform() }
