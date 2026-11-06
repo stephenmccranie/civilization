@@ -107,6 +107,10 @@ def inputs():
         public_text(content)
         if name.endswith('.toml'):
             tomllib.loads(content.decode('utf-8'))
+        # Without a version line the game runs every options fixer from version 0, and the pre-1.13 key fixer
+        # rejects named key bindings, so it discards the whole file.
+        if name == 'options.txt' and not re.match(rb'version:\d+\n', content):
+            raise ValueError('options.txt must start with the game data version')
         output['minecraft/' + name] = content
     # The updater's scripts are managed like any other pack file, published as release assets, so installs update
     # their own updater. Updaters from before this ignore the field.

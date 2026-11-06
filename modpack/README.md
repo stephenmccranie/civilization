@@ -73,7 +73,7 @@ If the machine struggles, disable shaders first or lower DH distance while keepi
 
 ## Maintaining the release
 
-This folder holds only reviewed public inputs: the pinned manifest, the Prism instance template and the client override files (settings and launch scripts). Never export a whole development instance. The builder rejects IP address literals, machine paths and unreviewed download hosts, never reads a player's instance or saved-server list, and generates loader metadata from the manifest.
+This folder holds only reviewed public inputs: the pinned manifest, the Prism instance template and the client override files (settings and launch scripts). Never export a whole development instance. The builder rejects IP address literals, machine paths, unreviewed download hosts and an `options.txt` that does not start with the game's data version line (`version:3955` for 1.21.1; without it the game discards the whole file), never reads a player's instance or saved-server list, and generates loader metadata from the manifest.
 
 To build and check a pack locally (Python 3.11+, from the repository root):
 
