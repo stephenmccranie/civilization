@@ -31,11 +31,11 @@ final class CivicVisualCheck {
         }
         if (ticks == 160) {
             if (mc.player.containerMenu.getType() != CivicContent.LAND_MENU.get() || !mc.player.containerMenu.getSlot(0).hasItem()) throw new IllegalStateException("Claim menu did not synchronize");
-            shot(mc, "land");
+            dev.civilization.client.CarryUiCheck.assertLayout(mc, false); shot(mc, "land");
             mc.screen.mouseClicked(mc.getWindow().getGuiScaledWidth() / 2.0 + 100, (mc.getWindow().getGuiScaledHeight() - 168) / 2.0 + 18, 0);
         }
         if (ticks == 180) {
-            shot(mc, "whitelist");
+            dev.civilization.client.CarryUiCheck.assertLayout(mc, false); shot(mc, "whitelist");
             server.execute(() -> { var p = server.getPlayerList().getPlayers().getFirst(); CivicMenu.open(p, CivicService.address(server.overworld(), SHOP), false); });
         }
         if (ticks == 190) {
@@ -45,7 +45,7 @@ final class CivicVisualCheck {
         if (ticks == 200) {
             if (!(mc.player.containerMenu instanceof CivicMenu m) || m.amount()!=65) throw new IllegalStateException("Typed quantity did not synchronize");
             if (mc.player.containerMenu.getType() != CivicContent.SHOP_MENU.get() || !mc.player.containerMenu.getSlot(27).getItem().is(Items.BREAD)) throw new IllegalStateException("Shop offer did not synchronize");
-            shot(mc, "shop");
+            dev.civilization.client.CarryUiCheck.assertLayout(mc, false); shot(mc, "shop");
         }
         if (ticks == 205) {
             // Real client click path: pick stock onto cursor, set a ghost outside the chest bounds.

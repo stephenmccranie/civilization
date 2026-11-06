@@ -78,7 +78,7 @@ public final class CargoLedgerGameTests {
         h.assertTrue(restored.cargo().entry(0).count()==128,"Stockpile balance survives native persistence");h.succeed();
     }
     @GameTest(template="industrial") public static void nativeMenuClicksConserveCargoCursorAndPlayerInventory(GameTestHelper h){
-        var stock=stockpile(h);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),stock);
+        var stock=stockpile(h);var p=player(h);var menu=new CargoMenu(1,p.getInventory(),stock);BlockCarry.attachMenu(menu,p.getInventory());
         p.getInventory().setItem(9,new ItemStack(Items.STONE,32));
         menu.clicked(27,0,ClickType.QUICK_MOVE,p);
         h.assertTrue(stock.cargo().entry(0).count()==32&&p.getInventory().getItem(9).isEmpty(),"Native shift-click deposits exactly its inventory stock");

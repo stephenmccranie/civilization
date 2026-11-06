@@ -100,6 +100,8 @@ Kiln-family machines (Kiln, Cooking Stove, Foundry and Fertilizer Furnace) accru
 
 ## JEI
 
+JEI's **+** on a crafting recipe fills the crafting table or inventory grid through the game's own recipe book, from the pockets, Hand, pack and nearby stores, so the server needs no JEI ([recipe placement](physics.md#personal-block-carrying)).
+
 With Just Enough Items installed, recipe lookup (default **R**) and uses (default **U**) include the Kiln, Foundry, Fertilizer Furnace, Cooking Stove, Tannery, Textile Workshop, Smithy, Assembly Bench, Oil Derrick, Fired Heater, Distillation Column, Air-Cooled Condenser, Coal Drill, canister filling and emptying, saw cutting and recombining. Each category shows its controller or tool as the catalyst; ordinary crafting stays in JEI's Crafting category. The Foundry has an information page about the metal-free brick bootstrap.
 
 Pages show ingredient alternatives and counts, coproducts, baseline seconds, fuel or tool requirements and operating notes. Coal appears as a fuel supply rather than a fixed per-recipe charge, because warming up and heat loss apply. Drill oil is marked optional with its dry slowdown explained. Repair pages are half-damaged examples; actual material use and resulting durability depend on the item. Retired furnace fuel pages and forbidden anvil/grindstone equipment repairs are hidden, and retired items are removed from the ingredient list.

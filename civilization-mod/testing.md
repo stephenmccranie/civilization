@@ -51,15 +51,15 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `uranium` | Exposed ore, stocked chest and held Raw Uranium |
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |
 | `builders-line` | Builder's Line clicks, automatic building and mining, and cancel |
-| `wheelbarrow` | Wheelbarrow first-person view, walking bob, A/D steering with a free mouse look, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering; the Hand beside a chest menu, and the Hand and Pack panel beside crafting and Kiln menus with their recipe panels open at 1080p, GUI scale 2, 768p and 1440p; in Creative, the same beside a Kiln menu with its recipe drawer open and closed, the Hand taking a full stack by real clicks |
-| `backpack` | Cooking Stoves, a chest and stairs on a Pallet, a backpack in its accessory slot, binding it in a Pallet menu, building that tops up the hand and pack from the store with stone conserved, the pack worn from behind, three-quarters and the side, its menu and Supply switch, building beyond reach from the pack alone, the held item, and the Pack panel beside a chest menu |
+| `wheelbarrow` | Wheelbarrow first-person view, walking bob, A/D steering with a free mouse look, a hill climb and descent, the hitbox and walking around the wheel's point, loading and rendering; the side column beside a chest menu, and beside crafting and Kiln menus with their recipe panels open at 1080p, GUI scale 2, 768p and 1440p, standing in the same place; in Creative, the same beside a Kiln menu with its recipe drawer open and closed, the Hand taking a full stack by real clicks |
+| `backpack` | Cooking Stoves, a chest and stairs on a Pallet, a backpack in its accessory slot, binding it in a Pallet menu, building that tops up the hand and pack from the store with stone conserved, the pack worn from behind, three-quarters and the side, the Pack panel in the inventory, building beyond reach from the pack alone, the held item, the Pack and Nearby panels beside a chest menu, and unbinding with the Pack panel's button |
 | `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
 | `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |
 | `chests` | Single and double chest menus with shift-click conservation |
 | `inventory` | Player inventory, equipment, offhand, pickup and recipe book |
-| `jei` | JEI categories, catalysts and recipe parity (needs JEI in `run/mods`) |
+| `jei` | JEI categories, catalysts and recipe parity, and the **+** placing a crafting recipe through our own transfer handler (needs JEI in `run/mods`) |
 | `civic` | Land controller and trade counter menus, whitelist and quantity input |
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |
 | `oven` | Baking Oven placement and animated door |

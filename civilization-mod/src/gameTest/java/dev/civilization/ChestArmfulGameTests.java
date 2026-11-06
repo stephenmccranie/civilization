@@ -134,7 +134,7 @@ public final class ChestArmfulGameTests {
 
     @GameTest(template="industrial") public static void thePackPanelRespectsTheArmful(GameTestHelper h){
         ChestBlockEntity chest=place(h,new BlockPos(3,1,3),Blocks.CHEST);
-        var p=player(h);var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,1000,1);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
+        var p=player(h);var pack=Backpack.ITEM.toStack();p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
         Backpack.worn(p).setItem(0,new ItemStack(Items.STONE,20));
         p.openMenu(chest);var menu=p.containerMenu;int slot=-1;
         for(int i=0;i<menu.slots.size();i++)if(menu.slots.get(i) instanceof Backpack.PackSlot s&&s.getItem().is(Items.STONE)){slot=i;break;}

@@ -13,6 +13,7 @@ public abstract class ServerPlayerMixin {
     private void civilization$carrySlot(net.minecraft.world.inventory.AbstractContainerMenu menu,CallbackInfo ci){
         dev.civilization.BlockCarry.attachMenu(menu,((ServerPlayer)(Object)this).getInventory());
         dev.civilization.Backpack.attachMenu(menu,(ServerPlayer)(Object)this);
+        dev.civilization.NearbyStores.attach(menu,(ServerPlayer)(Object)this);
     }
     @Inject(method="canHarmPlayer",at=@At("HEAD"),cancellable=true)
     private void civilization$arenaConsent(net.minecraft.world.entity.player.Player other,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean> ci){

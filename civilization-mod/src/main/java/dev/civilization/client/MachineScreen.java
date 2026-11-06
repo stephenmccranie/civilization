@@ -51,8 +51,8 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
     @Override protected void init(){
         super.init();repair=null;catalogKey=recipeCatalogKey();rows.clear();categories.clear();materials.clear();categoryKeys.clear();materialKeys.clear();
         catalog=List.copyOf(recipes());if(catalog.isEmpty()){ignition();return;}
-        // The drawer and its tab take the left side; while it is open the Hand stands on the right.
-        int margin=28+(menu.slots.stream().anyMatch(s->s instanceof dev.civilization.BlockCarry.HandSlot)?MachineUi.HAND_ROOM:0);
+        // The drawer and its tab take the left side; the side column keeps the right.
+        int margin=28+(dev.civilization.BlockCarry.handSlot(menu)!=null?SidePanels.ROOM:0);
         drawerWidth=Math.min(144,width-imageWidth-margin);
         drawer=drawer&&drawerWidth>=108;
         drawerWidth=Math.max(108,drawerWidth);

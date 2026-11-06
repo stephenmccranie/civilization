@@ -193,7 +193,7 @@ final class WheelbarrowVisualCheck {
         });
         if(t==815)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(2.5,100.5,2),Direction.NORTH,new BlockPos(2,100,2),false));
         if(t==825){
-            if(!(mc.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu)||mc.player.containerMenu.slots.size()!=64||mc.player.containerMenu.getSlot(63).getItem().getCount()!=BlockCarry.LIMIT)throw new IllegalStateException("Native chest hand-slot synchronization failed");
+            if(!(mc.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu)||mc.player.containerMenu.slots.size()!=64+Backpack.SLOTS||BlockCarry.handSlot(mc.player.containerMenu).getItem().getCount()!=BlockCarry.LIMIT)throw new IllegalStateException("Native chest hand-slot synchronization failed");
             mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,0,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,mc.player);
         }
         if(t==831){
@@ -240,7 +240,7 @@ final class WheelbarrowVisualCheck {
         // which the Kiln does not take as a building material, so an empty-handed click opens its menu.
         if(t==1170)check(server,()->{
             var p=server.getPlayerList().getPlayers().getFirst();p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Blocks.DIRT,BlockCarry.LIMIT));
-            var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,1000,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);Backpack.worn(p).setItem(0,new ItemStack(Blocks.STONE,6));
+            var pack=Backpack.ITEM.toStack();p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);Backpack.worn(p).setItem(0,new ItemStack(Blocks.STONE,6));
             p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),3.5,100,1,java.util.Set.of(),0,20);server.overworld().setBlockAndUpdate(new BlockPos(4,100,2),Blocks.CRAFTING_TABLE.defaultBlockState());
         });
         if(t==1185)mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(new Vec3(4.5,100.5,2),Direction.NORTH,new BlockPos(4,100,2),false));

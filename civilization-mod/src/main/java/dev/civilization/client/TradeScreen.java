@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-public final class TradeScreen extends AbstractContainerScreen<CivicMenu> {
+public final class TradeScreen extends AbstractContainerScreen<CivicMenu> implements SidePanels.Wide {
     private final EditBox[] quantities = new EditBox[2];
     private boolean syncing, dirty, awaiting;
     private int sentRevision, waitTicks;
@@ -53,8 +53,10 @@ public final class TradeScreen extends AbstractContainerScreen<CivicMenu> {
         return super.keyPressed(key,scan,mods);
     }
     @Override public void onClose() { save(); super.onClose(); }
+    /** The Pay wing beside the menu. */
+    @Override public int rightReach() { return 264; }
     @Override protected boolean hasClickedOutside(double x,double y,int left,int top,int button) {
-        return x < left-88 || x >= left+264 || y < top || y >= top+imageHeight+18;
+        return x < left-88 || x >= left+rightReach() || y < top || y >= top+imageHeight+18;
     }
     @Override protected void renderLabels(GuiGraphics g,int x,int y){g.drawString(font,playerInventoryTitle,inventoryLabelX,inventoryLabelY,MachineUi.INK,false);}
     @Override protected void renderBg(GuiGraphics g,float partial,int x,int y) {

@@ -1,16 +1,18 @@
 package dev.civilization.mixin;
 
 import dev.civilization.BlockCarry;
+import dev.civilization.client.SidePanels;
 import net.minecraft.client.gui.screens.inventory.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
-/** Reserve the hand well when deciding whether recipes require overlay mode. */
-@Mixin({CraftingScreen.class,AbstractFurnaceScreen.class})
+/** The recipe book opens beside the menu only where the side column still fits on the menu's right. */
+@Mixin({InventoryScreen.class,CraftingScreen.class,AbstractFurnaceScreen.class})
 public abstract class CarryRecipeBookMixin {
-    // init reads this after super.init, which has attached the menu's Hand.
+    // init reads this after super.init, which has attached the menu's Hand. The open book moves the 176-wide menu 77
+    // right of centre and the column reaches ROOM beyond it; centring doubles both.
     @ModifyConstant(method="init",constant=@Constant(intValue=379))
     private int civilization$carryWidth(int original){
-        return ((AbstractContainerScreen<?>)(Object)this).getMenu().slots.stream().anyMatch(s->s instanceof BlockCarry.HandSlot)?480:original;
+        return BlockCarry.handSlot(((AbstractContainerScreen<?>)(Object)this).getMenu())!=null?176+2*77+2*SidePanels.ROOM:original;
     }
 }

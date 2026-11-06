@@ -114,7 +114,7 @@ public class FrontierGameTests {
     public static void accessoryColumnKeepsVanillaInventoryCoordinates(GameTestHelper helper) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var menu = player.inventoryMenu;
-        helper.assertTrue(menu.slots.size() == 49, "46 vanilla slots plus three accessory slots");
+        helper.assertTrue(menu.slots.size() == 49 + Backpack.SLOTS, "46 vanilla slots, three accessory slots, then the pack's");
         for (int i = 0; i < 3; i++) {
             var slot = menu.getSlot(46 + i);
             helper.assertTrue(slot.x == 77 && slot.y == 8 + i * 18,

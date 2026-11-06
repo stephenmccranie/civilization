@@ -133,7 +133,7 @@ public final class GradeGameTests {
         h.assertTrue(Grade.value(bench.getItem(5)) == 900, "Armor takes the mean of its plates");
         var backpack = ManufacturingGameTests.job(3, Backpack.ITEM.get());
         ManufacturingGameTests.supply(bench, backpack); WorkshopGameTests.run(bench, backpack.ticks());
-        h.assertTrue(bench.getItem(5).is(Backpack.ITEM.get()) && EquipmentGrade.hasGrade(bench.getItem(5)), "A backpack rolls its own grade when made");
+        h.assertTrue(bench.getItem(5).is(Backpack.ITEM.get()) && !EquipmentGrade.hasGrade(bench.getItem(5)), "A backpack has no grade: every pack is the same size");
         h.succeed();
     }
 
