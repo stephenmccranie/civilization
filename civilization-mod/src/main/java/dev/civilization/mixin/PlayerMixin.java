@@ -46,11 +46,6 @@ public abstract class PlayerMixin {
                 net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
     }
 
-    @Redirect(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
-    private void civilization$jump(Player player, float ignored) {
-        if (!player.level().isClientSide) CalorieFoodData.of(player).spendOther(player, CalorieConfig.JUMP.get(), "jump");
-    }
-
     @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private void civilization$attack(Player player, float ignored) {
         if (!player.level().isClientSide) CalorieFoodData.of(player).spendOther(player, CalorieConfig.ATTACK.get(), "melee_hit");

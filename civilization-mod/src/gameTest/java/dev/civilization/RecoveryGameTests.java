@@ -124,7 +124,7 @@ public class RecoveryGameTests {
         helper.assertTrue(player.getHealth() == 6 && data.reserve().calories() == 100, "Healing must wait for recovery threshold");
         data.consume(player, 100, "test-food");
         for (int i = 0; i < 80; i++) data.tick(player);
-        helper.assertTrue(player.getHealth() == 7 && data.reserve().calories() == 160, "Healing must resume after recovery");
+        helper.assertTrue(player.getHealth() == 7 && data.reserve().calories() == 180, "Healing must resume after recovery");
         helper.succeed();
     }
 

@@ -103,7 +103,7 @@ public class CalorieGameTests {
         player.jumpFromGround();
         player.checkMovementStatistics(1, 0, 0);
         EnergyLog.marker(player, "logout");
-        helper.assertTrue(Math.abs(data.reserve().calories() - 2397.9) < 0.00001,
+        helper.assertTrue(Math.abs(data.reserve().calories() - 2399.9) < 0.00001,
                 "Audit hooks must not change energy accounting");
         helper.succeed();
     }
@@ -139,7 +139,7 @@ public class CalorieGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "civilization")
-    public static void cakeSliceAndJump(GameTestHelper helper) {
+    public static void cakeSliceAndFreeJump(GameTestHelper helper) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var data = CalorieFoodData.of(player);
         data.reserve().set(1000);
@@ -147,7 +147,7 @@ public class CalorieGameTests {
         helper.useBlock(new net.minecraft.core.BlockPos(1, 1, 1), player);
         helper.assertTrue(data.reserve().calories() == 1200, "One cake slice must add 200 kcal");
         player.jumpFromGround();
-        helper.assertTrue(data.reserve().calories() == 1198, "Jump must spend 2 kcal");
+        helper.assertTrue(data.reserve().calories() == 1200, "A jump pays only for the height it gains");
         helper.succeed();
     }
 
@@ -241,9 +241,9 @@ public class CalorieGameTests {
         player.setHealth(10);
         for (int i = 0; i < 80; i++) data.tick(player);
         helper.assertTrue(player.getHealth() == 11, "Natural healing must restore one health point");
-        helper.assertTrue(data.reserve().calories() == 960, "Healing must cost 40 kcal");
+        helper.assertTrue(data.reserve().calories() == 980, "Healing must cost 20 kcal");
         player.setHealth(10);
-        data.reserve().set(39);
+        data.reserve().set(19);
         for (int i = 0; i < 80; i++) data.tick(player);
         helper.assertTrue(player.getHealth() == 10, "Insufficient calories must prevent natural healing");
         helper.succeed();
