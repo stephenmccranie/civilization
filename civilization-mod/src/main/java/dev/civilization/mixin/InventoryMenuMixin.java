@@ -1,6 +1,7 @@
 package dev.civilization.mixin;
 
 import dev.civilization.AccessorySlot;
+import dev.civilization.Backpack;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Reuse the otherwise empty three cells immediately above the native offhand slot. */
+/** Accessories fill the three cells above the native offhand slot; the worn pack's slots follow. */
 @Mixin(InventoryMenu.class)
 public abstract class InventoryMenuMixin extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
     protected InventoryMenuMixin() { super(null, 0); }
@@ -20,5 +21,6 @@ public abstract class InventoryMenuMixin extends RecipeBookMenu<CraftingInput, C
     @Inject(method = "<init>", at = @At("TAIL"))
     private void civilization$accessories(Inventory inventory, boolean active, Player player, CallbackInfo ci) {
         for (int i = 0; i < 3; i++) addSlot(new AccessorySlot(player, i, 77, 8 + i * 18));
+        Backpack.attachMenu(this, player);
     }
 }

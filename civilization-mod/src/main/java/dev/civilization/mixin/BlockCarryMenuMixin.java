@@ -7,7 +7,7 @@ import dev.civilization.ChestArmful;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
@@ -16,6 +16,12 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarryMenuAccess {
     @Invoker("addSlot") public abstract Slot civilization$addCarrySlot(Slot slot);
     @Invoker("moveItemStackTo") protected abstract boolean civilization$move(ItemStack stack,int from,int to,boolean reverse);
+    @Shadow @Final public int containerId;
+    @Unique private dev.civilization.NearbyStores civilization$nearby;
+    @Override public dev.civilization.NearbyStores civilization$nearby(){return civilization$nearby;}
+    @Override public void civilization$setNearby(dev.civilization.NearbyStores nearby){civilization$nearby=nearby;}
+    @Inject(method="broadcastChanges",at=@At("TAIL"))
+    private void civilization$syncNearby(CallbackInfo ci){if(civilization$nearby!=null)civilization$nearby.sync(containerId);}
     @Inject(method="moveItemStackTo",at=@At("HEAD"),cancellable=true)
     private void civilization$shift(ItemStack stack,int from,int to,boolean reverse,CallbackInfoReturnable<Boolean> result){
         var menu=(AbstractContainerMenu)(Object)this;

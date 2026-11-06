@@ -2,16 +2,15 @@ package dev.civilization;
 
 import static dev.civilization.CargoHolder.REACH;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
 
 /** Native player slots and paged cargo identities. Large quantities never enter a native slot/cursor. */
 public final class CargoMenu extends AbstractContainerMenu {
     public static final int ROWS=27, DATA=122;
+    /** The Hand, attached after the 27 entries and 36 player slots. */
     public static final int OFFHAND_SLOT=63;
     private final CargoHolder holder,target;
     private final SimpleContainer icons=new SimpleContainer(ROWS);
@@ -36,8 +35,9 @@ public final class CargoMenu extends AbstractContainerMenu {
             @Override public boolean mayPlace(ItemStack s){return false;}
             @Override public boolean mayPickup(Player p){return false;}
         });
-        MachineMenus.playerSlots(this::addSlot,inv,169);if(BlockCarry.showsHand(inv.player))addSlot(new BlockCarry.HandSlot(inv,227));addDataSlots(data);refresh();
+        MachineMenus.playerSlots(this::addSlot,inv,169);addDataSlots(data);refresh();
     }
+    CargoHolder holder(){return holder;}
     private static int part(long value,int index){return (int)(value>>>(index*16))&65535;}
     private long value(int base){long n=0;for(int i=0;i<4;i++)n|=(long)(data.get(base+i)&65535)<<(16*i);return n;}
     public long count(int row){return value(row*4);}
@@ -63,26 +63,33 @@ public final class CargoMenu extends AbstractContainerMenu {
         if(p.level().isClientSide)return; // Stock actions are server-authoritative; native packets synchronize the cursor.
         if(!valid(p))return;
         if(index>=0&&index<ROWS){
-            int at=page*ROWS+index;var cargo=holder.cargo();
-            if(type==ClickType.QUICK_MOVE){withdraw(p,at,true,0);}
-            else if(type==ClickType.PICKUP&&(button==0||button==1)){
-                var carried=getCarried();
-                if(carried.isEmpty())withdraw(p,at,false,button);
-                else if(at>=cargo.size()||ItemStack.isSameItemSameComponents(carried,cargo.entry(at).item()))carried.shrink((int)cargo.insert(carried,button==1?1:carried.getCount()));
-            }
+            int at=page*ROWS+index;
+            if(type==ClickType.QUICK_MOVE||type==ClickType.PICKUP)click(this,p,holder.cargo(),at<holder.cargo().size()?at:-1,button,type==ClickType.QUICK_MOVE);
             refresh();broadcastChanges();return;
         }
         super.clicked(index,button,type,p);
     }
-    private void withdraw(Player p,int at,boolean inventory,int button){
-        var cargo=holder.cargo();if(at<0||at>=cargo.size())return;
+    /**
+     * A click on a store's entry, here or in the Nearby panel; `at` is -1 for an empty cell. With an empty cursor it takes
+     * a stack (right button: half); with goods on the cursor it stacks them, all or one, onto a matching entry or an
+     * empty cell; Shift moves stacks into the player's inventory, where blocks fill the Hand and then the pack.
+     */
+    static void click(AbstractContainerMenu menu,Player p,CargoInventory cargo,int at,int button,boolean quick){
+        if(button!=0&&button!=1)return;
+        var carried=menu.getCarried();
+        if(quick)withdraw(menu,p,cargo,at,true,0);
+        else if(carried.isEmpty())withdraw(menu,p,cargo,at,false,button);
+        else if(at<0||ItemStack.isSameItemSameComponents(carried,cargo.entry(at).item()))carried.shrink((int)cargo.insert(carried,button==1?1:carried.getCount()));
+    }
+    private static void withdraw(AbstractContainerMenu menu,Player p,CargoInventory cargo,int at,boolean inventory,int button){
+        if(at<0||at>=cargo.size())return;
         var identity=cargo.entry(at).item();
         for(int attempt=0;attempt<(inventory?38:1);attempt++){
             if(at>=cargo.size()||!ItemStack.isSameItemSameComponents(identity,cargo.entry(at).item()))break;
             var e=cargo.entry(at);int amount=(int)Math.min(e.count(),e.item().getMaxStackSize());if(button==1)amount=(amount+1)/2;
             var stack=e.item().copyWithCount(amount);
             if(inventory){p.getInventory().add(stack);int moved=amount-stack.getCount();cargo.remove(at,moved);if(moved<amount)break;}
-            else if(getCarried().isEmpty()){setCarried(stack);cargo.remove(at,amount);}
+            else if(menu.getCarried().isEmpty()){menu.setCarried(stack);cargo.remove(at,amount);}
         }
     }
     @Override public ItemStack quickMoveStack(Player p,int index){
@@ -99,17 +106,9 @@ public final class CargoMenu extends AbstractContainerMenu {
         if(id==0)target.cargo().transferTo(holder.cargo());else holder.cargo().transferTo(target.cargo());
         refresh();broadcastChanges();return true;
     }
+    /** A wheelbarrow's nearest Pallet group, or a Pallet's nearest parked wheelbarrow, that the player may use. */
     private static CargoHolder nearby(CargoHolder source,Player p){
-        if(source instanceof WheelbarrowEntity){
-            var center=BlockPos.containing(source.cargoPosition());CargoHolder best=null;double distance=REACH*REACH;
-            for(var at:BlockPos.betweenClosed(center.offset(-REACH,-REACH,-REACH),center.offset(REACH,REACH,REACH))){
-                if(!Chunks.loaded(source.cargoLevel(),at))continue;
-                if(source.cargoLevel().getBlockEntity(at) instanceof StockpileEntity s&&s.cargoValid(p)){
-                    double d=s.cargoPosition().distanceToSqr(source.cargoPosition());if(d<distance){distance=d;best=s;}
-                }
-            }return best;
-        }
-        return source.cargoLevel().getEntitiesOfClass(WheelbarrowEntity.class,new AABB(source.cargoPosition(),source.cargoPosition()).inflate(REACH),e->e.cargoValid(p)&&e.cargoPosition().distanceToSqr(source.cargoPosition())<=REACH*REACH)
-                .stream().min(java.util.Comparator.comparingDouble(e->e.cargoPosition().distanceToSqr(source.cargoPosition()))).orElse(null);
+        boolean pallet=source instanceof WheelbarrowEntity;
+        return CargoHolder.around(source.cargoLevel(),source.cargoPosition()).stream().filter(s->(s instanceof StockpileEntity)==pallet&&s.cargoValid(p)).findFirst().orElse(null);
     }
 }

@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 /** A native single-chest layout, with labeled controls outside the inventory instead of item icons. */
-public final class LandScreen extends AbstractContainerScreen<LandMenu> {
+public final class LandScreen extends AbstractContainerScreen<LandMenu> implements SidePanels.Wide {
     private final CivicWidget[] tiers = new CivicWidget[3], names = new CivicWidget[5];
     private CivicWidget access, buy, collect, add, remove, previous, next;
     private EditBox username;
@@ -88,9 +88,11 @@ public final class LandScreen extends AbstractContainerScreen<LandMenu> {
         }
         return super.keyPressed(key, scan, mods);
     }
+    /** The right-hand tabs, or the whitelist editor while it is open. */
+    @Override public int rightReach() { return imageWidth+(editing?106:28); }
     @Override protected boolean hasClickedOutside(double x, double y, int left, int top, int button) {
         int footer = menu.state.notice().isEmpty() ? 0 : font.split(Component.literal(menu.state.notice()), imageWidth-12).size()*9+12;
-        return x < left-28 || x >= left+imageWidth+(editing?106:28) || y < top-48 || y >= top+imageHeight+footer;
+        return x < left-28 || x >= left+rightReach() || y < top-48 || y >= top+imageHeight+footer;
     }
     @Override protected void renderLabels(GuiGraphics g,int x,int y){g.drawString(font,playerInventoryTitle,inventoryLabelX,inventoryLabelY,MachineUi.INK,false);}
     @Override protected void renderBg(GuiGraphics g, float partial, int x, int y) {

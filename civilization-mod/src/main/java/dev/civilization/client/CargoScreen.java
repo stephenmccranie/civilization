@@ -43,7 +43,7 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
     @Override public void render(GuiGraphics g,int x,int y,float partial){
         super.render(g,x,y,partial);
         for(int i=0;i<CargoMenu.ROWS;i++)if(menu.count(i)>1){
-            var slot=menu.slots.get(i);String n=quantity(menu.count(i));
+            var slot=menu.slots.get(i);String n=MachineUi.quantity(menu.count(i));
             g.pose().pushPose();g.pose().translate(leftPos+slot.x+16,topPos+slot.y+10,300);
             float scale=n.length()>3?.6f:n.length()==3?.8f:1;g.pose().scale(scale,scale,1);g.drawString(font,n,-font.width(n),0,0xffffffff,true);g.pose().popPose();
         }
@@ -58,11 +58,5 @@ public final class CargoScreen extends MachineScreen<CargoMenu> {
             if(!(menu.load()<=menu.capacity()))lines.add(Component.literal("Accepts nothing until goods are taken off"));
             g.renderComponentTooltip(font,lines,x,y);
         }
-    }
-    private static String quantity(long n){
-        if(n<1000)return Long.toString(n);
-        double divisor=n<1_000_000?1e3:n<1_000_000_000?1e6:n<1_000_000_000_000L?1e9:1e12;
-        String suffix=n<1_000_000?"k":n<1_000_000_000?"M":n<1_000_000_000_000L?"b":"T";
-        return String.format(java.util.Locale.ROOT,"%.1f%s",n/divisor,suffix);
     }
 }

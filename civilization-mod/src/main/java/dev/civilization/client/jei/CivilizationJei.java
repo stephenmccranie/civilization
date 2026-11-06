@@ -55,14 +55,11 @@ public final class CivilizationJei implements IModPlugin {
     }
     @Override public void registerGuiHandlers(IGuiHandlerRegistration r){
         r.addGlobalGuiHandler(new mezz.jei.api.gui.handlers.IGlobalGuiHandler(){
+            /** The side column, and a screen's own wings past its menu's side, which JEI does not see. */
             public Collection<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(){
-                var mc=Minecraft.getInstance();
-                if(!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
-                var areas=new java.util.ArrayList<net.minecraft.client.renderer.Rect2i>();
-                for(var slot:screen.getMenu().slots)if(slot instanceof BlockCarry.HandSlot)
-                    areas.add(dev.civilization.client.MachineUi.handBounds(screen,slot));
-                if(dev.civilization.client.MachineUi.packLayout(screen.getMenu()) instanceof net.minecraft.client.renderer.Rect2i pack)
-                    areas.add(new net.minecraft.client.renderer.Rect2i(screen.getGuiLeft()+pack.getX(),screen.getGuiTop()+pack.getY(),pack.getWidth(),pack.getHeight()));
+                if(!(Minecraft.getInstance().screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen))return List.of();
+                var areas=new ArrayList<>(dev.civilization.client.SidePanels.areas(screen));
+                if(screen instanceof dev.civilization.client.SidePanels.Wide)areas.add(new net.minecraft.client.renderer.Rect2i(screen.getGuiLeft()+screen.getXSize(),screen.getGuiTop(),dev.civilization.client.SidePanels.reach(screen)-screen.getXSize(),screen.getYSize()));
                 return areas;
             }
         });
@@ -77,6 +74,37 @@ public final class CivilizationJei implements IModPlugin {
             public List<net.minecraft.client.renderer.Rect2i> getGuiExtraAreas(dev.civilization.client.WorkshopScreen s){return List.of(s.recipeDrawerBounds());}
             public Collection<mezz.jei.api.gui.handlers.IGuiClickableArea> getGuiClickableAreas(dev.civilization.client.WorkshopScreen s,double x,double y){return List.of(mezz.jei.api.gui.handlers.IGuiClickableArea.createBasic(94,49,23,12,type(new String[]{"tannery","textile","smithy","assembly"}[s.getMenu().kind()])));}
         });
+    }
+    /** These replace JEI's own crafting handlers, which need JEI on the server. */
+    @Override public void registerRecipeTransferHandlers(IRecipeTransferRegistration r){
+        r.addRecipeTransferHandler(new Placement<>(net.minecraft.world.inventory.CraftingMenu.class,net.minecraft.world.inventory.MenuType.CRAFTING,3,r.getTransferHelper()),mezz.jei.api.constants.RecipeTypes.CRAFTING);
+        r.addRecipeTransferHandler(new Placement<>(net.minecraft.world.inventory.InventoryMenu.class,null,2,r.getTransferHelper()),mezz.jei.api.constants.RecipeTypes.CRAFTING);
+    }
+    /**
+     * JEI's + places a crafting recipe through the game's own recipe-book placement, which every server runs: from the
+     * pockets, Hand, pack and nearby stores. Missing items are marked by counting those same goods.
+     */
+    private record Placement<C extends net.minecraft.world.inventory.RecipeBookMenu<CraftingInput,CraftingRecipe>>(Class<C> menu,net.minecraft.world.inventory.MenuType<C> type,int size,
+            mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper helper) implements mezz.jei.api.recipe.transfer.IRecipeTransferHandler<C,RecipeHolder<CraftingRecipe>>{
+        public Class<? extends C> getContainerClass(){return menu;}
+        public Optional<net.minecraft.world.inventory.MenuType<C>> getMenuType(){return Optional.ofNullable(type);}
+        public mezz.jei.api.recipe.RecipeType<RecipeHolder<CraftingRecipe>> getRecipeType(){return mezz.jei.api.constants.RecipeTypes.CRAFTING;}
+        public mezz.jei.api.recipe.transfer.IRecipeTransferError transferRecipe(C container,RecipeHolder<CraftingRecipe> recipe,IRecipeSlotsView slots,net.minecraft.world.entity.player.Player player,boolean max,boolean transfer){
+            if(!recipe.value().canCraftInDimensions(size,size))return helper.createUserErrorWithTooltip(Component.literal("Too large for the 2×2 grid: use a crafting table"));
+            var contents=new net.minecraft.world.entity.player.StackedContents();
+            player.getInventory().fillStackedContents(contents);container.fillCraftSlotsStackedContents(contents);
+            if(!contents.canCraft(recipe.value(),null)){
+                var left=new it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap(contents.contents);var missing=new ArrayList<mezz.jei.api.gui.ingredient.IRecipeSlotView>();
+                for(var slot:slots.getSlotViews(RecipeIngredientRole.INPUT)){
+                    var options=slot.getItemStacks().mapToInt(net.minecraft.world.entity.player.StackedContents::getStackingIndex).toArray();if(options.length==0)continue;
+                    var found=Arrays.stream(options).filter(i->left.get(i)>0).findFirst();
+                    if(found.isPresent())left.addTo(found.getAsInt(),-1);else missing.add(slot);
+                }
+                return helper.createUserErrorForMissingSlots(Component.translatable("jei.tooltip.error.recipe.transfer.missing"),missing);
+            }
+            if(transfer)Minecraft.getInstance().gameMode.handlePlaceRecipe(container.containerId,recipe,max);
+            return null;
+        }
     }
     @Override public void registerCategories(IRecipeCategoryRegistration r){
         categories.clear();
@@ -134,6 +162,7 @@ public final class CivilizationJei implements IModPlugin {
         industry(r);anvil(r);cutting(r);
         r.addItemStackInfo(KilnContent.FOUNDRY.toStack(),Component.literal("First metals: fire clay into bricks in the Kiln, then build the Foundry. Its controller is eight brick blocks around cobblestone; place it and build the furnace from it with 3 stone and 20 brick blocks, no metal. Smelt iron, copper and gold ore here into rough metal, hammer it into ingots at an anvil while it glows white-yellow to orange, quench it in water at bright cherry red, and reheat ingots here to refine them. The first anvil is a Stone Anvil. The Smithy forges metal parts; the Assembly Bench joins them into equipment."));
         r.addItemStackInfo(KilnContent.RETORT_ITEM.toStack(),Component.literal("Fertilizer: refinery sulfur and gravel make Sulfur Blend, fired here into Mineral Fertilizer. Its controller is four brick blocks and four iron ingots around cobblestone; place it and build the works from it with 4 stone, 17 brick blocks, 6 planks and 8 steel plates."));
+        r.addItemStackInfo(WorkshopContent.TANBARK.toStack(),Component.literal("Strip a tree's log or wood with an axe (right-click it): each strip peels one Tanbark. Bamboo and Nether stems have none. The Tannery steeps one Tanbark with each Raw Hide."));
         r.addItemStackInfo(KilnContent.MINERAL_COAL.toStack(),Component.literal("Coal machines require manual ignition and keep burning while idle. Consumption depends on work, idle time and temperature; JEI shows baseline processing times, not a fixed Coal charge per recipe."));
     }
     private <T extends AbstractCookingRecipe> void cooking(IRecipeRegistration r,String name,net.minecraft.world.item.crafting.RecipeType<T> recipeType){

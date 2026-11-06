@@ -36,19 +36,19 @@ public final class EquipmentGrade {
 
     private EquipmentGrade() {}
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
-    /** Damageable equipment, and the backpack, whose grade sets its capacity. */
-    public static boolean eligible(ItemStack stack) { return !stack.isEmpty() && (stack.isDamageableItem() || stack.is(Backpack.ITEM)); }
+    /** Damageable equipment. */
+    public static boolean eligible(ItemStack stack) { return !stack.isEmpty() && stack.isDamageableItem(); }
     /** Equipment with a grade has its stats scaled; equipment without one has not been graded yet. */
     public static boolean hasGrade(ItemStack stack) { return stack.has(Grade.GRADE.get()); }
     public static long wearSeed(ItemStack stack) { return stack.getOrDefault(WEAR_SEED.get(), 0L); }
 
     /**
-     * Equipment made without graded material, found or crafted by hand, is standard, except a backpack, which rolls
-     * its grade when made as an ingot does; each item gets its own wear pattern.
+     * Equipment made without graded material, found or crafted by hand, is standard; each item gets its own wear
+     * pattern.
      */
     public static void ensure(ItemStack stack, RandomSource random) {
         if (!eligible(stack)) return;
-        if (!hasGrade(stack)) apply(stack, stack.is(Backpack.ITEM) ? Grade.roll(random) : Grade.STANDARD);
+        if (!hasGrade(stack)) apply(stack, Grade.STANDARD);
         if (!stack.has(WEAR_SEED.get())) stack.set(WEAR_SEED.get(), random.nextLong());
     }
 

@@ -9,9 +9,6 @@ import net.minecraft.world.item.ItemStack;
 /** Cabinet skin shared by every controller. Slots and all interaction remain native. */
 public final class MachineUi {
     public static final int INK=0xff35332e, MUTED=0xff5c584e;
-    public static final int HAND_LEFT=12,HAND_TOP=24,HAND_WIDTH=40,HAND_HEIGHT=46,PACK_COLUMNS=3,PACK_WIDTH=PACK_COLUMNS*18+12,HAND_GAP=8;
-    /** How far the Hand and the Pack panel above it reach out from the menu's side. */
-    public static final int HAND_ROOM=HAND_GAP+PACK_WIDTH;
     private static final ResourceLocation PANEL=ResourceLocation.fromNamespaceAndPath("civilization","textures/gui/cabinet.png");
     private MachineUi() {}
     public static void panel(GuiGraphics g,int x,int y,int w,int h) {
@@ -23,53 +20,22 @@ public final class MachineUi {
         for(int row=0;row<3;row++)for(int col=0;col<3;col++)
             g.blit(PANEL,dx[col],dy[row],dw[col],dh[row],sx[col],sy[row],sw[col],sw[row],512,512);
     }
-    /**
-     * Lays the worn pack's slots out above the Hand panel, flush with its edge nearest the menu, three across under a
-     * "Pack" label, and returns the panel, or null when no pack is shown beside this menu.
-     */
-    public static net.minecraft.client.renderer.Rect2i packLayout(AbstractContainerMenu menu){
-        net.minecraft.world.inventory.Slot hand=null;int n=0;
-        for(var s:menu.slots){if(s instanceof dev.civilization.Backpack.PackSlot)n++;else if(s instanceof dev.civilization.BlockCarry.HandSlot)hand=s;}
-        if(hand==null||n==0)return null;
-        int frame=hand.x-HAND_LEFT,rows=(n+PACK_COLUMNS-1)/PACK_COLUMNS,height=rows*18+20,left=hand.x<0?frame+HAND_WIDTH-PACK_WIDTH:frame,top=hand.y-HAND_TOP-4-height,i=0;
-        for(var s:menu.slots)if(s instanceof dev.civilization.Backpack.PackSlot){
-            ((dev.civilization.mixin.SlotPositionAccess)s).civilization$setX(left+7+i%PACK_COLUMNS*18);((dev.civilization.mixin.SlotPositionAccess)s).civilization$setY(top+15+i/PACK_COLUMNS*18);i++;
-        }
-        return new net.minecraft.client.renderer.Rect2i(left,top,PACK_WIDTH,height);
-    }
-    public static void packPanel(GuiGraphics g,net.minecraft.client.renderer.Rect2i r){
-        panel(g,r.getX()+3,r.getY()+3,r.getWidth()-6,r.getHeight()-6);
-        var font=Minecraft.getInstance().font;
-        g.drawString(font,"Pack",r.getX()+(r.getWidth()-font.width("Pack"))/2,r.getY()+5,INK,false);
-    }
-    public static void handPanel(GuiGraphics g,int x,int y){
-        panel(g,x-HAND_LEFT+3,y-HAND_TOP+3,HAND_WIDTH-6,HAND_HEIGHT-6);
-        var font=Minecraft.getInstance().font;
-        g.drawString(font,"Hand",x+8-font.width("Hand")/2,y-12,INK,false);
-        slot(g,x,y);
-    }
-    public static net.minecraft.client.renderer.Rect2i handBounds(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen,net.minecraft.world.inventory.Slot slot){
-        return new net.minecraft.client.renderer.Rect2i(screen.getGuiLeft()+handSlotX(screen)-HAND_LEFT,screen.getGuiTop()+slot.y-HAND_TOP,HAND_WIDTH,HAND_HEIGHT);
-    }
-    /**
-     * The Hand stands against the menu's side at hotbar height: the left, or the right while a recipe panel (a machine's
-     * recipe drawer or the vanilla recipe book) holds the left.
-     */
-    public static int handSlotX(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen){
-        return recipesOpen(screen)?screen.getXSize()+HAND_GAP+HAND_LEFT:HAND_LEFT-HAND_WIDTH-HAND_GAP;
-    }
-    public static boolean recipesOpen(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> screen){
-        return screen instanceof MachineScreen<?> machine?machine.recipesOpen()
-                :screen instanceof net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener book&&book.getRecipeBookComponent().isVisible();
-    }
     public static void slot(GuiGraphics g,int x,int y) {
         g.fill(x-1,y-1,x+17,y+17,0xffe0d8c6);
         g.fill(x-1,y-1,x+16,y+16,0xff45453f);
         g.fill(x,y,x+16,y+16,0xff77776f);
         g.fill(x+1,y+1,x+16,y+16,0xff828078);
     }
+    /** The menu's own slots; the side column draws the Hand and pack slots in its panels. */
     public static void slots(GuiGraphics g,AbstractContainerMenu menu,int x,int y) {
-        for(var s:menu.slots)if(s.isActive())slot(g,x+s.x,y+s.y);
+        for(var s:menu.slots)if(s.isActive()&&!SidePanels.inColumn(s))slot(g,x+s.x,y+s.y);
+    }
+    /** A store's count in a cell: exact below a thousand, then k, M, b and T. */
+    public static String quantity(long n){
+        if(n<1000)return Long.toString(n);
+        double divisor=n<1_000_000?1e3:n<1_000_000_000?1e6:n<1_000_000_000_000L?1e9:1e12;
+        String suffix=n<1_000_000?"k":n<1_000_000_000?"M":n<1_000_000_000_000L?"b":"T";
+        return String.format(java.util.Locale.ROOT,"%.1f%s",n/divisor,suffix);
     }
     public static void ghost(GuiGraphics g,ItemStack item,int x,int y) {
         if(item.isEmpty())return;

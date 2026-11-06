@@ -10,9 +10,10 @@ import java.util.*;
 /** Real JEI registration, output/use lookup and rendered processing pages. */
 final class JeiVisualCheck {
     private static int ticks;
+    private static volatile Throwable failure;
     static void tick(Minecraft mc){
         if(CivilizationJei.runtime()==null)return;
-        ticks++;
+        ticks++;if(failure!=null)throw new IllegalStateException("JEI scene",failure);
         var runtime=CivilizationJei.runtime();var manager=runtime.getRecipeManager();
         if(ticks==40){
             mc.options.hideGui=false;mc.options.guiScale().set(3);
@@ -50,7 +51,30 @@ final class JeiVisualCheck {
         if(ticks==140)shot(mc,"canister");
         if(ticks==145)runtime.getRecipesGui().showTypes(List.of(CivilizationJei.type("cutting")));
         if(ticks==165)shot(mc,"cutting");
-        if(ticks>175)mc.stop();
+        // JEI's + on a crafting recipe places it through the game's own recipe-book path, from the Hand, with no JEI on the server.
+        if(ticks==170){
+            mc.setScreen(null);
+            var server=mc.getSingleplayerServer();server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();
+                p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);p.getInventory().clearContent();p.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND,new ItemStack(Items.OAK_PLANKS,4));p.inventoryMenu.broadcastFullState();});
+        }
+        if(ticks==180)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+        if(ticks==190){
+            @SuppressWarnings("unchecked") var table=(net.minecraft.world.item.crafting.RecipeHolder<net.minecraft.world.item.crafting.CraftingRecipe>)mc.level.getRecipeManager().byKey(net.minecraft.resources.ResourceLocation.withDefaultNamespace("crafting_table")).orElseThrow();
+            var category=manager.getRecipeCategory(RecipeTypes.CRAFTING);var menu=mc.player.inventoryMenu;
+            var handler=runtime.getRecipeTransferManager().getRecipeTransferHandler(menu,category).orElseThrow(()->new IllegalStateException("No crafting transfer handler for the inventory"));
+            if(!handler.getClass().getName().contains("CivilizationJei"))throw new IllegalStateException("JEI's own transfer handler, which needs server JEI, is still in use: "+handler.getClass());
+            var view=manager.createRecipeLayoutDrawable(category,table,runtime.getJeiHelpers().getFocusFactory().getEmptyFocusGroup()).orElseThrow().getRecipeSlotsView();
+            var error=handler.transferRecipe(menu,table,view,mc.player,false,true);
+            if(error!=null)throw new IllegalStateException("The crafting transfer was refused: "+error.getType());
+        }
+        if(ticks==205){
+            var server=mc.getSingleplayerServer();server.execute(()->{try{var p=server.getPlayerList().getPlayers().getFirst();int placed=0;
+                for(int i=1;i<5;i++)if(p.inventoryMenu.getSlot(i).getItem().is(Items.OAK_PLANKS))placed+=p.inventoryMenu.getSlot(i).getItem().getCount();
+                if(placed!=4||!p.getOffhandItem().isEmpty())throw new IllegalStateException("JEI's + did not move the Hand's four planks into the grid: "+placed);
+                System.out.println("JEI check: the + button places crafting recipes without JEI on the server.");}catch(Throwable e){failure=e;}});
+        }
+        if(ticks==210)shot(mc,"transfer");
+        if(ticks>215)mc.stop();
     }
     private static void showCategory(String name,ItemStack output){
         var runtime=CivilizationJei.runtime();var manager=runtime.getRecipeManager();var focus=focus(RecipeIngredientRole.OUTPUT,output);var type=CivilizationJei.type(name);

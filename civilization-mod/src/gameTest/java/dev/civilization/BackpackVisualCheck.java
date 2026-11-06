@@ -12,9 +12,11 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.*;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-/** A worn backpack in its slot, binding it in a Pallet menu, building that the store refills, the pack worn on the back, its menu and building beyond reach. */
+/**
+ * A worn backpack in its slot, binding it in a Pallet menu, building that the store refills, the pack worn on the back,
+ * the pack in the inventory, building beyond reach, the pack and nearby Pallets beside a chest, and unbinding.
+ */
 final class BackpackVisualCheck {
     private static int ticks;
     private static volatile boolean ready;
@@ -37,7 +39,7 @@ final class BackpackVisualCheck {
             machines.insert(new ItemStack(Items.OAK_DOOR),1);machines.insert(BakingOvenContent.ITEM.toStack(),1);
             l.setBlockAndUpdate(CHEST,Blocks.CHEST.defaultBlockState());((net.minecraft.world.level.block.entity.ChestBlockEntity)l.getBlockEntity(CHEST)).setItem(0,new ItemStack(Items.APPLE,12));
             var p=player(server);p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();
-            var pack=Backpack.ITEM.toStack();EquipmentGrade.apply(pack,1000,7);p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
+            var pack=Backpack.ITEM.toStack();p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
             var contents=Backpack.worn(p);contents.setItem(0,new ItemStack(Items.STONE,PACKED));contents.setItem(1,new ItemStack(Items.OAK_PLANKS,4));
             contents.setItem(2,new ItemStack(Items.APPLE,5));contents.setItem(3,new ItemStack(Items.TORCH,16));
             p.teleportTo(l,174.5,Y,1.5,java.util.Set.of(),0,35);ready=true;
@@ -81,21 +83,14 @@ final class BackpackVisualCheck {
         if(ticks==300)shot(mc,"worn-quarter");
         if(ticks==322)shot(mc,"worn-side");
         if(ticks==326){mc.options.setCameraType(CameraType.FIRST_PERSON);mc.options.hideGui=false;check(server,()->player(server).teleportTo(server.overworld(),BUILDER.x,BUILDER.y,BUILDER.z,java.util.Set.of(),-90,40));}
-        if(ticks==332)PacketDistributor.sendToServer(new Backpack.Open());
+        // The inventory shows the pack beside the Hand, with its binding.
+        if(ticks==332)mc.setScreen(new InventoryScreen(mc.player));
         if(ticks==345){
-            if(!(mc.player.containerMenu instanceof BackpackMenu m)||m.size()!=Backpack.SLOTS||!m.getSlot(2).getItem().is(Items.APPLE))throw new IllegalStateException("The backpack key did not open its nine slots");
-            shot(mc,"menu");
+            if(active(mc.player.inventoryMenu)!=Backpack.SLOTS||!pack(mc.player.inventoryMenu,2).getItem().is(Items.APPLE))throw new IllegalStateException("The inventory did not show the pack's nine slots");
+            dev.civilization.client.CarryUiCheck.assertLayout(mc,false);
+            shot(mc,"inventory");
         }
-        // The menu's Supply switch is the only one: off, then back on.
-        if(ticks==347)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);
-        if(ticks==357){
-            if(!(mc.player.containerMenu instanceof BackpackMenu m)||m.data.get(1)!=0)throw new IllegalStateException("The Supply switch did not turn supply off");
-            check(server,()->{if(Backpack.worn(player(server)).pack().get(Backpack.SUPPLY.get()).on())throw new IllegalStateException("Supply stayed on in the server's pack");});
-            shot(mc,"menu-supply-off");
-        }
-        if(ticks==360)mc.gameMode.handleInventoryButtonClick(mc.player.containerMenu.containerId,0);
-        if(ticks==367&&(!(mc.player.containerMenu instanceof BackpackMenu m)||m.data.get(1)!=1))throw new IllegalStateException("The Supply switch did not turn supply back on");
-        if(ticks==370){mc.player.closeContainer();check(server,()->player(server).teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),-90,40));}
+        if(ticks==370){mc.setScreen(null);check(server,()->player(server).teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),-90,40));}
         if(ticks==385)place(mc,new BlockPos(197,Y-1,0));
         if(ticks==400)check(server,()->{
             var p=player(server);var store=((StockpileEntity)server.overworld().getBlockEntity(PALLET)).cargo();
@@ -110,16 +105,45 @@ final class BackpackVisualCheck {
             var p=player(server);p.setItemInHand(InteractionHand.OFF_HAND,ItemStack.EMPTY);p.inventoryMenu.broadcastFullState();p.teleportTo(server.overworld(),AWAY.x,AWAY.y,AWAY.z,java.util.Set.of(),90,0);
         });}
         if(ticks==443)shot(mc,"held-third");
-        // Any other menu shows the pack beside the Hand, here a chest.
+        // Any other menu shows the pack beside the Hand, here a chest, with the Pallets in reach above it.
         if(ticks==446){mc.options.setCameraType(CameraType.FIRST_PERSON);mc.options.hideGui=false;check(server,()->player(server).teleportTo(server.overworld(),BUILDER.x,BUILDER.y,BUILDER.z,java.util.Set.of(),90,20));}
         if(ticks==456)click(mc,CHEST);
         if(ticks==470){
-            if(!(mc.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu m)||m.slots.stream().filter(s->s instanceof Backpack.PackSlot).count()!=Backpack.SLOTS)throw new IllegalStateException("A chest menu did not show the worn pack");
+            if(!(mc.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu m)||active(m)!=Backpack.SLOTS)throw new IllegalStateException("A chest menu did not show the worn pack");
+            if(!(NearbyStores.of(m) instanceof NearbyStores near)||near.stores()!=2||near.indexOf(new ItemStack(Items.STONE))<0)throw new IllegalStateException("A chest menu did not list both Pallet groups in reach");
+            dev.civilization.client.CarryUiCheck.assertLayout(mc,false);
             shot(mc,"chest-menu");
         }
-        if(ticks>472){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: hand-carried machines on a Pallet, worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, its menu and Supply switch, the pack alone beyond reach, held item, the pack beside a chest menu");mc.stop();}
+        // Real clicks on the Nearby panel: one takes a stack of stone onto the cursor, one on an empty cell puts it back.
+        if(ticks==471){nearbyStone=nearbyCount(mc);clickNearby(mc,NearbyStores.of(mc.player.containerMenu).indexOf(new ItemStack(Items.STONE)));}
+        if(ticks==474){
+            var carried=mc.player.containerMenu.getCarried();
+            if(!carried.is(Items.STONE)||nearbyCount(mc)!=nearbyStone-carried.getCount())throw new IllegalStateException("A Nearby click did not take stone: cursor "+carried+", listed "+nearbyCount(mc)+" of "+nearbyStone);
+            check(server,()->{if(!player(server).containerMenu.getCarried().is(Items.STONE))throw new IllegalStateException("The server did not move the stone onto the cursor");});
+            clickNearby(mc,NearbyStores.of(mc.player.containerMenu).size());
+        }
+        if(ticks==477&&(!mc.player.containerMenu.getCarried().isEmpty()||nearbyCount(mc)!=nearbyStone))throw new IllegalStateException("A Nearby click did not put the stone back: listed "+nearbyCount(mc)+" of "+nearbyStone);
+        // The Pack panel's Unbind button, by a real click.
+        if(ticks==478){
+            var s=(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>)mc.screen;var b=dev.civilization.client.SidePanels.unbind(dev.civilization.client.SidePanels.layout(s).pack());
+            dev.civilization.client.CarryUiCheck.click(mc,s.getGuiLeft()+b.getX()+5,s.getGuiTop()+b.getY()+5);
+        }
+        if(ticks==490){
+            check(server,()->{if(Backpack.worn(player(server)).pack().has(Backpack.SUPPLY.get()))throw new IllegalStateException("Unbind left the pack bound");});
+            shot(mc,"unbound");
+        }
+        if(ticks>492){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: hand-carried machines on a Pallet, worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, the pack in the inventory, the pack alone beyond reach, held item, the pack and nearby Pallets beside a chest menu, unbinding from the Pack panel");mc.stop();}
+    }
+    private static long nearbyStone;
+    private static long nearbyCount(Minecraft mc){var near=NearbyStores.of(mc.player.containerMenu);return near.count(near.indexOf(new ItemStack(Items.STONE)));}
+    /** Clicks the Nearby panel's cell for an entry on its first page. */
+    private static void clickNearby(Minecraft mc,int entry){
+        var s=(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>)mc.screen;var r=dev.civilization.client.SidePanels.layout(s).nearby();int columns=dev.civilization.client.SidePanels.COLUMNS;
+        dev.civilization.client.CarryUiCheck.click(mc,s.getGuiLeft()+r.getX()+7+entry%columns*18+8,s.getGuiTop()+r.getY()+15+entry/columns*18+8);
     }
     private static ServerPlayer player(MinecraftServer s){return s.getPlayerList().getPlayers().getFirst();}
+    private static long active(net.minecraft.world.inventory.AbstractContainerMenu menu){return menu.slots.stream().filter(s->s instanceof Backpack.PackSlot&&s.isActive()).count();}
+    private static net.minecraft.world.inventory.Slot pack(net.minecraft.world.inventory.AbstractContainerMenu menu,int i){return menu.slots.stream().filter(s->s instanceof Backpack.PackSlot&&s.getContainerSlot()==i).findFirst().orElseThrow();}
     private static void click(Minecraft mc,BlockPos at){mc.gameMode.useItemOn(mc.player,InteractionHand.MAIN_HAND,new BlockHitResult(Vec3.atCenterOf(at),Direction.UP,at,false));}
     /** Places the offhand block on top of `below`, as a right-click with the hand does. */
     private static void place(Minecraft mc,BlockPos below){mc.gameMode.useItemOn(mc.player,InteractionHand.OFF_HAND,new BlockHitResult(Vec3.atCenterOf(below).add(0,.5,0),Direction.UP,below,false));}

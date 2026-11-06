@@ -1,6 +1,5 @@
 package dev.civilization.client;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.civilization.*;
@@ -24,13 +23,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import org.lwjgl.glfw.GLFW;
 
-/** The backpack key, the supply badge beside the Hand, the pack drawn on the wearer's back and its tooltip. */
+/** The supply badge beside the Hand, the pack drawn on the wearer's back and its tooltip. */
 @EventBusSubscriber(modid="civilization",value=Dist.CLIENT)
 public final class BackpackClient {
-    public static final KeyMapping OPEN=new KeyMapping("key.civilization.backpack",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_B,"key.categories.civilization");
     /** The worn pack and the badge's text, refreshed each tick rather than each frame. */
     private static ItemStack badgePack=ItemStack.EMPTY;
     private static Component badge;
@@ -38,18 +34,17 @@ public final class BackpackClient {
 
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         var mc=Minecraft.getInstance();
-        while(OPEN.consumeClick())if(mc.screen==null&&mc.player!=null)PacketDistributor.sendToServer(new Backpack.Open());
         var pack=mc.player==null?null:Backpack.worn(mc.player);
         badgePack=pack==null?ItemStack.EMPTY:pack.pack();badge=pack==null?null:badge(mc.player,pack);
     }
     /** Blocks in the pack against its cap, then the bound store's distance: green while building draws from it. */
     private static Component badge(Player p,Backpack.Contents pack){
         if(!BlockCarry.restricted(p))return null;
-        var text=Component.literal((Backpack.blocks(pack.pack())-pack.blockRoom())+"/"+Backpack.blocks(pack.pack()));
+        var text=Component.literal((Backpack.BLOCKS-pack.blockRoom())+"/"+Backpack.BLOCKS);
         var s=pack.pack().get(Backpack.SUPPLY.get());if(s==null)return text.withStyle(ChatFormatting.GRAY);
-        double distance=distance(p,s);boolean near=distance<=Backpack.RADIUS;
-        String where=!s.on()?"supply off":Double.isNaN(distance)?s.storeName()+" not nearby":s.storeName()+" "+Math.round(distance)+" m";
-        return text.append(" · "+where).withStyle(s.on()&&near?ChatFormatting.GREEN:ChatFormatting.GRAY);
+        double distance=distance(p,s);
+        String where=Double.isNaN(distance)?s.storeName()+" not nearby":s.storeName()+" "+Math.round(distance)+" m";
+        return text.append(" · "+where).withStyle(distance<=Backpack.RADIUS?ChatFormatting.GREEN:ChatFormatting.GRAY);
     }
     /** The client's own estimate; the server decides, and explains a refusal when the hand runs out. */
     static double distance(Player p,Backpack.Supply s){
@@ -60,16 +55,14 @@ public final class BackpackClient {
 
     @SubscribeEvent public static void tooltip(ItemTooltipEvent e){
         var stack=e.getItemStack();if(!stack.is(Backpack.ITEM))return;
-        e.getToolTip().add(Component.literal(Backpack.slots(stack)+" slots · up to "+Backpack.blocks(stack)+" blocks").withStyle(ChatFormatting.GRAY));
-        e.getToolTip().add(Component.translatable("tooltip.civilization.backpack",OPEN.getTranslatedKeyMessage()).withStyle(ChatFormatting.GRAY));
+        e.getToolTip().add(Component.literal(Backpack.SLOTS+" slots · up to "+Backpack.BLOCKS+" blocks").withStyle(ChatFormatting.GRAY));
+        e.getToolTip().add(Component.translatable("tooltip.civilization.backpack").withStyle(ChatFormatting.GRAY));
         var s=stack.get(Backpack.SUPPLY.get());
-        if(s!=null)e.getToolTip().add(Component.literal("Bound to a "+s.storeName()+" · supply "+(s.on()?"on":"off")).withStyle(ChatFormatting.GRAY));
+        if(s!=null)e.getToolTip().add(Component.literal("Bound to a "+s.storeName()).withStyle(ChatFormatting.GRAY));
     }
 
     @EventBusSubscriber(modid="civilization",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
     public static final class Setup {
-        @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(OPEN);}
-        @SubscribeEvent public static void screens(RegisterMenuScreensEvent e){e.register(Backpack.MENU.get(),BackpackScreen::new);}
         /** Left of the Hand slot beside the hotbar. */
         @SubscribeEvent public static void hud(RegisterGuiLayersEvent e){
             e.registerAbove(VanillaGuiLayers.HOTBAR,ResourceLocation.parse("civilization:backpack"),(g,delta)->{

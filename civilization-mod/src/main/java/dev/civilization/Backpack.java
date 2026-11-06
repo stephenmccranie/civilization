@@ -22,7 +22,6 @@ import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.*;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -30,40 +29,34 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.*;
 
 /**
- * A worn pack: grade-scaled slots of ordinary stacks, with building blocks among them up to a grade-scaled cap.
+ * A worn pack: eight slots of ordinary stacks, with building blocks among them up to a cap.
  * Its contents are the item's own container contents. Bound to a wheelbarrow or Pallet, it keeps the hand and the
  * pack's block stacks topped up from that store after each placement while the player builds within reach of it.
+ * Every menu that shows the Hand, the player's own inventory included, shows the pack's slots beside it.
  */
 @EventBusSubscriber(modid="civilization")
 public final class Backpack {
-    /** At 100% grade; the grade scales both. */
-    public static final int SLOTS=9,BLOCKS=24;
+    /** Every pack's slots, two rows beside a menu, and the building blocks they hold in all. */
+    public static final int SLOTS=8,BLOCKS=24;
     /** How far from the bound store a player builds from it. */
     public static final double RADIUS=16;
-    /** The bound store, a Pallet's position or a wheelbarrow's identity in one dimension, and whether supply is on. */
-    public record Supply(ResourceKey<Level> dimension,Either<BlockPos,UUID> store,boolean on){
+    /** The bound store, a Pallet's position or a wheelbarrow's identity in one dimension. A bound pack builds from it. */
+    public record Supply(ResourceKey<Level> dimension,Either<BlockPos,UUID> store){
         private static final Codec<Supply> CODEC=RecordCodecBuilder.create(i->i.group(
                 ResourceKey.codec(Registries.DIMENSION).fieldOf("dimension").forGetter(Supply::dimension),
-                Codec.either(BlockPos.CODEC,UUIDUtil.CODEC).fieldOf("store").forGetter(Supply::store),
-                Codec.BOOL.fieldOf("on").forGetter(Supply::on)).apply(i,Supply::new));
+                Codec.either(BlockPos.CODEC,UUIDUtil.CODEC).fieldOf("store").forGetter(Supply::store)).apply(i,Supply::new));
         private static final StreamCodec<ByteBuf,Supply> STREAM=StreamCodec.composite(
                 ResourceKey.streamCodec(Registries.DIMENSION),Supply::dimension,
-                ByteBufCodecs.either(BlockPos.STREAM_CODEC,UUIDUtil.STREAM_CODEC),Supply::store,
-                ByteBufCodecs.BOOL,Supply::on,Supply::new);
+                ByteBufCodecs.either(BlockPos.STREAM_CODEC,UUIDUtil.STREAM_CODEC),Supply::store,Supply::new);
         public String storeName(){return store.left().isPresent()?"Pallet":"wheelbarrow";}
     }
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems("civilization");
     private static final DeferredRegister.DataComponents COMPONENTS=DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE,"civilization");
-    private static final DeferredRegister<MenuType<?>> MENUS=DeferredRegister.create(Registries.MENU,"civilization");
     public static final DeferredItem<AccessoryItem> ITEM=ITEMS.register("backpack",()->new AccessoryItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<Supply>> SUPPLY=COMPONENTS.registerComponentType("backpack_supply",b->b.persistent(Supply.CODEC).networkSynchronized(Supply.STREAM));
-    public static final DeferredHolder<MenuType<?>,MenuType<BackpackMenu>> MENU=MENUS.register("backpack",()->IMenuTypeExtension.create(BackpackMenu::new));
     private Backpack(){}
-    public static void register(IEventBus bus){ITEMS.register(bus);COMPONENTS.register(bus);MENUS.register(bus);bus.addListener(Open::register);}
+    public static void register(IEventBus bus){ITEMS.register(bus);COMPONENTS.register(bus);bus.addListener(Unbind::register);}
 
-    public static int slots(ItemStack pack){return scaled(SLOTS,pack);}
-    public static int blocks(ItemStack pack){return scaled(BLOCKS,pack);}
-    private static int scaled(int full,ItemStack pack){return Math.max(0,(int)Math.round(full*Grade.value(pack)/1000.0));}
     /** The live contents of the backpack the player wears, or null. */
     public static Contents worn(Player p){return p.getData(Accessories.INVENTORY).backpack();}
 
@@ -72,13 +65,13 @@ public final class Backpack {
         private final ItemStack pack;
         Contents(ItemStack pack){
             // Never fewer slots than saved stacks, so no contents are ever cut off.
-            super(Math.max(slots(pack),(int)pack.getOrDefault(DataComponents.CONTAINER,ItemContainerContents.EMPTY).stream().count()));
+            super(Math.max(SLOTS,(int)pack.getOrDefault(DataComponents.CONTAINER,ItemContainerContents.EMPTY).stream().count()));
             this.pack=pack;pack.getOrDefault(DataComponents.CONTAINER,ItemContainerContents.EMPTY).copyInto(getItems());
         }
         public ItemStack pack(){return pack;}
         @Override public void setChanged(){super.setChanged();pack.set(DataComponents.CONTAINER,ItemContainerContents.fromItems(getItems()));}
         /** How many more building blocks the pack takes. */
-        public int blockRoom(){int n=0;for(var s:getItems())if(BlockCarry.carried(s))n+=s.getCount();return Math.max(0,blocks(pack)-n);}
+        public int blockRoom(){int n=0;for(var s:getItems())if(BlockCarry.carried(s))n+=s.getCount();return Math.max(0,BLOCKS-n);}
         @Override public boolean canPlaceItem(int slot,ItemStack stack){return !stack.is(ITEM)&&!BlockCarry.filledContainer(stack)&&(!BlockCarry.carried(stack)||blockRoom()>0);}
         /** The most of `stack` that a slot holds, building blocks counting against the cap. */
         public int limit(int slot,ItemStack stack){
@@ -89,7 +82,7 @@ public final class Backpack {
         public void insert(ItemStack stack){
             if(!canPlaceItem(0,stack))return;
             for(int pass=0;pass<2;pass++)for(int i=0;i<getContainerSize()&&!stack.isEmpty();i++){
-                var held=getItem(i);if(pass==0?held.isEmpty()||!Grade.stacks(held,stack):!held.isEmpty())continue;
+                var held=getItem(i);if(held==stack||(pass==0?held.isEmpty()||!Grade.stacks(held,stack):!held.isEmpty()))continue;
                 int n=Math.min(stack.getCount(),limit(i,stack)-held.getCount());if(n<=0)continue;
                 if(held.isEmpty())setItem(i,stack.split(n));else{Grade.join(held,stack,n);setChanged();}
             }
@@ -102,23 +95,38 @@ public final class Backpack {
         }
     }
 
-    /** A slot of the worn pack, in its own menu or beside any other; building blocks stay within its cap. */
-    public static final class PackSlot extends Slot {
-        PackSlot(Container pack,int index,int x,int y){super(pack,index,x,y);}
-        @Override public boolean mayPlace(ItemStack stack){return container.canPlaceItem(getContainerSlot(),stack);}
-        @Override public int getMaxStackSize(ItemStack stack){return container instanceof Contents c?c.limit(getContainerSlot(),stack):super.getMaxStackSize(stack);}
-    }
     /**
-     * Every other menu that shows the Hand also shows the worn pack: its slots follow the Hand on server and client
-     * alike, so packet indices match. The client's copy is filled by the menu's own synchronization.
+     * The pack the player wears now, seen through a fixed number of slots, so a menu's slot list never changes when a
+     * pack is put on or taken off. Slots beyond the worn pack hold nothing and take nothing.
      */
+    static final class View implements Container {
+        private final Player player;
+        View(Player player){this.player=player;}
+        private Contents pack(int slot){var pack=worn(player);return pack!=null&&slot<pack.getContainerSize()?pack:null;}
+        @Override public int getContainerSize(){return SLOTS;}
+        @Override public boolean isEmpty(){var pack=worn(player);return pack==null||pack.isEmpty();}
+        @Override public ItemStack getItem(int slot){var pack=pack(slot);return pack==null?ItemStack.EMPTY:pack.getItem(slot);}
+        @Override public ItemStack removeItem(int slot,int n){var pack=pack(slot);return pack==null?ItemStack.EMPTY:pack.removeItem(slot,n);}
+        @Override public ItemStack removeItemNoUpdate(int slot){var pack=pack(slot);return pack==null?ItemStack.EMPTY:pack.removeItemNoUpdate(slot);}
+        @Override public void setItem(int slot,ItemStack stack){var pack=pack(slot);if(pack!=null)pack.setItem(slot,stack);}
+        @Override public boolean canPlaceItem(int slot,ItemStack stack){var pack=pack(slot);return pack!=null&&pack.canPlaceItem(slot,stack);}
+        @Override public void setChanged(){var pack=worn(player);if(pack!=null)pack.setChanged();}
+        @Override public boolean stillValid(Player p){return true;}
+        @Override public void clearContent(){}
+    }
+    /** A slot of the worn pack beside a menu; building blocks stay within its cap. */
+    public static final class PackSlot extends Slot {
+        PackSlot(View pack,int index){super(pack,index,0,0);}
+        @Override public boolean isActive(){return worn(((View)container).player)!=null;}
+        @Override public boolean mayPlace(ItemStack stack){return container.canPlaceItem(getContainerSlot(),stack);}
+        @Override public int getMaxStackSize(ItemStack stack){var pack=worn(((View)container).player);return pack==null?0:pack.limit(getContainerSlot(),stack);}
+    }
+    /** Every menu that shows the Hand shows the pack's slots after it, on server and client alike, so packet indices match. */
     public static void attachMenu(AbstractContainerMenu menu,Player p){
-        if(menu instanceof InventoryMenu||menu instanceof BackpackMenu)return;
-        var pack=worn(p);if(pack==null)return;Slot hand=null;
-        for(var slot:menu.slots){if(slot instanceof PackSlot)return;if(slot.container==p.getInventory()&&slot.getContainerSlot()==BlockCarry.OFFHAND)hand=slot;}
-        if(hand==null)return;
-        Container view=p.level().isClientSide?new SimpleContainer(pack.getContainerSize()):pack;
-        for(int i=0;i<view.getContainerSize();i++)((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new PackSlot(view,i,hand.x,hand.y));
+        if(BlockCarry.handSlot(menu)==null)return;
+        for(var slot:menu.slots)if(slot instanceof PackSlot)return;
+        var view=new View(p);
+        for(int i=0;i<SLOTS;i++)((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new PackSlot(view,i));
     }
 
     /** The bound store, if it is in the player's dimension and loaded: a Pallet by its position, a wheelbarrow among loaded entities. */
@@ -128,9 +136,9 @@ public final class Backpack {
         return s.store().<CargoHolder>map(at->Chunks.loaded(level,at)&&level.getBlockEntity(at) instanceof StockpileEntity e?e:null,id->level.getEntity(id) instanceof WheelbarrowEntity w?w:null);
     }
     private static Either<BlockPos,UUID> address(CargoHolder store){return store instanceof WheelbarrowEntity w?Either.right(w.getUUID()):Either.left(BlockPos.containing(store.cargoPosition()));}
-    /** The bound store's goods while supply is on and the player may use the store from where they stand, otherwise null. */
+    /** The bound store's goods while the player may use the store from where they stand, otherwise null. */
     static CargoInventory supplying(ServerPlayer p,Contents pack){
-        var s=pack.pack().get(SUPPLY);if(s==null||!s.on())return null;
+        var s=pack.pack().get(SUPPLY);if(s==null)return null;
         var store=store(p,s);return store!=null&&store.cargoValid(p,RADIUS)?store.cargo():null;
     }
     /** Whether the pack the player wears is bound to this store: 0 without a pack, 1 elsewhere or unbound, 2 here. */
@@ -138,42 +146,25 @@ public final class Backpack {
         var pack=worn(p);if(pack==null)return 0;var s=pack.pack().get(SUPPLY);
         return s!=null&&s.dimension()==p.level().dimension()&&s.store().equals(address(store))?2:1;
     }
-    /** Binds the worn pack to the store with supply on, or unbinds it when it is already bound there. */
+    /** Binds the worn pack to the store, or unbinds it when it is already bound there. */
     static void bind(ServerPlayer p,CargoHolder store){
         var pack=worn(p);if(pack==null)return;
         if(binding(p,store)==2){unbind(p);return;}
-        var s=new Supply(p.level().dimension(),address(store),true);pack.pack().set(SUPPLY,s);
+        var s=new Supply(p.level().dimension(),address(store));pack.pack().set(SUPPLY,s);
         p.displayClientMessage(Component.literal("Backpack bound to this "+s.storeName()+": building within "+(int)RADIUS+" blocks draws from it"),true);
     }
     static void unbind(ServerPlayer p){
         var pack=worn(p);if(pack==null||pack.pack().remove(SUPPLY)==null)return;
         p.displayClientMessage(Component.literal("Backpack unbound"),true);
     }
-    /** The pack menu's Supply switch; an unbound pack has nothing to switch. */
-    static void toggle(ServerPlayer p){
-        var pack=worn(p);var s=pack==null?null:pack.pack().get(SUPPLY);if(s==null)return;
-        pack.pack().set(SUPPLY,new Supply(s.dimension(),s.store(),!s.on()));
-        p.displayClientMessage(Component.literal("Backpack supply "+(s.on()?"off":"on")),true);
-    }
-    /** Puts the pack's building blocks onto the bound store, as far as it accepts them. */
-    static void unload(ServerPlayer p,Contents pack){
-        var store=supplying(p,pack);if(store==null){p.displayClientMessage(Component.literal(shortage(p,pack,null)),true);return;}
-        long moved=0;
-        for(int i=0;i<pack.getContainerSize();i++){
-            var held=pack.getItem(i);if(!BlockCarry.carried(held))continue;
-            int n=(int)store.insert(held,held.getCount());if(n>0){held.shrink(n);moved+=n;pack.setChanged();}
-        }
-        p.displayClientMessage(Component.literal(moved>0?"Unloaded "+moved+" blocks · "+CargoInventory.blocks(store.load(),store.capacity()):"The bound store takes none of these blocks"),true);
-    }
     /** Why the bound store supplies nothing more of the item; null when the pack is not bound. */
     private static String shortage(ServerPlayer p,Contents pack,ItemStack item){
-        var s=pack.pack().get(SUPPLY);if(s==null)return item==null?"The backpack is not bound to a store":null;
+        var s=pack.pack().get(SUPPLY);if(s==null)return null;
         String name="bound "+s.storeName();var store=store(p,s);
-        if(!s.on())return "Backpack supply is off";
         if(store==null)return "The "+name+" is not nearby";
         if(store.cargoPosition().distanceTo(p.position())>RADIUS)return "Out of reach of the "+name+": come within "+(int)RADIUS+" blocks";
         if(!store.cargoValid(p,RADIUS))return store instanceof WheelbarrowEntity w&&w.isVehicle()?"The "+name+" is being pushed":"You may not use the "+name;
-        return item==null?"":"The "+name+" has no more "+item.getHoverName().getString();
+        return "The "+name+" has no more "+item.getHoverName().getString();
     }
 
     private static final Map<UUID,ItemStack> HAND=new HashMap<>();
@@ -209,25 +200,10 @@ public final class Backpack {
         if(want!=null&&inv.getItem(BlockCarry.OFFHAND).isEmpty()){var why=shortage(p,pack,want);if(why!=null)p.displayClientMessage(Component.literal(why),true);}
     }
 
-    /** Opens the worn pack's menu. */
-    static void open(ServerPlayer p){
-        var pack=worn(p);if(pack==null){p.displayClientMessage(Component.literal("Wear a backpack in an accessory slot to open it"),true);return;}
-        p.openMenu(new SimpleMenuProvider((id,inv,player)->new BackpackMenu(id,inv,pack,status(p,pack)),pack.pack().getHoverName()),buf->buf.writeVarInt(pack.getContainerSize()));
-    }
-    /** What the menu shows of the binding: 0 none, 1 Pallet, 2 wheelbarrow; supply on; distance to a store found nearby, or -1. */
-    private static ContainerData status(ServerPlayer p,Contents pack){return new ContainerData(){
-        public int get(int i){
-            var s=pack.pack().get(SUPPLY);if(s==null)return i==2?-1:0;
-            return switch(i){case 0->s.store().left().isPresent()?1:2;case 1->s.on()?1:0;default->{var store=store(p,s);yield store==null?-1:(int)Math.round(store.cargoPosition().distanceTo(p.position()));}};
-        }
-        public void set(int i,int value){}
-        public int getCount(){return 3;}
-    };}
-
-    /** The B key: open the worn pack. */
-    public record Open() implements CustomPacketPayload {
-        public static final Type<Open> TYPE=new Type<>(ResourceLocation.parse("civilization:backpack"));
+    /** The Pack panel's Unbind button. */
+    public record Unbind() implements CustomPacketPayload {
+        public static final Type<Unbind> TYPE=new Type<>(ResourceLocation.parse("civilization:backpack_unbind"));
         public Type<? extends CustomPacketPayload> type(){return TYPE;}
-        static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,StreamCodec.unit(new Open()),(payload,context)->{if(context.player() instanceof ServerPlayer p)open(p);});}
+        static void register(RegisterPayloadHandlersEvent e){e.registrar("1").playToServer(TYPE,StreamCodec.unit(new Unbind()),(payload,context)->{if(context.player() instanceof ServerPlayer p)unbind(p);});}
     }
 }

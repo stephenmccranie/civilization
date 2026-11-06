@@ -11,13 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 public abstract class BlockCarryInventoryMixin {
     @Inject(method="fillStackedContents",at=@At("TAIL"))
     private void civilization$craftingContents(net.minecraft.world.entity.player.StackedContents contents,CallbackInfo ci){
-        var inv=(Inventory)(Object)this;var hand=inv.getItem(BlockCarry.OFFHAND);
-        if(BlockCarry.restricted(inv.player)&&BlockCarry.carried(hand))contents.accountSimpleStack(hand);
-    }
-    @Inject(method="findSlotMatchingUnusedItem",at=@At("RETURN"),cancellable=true)
-    private void civilization$craftingSlot(ItemStack stack,CallbackInfoReturnable<Integer> result){
-        var inv=(Inventory)(Object)this;var hand=inv.getItem(BlockCarry.OFFHAND);
-        if(result.getReturnValue()==-1&&BlockCarry.restricted(inv.player)&&BlockCarry.carried(hand)&&ItemStack.isSameItemSameComponents(hand,stack)&&!hand.isDamaged()&&!hand.isEnchanted()&&!hand.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME))result.setReturnValue(BlockCarry.OFFHAND);
+        dev.civilization.CraftingSources.account(((Inventory)(Object)this).player,contents);
     }
     @Inject(method="add(ILnet/minecraft/world/item/ItemStack;)Z",at=@At("HEAD"),cancellable=true)
     private void civilization$offhand(int slot,ItemStack stack,CallbackInfoReturnable<Boolean> result){

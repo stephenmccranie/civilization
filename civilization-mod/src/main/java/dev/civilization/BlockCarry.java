@@ -74,16 +74,16 @@ public final class BlockCarry {
         }
         return false;
     }
-    /** The offhand shown beside a menu at hotbar height; the client stands it against the menu's side. */
-    public static final class HandSlot extends Slot {
-        public HandSlot(Inventory inv,int y){super(inv,OFFHAND,0,y);}
+    /** The menu's Hand: the player's offhand slot, native in the inventory and attached to every other menu. */
+    public static Slot handSlot(AbstractContainerMenu menu){
+        for(var slot:menu.slots)if(slot.container instanceof Inventory&&slot.getContainerSlot()==OFFHAND)return slot;
+        return null;
     }
-    /** Expose the same hand slot in native chests, crafting and machine menus. */
+    /** Expose the hand slot in every menu that shows the player's inventory: chests, crafting, stores and machines. */
     public static void attachMenu(AbstractContainerMenu menu,Inventory inv){
-        if(!showsHand(inv.player))return;
-        for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==OFFHAND)return;
+        if(!showsHand(inv.player)||handSlot(menu)!=null)return;
         for(var slot:menu.slots)if(slot.container==inv&&slot.getContainerSlot()==0){
-            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new HandSlot(inv,slot.y));return;
+            ((BlockCarryMenuAccess)menu).civilization$addCarrySlot(new Slot(inv,OFFHAND,0,slot.y));return;
         }
     }
     /** Runs only between transactions; old/foreign misplaced stock is saved, never silently deleted. */

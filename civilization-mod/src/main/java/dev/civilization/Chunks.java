@@ -3,6 +3,7 @@ package dev.civilization;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -15,7 +16,11 @@ public final class Chunks {
         return loaded(level, p.getX() >> 4, p.getZ() >> 4);
     }
     public static boolean loaded(Level level, int chunkX, int chunkZ) {
-        return level.getChunkSource().getChunkNow(chunkX, chunkZ) != null;
+        return chunk(level, chunkX, chunkZ) != null;
+    }
+    /** The chunk if it has finished loading, otherwise null. */
+    public static LevelChunk chunk(Level level, int chunkX, int chunkZ) {
+        return level.getChunkSource().getChunkNow(chunkX, chunkZ);
     }
     /** Whether every chunk within {@code reach} blocks of a point, horizontally, has finished loading. */
     public static boolean loadedAround(Level level, Vec3 at, double reach) {

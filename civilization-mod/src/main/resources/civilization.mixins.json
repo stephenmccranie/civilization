@@ -16,6 +16,7 @@
     "SharedCraftingMenuMixin",
     "SharedCraftingTableRemovalMixin",
     "ServerPlayerMixin",
+    "ServerPlaceRecipeMixin",
     "LatencyPongMixin",
     "CakeMixin",
     "ItemStackMixin",
