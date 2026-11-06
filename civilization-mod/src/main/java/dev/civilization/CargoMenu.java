@@ -71,15 +71,15 @@ public final class CargoMenu extends AbstractContainerMenu {
     }
     /**
      * A click on a store's entry, here or in the Nearby panel; `at` is -1 for an empty cell. With an empty cursor it takes
-     * a stack (right button: half); with goods on the cursor it stacks them, all or one, onto a matching entry or an
-     * empty cell; Shift moves stacks into the player's inventory, where blocks fill the Hand and then the pack.
+     * a stack (right button: half); with goods on the cursor it stacks them, all or one, onto the store, whichever cell
+     * was clicked; Shift moves stacks into the player's inventory, where blocks fill the Hand and then the pack.
      */
     static void click(AbstractContainerMenu menu,Player p,CargoInventory cargo,int at,int button,boolean quick){
         if(button!=0&&button!=1)return;
         var carried=menu.getCarried();
         if(quick)withdraw(menu,p,cargo,at,true,0);
         else if(carried.isEmpty())withdraw(menu,p,cargo,at,false,button);
-        else if(at<0||ItemStack.isSameItemSameComponents(carried,cargo.entry(at).item()))carried.shrink((int)cargo.insert(carried,button==1?1:carried.getCount()));
+        else carried.shrink((int)cargo.insert(carried,button==1?1:carried.getCount()));
     }
     private static void withdraw(AbstractContainerMenu menu,Player p,CargoInventory cargo,int at,boolean inventory,int button){
         if(at<0||at>=cargo.size())return;

@@ -53,6 +53,23 @@ public final class NearbyStoresGameTests {
         h.succeed();
     }
 
+    @GameTest(template="industrial") public static void goodsOnTheCursorGoOntoTheStoresWhicheverCellIsClicked(GameTestHelper h){
+        var pallet=pallet(h);var cargo=pallet.cargo();cargo.insert(new ItemStack(Items.STONE),10);
+        var p=player(h);var menu=chest(p);var near=NearbyStores.of(menu);menu.broadcastChanges();
+        menu.setCarried(new ItemStack(Items.OAK_PLANKS,20));
+        CargoMenu.click(menu,p,near,near.indexOf(new ItemStack(Items.STONE)),0,false);
+        h.assertTrue(menu.getCarried().isEmpty()&&stored(cargo,Items.OAK_PLANKS)==20&&stored(cargo,Items.STONE)==10,"Planks clicked onto the stone's cell go onto the Pallet as a new entry");
+        menu.setCarried(new ItemStack(Items.COBBLESTONE,4));
+        CargoMenu.click(menu,p,near,near.indexOf(new ItemStack(Items.OAK_PLANKS)),1,false);
+        h.assertTrue(menu.getCarried().getCount()==3&&stored(cargo,Items.COBBLESTONE)==1,"A right-click on another item's cell stacks one");
+        cargo.insert(new ItemStack(Items.STONE),(long)(cargo.capacity()-cargo.load())-2);
+        CargoMenu.click(menu,p,near,near.indexOf(new ItemStack(Items.STONE)),0,false);
+        h.assertTrue(menu.getCarried().getCount()==1&&stored(cargo,Items.COBBLESTONE)==3,"Only what fits is stacked and the rest stays on the cursor: "+menu.getCarried().getCount()+" left");
+        CargoMenu.click(menu,p,near,-1,0,false);
+        h.assertTrue(menu.getCarried().getCount()==1&&stored(cargo,Items.COBBLESTONE)==3,"A full store takes nothing and the cursor keeps it");
+        h.succeed();
+    }
+
     @GameTest(template="industrial") public static void recipePlacementFillsTheGridFromHandPackAndNearbyStores(GameTestHelper h){
         var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.OAK_PLANKS),2);
         var p=player(h);var pack=Backpack.ITEM.toStack();p.getData(Accessories.INVENTORY).setStackInSlot(0,pack);
