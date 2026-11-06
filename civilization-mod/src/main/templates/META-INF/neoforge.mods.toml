@@ -54,6 +54,9 @@ config="civilization.grassiergrass.mixins.json"
 [[mixins]]
 config="civilization.iris.mixins.json"
 
+[[mixins]]
+config="civilization.photon.mixins.json"
+
 # LambDynamicLights calls this when present, so hot metal lights its surroundings.
 [[modproperties.${mod_id}."yumi:entrypoints"."lambdynlights:initializer"]]
 value="dev.civilization.client.HotMetalLight"

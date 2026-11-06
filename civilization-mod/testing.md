@@ -36,6 +36,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `material-sync` | Delayed material packets: received identities and before/after rendering |
 | `machine-lighting` | Fueled and cold machines in daylight and at night |
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |
+| `clouds` | Photon drawing the server's clouds: the ground darker when the server puts a cloud on the line to the sun than when it reports a gap, then partly cloudy and overcast skies; fails if either Photon file was not patched |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip, and the cold, comfortable, hot and cool temperature screen effects |
 | `workshops` | Tannery with a loaded pit, Textile Workshop and Smithy with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks; then the steeping pit three seconds on, its bark heap close up and the pit without shaders |
 | `assembly` | Assembly Bench forging and assembly through the real menu |

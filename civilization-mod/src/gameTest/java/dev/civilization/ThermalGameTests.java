@@ -185,7 +185,7 @@ public final class ThermalGameTests {
         h.succeed();
     }
     /** A sky that radiates like the air, so only flames and surfaces change what a body feels. */
-    private static final ThermalExposure.Sky OVERCAST_NIGHT=new ThermalExposure.Sky(new net.minecraft.world.phys.Vec3(0,-1,0),1);
+    private static final ThermalExposure.Sky OVERCAST_NIGHT=new ThermalExposure.Sky(new net.minecraft.world.phys.Vec3(0,-1,0),1,1);
     @GameTest(template="industrial") public static void sunWarmsTheOpenAndShadeAndNightCool(GameTestHelper h){
         var l=h.getLevel();var p=h.absolutePos(new BlockPos(6,4,6));
         for(var q:BlockPos.betweenClosed(p.offset(-4,-1,-4),p.offset(4,3,4)))
@@ -193,23 +193,23 @@ public final class ThermalGameTests {
         var field=new ThermalField();var torso=ThermalSystem.torso(net.minecraft.world.phys.Vec3.atBottomCenterOf(p));
         double air=field.localTemperature(l,BlockPos.containing(torso));
         h.assertTrue(BlockPos.containing(torso).getY()>=l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ()),"Fixture stands under open sky");
-        var noon=new ThermalExposure.Sky(ThermalRules.sun(0),0);
+        var noon=new ThermalExposure.Sky(ThermalRules.sun(0),0,0);
         var sunny=ThermalExposure.sample(l,field,torso,air,noon);
         h.assertTrue(sunny.sunlight()==1,"Nothing shades the open fixture at noon");
         double sun=ThermalRules.felt(air,sunny.radiant());
         h.assertTrue(sun>air+3,"Noon sun feels warmer than the shade air: "+sun+" vs "+air);
-        var overcast=ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(noon.sun(),1));
+        var overcast=ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(noon.sun(),1,1));
         h.assertTrue(overcast.sunlight()==0&&Math.abs(overcast.radiant()-air)<1,"Overcast hides the sun and radiates like the air");
-        double night=ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0)).radiant());
+        double night=ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant());
         h.assertTrue(night<air-1.5,"A clear night sky draws warmth from the open: "+night+" vs "+air);
-        h.assertTrue(ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.26),0)).sunlight()==0,"No direct sun once it has set");
+        h.assertTrue(ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.26),0,0)).sunlight()==0,"No direct sun once it has set");
         // A stone roof over the player.
         for(var q:BlockPos.betweenClosed(p.offset(-4,3,-4),p.offset(4,3,4)))l.setBlockAndUpdate(q,Blocks.STONE.defaultBlockState());
         var shaded=ThermalExposure.sample(l,field,torso,air,noon);
         h.assertTrue(shaded.sunlight()==0,"A roof shades the noon sun");
         double shade=ThermalRules.felt(air,shaded.radiant());
         h.assertTrue(sun>shade+3&&Math.abs(shade-air)<2,"Shade under a roof feels close to the air: "+shade);
-        h.assertTrue(ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0)).radiant())>night+1,"A roof keeps off the cold night sky");
+        h.assertTrue(ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,new ThermalExposure.Sky(ThermalRules.sun(.5),0,0)).radiant())>night+1,"A roof keeps off the cold night sky");
         h.succeed();
     }
     @GameTest(template="industrial") public static void flamesWarmWhoeverSeesThem(GameTestHelper h){

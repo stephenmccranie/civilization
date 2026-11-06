@@ -98,7 +98,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Meltwater and cold-region farming.
 - Advanced felling and timber hauling, to be designed later; basic felling stands in until then.
 - The Rain Caller's eventual form; tower energy and Survival access; offline production.
-- Regional cloud and sky blending under Photon needs a spike; full weather fronts are not provided.
+- Weather fronts that carry rain and cloud across districts.
 
 ## Land, deposits and geography
 

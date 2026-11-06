@@ -29,10 +29,25 @@ final class ThermalExposure {
         }
     }
 
-    /** Where the sun is and how much of the sky is cloud, from 0 (clear) to 1 (overcast). */
-    record Sky(Vec3 sun, double cloud) {
-        static Sky at(ServerLevel level, BlockPos pos) {
-            return new Sky(ThermalRules.sun(level.getTimeOfDay(1)), RegionalWeather.cooling(level, pos));
+    /**
+     * Where the sun is, how much of the sky is cloud ({@code cloud}, 0 clear to 1 overcast), and how much cloud lies on
+     * the line to the sun ({@code cover}), read where that line crosses Photon's cloud shadow layer.
+     */
+    record Sky(Vec3 sun, double cloud, double cover) {
+        static Sky at(ServerLevel level, Vec3 torso) {
+            var weather = RegionalWeather.get(level);
+            int x = Math.floorDiv((int) Math.floor(torso.x), CloudCover.DISTRICT), z = Math.floorDiv((int) Math.floor(torso.z), CloudCover.DISTRICT);
+            var grid = weather.cloudGrid(level, x, z);
+            double cornerX = (x - 1) * (double) CloudCover.DISTRICT, cornerZ = (z - 1) * (double) CloudCover.DISTRICT;
+            var sun = ThermalRules.sun(level.getTimeOfDay(1));
+            double cloud = CloudCover.cloudiness(grid, (float) (torso.x - cornerX), (float) (torso.z - cornerZ)), cover = 0;
+            if (sun.y >= ThermalRules.MIN_SUN_HEIGHT && torso.y < CloudCover.SHADOW_Y) {
+                var at = torso.add(sun.scale((CloudCover.SHADOW_Y - torso.y) / sun.y));
+                float local = CloudCover.cloudiness(grid, (float) (at.x - cornerX), (float) (at.z - cornerZ));
+                cover = CloudCover.cover(CloudCover.shift(at.x, CloudCover.WIND_X, weather.clock),
+                        CloudCover.shift(at.z, CloudCover.WIND_Z, weather.clock), local);
+            }
+            return new Sky(sun, cloud, cover);
         }
     }
 
@@ -57,7 +72,7 @@ final class ThermalExposure {
         double power = 0;
         for (var direction : SIGHT) power += seen(level, field, torso, direction, skyPower) / SIGHT.length;
         power += emitters(level, torso);
-        double sunlight = sunlit(level, torso, sky.sun) ? 1 - sky.cloud : 0;
+        double sunlight = sunlit(level, torso, sky.sun) ? 1 - sky.cover : 0;
         power += ThermalRules.SUN_ABSORBED * ThermalRules.directSun(sky.sun.y) * sunlight;
         return new Exposure(Math.min(Math.pow(power / SIGMA, .25) - KELVIN, ThermalRules.MAX_RADIANT_C), sunlight);
     }

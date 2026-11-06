@@ -278,6 +278,8 @@ final class PerfBenchmark {
         var weather = RegionalWeather.get(l);
         for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) {
             var district = weather.district(l, RegionalWeather.key(at.getX() + dx * 512, at.getZ() + dz * 512)); district.rain = false; district.end = weather.clock + 720000;
+            // A steady half cloud cover, so runs compare.
+            district.cloudFrom = district.cloudTo = .5; district.cloudEnd = weather.clock + 720000;
         }
         weather.setDirty();
         // Placed without neighbour updates, so cut trees keep their leaves and nothing changes during the walk.
