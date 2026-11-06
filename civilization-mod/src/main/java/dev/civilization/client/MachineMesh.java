@@ -24,8 +24,8 @@ import software.bernie.geckolib.util.RenderUtil;
  * section, of the controller and of its lit and cold bones, placed relative to that cell's block with texture
  * coordinates in the model's own texture. A cube is drawn from the cell nearest its centre among those its section
  * fills, the controller's from the controller's, so it takes that cell's light. A bone named `…water` is water, drawn
- * in vanilla's water texture. Bones the model animates or the renderer drives are left out: the block entity renderer
- * draws them.
+ * in vanilla's water texture by the model's water cell, which draws nothing else, so a shader pack can shade it as its
+ * own water. Bones the model animates or the renderer drives are left out: the block entity renderer draws them.
  */
 final class MachineMesh {
     /** Groups besides the sections, numbered 0 up: the controller's bones and the lit and cold bones that follow its lit
@@ -77,8 +77,6 @@ final class MachineMesh {
      *  model's water. */
     static boolean driven(String name) { return name.startsWith("sway_") || name.startsWith("float_"); }
 
-    boolean hasWater() { return quads.values().stream().anyMatch(list -> list.stream().anyMatch(Quad::water)); }
-
     private void animate(GeoBone bone, Set<String> moved, boolean below) {
         boolean inside = below || moved.contains(bone.getName()) || driven(bone.getName());
         if (inside) animated.add(bone.getName());
@@ -122,8 +120,9 @@ final class MachineMesh {
         pose.popPose();
         if (placed.isEmpty()) return;
         centre.div(corners);
-        int cell = cell(group, front, centre);
+        int cell = water ? model.water : cell(group, front, centre);
         if (cell == Integer.MIN_VALUE) return;
+        if (cell < 0 && water) throw new IllegalStateException(model.id + ": water needs a water cell in its definition");
         var offset = cell == CONTROLLER_CELL ? BlockPos.ZERO : ModeledMachine.position(BlockPos.ZERO, front, model.cells.get(cell));
         var into = quads.computeIfAbsent(key(front, cell, group), k -> new ArrayList<>());
         for (var quad : placed) {
@@ -132,13 +131,13 @@ final class MachineMesh {
         }
     }
 
-    /** The cell a cube centred at `centre` is drawn from: the nearest that its section fills, or the controller's for
-     *  the controller's own and the fire's bones; none for a section that fills no cell. */
+    /** The cell a cube centred at `centre` is drawn from: the nearest that its section fills other than the water cell,
+     *  or the controller's for the controller's own and the fire's bones; none for a section that fills no cell. */
     private int cell(int group, Direction front, Vector3f centre) {
         if (group < 0) return CONTROLLER_CELL;
         int best = Integer.MIN_VALUE; double nearest = Double.MAX_VALUE;
         for (int i = 0; i < model.cells.size(); i++) {
-            if (!model.cells.get(i).pieces().containsKey(group)) continue;
+            if (i == model.water || !model.cells.get(i).pieces().containsKey(group)) continue;
             var p = ModeledMachine.position(BlockPos.ZERO, front, model.cells.get(i));
             double dx = Math.max(0, Math.max(p.getX() - centre.x, centre.x - p.getX() - 1)), dy = Math.max(0, Math.max(p.getY() - centre.y, centre.y - p.getY() - 1)),
                     dz = Math.max(0, Math.max(p.getZ() - centre.z, centre.z - p.getZ() - 1)), d = dx * dx + dy * dy + dz * dz;

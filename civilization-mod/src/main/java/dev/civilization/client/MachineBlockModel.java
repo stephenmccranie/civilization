@@ -39,23 +39,23 @@ import net.neoforged.neoforge.common.util.TriState;
  * door and its lit or cold bones by its lit state, so the chunk mesher builds a machine once, as it builds the
  * blocks around it, instead of every frame. Which sections are built is read from the controller as the chunk is meshed;
  * the controller redraws its cells when that changes. Quads are cut out, so a hide's ragged outline shows against
- * what lies behind it. Water is drawn translucent in vanilla's animated still-water
- * texture, one tile to a block as on a pool, and takes its biome's water colour.
+ * what lies behind it. A machine's water is drawn by its water cell while the controller is lit, translucent in
+ * vanilla's animated still-water texture, one tile to a block as on a pool, in its biome's water colour.
  */
 @EventBusSubscriber(modid = "civilization", value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 final class MachineBlockModel extends BakedModelWrapper<BakedModel> {
     private static final ModelProperty<Integer> SECTIONS = new ModelProperty<>();
+    private static final ModelProperty<Boolean> LIT = new ModelProperty<>();
     private static final ChunkRenderTypeSet CUT_OUT = ChunkRenderTypeSet.of(RenderType.cutoutMipped()), WITH_WATER = ChunkRenderTypeSet.of(RenderType.cutoutMipped(), RenderType.translucent());
     private final MachineMesh mesh;
     private final TextureAtlasSprite sprite, water;
-    private final ChunkRenderTypeSet types;
     private final Map<Long, List<BakedQuad>> baked = new ConcurrentHashMap<>();
-    /** A cell's cut-out or water quads for its facing and built sections; the controller's cell is -1, its `built` its lit state. */
-    private record CellKey(Direction front, int cell, int built, boolean water) {}
+    /** A cell's quads for its facing and built sections; the controller's cell is -1, its `built` its lit state. */
+    private record CellKey(Direction front, int cell, int built) {}
     private final Map<CellKey, List<BakedQuad>> cells = new ConcurrentHashMap<>();
 
     private MachineBlockModel(BakedModel original, MachineMesh mesh, TextureAtlasSprite sprite, TextureAtlasSprite water) {
-        super(original); this.mesh = mesh; this.sprite = sprite; this.water = water; types = mesh.hasWater() ? WITH_WATER : CUT_OUT;
+        super(original); this.mesh = mesh; this.sprite = sprite; this.water = water;
     }
 
     @SubscribeEvent static void bake(ModelEvent.ModifyBakingResult event) {
@@ -84,42 +84,41 @@ final class MachineBlockModel extends BakedModelWrapper<BakedModel> {
         var at = state.getBlock() instanceof MachinePartBlock part ? part.controller(pos, state) : pos;
         var c = ModeledMachine.of(level.getBlockEntity(at));
         int sections = c != null && c.model() == mesh.model && c.front() == state.getValue(CivicBlock.FACING) ? c.build().sections : 0;
-        return data.derive().with(SECTIONS, sections).build();
+        var controller = level.getBlockState(at);
+        return data.derive().with(SECTIONS, sections).with(LIT, sections != 0 && controller.hasProperty(BlockStateProperties.LIT) && controller.getValue(BlockStateProperties.LIT)).build();
     }
 
     @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand) { return getQuads(state, side, rand, ModelData.EMPTY, null); }
 
     @Override public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand, ModelData data, RenderType type) {
         if (side != null || state == null) return List.of();
-        if (type != null) return quads(state, data, type == RenderType.translucent());
-        var all = new ArrayList<>(quads(state, data, false)); all.addAll(quads(state, data, true));
-        return all;
-    }
-
-    private List<BakedQuad> quads(BlockState state, ModelData data, boolean water) {
+        boolean watery = waterCell(state);
+        if (type == RenderType.translucent() || type == null && watery) return watery && Boolean.TRUE.equals(data.get(LIT)) ? group(state.getValue(CivicBlock.FACING), mesh.model.water, MachineMesh.LIT) : List.of();
         var front = state.getValue(CivicBlock.FACING);
         if (!(state.getBlock() instanceof MachinePartBlock)) {
             boolean lit = state.hasProperty(BlockStateProperties.LIT) && state.getValue(BlockStateProperties.LIT);
-            return cells.computeIfAbsent(new CellKey(front, MachineMesh.CONTROLLER_CELL, lit ? 1 : 0, water), k -> {
-                var all = new ArrayList<>(group(front, MachineMesh.CONTROLLER_CELL, MachineMesh.CONTROLLER, water));
-                all.addAll(group(front, MachineMesh.CONTROLLER_CELL, lit ? MachineMesh.LIT : MachineMesh.COLD, water));
+            return cells.computeIfAbsent(new CellKey(front, MachineMesh.CONTROLLER_CELL, lit ? 1 : 0), k -> {
+                var all = new ArrayList<>(group(front, MachineMesh.CONTROLLER_CELL, MachineMesh.CONTROLLER));
+                all.addAll(group(front, MachineMesh.CONTROLLER_CELL, lit ? MachineMesh.LIT : MachineMesh.COLD));
                 return List.copyOf(all);
             });
         }
         int cell = state.getValue(mesh.model.cell);
         var sections = data.get(SECTIONS);
         int built = (sections == null ? 0 : sections) & mesh.model.cells.get(cell).sectionMask();
-        return cells.computeIfAbsent(new CellKey(front, cell, built, water), k -> {
+        return cells.computeIfAbsent(new CellKey(front, cell, built), k -> {
             var all = new ArrayList<BakedQuad>();
-            for (int part = 0; part < mesh.model.sections.size(); part++) if ((built & (1 << part)) != 0) all.addAll(group(front, cell, part, water));
+            for (int part = 0; part < mesh.model.sections.size(); part++) if ((built & (1 << part)) != 0) all.addAll(group(front, cell, part));
             return List.copyOf(all);
         });
     }
 
-    /** One group's cut-out or water quads in the block atlas, baked on first use. */
-    private List<BakedQuad> group(Direction front, int cell, int group, boolean water) {
-        return baked.computeIfAbsent(MachineMesh.key(front, cell, group) << 1 | (water ? 1 : 0),
-                k -> mesh.quads(front, cell, group).stream().filter(q -> q.water() == water).map(this::bake).toList());
+    /** Whether `state` is the part cell that draws its machine's water and nothing else. */
+    private boolean waterCell(BlockState state) { return state.getBlock() instanceof MachinePartBlock && state.getValue(mesh.model.cell) == mesh.model.water; }
+
+    /** One group's quads in the block atlas, baked on first use. */
+    private List<BakedQuad> group(Direction front, int cell, int group) {
+        return baked.computeIfAbsent(MachineMesh.key(front, cell, group), k -> mesh.quads(front, cell, group).stream().map(this::bake).toList());
     }
 
     private BakedQuad bake(MachineMesh.Quad quad) {
@@ -143,7 +142,7 @@ final class MachineBlockModel extends BakedModelWrapper<BakedModel> {
         return builder.bakeQuad();
     }
 
-    @Override public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) { return types; }
+    @Override public ChunkRenderTypeSet getRenderTypes(BlockState state, RandomSource rand, ModelData data) { return waterCell(state) ? WITH_WATER : CUT_OUT; }
     @Override public boolean useAmbientOcclusion() { return false; }
     @Override public TriState useAmbientOcclusion(BlockState state, ModelData data, RenderType type) { return TriState.FALSE; }
 }
