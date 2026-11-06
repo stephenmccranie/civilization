@@ -114,8 +114,17 @@ final class BackpackVisualCheck {
             dev.civilization.client.CarryUiCheck.assertLayout(mc,false);
             shot(mc,"chest-menu");
         }
+        // Real clicks on the Nearby panel: one takes a stack of stone onto the cursor, one on an empty cell puts it back.
+        if(ticks==471){nearbyStone=nearbyCount(mc);clickNearby(mc,NearbyStores.of(mc.player.containerMenu).indexOf(new ItemStack(Items.STONE)));}
+        if(ticks==474){
+            var carried=mc.player.containerMenu.getCarried();
+            if(!carried.is(Items.STONE)||nearbyCount(mc)!=nearbyStone-carried.getCount())throw new IllegalStateException("A Nearby click did not take stone: cursor "+carried+", listed "+nearbyCount(mc)+" of "+nearbyStone);
+            check(server,()->{if(!player(server).containerMenu.getCarried().is(Items.STONE))throw new IllegalStateException("The server did not move the stone onto the cursor");});
+            clickNearby(mc,NearbyStores.of(mc.player.containerMenu).size());
+        }
+        if(ticks==477&&(!mc.player.containerMenu.getCarried().isEmpty()||nearbyCount(mc)!=nearbyStone))throw new IllegalStateException("A Nearby click did not put the stone back: listed "+nearbyCount(mc)+" of "+nearbyStone);
         // The Pack panel's Unbind button, by a real click.
-        if(ticks==475){
+        if(ticks==478){
             var s=(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>)mc.screen;var b=dev.civilization.client.SidePanels.unbind(dev.civilization.client.SidePanels.layout(s).pack());
             dev.civilization.client.CarryUiCheck.click(mc,s.getGuiLeft()+b.getX()+5,s.getGuiTop()+b.getY()+5);
         }
@@ -124,6 +133,13 @@ final class BackpackVisualCheck {
             shot(mc,"unbound");
         }
         if(ticks>492){com.mojang.logging.LogUtils.getLogger().info("BACKPACK VISUAL VERIFIED: hand-carried machines on a Pallet, worn in an accessory slot, bound in a Pallet menu, building refilled from the store with stone conserved, worn from behind, three-quarters and the side, the pack in the inventory, the pack alone beyond reach, held item, the pack and nearby Pallets beside a chest menu, unbinding from the Pack panel");mc.stop();}
+    }
+    private static long nearbyStone;
+    private static long nearbyCount(Minecraft mc){var near=NearbyStores.of(mc.player.containerMenu);return near.count(near.indexOf(new ItemStack(Items.STONE)));}
+    /** Clicks the Nearby panel's cell for an entry on its first page. */
+    private static void clickNearby(Minecraft mc,int entry){
+        var s=(net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>)mc.screen;var r=dev.civilization.client.SidePanels.layout(s).nearby();int columns=dev.civilization.client.SidePanels.COLUMNS;
+        dev.civilization.client.CarryUiCheck.click(mc,s.getGuiLeft()+r.getX()+7+entry%columns*18+8,s.getGuiTop()+r.getY()+15+entry/columns*18+8);
     }
     private static ServerPlayer player(MinecraftServer s){return s.getPlayerList().getPlayers().getFirst();}
     private static long active(net.minecraft.world.inventory.AbstractContainerMenu menu){return menu.slots.stream().filter(s->s instanceof Backpack.PackSlot&&s.isActive()).count();}

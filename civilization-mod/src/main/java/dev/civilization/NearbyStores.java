@@ -26,6 +26,8 @@ public final class NearbyStores implements CargoInventory {
     /** The store whose own menu this is, never listed beside itself. */
     private final CargoHolder own;
     private List<Seen> seen=List.of();
+    /** The stores as last sent to the client, which the next sync compares against. */
+    private List<Seen> sent;
     private List<CargoLedger.Entry> entries;
     private int stores;
     private NearbyStores(Player player,List<CargoHolder> candidates,CargoHolder own){this.player=player;this.candidates=candidates;this.own=own;entries=List.of();}
@@ -42,23 +44,26 @@ public final class NearbyStores implements CargoInventory {
     /** How many stores are listed; the panel shows while there is at least one, even an empty one to stack goods onto. */
     public int stores(){return stores;}
 
-    /** Rechecks which stores the player may use now and merges their goods; true when anything changed since the last look. */
-    private boolean refresh(){
+    /** Rechecks which stores the player may use now and merges their goods when anything changed since the last look. */
+    private void refresh(){
         var owned=own==null?null:own.cargo();var now=new ArrayList<Seen>();
         for(var store:candidates)if(store.cargoValid(player)){
             var cargo=store.cargo();if(cargo!=owned&&now.stream().noneMatch(s->s.cargo==cargo))now.add(new Seen(cargo,cargo.revision()));
         }
-        if(now.equals(seen))return false;
+        if(now.equals(seen))return;
         seen=List.copyOf(now);stores=seen.size();
         var merged=new ArrayList<CargoLedger.Entry>();
         for(var s:seen)for(int i=0;i<s.cargo.size();i++){
             var e=s.cargo.entry(i);int at=0;while(at<merged.size()&&!ItemStack.isSameItemSameComponents(merged.get(at).item(),e.item()))at++;
             if(at==merged.size())merged.add(e);else merged.set(at,new CargoLedger.Entry(merged.get(at).item(),merged.get(at).count()+e.count()));
         }
-        entries=List.copyOf(merged);return true;
+        entries=List.copyOf(merged);
     }
-    /** Sends the list when it changed, from the menu's own synchronization each tick. */
-    public void sync(int containerId){if(refresh())PacketDistributor.sendToPlayer((ServerPlayer)player,new Sync(containerId,stores,entries));}
+    /** Sends the list when it differs from the last one sent, from the menu's own synchronization each tick. */
+    public void sync(int containerId){
+        refresh();if(seen.equals(sent))return;
+        sent=seen;PacketDistributor.sendToPlayer((ServerPlayer)player,new Sync(containerId,stores,entries));
+    }
 
     @Override public double capacity(){return seen.stream().mapToDouble(s->s.cargo.capacity()).sum();}
     @Override public double load(){return seen.stream().mapToDouble(s->s.cargo.load()).sum();}
