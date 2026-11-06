@@ -26,10 +26,10 @@ public final class ConnectionGameTests {
         h.assertTrue(!server.optional() && server.version().equals(CaloriePayload.PROTOCOL_VERSION), "The core channel requires the stable protocol, not the running build");
         var required = List.of(server);
         h.assertTrue(NetworkComponentNegotiator.negotiate(required, required).success(), "The matching client is accepted");
-        var published = new NegotiableNetworkComponent(server.id(), "10/0.35.23-dev", server.flow(), false);
-        h.assertTrue(NetworkComponentNegotiator.negotiate(required, List.of(published)).success(), "The unchanged published 0.35.23 client connects to later compatible server builds");
+        var published = new NegotiableNetworkComponent(server.id(), "11/0.35.26-dev", server.flow(), false);
+        h.assertTrue(NetworkComponentNegotiator.negotiate(required, List.of(published)).success(), "The unchanged published 0.35.26 client connects to later compatible server builds");
         h.assertTrue(!NetworkComponentNegotiator.negotiate(required, List.of()).success(), "A missing mod is rejected before play");
-        for (String version : List.of("9/0.35.21-dev", "8/0.35.18-dev", "7/0.35.17-dev", "6/0.35.16-dev", "5/0.35.15-dev", "4/0.35.14-dev", "3/0.35.0-dev", "3", "3/0.34.55-dev", "4")) {
+        for (String version : List.of("10/0.35.23-dev", "9/0.35.21-dev", "8/0.35.18-dev", "7/0.35.17-dev", "6/0.35.16-dev", "5/0.35.15-dev", "4/0.35.14-dev", "3/0.35.0-dev", "3", "3/0.34.55-dev", "4")) {
             var client = new NegotiableNetworkComponent(server.id(), version, server.flow(), false);
             var result = NetworkComponentNegotiator.negotiate(required, List.of(client));
             h.assertTrue(!result.success() && result.failureReasons().containsKey(server.id()), "Legacy and incompatible protocols are rejected with a channel reason");
