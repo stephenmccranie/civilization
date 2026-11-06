@@ -68,11 +68,10 @@ public final class TemperatureWash {
                 a.opacity + (b.opacity - a.opacity) * t);
     }
 
-    /** A lub-dub heartbeat, 0 between beats and 1 at the first. */
+    /** A slow throb: one soft swell per beat, 0 between swells and 1 at the crest. */
     private static double pulse() {
-        double phase = beat - Math.floor(beat);
-        double lub = (phase - .1) / .07, dub = (phase - .34) / .07;
-        return Math.exp(-lub * lub) + .55 * Math.exp(-dub * dub);
+        double swell = .5 - .5 * Math.cos(Math.TAU * beat);
+        return swell * swell;
     }
 
     private static double motion() {
@@ -102,7 +101,7 @@ public final class TemperatureWash {
             sinceShiver = 0;
             nextShiver = 12 - 6 * past(-strain, .5) + 3 * Math.random();
         }
-        beat += elapsed * (70 + 60 * Math.max(0, strain)) / 60;
+        beat += elapsed * (40 + 20 * Math.max(0, strain)) / 60;
     }
 
     private static void wash(GuiGraphics graphics) {

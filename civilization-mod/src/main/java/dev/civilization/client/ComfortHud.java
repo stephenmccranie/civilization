@@ -61,6 +61,9 @@ public final class ComfortHud {
         lines.add(Component.literal(String.format(Locale.ROOT,"Surroundings: %.1f°F",ThermalDisplay.fahrenheit(data.radiantTemperature()))));
         if(ThermalRules.sun(Minecraft.getInstance().level.getTimeOfDay(1)).y>=ThermalRules.MIN_SUN_HEIGHT)
             lines.add(Component.literal(data.sunlight()>0?String.format(Locale.ROOT,"Direct sun: %.0f%%",data.sunlight()*100):"Direct sun: none (shade or cloud)"));
+        double insulation=ThermalRules.insulation(Minecraft.getInstance().player);
+        double clothing=ThermalRules.felt(data.temperature(),data.radiantTemperature(),insulation)-ThermalRules.felt(data.temperature(),data.radiantTemperature(),0);
+        lines.add(Component.literal(insulation>0?String.format(Locale.ROOT,"Clothing: %+.1f°F",clothing*1.8):"Clothing: none"));
         lines.add(Component.literal(String.format(Locale.ROOT,"Felt temperature: %.1f°F",ThermalDisplay.fahrenheit(data.playerTemperature()))));
         lines.add(Component.literal(String.format(Locale.ROOT,"Comfort: %.0f%%",data.comfort()*100)));
         double cold=ThermalRules.coldKcalPerSecond(data.playerTemperature(),CalorieConfig.COLD_EXPOSURE.get());
