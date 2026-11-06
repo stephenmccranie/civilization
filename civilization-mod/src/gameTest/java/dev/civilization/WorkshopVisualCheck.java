@@ -100,7 +100,7 @@ final class WorkshopVisualCheck {
         if(ticks==397)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),44.5,102,-4,java.util.Set.of(),0,25);ModeledMachine.removeSection(ModeledMachine.of(server.overworld().getBlockEntity(at(2))),3,false);p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(WorkshopContent.SMITHY.get()));});
         if(ticks==409)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),48.5,103.5,-5,java.util.Set.of(),30,15);});
         if(ticks==415)shot(mc,"smithy-guide");
-        // The Tannery still steeps the batch poured at tick 187: its liquor and hides show from the front left.
+        // The Tannery still steeps the batch poured at tick 187: its water and hides show from the front left.
         if(ticks==416){mc.options.hideGui=true;server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
         if(ticks==423){shot(mc,"tannery-steeping");mc.options.hideGui=false;}
         if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
@@ -118,7 +118,15 @@ final class WorkshopVisualCheck {
                 p.containerMenu.clickMenuButton(p,CoalFire.BUTTON);
             }
         });
-        if(ticks==485){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||(m.fireState()&1)==0)throw new IllegalStateException("Seeded menu ignition failed to synchronize");shot(mc,"ignition-lit");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
+        if(ticks==485){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||(m.fireState()&1)==0)throw new IllegalStateException("Seeded menu ignition failed to synchronize");shot(mc,"ignition-lit");}
+        // The same batch three seconds on: its hides have drifted, and the client knows every hide in the pit; then the bark heap close up.
+        if(ticks==487){mc.player.closeContainer();mc.options.hideGui=true;server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32);});}
+        if(ticks==497){if(ModeledMachine.of(mc.level.getBlockEntity(at(0))).afloat()!=Tanning.PIT)throw new IllegalStateException("The client does not see the steeping hides");shot(mc,"tannery-drift");}
+        if(ticks==498)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.2,103.2,-1.2,java.util.Set.of(),47,24));
+        if(ticks==508)shot(mc,"tannery-heap");
+        // The steeping pit again without a shader pack, its water as vanilla draws it.
+        if(ticks==509){WheelbarrowVisualCheck.shaders(false);server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
+        if(ticks==550){shot(mc,"tannery-plain");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
     }
     private static void click(Minecraft mc,String name){
         var b=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button button&&button.visible&&button.getMessage().getString().equals(name)).map(c->(net.minecraft.client.gui.components.Button)c).findFirst().orElseThrow(()->new IllegalStateException("Missing control: "+name));

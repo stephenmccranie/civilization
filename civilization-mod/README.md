@@ -32,6 +32,7 @@ Civilization runs without these. Each version-gated integration activates only f
 | Grassier Grass | 1.4.5 | Client | [Trampled grass and no snow tint](survival.md#trampled-grass) |
 | Distant Horizons | 3.3.1 | Client | [Speed-adaptive LOD detail](vehicle-physics.md#distant-horizons-detail) |
 | Sodium, with DH 3.3.1 | 0.8.13 | Client | [Warp terrain suppression](vehicle-physics.md#warp-terrain-rendering) |
+| Iris | 1.8.14 | Client | [Machine water shaded as water](manufacturing.md#town-workshops) |
 | Iris, with DH 3.3.1 | 1.8.14 | Client | Warp bypass of the DH fade in shader programs |
 | C2ME (`c2me_notickvd` module) | 0.4.0-alpha.0.122+1.21.1 | Server | [Directional chunk loading](vehicle-physics.md#directional-chunk-loading) |
 | Terrain Diffusion | Surface-water API, built against 1.4.1 (detected, not version-gated) | Server | [Local river elevations](geography.md#generator-integration) |

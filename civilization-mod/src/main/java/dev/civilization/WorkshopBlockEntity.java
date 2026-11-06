@@ -53,6 +53,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     @Override public Direction front(){return getBlockState().getValue(WorkshopBlock.FACING);}
     @Override public boolean working(){return getBlockState().getValue(MachineFeedback.WORKING);}
     @Override public void sectionsChanged(){status=MachineStatus.Workshop.INCOMPLETE;}
+    @Override public int afloat(){return steeped()?items.get(PIT_HIDES).getCount():0;}
     /** A forge built as a native model checks its sections; the other workshops check their block structures. */
     int structure(){
         if(model()==null)return MachineStructure.check(level,worldPosition,front()).status();
@@ -179,8 +180,13 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     };
     @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);if(model()!=null)build.save(t,r);t.putInt("productionXp",pendingExperience);fire.save(t);ContainerHelper.saveAllItems(t,items,r);if(selected>=0)t.putString("jobId",WorkshopJobs.outputs(kind).get(selected));t.putInt("progress",progress);t.putInt("steep",steep);if(!workingResult.isEmpty())t.put("workResult",workingResult.save(r));}
     @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);if(model()!=null){int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);}pendingExperience=Math.max(0,t.getInt("productionXp"));fire.load(t);items.clear();ContainerHelper.loadAllItems(t,items,r);selected=WorkshopJobs.index(kind,t.getString("jobId"));progress=Math.clamp(t.getInt("progress"),0,20000);steep=Math.clamp(t.getInt("steep"),0,Tanning.TICKS);worker=null;workingResult=ItemStack.parseOptional(r,t.getCompound("workResult"));if(t.contains("jobId")&&selected<0){progress=0;workingResult=ItemStack.EMPTY;}}
-    /** Clients draw a modeled machine from its built sections, so they receive those and nothing else. */
-    @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){var t=new CompoundTag();if(model()!=null)build.save(t,r);return t;}
+    /** Clients draw a modeled machine from its built sections and a Tannery's pit from its hides, so they receive those
+     * and nothing else. The pit fills and empties as the controller's lit state changes, which resends this. */
+    @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){
+        var t=new CompoundTag();if(model()!=null)build.save(t,r);
+        var pit=NonNullList.withSize(items.size(),ItemStack.EMPTY);pit.set(PIT_HIDES,items.get(PIT_HIDES));ContainerHelper.saveAllItems(t,pit,r);
+        return t;
+    }
     @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}
     @Override public Component getDisplayName(){return getBlockState().getBlock().getName();}
     @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new WorkshopMenu(id,inv,this,data);}

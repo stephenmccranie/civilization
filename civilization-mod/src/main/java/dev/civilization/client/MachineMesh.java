@@ -23,8 +23,9 @@ import software.bernie.geckolib.util.RenderUtil;
  * the cells draw exactly what {@link ModeledMachineRenderer} would. For each facing and cell it holds the quads of each
  * section, of the controller and of its lit and cold bones, placed relative to that cell's block with texture
  * coordinates in the model's own texture. A cube is drawn from the cell nearest its centre among those its section
- * fills, the controller's from the controller's, so it takes that cell's light. Bones the model animates are left out:
- * the block entity renderer draws them.
+ * fills, the controller's from the controller's, so it takes that cell's light. A bone named `…water` is water, drawn
+ * in vanilla's water texture by the model's water cell, which draws nothing else, so a shader pack can shade it as its
+ * own water. Bones the model animates or the renderer drives are left out: the block entity renderer draws them.
  */
 final class MachineMesh {
     /** Groups besides the sections, numbered 0 up: the controller's bones and the lit and cold bones that follow its lit
@@ -32,11 +33,11 @@ final class MachineMesh {
     static final int CONTROLLER = -1, LIT = -2, COLD = -3;
     /** The controller's cell, which is not one of the model's part cells. */
     static final int CONTROLLER_CELL = -1;
-    /** Four corners' positions and texture coordinates, the normal, and whether the quad glows. */
-    record Quad(Vector3f[] corners, float[] uv, Vector3f normal, boolean glow) {}
+    /** Four corners' positions and texture coordinates, the normal, whether the quad glows and whether it is water. */
+    record Quad(Vector3f[] corners, float[] uv, Vector3f normal, boolean glow, boolean water) {}
 
     final MachineModel model;
-    /** Names of the bones the model's animations move, and of every bone below them. */
+    /** Names of the bones the model's animations move or the renderer drives, and of every bone below them. */
     final Set<String> animated;
     /** Per facing, cell and group, keyed by {@link #key}. */
     private final Map<Long, List<Quad>> quads = new HashMap<>();
@@ -66,14 +67,18 @@ final class MachineMesh {
             // GeckoLib's block renderer draws from the controller block's centre, turned to its facing.
             var pose = new PoseStack(); pose.translate(.5, 0, .5);
             pose.mulPose(Axis.YP.rotationDegrees(switch (front) { case SOUTH -> 180; case WEST -> 90; case EAST -> 270; default -> 0; }));
-            for (var bone : baked.topLevelBones()) mesh.add(bone, CONTROLLER, front, pose);
+            for (var bone : baked.topLevelBones()) mesh.add(bone, CONTROLLER, false, front, pose);
         }
         LOADED.put(model, mesh);
         return mesh;
     }
 
+    /** Whether the renderer moves a bone itself: `sway_` bones swing in the wind and `float_<n>` bones drift on the
+     *  model's water. */
+    static boolean driven(String name) { return name.startsWith("sway_") || name.startsWith("float_"); }
+
     private void animate(GeoBone bone, Set<String> moved, boolean below) {
-        boolean inside = below || moved.contains(bone.getName());
+        boolean inside = below || moved.contains(bone.getName()) || driven(bone.getName());
         if (inside) animated.add(bone.getName());
         for (var child : bone.getChildBones()) animate(child, moved, inside);
     }
@@ -84,17 +89,18 @@ final class MachineMesh {
         return name.equals("controller") ? CONTROLLER : name.startsWith("lit_") ? LIT : name.startsWith("cold_") ? COLD : parent;
     }
 
-    private void add(GeoBone bone, int parent, Direction front, PoseStack pose) {
+    private void add(GeoBone bone, int parent, boolean water, Direction front, PoseStack pose) {
         if (animated.contains(bone.getName())) return;
         int group = group(bone.getName(), parent);
+        water |= bone.getName().endsWith("water");
         pose.pushPose();
         RenderUtil.prepMatrixForBone(pose, bone);
-        for (var cube : bone.getCubes()) add(cube, group, front, pose);
-        for (var child : bone.getChildBones()) add(child, group, front, pose);
+        for (var cube : bone.getCubes()) add(cube, group, water, front, pose);
+        for (var child : bone.getChildBones()) add(child, group, water, front, pose);
         pose.popPose();
     }
 
-    private void add(GeoCube cube, int group, Direction front, PoseStack pose) {
+    private void add(GeoCube cube, int group, boolean water, Direction front, PoseStack pose) {
         pose.pushPose();
         RenderUtil.translateToPivotPoint(pose, cube); RenderUtil.rotateMatrixAroundCube(pose, cube); RenderUtil.translateAwayFromPivotPoint(pose, cube);
         var placed = new ArrayList<Quad>(); var centre = new Vector3f(); int corners = 0;
@@ -109,13 +115,14 @@ final class MachineMesh {
                 points[i] = new Vector3f(at.x(), at.y(), at.z()); centre.add(points[i]); corners++;
                 uv[2 * i] = v.texU(); uv[2 * i + 1] = v.texV();
             }
-            placed.add(new Quad(points, uv, normal, group == LIT && model.heated));
+            placed.add(new Quad(points, uv, normal, group == LIT && model.heated, water));
         }
         pose.popPose();
         if (placed.isEmpty()) return;
         centre.div(corners);
-        int cell = cell(group, front, centre);
+        int cell = water ? model.water : cell(group, front, centre);
         if (cell == Integer.MIN_VALUE) return;
+        if (cell < 0 && water) throw new IllegalStateException(model.id + ": water needs a water cell in its definition");
         var offset = cell == CONTROLLER_CELL ? BlockPos.ZERO : ModeledMachine.position(BlockPos.ZERO, front, model.cells.get(cell));
         var into = quads.computeIfAbsent(key(front, cell, group), k -> new ArrayList<>());
         for (var quad : placed) {
@@ -124,13 +131,13 @@ final class MachineMesh {
         }
     }
 
-    /** The cell a cube centred at `centre` is drawn from: the nearest that its section fills, or the controller's for
-     *  the controller's own and the fire's bones; none for a section that fills no cell. */
+    /** The cell a cube centred at `centre` is drawn from: the nearest that its section fills other than the water cell,
+     *  or the controller's for the controller's own and the fire's bones; none for a section that fills no cell. */
     private int cell(int group, Direction front, Vector3f centre) {
         if (group < 0) return CONTROLLER_CELL;
         int best = Integer.MIN_VALUE; double nearest = Double.MAX_VALUE;
         for (int i = 0; i < model.cells.size(); i++) {
-            if (!model.cells.get(i).pieces().containsKey(group)) continue;
+            if (i == model.water || !model.cells.get(i).pieces().containsKey(group)) continue;
             var p = ModeledMachine.position(BlockPos.ZERO, front, model.cells.get(i));
             double dx = Math.max(0, Math.max(p.getX() - centre.x, centre.x - p.getX() - 1)), dy = Math.max(0, Math.max(p.getY() - centre.y, centre.y - p.getY() - 1)),
                     dz = Math.max(0, Math.max(p.getZ() - centre.z, centre.z - p.getZ() - 1)), d = dx * dx + dy * dy + dz * dz;

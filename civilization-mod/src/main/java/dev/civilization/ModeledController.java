@@ -13,6 +13,8 @@ public interface ModeledController {
     boolean stillValid(Player player);
     /** Whether the machine is running, which plays its work animation and shows its lit bones. */
     boolean working();
+    /** How many of the model's `float_<n>` pieces are afloat in its water, such as a Tannery's steeping hides. */
+    default int afloat(){return 0;}
     /** Sections were added or removed: the machine stops until it next checks itself. */
     void sectionsChanged();
     default BlockEntity entity(){return (BlockEntity)this;}
