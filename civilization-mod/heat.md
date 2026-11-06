@@ -8,7 +8,7 @@ Every loaded block cell has a temperature: the regional climate plus local therm
 
 ## Climate
 
-Overworld background temperature comes from biome, altitude, the 60-minute day and regional rain. Air reaches its daily low near dawn (time 0, about 06:00) and its high in mid-afternoon (time 9000, about 15:00), on two smooth half-cosine curves that keep each biome's daily high, low and mean; at the default day length the peak comes about 7.5 real minutes after noon. A clear river biome at ordinary elevation:
+Overworld background temperature comes from the world's climate, altitude, the 60-minute day and regional rain. Air reaches its daily low near dawn (time 0, about 06:00) and its high in mid-afternoon (time 9000, about 15:00), on two smooth half-cosine curves that keep each biome's daily high, low and mean; at the default day length the peak comes about 7.5 real minutes after noon. A clear river biome at ordinary elevation:
 
 | In-game time | Outdoor temperature |
 | --- | --- |
@@ -18,7 +18,9 @@ Overworld background temperature comes from biome, altitude, the 60-minute day a
 | Sunset, 18:00 | 60.9°F / 16°C |
 | Midnight, 00:00 | 50.8°F / 10.5°C |
 
-A biome's game temperature is a gameplay index, not an air temperature, so one curve turns it into a mean for every biome from any mod: index −1 is −22°C, 0 is −10°C, every temperate index from 0.25 to 0.8 shares 12°C, 0.95 is 24°C, 1.2 is 25°C and 2 is 30°C, linear between. Neighbouring temperate biomes therefore agree, whichever mod adds them. The daily swing is ±(3 + 4 × (1 − rainfall)) °C from the biome's own rainfall value, so dry land swings further than wet woods. Biomes tagged as oceans or beaches swing ±3°C; caves have no daily swing. The game gives every ocean the same index, so oceans alone are named by their water.
+**Terrain Diffusion worlds** take the mean from the generator's own climate: its air at sea level, smooth across the land on a 32-block lattice, cooled 6.5°C for every kilometre of the world's height above sea level (Y63). At world scale 4 a block of height is 7.5 m, so air cools 0.049°C per block, on raised mountains, in valleys and in the air above the ground alike: climbing is steadily colder and neighbouring biomes no longer step. Biomes still set each place's daily swing and rain response. The server fetches that air for each 256-block region off the server thread when its chunks load; until it arrives, heat there is off, as in an unloaded chunk.
+
+**Other worlds** take the mean from the biome. A biome's game temperature is a gameplay index, not an air temperature, so one curve turns it into a mean for every biome from any mod: index −1 is −22°C, 0 is −10°C, every temperate index from 0.25 to 0.8 shares 12°C, 0.95 is 24°C, 1.2 is 25°C and 2 is 30°C, linear between. Neighbouring temperate biomes therefore agree, whichever mod adds them. The daily swing is ±(3 + 4 × (1 − rainfall)) °C from the biome's own rainfall value, so dry land swings further than wet woods. Biomes tagged as oceans or beaches swing ±3°C; caves have no daily swing. The game gives every ocean the same index, so oceans alone are named by their water.
 
 | Climate | Clear-weather daily high / dawn low at Y=64 |
 | --- | --- |
@@ -33,7 +35,7 @@ A biome's game temperature is a gameplay index, not an air temperature, so one c
 | Beaches | Their index's mean, ±3°C |
 | Caves | Their index's mean with no daily or rain change: lush, dripstone and deep dark caves are 12°C |
 
-Rain moves the district baseline toward 6°C cooler over five real minutes and recovers over forty minutes after it stops; the response is full on land, 50% on oceans and beaches and zero in caves. Above Y=80 air cools 0.045°C per block. Time commands and sleeping select the climate of the resulting world time.
+Rain moves the district baseline toward 6°C cooler over five real minutes and recovers over forty minutes after it stops; the response is full on land, 50% on oceans and beaches and zero in caves. On other worlds air cools 0.045°C per block above Y=80. Time commands and sleeping select the climate of the resulting world time.
 
 ## Thermal field
 

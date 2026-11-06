@@ -55,6 +55,7 @@ public final class ThermalRules {
     public static final double EXPOSED_BUOYANT_RISE = .16; // Open-to-sky columns carry a stronger rising plume.
     public static final double COMFORT_CENTER_C = (70-32)/1.8;
     private static final double COMFORT_SPREAD_C = 8/1.8;
+    /** Mean air, daily swing and rain response; a biome's profile gives its mean at the biome reference height. */
     public record Climate(double meanC, double dailySwingC, double rainFactor) {}
     // A biome's game temperature is an index, not degrees. One curve turns it into mean air, so every
     // biome of any mod with the same index shares a climate; all temperate land lies on one 12 C band.
@@ -81,9 +82,9 @@ public final class ThermalRules {
     public static double temperaturePhase(long dayTime){
         return DailyTemperatureCycle.phase(dayTime);
     }
-    public static double climate(Climate profile,int height,double daylight,double rainCooling){
-        return profile.meanC+profile.dailySwingC*daylight-Math.max(0,height-80)*.045
-                -RAIN_COOLING_C*profile.rainFactor*rainCooling;
+    /** A position's air for the time of day and its district's rain; its mean already includes its height. */
+    public static double climate(Climate profile,double daylight,double rainCooling){
+        return profile.meanC+profile.dailySwingC*daylight-RAIN_COOLING_C*profile.rainFactor*rainCooling;
     }
     /** Shared interface rate for the thermal solver and the survey helmet's flow estimate. */
     public static double exchangeRate(boolean fromAir, boolean toAir, Direction direction, double from, double to,

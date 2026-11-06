@@ -240,7 +240,7 @@ Progression expands the quantities, distances and areas a player handles: person
 
 One environmental temperature field connects buildings, machines and people.
 
-- Climate, altitude, weather and time set ambient air, with a mid-afternoon peak, warm evenings and a dawn low.
+- Climate, altitude, weather and time set ambient air, with a mid-afternoon peak, warm evenings and a dawn low. On Terrain Diffusion worlds the generator's own sea-level air cools 6.5°C per kilometre of the world's height, so climbing is steadily colder and biome borders do not step; biomes set the daily swing and rain response.
 - Blocks slow heat without stopping it; glass and doors pass more, openings more again. Wood insulates, masonry stores, air mixes. Heat eventually escapes.
 - Burning machines heat their shell and exhaust, warming nearby air; enclosure and insulation still matter. Torches give modest heat, campfires more, lava much more. Passive exchange conserves heat and never invents hotspots.
 - **Comfort.** Players feel the air around them blended with the warmth or chill of what they can see — fires, lava, warm or cold walls, the sun and a sky that is colder when clear — with a short delay; walls and roofs block it. Clothing pulls felt temperature toward skin temperature: leather insulates most and padded metal armor somewhat less, enough to matter as much as shelter in the cold, so it warms the cold and adds to warm weather. Comfort peaks at 70°F, lowering calorie costs and speeding work, with a smaller movement benefit. Ordinary daylight is mildly cool, so shelter helps; hot biomes are their own challenge. Cold adds a capped passive calorie cost, never damage.
@@ -251,7 +251,6 @@ One environmental temperature field connects buildings, machines and people.
 - Architecture matters through physical relationships — shelter, heat, access, scale — not room types or proximity bonuses; outdoor life stays viable.
 
 **Open**
-- Elevation (proposal): air cools 0.045°C per block above Y80 on top of the biome, but Terrain Diffusion already picks colder biomes for higher model ground, so high country is cooled twice. Reading the fork's own air temperature per column (its model climate cooled 6.5°C/km for the raised ground) would give continuous cooling with height and no biome steps.
 - Cadence (owner direction, still a proposal): about one update per second where changing, two to five seconds where settled, sleeping when negligible. Unverified targets: under 2 ms per tick and at most 3 s behind at 200 players.
 - Heat transport, greenhouses, internal machine temperatures, radiant exchange between blocks and oxygen-limited burning.
 - Architecture proposals: workshops warming homes, greenhouses on waste heat, ventilated engine rooms; heat aboard moving vessels.

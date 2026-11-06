@@ -63,10 +63,10 @@ final class ThermalExposure {
         return SIGMA * kelvin * kelvin * kelvin * kelvin;
     }
 
-    /** What the body sees, or the air alone where its surroundings are not all loaded. */
+    /** What the body sees, or the air alone where its surroundings are not all loaded with their air. */
     static Exposure sample(ServerLevel level, ThermalField field, Vec3 torso, double air, Sky sky) {
         double reach = ThermalRules.RADIANT_REACH;
-        if (!Chunks.loadedAround(level, torso, reach)) return new Exposure(air, 0);
+        if (!Chunks.loadedAround(level, torso, reach) || !AirClimate.readyAround(level, torso, reach)) return new Exposure(air, 0);
         // A clear sky is far colder than the air and glows with scattered sunlight by day; cloud radiates near air.
         double kelvin = air + KELVIN, clear = .0552 * Math.pow(kelvin, 1.5) - KELVIN;
         double skyPower = (1 - sky.cloud) * (emission(clear) + ThermalRules.SKY_DIFFUSE * Math.max(0, sky.sun.y))
