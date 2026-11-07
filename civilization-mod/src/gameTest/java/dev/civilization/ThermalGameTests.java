@@ -654,10 +654,16 @@ public final class ThermalGameTests {
             h.assertTrue(ThermalRules.climate(cave,1,1)==ThermalRules.climate(cave,-1,0),
                     "Caves ignore the surface day cycle and regional rain: "+k.location());
         }
-        h.assertTrue(ThermalRules.playerTemperature(10,30,2)<12.5&&ThermalRules.playerTemperature(30,10,2)>27.5,
-                "Passing a fire or stepping briefly outside barely moves body temperature");
-        h.assertTrue(ThermalRules.playerTemperature(10,30,60)>29&&ThermalRules.playerTemperature(30,10,60)<11,
-                "Staying put settles within about a minute, warming or cooling");
+        // Share of a gap in °F that a body warming from 0 °C covers in the given seconds.
+        java.util.function.DoubleBinaryOperator covered=(gapF,seconds)->ThermalRules.playerTemperature(0,gapF/1.8,seconds)/(gapF/1.8);
+        h.assertTrue(covered.applyAsDouble(5,10)<1/3d&&covered.applyAsDouble(30,2)<.2,
+                "A mild breeze drifts slowly and passing a fire barely moves body temperature");
+        h.assertTrue(covered.applyAsDouble(150,4)>.5&&covered.applyAsDouble(100,5)>.5&&covered.applyAsDouble(5,5)<.2,
+                "Extreme gaps close within seconds, far faster than mild ones");
+        h.assertTrue(Math.abs(ThermalRules.playerTemperature(30,10,4)-10-(10-ThermalRules.playerTemperature(-10,10,4)))<1e-9,
+                "Warming and cooling follow the same curve");
+        h.assertTrue(Math.abs(ThermalRules.playerTemperature(10,30,120)-30)<.5&&ThermalRules.playerTemperature(0,100,1000)<=100,
+                "Staying put settles without overshooting");
         h.assertTrue(ThermalRules.coldKcalPerSecond(18,.2)==0&&Math.abs(ThermalRules.coldKcalPerSecond(10,.2)-.05)<1e-9,"Cold drain begins below the comfort threshold and rises gently");
         h.assertTrue(ThermalRules.coldKcalPerSecond(2,.2)==.2&&ThermalRules.coldKcalPerSecond(-20,.2)==.2&&ThermalRules.coldKcalPerSecond(30,.2)==0,"Severe cold is capped and heat is not charged as cold");
         h.assertTrue(ThermalRules.calorieFactor(1)==.8,"Maximum twenty percent work calorie saving");
