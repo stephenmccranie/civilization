@@ -31,9 +31,10 @@ public final class ThermalRules {
     public static final double RAIN_COOLING_TICKS = 6000; // Five real minutes to approach wet equilibrium.
     public static final double RAIN_RECOVERY_TICKS = 48000; // Forty-minute thermal recovery after rain.
     public static final double MACHINE_TOP_SHARE = .80;
-    public static final double PLAYER_RESPONSE_SECONDS = 2.5;
+    // A body settles toward what it feels within about a minute (95% after 60 s); a two-second pass moves it a tenth.
+    public static final double PLAYER_RESPONSE_SECONDS = 20;
     // Felt temperature blends torso air with the mean radiant temperature of what a body sees.
-    public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8, MAX_RADIANT_C = 100;
+    public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8;
     // Radiant output as bodies feel it, softened over about a block. Tuning, not SI.
     public static final double FLAME_RADIANCE = 30000, TORCH_RADIANCE = 3000, LAVA_RADIANCE = 60000;
     // Climate temperatures are shade air; direct sun is felt on top. A body absorbs about an eighth of the sun's beam

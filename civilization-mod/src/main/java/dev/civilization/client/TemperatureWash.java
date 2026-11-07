@@ -2,7 +2,7 @@ package dev.civilization.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.civilization.TemperatureWashConfig;
-import dev.civilization.ThermalRules;
+import dev.civilization.ThermalDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
@@ -40,8 +40,6 @@ public final class TemperatureWash {
     private static final Tone ICE_EDGE = new Tone(214, 236, 255, .40);
     private static final Tone EMBER_EDGE = new Tone(255, 104, 24, .55);
     private static final ResourceLocation FROST = ResourceLocation.withDefaultNamespace("textures/misc/powder_snow_outline.png");
-    /** Every effect is at full strength this far from comfort: 36°F and 104°F felt. */
-    private static final double FULL_STRAIN_C = 19;
 
     private static Level lastWorld;
     private static long lastFrameNanos;
@@ -89,7 +87,7 @@ public final class TemperatureWash {
         var sample = ThermalVision.current();
         boolean active = TemperatureWashConfig.ENABLED.get()
                 && sample != null && sample.supported() && Float.isFinite(sample.playerTemperature());
-        double desired = active ? Math.clamp((sample.playerTemperature() - ThermalRules.COMFORT_CENTER_C) / FULL_STRAIN_C, -1, 1) : 0;
+        double desired = active ? ThermalDisplay.strain(sample.playerTemperature()) : 0;
         long now = System.nanoTime();
         double elapsed = lastFrameNanos == 0 ? 0 : Math.clamp((now - lastFrameNanos) / 1_000_000_000.0, 0, .25);
         lastFrameNanos = now;
@@ -109,7 +107,7 @@ public final class TemperatureWash {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
         advance();
-        int color = between(COMFORT, strain < 0 ? COLD : HOT, 2 * Math.abs(strain)).argb(presence);
+        int color = between(COMFORT, strain < 0 ? COLD : HOT, Math.abs(strain)).argb(presence);
         if (color >>> 24 == 0) return;
         graphics.flush();
         graphics.pose().pushPose();

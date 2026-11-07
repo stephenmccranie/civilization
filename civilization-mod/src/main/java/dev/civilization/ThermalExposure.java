@@ -1,8 +1,11 @@
 package dev.civilization;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongArrays;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
@@ -76,7 +79,7 @@ final class ThermalExposure {
         power += emitters(level, torso);
         double sunlight = sunlit(level, torso, sky.sun) ? 1 - sky.cover : 0;
         power += ThermalRules.SUN_ABSORBED * ThermalRules.directSun(sky.sun.y) * sunlight;
-        return new Exposure(Math.min(Math.pow(power / SIGMA, .25) - KELVIN, ThermalRules.MAX_RADIANT_C), sunlight);
+        return new Exposure(Math.pow(power / SIGMA, .25) - KELVIN, sunlight);
     }
 
     private static boolean opaque(ServerLevel level, BlockPos pos, BlockState state) {
@@ -99,16 +102,38 @@ final class ThermalExposure {
         });
     }
 
-    /** Absorbed flux from the flames and lava surfaces with a clear line to the torso, nearest first. */
+    /**
+     * Absorbed flux from the flames and lava surfaces with a clear line to the torso, nearest first. Sources are read
+     * from the loaded sections within reach, skipping any section whose palette holds none.
+     */
     private static double emitters(ServerLevel level, Vec3 torso) {
+        double reach = ThermalRules.RADIANT_REACH;
+        int x0 = Mth.floor(torso.x - reach), y0 = Mth.floor(torso.y - reach), z0 = Mth.floor(torso.z - reach);
+        int x1 = Mth.floor(torso.x + reach), y1 = Mth.floor(torso.y + reach), z1 = Mth.floor(torso.z + reach);
+        var found = new LongArrayList();
+        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
+            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) {
+                var chunk = Chunks.chunk(level, cx, cz);
+                for (int cy = Math.max(y0, level.getMinBuildHeight()) >> 4; cy <= Math.min(y1, level.getMaxBuildHeight() - 1) >> 4; cy++) {
+                    var section = chunk.getSection(chunk.getSectionIndexFromSectionY(cy));
+                    if (section.hasOnlyAir() || !section.maybeHas(BlockHeatSources::source)) continue;
+                    for (int x = Math.max(x0, cx << 4); x <= Math.min(x1, (cx << 4) + 15); x++)
+                        for (int y = Math.max(y0, cy << 4); y <= Math.min(y1, (cy << 4) + 15); y++)
+                            for (int z = Math.max(z0, cz << 4); z <= Math.min(z1, (cz << 4) + 15); z++)
+                                if (BlockHeatSources.source(section.getBlockState(x & 15, y & 15, z & 15))
+                                        && torso.distanceToSqr(x + .5, y + .5, z + .5) <= reach * reach)
+                                    found.add(BlockPos.asLong(x, y, z));
+                }
+            }
+        var keys = found.toLongArray();
+        LongArrays.quickSort(keys, (a, b) -> Double.compare(torso.distanceToSqr(Vec3.atCenterOf(BlockPos.of(a))),
+                torso.distanceToSqr(Vec3.atCenterOf(BlockPos.of(b)))));
         double power = 0;
         int seen = 0;
-        for (long key : BlockHeatSources.near(level, torso, ThermalRules.RADIANT_REACH)) {
+        for (long key : keys) {
             if (seen == MAX_EMITTERS) break;
             var pos = BlockPos.of(key);
             var state = level.getBlockState(pos);
-            double radiance = BlockHeatSources.radiance(state);
-            if (radiance == 0) continue;
             boolean lava = state.getFluidState().is(FluidTags.LAVA);
             // A lava pool shines from its surface; lava beneath more lava is hidden.
             if (lava && level.getFluidState(pos.above()).is(FluidTags.LAVA)) continue;
@@ -117,7 +142,7 @@ final class ThermalExposure {
             var sight = level.clip(new ClipContext(from, torso, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, CollisionContext.empty()));
             if (sight.getType() != HitResult.Type.MISS) continue;
             // Flux softened over about a block, since a fire is not a point; a body absorbs a quarter of it per area.
-            power += radiance / (4 * Math.PI * (from.distanceToSqr(torso) + 1)) / 4;
+            power += BlockHeatSources.radiance(state) / (4 * Math.PI * (from.distanceToSqr(torso) + 1)) / 4;
         }
         return power;
     }
