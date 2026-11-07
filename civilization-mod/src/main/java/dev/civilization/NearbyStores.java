@@ -84,15 +84,15 @@ public final class NearbyStores implements CargoInventory {
     }
     /**
      * Stacks what it can of the goods onto the nearest stores with room, taking it from the stack, and says on the action
-     * bar where it went; whether any went.
+     * bar where it went and how many that store now holds, so repeated crafts read as a running total; whether any went.
      */
     public boolean store(ItemStack goods){
-        refresh();var name=goods.getHoverName();boolean any=false;
+        refresh();var kind=goods.copyWithCount(1);boolean any=false;
         for(var s:seen)if(!goods.isEmpty()){
             int n=(int)s.cargo.insert(goods,goods.getCount());if(n==0)continue;
             goods.shrink(n);any=true;
-            player.displayClientMessage(Component.literal("Stacked "+n+" ").append(name).append(" onto the ").append(s.holder.cargoName())
-                    .append(" · "+CargoInventory.blocks(s.cargo.load(),s.cargo.capacity())),true);
+            player.displayClientMessage(Component.literal("Stacked ").append(kind.getHoverName()).append(" onto the ").append(s.holder.cargoName())
+                    .append(": "+s.cargo.count(s.cargo.indexOf(kind))+" there · "+CargoInventory.blocks(s.cargo.load(),s.cargo.capacity())),true);
         }
         refresh();return any;
     }
