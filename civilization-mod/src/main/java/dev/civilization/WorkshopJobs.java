@@ -95,10 +95,13 @@ public final class WorkshopJobs {
         int count=Math.max(1,(int)Math.ceil(e.amount()*.5*stack.getDamageValue()/stack.getMaxDamage()));
         var result=stack.copy();EquipmentGrade.apply(result,repairedGrade);result.setDamageValue(0);
         result.remove(DataComponents.REPAIR_COST);
-        Item material=e.material()==Items.IRON_INGOT||e.material()==Items.GOLD_INGOT?ManufacturingContent.part(ManufacturingJobs.metal(e.material()),"plate"):e.material();
-        Item fitting=e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;
-        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material,count),need(fitting,1),empty()),200);
+        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material(e),count),need(fitting(e),1),empty()),200);
     }
+    /** A repair's primary stock: Plates for iron and gold, otherwise the equipment's own material. */
+    private static Item material(Equipment e){return e.material()==Items.IRON_INGOT||e.material()==Items.GOLD_INGOT?ManufacturingContent.part(ManufacturingJobs.metal(e.material()),"plate"):e.material();}
+    private static Item fitting(Equipment e){return e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;}
+    /** Stock some repair draws, which a bench set to Repair takes before or after the damaged equipment. */
+    public static boolean repairStock(ItemStack s){equipmentJobs();return EQUIPMENT.values().stream().anyMatch(e->s.is(material(e))||s.is(fitting(e)));}
     /**
      * The output of a matched job. A repair is fully quoted and an upgrade keeps the item it upgrades; any other
      * graded output takes the mean grade of the graded units it consumes, the top units of each input stack.

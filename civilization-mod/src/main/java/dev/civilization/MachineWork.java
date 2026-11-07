@@ -40,9 +40,9 @@ public final class MachineWork {
         for(int i=0;i<4;i++){var stack=c.getItem(i);if(!stack.isEmpty()&&taken[i]==0&&job.needs().stream().noneMatch(n->n.count()>0&&n.ingredient().test(stack)))return null;}
         return new Match(job,taken,first);
     }
-    /** Inputs any candidate job uses; on the Assembly Bench's Automatic or Repair, also damaged equipment to repair. */
+    /** Inputs any candidate job uses; on the Assembly Bench's Automatic or Repair, also damaged equipment and repair stock, in either order. */
     public static boolean accepts(Container c,int kind,int selection,ItemStack s){
-        if(kind==ManufacturingJobs.BENCH&&WorkshopJobs.gated(s)&&s.isDamaged()&&selection<=0)return true;
+        if(kind==ManufacturingJobs.BENCH&&selection<=0&&(WorkshopJobs.gated(s)&&s.isDamaged()||WorkshopJobs.repairStock(s)))return true;
         return candidates(c,kind,selection).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(s)));
     }
 }

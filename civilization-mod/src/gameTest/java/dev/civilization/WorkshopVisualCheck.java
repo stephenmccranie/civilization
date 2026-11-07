@@ -70,6 +70,14 @@ final class WorkshopVisualCheck {
         if(ticks==330){if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.selection()!=WorkshopJobs.index(3,"minecraft:diamond_pickaxe"))throw new IllegalStateException("Filtered recipe selection did not synchronize");shot(mc,"search");}
         if(ticks==332){click(mc,"Armor");click(mc,"Netherite");var field=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.EditBox).map(c->(net.minecraft.client.gui.components.EditBox)c).findFirst().orElseThrow();field.setValue("");}
         if(ticks==337){click(mc,"Netherite Helmet (upgrade)");shot(mc,"upgrade");}
+        if(ticks==338){
+            click(mc,"All materials");click(mc,"Machines");
+            int bottom=(mc.getWindow().getGuiScaledHeight()+214)/2;
+            for(var c:ManufacturingJobs.Category.values()){var tab=mc.screen.children().stream().filter(w->w instanceof net.minecraft.client.gui.components.Button b&&b.visible&&b.getMessage().getString().equals(c.label)).map(w->(net.minecraft.client.gui.components.Button)w).findFirst().orElseThrow(()->new IllegalStateException("Missing tab: "+c.label));
+                if(tab.getBottom()>bottom)throw new IllegalStateException("Tab "+c.label+" runs below the cabinet");}
+            if(recipeRows(mc).stream().noneMatch(r->r.visible&&r.getMessage().getString().equals("Hot-Bulb Engine")))throw new IllegalStateException("Machines tab lacks the Hot-Bulb Engine");
+        }
+        if(ticks==339)shot(mc,"tabs");
         if(ticks==340){
             click(mc,"All");click(mc,"All materials");mc.screen.mouseScrolled(100,150,0,-1);
             shot(mc,"scroll");

@@ -63,11 +63,16 @@ public abstract class MachineScreen<M extends AbstractContainerMenu> extends Abs
         search=addRenderableWidget(new EditBox(font,drawerX+27,topPos+16,drawerWidth-39,12,Component.literal("Search recipes")));
         search.setBordered(false);search.setTextColor(0xffb9b6aa);search.setMaxLength(64);search.setHint(Component.literal("Search...").withStyle(style->style.withColor(0x85877e)));search.setValue(query);
         search.setResponder(s->{offset=0;updateDrawer();});
-        for(String key:List.of("Tools","Weapons","Armor","Components"))if(catalog.stream().anyMatch(r->r.category().equals(key)))categoryKeys.add(key);
-        if(categoryKeys.size()>1){categoryKeys.addFirst("All");for(int i=0;i<categoryKeys.size();i++){
-            String key=categoryKeys.get(i);Item icon=switch(key){case "Tools"->Items.IRON_PICKAXE;case "Weapons"->Items.IRON_SWORD;case "Armor"->Items.IRON_CHESTPLATE;case "Components"->dev.civilization.KilnContent.MACHINE_PARTS.get();default->Items.AIR;};
-            var b=button(drawerX-23,topPos+28+i*24,22,22,false,key,new ItemStack(icon),()->{category=key;offset=0;updateDrawer();});b.dark=true;if(icon==Items.AIR)b.symbol="all";categories.add(b);
-        }}else categoryKeys.clear();
+        var icons=new HashMap<String,ItemStack>();
+        for(var c:dev.civilization.ManufacturingJobs.Category.values())if(catalog.stream().anyMatch(r->r.category().equals(c.label))){categoryKeys.add(c.label);icons.put(c.label,new ItemStack(c.icon));}
+        if(categoryKeys.size()>1){categoryKeys.addFirst("All");
+            // Tabs shrink from 22 pixels so every one fits beside the cabinet.
+            int step=Math.min(24,(imageHeight-32)/categoryKeys.size()),size=step-2;
+            for(int i=0;i<categoryKeys.size();i++){
+                String key=categoryKeys.get(i);
+                var b=button(drawerX-1-size,topPos+28+i*step,size,size,false,key,icons.getOrDefault(key,ItemStack.EMPTY),()->{category=key;offset=0;updateDrawer();});b.dark=true;if(key.equals("All"))b.symbol="all";categories.add(b);
+            }
+        }else categoryKeys.clear();
         for(Item key:List.of(Items.IRON_INGOT,Items.GOLD_INGOT,Items.DIAMOND,Items.NETHERITE_INGOT))if(catalog.stream().anyMatch(r->r.material()==key))materialKeys.add(key);
         if(materialKeys.size()>1){materialKeys.addFirst(Items.AIR);for(int i=0;i<materialKeys.size();i++){
             Item key=materialKeys.get(i);var b=button(drawerX+9+i*20,topPos+35,18,18,false,materialName(key),new ItemStack(key),()->{material=key;offset=0;updateDrawer();});if(key==Items.AIR)b.symbol="all";materials.add(b);

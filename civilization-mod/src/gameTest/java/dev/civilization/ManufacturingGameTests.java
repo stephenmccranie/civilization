@@ -84,6 +84,17 @@ public final class ManufacturingGameTests {
         var out=w.getItem(5);h.assertTrue(out.getDamageValue()==0&&Grade.value(out)<800&&EquipmentGrade.wearSeed(out)==123&&out.getHoverName().getString().equals("Kept"),"Repair preserves identity and lowers grade");
         h.assertTrue(w.getItem(0).is(Items.IRON_PICKAXE)&&w.getItem(3).isEmpty(),"Only the damaged item was consumed");h.succeed();
     }
+    @GameTest(template="industrial") public static void benchDrawerTabsSortEveryOutput(GameTestHelper h){
+        var tabs=new EnumMap<ManufacturingJobs.Category,List<String>>(ManufacturingJobs.Category.class);
+        for(var job:WorkshopJobs.jobs(3))if(!job.output().isEmpty())tabs.computeIfAbsent(ManufacturingJobs.category(job.output()),c->new ArrayList<>()).add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(job.output().getItem()).getPath());
+        h.assertTrue(tabs.keySet().equals(EnumSet.allOf(ManufacturingJobs.Category.class)),"Every tab has recipes: "+tabs.keySet());
+        h.assertTrue(new HashSet<>(tabs.get(ManufacturingJobs.Category.COMPONENTS)).equals(Set.of("tool_handle","wooden_wheel","machine_parts","industrial_casing","engine_cylinder","engine_flywheel","cooling_grille","refinery_flue","refinery_port")),
+                "Components holds only parts, so a new output must be given its tab: "+tabs.get(ManufacturingJobs.Category.COMPONENTS));
+        for(var expected:Map.of("oak_door",ManufacturingJobs.Category.BUILDING,"iron_bars",ManufacturingJobs.Category.BUILDING,"rail",ManufacturingJobs.Category.TRANSPORT,"wheelbarrow",ManufacturingJobs.Category.TRANSPORT,
+                "chest",ManufacturingJobs.Category.STORAGE,"coal_bunker",ManufacturingJobs.Category.STORAGE,"oil_engine",ManufacturingJobs.Category.MACHINES,"builders_line",ManufacturingJobs.Category.TOOLS,"shield",ManufacturingJobs.Category.ARMOR,"netherite_sword",ManufacturingJobs.Category.WEAPONS).entrySet())
+            h.assertTrue(tabs.get(expected.getValue()).contains(expected.getKey()),expected.getKey()+" is under "+expected.getValue().label);
+        h.succeed();
+    }
     @GameTest(template="industrial") public static void tableBypassesRetiredAndBootstrapRemains(GameTestHelper h){
         var manager=h.getLevel().getRecipeManager();
         for(String id:List.of("civilization:machine_parts","civilization:empty_canister","civilization:oil_pump","civilization:engine_cylinder","civilization:coal_minecart","minecraft:oak_door","minecraft:minecart","minecraft:rail"))
@@ -109,6 +120,36 @@ public final class ManufacturingGameTests {
     }
     @GameTest(template="industrial") public static void eachForgedPartHasAnActualCustomer(GameTestHelper h){
         for(var forged:WorkshopJobs.jobs(2))h.assertTrue(WorkshopJobs.jobs(3).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(forged.output()))),"Forged part earns a stock slot: "+forged.id());h.succeed();
+    }
+    /** A player's repair at the bench by real menu clicks: inputs shift-clicked from the inventory in `order`, Work pressed, the output shift-clicked back. */
+    static ItemStack repairByMenu(GameTestHelper h,WorkshopBlockEntity w,int selection,ItemStack damaged,List<String> order){
+        var p=operator(w);var menu=(WorkshopMenu)p.containerMenu;var inv=p.getInventory();
+        inv.clearContent();var quote=WorkshopJobs.repair(damaged);h.assertTrue(quote!=null,"Damaged gear has a repair quote: "+damaged);
+        var stock=Map.of("gear",damaged.copy(),"material",quote.needs().get(1).icon().copyWithCount(quote.needs().get(1).count()+5),"fitting",quote.needs().get(2).icon().copyWithCount(3));
+        h.assertTrue(menu.clickMenuButton(p,selection),"Selection is accepted");
+        int slot=9;for(String key:order){inv.setItem(slot,stock.get(key).copy());menu.clicked(slot-1,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,p);
+            h.assertTrue(inv.getItem(slot).isEmpty(),"Shift-click moves the "+key+" into the bench");slot++;}
+        var job=menu.job();h.assertTrue(job!=null&&job.name().equals("Repair"),"The bench quotes a repair");
+        h.assertTrue(menu.clickMenuButton(p,WorkshopBlockEntity.WORK_BUTTON),"Work starts");
+        for(int t=0;t<job.ticks();t+=10)w.process();
+        var out=w.getItem(5).copy();h.assertTrue(!out.isEmpty(),"Repair finished: status "+w.status+", progress "+w.progress);
+        int material=0,fitting=0;for(int i=0;i<4;i++){var s=w.getItem(i);if(s.is(quote.needs().get(1).icon().getItem()))material+=s.getCount();else if(s.is(quote.needs().get(2).icon().getItem()))fitting+=s.getCount();else h.assertTrue(s.isEmpty(),"Only leftover stock remains: "+s);}
+        h.assertTrue(material==5&&fitting==2,"The repair consumed exactly its quote: "+material+" material and "+fitting+" fittings left");
+        menu.clicked(5,0,net.minecraft.world.inventory.ClickType.QUICK_MOVE,p);
+        h.assertTrue(w.getItem(5).isEmpty()&&inv.contains(s->ItemStack.matches(s,out)),"The repaired item shift-clicks back to the player");
+        w.clearContent();return out;
+    }
+    @GameTest(template="industrial") public static void playersRepairToolsAndArmorThroughTheBenchMenu(GameTestHelper h){
+        var w=WorkshopGameTests.build(h,3,Direction.NORTH);
+        for(var item:List.of(Items.IRON_PICKAXE,Items.IRON_SWORD,Items.IRON_CHESTPLATE,Items.CHAINMAIL_BOOTS,Items.GOLDEN_HELMET,Items.DIAMOND_AXE,Items.SHIELD,Items.SHEARS,CoalMiningContent.PICK.get()))
+            for(var order:List.of(List.of("gear","material","fitting"),List.of("material","fitting","gear")))
+                for(int selection:new int[]{0,-1}){
+                    var damaged=new ItemStack(item);EquipmentGrade.apply(damaged,820,99);damaged.setDamageValue(damaged.getMaxDamage()*3/5);
+                    int grade=EquipmentGrade.afterRepair(damaged);
+                    var out=repairByMenu(h,w,selection,damaged,order);
+                    h.assertTrue(out.is(item)&&out.getDamageValue()==0&&Grade.value(out)==grade&&EquipmentGrade.wearSeed(out)==99,"Repaired "+item+" at its quoted grade, selection "+selection+", order "+order);
+                }
+        h.succeed();
     }
     @GameTest(template="industrial") public static void legacyRepairInputReceivesStableIdentityBeforeWork(GameTestHelper h){
         var w=WorkshopGameTests.build(h,3,Direction.NORTH);var gear=new ItemStack(Items.IRON_PICKAXE);EquipmentGrade.apply(gear,800,123);gear.setDamageValue(100);w.setItem(0,gear);

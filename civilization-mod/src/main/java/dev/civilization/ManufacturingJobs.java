@@ -6,12 +6,35 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import static dev.civilization.WorkshopJobs.*;
 
 /** One authoritative catalog for powered forming and hand joining; no recursive recipe execution. */
 public final class ManufacturingJobs {
     private static List<Job> forging,assembly;
     public static final int BENCH=3;
+    /** The recipe drawer's tabs, in order, each with its icon. */
+    public enum Category {
+        TOOLS("Tools",Items.IRON_PICKAXE),WEAPONS("Weapons",Items.IRON_SWORD),ARMOR("Armor",Items.IRON_CHESTPLATE),COMPONENTS("Components",KilnContent.MACHINE_PARTS),
+        MACHINES("Machines",OilEngineContent.ENGINE),STORAGE("Storage",Items.CHEST),TRANSPORT("Transport",Items.MINECART),BUILDING("Building",Items.OAK_DOOR);
+        public final String label;public final ItemLike icon;
+        Category(String label,ItemLike icon){this.label=label;this.icon=icon;}
+    }
+    /** The tab a catalog output is browsed under. Equipment sorts by its kind; parts and stock are Components. */
+    public static Category category(ItemStack output){
+        var e=WorkshopJobs.equipment(output);
+        if(e!=null)return e.armor()||output.is(Items.SHIELD)?Category.ARMOR:output.getItem() instanceof SwordItem?Category.WEAPONS:Category.TOOLS;
+        if(output.is(ItemTags.DOORS)||output.is(ItemTags.TRAPDOORS)||output.is(ItemTags.FENCE_GATES))return Category.BUILDING;
+        if(output.is(ItemTags.RAILS))return Category.TRANSPORT;
+        return switch(BuiltInRegistries.ITEM.getKey(output.getItem()).getPath()){
+            case "builders_line","prospecting_rod","geiger_counter"->Category.TOOLS;
+            case "oil_engine","oil_pump","oil_refinery","coal_drill","distillation_column","condenser","fluid_pipe","coal_preparation_screen","land_controller","trade_counter","survey_table_section","gladiator_pit"->Category.MACHINES;
+            case "chest","barrel","backpack","empty_canister","fuel_tank","coal_bunker","cargo_tank"->Category.STORAGE;
+            case "wheelbarrow","minecart","coal_minecart","boat_helm"->Category.TRANSPORT;
+            case "iron_bars","industrial_guardrail"->Category.BUILDING;
+            default->Category.COMPONENTS;
+        };
+    }
     private static Need planks(int n){return new Need(Ingredient.of(ItemTags.PLANKS),n);}
     private static Need part(String metal,String form,int n){return need(ManufacturingContent.part(metal,form),n);}
     private static void add(List<Job> jobs,Item output,int count,int ticks,Need... input){
