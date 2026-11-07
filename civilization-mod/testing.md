@@ -56,7 +56,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
-| `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |
+| `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs; a shift-click crafting six logs onto a nearby Pallet past a full Hand, with the action bar naming it; an enchanting table keeping its book and lapis across reopening |
 | `chests` | Single and double chest menus with shift-click conservation |
 | `inventory` | Player inventory, equipment, offhand, pickup and recipe book; graded ingots dealt by a real mouse drag in the order crossed, and stone from the Pack swapped into a Hand holding torches |
 | `jei` | JEI categories, catalysts and recipe parity, and the **+** placing a crafting recipe through our own transfer handler (needs JEI in `run/mods`) |

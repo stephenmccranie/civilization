@@ -1,7 +1,6 @@
 package dev.civilization.mixin;
 
-import dev.civilization.SharedCraftingTables;
-import net.minecraft.server.level.ServerLevel;
+import dev.civilization.SharedTables;
 import net.minecraft.world.entity.player.*;
 import net.minecraft.world.inventory.*;
 import org.spongepowered.asm.mixin.*;
@@ -16,16 +15,15 @@ public abstract class SharedCraftingMenuMixin extends AbstractContainerMenu {
             at=@At(value="NEW",target="net/minecraft/world/inventory/TransientCraftingContainer"))
     private TransientCraftingContainer civilization$grid(AbstractContainerMenu menu,int width,int height,
             int id,Inventory inventory,ContainerLevelAccess access){
-        return access.evaluate((level,pos)->level instanceof ServerLevel server&&level.getBlockState(pos).is(net.minecraft.world.level.block.Blocks.CRAFTING_TABLE)
-                ? SharedCraftingTables.get(server).open(server,pos,menu,inventory.player)
-                : new TransientCraftingContainer(menu,width,height),new TransientCraftingContainer(menu,width,height));
+        var shared=SharedTables.open(access,SharedTables.Kind.CRAFTING,menu,inventory.player);
+        return shared!=null?shared:new TransientCraftingContainer(menu,width,height);
     }
     @Inject(method="<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at=@At("RETURN"))
     private void civilization$initial(int id,Inventory inventory,ContainerLevelAccess access,CallbackInfo ci){
-        if(craftSlots instanceof SharedCraftingTables.Grid)slotsChanged(craftSlots);
+        if(craftSlots instanceof SharedTables.Grid)slotsChanged(craftSlots);
     }
     @Inject(method="removed",at=@At("HEAD"),cancellable=true)
     private void civilization$keepInputs(Player player,CallbackInfo ci){
-        if(craftSlots instanceof SharedCraftingTables.Grid grid){grid.close();super.removed(player);ci.cancel();}
+        if(craftSlots instanceof SharedTables.Grid grid){grid.close();super.removed(player);ci.cancel();}
     }
 }

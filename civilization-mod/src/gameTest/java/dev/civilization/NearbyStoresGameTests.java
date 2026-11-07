@@ -86,6 +86,61 @@ public final class NearbyStoresGameTests {
         h.succeed();
     }
 
+    /** A crafting table beside the stores, opened with the Hand already full of cobblestone so crafted planks have nowhere on the player. */
+    private static CraftingMenu fullHandedCrafting(GameTestHelper h,ServerPlayer p,int logs){
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.COBBLESTONE,BlockCarry.LIMIT));
+        var at=h.absolutePos(new BlockPos(7,1,9));h.getLevel().setBlockAndUpdate(at,Blocks.CRAFTING_TABLE.defaultBlockState());
+        p.openMenu(new SimpleMenuProvider((id,inv,player)->new CraftingMenu(id,inv,ContainerLevelAccess.create(h.getLevel(),at)),Component.literal("Crafting")));
+        var menu=(CraftingMenu)p.containerMenu;menu.getSlot(1).set(new ItemStack(Items.OAK_LOG,logs));return menu;
+    }
+    private static int dropped(GameTestHelper h,ServerPlayer p,Item item){
+        return h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(4),e->e.getItem().is(item)).stream().mapToInt(e->e.getItem().getCount()).sum();
+    }
+
+    @GameTest(template="industrial") public static void bulkCraftingStacksWhatTheHandCannotHoldOntoTheNearestStore(GameTestHelper h){
+        var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.STONE),10);
+        var p=player(h);var menu=fullHandedCrafting(h,p,3);
+        menu.clicked(0,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(stored(pallet.cargo(),Items.OAK_PLANKS)==3&&menu.getSlot(1).getItem().isEmpty(),"Shift-clicking planks crafts all three logs onto the Pallet: "+stored(pallet.cargo(),Items.OAK_PLANKS));
+        h.assertTrue(p.getOffhandItem().is(Items.COBBLESTONE)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&dropped(h,p,Items.OAK_PLANKS)==0&&stored(pallet.cargo(),Items.STONE)==10,"The Hand and the Pallet's stone are untouched and nothing drops");
+        h.succeed();
+    }
+
+    @GameTest(template="industrial") public static void bulkCraftingStopsWhenEveryStoreIsFull(GameTestHelper h){
+        var pallet=pallet(h);var cargo=pallet.cargo();
+        cargo.insert(new ItemStack(Items.STONE),(long)(cargo.capacity()-cargo.load())-2);
+        var p=player(h);var menu=fullHandedCrafting(h,p,3);
+        menu.clicked(0,0,ClickType.QUICK_MOVE,p);
+        int stacked=(int)stored(cargo,Items.OAK_PLANKS),fell=dropped(h,p,Items.OAK_PLANKS),left=menu.getSlot(1).getItem().getCount();
+        h.assertTrue(stacked==2&&fell==0&&left==1,"Room for two planks crafts two logs and the third stays on the table: "+stacked+" stacked, "+fell+" dropped, "+left+" left");
+        h.succeed();
+    }
+
+    @GameTest(template="industrial") public static void bulkCraftingSkipsAStoreThePlayerMayNoLongerUse(GameTestHelper h){
+        var pallet=pallet(h);var p=player(h);var menu=fullHandedCrafting(h,p,2);menu.broadcastChanges();
+        var data=CivicData.get(h.getLevel().getServer());var c=new CivicData.Claim();
+        c.at=new CivicData.Address(h.getLevel().dimension().location().toString(),h.absolutePos(new BlockPos(5,1,5)));c.owner=new CivicData.Owner(UUID.randomUUID(),false);c.radius=2;c.height=32;c.upkeep=1;c.coalUnit=3600000;c.energy=360000000;c.lastUpdate=System.currentTimeMillis();data.claims.put(c.at,c);data.rebuildIndex();
+        try{
+            menu.clicked(0,0,ClickType.QUICK_MOVE,p);
+            h.assertTrue(stored(pallet.cargo(),Items.OAK_PLANKS)==0&&menu.getSlot(1).getItem().getCount()==2&&dropped(h,p,Items.OAK_PLANKS)==0,"A Pallet claimed after the menu opened takes no planks and no logs are spent");
+        }finally{data.claims.remove(c.at);data.rebuildIndex();}
+        h.succeed();
+    }
+
+    @GameTest(template="industrial") public static void bulkStonecuttingStacksOntoTheNearestStore(GameTestHelper h){
+        var pallet=pallet(h);var p=player(h);p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.COBBLESTONE,BlockCarry.LIMIT));
+        var at=h.absolutePos(new BlockPos(7,1,9));h.getLevel().setBlockAndUpdate(at,Blocks.STONECUTTER.defaultBlockState());
+        // Opened as the server opens it, less the initial sync: the stonecutter's recipe index is a data slot, which the stand-in connection cannot send.
+        var menu=new StonecutterMenu(1,p.getInventory(),ContainerLevelAccess.create(h.getLevel(),at));p.containerMenu=menu;
+        BlockCarry.attachMenu(menu,p.getInventory());NearbyStores.attach(menu,p);menu.getSlot(0).set(new ItemStack(Items.STONE,5));
+        int bricks=-1;var recipes=menu.getRecipes();
+        for(int i=0;i<recipes.size();i++)if(recipes.get(i).value().getResultItem(h.getLevel().registryAccess()).is(Items.STONE_BRICKS))bricks=i;
+        h.assertTrue(bricks>=0&&menu.clickMenuButton(p,bricks),"The stonecutter offers stone bricks");
+        menu.clicked(1,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(stored(pallet.cargo(),Items.STONE_BRICKS)==5&&menu.getSlot(0).getItem().isEmpty(),"Shift-clicking cuts all five stone into bricks on the Pallet: "+stored(pallet.cargo(),Items.STONE_BRICKS));
+        h.succeed();
+    }
+
     @GameTest(template="industrial") public static void craftingTakesTheItemItAsksForAfterTheListChanged(GameTestHelper h){
         var pallet=pallet(h);pallet.cargo().insert(new ItemStack(Items.OAK_PLANKS),4);pallet.cargo().insert(new ItemStack(Items.COBBLESTONE),4);
         var barrow=barrow(h);barrow.cargo().insert(new ItemStack(Items.STONE),1);

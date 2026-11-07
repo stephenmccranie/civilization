@@ -2,6 +2,7 @@ package dev.civilization;
 
 import java.util.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.*;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +21,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
  * whenever it changes; the client keeps the last list it received.
  */
 public final class NearbyStores implements CargoInventory {
-    private record Seen(CargoInventory cargo,long revision){}
+    private record Seen(CargoHolder holder,CargoInventory cargo,long revision){}
     private final Player player;
     private final List<CargoHolder> candidates;
     /** The store whose own menu this is, never listed beside itself. */
@@ -48,7 +49,7 @@ public final class NearbyStores implements CargoInventory {
     private void refresh(){
         var owned=own==null?null:own.cargo();var now=new ArrayList<Seen>();
         for(var store:candidates)if(store.cargoValid(player)){
-            var cargo=store.cargo();if(cargo!=owned&&now.stream().noneMatch(s->s.cargo==cargo))now.add(new Seen(cargo,cargo.revision()));
+            var cargo=store.cargo();if(cargo!=owned&&now.stream().noneMatch(s->s.cargo==cargo))now.add(new Seen(store,cargo,cargo.revision()));
         }
         if(now.equals(seen))return;
         seen=List.copyOf(now);stores=seen.size();
@@ -80,6 +81,20 @@ public final class NearbyStores implements CargoInventory {
         refresh();long moved=0;
         for(var s:seen)if(moved<offered)moved+=s.cargo.insert(item,offered-moved);
         refresh();return moved;
+    }
+    /**
+     * Stacks what it can of the goods onto the nearest stores with room, taking it from the stack, and says on the action
+     * bar where it went and how many that store now holds, so repeated crafts read as a running total; whether any went.
+     */
+    public boolean store(ItemStack goods){
+        refresh();var kind=goods.copyWithCount(1);boolean any=false;
+        for(var s:seen)if(!goods.isEmpty()){
+            int n=(int)s.cargo.insert(goods,goods.getCount());if(n==0)continue;
+            goods.shrink(n);any=true;
+            player.displayClientMessage(Component.literal("Stacked ").append(kind.getHoverName()).append(" onto the ").append(s.holder.cargoName())
+                    .append(": "+s.cargo.count(s.cargo.indexOf(kind))+" there · "+CargoInventory.blocks(s.cargo.load(),s.cargo.capacity())),true);
+        }
+        refresh();return any;
     }
     @Override public long remove(int index,long requested){
         refresh();return index<0||index>=entries.size()?0:take(entries.get(index).item(),requested);

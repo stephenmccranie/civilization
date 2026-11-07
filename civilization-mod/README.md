@@ -15,7 +15,7 @@ This folder holds the working mod. [Game rules](../design_direction.md) describe
 - [Cooking](cooking.md): Cooking Stove, Prototype Stove and Baking Oven.
 - [Heat](heat.md): climate, the thermal field, comfort and cold, and the Thermal Survey Helmet.
 - [Geography and weather](geography.md): farmland and woodland, tree felling, regional weather, crops and frontier uranium.
-- [Physical materials and cargo](physics.md): materials, inspectors, wheelbarrow, pallets, block carrying and the side column, the backpack, nearby stores and shared crafting tables.
+- [Physical materials and cargo](physics.md): materials, inspectors, wheelbarrow, pallets, block carrying and the side column, the backpack, nearby stores and shared crafting and enchanting tables.
 - [Vehicles](vehicle-physics.md): boats, the airship prototype and fast-flight integrations.
 - [Ownership and trade](ownership-trade.md): land claims, takeovers, whitelists, Trade Counters and the Survey Table.
 - [Gladiator Pit](gladiator-pit.md): the arena, knockout fights and wagers.
