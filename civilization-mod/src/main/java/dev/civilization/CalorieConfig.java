@@ -18,13 +18,13 @@ public final class CalorieConfig {
         CAPACITY = b.defineInRange("capacityKcal", 2400.0, 100.0, 100000.0);
         WALK = b.comment("Walking kcal per horizontal block, independent of speed; swimming includes vertical distance. Ascent is charged separately.")
                 .defineInRange("walkKcalPerBlock", 0.1, 0.001, 100.0);
-        ROW = b.comment("Controlling a paddled vanilla boat or chest boat costs this many kcal per horizontal block traveled; drifting and passengers cost nothing.")
-                .defineInRange("rowKcalPerBlock", 0.05, 0.0, 100.0);
+        ROW = b.comment("Controlling a paddled vanilla boat or chest boat costs this many kcal per horizontal block traveled, plus ascent when the boat climbs; drifting and passengers cost nothing.")
+                .defineInRange("rowKcalPerBlock", 0.2, 0.0, 100.0);
         ASCENT = b.comment("Additional kcal per block gained vertically, independent of gait, including the rise of a jump.")
                 .defineInRange("ascentKcalPerBlock", 1.0, 0.0, 100.0);
         SPRINT_MULTIPLIER = b.comment("Sprinting costs this many times the walking rate per block; road/effect speed does not change that rate.")
                 .defineInRange("sprintMultiplier", 3.0, 1.0, 20.0);
-        BREAK = b.defineInRange("breakKcal", 4.0, 0.0, 1000.0);
+        BREAK = b.defineInRange("breakKcal", 3.0, 0.0, 1000.0);
         LIGHT_BREAK = b.defineInRange("lightVegetationBreakKcal", 0.25, 0.0, 1000.0);
         HARVEST = b.defineInRange("cropHarvestKcal", 1.0, 0.0, 1000.0);
         PLANT = b.defineInRange("cropPlantKcal", 1.0, 0.0, 1000.0);

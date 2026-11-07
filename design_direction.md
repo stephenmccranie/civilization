@@ -49,7 +49,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 
 - One calorie reserve replaces hunger, saturation and exhaustion. Work, movement, healing and sleep have explicit costs; cut-piece placement scales with volume, and sleep pays for elapsed in-game time. No idle or offline drain; cold adds a bounded passive cost while an active Survival player is online.
 - On level ground, walking is 3.2 blocks/s and sprinting 4.6, with jumps scaled to match; sprint-jumping gives about 20% over sprinting. Sprinting costs three times walking per block, at a constant rate per gait. Ascent costs 1 kcal per vertical block, including the rise of a jump, which has no charge of its own; there is no descent refund.
-- Rowing a vanilla boat costs less per block than sprinting, and only for the paddling player.
+- Rowing a vanilla boat costs less per block than sprinting but is a real effort: sustained paddling at twice walking's rate per block, and a boat floating up a river step or rapid pays ascent like any climb. Only the paddling player pays.
 - **Street Pavers** — gray, muted red and brown long-paver brick, distinct from structural bricks — give 25% faster ground movement, including their slabs, stairs and cut pieces; ordinary bricks do not. No stored buff, airborne boost or calorie change.
 - At depletion, walking and basic actions work; mining slows, sprinting and natural healing stop. Starvation alone has a health floor. Hand-foraging is a slow recovery route. Death and relog never refill calories.
 - Death leaves everything carried in an owner-only recovery container near the death location, persisting through restarts. Respawn keeps calorie state.
@@ -64,6 +64,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 
 - Farming and uncooked food sustain a person without industrial fuel; river crops supply staple calories. Fishing and gathering add subsistence and variety while purchased provisions stay useful.
 - Livestock kills yield one meat portion, with no Looting bonus.
+- Raw meat and fish give about half their stove-cooked value or less, so the full starting reserve plus hunting, roasting and foraging carries a new player to a Cooking Stove without starving, while farming and cooking stay clearly better than foraging.
 - Future husbandry uses farm feed at breeding and production, with no animal-hunger simulation or livestock region.
 - Household cooking uses one coal-fired station; a campfire also roasts raw food, three times slower and for half the calories the stove adds. Cooking raises food value; packed provisions conserve calories; food tiers express convenience, density and luxury on one calorie scale.
 - **Tier 2 cooking** grows into a kitchen workshop of distinct multiblocks. Mastery is the player learning — no cooking XP — and pays off in higher-calorie meals and stronger work bonuses. Chopping is not a mastery mechanic.
@@ -77,6 +78,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Station proposals: preparation bench, cooking range (browning then simmering), oven (preheat, trays, a generous browned window), portioning bench (only if it earns a role); freely arranged, no room detection. Cues should work by colour or sound alone; no hidden quality rolls or perfect-state lamp. Recipe sets specialties; batch quality sets calories and bonus strength, capped by ingredient energy.
 - Husbandry products, domestic versus wild yields, feed-supported wool and hides, and any animal role in fertilizer.
 - Cheap foods such as berries must not undercut farmland.
+- **Proposal: spoiling and salting.** Raw meat and fish carry a spoil time, an absolute world game time stamped on the stack when it drops (about two in-game days); merged stacks keep the earlier time, so merging never extends life. Past it the stack becomes Spoiled Meat, a poor emergency food. Salting at a crafting table, raw meat plus Salt, makes Salted Meat that never spoils and cooks like the raw cut; Salt would come from boiling seawater in a pan over a fire or from a rock-salt deposit. The stack owns its deadline, so chests, stores, trade counters and death recovery carry it with no per-container code, and spoilage is settled only when a stack is shown, eaten, cooked, merged or moved: no ticking containers, world scans or loading. To decide: lifetimes, whether cooked food and crops spoil, the salt source, and whether cold air slows spoiling.
 
 ## Farming and weather
 
@@ -86,7 +88,7 @@ These are visual stages, not resource tiers. Precision, scale and command over e
 - Governed crops: wheat, carrots, potatoes, beetroot, melon and pumpkin stems, torchflowers and pitcher plants. Each later melon or pumpkin needs the full production interval. Sweet berry bushes ripen on the same clock and water reserve wherever they grow, a full interval per picking, with their native picking yield and no fertilizer.
 - **Fertilizer** raises yield, not speed: one non-stacking dose per cycle tripling harvest output after replanting material (wheat keeps its 1→3). Fortune and alternative paths cannot bypass yields. Mineral Fertilizer comes only from refinery sulfur plus gravel. Bone meal is disabled.
 - Trees grow anywhere suitable, substantially faster in woodland. Every other growable needs its own habitat policy rather than inheriting wheat rules.
-- **Basic felling.** Cutting a log of a natural tree drops every log of that tree at and above the cut, each as if broken by hand; the stump stays and leaves decay. Log buildings never fall. It answers the strongest playtest complaint, chopping one log at a time.
+- **Basic felling.** Cutting a log of a natural tree drops every log of that tree at and above the cut, each as if broken by hand; the stump stays and leaves decay. Log buildings never fall. It answers the strongest playtest complaint, chopping one log at a time. The cut takes longer for each log it will fell, a quarter of a log's breaking time per log, so a big tree is real work yet far quicker than chopping it log by log.
 - **Regional weather.** Weather runs in fixed 512×512-block districts — atmosphere, not claims — through one authoritative server query that natural rain, the Rain Caller and later towers all feed. Overworld only. Sleeping changes time, not weather.
 - Natural rain lasts 25–35 minutes. Clear spells end with a constant chance over time (mean 12 real hours) and no minimum or maximum, so back-to-back storms and multi-day droughts both happen. Rain only: no lightning, wind, floods or destructive storms; snow is not irrigation.
 - Crops and soil advance only while loaded; district schedules advance with server time; no offline catch-up or forced loading.

@@ -76,6 +76,25 @@ public final class TreeFellingGameTests {
         h.runAfterDelay(2, () -> { h.assertTrue(CalorieFoodData.of(p).broken == 5, "Each log costs ordinary breaking labor"); h.succeed(); });
     }
 
+    @GameTest(template = CUBE) public static void theCutTakesLongerForEveryLogItWillFell(GameTestHelper h) {
+        oak(h, 6, NATURAL); fill(h, Blocks.OAK_LOG.defaultBlockState(), 1, 1, 1, 1, 3, 1);
+        var p = player(h, GameType.SURVIVAL, new ItemStack(Items.IRON_AXE));
+        var trunk = h.absolutePos(new BlockPos(5, 2, 5)); var post = h.absolutePos(new BlockPos(1, 2, 1));
+        float alone = progress(h, p, trunk);
+        start(p, trunk);
+        h.assertTrue(Math.abs(progress(h, p, trunk) - alone / (1 + 4 * TreeFelling.LOG_SHARE)) < 1e-6, "Four logs above the cut double its time");
+        h.assertTrue(progress(h, p, post) == alone, "Only the started cut is slowed");
+        start(p, post);
+        h.assertTrue(progress(h, p, post) == alone && progress(h, p, trunk) == alone, "A post without foliage fells nothing and keeps its time");
+        start(p, h.absolutePos(new BlockPos(5, 6, 5)));
+        h.assertTrue(progress(h, p, h.absolutePos(new BlockPos(5, 6, 5))) == alone, "The top log fells nothing more");
+        h.succeed();
+    }
+    private static void start(FakePlayer p, BlockPos at) {
+        net.neoforged.neoforge.common.CommonHooks.onLeftClickBlock(p, at, net.minecraft.core.Direction.UP, net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK);
+    }
+    private static float progress(GameTestHelper h, FakePlayer p, BlockPos at) { return h.getLevel().getBlockState(at).getDestroyProgress(p, h.getLevel(), at); }
+
     @GameTest(template = CUBE) public static void branchesAboveTheCutFallButRootsBelowItStay(GameTestHelper h) {
         var log = Blocks.ACACIA_LOG.defaultBlockState(); var leaves = Blocks.ACACIA_LEAVES.defaultBlockState();
         fill(h, log, 5, 1, 5, 5, 3, 5);
