@@ -67,8 +67,7 @@ public final class CalorieFoodData extends FoodData {
         if (!active(player) || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying) return;
         double distance = MovementCost.distance(dx, dy, dz, player.isInWater(), player.onClimbable());
         boolean sprint = player.isSprinting();
-        double ascent = MovementCost.ascent(dx, dy, dz);
-        spendTravel(player,distance,ascent,sprint,sprint?"sprint":"walk",player.isInWater()?"swimming":player.onClimbable()?"climbing":"ground_or_air");
+        spendGait(player,distance,MovementCost.ascent(dx, dy, dz),sprint,sprint?"sprint":"walk",player.isInWater()?"swimming":player.onClimbable()?"climbing":"ground_or_air");
     }
 
     /** Sprinting, on foot or behind a wheelbarrow, needs the sprint minimum and no depletion; exempt players always may. */
@@ -77,13 +76,18 @@ public final class CalorieFoodData extends FoodData {
     /** The server carrier supplies actual handle displacement, including turning, at its gait. */
     public void pushWheelbarrow(Player player,double dx,double dy,double dz,boolean sprint){
         if(!active(player)||!(player.getVehicle() instanceof WheelbarrowEntity e)||e.getFirstPassenger()!=player)return;
-        spendTravel(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),sprint,"push_wheelbarrow","wheelbarrow");
+        spendGait(player,MovementCost.distance(dx,dy,dz,false,false),MovementCost.ascent(dx,dy,dz),sprint,"push_wheelbarrow","wheelbarrow");
     }
 
-    private void spendTravel(Player player,double distance,double ascent,boolean sprint,String action,String detail){
-        if (distance <= 0 && ascent <= 0) return;
+    private void spendGait(Player player,double distance,double ascent,boolean sprint,String action,String detail){
         if (sprint) sprintDistance += distance; else walkDistance += distance;
-        double cost = MovementCost.calories(distance, sprint, CalorieConfig.WALK.get(), CalorieConfig.SPRINT_MULTIPLIER.get()) * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
+        spendTravel(player,distance,ascent,MovementCost.calories(1, sprint, CalorieConfig.WALK.get(), CalorieConfig.SPRINT_MULTIPLIER.get()),action,detail);
+    }
+
+    /** Travel at {@code rate} kcal per block plus ascent, both eased by comfort and a meal. */
+    private void spendTravel(Player player,double distance,double ascent,double rate,String action,String detail){
+        if (distance <= 0 && ascent <= 0) return;
+        double cost = distance * rate * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
         double before = reserve.calories();
         travelSpent += reserve.spend(cost);
         EnergyLog.record(player, action, detail,
@@ -109,15 +113,10 @@ public final class CalorieFoodData extends FoodData {
         UUID id = boat.getUUID();
         if (id.equals(lastRowBoat) && lastRowPosition != null
                 && (boat.getPaddleState(Boat.PADDLE_LEFT) || boat.getPaddleState(Boat.PADDLE_RIGHT))) {
-            double distance = MovementCost.distance(position.x - lastRowPosition.x, 0, position.z - lastRowPosition.z, false, false);
-            if (distance > 0) {
-                double cost = distance * CalorieConfig.ROW.get() * ThermalRules.calorieFactor(ThermalSystem.comfort(player))*workFactor();
-                double before = reserve.calories();
-                rowDistance += distance;
-                travelSpent += reserve.spend(cost);
-                EnergyLog.record(player, "row", "boat", -cost, before, reserve.calories(), distance, true);
-                updateRecovery(player);
-            }
+            var moved = position.subtract(lastRowPosition);
+            double distance = MovementCost.distance(moved.x, moved.y, moved.z, false, false);
+            rowDistance += distance;
+            spendTravel(player, distance, MovementCost.ascent(moved.x, moved.y, moved.z), CalorieConfig.ROW.get(), "row", "boat");
         }
         lastRowBoat = id;
         lastRowPosition = position;

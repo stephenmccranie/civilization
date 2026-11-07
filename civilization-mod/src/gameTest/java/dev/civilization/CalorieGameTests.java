@@ -198,15 +198,18 @@ public class CalorieGameTests {
         boat.setPaddleState(true, true);
         boat.setPos(12, 2, 2);
         data.row(player);
-        helper.assertTrue(Math.abs(data.reserve().calories() - 999.5) < 0.00001 && Math.abs(data.rowDistance - 10) < 0.00001,
-                "Ten paddled blocks cost 0.5 kcal, below sprinting's 3 kcal");
-        boat.setPaddleState(false, false);
-        boat.setPos(22, 2, 2);
+        helper.assertTrue(Math.abs(data.reserve().calories() - 998) < 0.00001 && Math.abs(data.rowDistance - 10) < 0.00001,
+                "Ten paddled blocks cost 2 kcal, between walking's 1 and sprinting's 3");
+        boat.setPos(13, 3, 2);
         data.row(player);
-        helper.assertTrue(Math.abs(data.reserve().calories() - 999.5) < 0.00001, "Drifting spends nothing");
+        helper.assertTrue(Math.abs(data.reserve().calories() - 996.8) < 0.00001, "Paddling a block forward and up a river step costs 0.2 + 1 kcal of ascent");
+        boat.setPaddleState(false, false);
+        boat.setPos(23, 3, 2);
+        data.row(player);
+        helper.assertTrue(Math.abs(data.reserve().calories() - 996.8) < 0.00001, "Drifting spends nothing");
         player.stopRiding();
         data.row(player);
-        helper.assertTrue(Math.abs(data.reserve().calories() - 999.5) < 0.00001, "Dismounting spends nothing");
+        helper.assertTrue(Math.abs(data.reserve().calories() - 996.8) < 0.00001, "Dismounting spends nothing");
         helper.succeed();
     }
 
