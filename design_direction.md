@@ -253,6 +253,7 @@ One environmental temperature field connects buildings, machines and people.
 **Open**
 - Cadence (owner direction, still a proposal): about one update per second where changing, two to five seconds where settled, sleeping when negligible. Unverified targets: under 2 ms per tick and at most 3 s behind at 200 players.
 - Heat transport, greenhouses, internal machine temperatures, radiant exchange between blocks and oxygen-limited burning.
+- Lava and flames warm the air only while among the 4,096 of each indexed per dimension, which Terrain Diffusion's underground lava fills from about 70 chunks; bodies still feel every source they see. Proposal: index and emit only sources near players, the only place their air warmth is felt.
 - Architecture proposals: workshops warming homes, greenhouses on waste heat, ventilated engine rooms; heat aboard moving vessels.
 
 ## Physical foundation
