@@ -78,6 +78,12 @@ public final class HotMetal {
             builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
     /** Labor each player has paid since their last finished hammering or cutting, in blows on one unit. */
     private static final Map<UUID, Integer> WORK = new HashMap<>();
+    /**
+     * When each player last used an anvil with metal in hand. Held use repeats every four ticks, so a use within
+     * `HELD_TICKS` of the last continues one press: it keeps striking, but never replaces a hammering's result with a refusal.
+     */
+    private static final Map<UUID, Long> PRESSED = new HashMap<>();
+    private static final int HELD_TICKS = 8;
 
     private HotMetal() {}
     public static void register(IEventBus bus) { COMPONENTS.register(bus); }
@@ -168,9 +174,10 @@ public final class HotMetal {
         // The hand swings with each landed blow, not with every repeat of held use.
         event.setCancellationResult(InteractionResult.CONSUME);
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Long last = anvil > 0 ? PRESSED.put(player.getUUID(), now) : null;
         if (blows > 0) strike(player, event.getPos(), stack, blows);
         else if (water != null) quench(player, stack, water);
-        else player.displayClientMessage(Component.translatable(stack.has(WORKED.get()) ? "message.civilization.worked" : "message.civilization.too_cool", stack.getHoverName()), true);
+        else if (last == null || now - last > HELD_TICKS) player.displayClientMessage(Component.translatable(stack.has(WORKED.get()) ? "message.civilization.worked" : "message.civilization.too_cool", stack.getHoverName()), true);
     }
     @SubscribeEvent public static void use(PlayerInteractEvent.RightClickItem event) {
         var water = hot(event.getItemStack(), event.getLevel().getGameTime()) ? water(event.getEntity()) : null;
@@ -270,5 +277,8 @@ public final class HotMetal {
         for (var slot : player.containerMenu.slots) cool(slot.getItem(), now);
         cool(player.containerMenu.getCarried(), now);
     }
-    @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) { WORK.remove(event.getEntity().getUUID()); }
+    @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) {
+        WORK.remove(event.getEntity().getUUID());
+        PRESSED.remove(event.getEntity().getUUID());
+    }
 }

@@ -15,7 +15,9 @@ public final class WorkshopGates {
     }
     @SubscribeEvent public static void anvil(AnvilUpdateEvent e){
         // Naming and enchanted books are still allowed; physical repair/combining belongs at the Assembly Bench.
-        if(WorkshopJobs.gated(e.getLeft())&&!e.getRight().isEmpty()&&!e.getRight().is(Items.ENCHANTED_BOOK))e.setCanceled(true);
+        if(!WorkshopJobs.gated(e.getLeft())||e.getRight().isEmpty()||e.getRight().is(Items.ENCHANTED_BOOK))return;
+        e.setCanceled(true);
+        if(e.getPlayer() instanceof net.minecraft.server.level.ServerPlayer p)p.displayClientMessage(net.minecraft.network.chat.Component.literal("Repair equipment at the Assembly Bench"),true);
     }
     @SubscribeEvent public static void grindstone(GrindstoneEvent.OnPlaceItem e){
         if(!e.getTopItem().isEmpty()&&!e.getBottomItem().isEmpty()&&(WorkshopJobs.gated(e.getTopItem())||WorkshopJobs.gated(e.getBottomItem())))e.setCanceled(true);

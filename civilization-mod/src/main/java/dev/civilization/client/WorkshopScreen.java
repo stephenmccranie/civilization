@@ -21,7 +21,7 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
         var list=new ArrayList<RecipeEntry>();
         for(int i=0;i<WorkshopJobs.outputs(menu.kind()).size();i++){
             var made=WorkshopJobs.jobs(menu.kind(),i);var job=made.getFirst();var output=job.output();var equipment=WorkshopJobs.equipment(output);
-            String category=output.isEmpty()?"Repair":equipment==null?"Components":equipment.armor()||output.is(net.minecraft.world.item.Items.SHIELD)?"Armor":output.getItem() instanceof net.minecraft.world.item.SwordItem?"Weapons":"Tools";
+            String category=output.isEmpty()?"Repair":ManufacturingJobs.category(output).label;
             var name=Component.translatable(job.name());
             if(equipment!=null&&equipment.material()==net.minecraft.world.item.Items.NETHERITE_INGOT)name.append(" (upgrade)");
             list.add(new RecipeEntry(i,name,output,category,equipment==null?net.minecraft.world.item.Items.AIR:equipment.material(),made.stream().map(WorkshopScreen::inputs).toList()));

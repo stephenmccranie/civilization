@@ -146,6 +146,29 @@ public final class HotMetalGameTests {
         h.succeed();
     }
 
+    @GameTest(template = "industrial") public static void heldUseLeavesTheHammeringResultReadable(GameTestHelper h) {
+        var anvil = station(h, 2, Blocks.ANVIL);
+        var bar = new java.util.ArrayList<String>();
+        var player = new FakePlayer(h.getLevel(), new GameProfile(UUID.randomUUID(), "smith")) {
+            @Override public void displayClientMessage(net.minecraft.network.chat.Component message, boolean actionBar) {
+                if (actionBar && message.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents key) bar.add(key.getKey());
+            }
+        };
+        player.setGameMode(GameType.SURVIVAL);
+        player.setPos(anvil.getX() + .5, anvil.getY() + 1, anvil.getZ() + 1.5);
+        CalorieFoodData.of(player).reserve().set(2000);
+        player.setItemInHand(InteractionHand.MAIN_HAND, HotMetal.heated(new ItemStack(KilnContent.IRON_BLOOM.get()), h.getLevel().getGameTime()));
+        work(h, player, anvil, HotMetal.ANVIL_BLOWS);
+        h.assertTrue(bar.getLast().equals("message.civilization.hammered"), "The last blow reports the grade change: " + bar);
+        click(player, anvil);
+        h.assertTrue(bar.getLast().equals("message.civilization.hammered"), "Use still held after the hammering refuses quietly, leaving the grade change readable: " + bar);
+        h.runAfterDelay(10, () -> {
+            click(player, anvil);
+            h.assertTrue(bar.getLast().equals("message.civilization.worked"), "A fresh press on worked metal says why it is refused: " + bar);
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "industrial") public static void aSmithWhoCannotPayStrikesNothing(GameTestHelper h) {
         var anvil = station(h, 6, Blocks.ANVIL);
         var player = smith(h, anvil);
