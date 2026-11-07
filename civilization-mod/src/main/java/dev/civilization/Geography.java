@@ -40,12 +40,12 @@ public final class Geography {
         if (cached == null || cached.radius != radius || cached.waterY != waterY || cached.tags != tagGeneration) {
             var source = level.getChunkSource().getGenerator().getBiomeSource();
             var sampler = level.getChunkSource().randomState().sampler();
-            boolean localRivers = TerrainRiver.supported(source);
+            boolean localRivers = TerrainDiffusion.supported(source);
             var grid = new GeographyGrid((x, z) -> {
                 // Above all terrain, TD returns its surface biome instead of a deep cave biome.
                 int sampleY = localRivers ? level.getMaxBuildHeight() - 1 : waterY + 1;
                 var biome = source.getNoiseBiome(x, sampleY >> 2, z, sampler);
-                int riverY = localRivers && biome.is(RIVERS) ? TerrainRiver.surfaceWaterY(x << 2, z << 2) : waterY;
+                int riverY = localRivers && biome.is(RIVERS) ? TerrainDiffusion.surfaceWaterY(x << 2, z << 2) : waterY;
                 return new GeographyGrid.Region(biome.is(RIVERS) && riverY != Integer.MIN_VALUE, biome.is(WOODLAND), riverY);
             }, radius);
             cached = new Cached(radius, waterY, tagGeneration, grid);
@@ -63,7 +63,7 @@ public final class Geography {
     }
     public static boolean canFarm(ServerLevel level, BlockPos soil) {
         if (!supported(level)) return false;
-        if (!TerrainRiver.supported(level.getChunkSource().getGenerator().getBiomeSource())
+        if (!TerrainDiffusion.supported(level.getChunkSource().getGenerator().getBiomeSource())
                 && !GeographyGrid.heightEligible(soil.getY(), GeographyConfig.WATER_Y.get(),
                         GeographyConfig.BELOW.get(), GeographyConfig.ABOVE.get())) return false;
         var column = grid(level).column(soil.getX(), soil.getZ());

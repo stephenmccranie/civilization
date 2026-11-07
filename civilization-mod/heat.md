@@ -8,7 +8,7 @@ Every loaded block cell has a temperature: the regional climate plus local therm
 
 ## Climate
 
-Overworld background temperature comes from biome, altitude, the 60-minute day and regional rain. Air reaches its daily low near dawn (time 0, about 06:00) and its high in mid-afternoon (time 9000, about 15:00), on two smooth half-cosine curves that keep each biome's daily high, low and mean; at the default day length the peak comes about 7.5 real minutes after noon. A clear river biome at ordinary elevation:
+Overworld background temperature comes from the world's climate, altitude, the 60-minute day and regional rain. Air reaches its daily low near dawn (time 0, about 06:00) and its high in mid-afternoon (time 9000, about 15:00), on two smooth half-cosine curves that keep each biome's daily high, low and mean; at the default day length the peak comes about 7.5 real minutes after noon. A clear river biome at ordinary elevation:
 
 | In-game time | Outdoor temperature |
 | --- | --- |
@@ -18,23 +18,24 @@ Overworld background temperature comes from biome, altitude, the 60-minute day a
 | Sunset, 18:00 | 60.9°F / 16°C |
 | Midnight, 00:00 | 50.8°F / 10.5°C |
 
-Vanilla's biome temperature is a gameplay index, not an air temperature. For ordinary land it supplies a mean with a temperate daily swing of ±5°C; negative indices stay distinct (frozen peaks are colder than snowy plains). Biome families adjust that rule:
+**Terrain Diffusion worlds** take the mean from the generator's own climate: its air at sea level, smooth across the land on a 32-block lattice, cooled 6.5°C for every kilometre of the world's height above sea level (Y63). At world scale 4 a block of height is 7.5 m, so air cools 0.049°C per block, on raised mountains, in valleys and in the air above the ground alike: climbing is steadily colder and neighbouring biomes no longer step. Biomes still set each place's daily swing and rain response. The server fetches that air for each 256-block region off the server thread when its chunks load; until it arrives, heat there is off, as in an unloaded chunk.
+
+**Other worlds** take the mean from the biome. A biome's game temperature is a gameplay index, not an air temperature, so one curve turns it into a mean for every biome from any mod: index −1 is −22°C, 0 is −10°C, every temperate index from 0.25 to 0.8 shares 12°C, 0.95 is 24°C, 1.2 is 25°C and 2 is 30°C, linear between. Neighbouring temperate biomes therefore agree, whichever mod adds them. The daily swing is ±(3 + 4 × (1 − rainfall)) °C from the biome's own rainfall value, so dry land swings further than wet woods. Biomes tagged as oceans or beaches swing ±3°C; caves have no daily swing. The game gives every ocean the same index, so oceans alone are named by their water.
 
 | Climate | Clear-weather daily high / dawn low at Y=64 |
 | --- | --- |
-| Forests, birch woods, cherry groves and meadows | Shared woodland mean with a small index distinction, ±5°C. Ordinary forest: 62.4°F / 44.4°F |
-| Plains and sunflower plains | 12.2°C mean, ±5°C: 63.0°F / 45.0°F |
-| River | 12°C mean, ±5°C: 62.6°F / 44.6°F. Frozen river keeps its cold profile |
-| Other temperate land | Index-based mean, ±5°C |
-| Desert and badlands | Hot index-based mean, ±9°C. Desert: 102.2°F / 69.8°F |
-| Savanna | 25°C mean (windswept 24°C), ±7°C. Savanna: 89.6°F / 64.4°F |
-| Non-snowy taiga | 12°C mean, ±5°C: 62.6°F / 44.6°F. Snowy taiga keeps its colder index |
-| Jungle and swamp | Index-based mean plus 4°C, ±3°C. Jungle: 81°F / 70.2°F |
-| Oceans and coasts | ±3°C. Means: frozen −8°C, cold 8°C, ordinary 16°C, lukewarm 23°C, warm 27°C; beaches and mushroom fields use their index mean; deep variants follow their surface profile |
-| Caves | Lush 16°C, dripstone 14°C, deep dark 10°C, with no daily or rain change |
-| Stony peaks | Index-based mean minus 7°C, then altitude cooling |
+| River | 12°C mean, ±5°C: 62.6°F / 44.6°F |
+| Forest, taiga and other wet temperate land | 12°C mean, ±3.8°C: 60.4°F / 46.8°F |
+| Plains | 12°C mean, ±5.4°C: 63.3°F / 43.9°F |
+| Snowy plains | −10°C mean, ±5°C: 23°F / 5°F |
+| Jungle | 24°C mean, ±3.4°C: 81.3°F / 69.1°F |
+| Savanna at index 1.2, as Terralith sets it | 25°C mean, ±7°C: 89.6°F / 64.4°F |
+| Desert and badlands, and vanilla savanna, whose index is also 2 | 30°C mean, ±7°C: 98.6°F / 73.4°F |
+| Oceans | ±3°C. Means: frozen −8°C, cold 8°C, ordinary 16°C, lukewarm 23°C, warm 27°C; deep variants share their surface's |
+| Beaches | Their index's mean, ±3°C |
+| Caves | Their index's mean with no daily or rain change: lush, dripstone and deep dark caves are 12°C |
 
-Rain moves the district baseline toward 6°C cooler over five real minutes and recovers over forty minutes after it stops; the response is 80% in dry and savanna profiles, 60% in humid ones, 50% on coasts and oceans, zero in caves and full elsewhere. Above Y=80 air cools 0.045°C per block. Unrecognized modded biomes use their own index and the temperate swing. Time commands and sleeping select the climate of the resulting world time.
+Rain moves the district baseline toward 6°C cooler over five real minutes and recovers over forty minutes after it stops; the response is full on land, 50% on oceans and beaches and zero in caves. On other worlds air cools 0.045°C per block above Y=80. Time commands and sleeping select the climate of the resulting world time.
 
 ## Thermal field
 

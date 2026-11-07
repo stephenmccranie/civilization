@@ -5,10 +5,8 @@ import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.core.*;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -32,7 +30,6 @@ public final class ThermalField extends SavedData {
     // Biome identity is stable during normal play. Bound this transient cache and expire it
     // for /fillbiome and reload changes; sunlight and regional rain are never cached here.
     private final Long2ObjectOpenCustomHashMap<ThermalRules.Climate> biomeClimates=new Long2ObjectOpenCustomHashMap<>(HeatMaps.POSITIONS);
-    private final Map<ResourceKey<Biome>,ThermalRules.Climate> profiles=new HashMap<>();
     private long climateExpires=Long.MIN_VALUE;
     private static final Direction[] NEIGHBORS=Direction.values();
     private static final int[] OPEN_AIR={15,15,15,15,15,15},CLOSED={0,0,0,0,0,0};
@@ -40,12 +37,13 @@ public final class ThermalField extends SavedData {
         return l.getDataStorage().computeIfAbsent(new Factory<>(ThermalField::new,ThermalField::load),"civilization_heat");
     }
     public static boolean supported(Level l, BlockPos p) {
-        return ThermalConfig.enabled() && l.dimension().equals(Level.OVERWORLD) && p.getY() >= l.getMinBuildHeight() && p.getY() < l.getMaxBuildHeight() && Chunks.loaded(l, p);
+        return ThermalConfig.enabled() && l.dimension().equals(Level.OVERWORLD) && p.getY() >= l.getMinBuildHeight() && p.getY() < l.getMaxBuildHeight() && Chunks.loaded(l, p)
+                && (!(l instanceof ServerLevel s) || AirClimate.ready(s, p.getX(), p.getZ()));
     }
     public static double ambient(ServerLevel l, BlockPos p) {
-        var biome=l.getBiome(p);
-        var profile=ThermalRules.profile(biome.unwrapKey().orElse(null),biome.value().getBaseTemperature());
-        return ThermalRules.climate(profile,p.getY(),ThermalRules.temperaturePhase(l.getDayTime()),RegionalWeather.cooling(l,p));
+        var climate=AirClimate.at(l,p);
+        if(climate==null)throw new IllegalStateException("Air is not ready at "+p+"; check supported() first");
+        return ThermalRules.climate(climate,ThermalRules.temperaturePhase(l.getDayTime()),RegionalWeather.cooling(l,p));
     }
     public static double conductance(BlockState s) {return PhysicalMaterials.legacyConductance(s);}
     public static double capacity(BlockState s) {return PhysicalMaterials.legacyCapacity(s);}
@@ -413,7 +411,7 @@ public final class ThermalField extends SavedData {
             this.level=level;directLevel=level.getClass()==ServerLevel.class&&!level.isDebug();
             temperaturePhase=ThermalRules.temperaturePhase(level.getDayTime());
             if(level.getGameTime()>=climateExpires||climateExpires==Long.MIN_VALUE){
-                biomeClimates.clear();profiles.clear();climateExpires=level.getGameTime()+200;
+                biomeClimates.clear();climateExpires=level.getGameTime()+200;
             }
         }
         void copy(int limit){
@@ -489,16 +487,14 @@ public final class ThermalField extends SavedData {
                     :materials.computeIfAbsent(state,s->material(level,p,s));
             var profile=biomeClimates.get(key);
             if(profile==null){
-                var biome=level.getBiome(p);
-                var biomeKey=biome.unwrapKey().orElse(null);
-                profile=biomeKey==null?ThermalRules.profile(null,biome.value().getBaseTemperature())
-                        :profiles.computeIfAbsent(biomeKey,k->ThermalRules.profile(k,biome.value().getBaseTemperature()));
+                profile=AirClimate.at(level,p);
+                if(profile==null)return null;
                 if(biomeClimates.size()<131072)biomeClimates.put(key,profile);
             }
             long district=RegionalWeather.key(p.getX(),p.getZ());
             double cooling=rainCooling.get(district);
             if(Double.isNaN(cooling)){cooling=RegionalWeather.cooling(level,p);rainCooling.put(district,cooling);}
-            double ambient=ThermalRules.climate(profile,p.getY(),temperaturePhase,cooling);
+            double ambient=ThermalRules.climate(profile,temperaturePhase,cooling);
             long column=net.minecraft.world.level.ChunkPos.asLong(p.getX(),p.getZ());
             int height=heights.get(column);
             if(material.air&&height==Integer.MIN_VALUE){height=level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,p.getX(),p.getZ());heights.put(column,height);}
