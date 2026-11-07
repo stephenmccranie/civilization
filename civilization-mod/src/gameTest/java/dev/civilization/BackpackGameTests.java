@@ -43,8 +43,8 @@ public final class BackpackGameTests {
     @GameTest(template="industrial") public static void everyPackHasEightSlotsAndTheBlockCap(GameTestHelper h){
         var made=Backpack.ITEM.toStack();EquipmentGrade.ensure(made,h.getLevel().random);
         h.assertTrue(!EquipmentGrade.hasGrade(made)&&!made.isDamageableItem(),"A finished backpack has no grade and no durability");
-        var p=player(h);var pack=wear(p);var stone=new ItemStack(Items.STONE,32);pack.insert(stone);
-        h.assertTrue(pack.getContainerSize()==Backpack.SLOTS&&held(pack,Items.STONE)==Backpack.BLOCKS&&stone.getCount()==32-Backpack.BLOCKS&&pack.blockRoom()==0,"A pack has 8 slots and stops at 24 blocks");
+        var p=player(h);var pack=wear(p);var stone=new ItemStack(Items.STONE,32);var more=new ItemStack(Items.STONE,8);pack.insert(stone);pack.insert(more);
+        h.assertTrue(pack.getContainerSize()==Backpack.SLOTS&&held(pack,Items.STONE)==Backpack.BLOCKS&&stone.isEmpty()&&more.getCount()==8&&pack.blockRoom()==0,"A pack has 8 slots and stops at 32 blocks");
         var apples=new ItemStack(Items.APPLE,32);pack.insert(apples);
         h.assertTrue(apples.isEmpty()&&held(pack,Items.APPLE)==32,"Ordinary goods fill the slots blocks leave free");
         h.assertTrue(!pack.canPlaceItem(0,Backpack.ITEM.toStack())&&!pack.canPlaceItem(0,new ItemStack(Items.DIRT)),"Neither another backpack nor blocks beyond the cap go in");
@@ -57,8 +57,8 @@ public final class BackpackGameTests {
     @GameTest(template="industrial") public static void pickupsFillTheHandThenThePack(GameTestHelper h){
         var p=player(h);var pack=wear(p);
         var stone=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.STONE,32));stone.setNoPickUpDelay();stone.playerTouch(p);
-        var more=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.STONE,8));more.setNoPickUpDelay();more.playerTouch(p);
-        h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==24&&!more.isRemoved()&&more.getItem().getCount()==8,"Blocks fill the 8-block hand, then the pack to its 24-block cap; the rest stays on the ground");
+        var more=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.STONE,16));more.setNoPickUpDelay();more.playerTouch(p);
+        h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==Backpack.BLOCKS&&!more.isRemoved()&&more.getItem().getCount()==8,"Blocks fill the 8-block hand, then the pack to its 32-block cap; the rest stays on the ground");
         for(int i=0;i<36;i++)p.getInventory().setItem(i,new ItemStack(Items.STICK,32));
         var apples=new ItemEntity(h.getLevel(),0,2,0,new ItemStack(Items.APPLE,5));apples.setNoPickUpDelay();apples.playerTouch(p);
         h.assertTrue(apples.isRemoved()&&held(pack,Items.APPLE)==5,"Goods the full pockets cannot take go into the pack");
@@ -75,7 +75,7 @@ public final class BackpackGameTests {
         h.assertTrue(placed.consumesAction()&&h.getLevel().getBlockState(at).is(Blocks.STONE)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT-1,"A real placement uses one stone from the hand");
         Backpack.tick(new PlayerTickEvent.Post(p));
         long after=stored(store.cargo(),Items.STONE)+held(pack,Items.STONE)+p.getOffhandItem().getCount();
-        h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==22,"The hand is topped off and the pack's stone stack topped up to the cap");
+        h.assertTrue(p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==Backpack.BLOCKS-2,"The hand is topped off and the pack's stone stack topped up to the cap");
         h.assertTrue(after==before-1,"Exactly the placed block leaves the store, pack and hand: "+before+" then "+after);
         h.assertTrue(held(pack,Items.GLASS)==0&&held(pack,Items.OAK_PLANKS)==2&&stored(store.cargo(),Items.GLASS)==10,"The pack takes on no block it did not already hold");
         pack.setItem(0,new ItemStack(Items.STONE,3));p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.STONE,1));Backpack.tick(new PlayerTickEvent.Post(p));
@@ -83,7 +83,7 @@ public final class BackpackGameTests {
         h.assertTrue(p.getOffhandItem().isEmpty(),"Placing the last block empties the hand");
         Backpack.tick(new PlayerTickEvent.Post(p));
         h.assertTrue(p.getOffhandItem().is(Items.STONE)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT,"An emptied hand refills with the block it last held");
-        h.assertTrue(held(pack,Items.STONE)==22,"The hand draws on the store first, so the pack's own stack stays and is topped up");
+        h.assertTrue(held(pack,Items.STONE)==Backpack.BLOCKS-2,"The hand draws on the store first, so the pack's own stack stays and is topped up");
         h.succeed();
     }
 
@@ -154,8 +154,8 @@ public final class BackpackGameTests {
         for(int i=0;i<36;i++)p.getInventory().setItem(i,new ItemStack(Items.STICK,32));
         chest.setItem(0,new ItemStack(Items.APPLE,32));menu.clicked(0,0,ClickType.QUICK_MOVE,p);
         h.assertTrue(chest.getItem(0).isEmpty()&&held(pack,Items.APPLE)==32,"With the pockets full they go into the pack");
-        chest.setItem(1,new ItemStack(Items.STONE,32));menu.clicked(1,0,ClickType.QUICK_MOVE,p);
-        h.assertTrue(chest.getItem(1).getCount()==32-Backpack.BLOCKS&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==Backpack.BLOCKS,"With the hand full, blocks go into the pack up to its cap and the rest stays: chest "+chest.getItem(1)+", hand "+p.getOffhandItem()+", pack "+held(pack,Items.STONE));
+        pack.insert(new ItemStack(Items.STONE,8));chest.setItem(1,new ItemStack(Items.STONE,32));menu.clicked(1,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(chest.getItem(1).getCount()==8&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==Backpack.BLOCKS,"With the hand full, blocks go into the pack up to its cap and the rest stays: chest "+chest.getItem(1)+", hand "+p.getOffhandItem()+", pack "+held(pack,Items.STONE));
         // As the server's menu opening does: the Hand, then the pack.
         menu=new CargoMenu(2,p.getInventory(),store);BlockCarry.attachMenu(menu,p.getInventory());Backpack.attachMenu(menu,p);int first=-1;
         for(int i=0;i<menu.slots.size();i++)if(menu.slots.get(i) instanceof Backpack.PackSlot s&&s.getItem().is(Items.STONE)){first=i;break;}

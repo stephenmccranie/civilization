@@ -37,7 +37,7 @@ import net.neoforged.neoforge.registries.*;
 @EventBusSubscriber(modid="civilization")
 public final class Backpack {
     /** Every pack's slots, two rows beside a menu, and the building blocks they hold in all. */
-    public static final int SLOTS=8,BLOCKS=24;
+    public static final int SLOTS=8,BLOCKS=32;
     /** How far from the bound store a player builds from it. */
     public static final double RADIUS=16;
     /** The bound store, a Pallet's position or a wheelbarrow's identity in one dimension. A bound pack builds from it. */
