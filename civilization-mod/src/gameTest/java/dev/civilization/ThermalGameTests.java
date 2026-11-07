@@ -654,11 +654,16 @@ public final class ThermalGameTests {
             h.assertTrue(ThermalRules.climate(cave,1,1)==ThermalRules.climate(cave,-1,0),
                     "Caves ignore the surface day cycle and regional rain: "+k.location());
         }
-        double first=ThermalRules.playerTemperature(10,30,1);
-        h.assertTrue(first>10&&first<30&&ThermalRules.playerTemperature(first,30,6)>28,
-                "Player temperature approaches warmer air over several seconds");
-        h.assertTrue(ThermalRules.playerTemperature(30,10,1)>10&&ThermalRules.playerTemperature(30,10,6)<12,
-                "Stored personal warmth also fades gradually in colder air");
+        // Share of a gap in °F that a body warming from 0 °C covers in the given seconds.
+        java.util.function.DoubleBinaryOperator covered=(gapF,seconds)->ThermalRules.playerTemperature(0,gapF/1.8,seconds)/(gapF/1.8);
+        h.assertTrue(covered.applyAsDouble(5,10)<1/3d&&covered.applyAsDouble(30,2)<.2,
+                "A mild breeze drifts slowly and passing a fire barely moves body temperature");
+        h.assertTrue(covered.applyAsDouble(150,4)>.5&&covered.applyAsDouble(100,5)>.5&&covered.applyAsDouble(5,5)<.2,
+                "Extreme gaps close within seconds, far faster than mild ones");
+        h.assertTrue(Math.abs(ThermalRules.playerTemperature(30,10,4)-10-(10-ThermalRules.playerTemperature(-10,10,4)))<1e-9,
+                "Warming and cooling follow the same curve");
+        h.assertTrue(Math.abs(ThermalRules.playerTemperature(10,30,120)-30)<.5&&ThermalRules.playerTemperature(0,100,1000)<=100,
+                "Staying put settles without overshooting");
         h.assertTrue(ThermalRules.coldKcalPerSecond(18,.2)==0&&Math.abs(ThermalRules.coldKcalPerSecond(10,.2)-.05)<1e-9,"Cold drain begins below the comfort threshold and rises gently");
         h.assertTrue(ThermalRules.coldKcalPerSecond(2,.2)==.2&&ThermalRules.coldKcalPerSecond(-20,.2)==.2&&ThermalRules.coldKcalPerSecond(30,.2)==0,"Severe cold is capped and heat is not charged as cold");
         h.assertTrue(ThermalRules.calorieFactor(1)==.8,"Maximum twenty percent work calorie saving");
@@ -727,5 +732,29 @@ public final class ThermalGameTests {
         h.assertTrue(f.excess(l,p)<35,"Source hotspot mixes into surrounding air");
         double total=f.energy.values().stream().mapToDouble(Double::doubleValue).sum();
         h.assertTrue(total<=60.001&&total>59,"Sheltered heat moves into air and walls instead of vanishing: "+total);h.succeed();
+    }
+    @GameTest(template="industrial") public static void openLavaFeelsFarHotterThanACampfire(GameTestHelper h){
+        var l=h.getLevel();var base=h.absolutePos(BlockPos.ZERO);
+        for(var q:BlockPos.betweenClosed(base.offset(0,1,0),base.offset(11,5,11)))
+            l.setBlockAndUpdate(q,q.getY()==base.getY()+1?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
+        var field=new ThermalField();
+        // How much warmer than the air a bare body feels, standing d blocks west of the source; the air itself is not heated here.
+        java.util.function.IntToDoubleFunction warmth=d->{
+            var torso=ThermalSystem.torso(net.minecraft.world.phys.Vec3.atBottomCenterOf(base.offset(6-d,2,6)));
+            double air=field.localTemperature(l,BlockPos.containing(torso));
+            return ThermalRules.felt(air,ThermalExposure.sample(l,field,torso,air,OVERCAST_NIGHT).radiant(),0)-air;
+        };
+        l.setBlockAndUpdate(base.offset(6,2,6),Blocks.CAMPFIRE.defaultBlockState());
+        double campfire=warmth.applyAsDouble(1);
+        l.setBlockAndUpdate(base.offset(6,2,6),Blocks.AIR.defaultBlockState());
+        l.setBlockAndUpdate(base.offset(6,1,6),Blocks.LAVA.defaultBlockState());
+        double single=warmth.applyAsDouble(1);
+        for(int x=6;x<=8;x++)for(int z=5;z<=7;z++)l.setBlockAndUpdate(base.offset(x,1,z),Blocks.LAVA.defaultBlockState());
+        double beside=warmth.applyAsDouble(1),two=warmth.applyAsDouble(2),four=warmth.applyAsDouble(4);
+        h.assertTrue(single>campfire,"One lava block beside you feels hotter than a campfire: "+single+" vs "+campfire);
+        h.assertTrue(beside>50&&beside>2*campfire,"A lava pool beside you feels far hotter than a campfire (C above the air): "+beside+" vs "+campfire);
+        h.assertTrue(beside>two+10&&two>four+10&&four>campfire,"Lava warmth keeps falling with distance, with no ceiling: "+beside+", "+two+", "+four);
+        h.assertTrue(ThermalRules.playerTemperature(0,beside,5)>10,"Beside open lava a body grows clearly hot within seconds");
+        h.succeed();
     }
 }

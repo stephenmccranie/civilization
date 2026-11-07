@@ -14,14 +14,14 @@ public final class WorkshopScreen extends MachineScreen<WorkshopMenu> {
     private net.minecraft.client.gui.components.Button work;
     public WorkshopScreen(WorkshopMenu m,Inventory i,Component title){super(m,i,title);imageHeight=214;inventoryLabelY=120;}
     @SubscribeEvent public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent e){e.register(WorkshopContent.MENU.get(),WorkshopScreen::new);}
-    @Override protected void init(){super.init();work=null;if(menu.kind()==ManufacturingJobs.BENCH)work=addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal("Work"),b->minecraft.gameMode.handleInventoryButtonClick(menu.containerId,WorkshopBlockEntity.WORK_BUTTON)).bounds(leftPos+17,topPos+86,90,20).build());}
-    @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,new int[]{5},WorkshopJobs.result(menu.inventory,match));}}
+    @Override protected void init(){super.init();work=null;if(WorkshopBlockEntity.handWorked(menu.kind()))work=addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal("Work"),b->minecraft.gameMode.handleInventoryButtonClick(menu.containerId,WorkshopBlockEntity.WORK_BUTTON)).bounds(leftPos+17,topPos+86,90,20).build());}
+    @Override protected void containerTick(){super.containerTick();if(work!=null){var match=MachineWork.match(menu.inventory,menu.job());work.active=match!=null&&MachineInventory.room(menu.inventory,WorkshopBlockEntity.outputSlots(menu.kind()),WorkshopJobs.result(menu.inventory,match));}}
     @Override protected int recipeCatalogKey(){return menu.kind();}
     @Override protected List<RecipeEntry> recipes(){
         var list=new ArrayList<RecipeEntry>();
         for(int i=0;i<WorkshopJobs.outputs(menu.kind()).size();i++){
             var made=WorkshopJobs.jobs(menu.kind(),i);var job=made.getFirst();var output=job.output();var equipment=WorkshopJobs.equipment(output);
-            String category=output.isEmpty()?"Repair":equipment==null?"Components":equipment.armor()||output.is(net.minecraft.world.item.Items.SHIELD)?"Armor":output.getItem() instanceof net.minecraft.world.item.SwordItem?"Weapons":"Tools";
+            String category=output.isEmpty()?"Repair":ManufacturingJobs.category(output).label;
             var name=Component.translatable(job.name());
             if(equipment!=null&&equipment.material()==net.minecraft.world.item.Items.NETHERITE_INGOT)name.append(" (upgrade)");
             list.add(new RecipeEntry(i,name,output,category,equipment==null?net.minecraft.world.item.Items.AIR:equipment.material(),made.stream().map(WorkshopScreen::inputs).toList()));

@@ -8,6 +8,13 @@ public final class ThermalDisplay {
     private static final int[] COLORS = {0x384ab8, 0x3795df, 0x76c8c8, 0xd7bb7b, 0xe7c05f,
             0xffa343, 0xf37136, 0xd73831, 0xffe6d7};
     public static double fahrenheit(double celsius) { return celsius * 1.8 + 32; }
+    // Felt temperatures within 10°F of comfort read as comfortable; display effects reach full strength 34°F away.
+    private static final double NEUTRAL_F = 10, FULL_F = 34;
+    /** Signed display strain of a felt temperature: 0 from 60°F to 80°F, -1 at 36°F or colder, 1 at 104°F or hotter. */
+    public static double strain(double celsius) {
+        double off = fahrenheit(celsius) - fahrenheit(ThermalRules.COMFORT_CENTER_C);
+        return Math.signum(off) * Math.clamp((Math.abs(off) - NEUTRAL_F) / (FULL_F - NEUTRAL_F), 0, 1);
+    }
     /** Fraction along the labeled, deliberately nonlinear absolute-temperature legend. */
     public static double legendPosition(double celsius) {
         double f = fahrenheit(celsius);

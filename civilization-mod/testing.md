@@ -38,7 +38,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `thermal-art` | Cold and lit Kiln, Foundry, Cooking Stove, Fertilizer Furnace and Smithy, their icons, and the ground at the foot of a controller seen from above |
 | `clouds` | Photon drawing the server's clouds: the ground darker when the server puts a cloud on the line to the sun than when it reports a gap, then partly cloudy and overcast skies; fails if either Photon file was not patched |
 | `thermal` | Survey helmet temperature cells and readout, comfort HUD and inspection tooltip, and the cold, comfortable, hot and cool temperature screen effects |
-| `workshops` | Tannery with a loaded pit, Textile Workshop and Smithy with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks; then the steeping pit three seconds on, its bark heap close up and the pit without shaders |
+| `workshops` | Tannery with a loaded pit, Textile Workshop, and Smithy with manual ignition, and the recipe drawer's filters, search, scrollbar drag and track clicks; then the steeping pit three seconds on, its bark heap close up, the loom being worked from its front left and the pit without shaders |
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron; iron ingots through every glow colour in the hotbar, held white-hot and cherry red in first person and cherry red in third, lighting the floor around them, then the same night without shaders and dropped white-yellow, cherry red and dull red, by day and night |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
@@ -56,9 +56,9 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `pallet` | Pallet stacks at each fill level up to two blocks high, one under a block, mixed goods and pieces, an overloaded pre-limit pallet, a 3x3 yard, right-click stacking, shared menus and loaded wheelbarrows |
 | `road` | Street Paver surface variants and forms |
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
-| `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |
+| `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs; a shift-click crafting six logs onto a nearby Pallet past a full Hand, with the action bar naming it; an enchanting table keeping its book and lapis across reopening |
 | `chests` | Single and double chest menus with shift-click conservation |
-| `inventory` | Player inventory, equipment, offhand, pickup and recipe book |
+| `inventory` | Player inventory, equipment, offhand, pickup and recipe book; graded ingots dealt by a real mouse drag in the order crossed, and stone from the Pack swapped into a Hand holding torches |
 | `jei` | JEI categories, catalysts and recipe parity, and the **+** placing a crafting recipe through our own transfer handler (needs JEI in `run/mods`) |
 | `civic` | Land controller and trade counter menus, whitelist and quantity input |
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |

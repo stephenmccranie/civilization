@@ -1,8 +1,6 @@
 {
-  "parent": "minecraft:block/orientable",
   "textures": {
-    "side": "minecraft:block/oak_planks",
-    "top": "minecraft:block/oak_planks",
-    "front": "civilization:block/textile_workshop_front"
-  }
+    "particle": "minecraft:block/oak_planks"
+  },
+  "elements": []
 }

@@ -17,9 +17,9 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Capacity / initial reserve | 2,400 kcal |
 | Walking/crouching | 0.10 kcal per block |
 | Sprinting | 0.30 kcal per block (3× walking) |
-| Rowing a vanilla boat/chest boat | 0.05 kcal per horizontal block while paddling |
+| Rowing a vanilla boat/chest boat | 0.20 kcal per horizontal block while paddling (2× walking), plus ascent |
 | Wheelbarrow handling | Walking or sprinting rate: 0.10 or 0.30 kcal per horizontal block traveled at the handles, including turns |
-| Break ordinary block / light vegetation / crop | 4 / 0.25 / 1 kcal |
+| Break ordinary block / light vegetation / crop | 3 / 0.25 / 1 kcal |
 | Place block / plant crop / apply fertilizer | 2 / 1 / 1 kcal |
 | Place cut slab / quarter beam / eighth cube | 1 / 0.5 / 0.25 kcal |
 | Sleep | 50 kcal per in-game hour actually slept, including skipped hours |
@@ -32,7 +32,7 @@ One server-owned calorie reserve replaces vanilla hunger, saturation and exhaust
 | Cold exposure | Up to 0.20 kcal/second ([rule](heat.md#comfort-and-cold)) |
 | Depletion recovery threshold | 200 kcal |
 
-- **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 30 sprinting or 5 rowing. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming and the rising part of a jump, which is all a jump costs; descending refunds nothing. Movement is measured from server-accepted displacement.
+- **Travel** costs distance × the gait's rate, whatever the speed: 100 blocks costs 10 kcal walking, 20 rowing or 30 sprinting. Speed bonuses never multiply the charge. Walking, sprinting and rowing count horizontal distance; swimming counts 3D distance. Every block of upward personal travel adds `ascentKcalPerBlock` (1 kcal), including stairs, ladders, swimming, a paddled boat floating up a river step or rapid, and the rising part of a jump, which is all a jump costs; descending refunds nothing. Movement is measured from server-accepted displacement.
 - **Rowing** is charged only to the controlling player of a vanilla boat or chest boat while its paddles are active; passengers, drifting boats and powered Civilization vessels pay nothing. Rowing has its own distance counter.
 - **River steps.** A vanilla boat or chest boat meeting water that stands at most a block above its top with open air over it, as at a step in a river's surface or up a rapid, floats up onto it instead of sinking under it; deeper water, or water under a ceiling, still sinks it and drops its rider.
 - **Wheelbarrow handling** charges the walking rate, or the sprinting rate while sprinting, for actual handle travel, including reversing and turning, plus normal ascent; idle or blocked drive is free.
@@ -71,7 +71,7 @@ The server stores sparse counts in chunk attachments (at most 16,384 grass posit
 
 ## Food
 
-Bread is worth 500 kcal and cooked beef or pork 700 by default. Every vanilla food has an explicit value; server overrides take precedence, and unknown mod food uses nutrition × `fallbackKcalPerNutrition` (100). A cake slice is `cakeSliceKcal` (200). Food tooltips show kcal; food effects and eating animations remain. Excess above capacity is discarded.
+Bread is worth 500 kcal and cooked beef or pork 700 by default. Raw beef and pork give 300 kcal, raw chicken, mutton, rabbit and salmon 225 and raw cod 150; a [campfire](cooking.md#campfire) roast gives halfway between raw and stove-cooked, such as 500 for beef. Sweet and glow berries stay at 75 so they never undercut farmland. Every vanilla food has an explicit value; server overrides take precedence, and unknown mod food uses nutrition × `fallbackKcalPerNutrition` (100). A cake slice is `cakeSliceKcal` (200). Food tooltips show kcal; food effects and eating animations remain. Excess above capacity is discarded.
 
 Three bread craft one **Field Ration** worth exactly three times the configured bread value (1,500 kcal by default).
 

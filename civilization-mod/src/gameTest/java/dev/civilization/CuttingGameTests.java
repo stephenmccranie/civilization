@@ -149,17 +149,18 @@ public final class CuttingGameTests {
     }
     @GameTest(template="industrial") public static void shapedMachineRequiresCorrectOrientationAndMaterial(GameTestHelper h) {
         var controller=h.absolutePos(new BlockPos(5,1,5));
-        var textile=WorkshopContent.TEXTILE.get().defaultBlockState().setValue(CivicBlock.FACING,Direction.NORTH);
-        h.getLevel().setBlockAndUpdate(controller,textile);
-        MachineFixture.build(h.getLevel(),controller);
-        var part=MachineStructure.parts(textile).stream().filter(p->p.units()==2&&p.material().equals("planks")&&p.sharedMask()==0).findFirst().orElseThrow();
+        var drill=IndustrialContent.DRILL.get().defaultBlockState().setValue(CivicBlock.FACING,Direction.NORTH);
+        h.getLevel().setBlockAndUpdate(controller,drill);
+        var parts=MachineStructure.guideParts(drill);
+        for(var part:parts)MachineStructure.placePart(h.getLevel(),controller,Direction.NORTH,part);
+        var part=parts.stream().filter(p->p.units()==2).findFirst().orElseThrow();
         var pos=MachineStructure.position(controller,Direction.NORTH,part);var good=h.getLevel().getBlockState(pos);
         h.getLevel().setBlockAndUpdate(pos,good.setValue(CutBlock.SIDE,good.getValue(CutBlock.SIDE).getOpposite()));
-        h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.INCOMPLETE,"Wrong-facing slab cannot form machine");
+        h.assertTrue(MachineStructure.checkParts(h.getLevel(),controller,Direction.NORTH,parts).status()==MachineStructure.INCOMPLETE,"Wrong-facing slab cannot form machine");
         h.getLevel().setBlockAndUpdate(pos,good);((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(Blocks.BRICKS.defaultBlockState());
-        h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.INCOMPLETE,"Wrong material cannot form machine");
-        ((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(Blocks.OAK_PLANKS.defaultBlockState());
-        h.assertTrue(MachineStructure.check(h.getLevel(),controller,Direction.NORTH).status()==MachineStructure.COMPLETE,"Correct repair forms machine");
+        h.assertTrue(MachineStructure.checkParts(h.getLevel(),controller,Direction.NORTH,parts).status()==MachineStructure.INCOMPLETE,"Wrong material cannot form machine");
+        ((CutBlockEntity)h.getLevel().getBlockEntity(pos)).material(MachineStructure.materialState(part.material()));
+        h.assertTrue(MachineStructure.checkParts(h.getLevel(),controller,Direction.NORTH,parts).status()==MachineStructure.COMPLETE,"Correct repair forms machine");
         h.succeed();
     }
     @GameTest(template="industrial") public static void gridHasExactlySixSlabsTwelveBeamsEightCubes(GameTestHelper h) {

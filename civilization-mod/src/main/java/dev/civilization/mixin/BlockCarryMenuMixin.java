@@ -15,35 +15,38 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 @Mixin(AbstractContainerMenu.class)
 public abstract class BlockCarryMenuMixin implements dev.civilization.BlockCarryMenuAccess {
     @Invoker("addSlot") public abstract Slot civilization$addCarrySlot(Slot slot);
-    @Invoker("moveItemStackTo") protected abstract boolean civilization$move(ItemStack stack,int from,int to,boolean reverse);
     @Shadow @Final public int containerId;
     @Unique private dev.civilization.NearbyStores civilization$nearby;
     @Override public dev.civilization.NearbyStores civilization$nearby(){return civilization$nearby;}
     @Override public void civilization$setNearby(dev.civilization.NearbyStores nearby){civilization$nearby=nearby;}
     @Inject(method="broadcastChanges",at=@At("TAIL"))
     private void civilization$syncNearby(CallbackInfo ci){if(civilization$nearby!=null)civilization$nearby.sync(containerId);}
-    @Inject(method="moveItemStackTo",at=@At("HEAD"),cancellable=true)
-    private void civilization$shift(ItemStack stack,int from,int to,boolean reverse,CallbackInfoReturnable<Boolean> result){
+    /**
+     * A move whose range spans all the pockets moves goods into the player's inventory, from whatever the menu shows:
+     * building blocks and buckets into the hand and then the worn pack, other goods into the pockets, hotbar first,
+     * then the pack, unless they come from it. Narrower ranges are the menu's own moves into its container or between
+     * the main pockets and the hotbar.
+     */
+    @WrapMethod(method="moveItemStackTo")
+    private boolean civilization$intoPlayer(ItemStack stack,int from,int to,boolean reverse,Operation<Boolean> original){
         var menu=(AbstractContainerMenu)(Object)this;
-        if(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack))
-            for(int i=from;i<to;i++)if(menu.slots.get(i).container instanceof Inventory inv&&BlockCarry.restricted(inv.player)){
-                result.setReturnValue(BlockCarry.insert(inv,stack)>0);return;
-            }
-        // Ordinary goods, and in Creative everything, fill the pockets, hotbar first, before the worn pack shown beside
-        // them, as pickups do. The Hand among the pockets is filled only by the carrying route above.
-        int hand=-1,pack=to;
+        int first=-1,last=-1,pockets=0;
         for(int i=from;i<to;i++){
             var slot=menu.slots.get(i);
-            if(slot instanceof dev.civilization.Backpack.PackSlot){if(i>from&&!(menu.slots.get(i-1) instanceof dev.civilization.Backpack.PackSlot))pack=i;}
-            else if(to-from>1&&slot.container instanceof Inventory&&slot.getContainerSlot()==BlockCarry.OFFHAND)hand=i;
+            if(slot.container instanceof Inventory&&slot.getContainerSlot()<Inventory.INVENTORY_SIZE){pockets++;if(first<0)first=i;last=i;}
         }
-        if(hand<0&&pack==to)return;
-        boolean pockets=hand<0?civilization$move(stack,from,pack,reverse):civilization$move(stack,from,hand,reverse)|civilization$move(stack,hand+1,pack,reverse);
-        result.setReturnValue(pockets|civilization$move(stack,pack,to,reverse));
+        if(pockets<Inventory.INVENTORY_SIZE)return original.call(stack,from,to,reverse);
+        var inv=(Inventory)menu.slots.get(first).container;
+        if(BlockCarry.restricted(inv.player)&&(BlockCarry.carried(stack)||BlockCarry.filledContainer(stack)))return BlockCarry.insert(inv,stack)>0;
+        boolean moved=original.call(stack,first,last+1,true);
+        int pack=-1;
+        for(int i=0;i<menu.slots.size();i++)if(menu.slots.get(i) instanceof dev.civilization.Backpack.PackSlot slot){if(pack<0)pack=i;if(slot.getItem()==stack)return moved;}
+        return pack<0?moved:original.call(stack,pack,pack+dev.civilization.Backpack.SLOTS,false)|moved;
     }
     @Inject(method="clicked",at=@At("HEAD"),cancellable=true)
     private void civilization$click(int index,int button,ClickType type,Player player,CallbackInfo ci){
-        if(BlockCarry.forbiddenClick((AbstractContainerMenu)(Object)this,index,button,type,player))ci.cancel();
+        var menu=(AbstractContainerMenu)(Object)this;
+        if(BlockCarry.forbiddenClick(menu,index,button,type,player)||BlockCarry.swapIntoHand(menu,index,type,player))ci.cancel();
     }
     @WrapMethod(method="clicked")
     private void civilization$chestArmful(int index,int button,ClickType type,Player player,Operation<Void> original){

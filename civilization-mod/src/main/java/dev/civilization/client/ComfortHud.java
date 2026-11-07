@@ -21,7 +21,7 @@ public final class ComfortHud {
     public static void draw(GuiGraphics g,int x,int y){
         var mc=Minecraft.getInstance();var data=ThermalVision.current();if(mc.player==null||data==null)return;
         double c=comfort();int edge=data.playerTemperature()<ThermalRules.COMFORT_CENTER_C?0xff719ac0:0xffce7854;
-        int tint=mix(edge,0xffadd5a0,Math.clamp(data.comfort(),0,1));
+        int tint=mix(0xffadd5a0,edge,Math.abs(ThermalDisplay.strain(data.playerTemperature())));
         double phase=(net.minecraft.Util.getMillis()%4000)/4000.0*Math.PI*2;
         double pulse=(.5+.5*Math.sin(phase))*c;
         // Tight highlights breathe slowly; they never obscure the world or flash.

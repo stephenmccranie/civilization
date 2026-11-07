@@ -21,7 +21,7 @@ Furnaces and smokers cook no food. Burning animals, including fire-aspect kills,
 
 ## Campfire
 
-A lit campfire roasts raw meat, fish, potatoes and kelp as in vanilla: four at once, 30 seconds each, three times the stove's time, with no fuel and no XP. Roasted food is the ordinary cooked item marked **Campfire-roasted**, worth halfway between the raw food and the stove's result: roast beef gives 450 kcal against 200 raw and 700 from the stove by default. It does not stack with stove-cooked food.
+A lit campfire roasts raw meat, fish, potatoes and kelp as in vanilla: four at once, 30 seconds each, three times the stove's time, with no fuel and no XP. Roasted food is the ordinary cooked item marked **Campfire-roasted**, worth halfway between the raw food and the stove's result: roast beef gives 500 kcal against 300 raw and 700 from the stove by default. It does not stack with stove-cooked food.
 
 ## Prototype Stove
 

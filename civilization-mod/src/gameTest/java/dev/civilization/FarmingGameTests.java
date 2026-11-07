@@ -60,8 +60,8 @@ public class FarmingGameTests {
 
     @GameTest(template = "empty")
     public static void lightClearingAndCropsHaveSeparateCosts(GameTestHelper helper) {
-        helper.assertTrue(LaborCosts.breaking(Blocks.STONE.defaultBlockState()) == 4, "Stone stays 4 kcal");
-        helper.assertTrue(LaborCosts.breaking(Blocks.OAK_LOG.defaultBlockState()) == 4, "Logs stay 4 kcal");
+        helper.assertTrue(LaborCosts.breaking(Blocks.STONE.defaultBlockState()) == 3, "Stone stays 3 kcal");
+        helper.assertTrue(LaborCosts.breaking(Blocks.OAK_LOG.defaultBlockState()) == 3, "Logs stay 3 kcal");
         for (var block : List.of(Blocks.POPPY, Blocks.SHORT_GRASS, Blocks.OAK_LEAVES))
             helper.assertTrue(LaborCosts.breaking(block.defaultBlockState()) == 0.25, "Vegetation costs 0.25 kcal");
         helper.assertTrue(LaborCosts.breaking(Blocks.WHEAT.defaultBlockState()) == 1, "Harvest costs 1 kcal");

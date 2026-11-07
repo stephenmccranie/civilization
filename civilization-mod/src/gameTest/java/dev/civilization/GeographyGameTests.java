@@ -13,6 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
@@ -46,6 +50,34 @@ public class GeographyGameTests {
         Geography.unload(level);
         helper.assertTrue(before.equals(Geography.inspect(level, low)), "Cache recreation preserves geography");
         helper.succeed();
+    }
+    @GameTest(template = "empty")
+    public static void fishSpawnInOpenWaterAboveTheSea(GameTestHelper helper) {
+        var level = region(helper, "river");
+        var random = RandomSource.create(1);
+        var column = new BlockPos(400, 150, 400);
+        level.setBlockAndUpdate(column.atY(149), Blocks.STONE.defaultBlockState());
+        level.setBlockAndUpdate(column, Blocks.WATER.defaultBlockState());
+        helper.assertTrue(!spawns(level, column, random), "One block of water holds no fish");
+        level.setBlockAndUpdate(column.above(), Blocks.WATER.defaultBlockState());
+        helper.assertTrue(spawns(level, column, random), "Salmon spawn on the bed of two-deep river water 87 blocks above the sea");
+        helper.assertTrue(!spawns(level, column.above(), random), "Fish need water over them");
+        level.setBlockAndUpdate(column.atY(152), Blocks.STONE.defaultBlockState());
+        helper.assertTrue(!spawns(level, column, random), "Covered water is not open water");
+        level.setBlockAndUpdate(column.atY(152), Blocks.AIR.defaultBlockState());
+        for (int y = 130; y < 152; y++) level.setBlockAndUpdate(column.atY(y), Blocks.WATER.defaultBlockState());
+        helper.assertTrue(spawns(level, column.atY(139), random), "Fish spawn 13 blocks below the surface");
+        helper.assertTrue(!spawns(level, column.atY(138), random), "Fish do not spawn deeper");
+        var mobs = level.getBiome(column).value().getMobSettings();
+        helper.assertTrue(mobs.getMobs(MobCategory.WATER_AMBIENT).unwrap().stream().anyMatch(s -> s.type == EntityType.SALMON),
+                "Rivers spawn salmon");
+        helper.assertTrue(mobs.getMobs(MobCategory.WATER_CREATURE).unwrap().stream().noneMatch(s -> s.type == EntityType.SQUID),
+                "Rivers spawn no squid");
+        helper.succeed();
+    }
+    private static boolean spawns(ServerLevel level, BlockPos pos, RandomSource random) {
+        return SpawnPlacements.isSpawnPositionOk(EntityType.SALMON, level, pos)
+                && SpawnPlacements.checkSpawnRules(EntityType.SALMON, level, MobSpawnType.NATURAL, pos, random);
     }
     @GameTest(template = "empty")
     public static void waterCannotCreateFarmlandOrConsumeFertilizer(GameTestHelper helper) {

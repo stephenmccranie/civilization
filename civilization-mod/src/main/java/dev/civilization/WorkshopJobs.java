@@ -14,19 +14,16 @@ public final class WorkshopJobs {
         public boolean matches(ItemStack s){return count==0?s.isEmpty():s.getCount()>=count&&ingredient.test(s);}
         public ItemStack icon(){return count==0?ItemStack.EMPTY:ingredient.getItems()[0].copyWithCount(count);}
     }
-    public record Job(String name,ItemStack output,List<Need> needs,int ticks,int workTicksPerHeat){
-        public Job {if(workTicksPerHeat<1)throw new IllegalArgumentException("Work ticks per heat must be positive");}
-        public Job(String name,ItemStack output,List<Need> needs,int ticks){this(name,output,needs,ticks,1);}
+    public record Job(String name,ItemStack output,List<Need> needs,int ticks){
         /** The output registry ID is stable when catalog rows are reordered. Repair has no output template. */
         public String id(){return output.isEmpty()?"civilization:repair":BuiltInRegistries.ITEM.getKey(output.getItem()).toString();}
         /** Catalog durations are base ticks; all consumers use the material-scaled accessor. */
         public int ticks(){return ticks*materialMultiplier();}
-        public int heatSpent(int completedTicks){return completedTicks/workTicksPerHeat;}
         public int materialMultiplier(){
             var e=equipment(output);if(e==null)return ManufacturingContent.materialMultiplier(output);
             return e.material()==Items.NETHERITE_INGOT?8:e.material()==Items.DIAMOND?4:e.material()==Items.GOLD_INGOT?2:1;
         }
-        public String coalNote(){double coal=heatSpent(ticks())/(double)ProductionEnergy.COAL;return String.format(Locale.ROOT,"Base coal: %.2f (%s) per batch%s, drawn from a hot fire; warming up and heat loss come on top.",coal,Energy.text(coal*Energy.COAL),workTicksPerHeat==1?String.format(Locale.ROOT," (%dx duration)",materialMultiplier()):" (gentle heat)");}
+        public String coalNote(){double coal=ticks()/(double)ProductionEnergy.COAL;return String.format(Locale.ROOT,"Base coal: %.2f (%s) per batch (%dx duration), drawn from a hot fire; warming up and heat loss come on top.",coal,Energy.text(coal*Energy.COAL),materialMultiplier());}
     }
     public record Equipment(Item item,Item material,int amount,boolean armor){}
     private static List<Job> smithy;
@@ -82,7 +79,7 @@ public final class WorkshopJobs {
     }
     public static List<Job> jobs(int kind){return switch(kind){
         case 0->List.of(new Job("Tanning",new ItemStack(Items.LEATHER,Tanning.PIT),List.of(need(WorkshopContent.HIDE.get(),Tanning.PIT),need(WorkshopContent.TANBARK.get(),Tanning.PIT),empty(),empty()),Tanning.TICKS));
-        case 1->List.of(new Job("Weaving",WorkshopContent.CLOTH.toStack(2),List.of(new Need(Ingredient.of(ItemTags.WOOL),1),empty(),empty(),empty()),200,2));
+        case 1->List.of(new Job("Weaving",WorkshopContent.CLOTH.toStack(2),List.of(new Need(Ingredient.of(ItemTags.WOOL),1),empty(),empty(),empty()),200));
         case 2->smithy();case 3->ManufacturingJobs.assembly();default->throw new IllegalArgumentException("Workshop kind "+kind);};}
     public static int originalMax(ItemStack stack){
         int base=stack.getItem().components().getOrDefault(DataComponents.MAX_DAMAGE,stack.getMaxDamage());
@@ -95,10 +92,13 @@ public final class WorkshopJobs {
         int count=Math.max(1,(int)Math.ceil(e.amount()*.5*stack.getDamageValue()/stack.getMaxDamage()));
         var result=stack.copy();EquipmentGrade.apply(result,repairedGrade);result.setDamageValue(0);
         result.remove(DataComponents.REPAIR_COST);
-        Item material=e.material()==Items.IRON_INGOT||e.material()==Items.GOLD_INGOT?ManufacturingContent.part(ManufacturingJobs.metal(e.material()),"plate"):e.material();
-        Item fitting=e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;
-        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material,count),need(fitting,1),empty()),200);
+        return new Job("Repair",result,List.of(need(stack.getItem(),1),need(material(e),count),need(fitting(e),1),empty()),200);
     }
+    /** A repair's primary stock: Plates for iron and gold, otherwise the equipment's own material. */
+    private static Item material(Equipment e){return e.material()==Items.IRON_INGOT||e.material()==Items.GOLD_INGOT?ManufacturingContent.part(ManufacturingJobs.metal(e.material()),"plate"):e.material();}
+    private static Item fitting(Equipment e){return e.armor()?WorkshopContent.CLOTH.get():ManufacturingJobs.shape(e.item())!=null?ManufacturingContent.HANDLE.get():Items.LEATHER;}
+    /** Stock some repair draws, which a bench set to Repair takes before or after the damaged equipment. */
+    public static boolean repairStock(ItemStack s){equipmentJobs();return EQUIPMENT.values().stream().anyMatch(e->s.is(material(e))||s.is(fitting(e)));}
     /**
      * The output of a matched job. A repair is fully quoted and an upgrade keeps the item it upgrades; any other
      * graded output takes the mean grade of the graded units it consumes, the top units of each input stack.

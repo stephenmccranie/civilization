@@ -147,7 +147,7 @@ public final class CivilizationJei implements IModPlugin {
                 slots.add(item(RecipeIngredientRole.OUTPUT,job.output().copy()));if(WorkshopBlockEntity.fired(kind))slots.add(coal());
                 if(kind==0)slots.add(new Slot(RecipeIngredientRole.CATALYST,List.of(new ItemStack(Items.WATER_BUCKET)),FluidStack.EMPTY,"Pour into the pit to start a batch; the bucket comes back empty."));
                 boolean upgrade=BuiltInRegistries.ITEM.getKey(job.output().getItem()).getPath().startsWith("netherite_");
-                recipes.add(process("workshop_"+kind+"/"+job.id().replace(':','/'),slots,job.ticks(),(kind==3?"Hand worked: press Work and remain at the Assembly Bench. No Coal.":kind==0?"Load up to 8 Raw Hide with one Tanbark each, then pour a water bucket into the pit: the batch tans in 20 minutes while loaded. Strip logs with an axe for Tanbark. No Coal.":job.coalNote()+" Light the fire in the controller.")+(upgrade?" Upgrade keeps enchantments and existing wear.":"")));
+                recipes.add(process("workshop_"+kind+"/"+job.id().replace(':','/'),slots,job.ticks(),(WorkshopBlockEntity.handWorked(kind)?"Hand worked: press Work and stay at the bench. No Coal.":kind==0?"Load up to 8 Raw Hide with one Tanbark each, then pour a water bucket into the pit: the batch tans in 20 minutes while loaded. Strip logs with an axe for Tanbark. No Coal.":job.coalNote()+" Light the fire in the controller.")+(upgrade?" Upgrade keeps enchantments and existing wear.":"")));
             }
             if(kind==3)for(var item:BuiltInRegistries.ITEM){
                 var damaged=new ItemStack(item);if(!WorkshopJobs.gated(damaged))continue;

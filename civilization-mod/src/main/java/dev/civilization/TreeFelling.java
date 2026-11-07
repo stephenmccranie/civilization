@@ -1,15 +1,19 @@
 package dev.civilization;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.LevelEvent;
@@ -17,18 +21,42 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 /**
  * Cutting a log of a natural tree also breaks every log of that tree at or above the cut, each through the
- * player's own block-breaking path, so claims, calories, tool wear and loot apply per log exactly as by hand.
+ * player's own block-breaking path, so claims, calories, tool wear and loot apply per log exactly as by hand. The cut
+ * takes longer the more logs it will fell: the tree is counted once when the player starts cutting, on the client and
+ * the server alike, so both see the same breaking time.
  */
 @EventBusSubscriber(modid = "civilization")
 public final class TreeFelling {
     /** A giant jungle tree, the largest vanilla tree, has at most about 130 trunk logs plus a few short branches. */
     static final int MAX_LOGS = 256;
+    /** Each log the cut will fell adds this share of the cut's own breaking time, so felling beats chopping log by log. */
+    static final float LOG_SHARE = 0.25f;
     /** The felled logs' own break events must not start felling again. */
     private static boolean felling;
+    /** The log each player started cutting and how many times longer the cut takes; client and server players alike. */
+    private static final Map<Player, Cut> cuts = Collections.synchronizedMap(new WeakHashMap<>());
+
+    private record Cut(BlockPos pos, float work) {}
+
+    @SubscribeEvent
+    public static void startCut(PlayerInteractEvent.LeftClickBlock e) {
+        if (e.getAction() != PlayerInteractEvent.LeftClickBlock.Action.START) return;
+        var player = e.getEntity();
+        if (player.isCreative() || !e.getLevel().getBlockState(e.getPos()).is(BlockTags.LOGS)) cuts.remove(player);
+        else cuts.put(player, new Cut(e.getPos().immutable(), 1 + LOG_SHARE * tree(e.getLevel(), e.getPos()).size()));
+    }
+
+    @SubscribeEvent
+    public static void cutSpeed(PlayerEvent.BreakSpeed e) {
+        var cut = cuts.get(e.getEntity());
+        if (cut != null && e.getPosition().filter(cut.pos::equals).isPresent()) e.setNewSpeed(e.getNewSpeed() / cut.work);
+    }
 
     /** Runs last, so only a cut every other rule has accepted fells anything. */
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -55,7 +83,7 @@ public final class TreeFelling {
      * order of distance from it and without the cut itself. Empty unless one of them touches natural foliage and
      * there are at most {@link #MAX_LOGS}. Only loaded positions are read.
      */
-    static List<BlockPos> tree(ServerLevel level, BlockPos cut) {
+    static List<BlockPos> tree(Level level, BlockPos cut) {
         var logs = new LinkedHashSet<BlockPos>(List.of(cut));
         var open = new ArrayDeque<BlockPos>(List.of(cut));
         boolean natural = false;

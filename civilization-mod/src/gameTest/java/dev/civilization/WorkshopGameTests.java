@@ -14,7 +14,7 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public final class WorkshopGameTests {
     @GameTest(template="industrial") public static void pairedWorkshopStorageAndSmithySingleOutput(GameTestHelper h){
-        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL));w.setItem(1,new ItemStack(Items.WHITE_WOOL));w.setItem(5,WorkshopContent.CLOTH.toStack(31));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,1200);
+        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL));w.setItem(1,new ItemStack(Items.WHITE_WOOL));w.setItem(5,WorkshopContent.CLOTH.toStack(31));run(w,200);run(w,200);
         h.assertTrue(w.getItem(5).getCount()==32&&w.getItem(7).getCount()==3&&w.getItem(0).isEmpty()&&w.getItem(1).isEmpty(),"Two input stacks feed both output stacks");
         var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(copy.getItem(7).getCount()==3,"Backup workshop output persists");
         copy.removeItem(5,32);
@@ -83,15 +83,13 @@ public final class WorkshopGameTests {
     }
     static WorkshopBlockEntity build(GameTestHelper h,int kind,Direction front){
         var pos=h.absolutePos(new BlockPos(5,1,4));var block=switch(kind){case 0->WorkshopContent.TANNERY.get();case 1->WorkshopContent.TEXTILE.get();case 3->WorkshopContent.BENCH.get();default->WorkshopContent.SMITHY.get();};
-        // Removing the controller takes down a forge standing here; block shells are cleared cell by cell.
+        // Removing the controller takes down the workshop standing here; every workshop but the bench is then built in sections.
         h.getLevel().removeBlock(pos,false);
-        for(int oldKind=0;oldKind<3;oldKind++)for(var oldFront:Direction.Plane.HORIZONTAL)
-            for(var part:WorkshopStructure.parts(oldKind))h.getLevel().removeBlock(MachineStructure.position(pos,oldFront,part),false);
         h.getLevel().setBlockAndUpdate(pos,block.defaultBlockState().setValue(WorkshopBlock.FACING,front));
-        MachineFixture.build(h.getLevel(),pos);
+        if(kind!=ManufacturingJobs.BENCH)MachineFixture.build(h.getLevel(),pos);
         return (WorkshopBlockEntity)h.getLevel().getBlockEntity(pos);
     }
-    static void run(WorkshopBlockEntity w,int ticks){if(w.handWorked()){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else if(!w.steeped())CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
+    static void run(WorkshopBlockEntity w,int ticks){if(WorkshopBlockEntity.handWorked(w.kind)){var p=ManufacturingGameTests.operator(w);w.beginWork(p);}else if(!w.steeped())CoalFireFixture.light(w);for(int i=0;i<ticks;i+=10)w.process();}
     @GameTest(template="industrial") public static void coalHeatFollowsIdleAndMaterialBurn(GameTestHelper h){
         var l=h.getLevel();var field=ThermalField.get(l);
         double[] emissions=new double[3];int n=0;
@@ -133,17 +131,27 @@ public final class WorkshopGameTests {
         var job=WorkshopJobs.repair(tool);w.setItem(0,tool);for(int i=1;i<4;i++)w.setItem(i,job.needs().get(i).icon());
         run(w,job.ticks());h.assertTrue(w.getItem(5).is(Items.DIAMOND_PICKAXE)&&w.getItem(5).getDamageValue()==0&&w.fire.heat()==0,"Diamond repair completes by hand without Coal");h.succeed();
     }
-    @GameTest(template="industrial") public static void weavingProductiveCoal(GameTestHelper h){
-        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,400);
-        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==4&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two wool draw half a Coal from the hot fire, which stokes one to top up");
-        h.assertTrue(WorkshopJobs.jobs(1).getFirst().coalNote().contains("0.25"),"Textile quote shows the lower coal cost");
-        run(w,1600);h.assertTrue(w.fire.hot()&&w.getItem(4).getCount()==3,"A hot idle fire only replaces what its masonry leaks");
-        w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.RED_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,190);
-        h.assertTrue(w.getItem(5).isEmpty(),"Weaving needs the full ten seconds");
-        run(w,210);
-        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==4&&w.fire.hot()&&w.getItem(4).getCount()==3,"Two colored wool yield four Cloth in twenty seconds, drawing half a Coal");
-        h.assertTrue(WorkshopJobs.jobs(1).getFirst().coalNote().contains("0.25"),"Textile quote shows the lower coal cost");
-        h.assertTrue(!w.canPlaceItem(0,new ItemStack(Items.WHEAT))&&!w.canPlaceItem(4,new ItemStack(Items.CHARCOAL)),"No plant cloth or biomass fuel");h.succeed();
+    @GameTest(template="industrial") public static void loomWeavesByHandOneBatchPerPress(GameTestHelper h){
+        var w=build(h,1,Direction.NORTH);var p=ManufacturingGameTests.operator(w);var menu=(WorkshopMenu)p.containerMenu;
+        w.setItem(0,new ItemStack(Items.RED_WOOL,2));w.process();
+        h.assertTrue(w.progress==0&&w.status==MachineStatus.Workshop.HAND_READY,"Wool alone does not weave without a weaver");
+        h.assertTrue(menu.clickMenuButton(p,WorkshopBlockEntity.WORK_BUTTON),"A weaver at the loom presses Work");
+        for(int t=10;t<200;t+=10)w.process();
+        h.assertTrue(w.getItem(5).isEmpty()&&w.progress==190,"Weaving takes the full ten seconds");
+        w.process();double paid=2400-CalorieFoodData.of(p).reserve().calories();
+        h.assertTrue(w.getItem(5).is(WorkshopContent.CLOTH.get())&&w.getItem(5).getCount()==2&&w.getItem(0).getCount()==1,"One coloured wool weaves into two Cloth");
+        h.assertTrue(Math.abs(paid-20*2.5*ThermalRules.calorieFactor(ThermalSystem.comfort(p)))<1e-6,"Each half-second of weaving costs the weaver 2.5 kcal before comfort");
+        w.process();
+        h.assertTrue(w.getItem(5).getCount()==2&&w.getItem(0).getCount()==1&&w.status==MachineStatus.Workshop.HAND_READY,"One press weaves one batch");
+        h.assertTrue(w.pendingExperience==0&&w.fire.heat()==0,"Hand weaving earns no production XP and burns nothing");
+        h.assertTrue(!w.canPlaceItem(4,KilnContent.MINERAL_COAL.toStack())&&!w.canPlaceItem(6,KilnContent.MINERAL_COAL.toStack())&&w.getSlotsForFace(Direction.EAST).length==0,"The loom refuses Coal, including from hoppers");
+        h.assertTrue(w.canPlaceItem(0,new ItemStack(Items.WHITE_WOOL))&&!w.canPlaceItem(0,new ItemStack(Items.WHEAT)),"The loom takes wool and no plant fibre");
+        menu.clickMenuButton(p,WorkshopBlockEntity.WORK_BUTTON);w.process();p.containerMenu=p.inventoryMenu;w.process();
+        h.assertTrue(w.progress==10&&w.status==MachineStatus.Workshop.HAND_READY,"Leaving the loom pauses the batch and keeps its work");
+        p.containerMenu=menu;h.assertTrue(menu.clickMenuButton(p,WorkshopBlockEntity.WORK_BUTTON),"Returning to the loom resumes the batch");w.process();
+        ModeledMachine.removeSection(w,0,false);w.process();
+        h.assertTrue(w.progress==20&&w.status==MachineStatus.Workshop.INCOMPLETE&&w.getItem(0).getCount()==1,"Breaking the loom stops the weaver without finishing or losing the batch");
+        h.assertTrue(!menu.clickMenuButton(p,WorkshopBlockEntity.WORK_BUTTON),"An unfinished loom cannot be worked");h.succeed();
     }
     @GameTest(template="industrial") public static void everyEquipmentJobConservesIngredients(GameTestHelper h){
         var w=build(h,2,Direction.NORTH);var jobs=WorkshopJobs.smithy();
@@ -300,15 +308,18 @@ public final class WorkshopGameTests {
                 &&ingredients.stream().anyMatch(ingredient->ingredient.test(new ItemStack(Items.BARREL))),"Tannery controller needs a barrel but no iron");h.succeed();
     }
     @GameTest(template="industrial") public static void blockedStructureAndSaveResume(GameTestHelper h){
-        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,100);
-        var saved=w.saveWithFullMetadata(h.getLevel().registryAccess());var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(saved,h.getLevel().registryAccess());
-        h.assertTrue(copy.progress==100&&copy.fire.lit()&&CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(w.fire)&&copy.getItem(0).getCount()==1,"Saved work and stored heat retained");
-        copy.setItem(5,new ItemStack(Items.STONE,32));copy.setItem(7,new ItemStack(Items.STONE,32));int coal=copy.getItem(4).getCount();run(copy,200);h.assertTrue(copy.progress==100&&copy.fire.hot()&&copy.getItem(4).getCount()==coal,"Blocked output preserves work; the hot fire only replaces leakage");copy.setItem(5,ItemStack.EMPTY);copy.setItem(7,ItemStack.EMPTY);
-        var wall=w.getBlockPos().east();h.getLevel().removeBlock(wall,false);run(copy,200);h.assertTrue(copy.getItem(0).getCount()==1&&copy.fire.heat()==0&&!copy.fire.lit(),"A broken shell loses its fire and stored heat");
-        MachineFixture.build(h.getLevel(),w.getBlockPos());run(copy,100);h.assertTrue(copy.getItem(5).is(WorkshopContent.CLOTH.get())&&copy.getItem(0).isEmpty(),"Relit shell finishes saved job once");
-        var oldProgress=build(h,1,Direction.NORTH);oldProgress.setItem(0,new ItemStack(Items.WHITE_WOOL));oldProgress.setItem(4,KilnContent.MINERAL_COAL.toStack());run(oldProgress,100);
-        oldProgress.progress=300;CoalFireFixture.set(oldProgress.fire,false,oldProgress.fire.capacity());double stored=CoalFireFixture.stored(oldProgress.fire);oldProgress.process();
-        h.assertTrue(oldProgress.getItem(5).is(WorkshopContent.CLOTH.get())&&stored-CoalFireFixture.stored(oldProgress.fire)<CoalFire.UNIT,"Previously saved weaving work beyond the shorter duration completes without drawing heat");h.succeed();
+        var l=h.getLevel();int head=WorkshopJobs.index(2,"civilization:iron_pickaxe_head");
+        var w=build(h,2,Direction.NORTH);w.select(head);w.setItem(0,new ItemStack(Items.IRON_INGOT,3));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));run(w,200);
+        // The reloaded forge takes the original's place in the world, so breaking and rebuilding below act on it.
+        var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.loadWithComponents(w.saveWithFullMetadata(l.registryAccess()),l.registryAccess());l.setBlockEntity(copy);
+        h.assertTrue(copy.progress==200&&copy.fire.lit()&&CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(w.fire)&&copy.getItem(0).getCount()==3,"Saved work and stored heat retained");
+        copy.setItem(5,new ItemStack(Items.STONE,32));int coal=copy.getItem(4).getCount();run(copy,200);h.assertTrue(copy.progress==200&&copy.fire.hot()&&copy.getItem(4).getCount()==coal,"Blocked output preserves work; the hot fire only replaces leakage");copy.setItem(5,ItemStack.EMPTY);
+        var top=copy.model().cells.stream().map(c->ModeledMachine.position(copy.getBlockPos(),copy.front(),c)).max(java.util.Comparator.comparingInt(BlockPos::getY)).orElseThrow();
+        l.destroyBlock(top,false);run(copy,200);h.assertTrue(copy.getItem(0).getCount()==3&&copy.fire.heat()==0&&!copy.fire.lit(),"A broken forge loses its fire and stored heat");
+        MachineFixture.build(l,copy.getBlockPos());run(copy,300);h.assertTrue(copy.getItem(5).is(ManufacturingContent.head("iron","pickaxe"))&&copy.getItem(0).isEmpty(),"The rebuilt, relit forge finishes the saved job once");
+        var oldProgress=build(h,2,Direction.NORTH);oldProgress.select(head);oldProgress.setItem(0,new ItemStack(Items.IRON_INGOT,3));oldProgress.setItem(4,KilnContent.MINERAL_COAL.toStack());run(oldProgress,100);
+        oldProgress.progress=600;CoalFireFixture.set(oldProgress.fire,false,oldProgress.fire.capacity());double stored=CoalFireFixture.stored(oldProgress.fire);oldProgress.process();
+        h.assertTrue(oldProgress.getItem(5).is(ManufacturingContent.head("iron","pickaxe"))&&stored-CoalFireFixture.stored(oldProgress.fire)<CoalFire.UNIT,"Saved work beyond a shortened duration completes without drawing heat");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopsRotateAndProtectSlots(GameTestHelper h){
         for(int kind=0;kind<3;kind++)for(var dir:Direction.Plane.HORIZONTAL){var w=build(h,kind,dir);h.assertTrue(MachineFixture.status(h.getLevel(),w.getBlockPos())==MachineStructure.COMPLETE,"Complete rotated workshop");}
@@ -397,7 +408,7 @@ public final class WorkshopGameTests {
         h.assertTrue(grind.getSlot(2).getItem().getMaxDamage()==200&&grind.getSlot(2).getItem().getDamageValue()==150,"Disenchanting preserves wear and damage");h.succeed();
     }
     @GameTest(template="industrial",timeoutTicks=80) public static void mobGearAndBrokenWorkshopConservation(GameTestHelper h){
-        var w=build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,7));w.setItem(4,KilnContent.MINERAL_COAL.toStack(3));CoalFireFixture.light(w);w.process();
+        var w=build(h,2,Direction.NORTH);w.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));w.setItem(0,new ItemStack(Items.IRON_INGOT,7));w.setItem(4,KilnContent.MINERAL_COAL.toStack(3));CoalFireFixture.light(w);w.process();
         h.runAfterDelay(10,()->{
             var zombie=h.spawn(net.minecraft.world.entity.EntityType.ZOMBIE,new BlockPos(4,2,2));
             for(var slot:net.minecraft.world.entity.EquipmentSlot.values())zombie.setItemSlot(slot,ItemStack.EMPTY);
@@ -410,7 +421,7 @@ public final class WorkshopGameTests {
             var drops=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(w.getBlockPos()).inflate(6));
             java.util.function.ToIntFunction<Item> count=item->drops.stream().filter(e->e.getItem().is(item)).mapToInt(e->e.getItem().getCount()).sum();
             h.assertTrue(count.applyAsInt(Items.DIAMOND_SWORD)==1&&count.applyAsInt(Items.DIAMOND_HELMET)==0,"Player-supplied gear retained; naturally spawned gear excluded");
-            h.assertTrue(count.applyAsInt(Items.WHITE_WOOL)==7&&count.applyAsInt(KilnContent.MINERAL_COAL.get())==2,"Breaking returns all physical stock; consumed coal remains consumed");h.succeed();
+            h.assertTrue(count.applyAsInt(Items.IRON_INGOT)==7&&count.applyAsInt(KilnContent.MINERAL_COAL.get())==2,"Breaking returns all physical stock; consumed coal remains consumed");h.succeed();
         });
     }
     @GameTest(template="industrial") public static void automaticRecipesAndTwoCoalSlots(GameTestHelper h){

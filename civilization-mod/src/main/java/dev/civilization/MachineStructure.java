@@ -14,18 +14,13 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class MachineStructure {
     public static final int INCOMPLETE = 0, COMPLETE = 1, UNLOADED = 2;
     public static final TagKey<Block> KILN_WALL = TagKey.create(Registries.BLOCK, ResourceLocation.parse("civilization:kiln_wall"));
-    public static final TagKey<Block> COPPER = TagKey.create(Registries.BLOCK, ResourceLocation.parse("civilization:works_copper"));
-    public record Part(int x, int y, int depth, String material, int units, Direction side, int corner, int railConnections, int sharedMask) {
-        public Part(int x,int y,int depth,String material,int units,Direction side,int corner,int railConnections){this(x,y,depth,material,units,side,corner,railConnections,0);}
+    public record Part(int x, int y, int depth, String material, int units, Direction side, int corner, int railConnections) {
         public Part(int x,int y,int depth,String material,int units,Direction side,int corner){this(x,y,depth,material,units,side,corner,0);}
         public Part(int x,int y,int depth,String material,int units,Direction side){this(x,y,depth,material,units,side,-1);}
-        public Part shared(int mask){return new Part(x,y,depth,material,units,side,corner,railConnections,mask);}
     }
     public record Result(int status, BlockPos problem, String material) {}
     private MachineStructure() {}
 
-    /** The block structure of the Tannery or Textile Workshop; every other kiln-family machine is a native model. */
-    public static List<Part> parts(BlockState state) {return WorkshopStructure.parts(((WorkshopBlock)state.getBlock()).kind);}
     /** Every controller that exposes the contextual construction guide uses this blueprint. */
     public static List<Part> guideParts(BlockState state) {
         if (state.getBlock() instanceof ArenaBlock) return ArenaStructure.PARTS;
@@ -33,7 +28,6 @@ public final class MachineStructure {
         if (state.getBlock() instanceof OilEngineBlock) return OilEngineStructure.PARTS;
         if (state.getBlock() instanceof IndustrialBlock industrial) return industrial.kind==IndustrialBlock.Kind.PUMP?List.of():IndustrialStructure.parts(industrial.kind);
         if (state.is(CivicContent.TABLE.get())) return SurveyTable.PARTS;
-        if (state.getBlock() instanceof KilnBlock kiln) return kiln.model() != null ? List.of() : parts(state);
         return List.of();
     }
     public static BlockPos position(BlockPos controller, Direction front, Part part) {
@@ -59,7 +53,6 @@ public final class MachineStructure {
             case "air" -> state.isAir();
             case "stone" -> state.is(KILN_WALL);
             case "brick" -> state.is(Blocks.BRICKS);
-            case "copper" -> state.is(COPPER);
             default -> false;
         };
     }
@@ -86,7 +79,6 @@ public final class MachineStructure {
             case "survey_section" -> CivicContent.TABLE_PART.get().defaultBlockState();
             case "air" -> Blocks.AIR.defaultBlockState();
             case "brick" -> Blocks.BRICKS.defaultBlockState();
-            case "copper" -> Blocks.COPPER_BLOCK.defaultBlockState();
             case "stone" -> Blocks.COBBLESTONE.defaultBlockState();
             default -> throw new IllegalArgumentException("Unknown structure material: " + material);
         };
@@ -116,14 +108,6 @@ public final class MachineStructure {
     }
     public static boolean matches(Level level, BlockPos pos, Part part, Direction front) {
         var actual = level.getBlockState(pos);
-        if(part.sharedMask()!=0){
-            // Complementary cut pieces can canonicalize into their ordinary full block.
-            if(part.sharedMask()==255 && CuttingContent.cuttable(actual) && matches(actual,part.material()))return true;
-            var cells=CutCells.read(level,pos);int required=CutCells.mask(CutBlock.bounds(shape(part,front)));
-            if((CutCells.mask(cells)&required)!=required || obstructed(level,pos,part,front))return false;
-            for(int i=0;i<8;i++)if((required&(1<<i))!=0 && !matches(cells[i],part.material()))return false;
-            return true;
-        }
         if (part.units() == 4) return matches(actual, part.material()) && (!part.material().startsWith("engine_") || actual.getValue(CivicBlock.FACING)==front)
                 && (!part.material().equals("arena_gate") || actual.getValue(FenceGateBlock.FACING).getAxis()==front.getClockWise().getAxis());
         var expected=CutBlock.bounds(shape(part,front));
@@ -137,30 +121,8 @@ public final class MachineStructure {
     /** Shared fixture helper; survival construction still uses normal block placement. */
     public static void placePart(Level level, BlockPos controller, Direction front, Part part) {
         var pos = position(controller, front, part);
-        if(part.sharedMask()!=0){
-            var cells=CutCells.read(level,pos);int mask=CutCells.mask(CutBlock.bounds(shape(part,front)));
-            for(int i=0;i<8;i++)if((mask&(1<<i))!=0)cells[i]=materialState(part.material());
-            level.setBlockAndUpdate(pos,shape(part,front));
-            ((CutBlockEntity)level.getBlockEntity(pos)).cells(cells);return;
-        }
         level.setBlockAndUpdate(pos, shape(part, front));
         if (level.getBlockEntity(pos) instanceof CutBlockEntity cut) cut.material(materialState(part.material()));
-    }
-    /** Shared-cell requirements allow their sibling pieces, but no extra cells or wrong materials. */
-    public static boolean obstructed(Level level,BlockPos pos,Part part,Direction front){
-        if(level.getBlockState(pos).isAir())return false;
-        if(part.sharedMask()==0)return true;
-        var state=level.getBlockState(pos);
-        if(!(state.getBlock() instanceof SlabBlock)&&!state.is(CuttingContent.PIECE.get()))return true;
-        var rotation=switch(front){case EAST->Rotation.CLOCKWISE_90;case SOUTH->Rotation.CLOCKWISE_180;case WEST->Rotation.COUNTERCLOCKWISE_90;default->Rotation.NONE;};
-        int allowed=0;
-        for(int i=0;i<8;i++)if((part.sharedMask()&(1<<i))!=0)allowed|=CutCells.mask(CutGeometry.rotate(CutCells.box(i),rotation));
-        var cells=CutCells.read(level,pos);
-        if((CutCells.mask(cells)&~allowed)!=0)return true;
-        return false;
-    }
-    public static Result check(Level level, BlockPos controller, Direction front) {
-        return checkParts(level, controller, front, parts(level.getBlockState(controller)));
     }
     public static Result checkParts(Level level, BlockPos controller, Direction front, List<Part> parts) {
         // An unloaded shell wins over an incomplete one, without reading every part twice.

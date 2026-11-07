@@ -1,3 +1,6 @@
 {
-  "parent": "civilization:block/textile_workshop"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "civilization:item/textile_workshop"
+  }
 }
