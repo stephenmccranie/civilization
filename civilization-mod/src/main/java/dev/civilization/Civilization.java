@@ -63,6 +63,7 @@ public final class Civilization {
         ArenaContent.register(modBus);
         IndustrialContent.register(modBus);
         FrontierContent.register(modBus);
+        OpenWaterSwimmers.register(modBus);
         OilEngineContent.register(modBus);
         BulkContent.register(modBus);
         BoatContent.register(modBus);
