@@ -1,22 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "BBB",
-    "PCP",
-    "III"
+    "SSS",
+    "PPP",
+    "T T"
   ],
   "key": {
-    "B": {
-      "item": "minecraft:bricks"
+    "S": {
+      "item": "minecraft:string"
     },
     "P": {
       "tag": "minecraft:planks"
     },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
+    "T": {
+      "item": "minecraft:stick"
     }
   },
   "result": {

@@ -19,8 +19,9 @@ public final class ProductionExperienceGameTests {
         copy.awardUsedRecipesAndPopExperience(player);h.assertTrue(h.getLevel().getEntitiesOfClass(ExperienceOrb.class,area).isEmpty(),"Claiming twice cannot duplicate XP");h.succeed();
     }
     @GameTest(template="industrial") public static void workshopOutputBanksCollectSavedXpOnce(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,1,Direction.NORTH);w.setItem(0,new ItemStack(Items.WHITE_WOOL,2));w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));WorkshopGameTests.run(w,1200);
-        h.assertTrue(w.pendingExperience==2,"Each completed production batch earns one XP");
+        var w=WorkshopGameTests.build(h,0,Direction.NORTH);var tanner=ManufacturingGameTests.operator(w);w.setItem(0,WorkshopContent.HIDE.toStack(2));w.setItem(1,WorkshopContent.TANBARK.toStack(2));
+        tanner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new ItemStack(Items.WATER_BUCKET));w.pour(tanner,net.minecraft.world.InteractionHand.MAIN_HAND);WorkshopGameTests.run(w,Tanning.TICKS);
+        h.assertTrue(w.pendingExperience==2,"Each tanned hide earns one XP");
         var copy=new WorkshopBlockEntity(w.getBlockPos(),w.getBlockState());copy.setLevel(h.getLevel());copy.loadWithComponents(w.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());
         h.assertTrue(copy.pendingExperience==2,"XP survives save/load");
         copy.setItem(7,copy.removeItem(5,2));h.assertTrue(copy.pendingExperience==2,"Automation removal retains XP");

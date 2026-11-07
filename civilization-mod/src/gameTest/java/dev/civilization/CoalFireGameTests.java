@@ -12,7 +12,7 @@ public final class CoalFireGameTests {
         h.succeed();
     }
     @GameTest(template="industrial") public static void acceptedIgnitionStrikesCostCalories(GameTestHelper h){
-        var w=WorkshopGameTests.build(h,1,Direction.NORTH);
+        var w=WorkshopGameTests.build(h,2,Direction.NORTH);
         var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"ignition-labor"));
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
@@ -32,7 +32,7 @@ public final class CoalFireGameTests {
         h.runAfterDelay(21,()->{
             MachineFixture.spark(h.getLevel(),true);
             double secondCost=CalorieConfig.IGNITE.get()*ThermalRules.calorieFactor(ThermalSystem.comfort(player));
-            h.assertTrue(menu.clickMenuButton(player,CoalFire.BUTTON)&&w.fire.lit(),"Later accepted spark lights the fire: valid="+menu.stillValid(player)+", structure="+MachineStructure.check(w.getLevel(),w.getBlockPos(),Direction.NORTH).status()+", wet="+MachineWeather.wetWorkFace(w.getLevel(),w.getBlockPos(),w.getBlockState())+", fuel="+w.getItem(4).getCount()+", state="+w.fire.state());
+            h.assertTrue(menu.clickMenuButton(player,CoalFire.BUTTON)&&w.fire.lit(),"Later accepted spark lights the fire: valid="+menu.stillValid(player)+", structure="+MachineFixture.status(h.getLevel(),w.getBlockPos())+", wet="+MachineWeather.wetWorkFace(w.getLevel(),w.getBlockPos(),w.getBlockState())+", fuel="+w.getItem(4).getCount()+", state="+w.fire.state());
             h.assertTrue(Math.abs(data.reserve().calories()-(first-secondCost))<1e-8,
                     "Successful ignition costs one further strike");
             h.succeed();

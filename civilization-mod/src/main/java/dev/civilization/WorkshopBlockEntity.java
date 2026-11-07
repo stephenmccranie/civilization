@@ -23,8 +23,9 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     public int[] coalFuelSlots(){return MachineInventory.WORKSHOP_FUEL;}
     /** The Smithy's footing and brickwork store its fire's heat. */
     public int masonry(){return kind==2?24:0;}
-    /** The Textile Workshop and Smithy burn Coal; the Tannery steeps and the Assembly Bench is worked by hand. */
-    public static boolean fired(int kind){return kind==1||kind==2;}
+    /** The Smithy burns Coal, the Tannery steeps, and the loom and Assembly Bench are worked by hand. */
+    public static boolean fired(int kind){return kind==2;}
+    public static boolean handWorked(int kind){return kind==1||kind==ManufacturingJobs.BENCH;}
     public boolean steeped(){return kind==0;}
     public int pendingExperience;
     public void awardExperience(net.minecraft.world.phys.Vec3 at){
@@ -36,13 +37,12 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     private boolean firePaused;
     public static final int WORK_BUTTON=30000;
     private Player worker;
-    public boolean handWorked(){return kind==ManufacturingJobs.BENCH;}
     public boolean beginWork(Player player){
-        if(!handWorked()||!stillValid(player)||player.isSpectator()||worker!=null&&worker!=player)return false;
-        if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState()))return false;
+        if(!handWorked(kind)||!stillValid(player)||player.isSpectator()||worker!=null&&worker!=player)return false;
+        if(structure()!=MachineStructure.COMPLETE)return false;
         if(!(player.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this)return false;
         var quote=MachineWork.match(this,job());
-        if(quote==null||!MachineInventory.room(this,outputSlots(),WorkshopJobs.result(this,quote)))return false;
+        if(quote==null||!MachineInventory.room(this,outputSlots(kind),WorkshopJobs.result(this,quote)))return false;
         worker=player;setChanged();return true;
     }
     private ItemStack workingResult=ItemStack.EMPTY;
@@ -54,9 +54,9 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     @Override public boolean working(){return getBlockState().getValue(MachineFeedback.WORKING);}
     @Override public void sectionsChanged(){status=MachineStatus.Workshop.INCOMPLETE;}
     @Override public int afloat(){return steeped()?items.get(PIT_HIDES).getCount():0;}
-    /** A forge built as a native model checks its sections; the other workshops check their block structures. */
+    /** Workshops built as native models check their sections; the Assembly Bench checks its two halves. */
     int structure(){
-        if(model()==null)return MachineStructure.check(level,worldPosition,front()).status();
+        if(model()==null)return AssemblyBenchBlock.complete(level,worldPosition,getBlockState())?MachineStructure.COMPLETE:MachineStructure.INCOMPLETE;
         ModeledMachine.reconcile(this);return ModeledMachine.status(this);
     }
     public WorkshopJobs.Job job(){return MachineWork.job(this,kind,selected);}
@@ -64,30 +64,30 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     public void tick(){if(level!=null&&!level.isClientSide&&Math.floorMod(level.getGameTime()+worldPosition.asLong(),10)==0)process();}
     public void process(){
         if(level==null||level.isClientSide)return;
-        if(handWorked()){processHandWork();working(status==MachineStatus.Workshop.WORKING);return;}
+        if(handWorked(kind)){processHandWork();working(status==MachineStatus.Workshop.WORKING);return;}
         if(steeped()){processSteep();working(status==MachineStatus.Workshop.WORKING);return;}
         firePaused=false;processWork();if(!firePaused)fire.tick(10);working(status==MachineStatus.Workshop.WORKING);
     }
     private void processHandWork(){
         if(worker==null||!worker.isAlive()||worker.isSpectator()||!stillValid(worker)||!(worker.containerMenu instanceof WorkshopMenu menu)||menu.inventory!=this){worker=null;pause(MachineStatus.Workshop.HAND_READY,false);return;}
-        if(getBlockState().getBlock() instanceof AssemblyBenchBlock&&!AssemblyBenchBlock.complete(level,worldPosition,getBlockState())){worker=null;pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
+        if(structure()!=MachineStructure.COMPLETE){worker=null;pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
         if(settleInputs()){worker=null;pause(MachineStatus.Workshop.HOT_METAL,true);return;}
         var job=job();var match=MachineWork.match(this,job);
         if(match==null){worker=null;pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
-        if(!MachineInventory.room(this,outputSlots(),result)){worker=null;pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
+        if(!MachineInventory.room(this,outputSlots(kind),result)){worker=null;pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
         double labor=2.5*ThermalRules.calorieFactor(ThermalSystem.comfort(worker));
         var food=CalorieFoodData.of(worker);
         if(CalorieFoodData.active(worker)&&(food.isDepleted()||!food.reserve().canAfford(labor))){worker=null;pause(MachineStatus.Workshop.NEEDS_FOOD,false);return;}
         // Charge only performed work. No fuel, stored power, offline catch-up or automatic repeat.
-        food.spendOther(worker,labor,"assembly_work",job.id());
+        food.spendOther(worker,labor,"hand_work",job.id());
         progress=Math.min(job.ticks(),progress+10);status=MachineStatus.Workshop.WORKING;setChanged();
         if(progress<job.ticks())return;
         EquipmentGrade.ensure(result,level.random,level.registryAccess());
         for(int i=0;i<4;i++)items.get(i).shrink(match.consumed()[i]);
-        MachineInventory.insert(this,outputSlots(),result);
-        EnergyLog.machine(level,worldPosition,"assembly_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
+        MachineInventory.insert(this,outputSlots(kind),result);
+        EnergyLog.machine(level,worldPosition,"hand_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
         level.playSound(null,worldPosition,net.minecraft.sounds.SoundEvents.WOOD_PLACE,net.minecraft.sounds.SoundSource.BLOCKS,.35f,1f);
         worker=null;progress=0;workingResult=ItemStack.EMPTY;status=MachineStatus.Workshop.HAND_READY;setChanged();
     }
@@ -117,8 +117,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(steep<Tanning.TICKS){steep=Math.min(Tanning.TICKS,steep+10);setChanged();}
         if(steep<Tanning.TICKS){status=MachineStatus.Workshop.WORKING;working(true);return;}
         var leather=new ItemStack(Items.LEATHER,pit.getCount());
-        if(!MachineInventory.room(this,outputSlots(),leather)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
-        MachineInventory.insert(this,outputSlots(),leather);
+        if(!MachineInventory.room(this,outputSlots(kind),leather)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
+        MachineInventory.insert(this,outputSlots(kind),leather);
         pendingExperience=(int)Math.min(Integer.MAX_VALUE,(long)pendingExperience+pit.getCount());
         EnergyLog.machine(level,worldPosition,"workshop_batch","Tanning",1,"minecraft:leather",pit.getCount());
         items.set(PIT_HIDES,ItemStack.EMPTY);items.set(PIT_BARK,ItemStack.EMPTY);steep=0;
@@ -136,19 +136,19 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         var match=MachineWork.match(this,job);if(match==null){pause(MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}
         var result=WorkshopJobs.result(this,match);
         if(!ItemStack.matches(result,workingResult)){progress=0;workingResult=result.copy();}
-        if(!MachineInventory.room(this,outputSlots(),result)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
+        if(!MachineInventory.room(this,outputSlots(kind),result)){pause(MachineStatus.Workshop.OUTPUT_FULL,false);return;}
         MachineInventory.refill(this,MachineInventory.WORKSHOP_FUEL);
         // Saved work may already exceed a recipe whose duration was shortened in an update.
         if(progress<job.ticks()){
             int work=Math.min(10,job.ticks()-progress);
-            fire.draw(job.heatSpent(progress+work)-job.heatSpent(progress));
+            fire.draw(work);
             progress+=work;
         }
         status=MachineStatus.Workshop.WORKING;working(true);setChanged();
         if(progress<job.ticks())return;
         EquipmentGrade.ensure(result, level.random, level.registryAccess());
         for(int i=0;i<4;i++)items.get(i).shrink(match.consumed()[i]);
-        MachineInventory.insert(this,outputSlots(),result);
+        MachineInventory.insert(this,outputSlots(kind),result);
         if(!job.name().equals("Repair"))pendingExperience=(int)Math.min(Integer.MAX_VALUE,(long)pendingExperience+1);
         progress=0;workingResult=ItemStack.EMPTY;
         EnergyLog.machine(level,worldPosition,"workshop_batch",job.name(),1,net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(result.getItem()).toString(),result.getCount());
@@ -200,15 +200,15 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         items.set(i,s);s.limitSize(s.getMaxStackSize());changedInput(i);
     }
     private void changedInput(int i){if(i<4){progress=0;workingResult=ItemStack.EMPTY;}setChanged();}
-    private int[] outputSlots(){return kind>=2?MachineInventory.SMITHY_OUTPUT:MachineInventory.WORKSHOP_OUTPUT;}
+    public static int[] outputSlots(int kind){return kind>=2?MachineInventory.SMITHY_OUTPUT:MachineInventory.WORKSHOP_OUTPUT;}
     @Override public void clearContent(){items.clear();worker=null;progress=0;steep=0;workingResult=ItemStack.EMPTY;setChanged();}
     @Override public boolean stillValid(Player p){return !isRemoved()&&level!=null&&level.getBlockEntity(worldPosition)==this&&p.level()==level&&p.distanceToSqr(worldPosition.getCenter())<=64&&CivicAccess.allowed(level,worldPosition,p)&&(!(getBlockState().getBlock() instanceof AssemblyBenchBlock)||AssemblyBenchBlock.allowed(level,worldPosition,getBlockState(),p));}
     @Override public boolean canPlaceItem(int i,ItemStack s){if(i==4||i==6)return fired(kind)&&s.is(KilnContent.MINERAL_COAL.get());return i>=0&&i<4&&(kind>=2||i<2)&&MachineWork.accepts(this,kind,selected,s);}
     @Override public int[] getSlotsForFace(Direction side){
-        if(side==Direction.DOWN)return outputSlots();
+        if(side==Direction.DOWN)return outputSlots(kind);
         if(side==Direction.UP)return kind>=2?new int[]{0,1,2,3}:new int[]{0,1};
         return fired(kind)?MachineInventory.WORKSHOP_FUEL:new int[0];
     }
     @Override public boolean canPlaceItemThroughFace(int i,ItemStack s,Direction side){return side!=Direction.DOWN&&canPlaceItem(i,s);}
-    @Override public boolean canTakeItemThroughFace(int i,ItemStack s,Direction side){return side==Direction.DOWN&&MachineInventory.contains(outputSlots(),i);}
+    @Override public boolean canTakeItemThroughFace(int i,ItemStack s,Direction side){return side==Direction.DOWN&&MachineInventory.contains(outputSlots(kind),i);}
 }

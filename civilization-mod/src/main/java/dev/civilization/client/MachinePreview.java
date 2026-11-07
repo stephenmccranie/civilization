@@ -82,13 +82,13 @@ public final class MachinePreview {
         for(var entry:layout){
             var pos=entry.pos();var part=entry.part();var front=entry.front();
             if(!mc.level.hasChunkAt(pos)){unloaded=true;continue;}
-            if(MachineConstruction.present(mc.level,pos,part,front))continue;
-            boolean occupied=MachineConstruction.blocked(mc.level,pos,part,front);
+            if(MachineStructure.matches(mc.level,pos,part,front))continue;
+            boolean occupied=!mc.level.getBlockState(pos).isAir();
             if(occupied)wrong++;else missing++;
             // Occupied cells already have a real surface: use the red outline only. Layering a
             // full-bright ghost onto newly rebuilt terrain causes a bright flash. An obstructed
             // air chamber likewise gets a red outline, never a fake block.
-            var shown = MachineStructure.obstructed(mc.level,pos,part,front) ? null : MachineStructure.previewState(part, front, heldBlock);
+            var shown = occupied ? null : MachineStructure.previewState(part, front, heldBlock);
             var material = MachineStructure.matches(heldMaterial, part.material()) ? heldMaterial : MachineStructure.materialState(part.material());
             next.add(new Ghost(pos,entry.box(),part,shown,ModelData.builder().with(CutBlockEntity.MATERIAL, material).build(),occupied));
         }

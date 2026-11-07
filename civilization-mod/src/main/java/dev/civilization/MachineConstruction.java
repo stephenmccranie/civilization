@@ -39,25 +39,6 @@ public final class MachineConstruction {
                 && MachineStructure.matches(CuttingContent.material(stack), part.material());
     }
 
-    /** A shared workshop cell may already contain a sibling piece while this part is still missing. */
-    public static boolean present(Level level, BlockPos pos, MachineStructure.Part part, Direction front) {
-        if (part.sharedMask() == 0) return MachineStructure.matches(level, pos, part, front);
-        var state = level.getBlockState(pos);
-        if (part.sharedMask() == 255 && CuttingContent.cuttable(state) && MachineStructure.matches(state, part.material())) return true;
-        var cells = CutCells.read(level, pos);
-        int required = CutCells.mask(CutBlock.bounds(MachineStructure.shape(part, front)));
-        if ((CutCells.mask(cells) & required) != required) return false;
-        for (int i = 0; i < 8; i++) if ((required & (1 << i)) != 0 && !MachineStructure.matches(cells[i], part.material())) return false;
-        return true;
-    }
-
-    public static boolean blocked(Level level, BlockPos pos, MachineStructure.Part part, Direction front) {
-        if (level.getBlockState(pos).isAir()) return false;
-        if (part.sharedMask() == 0 || MachineStructure.obstructed(level, pos, part, front)) return true;
-        int required = CutCells.mask(CutBlock.bounds(MachineStructure.shape(part, front)));
-        return (CutCells.mask(CutCells.read(level, pos)) & required) != 0;
-    }
-
     public static ItemInteractionResult useOn(ItemStack stack, BlockState state, Level level, BlockPos controller, Player player) {
         var parts = MachineStructure.guideParts(state);
         var front = state.getValue(CivicBlock.FACING);
@@ -78,7 +59,7 @@ public final class MachineConstruction {
         for (var part : parts) {
             if (!supplies(stack, part)) continue;
             var pos = MachineStructure.position(controller, front, part);
-            if (!Chunks.loaded(level, pos) || !present(level, pos, part, front)) return true;
+            if (!Chunks.loaded(level, pos) || !MachineStructure.matches(level, pos, part, front)) return true;
         }
         return false;
     }
@@ -92,10 +73,10 @@ public final class MachineConstruction {
             if (stack.isEmpty() || !supplies(stack, part)) continue;
             var pos = MachineStructure.position(controller, front, part);
             if (!Chunks.loaded(level, pos)) { if (firstBlocked == null) firstBlocked = pos; continue; }
-            if (present(level, pos, part, front)) continue;
+            if (MachineStructure.matches(level, pos, part, front)) continue;
             // Construction never clears terrain, liquids, other machines, or an occupied guide cell.
             if (level.isOutsideBuildHeight(pos) || !level.getWorldBorder().isWithinBounds(pos)
-                    || blocked(level, pos, part, front) || !level.getFluidState(pos).isEmpty()
+                    || !level.getBlockState(pos).isAir() || !level.getFluidState(pos).isEmpty()
                     || !CivicAccess.allowed(level, pos, player) || !level.mayInteract(player, pos)
                     || !player.mayUseItemAt(pos, Direction.UP, stack)
                     || AirshipSystem.at(level, pos) != null) {
@@ -103,15 +84,7 @@ public final class MachineConstruction {
                 continue;
             }
             BlockState state = MachineStructure.shape(part, front);
-            BlockState[] joined = null;
-            if (part.sharedMask() != 0) {
-                joined = CutCells.read(level, pos);
-                int mask = CutCells.mask(CutBlock.bounds(state));
-                for (int i = 0; i < 8; i++) if ((mask & (1 << i)) != 0) joined[i] = CuttingContent.material(stack);
-                state = CutCells.canonical(joined);
-                if (state == null) state = CuttingContent.PIECE.get().defaultBlockState();
-                if (state.is(CuttingContent.PIECE.get()) && state.equals(level.getBlockState(pos))) state = state.cycle(CutBlock.REVISION);
-            } else if (part.units() == 4 && !part.material().endsWith("_port") && !part.material().equals("guardrail")
+            if (part.units() == 4 && !part.material().endsWith("_port") && !part.material().equals("guardrail")
                     && !part.material().startsWith("engine_") && !part.material().equals("arena_gate") && stack.getItem() instanceof BlockItem block)
                 state = block.getBlock().defaultBlockState();
             var shape = part.units() == 4 ? state.getCollisionShape(level, pos)
@@ -122,10 +95,7 @@ public final class MachineConstruction {
             }
             var snapshot = BlockSnapshot.create(level.dimension(), level, pos);
             if (!level.setBlock(pos, state, 3)) { if (firstBlocked == null) firstBlocked = pos; continue; }
-            if (level.getBlockEntity(pos) instanceof CutBlockEntity cut) {
-                if (joined != null) cut.cells(joined);
-                else if (part.units() < 4) cut.material(CuttingContent.material(stack));
-            }
+            if (part.units() < 4 && level.getBlockEntity(pos) instanceof CutBlockEntity cut) cut.material(CuttingContent.material(stack));
             if (player instanceof ServerPlayer server && part.units() < 4)
                 PENDING.set(new Pending(server, pos.immutable(), CuttingContent.volume(part.units())));
             boolean cancelled;

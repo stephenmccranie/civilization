@@ -104,15 +104,16 @@ final class WorkshopVisualCheck {
         if(ticks==416){mc.options.hideGui=true;server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
         if(ticks==423){shot(mc,"tannery-steeping");mc.options.hideGui=false;}
         if(ticks==425){mc.options.guiScale().set(3);mc.resizeDisplay();server.execute(()->{
-            var l=server.overworld();var w=(WorkshopBlockEntity)l.getBlockEntity(at(1));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
-            var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,37.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);
+            // The Smithy stands without its chimney since the guide capture; rebuild it to light its fire.
+            var l=server.overworld();MachineFixture.build(l,at(2));var w=(WorkshopBlockEntity)l.getBlockEntity(at(2));w.clearContent();w.fire.extinguish();w.setItem(4,KilnContent.MINERAL_COAL.toStack(4));
+            var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,at(2).getX()+.5,101,-2,java.util.Set.of(),0,0);p.openMenu(w);
         });}
         if(ticks==445)shot(mc,"ignition-rest");
         if(ticks==446)click(mc,"Strike to light");
         if(ticks==447)shot(mc,"ignition-strike");
         // Exercise the real button first; a paced seeded menu strike makes the final art capture repeatable.
         if(ticks==470)server.execute(()->{
-            var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(1));
+            var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)server.overworld().getBlockEntity(at(2));
             if(!w.fire.lit()){
                 MachineFixture.spark(server.overworld(),true);
                 p.containerMenu.clickMenuButton(p,CoalFire.BUTTON);
@@ -124,9 +125,19 @@ final class WorkshopVisualCheck {
         if(ticks==497){if(ModeledMachine.of(mc.level.getBlockEntity(at(0))).afloat()!=Tanning.PIT)throw new IllegalStateException("The client does not see the steeping hides");shot(mc,"tannery-drift");}
         if(ticks==498)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.2,103.2,-1.2,java.util.Set.of(),47,24));
         if(ticks==508)shot(mc,"tannery-heap");
+        // A weaver at the loom from its front left: the server keeps the menu open while the client hides it, so the
+        // beater, shafts and treadles move; three frames catch different points of the pick.
+        if(ticks==509)server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();var w=(WorkshopBlockEntity)l.getBlockEntity(at(1));
+            p.teleportTo(l,at(1).getX()+4,103.6,-3.5,java.util.Set.of(),32,22);p.openMenu(w);
+            if(!w.beginWork(p))failure=new IllegalStateException("The loom refused its weaver");});
+        if(ticks==512)mc.setScreen(null);
+        if(ticks==520)shot(mc,"textile-working-a");
+        if(ticks==524)shot(mc,"textile-working-b");
+        if(ticks==528){shot(mc,"textile-working-c");if(!mc.level.getBlockState(at(1)).getValue(MachineFeedback.WORKING))throw new IllegalStateException("The client does not see the loom working");}
+        if(ticks==530)server.execute(()->server.getPlayerList().getPlayers().getFirst().closeContainer());
         // The steeping pit again without a shader pack, its water as vanilla draws it.
-        if(ticks==509){WheelbarrowVisualCheck.shaders(false);server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
-        if(ticks==550){shot(mc,"tannery-plain");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
+        if(ticks==539){WheelbarrowVisualCheck.shaders(false);server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),34.5,104,-3.5,java.util.Set.of(),37,32));}
+        if(ticks==580){shot(mc,"tannery-plain");com.mojang.logging.LogUtils.getLogger().info("WORKSHOP VISUAL VERIFIED, manual ignition synchronized");mc.stop();}
     }
     private static void click(Minecraft mc,String name){
         var b=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.Button button&&button.visible&&button.getMessage().getString().equals(name)).map(c->(net.minecraft.client.gui.components.Button)c).findFirst().orElseThrow(()->new IllegalStateException("Missing control: "+name));

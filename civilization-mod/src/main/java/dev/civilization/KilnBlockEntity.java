@@ -61,9 +61,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     public boolean requiresStructure() { return true; }
     public MachineStructure.Result checkStructure() {
         if (model() != null) { ModeledMachine.reconcile(this); structure = new MachineStructure.Result(ModeledMachine.status(this), null, ""); }
-        else structure = requiresStructure()
-                ? MachineStructure.check(level, worldPosition, front())
-                : new MachineStructure.Result(MachineStructure.COMPLETE, null, "");
+        else structure = new MachineStructure.Result(MachineStructure.COMPLETE, null, "");
         return structure;
     }
     private final ModeledBuild build = new ModeledBuild();
