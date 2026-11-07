@@ -8,11 +8,10 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
-/** Disposable fixtures build machines the way players do: native models through their sections, block structures part by part. */
+/** Disposable fixtures build native-model machines the way players do, section by section. */
 final class MachineFixture {
     static void build(ServerLevel l,BlockPos at){
         var modeled=ModeledMachine.of(l.getBlockEntity(at));
-        if(modeled==null){var front=l.getBlockState(at).getValue(CivicBlock.FACING);for(var part:MachineStructure.parts(l.getBlockState(at)))MachineStructure.placePart(l,at,front,part);return;}
         var model=modeled.model();var front=modeled.front();
         for(var c:model.cells){var p=ModeledMachine.position(at,front,c);l.getChunkAt(p);l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());}
         for(var port:model.ports)l.setBlockAndUpdate(MachineStructure.position(at,front,port.part()),Blocks.AIR.defaultBlockState());
@@ -23,8 +22,5 @@ final class MachineFixture {
     static void spark(ServerLevel l,boolean catches){
         for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if((r.nextInt(3)==0)==catches){l.random.setSeed(seed);return;}}
     }
-    static int status(ServerLevel l,BlockPos at){
-        var modeled=ModeledMachine.of(l.getBlockEntity(at));
-        return modeled!=null?ModeledMachine.status(modeled):MachineStructure.check(l,at,l.getBlockState(at).getValue(CivicBlock.FACING)).status();
-    }
+    static int status(ServerLevel l,BlockPos at){return ModeledMachine.status(ModeledMachine.of(l.getBlockEntity(at)));}
 }

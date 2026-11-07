@@ -89,13 +89,13 @@ public final class IndustryGameTests {
     @GameTest(template="empty") public static void stoneToolsRecoverControllers(GameTestHelper h){
         var pick=new ItemStack(Items.STONE_PICKAXE).get(net.minecraft.core.component.DataComponents.TOOL);
         for(var block:List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),CookingContent.STATION.get(),KilnContent.FOUNDRY.get(),
-                WorkshopContent.TANNERY.get(),WorkshopContent.TEXTILE.get(),WorkshopContent.SMITHY.get(),CivicContent.LAND.get(),
+                WorkshopContent.TANNERY.get(),WorkshopContent.SMITHY.get(),CivicContent.LAND.get(),
                 AirshipContent.CONTROLLER.get(),IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.TANK.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),OilEngineContent.ENGINE.get(),
                 BulkContent.BUNKER.get(),BulkContent.TANK.get()))
             h.assertTrue(pick.isCorrectForDrops(block.defaultBlockState()),"Stone pickaxe recovers "+block.getDescriptionId());
         var axe=new ItemStack(Items.STONE_AXE).get(net.minecraft.core.component.DataComponents.TOOL);
-        for(var block:List.of(CivicContent.SHOP.get(),CivicContent.TABLE.get(),CivicContent.TABLE_PART.get(),BoatContent.HELM.get()))
+        for(var block:List.of(CivicContent.SHOP.get(),CivicContent.TABLE.get(),CivicContent.TABLE_PART.get(),BoatContent.HELM.get(),WorkshopContent.TEXTILE.get(),MachineParts.block(MachineModel.TEXTILE)))
             h.assertTrue(axe.isCorrectForDrops(block.defaultBlockState()),"Stone axe recovers "+block.getDescriptionId());
         var pos=h.absolutePos(new BlockPos(3,1,3));var level=h.getLevel();level.setBlockAndUpdate(pos,WorkshopContent.SMITHY.get().defaultBlockState());
         var player=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"stone-miner"));

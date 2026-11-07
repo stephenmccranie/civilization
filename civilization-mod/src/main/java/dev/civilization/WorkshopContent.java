@@ -20,7 +20,12 @@ public final class WorkshopContent {
     public static final DeferredItem<Item> HIDE=ITEMS.registerSimpleItem("raw_hide"), TANBARK=ITEMS.registerSimpleItem("tanbark"), CLOTH=ITEMS.registerSimpleItem("cloth");
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<WorkshopBlockEntity>> ENTITY=ENTITIES.register("workshop",()->BlockEntityType.Builder.of(WorkshopBlockEntity::new,TANNERY.get(),TEXTILE.get(),SMITHY.get(),BENCH.get()).build(null));
     public static final DeferredHolder<MenuType<?>,MenuType<WorkshopMenu>> MENU=MENUS.register("workshop",()->new MenuType<>(WorkshopMenu::new,FeatureFlags.DEFAULT_FLAGS));
-    /** The Tannery's controller cell is mostly open pit, so light reaches its water and floor. */
-    private static DeferredBlock<WorkshopBlock> block(String name,int kind){var b=BLOCKS.register(name,()->kind==3?new AssemblyBenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)):new WorkshopBlock(kind==0?BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE).noOcclusion():BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE),kind));ITEMS.registerSimpleBlockItem(b);return b;}
+    /** The Tannery's controller cell is mostly open pit and the loom's is its open bench, so light reaches through them;
+     * the loom and Assembly Bench are timber. */
+    private static DeferredBlock<WorkshopBlock> block(String name,int kind){var b=BLOCKS.register(name,()->switch(kind){
+        case 0->new WorkshopBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE).noOcclusion(),kind);
+        case 1->new WorkshopBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion(),kind);
+        case 3->new AssemblyBenchBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE).noOcclusion().pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK));
+        default->new WorkshopBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE),kind);});ITEMS.registerSimpleBlockItem(b);return b;}
     public static void register(IEventBus bus){BLOCKS.register(bus);ITEMS.register(bus);ENTITIES.register(bus);MENUS.register(bus);}
 }

@@ -1,6 +1,6 @@
 # Manufacturing
 
-Town manufacturing runs **Foundry metals + hides and wool → Tannery, Textile Workshop and Smithy parts → Assembly Bench goods and repairs**. It needs Coal and labor, not oil. Forming metal is coal-fired; final assembly, upgrades and repairs are player labor at the Assembly Bench. Guides, the cabinet interface, coal fires and XP are shared [machine rules](machines.md).
+Town manufacturing runs **Foundry metals + hides and wool → Tannery, Textile Workshop and Smithy parts → Assembly Bench goods and repairs**. It needs Coal and labor, not oil. Forming metal is coal-fired; weaving at the Textile Workshop and final assembly, upgrades and repairs at the Assembly Bench are player labor. Guides, the cabinet interface, coal fires and XP are shared [machine rules](machines.md).
 
 ## Foundry
 
@@ -21,20 +21,22 @@ Ore smelting is 1:1, without multiplication. Coal is both heat and steel's carbo
 | Controller | Crafting pattern (top / middle / bottom) |
 | --- | --- |
 | Tannery | plank–brick block–plank / plank–barrel–plank / three cobblestone |
-| Textile Workshop | three brick blocks / plank–copper ingot–plank / three iron ingots |
+| Textile Workshop | three string / three planks / stick–blank–stick |
 | Smithy | three brick blocks / plank–cobblestone–plank / three iron ingots |
 
-Controller crafting needs no leather, cloth, shears, anvil or oil. The Textile Workshop is a shell of vanilla or resource-pack materials and saw-cut pieces; the Tannery and Smithy are built from their controllers in sections:
+Controller crafting needs no leather, cloth, shears, anvil or oil. The Tannery, Textile Workshop and Smithy are built from their controllers in sections:
 
 - **Tannery** (4×2, about 2.75 high): placed, its controller is the plank hatch of a bark tan pit: a waist-high brick curb on a fieldstone footing round a vat lined with upright boards under a timber coping, a slatted bin heaped over its rim with curled slabs of peeled bark at its left and a drying rack along its back, a tanned hide over its rail. It is built like the other [modeled machines](machines.md#building-with-a-controller), in five sections paid with **4 stone, 8 brick blocks and 10 planks**: footing (4 stone or cobblestone), curb (8 brick blocks), vat (6 planks of any wood), bark bin (2) and drying rack (2). While a batch steeps, water fills the vat, drawn in vanilla's animated water texture and its biome's water colour, with one hide afloat for each hide in the pit: they drift slowly round it on a wandering eddy, turning as they go, nudge each other apart, ride a little deeper one after another and ripple as they bob; one more laps over the front. The hide on the drying rack swings and flutters in one world-wide breeze, harder in rain and storms and still under cover from the sky. With Iris 1.8.14 a shader pack such as Photon shades the pit's water as its own water, with its reflections and ripples. The empty pit shows its plank floor.
-- **Textile Workshop** (3×3, four high): **5 plank slabs, 9 plank quarter beams, 4 plank eighth cubes, 1 copper quarter beam**. A two-deep upper-slab bench stands on four shared-cell feet; two rear posts and a crossbar frame an open center, with the copper roller in the supported central cell.
+- **Textile Workshop** (about 3×3, 2.5 high): placed, its controller is the weaver's knee-high plank bench, with knee-high collision. Behind it stands a counterbalance floor loom: a four-post timber frame two blocks wide and deep, the breast beam over a roll of woven cream cloth with a blue stripe and an iron ratchet, the warp running level back through two harness shafts hung from a crossbeam and a swinging beater to the warp beam, four treadles on the floor. A walking great wheel on its own three-legged bench stands at its left, a hank of yarn hanging from a peg. It is built like the other [modeled machines](machines.md#building-with-a-controller), in six sections paid with **22 planks, 4 string and 4 wool**: frame (8 planks of any wood), beams and treadles (6), harness (4 string), beater (2 planks), warp (4 wool of any colour) and great wheel (6 planks). While someone weaves, the beater beats, the shafts change and the treadles work beneath them; the hank sways in the wind.
 - **Smithy** (4×2, about 3.7 high): placed, its controller is the japanned ash-pit door of a brick coal forge: a waist-high hearth on a fieldstone footing with a coal bed in its firepot, brick cheeks and a sooty fireback under a hood that steps in to a square chimney, a leather bellows on a timber frame at its left whose lever pumps while the forge works, and a stave slack tub at its front right. It is built like the other [modeled machines](machines.md#building-with-a-controller), in six sections paid with **4 stone, 20 brick blocks and 8 planks**: footing (4 stone or cobblestone), hearth (8 brick blocks), hood (8), chimney (4), bellows (6 planks of any wood) and slack tub (2). The fire warms the whole forge. The coal bed and fire are visual only — no inventory, free fuel or real fire.
 
 | Workshop | Job | Productive time |
 | --- | --- | --- |
 | Tannery | Up to 8 Raw Hide, one Tanbark each, steeped in its water pit → as many Leather | 20 minutes while loaded; no fuel |
-| Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds at half heat rate (0.25 Coal) |
+| Textile Workshop | 1 wool of any color → 2 Cloth | 10 seconds of hand work (50 kcal at neutral comfort) |
 | Smithy | Ingots → Plates, Rods, Fasteners, heads and blades | [Shared stock](#shared-stock), [equipment](#equipment) |
+
+The Textile Workshop is worked like the [Assembly Bench](#assembly-bench): load wool, press **Work** and stay at the loom with its menu open; each press weaves one batch, at the bench's labor rate, with no fuel and no XP.
 
 Choose a job in the recipe drawer or let Automatic start a unique match; ambiguous materials wait for a selection while a lit fire keeps the Smithy hot. A Smithy with an occupied output pauses until the item is collected or removed by a hopper. Missing inputs or a changed selection reset unfinished work; blocked output or a broken structure pauses it. Inputs are consumed only when the output fits. Selections are saved by output ID. Hoppers and menus check range and claims.
 

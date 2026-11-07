@@ -44,7 +44,7 @@ public class MultiblockGameTests {
             modeled++;
         }
         h.assertTrue(modeled == MachineModel.all().size(), "Every machine model has one controller, found " + modeled);
-        l.setBlockAndUpdate(at, WorkshopContent.TEXTILE.get().defaultBlockState());
+        l.setBlockAndUpdate(at, IndustrialContent.REFINERY.get().defaultBlockState());
         h.assertTrue(!net.minecraft.world.level.block.Block.shouldRenderFace(l.getBlockState(below), l, below, Direction.UP, at), "A block-structure controller hides the face under it");
         h.succeed();
     }

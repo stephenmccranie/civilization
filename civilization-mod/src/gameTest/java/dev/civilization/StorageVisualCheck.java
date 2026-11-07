@@ -36,7 +36,7 @@ final class StorageVisualCheck {
         if(ticks==105)server.execute(()->{
             var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();var pos=new BlockPos(80,101,0);
             l.setBlockAndUpdate(pos,WorkshopContent.TEXTILE.get().defaultBlockState());var w=(WorkshopBlockEntity)l.getBlockEntity(pos);
-            w.setItem(0,new ItemStack(Items.WHITE_WOOL,32));w.setItem(1,new ItemStack(Items.WHITE_WOOL,32));w.setItem(4,KilnContent.MINERAL_COAL.toStack(32));w.setItem(6,KilnContent.MINERAL_COAL.toStack(32));w.setItem(5,WorkshopContent.CLOTH.toStack(32));w.setItem(7,WorkshopContent.CLOTH.toStack(32));p.openMenu(w);
+            w.setItem(0,new ItemStack(Items.WHITE_WOOL,32));w.setItem(1,new ItemStack(Items.WHITE_WOOL,32));w.setItem(5,WorkshopContent.CLOTH.toStack(32));w.setItem(7,WorkshopContent.CLOTH.toStack(32));p.openMenu(w);
         });
         if(ticks==135){
             if(!(mc.player.containerMenu instanceof WorkshopMenu m)||m.slots.size()!=44+1||!m.getSlot(1).isActive()||m.getSlot(7).getItem().getCount()!=32)throw new IllegalStateException("Paired workshop storage failed menu sync");

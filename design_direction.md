@@ -173,7 +173,7 @@ Towns concentrate production, customers and services: rural farms, mines and for
 | --- | --- |
 | Foundry | Ore + Coal → metals and steel; refining |
 | Tannery | Raw Hide + Tanbark → Leather, steeped in a water bark pit by time alone; brick, stone and wood, no iron or fuel |
-| Textile Workshop | Wool → Cloth |
+| Textile Workshop | Wool → Cloth, woven by hand at a timber loom for labour; no fuel |
 | Smithy | Metals → forged heads, Plates, Rods, Fasteners |
 | Assembly Bench | Parts, timber, Leather, Cloth → finished goods and repairs |
 
