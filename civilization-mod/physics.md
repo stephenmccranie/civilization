@@ -1,6 +1,6 @@
 # Physical materials and cargo
 
-Shared material data and block geometry, the operator inspectors, the wheelbarrow and pallets, personal block carrying, the backpack, nearby stores and shared crafting tables. Sable owns vessel motion, collision and inertia; physical mass here is separate from thermal capacity and machine work credit.
+Shared material data and block geometry, the operator inspectors, the wheelbarrow and pallets, personal block carrying, the backpack, nearby stores and shared crafting and enchanting tables. Sable owns vessel motion, collision and inertia; physical mass here is separate from thermal capacity and machine work credit.
 
 ## Materials
 
@@ -100,13 +100,15 @@ The contents are the backpack item's own container contents, and its binding (a 
 
 Every menu that shows the Hand, except the player's own inventory, lists the Pallets and parked wheelbarrows the player could open from where they stand, within **6 blocks** and with claim access, in its **Nearby** panel: one list of their goods merged by item, twelve to a page (the arrows or the scroll wheel turn pages), with exact counts in tooltips. A Pallet group counts once, and a store's own menu leaves itself out. Click an entry to take a stack (right-click for half), or click any cell with goods on the cursor, whatever it shows, to stack them, all or one, onto the nearest stores with room, new kinds of goods included; Shift-click moves stacks into the inventory, blocks filling the Hand and then the pack. Taking draws from the nearest store holding the goods first. [Recipe placement](#personal-block-carrying) draws from the same stores.
 
+Shift-clicking the result of a crafting table or stonecutter crafts until the ingredients run out or nothing can take another result. Each result fills the pockets, the Hand and the pack as any shift-click does, and what they cannot hold goes onto the nearest listed store with room, under the same reach and access checks as taking; the action bar names the store and its load. As in vanilla, the part of a last result that fits nowhere drops at the player's feet.
+
 The server finds the stores when the menu opens, from loaded chunks and entities only, rechecks reach and access on every use and sends the list whenever a store's goods change; a store that moves out of reach, is pushed or loses access leaves the list. The inventory has no Nearby panel because it opens without telling the server.
 
-## Shared crafting tables
+## Shared tables
 
-Placed vanilla crafting tables keep their nine input slots in the world. Closing the table, walking away or disconnecting leaves the ingredients there, and anyone with claim access who opens the same table sees and uses the same grid; open viewers receive input and result changes together. Each table's storage is saved with the dimension. Leave logs on a table, close it to free your hand and return with more. The player's 2×2 grid is unchanged.
+Placed vanilla crafting tables keep their nine input slots in the world, and enchanting tables the item being enchanted and their lapis. Closing the table, walking away or disconnecting leaves the goods there, and anyone with claim access who opens the same table sees and uses the same slots; open viewers receive changes together. Each kind of table's storage is saved with the dimension. Leave logs on a table, close it to free your hand and return with more; keep a stack of lapis on an enchanting table for everyone who uses it. The player's 2×2 grid is unchanged.
 
-Breaking or replacing the table drops its inputs once and invalidates open menus. Outputs are previews; crafting consumes the shared ingredients through the normal recipe path. There is no ticking block entity or hopper inventory. This is server-side and uses native menus, so protocol-compatible clients need no update.
+Crafting outputs are previews; crafting consumes the shared ingredients through the normal recipe path. Each viewer of an enchanting table is offered enchantments from their own seed, as in vanilla; choosing one rechecks claim access and spends the shared lapis once, and the other viewers' offers follow the changed item. Breaking or replacing a table drops its slots once and invalidates open menus. There is no ticking block entity or hopper inventory. This is server-side and uses native menus, so protocol-compatible clients need no update.
 
 ## Save compatibility
 
