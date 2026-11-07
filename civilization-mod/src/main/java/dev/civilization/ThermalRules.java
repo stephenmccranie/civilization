@@ -31,9 +31,12 @@ public final class ThermalRules {
     public static final double RAIN_COOLING_TICKS = 6000; // Five real minutes to approach wet equilibrium.
     public static final double RAIN_RECOVERY_TICKS = 48000; // Forty-minute thermal recovery after rain.
     public static final double MACHINE_TOP_SHARE = .80;
-    public static final double PLAYER_RESPONSE_SECONDS = 2.5;
+    // A body closes its gap to what it feels at gap * (1 + |gap| / PLAYER_RESPONSE_GAP_C) / PLAYER_RESPONSE_SECONDS per
+    // second: a mild gap drifts on a 40 s time constant, and the constant shrinks as the gap grows, as convection and
+    // radiation outpace the difference that drives them, so fire, lava or deep cold move a body within seconds.
+    public static final double PLAYER_RESPONSE_SECONDS = 40, PLAYER_RESPONSE_GAP_C = 15 / 1.8;
     // Felt temperature blends torso air with the mean radiant temperature of what a body sees.
-    public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8, MAX_RADIANT_C = 100;
+    public static final double RADIANT_SHARE = .4, RADIANT_REACH = 8;
     // Radiant output as bodies feel it, softened over about a block. Tuning, not SI.
     public static final double FLAME_RADIANCE = 30000, TORCH_RADIANCE = 3000, LAVA_RADIANCE = 60000;
     // Climate temperatures are shade air; direct sun is felt on top. A body absorbs about an eighth of the sun's beam
@@ -142,9 +145,14 @@ public final class ThermalRules {
         return height < MIN_SUN_HEIGHT ? 0 : 1353 * Math.pow(.7, Math.pow(1 / height, .678));
     }
     public static double calorieFactor(double comfort) { return 1 - .20 * comfort; }
-    /** A player's thermal state follows the sampled air, without changing the air field. */
-    public static double playerTemperature(double previous, double air, double seconds) {
-        return previous + (air - previous) * (1 - Math.exp(-Math.max(0, seconds) / PLAYER_RESPONSE_SECONDS));
+    /**
+     * A player's thermal state approaching what they feel, without changing the air field. The exact solution of the
+     * gap's equation: gap / (G + gap) decays as exp(-t / PLAYER_RESPONSE_SECONDS), so no step can overshoot.
+     */
+    public static double playerTemperature(double previous, double target, double seconds) {
+        double gap = Math.abs(previous - target), g = PLAYER_RESPONSE_GAP_C;
+        double share = gap / (g + gap) * Math.exp(-Math.max(0, seconds) / PLAYER_RESPONSE_SECONDS);
+        return target + Math.signum(previous - target) * g * share / (1 - share);
     }
     /** Felt cold costs up to the configured kcal/s; mild cold is deliberately inexpensive. */
     public static double coldKcalPerSecond(double c, double maximum) {
