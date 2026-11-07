@@ -87,6 +87,8 @@ public final class Backpack {
                 if(held.isEmpty())setItem(i,stack.split(n));else{Grade.join(held,stack,n);setChanged();}
             }
         }
+        /** Whether the pack takes all of `stack`. */
+        public boolean fits(ItemStack stack){var rest=stack.copy();new Contents(pack.copy()).insert(rest);return rest.isEmpty();}
         /** Takes up to `n` of the item, from the last matching stack first. */
         public int take(ItemStack item,int n){
             int taken=0;

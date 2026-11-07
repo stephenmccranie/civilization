@@ -58,7 +58,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `grassier-grass` | Grass at low and high altitude with Grassier Grass installed |
 | `crafting` | Crafting table output, ingredient use, recipe book and saved shared inputs |
 | `chests` | Single and double chest menus with shift-click conservation |
-| `inventory` | Player inventory, equipment, offhand, pickup and recipe book |
+| `inventory` | Player inventory, equipment, offhand, pickup and recipe book; graded ingots dealt by a real mouse drag in the order crossed, and stone from the Pack swapped into a Hand holding torches |
 | `jei` | JEI categories, catalysts and recipe parity, and the **+** placing a crafting recipe through our own transfer handler (needs JEI in `run/mods`) |
 | `civic` | Land controller and trade counter menus, whitelist and quantity input |
 | `kitchen` | Prototype stove, food doneness, rotary menu input and serving |

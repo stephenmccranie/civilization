@@ -65,8 +65,6 @@ public final class SidePanels {
     /** The column height a panel takes above the next, or nothing for an absent one. */
     private static int stacked(int height){return height==0?0:height+SPACING;}
     private static void place(Slot s,int x,int y){((dev.civilization.mixin.SlotPositionAccess)s).civilization$setX(x);((dev.civilization.mixin.SlotPositionAccess)s).civilization$setY(y);}
-    /** Slots drawn in the column rather than by the menu's own skin. */
-    public static boolean inColumn(Slot s){return s instanceof Backpack.PackSlot||s.container instanceof Inventory&&s.getContainerSlot()==BlockCarry.OFFHAND;}
     /** The panels in screen coordinates, kept clear by JEI and counted as inside the menu. */
     public static List<Rect2i> areas(AbstractContainerScreen<?> screen){
         var layout=layout(screen);if(layout==null)return List.of();
