@@ -1,6 +1,6 @@
 # Geography and weather
 
-Natural river bands decide where crops grow and woodland decides how fast trees grow; cut trees fall from the cut up; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Deposits of coal and oil are in [industry](industry.md#deposits).
+Natural river bands decide where crops grow and woodland decides how fast trees grow; cut trees fall from the cut up; regional weather waters fields; frontier uranium is scattered through the Overworld. Geography is derived from the world generator's biomes and rivers, so it changes no terrain and is not saved separately. Rivers are fresh water: squid spawn in the sea, never in river or frozen-river biomes. Fish spawn in any water open to the sky, within 13 blocks below its surface and with water above them, so two-block-deep rivers and lakes high above the sea have salmon (tropical fish in warm rivers); vanilla allows them only within 13 blocks below sea level, which no raised Terrain Diffusion river reaches. The biome still chooses the species, so fish appear only where it lists them. Deposits of coal and oil are in [industry](industry.md#deposits).
 
 ## Farmland and woodland
 
