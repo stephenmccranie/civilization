@@ -280,7 +280,7 @@ Sable is the vehicle physics backend. Controls stay simple and stable, without l
 - **Rivers** connect farms, mines, workshops and towns to each other and the sea. Mouths, confluences and landings create ports and markets through real deliveries, not assigned bonuses. Terrain must offer connected sea-to-inland routes judged by loaded journeys both ways; not every tributary must be navigable. There is no hydrology simulation.
 - **Offshore oil** is the first ocean resource: finite reserves, physical crude delivered inland by river. It never replaces onshore oil as the first route to refined fuel.
 - **Boats** are freeform vessels built around one Helm, with no prefab hull or size band and a 4,096-block safety cap. Owners extend them freely; only the Helm is fixed.
-- Every running **Hot-Bulb Engine** aboard adds fixed thrust, and block mass slows the ship, so larger vessels need more engines. Each engine burns its own refined fuel and oil; the Helm never burns cargo. The engine is an 1890s early oil engine, not steam or diesel, and runs on refined fuel by design to keep refining in demand.
+- Every running **Hot-Bulb Engine** aboard adds fixed thrust, and block mass slows the ship, so larger vessels need more engines. Each engine burns its own refined fuel and oil; the Helm never burns cargo. The engine is a twin-cylinder vertical marine hot-bulb engine of about 1910, not steam or diesel, and runs on refined fuel by design to keep refining in demand. One engine serves boats and land.
 - Freight hulls, bunkers and tanks use structural steel with timber decks and player-built cabins.
 - The **Coal Bunker** and **Cargo Tank** are reusable 3×5×3 stores that work on land and aboard; later bulk materials extend the same bunker. Incomplete shells keep stock; stocked controllers resist mining, and forced destruction loses contents.
 - **Airships** are player-built around a controller — no prefab hulls. The endgame is nuclear-powered antigravity with realistic Sable motion: mass, aerodynamics and wind matter. Antigravity keeps inertia; powered hover holds position against wind; acceleration, braking and reversing build gradually.
@@ -289,6 +289,7 @@ Sable is the vehicle physics backend. Controls stay simple and stable, without l
 - Airships express the most refined layer: precise metalwork, ivory enamel, restrained turquoise, porcelain and glass. Speed and capacity are tradeoffs.
 
 **Open**
+- How the Hot-Bulb Engine drives land machinery (proposal: it drives the machine its flywheel faces, and fuel-powered machines such as the Coal Drill take its work instead of burning fuel themselves).
 - Portals, mounts, elytra and teleport commands, before final distances.
 - A real ocean → river → inland route on the server terrain; offshore reserves and extraction; one vessel or transfers at the coast; useful return cargo.
 - Docking (proposal): a short port-to-port connection with Load/Unload and visible progress while moored, around 128 coal/s or 1,000 mB/s.

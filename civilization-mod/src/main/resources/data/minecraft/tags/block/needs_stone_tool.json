@@ -16,8 +16,6 @@
     "civilization:industrial_guardrail",
     "civilization:refinery_flue",
     "civilization:refinery_port",
-    "civilization:fluid_pipe",
-    "civilization:engine_cylinder",
-    "civilization:engine_flywheel"
+    "civilization:fluid_pipe"
   ]
 }

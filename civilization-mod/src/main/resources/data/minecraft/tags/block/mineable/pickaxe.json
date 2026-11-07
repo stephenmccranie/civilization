@@ -29,8 +29,6 @@
     "civilization:refinery_flue",
     "civilization:refinery_port",
     "civilization:fluid_pipe",
-    "civilization:engine_cylinder",
-    "civilization:engine_flywheel",
     "civilization:prototype_stove",
     "civilization:resting_skillet",
     "civilization:baking_oven",
@@ -40,6 +38,7 @@
     "civilization:foundry_part",
     "civilization:fertilizer_furnace_part",
     "civilization:smithy_part",
-    "civilization:tannery_part"
+    "civilization:tannery_part",
+    "civilization:oil_engine_part"
   ]
 }

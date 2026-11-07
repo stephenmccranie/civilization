@@ -1,70 +1,52 @@
 package dev.civilization;
 import net.minecraft.core.*;
 import net.minecraft.gametest.framework.*;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.gametest.*;
 import net.neoforged.neoforge.fluids.FluidStack;
 import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.*;
 @GameTestHolder("civilization") @PrefixGameTestTemplate(false)
 public class OilEngineGameTests {
- @GameTest(template="industrial") public static void componentsAlignWhenPlacedFromEverySide(GameTestHelper h){
-  var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"EngineBuilder"));
-  var hand=net.minecraft.world.InteractionHand.MAIN_HAND;
+ /** Fixture engine: the controller and every section's cells placed directly, as a finished build would leave them. */
+ static OilEngineEntity place(ServerLevel l,BlockPos at,Direction facing){
+  l.setBlockAndUpdate(at,OilEngineContent.ENGINE.get().defaultBlockState().setValue(CivicBlock.FACING,facing));
+  var e=(OilEngineEntity)l.getBlockEntity(at);var model=e.model();e.build().sections=model.all;
+  for(int i=0;i<model.cells.size();i++)l.setBlockAndUpdate(ModeledMachine.position(at,facing,model.cells.get(i)),ModeledMachine.cellState(model,i,facing));
+  e.setChanged();l.sendBlockUpdated(at,e.getBlockState(),e.getBlockState(),3);return e;
+ }
+ static OilEngineEntity build(GameTestHelper h,Direction facing){return place(h.getLevel(),h.absolutePos(new BlockPos(4,1,3)),facing);}
+ @GameTest(template="industrial") public static void engineBuildsInSectionsFromEverySide(GameTestHelper h){
+  var l=h.getLevel();var player=new net.neoforged.neoforge.common.util.FakePlayer(l,new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"EngineBuilder"));
+  var at=h.absolutePos(new BlockPos(4,1,3));var model=MachineModel.OIL_ENGINE;
   for(var front:Direction.Plane.HORIZONTAL){
-   var e=build(h,front);player.setPos(e.getBlockPos().getX()+4,e.getBlockPos().getY()+3,e.getBlockPos().getZ()+4);
-   for(var part:OilEngineStructure.PARTS){
-    if(!part.material().startsWith("engine_"))continue;
-    var target=MachineStructure.position(e.getBlockPos(),front,part);
-    var item=MachineStructure.materialState(part.material()).getBlock().asItem();
-    for(var approach:Direction.Plane.HORIZONTAL){
-     h.getLevel().removeBlock(target,false);player.setYRot(approach.toYRot());
-     player.setItemInHand(hand,new net.minecraft.world.item.ItemStack(item,2));
-     var hit=new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(target.getX()+.5,target.getY()-.5,target.getZ()+.5),Direction.UP,target.below(),false);
-     player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player,hand,hit));
-     h.assertTrue(MachineStructure.matches(h.getLevel(),target,part,front),"Placed component matches controller from "+approach+" for "+front);
-     h.assertTrue(player.getMainHandItem().getCount()==1,"One component consumed");
-    }
-   }
-   h.assertTrue(OilEngineStructure.complete(h.getLevel(),e.getBlockPos(),front),"Actual item placement completes rotated engine");
-   h.getLevel().removeBlock(e.getBlockPos(),false);
-   for(var preferred:Direction.Plane.HORIZONTAL)h.assertTrue(OilEngineStructure.placementFacing(h.getLevel(),e.getBlockPos().above(),OilEngineContent.CYLINDER.get(),preferred)==preferred,"Standalone orientation retains player facing");
+   for(var cell:model.cells)l.removeBlock(ModeledMachine.position(at,front,cell),false);
+   l.setBlockAndUpdate(at,OilEngineContent.ENGINE.get().defaultBlockState().setValue(CivicBlock.FACING,front));
+   var e=(OilEngineEntity)l.getBlockEntity(at);player.setPos(at.getX()+.5,at.getY()+1,at.getZ()+.5);
+   for(int part=0;part<model.sections.size();part++){var stack=model.section(part).sample();h.assertTrue(ModeledMachine.build(e,player,stack)&&stack.isEmpty(),"Section "+model.section(part).name()+" built from its materials facing "+front);}
+   h.assertTrue(e.build().sections==model.all&&ModeledMachine.status(e)==MachineStructure.COMPLETE,"Every section completes the engine facing "+front);
+   var silencer=model.cells.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(5)).findFirst().orElseThrow();
+   l.destroyBlock(ModeledMachine.position(at,front,silencer),false);
+   h.assertTrue(!e.build().has(5)&&Integer.bitCount(e.build().sections)==model.sections.size()-1,"Breaking the silencer removes only the exhaust section facing "+front);
+   h.assertTrue(e.requestWork(at,1)==0,"An engine missing a section supplies no work");
+   l.removeBlock(at,false);h.killAllEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class);
   }h.succeed();
  }
- @GameTest(template="industrial") public static void heldComponentsDoNotRotateGuides(GameTestHelper h){
-  for(var front:Direction.Plane.HORIZONTAL)for(var part:OilEngineStructure.PARTS){
-   if(!part.material().startsWith("engine_"))continue;
-   var expected=MachineStructure.shape(part,front);
-   for(var held:new net.minecraft.world.level.block.state.BlockState[]{Blocks.AIR.defaultBlockState(),OilEngineContent.CYLINDER.get().defaultBlockState(),OilEngineContent.WHEEL.get().defaultBlockState()})
-    h.assertTrue(MachineStructure.previewState(part,front,held).equals(expected),"Held item leaves oriented guide intact "+front+" "+part.material());
-  }
-  var wall=new MachineStructure.Part(0,0,0,"stone",4,Direction.NORTH);
-  h.assertTrue(MachineStructure.previewState(wall,Direction.EAST,Blocks.STONE_BRICKS.defaultBlockState()).is(Blocks.STONE_BRICKS),"Accepted material variants still preview");
-  h.succeed();
- }
- @GameTest(template="industrial") public static void wheelRecoversStaticModelAfterControllerRemoval(GameTestHelper h){
-  for(var facing:Direction.Plane.HORIZONTAL){
-   var e=build(h,facing);var l=h.getLevel();var wheel=e.getBlockPos().relative(facing.getCounterClockWise()).relative(facing.getOpposite()).above();
-   EngineFlywheelBlock.refresh(l,wheel);h.assertTrue(l.getBlockState(wheel).getValue(EngineFlywheelBlock.LINKED),"Animated wheel linked "+facing);
-   l.removeBlock(e.getBlockPos(),false);EngineFlywheelBlock.refresh(l,wheel);
-   h.assertTrue(!l.getBlockState(wheel).getValue(EngineFlywheelBlock.LINKED),"Static wheel restored "+facing);
-  }h.succeed();
- }
- static OilEngineEntity build(GameTestHelper h,Direction facing){var at=h.absolutePos(new BlockPos(4,1,3));h.getLevel().setBlockAndUpdate(at,OilEngineContent.ENGINE.get().defaultBlockState().setValue(CivicBlock.FACING,facing));for(var part:OilEngineStructure.PARTS)MachineStructure.placePart(h.getLevel(),at,facing,part);return (OilEngineEntity)h.getLevel().getBlockEntity(at);}
  @GameTest(template="industrial") public static void engineStartWorkAndConservation(GameTestHelper h){
-  for(var d:Direction.Plane.HORIZONTAL){var e=build(h,d);h.assertTrue(OilEngineStructure.complete(h.getLevel(),e.getBlockPos(),d),"Rotated engine build "+d);}
+  for(var d:Direction.Plane.HORIZONTAL){var e=build(h,d);h.assertTrue(ModeledMachine.status(e)==MachineStructure.COMPLETE,"Rotated engine build "+d);}
   var e=build(h,Direction.NORTH);e.fuel.fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE);e.oil.fill(new FluidStack(IndustrialContent.LUBE.get(),1000),EXECUTE);e.control(0);
-  for(int i=0;i<100;i++)e.tick();h.assertTrue(e.warmup==100&&e.fuel.getFluidAmount()==990,"One 10mB cold start");
-  for(int i=0;i<30;i++)e.tick();h.assertTrue(e.fuel.getFluidAmount()==990,"Ready engine uses no idle fuel");
+  e.tick();h.assertTrue(e.lit()&&e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Lamps light the controller while the bulbs heat");
+  for(int i=1;i<100;i++)e.tick();h.assertTrue(e.warmup==100&&e.fuel.getFluidAmount()==990,"One 10mB cold start");
+  for(int i=0;i<30;i++)e.tick();h.assertTrue(e.fuel.getFluidAmount()==990&&!e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Ready engine uses no idle fuel and its lamps are out");
   double power=e.requestWork(e.getBlockPos(),1);h.assertTrue(power>.99,"Engine supplies work");h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Repeated request cannot double-spend or double-output");
   h.assertTrue(Math.abs(e.fuel.getFluidAmount()+e.fuelCredit-989.9)<.00001,"Fractional fuel is conserved");
   h.assertTrue(Math.abs(e.oil.getFluidAmount()+e.oilCredit-999.995)<.00001,"Fractional lubricant is conserved");
-  var saved=e.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new OilEngineEntity(e.getBlockPos(),e.getBlockState());restored.loadWithComponents(saved,h.getLevel().registryAccess());h.assertTrue(Math.abs(restored.fuelCredit-e.fuelCredit)<.00001&&restored.warmup==100,"Saved warmup and fractional stock");
-  h.getLevel().removeBlock(MachineStructure.position(e.getBlockPos(),e.front(),OilEngineStructure.PARTS.getFirst()),false);h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Broken structure cannot work");h.succeed();
+  var saved=e.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new OilEngineEntity(e.getBlockPos(),e.getBlockState());restored.loadWithComponents(saved,h.getLevel().registryAccess());
+  h.assertTrue(Math.abs(restored.fuelCredit-e.fuelCredit)<.00001&&restored.warmup==100&&restored.build().sections==e.build().sections,"Saved build, warmup and fractional stock");
+  h.getLevel().removeBlock(ModeledMachine.position(e.getBlockPos(),e.front(),e.model().cells.getFirst()),false);h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Broken structure cannot work");h.succeed();
  }
  @GameTest(template="industrial") public static void enginePipesReachUnobstructedServicePorts(GameTestHelper h){
   for(var facing:Direction.Plane.HORIZONTAL){
    var e=build(h,facing);var l=h.getLevel();e.fuel.setFluid(FluidStack.EMPTY);e.oil.setFluid(FluidStack.EMPTY);
-   h.assertTrue(OilEngineStructure.PARTS.stream().filter(p->p.material().equals("casing")).count()==8,"Complete 3x3 bed including controller");
    for(var side:java.util.List.of(facing,Direction.DOWN)){
     boolean fuel=side==facing;var pipe=e.getBlockPos().relative(side);l.setBlockAndUpdate(pipe,IndustrialContent.PIPE.get().defaultBlockState());
     var at=pipe.relative(side);l.setBlockAndUpdate(at,IndustrialContent.TANK.get().defaultBlockState());var tank=(IndustrialBlockEntity)l.getBlockEntity(at);
@@ -72,7 +54,7 @@ public class OilEngineGameTests {
     var cap=l.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,e.getBlockPos(),side);
     h.assertTrue(cap==target,"Correct sided capability");
     int n=PipeRouting.transfer(l,e.getBlockPos(),side,target,false);h.assertTrue(n==25&&target.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Pipe transfer conserves fluid "+facing+" "+side+" n="+n+" engine="+target.getFluidAmount()+" tank="+tank.input.getFluidAmount());
-    h.assertTrue(OilEngineStructure.complete(l,e.getBlockPos(),facing),"Ports leave base complete");
+    h.assertTrue(ModeledMachine.status(e)==MachineStructure.COMPLETE,"Service pipes leave the engine complete");
     l.removeBlock(pipe,false);l.removeBlock(at,false);
    }
   }h.succeed();

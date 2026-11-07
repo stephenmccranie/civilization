@@ -6,6 +6,7 @@
     {"type": "single", "resource": "civilization:entity/fertilizer_furnace"},
     {"type": "single", "resource": "civilization:entity/tannery"},
     {"type": "single", "resource": "civilization:entity/textile_workshop"},
-    {"type": "single", "resource": "civilization:entity/smithy"}
+    {"type": "single", "resource": "civilization:entity/smithy"},
+    {"type": "single", "resource": "civilization:entity/oil_engine"}
   ]
 }

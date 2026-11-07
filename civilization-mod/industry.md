@@ -78,8 +78,6 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 | Industrial Guardrail ×16 | 6 Copper Rods, 10 Iron Rods |
 | Empty Canister | 5 Iron Plates |
 | Hot-Bulb Engine | 4 Steel Plates, 2 Machine Parts, 2 Copper Plates, 4 Iron Plates |
-| Engine Cylinder | 6 Iron Plates, 2 Machine Parts |
-| Engine Flywheel | 8 Steel Rods, 1 Machine Parts |
 | Coal Bunker | 4 Steel Plates, 1 Machine Parts |
 | Cargo Tank | 4 Steel Plates, 1 Machine Parts, 2 Glass |
 
@@ -127,15 +125,15 @@ Inventory, fluid buffers, lubrication, the fire and its stored heat, in-progress
 
 ## Hot-Bulb Engine
 
-A standalone hot-bulb oil engine: a stepped cast-iron bed, horizontal cylinder, enclosed crankcase and a rotating four-spoke flywheel, with a dial and lever on the control face. It powers [boats](vehicle-physics.md#boats) and its own commissioning test; it is not an electric grid or shaft network.
+A twin-cylinder vertical marine hot-bulb oil engine, **2 blocks wide, 4 long and 3 tall**, after period Bolinder-type engines: a two-rail bedplate, two cylinders on cast crankcase columns crowned by drum-shaped hot-bulb heads with lamp ports, a silencer drum and stack, a solid flywheel at the back and the clutch drum, handwheel, starting lever, sight-feed lubricator and gauge at the front. It powers [boats](vehicle-physics.md#boats) and its own commissioning test; it is not an electric grid or shaft network.
 
-**Construction.** The controller, Engine Cylinder and Engine Flywheel come from the Assembly Bench ([recipes](#recipes)). The guide requires **8 Industrial Casing slabs, 1 Engine Cylinder and 1 Engine Flywheel**: the controller occupies the front center of a complete 3×3 half-height bed. Cylinder and flywheel match the controller's facing when placed in their positions, regardless of where you stand; elsewhere they face the player. Keep the marked space above and in front of the machinery and behind the cylinder clear.
+**Construction.** The controller comes from the Assembly Bench ([recipes](#recipes)) and is the engine's front corner on its control side; the engine extends one block to the controller's left as you face it and three behind. Like the [other modelled machines](machines.md#building-with-a-controller), it is built in sections by right-clicking the controller with each section's material, any amount at a time: **Bedplate** 8 Industrial Casing, **Crankcase** 8 Iron Plates, **Cylinders** 6 Steel Plates, **Running gear** 4 Machine Parts, **Flywheel** 8 Steel Rods, **Exhaust** 4 Iron Plates and **Controls** 2 Copper Plates. Breaking any part of a section removes that section and refunds what was paid for it.
 
 **Supply.** The controller front accepts refined fuel and its underside lubricating oil (route the lubricant pipe beneath the bed); capacities are **4,000 mB fuel / 2,000 mB oil**. A filled canister inserts 1,000 mB; an empty canister withdraws fuel, or oil when sneaking, and needs a whole 1,000 mB. Crude and wrong liquids are rejected. The screen has named gauges, **Start/Stop** and **Test Run**.
 
-**Operation.** Start spends **10 mB fuel once**, then heats for **5 loaded seconds**; with less than 10 mB it waits without spending. Ready or idle engines use no fuel. At full load an engine uses **2 mB fuel/s and 0.1 mB oil/s**; Test Run applies full load for **10 seconds** (20 mB fuel, 1 mB oil) and dissipates the work. Dry running gradually reduces delivered power to 20%; supplied lubricant restores it. Stop cancels startup, readiness and the test, and a later cold start costs fuel again. The startup flame goes out when ready; running turns the flywheel with bounded exhaust and quiet mechanical sound. Loose flywheels and guides use a static model.
+**Operation.** Start spends **10 mB fuel once**, then heats for **5 loaded seconds**; with less than 10 mB it waits without spending. Ready or idle engines use no fuel. At full load an engine uses **2 mB fuel/s and 0.1 mB oil/s**; Test Run applies full load for **10 seconds** (20 mB fuel, 1 mB oil) and dissipates the work. Dry running gradually reduces delivered power to 20%; supplied lubricant restores it. Stop cancels startup, readiness and the test, and a later cold start costs fuel again. While the bulbs heat, both lamp ports glow; they go dark when the engine is ready. Running turns the flywheel, with bounded exhaust from the stack and quiet mechanical sound.
 
-**State and limits.** Tanks, fractional work credit, lubrication, enabled state and completed warm-up are saved; a test run does not restart after load. No offline work or forced chunks. A missing structure stops the engine and requires reheating. The server accepts at most one work request per engine per game tick and checks range, loaded endpoints, structure and claims; physics substeps never spend fuel independently. Breaking the controller returns it empty: **stored fluids and work credit are lost**, so drain it first.
+**State and limits.** Tanks, fractional work credit, lubrication, enabled state and completed warm-up are saved; a test run does not restart after load. No offline work or forced chunks. A missing section stops the engine and requires reheating. The server accepts at most one work request per engine per game tick and checks range, loaded endpoints, structure and claims; physics substeps never spend fuel independently. Breaking the controller returns it empty: **stored fluids and work credit are lost**, so drain it first.
 
 ## Bulk freight storage
 

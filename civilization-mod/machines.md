@@ -44,7 +44,7 @@ Inventories live only in the controller. Breaking a shell block scatters nothing
 
 **Hoppers:** kiln-family machines take ingredients from above, coal from the sides or front and give output below. A modeled machine reaches its controller through every part: a hopper feeding into its top adds ingredients, one at a side adds coal and one underneath extracts output. No casing inventories or hidden transfers exist.
 
-**Removing controllers:** stone pickaxes recover stone and metal controllers (the Smithy, extraction and refinery machinery, Hot-Bulb Engine, Land Controller, bulk stores) and Industrial Casing, pipes and engine pieces. Stone axes recover wooden controllers such as the Trade Counter, Survey Table and Small Boat Helm. Stocked bulk stores must be emptied first; claim and vehicle protections still apply.
+**Removing controllers:** stone pickaxes recover stone and metal controllers (the Smithy, extraction and refinery machinery, Hot-Bulb Engine, Land Controller, bulk stores) and Industrial Casing and pipes. Stone axes recover wooden controllers such as the Trade Counter, Survey Table and Small Boat Helm. Stocked bulk stores must be emptied first; claim and vehicle protections still apply.
 
 ## Cabinet interface
 

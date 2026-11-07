@@ -26,8 +26,6 @@ final class AssemblyRecipes {
         add(jobs,"civilization:cooling_grille",3,item("civilization:iron_fasteners",6),item("civilization:industrial_casing",3));
         add(jobs,"civilization:distillation_column",1,item("civilization:iron_plate",4),item("civilization:copper_plate",4),item("civilization:machine_parts",1));
         add(jobs,"civilization:empty_canister",1,item("civilization:iron_plate",5));
-        add(jobs,"civilization:engine_cylinder",1,item("civilization:iron_plate",6),item("civilization:machine_parts",2));
-        add(jobs,"civilization:engine_flywheel",1,item("civilization:steel_rod",8),item("civilization:machine_parts",1));
         add(jobs,"civilization:fluid_pipe",8,item("civilization:iron_fasteners",4),item("civilization:copper_plate",2));
         add(jobs,"civilization:fuel_tank",1,item("civilization:iron_plate",4),item("civilization:copper_plate",4));
         add(jobs,"civilization:geiger_counter",1,item("minecraft:glass_pane",1),item("civilization:copper_plate",2),item("minecraft:redstone",1),item("civilization:machine_parts",1));

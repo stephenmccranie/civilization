@@ -25,7 +25,6 @@ public final class MachineStructure {
     public static List<Part> guideParts(BlockState state) {
         if (state.getBlock() instanceof ArenaBlock) return ArenaStructure.PARTS;
         if (state.getBlock() instanceof BulkBlock bulk) return BulkStructure.parts(bulk.liquid);
-        if (state.getBlock() instanceof OilEngineBlock) return OilEngineStructure.PARTS;
         if (state.getBlock() instanceof IndustrialBlock industrial) return industrial.kind==IndustrialBlock.Kind.PUMP?List.of():IndustrialStructure.parts(industrial.kind);
         if (state.is(CivicContent.TABLE.get())) return SurveyTable.PARTS;
         return List.of();
@@ -47,8 +46,6 @@ public final class MachineStructure {
             case "ladder" -> state.is(Blocks.LADDER);
             case "bars" -> state.is(Blocks.IRON_BARS);
             case "iron" -> state.is(Blocks.IRON_BLOCK);
-            case "engine_cylinder" -> state.is(OilEngineContent.CYLINDER.get());
-            case "engine_flywheel" -> state.is(OilEngineContent.WHEEL.get());
             case "survey_section" -> state.is(CivicContent.TABLE_PART.get());
             case "air" -> state.isAir();
             case "stone" -> state.is(KILN_WALL);
@@ -74,8 +71,6 @@ public final class MachineStructure {
             case "ladder" -> Blocks.LADDER.defaultBlockState();
             case "bars" -> Blocks.IRON_BARS.defaultBlockState();
             case "iron" -> Blocks.IRON_BLOCK.defaultBlockState();
-            case "engine_cylinder" -> OilEngineContent.CYLINDER.get().defaultBlockState();
-            case "engine_flywheel" -> OilEngineContent.WHEEL.get().defaultBlockState();
             case "survey_section" -> CivicContent.TABLE_PART.get().defaultBlockState();
             case "air" -> Blocks.AIR.defaultBlockState();
             case "brick" -> Blocks.BRICKS.defaultBlockState();
