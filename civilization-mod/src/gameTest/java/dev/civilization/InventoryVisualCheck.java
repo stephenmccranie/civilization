@@ -9,6 +9,7 @@ import net.minecraft.world.item.*;
 /** Focused native inventory skin/interaction check in the disposable hidden client. */
 final class InventoryVisualCheck {
     private static int ticks;
+    private static final int[] DRAG={33,30,35,28};
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();
         if(ticks==100){
@@ -56,11 +57,43 @@ final class InventoryVisualCheck {
         if(ticks==178)click(mc,10);
         if(ticks==190){
             if(!mc.player.inventoryMenu.getSlot(10).getItem().is(Items.BONE_MEAL)||mc.player.inventoryMenu.getSlot(1).getItem().getCount()!=2||!mc.player.inventoryMenu.getCarried().isEmpty())throw new IllegalStateException("Native crafting custody changed");
-            toggle(mc);
+            server.execute(()->{
+                var p=server.getPlayerList().getPlayers().getFirst();
+                var ingots=new ItemStack(Items.IRON_INGOT);Grade.assign(ingots,1000);
+                for(int grade:new int[]{900,800,700}){var unit=new ItemStack(Items.IRON_INGOT);Grade.assign(unit,grade);Grade.join(ingots,unit,1);}
+                p.getInventory().setItem(27,ingots);
+                p.getData(Accessories.INVENTORY).setStackInSlot(1,Backpack.ITEM.toStack());Backpack.worn(p).setItem(0,new ItemStack(Items.STONE,20));
+                p.inventoryMenu.broadcastChanges();
+            });
         }
-        if(ticks==205){if(!((InventoryScreen)mc.screen).getRecipeBookComponent().isVisible())throw new IllegalStateException("Recipe book toggle failed");shot(mc,"recipes");}
-        if(ticks==210)server.execute(()->server.getPlayerList().getPlayers().getFirst().setGameMode(net.minecraft.world.level.GameType.CREATIVE));
-        if(ticks==235){
+        if(ticks==200){
+            if(mc.player.inventoryMenu.getSlot(27).getItem().getCount()!=4||!pack(mc).getItem().is(Items.STONE))throw new IllegalStateException("Drag fixture did not synchronize");
+            click(mc,27);
+        }
+        // A real left-drag across four pockets out of index order: the client must send the slots in the order crossed.
+        if(ticks==206){
+            var screen=(InventoryScreen)mc.screen;screen.mouseClicked(x(mc,DRAG[0]),y(mc,DRAG[0]),0);
+            for(int slot:DRAG)screen.mouseDragged(x(mc,slot),y(mc,slot),0,0,0);
+            screen.mouseReleased(x(mc,DRAG[DRAG.length-1]),y(mc,DRAG[DRAG.length-1]),0);
+        }
+        if(ticks==215){
+            var dealt=java.util.Arrays.stream(DRAG).mapToObj(slot->Grade.value(server.getPlayerList().getPlayers().getFirst().getInventory().getItem(slot))).toList();
+            if(!dealt.equals(java.util.List.of(1000,900,800,700))||!mc.player.inventoryMenu.getCarried().isEmpty())throw new IllegalStateException("A drag must deal the best ingots first in the order crossed: "+dealt);
+            shot(mc,"drag-order");click(mc,pack(mc).index);
+        }
+        // More stone than an armful clicked onto a Hand holding torches: the hand takes eight, the pack the rest, the cursor the torches.
+        if(ticks==222)click(mc,45);
+        if(ticks==230){
+            var p=server.getPlayerList().getPlayers().getFirst();
+            if(!p.getOffhandItem().is(Items.STONE)||p.getOffhandItem().getCount()!=BlockCarry.LIMIT||Backpack.worn(p).getItem(0).getCount()!=20-BlockCarry.LIMIT
+                    ||!p.inventoryMenu.getCarried().is(Items.TORCH)||!mc.player.inventoryMenu.getCarried().is(Items.TORCH)||!mc.player.getOffhandItem().is(Items.STONE))
+                throw new IllegalStateException("Stone did not swap into the Hand: hand "+p.getOffhandItem()+", pack "+Backpack.worn(p).getItem(0)+", cursor "+p.inventoryMenu.getCarried());
+            shot(mc,"hand-swap");click(mc,24);
+        }
+        if(ticks==240){if(!mc.player.inventoryMenu.getCarried().isEmpty())throw new IllegalStateException("The torches did not go into a pocket");toggle(mc);}
+        if(ticks==255){if(!((InventoryScreen)mc.screen).getRecipeBookComponent().isVisible())throw new IllegalStateException("Recipe book toggle failed");shot(mc,"recipes");}
+        if(ticks==260)server.execute(()->server.getPlayerList().getPlayers().getFirst().setGameMode(net.minecraft.world.level.GameType.CREATIVE));
+        if(ticks==285){
             if(!(mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen creative))
                 throw new IllegalStateException("Creative inventory did not open");
             try {
@@ -71,10 +104,13 @@ final class InventoryVisualCheck {
             for(int i=46;i<49;i++)if(creative.getMenu().getSlot(i).x!=-2000||creative.getMenu().getSlot(i).y!=-2000)
                 throw new IllegalStateException("Accessory wrapper overlaps creative inventory: "+i);
         }
-        if(ticks==236)shot(mc,"creative-inventory");
-        if(ticks>240){com.mojang.logging.LogUtils.getLogger().info("PLAYER INVENTORY VISUAL VERIFIED");mc.stop();}
+        if(ticks==286)shot(mc,"creative-inventory");
+        if(ticks>290){com.mojang.logging.LogUtils.getLogger().info("PLAYER INVENTORY VISUAL VERIFIED");mc.stop();}
     }
     private static void toggle(Minecraft mc){var b=mc.screen.children().stream().filter(c->c instanceof net.minecraft.client.gui.components.ImageButton).map(c->(net.minecraft.client.gui.components.ImageButton)c).findFirst().orElseThrow();mc.screen.mouseClicked(b.getX()+5,b.getY()+5,0);mc.screen.mouseReleased(b.getX()+5,b.getY()+5,0);}
-    private static void click(Minecraft mc,int index){var screen=(InventoryScreen)mc.screen;var slot=mc.player.inventoryMenu.getSlot(index);double x=screen.getGuiLeft()+slot.x+8,y=screen.getGuiTop()+slot.y+8;screen.mouseClicked(x,y,0);screen.mouseReleased(x,y,0);}
+    private static void click(Minecraft mc,int index){var screen=(InventoryScreen)mc.screen;screen.mouseClicked(x(mc,index),y(mc,index),0);screen.mouseReleased(x(mc,index),y(mc,index),0);}
+    private static double x(Minecraft mc,int index){return ((InventoryScreen)mc.screen).getGuiLeft()+mc.player.inventoryMenu.getSlot(index).x+8;}
+    private static double y(Minecraft mc,int index){return ((InventoryScreen)mc.screen).getGuiTop()+mc.player.inventoryMenu.getSlot(index).y+8;}
+    private static net.minecraft.world.inventory.Slot pack(Minecraft mc){return mc.player.inventoryMenu.slots.stream().filter(s->s instanceof Backpack.PackSlot&&s.getContainerSlot()==0).findFirst().orElseThrow();}
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"inventory-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }

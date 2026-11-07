@@ -167,6 +167,40 @@ public final class BackpackGameTests {
         h.succeed();
     }
 
+    @GameTest(template="industrial") public static void blocksClickedOntoTheHandSwapWithWhatItHolds(GameTestHelper h){
+        var p=player(h);var menu=p.inventoryMenu;p.containerMenu=menu;int hand=BlockCarry.handSlot(menu).index;
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.TORCH,16));menu.setCarried(new ItemStack(Items.STONE,5));menu.clicked(hand,0,ClickType.PICKUP,p);
+        h.assertTrue(p.getOffhandItem().is(Items.STONE)&&p.getOffhandItem().getCount()==5&&menu.getCarried().is(Items.TORCH)&&menu.getCarried().getCount()==16,"An armful clicked onto the Hand swaps with the torch it held");
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.TORCH,16));menu.setCarried(new ItemStack(Items.STONE,20));menu.clicked(hand,0,ClickType.PICKUP,p);
+        h.assertTrue(p.getOffhandItem().is(Items.TORCH)&&menu.getCarried().getCount()==20,"Without a pack to take the rest, more than an armful does not swap");
+        var pack=wear(p);pack.setItem(0,new ItemStack(Items.STONE,20));menu.setCarried(ItemStack.EMPTY);menu.clicked(slot(menu,0).index,0,ClickType.PICKUP,p);
+        h.assertTrue(menu.getCarried().getCount()==20&&held(pack,Items.STONE)==0,"The whole pack stack comes onto the cursor");
+        menu.clicked(hand,0,ClickType.PICKUP,p);
+        h.assertTrue(p.getOffhandItem().is(Items.STONE)&&p.getOffhandItem().getCount()==BlockCarry.LIMIT&&held(pack,Items.STONE)==20-BlockCarry.LIMIT
+                &&menu.getCarried().is(Items.TORCH)&&menu.getCarried().getCount()==16,"The hand takes its armful, the rest goes back into the pack and the torch comes onto the cursor");
+        menu.removed(p);
+        h.assertTrue(menu.getCarried().isEmpty()&&p.getInventory().countItem(Items.TORCH)==16,"Closing the menu puts the torch in the pockets");
+        h.succeed();
+    }
+
+    @GameTest(template="industrial") public static void shiftClickMovesBetweenTheMenuAndThePlayer(GameTestHelper h){
+        var p=player(h);var pack=wear(p);
+        var crafting=new net.minecraft.world.inventory.CraftingMenu(1,p.getInventory(),net.minecraft.world.inventory.ContainerLevelAccess.NULL);
+        BlockCarry.attachMenu(crafting,p.getInventory());Backpack.attachMenu(crafting,p);
+        p.setItemInHand(InteractionHand.OFF_HAND,new ItemStack(Items.OAK_LOG,BlockCarry.LIMIT));pack.setItem(0,new ItemStack(Items.STICK,4));
+        crafting.clicked(BlockCarry.handSlot(crafting).index,0,ClickType.QUICK_MOVE,p);crafting.clicked(slot(crafting,0).index,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(p.getOffhandItem().isEmpty()&&crafting.getSlot(1).getItem().getCount()==BlockCarry.LIMIT&&crafting.getSlot(2).getItem().is(Items.STICK)&&held(pack,Items.STICK)==0,
+                "The Hand's logs and the pack's sticks go into the crafting grid, as the pockets' goods do");
+        for(int i=0;i<36;i++)p.getInventory().setItem(i,new ItemStack(Items.STICK,64));pack.clearContent();
+        var furnace=new net.minecraft.world.SimpleContainer(3);furnace.setItem(2,new ItemStack(Items.CHARCOAL,10));
+        var menu=new net.minecraft.world.inventory.FurnaceMenu(2,p.getInventory(),furnace,new net.minecraft.world.inventory.SimpleContainerData(4));
+        BlockCarry.attachMenu(menu,p.getInventory());Backpack.attachMenu(menu,p);menu.clicked(2,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(furnace.getItem(2).isEmpty()&&held(pack,Items.CHARCOAL)==10,"A furnace's output goes into the pack when the pockets are full");
+        p.getInventory().setItem(9,new ItemStack(Items.APPLE));p.inventoryMenu.clicked(9,0,ClickType.QUICK_MOVE,p);
+        h.assertTrue(p.getInventory().getItem(9).is(Items.APPLE)&&held(pack,Items.APPLE)==0,"Between the main pockets and a full hotbar nothing spills into the pack");
+        h.succeed();
+    }
+
     @GameTest(template="industrial") public static void deathDropsThePackAndItsContentsSeparately(GameTestHelper h){
         var p=player(h);var pack=wear(p);pack.setItem(0,new ItemStack(Items.STONE,10));pack.setItem(1,new ItemStack(Items.APPLE,3));
         var drops=new ArrayList<ItemEntity>();NeoForge.EVENT_BUS.post(new LivingDropsEvent(p,h.getLevel().damageSources().generic(),drops,false));

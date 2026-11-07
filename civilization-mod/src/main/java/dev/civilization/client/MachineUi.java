@@ -28,7 +28,7 @@ public final class MachineUi {
     }
     /** The menu's own slots; the side column draws the Hand and pack slots in its panels. */
     public static void slots(GuiGraphics g,AbstractContainerMenu menu,int x,int y) {
-        for(var s:menu.slots)if(s.isActive()&&!SidePanels.inColumn(s))slot(g,x+s.x,y+s.y);
+        for(var s:menu.slots)if(s.isActive()&&!dev.civilization.BlockCarry.column(s))slot(g,x+s.x,y+s.y);
     }
     /** A store's count in a cell: exact below a thousand, then k, M, b and T. */
     public static String quantity(long n){

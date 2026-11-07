@@ -145,6 +145,18 @@ public final class GradeGameTests {
         menu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 1), ClickType.QUICK_CRAFT, p);
         h.assertTrue(menu.getCarried().isEmpty() && grades(inventory.getItem(20)).equals(List.of(1000)) && grades(inventory.getItem(9)).equals(List.of(900))
                 && grades(inventory.getItem(31)).equals(List.of(800)) && inventory.getItem(14).isEmpty(), "A right-drag deals the best units into the slots in the order dragged");
+        inventory.clearContent(); var chest = new net.minecraft.world.SimpleContainer(27);
+        var chestMenu = net.minecraft.world.inventory.ChestMenu.threeRows(1, inventory, chest); p.containerMenu = chestMenu;
+        BlockCarry.attachMenu(chestMenu, inventory); Backpack.attachMenu(chestMenu, p);
+        chestMenu.setCarried(ingots(1000, 900, 800, 700, 600));
+        int[] crossed = {40, 2, 31, 15, 27};
+        chestMenu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(0, 0), ClickType.QUICK_CRAFT, p);
+        for (int slot : crossed) chestMenu.clicked(slot, AbstractContainerMenu.getQuickcraftMask(1, 0), ClickType.QUICK_CRAFT, p);
+        chestMenu.clicked(-999, AbstractContainerMenu.getQuickcraftMask(2, 0), ClickType.QUICK_CRAFT, p);
+        var dealt = java.util.Arrays.stream(crossed).mapToObj(slot -> grades(chestMenu.getSlot(slot).getItem())).toList();
+        h.assertTrue(chestMenu.getCarried().isEmpty() && dealt.equals(List.of(List.of(1000), List.of(900), List.of(800), List.of(700), List.of(600))),
+                "A left-drag across a chest and the pockets deals the best units out in the order crossed: " + dealt);
+        p.containerMenu = menu;
         inventory.clearContent(); inventory.setItem(9, ingots(1000, 900)); menu.setCarried(ingots(700));
         menu.clicked(9, 0, ClickType.PICKUP, p);
         h.assertTrue(menu.getCarried().isEmpty() && grades(inventory.getItem(9)).equals(List.of(1000, 900, 700)), "Clicking joins differing grades onto one stack");

@@ -74,11 +74,27 @@ public final class BlockCarry {
         }
         return false;
     }
+    /**
+     * Clicking more building blocks than the Hand takes onto a Hand holding something else swaps them as an ordinary
+     * click would: the hand takes its armful, the rest goes into the worn pack and what the hand held comes onto the
+     * cursor. When the pack cannot take the rest, nothing moves.
+     */
+    public static boolean swapIntoHand(AbstractContainerMenu menu,int index,ClickType type,Player player){
+        if(type!=ClickType.PICKUP||!restricted(player)||index<0||index>=menu.slots.size())return false;
+        var slot=menu.slots.get(index);var cursor=menu.getCarried();var held=slot.getItem();
+        if(slot!=handSlot(menu)||!carried(cursor)||held.isEmpty()||ItemStack.isSameItemSameComponents(held,cursor)||!slot.mayPickup(player)||!slot.mayPlace(cursor))return false;
+        int armful=slot.getMaxStackSize(cursor);var pack=Backpack.worn(player);
+        if(cursor.getCount()<=armful||pack==null||!pack.fits(cursor.copyWithCount(cursor.getCount()-armful)))return false;
+        slot.setByPlayer(cursor.split(armful));pack.insert(cursor);menu.setCarried(held);
+        return true;
+    }
     /** The menu's Hand: the player's offhand slot, native in the inventory and attached to every other menu. */
     public static Slot handSlot(AbstractContainerMenu menu){
         for(var slot:menu.slots)if(slot.container instanceof Inventory&&slot.getContainerSlot()==OFFHAND)return slot;
         return null;
     }
+    /** The side column's slots: the Hand and the worn pack's. */
+    public static boolean column(Slot slot){return slot instanceof Backpack.PackSlot||slot.container instanceof Inventory&&slot.getContainerSlot()==OFFHAND;}
     /** Expose the hand slot in every menu that shows the player's inventory: chests, crafting, stores and machines. */
     public static void attachMenu(AbstractContainerMenu menu,Inventory inv){
         if(!showsHand(inv.player)||handSlot(menu)!=null)return;

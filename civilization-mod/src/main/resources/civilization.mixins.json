@@ -11,6 +11,7 @@
     "BlockCarryInventoryMixin",
     "BlockCarrySlotMixin",
     "BlockCarryMenuMixin",
+    "CarryColumnQuickMoveMixin",
     "ChestArmfulMixin",
     "InventoryMenuMixin",
     "SharedCraftingMenuMixin",
@@ -54,6 +55,7 @@
   "client": [
     "LocalPlayerMixin",
     "BlockCarryScreenMixin",
+    "GradeScreenMixin",
     "SlotPositionAccess",
     "BlockPlacementAccess",
     "CarryRecipeBookMixin",
