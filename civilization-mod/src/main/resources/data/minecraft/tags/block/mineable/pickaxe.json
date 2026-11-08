@@ -21,6 +21,7 @@
     "civilization:distillation_column",
     "civilization:condenser",
     "civilization:oil_engine",
+    "civilization:coal_engine",
     "civilization:coal_bunker",
     "civilization:cargo_tank",
     "civilization:industrial_casing",
@@ -39,6 +40,7 @@
     "civilization:fertilizer_furnace_part",
     "civilization:smithy_part",
     "civilization:tannery_part",
-    "civilization:oil_engine_part"
+    "civilization:oil_engine_part",
+    "civilization:coal_engine_part"
   ]
 }

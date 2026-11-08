@@ -22,9 +22,15 @@ public final class ModeledMachine {
     public static BlockPos position(BlockPos at,Direction front,MachineModel.Cell c){return at.relative(front.getClockWise(),c.x()).relative(front.getOpposite(),c.z()).above(c.y());}
     public static BlockState cellState(MachineModel model,int index,Direction front){return MachineParts.block(model).defaultBlockState().setValue(CivicBlock.FACING,front).setValue(model.cell,index);}
     private static BlockPos at(ModeledController c){return c.entity().getBlockPos();}
+    /** A controller's model, facing and built sections as the client last received them. */
+    public record Drawn(MachineModel model,Direction front,int sections){}
+    /** The client's loaded controllers by position. Chunk meshing reads a cell's controller here, not from the level:
+     *  Sodium's mesh threads see block entities only within two blocks of the section they mesh, and a tall machine's
+     *  cells reach far beyond its controller's. */
+    public static final Map<BlockPos,Drawn> DRAWN=new java.util.concurrent.ConcurrentHashMap<>();
     /** On the client, a change in built sections redraws the machine's cells, whose block states it leaves unchanged. */
     public static void redraw(ModeledController c){
-        var l=c.entity().getLevel();
+        var l=c.entity().getLevel();DRAWN.put(at(c),new Drawn(c.model(),c.front(),c.build().sections));
         for(var cell:c.model().cells){var p=position(at(c),c.front(),cell);var s=l.getBlockState(p);l.sendBlockUpdated(p,s,s,net.minecraft.world.level.block.Block.UPDATE_CLIENTS);}
     }
 

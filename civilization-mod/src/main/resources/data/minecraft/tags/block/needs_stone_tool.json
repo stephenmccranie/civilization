@@ -9,6 +9,7 @@
     "civilization:distillation_column",
     "civilization:condenser",
     "civilization:oil_engine",
+    "civilization:coal_engine",
     "civilization:coal_bunker",
     "civilization:cargo_tank",
     "civilization:industrial_casing",

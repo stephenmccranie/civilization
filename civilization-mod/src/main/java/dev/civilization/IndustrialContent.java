@@ -38,7 +38,7 @@ public final class IndustrialContent {
     public static final DeferredHolder<Fluid,BaseFlowingFluid.Source> LUBE=FLUIDS.register("lubricating_oil",()->new BaseFlowingFluid.Source(lube()));
     public static final DeferredHolder<Fluid,BaseFlowingFluid.Flowing> LUBE_FLOWING=FLUIDS.register("flowing_lubricating_oil",()->new BaseFlowingFluid.Flowing(lube()));
     private static BaseFlowingFluid.Properties lube(){return new BaseFlowingFluid.Properties(LUBE_TYPE,LUBE,LUBE_FLOWING);}
-    public static final DeferredBlock<IndustrialBlock> PUMP=machine("oil_pump",IndustrialBlock.Kind.PUMP), REFINERY=machine("oil_refinery",IndustrialBlock.Kind.REFINERY), DRILL=machine("coal_drill",IndustrialBlock.Kind.DRILL), TANK=machine("fuel_tank",IndustrialBlock.Kind.TANK), COLUMN=machine("distillation_column",IndustrialBlock.Kind.COLUMN), CONDENSER=machine("condenser",IndustrialBlock.Kind.CONDENSER);
+    public static final DeferredBlock<IndustrialBlock> DERRICK=machine("oil_pump",IndustrialBlock.Kind.DERRICK), REFINERY=machine("oil_refinery",IndustrialBlock.Kind.REFINERY), DRILL=machine("coal_drill",IndustrialBlock.Kind.DRILL), TANK=machine("fuel_tank",IndustrialBlock.Kind.TANK), COLUMN=machine("distillation_column",IndustrialBlock.Kind.COLUMN), CONDENSER=machine("condenser",IndustrialBlock.Kind.CONDENSER), COAL_ENGINE=machine("coal_engine",IndustrialBlock.Kind.COAL_ENGINE);
     private static DeferredBlock<IndustrialBlock> machine(String name,IndustrialBlock.Kind kind){var b=BLOCKS.register(name,()->new IndustrialBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).pushReaction(PushReaction.BLOCK),kind));ITEMS.registerSimpleBlockItem(b);return b;}
     public static final DeferredBlock<IndustrialGuardrailBlock> GUARDRAIL=BLOCKS.register("industrial_guardrail",()->new IndustrialGuardrailBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion()));
     public static final DeferredBlock<Block> CASING=BLOCKS.register("industrial_casing",()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)));
@@ -60,7 +60,7 @@ public final class IndustrialContent {
     public static final DeferredItem<Item> CAN=ITEMS.registerSimpleItem("empty_canister",new Item.Properties().stacksTo(1));
     public static final DeferredItem<Item> CRUDE_CAN=ITEMS.registerSimpleItem("crude_canister",new Item.Properties().stacksTo(1));
     public static final DeferredItem<Item> FUEL_CAN=ITEMS.registerSimpleItem("fuel_canister",new Item.Properties().stacksTo(1));
-    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<IndustrialBlockEntity>> ENTITY=ENTITIES.register("industry",()->BlockEntityType.Builder.of(IndustrialBlockEntity::new,PUMP.get(),REFINERY.get(),DRILL.get(),TANK.get(),COLUMN.get(),CONDENSER.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<IndustrialBlockEntity>> ENTITY=ENTITIES.register("industry",()->BlockEntityType.Builder.of(IndustrialBlockEntity::new,DERRICK.get(),REFINERY.get(),DRILL.get(),TANK.get(),COLUMN.get(),CONDENSER.get(),COAL_ENGINE.get()).build(null));
     public static final DeferredHolder<MenuType<?>,MenuType<IndustrialMenu>> MENU=MENUS.register("industry",()->new MenuType<>(IndustrialMenu::new,net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS));
     static {FEATURES.register("deposit",DepositFeature::new);}
     public static boolean industrial(FluidStack stack){return stack.is(CRUDE.get())||stack.is(FUEL.get())||stack.is(LUBE.get())||stack.is(HEATED.get())||stack.is(VAPOR.get());}

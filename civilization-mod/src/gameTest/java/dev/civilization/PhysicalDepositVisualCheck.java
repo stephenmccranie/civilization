@@ -38,7 +38,7 @@ final class PhysicalDepositVisualCheck {
         }
         // Expose a small center cutaway; clearing a quarter of a 150-block field is excessive.
         for(int x=s.x();x<=s.x()+12;x++)for(int z=s.z()-12;z<=s.z();z++)for(int y=s.kind()==Deposits.Kind.COAL?s.bottom():s.top()+1;y<s.y()+12;y++){var clear=new BlockPos(x,y,z);if(!l.getBlockState(clear).is(IndustrialContent.COAL_SEAM.get()))l.setBlock(clear,Blocks.AIR.defaultBlockState(),2);}
-        var at=new BlockPos(s.x(),s.y(),s.z());var block=s.kind()==Deposits.Kind.COAL?IndustrialContent.DRILL.get():IndustrialContent.PUMP.get();l.setBlockAndUpdate(at,block.defaultBlockState());for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(l,at,Direction.NORTH,part);
+        var at=new BlockPos(s.x(),s.y(),s.z());var block=s.kind()==Deposits.Kind.COAL?IndustrialContent.DRILL.get():IndustrialContent.DERRICK.get();l.setBlockAndUpdate(at,block.defaultBlockState());for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(l,at,Direction.NORTH,part);
         if(s.kind()==Deposits.Kind.OIL){
             var pool=new BlockPos(s.x()+s.radius()/2,s.y(),s.z()+s.radius()/2);
             for(int dx=-4;dx<=4;dx++)for(int dz=-4;dz<=4;dz++){

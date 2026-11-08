@@ -8,7 +8,7 @@ import static dev.civilization.IndustrialBlock.Kind;
 public final class IndustrialPort implements IFluidHandler {
     private final IndustrialBlockEntity machine;private final Direction side;private final FluidTank tank;private final boolean accepts,extracts;
     public IndustrialPort(IndustrialBlockEntity machine,Direction side){this.machine=machine;this.side=side;
-        boolean output=machine.kind==Kind.PUMP&&side==machine.front();
+        boolean output=machine.kind==Kind.DERRICK&&side==machine.front();
         boolean lube=machine.kind==Kind.DRILL&&side==machine.front().getCounterClockWise();
         tank=lube?machine.lubricant:output?machine.output:machine.input;
         accepts=lube||machine.kind==Kind.TANK||!output&&side==machine.front().getOpposite()&&machine.kind==Kind.DRILL;

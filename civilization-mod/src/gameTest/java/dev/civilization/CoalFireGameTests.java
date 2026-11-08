@@ -95,12 +95,12 @@ public final class CoalFireGameTests {
         h.assertTrue(!w.fire.lit()&&w.fire.heat()==0,"A broken shell loses its fire and its stored heat");h.succeed();
     }
     @GameTest(template="empty") public static void tooLittleCoalNeverReachesWorkingHeat(GameTestHelper h){
-        var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,67,4));l.setBlockAndUpdate(p,IndustrialContent.PUMP.get().defaultBlockState());
+        var l=h.getLevel();var p=h.absolutePos(new BlockPos(4,67,4));l.setBlockAndUpdate(p,IndustrialContent.COAL_ENGINE.get().defaultBlockState());
         var m=(IndustrialBlockEntity)l.getBlockEntity(p);MachineFixture.build((net.minecraft.server.level.ServerLevel)m.getLevel(),m.getBlockPos());
-        m.setItem(0,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(m.fire.heat()==0&&m.getItem(0).getCount()==1,"Pump coal waits for strike");
+        m.setItem(0,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(m.fire.heat()==0&&m.getItem(0).getCount()==1,"Engine coal waits for strike");
         MachineFixture.spark(h.getLevel(),true);h.assertTrue(m.fire.strike(IndustrialStructure.bind(m))&&m.getItem(0).getCount()==1,"A strike lights without burning coal yet");
         for(int i=0;i<400;i++)m.fire.tick(10);
-        h.assertTrue(!m.fire.lit()&&!m.fire.hot()&&m.getItem(0).isEmpty()&&m.output.isEmpty(),"One Coal cannot bring the Derrick's footings to working heat");
-        m.setItem(2,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(!m.fire.lit()&&m.getItem(2).getCount()==1,"Backup coal cannot relight an extinguished pump");h.succeed();
+        h.assertTrue(!m.fire.lit()&&!m.fire.hot()&&m.getItem(0).isEmpty(),"One Coal cannot bring the Coal Engine's firebox to working heat");
+        m.setItem(2,KilnContent.MINERAL_COAL.toStack());m.process();h.assertTrue(!m.fire.lit()&&m.getItem(2).getCount()==1,"Backup coal cannot relight an extinguished engine");h.succeed();
     }
 }

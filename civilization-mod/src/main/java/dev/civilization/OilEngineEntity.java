@@ -12,7 +12,7 @@ import net.neoforged.neoforge.fluids.*;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.*;
 /** One server owner of the engine's build, fluid stock, fractional work credit and the current load. */
-public final class OilEngineEntity extends BlockEntity implements MenuProvider, ModeledController {
+public final class OilEngineEntity extends BlockEntity implements MenuProvider, ModeledController, Engine {
  public final FluidTank fuel=tank(4000,true),oil=tank(2000,false);
  public boolean enabled,complete; public int warmup,status; public double condition=1,fuelCredit,oilCredit;
  private long workedTick=Long.MIN_VALUE; private int activity; private boolean checked;
@@ -50,11 +50,10 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
   }else {if(activity>0)activity--;status=activity>0?5:4;}
   sync();
  }
- /** Consumer adapter calls at most once per server tick; repeats receive no extra work. */
- public double requestWork(BlockPos consumer,double demand){
+ @Override public double requestWork(BlockPos consumer,double demand){
   if(level==null||level.isClientSide||!enabled||warmup<100||!Double.isFinite(demand)||demand<=0||workedTick==level.getGameTime())return 0;
   if(!consumer.equals(worldPosition)&&level.getBlockEntity(consumer)==null)return 0;
-  if(!Chunks.loaded(level,consumer)||consumer.distSqr(worldPosition)>64||!CivicAccess.boundary(level,worldPosition,consumer)||ModeledMachine.status(this)!=MachineStructure.COMPLETE)return 0;
+  if(!Chunks.loaded(level,consumer)||consumer.distSqr(worldPosition)>RANGE*RANGE||!CivicAccess.boundary(level,worldPosition,consumer)||ModeledMachine.status(this)!=MachineStructure.COMPLETE)return 0;
   double beforeFuel=fuel.getFluidAmount()+fuelCredit;
   workedTick=level.getGameTime();var result=BoatEngine.step(fuel.getFluidAmount()+fuelCredit,oil.getFluidAmount()+oilCredit,condition,demand,.05);
   // Whole mB remain transferable; sub-mB credit stays inside the engine and is persisted.

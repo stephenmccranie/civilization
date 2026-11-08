@@ -225,6 +225,7 @@
   "item.civilization.cloth": "Cloth",
   "enchantment.minecraft.mending": "Mending (disabled)",
   "block.civilization.oil_engine": "Hot-Bulb Engine",
+  "block.civilization.coal_engine": "Coal Engine",
   "item.civilization.thermal_helmet": "Thermal Survey Helmet",
   "material.civilization.anvil": "Anvil (any wear)",
   "block.civilization.airship_controller": "Airship Controller (Prototype)",

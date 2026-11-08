@@ -314,7 +314,7 @@ final class PerfBenchmark {
      *  Stove beside them, the Smithy forging iron plates with its bellows working, loaded pallets in front and loaded
      *  wheelbarrows among them. */
     private static void yard(ServerLevel l, BlockPos at) {
-        machine(l, at.offset(-8, 0, 6), IndustrialContent.PUMP.get().defaultBlockState());
+        machine(l, at.offset(-8, 0, 6), IndustrialContent.DERRICK.get().defaultBlockState());
         int x = 0;
         for (var block : List.of(KilnContent.KILN.get(), KilnContent.FOUNDRY.get(), KilnContent.RETORT.get())) {
             var m = machine(l, at.offset(x, 0, 6), block.defaultBlockState().setValue(CivicBlock.FACING, Direction.NORTH));
