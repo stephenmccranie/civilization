@@ -39,10 +39,11 @@ public class OilEngineGameTests {
   for(int i=0;i<30;i++)e.tick();h.assertTrue(e.fuel.getFluidAmount()==990&&e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Ready engine uses no idle fuel and its lamps keep the bulbs hot");
   double power=e.requestWork(e.getBlockPos(),1);h.assertTrue(power>.99,"Engine supplies work");h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Repeated request cannot double-spend or double-output");
   e.tick();h.assertTrue(!e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"The lamps go out once the engine runs");
+  for(int i=0;i<5;i++)e.tick();h.assertTrue(e.status==4&&!e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Once it has run, an idle engine keeps its bulbs hot without the lamps");
   h.assertTrue(Math.abs(e.fuel.getFluidAmount()+e.fuelCredit-989.9)<.00001,"Fractional fuel is conserved");
   h.assertTrue(Math.abs(e.oil.getFluidAmount()+e.oilCredit-999.995)<.00001,"Fractional lubricant is conserved");
   var saved=e.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new OilEngineEntity(e.getBlockPos(),e.getBlockState());restored.loadWithComponents(saved,h.getLevel().registryAccess());
-  h.assertTrue(Math.abs(restored.fuelCredit-e.fuelCredit)<.00001&&restored.warmup==100&&restored.build().sections==e.build().sections,"Saved build, warmup and fractional stock");
+  h.assertTrue(Math.abs(restored.fuelCredit-e.fuelCredit)<.00001&&restored.warmup==100&&restored.caught&&restored.build().sections==e.build().sections,"Saved build, warmup, caught bulbs and fractional stock");
   h.getLevel().removeBlock(ModeledMachine.position(e.getBlockPos(),e.front(),e.model().cells.getFirst()),false);h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Broken structure cannot work");h.succeed();
  }
  @GameTest(template="industrial") public static void enginePipesReachUnobstructedServicePorts(GameTestHelper h){
