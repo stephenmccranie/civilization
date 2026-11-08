@@ -45,7 +45,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `pipes` | Empty and flowing glass pipes, connections and flanges |
 | `industry` | Refinery, Oil Derrick, construction cabinet, industrial icons, and a boat helm and guardrail run |
 | `derrick-guide` | Oil Derrick section guides placed by real clicks, day and night |
-| `engine` | Hot-Bulb Engine stopped, heating with lit lamp ports, running with the flywheel turning, its menu and its section guide |
+| `engine` | Hot-Bulb Engine stopped, heating with lit lamp ports and the blowlamp sounding, kicked over and running with the flywheel turning and the stack knocking, its menu and its section guide |
 | `models` | GeckoLib model integration beside the Oil Engine |
 | `deposits` | Generated coal and oil bodies across chunk borders, before and after extraction |
 | `uranium` | Exposed ore, stocked chest and held Raw Uranium |

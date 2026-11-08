@@ -21,6 +21,12 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
  private FluidTank tank(int capacity,boolean isFuel){return new FluidTank(capacity,s->s.is(isFuel?IndustrialContent.FUEL.get():IndustrialContent.LUBE.get())){ @Override public int fill(FluidStack stack,net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction action){int room=getSpace()-((isFuel?fuelCredit:oilCredit)>0?1:0);return room<=0?0:super.fill(stack.copyWithAmount(Math.min(stack.getAmount(),room)),action);}
  @Override protected void onContentsChanged(){OilEngineEntity.this.setChanged();} };}
  public Direction front(){return getBlockState().getValue(CivicBlock.FACING);}
+ /** A point of the engine in its model's units: x across the engine from the controller's side, y up, z back from its
+  *  front, with the controller's cell spanning 0..16 on each. */
+ public net.minecraft.world.phys.Vec3 point(double x,double y,double z){
+  var across=front().getClockWise();var back=front().getOpposite();double a=x/16-.5,b=z/16-.5;
+  return new net.minecraft.world.phys.Vec3(worldPosition.getX()+.5+across.getStepX()*a+back.getStepX()*b,worldPosition.getY()+y/16,worldPosition.getZ()+.5+across.getStepZ()*a+back.getStepZ()*b);
+ }
  @Override public MachineModel model(){return MachineModel.OIL_ENGINE;}
  @Override public ModeledBuild build(){return build;}
  @Override public boolean stillValid(Player p){return valid(p);}

@@ -66,6 +66,10 @@ The tools write UTF-8 text with LF line endings; recipes write theirs with `newl
 
 Fast checks need no Minecraft launch: `python -m unittest discover -s tools/modeling -p "test_*.py"`.
 
+### Sounds
+
+Sounds come from the owner's ElevenLabs Sound Effects generations. An asset keeps the downloaded originals in `audio/originals/` and lists them in `audio/sources.json` with the prompt and settings used, the original's sha256, the runtime sound each becomes and its kind: a `loop` made seamless, a `shot`, or `hits`, several separate sounds in one recording split into numbered shots. `python tools/audio/prepare.py <asset>` (numpy and soundfile >= 0.13) writes mono Vorbis files, copies them into the runtime `sounds/` and records a receipt; `--check` verifies it. Visual clients are muted, so judge a sound by listening to its prepared file or an offline mix of its sequence.
+
 ### Textured models
 
 Image generation paints the materials; the native geometry and its UVs stay in the recipe. Items and machines follow one route: **concept → texture master → atlas → model**.
