@@ -34,7 +34,7 @@ public final class OilEngineBlock extends Block implements EntityBlock, ModeledB
  /** While it runs, exhaust leaves the stack's top: half a block across the engine from the controller's centre, 2.875
   *  blocks back and three up. */
  @Override public void animateTick(BlockState s,Level l,BlockPos pos,net.minecraft.util.RandomSource r){
-  if(!(l.getBlockEntity(pos) instanceof OilEngineEntity e)||e.status!=5)return;
+  if(!(l.getBlockEntity(pos) instanceof OilEngineEntity e)||!e.working())return;
   var stack=e.point(16,48,54);l.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE,stack.x,stack.y,stack.z,0,.03,0);
  }
  @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Runs on refined fuel + lubricating oil"));lines.add(Component.literal("Place for the build guide"));lines.add(Component.literal("Drain liquids before breaking."));}

@@ -14,9 +14,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 /** One server owner of the engine's build, fluid stock, fractional work credit and the current load. */
 public final class OilEngineEntity extends BlockEntity implements MenuProvider, ModeledController {
  public final FluidTank fuel=tank(4000,true),oil=tank(2000,false);
- public boolean enabled,complete; public int warmup,testTicks,status; public double condition=1,fuelCredit,oilCredit;
- /** Whether the engine has fired since its bulbs were last heated: from then on its own firing keeps them hot. */
- public boolean caught;
+ public boolean enabled,complete; public int warmup,status; public double condition=1,fuelCredit,oilCredit;
  private long workedTick=Long.MIN_VALUE; private int activity; private boolean checked;
  private final ModeledBuild build=new ModeledBuild();
  public OilEngineEntity(BlockPos p,BlockState s){super(OilEngineContent.ENTITY.get(),p,s);}
@@ -32,25 +30,24 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
  @Override public MachineModel model(){return MachineModel.OIL_ENGINE;}
  @Override public ModeledBuild build(){return build;}
  @Override public boolean stillValid(Player p){return valid(p);}
- /** The flywheel turns while the engine works under load. */
- @Override public boolean working(){return status==5;}
- /** The lamps burn at the bulbs while they heat them and keep them hot until the engine first runs. */
- @Override public boolean lit(){return status==3||status==4&&!caught;}
+ /** Once its bulbs are hot the engine runs, its flywheel turning, until it is stopped or runs dry. */
+ @Override public boolean working(){return status>=4;}
+ /** The lamps burn at the bulbs while they heat them to start. */
+ @Override public boolean lit(){return status==3;}
  @Override public void sectionsChanged(){complete=false;checked=false;}
  public boolean valid(Player p){return level!=null&&!isRemoved()&&level.getBlockEntity(worldPosition)==this&&p.distanceToSqr(CivicAccess.world(level,worldPosition))<=64&&CivicAccess.allowed(level,worldPosition,p);}
- public void control(int button){if(button==0){enabled=!enabled;if(!enabled){warmup=0;testTicks=0;}}else if(button==1&&enabled&&warmup>=100)testTicks=200;setChanged();}
+ /** Start heats the bulbs and then runs the engine; Stop shuts it down, and the next start is cold again. */
+ public void toggle(){enabled=!enabled;if(!enabled)warmup=0;setChanged();}
  public void tick(){
   if(level==null||level.isClientSide)return;
   if(!checked||level.getGameTime()%10==0){checked=true;ModeledMachine.reconcile(this);complete=ModeledMachine.status(this)==MachineStructure.COMPLETE;PipeRouting.transfer(level,worldPosition,front(),fuel,false);PipeRouting.transfer(level,worldPosition,Direction.DOWN,oil,false);}
-  if(!complete){status=1;warmup=0;testTicks=0;activity=0;}
+  if(!complete){status=1;warmup=0;activity=0;}
   else if(!enabled){status=0;activity=0;}
-  else if(fuel.getFluidAmount()+fuelCredit<=0){status=2;warmup=0;testTicks=0;activity=0;}
+  else if(fuel.getFluidAmount()+fuelCredit<=0){status=2;warmup=0;activity=0;}
   else if(warmup<100){
-   if(warmup==0){if(fuel.getFluidAmount()<10){status=2;sync();return;}fuel.drain(10,EXECUTE);caught=false;ThermalField.fuel(level,worldPosition,80);EnergyLog.machine(level,worldPosition,"engine_start","civilization:refined_fuel_mb",10,null,0);}
+   if(warmup==0){if(fuel.getFluidAmount()<10){status=2;sync();return;}fuel.drain(10,EXECUTE);ThermalField.fuel(level,worldPosition,80);EnergyLog.machine(level,worldPosition,"engine_start","civilization:refined_fuel_mb",10,null,0);}
    warmup++;status=3;setChanged();
-  }else {if(activity>0)activity--;status=activity>0?5:4;
-   if(testTicks>0){requestWork(worldPosition,1);testTicks--;setChanged();}
-  }
+  }else {if(activity>0)activity--;status=activity>0?5:4;}
   sync();
  }
  /** Consumer adapter calls at most once per server tick; repeats receive no extra work. */
@@ -63,7 +60,7 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
   // Whole mB remain transferable; sub-mB credit stays inside the engine and is persisted.
   int f=(int)Math.floor(result.fuel()),o=(int)Math.floor(result.oil());fuelCredit=result.fuel()-f;oilCredit=result.oil()-o;
   fuel.drain(fuel.getFluidAmount()-f,EXECUTE);oil.drain(oil.getFluidAmount()-o,EXECUTE);condition=result.condition();ThermalField.fuel(level,worldPosition,Math.max(0,beforeFuel-result.fuel())*8);
-  if(result.power()>0){activity=2;status=5;caught=true;}setChanged();return result.power();
+  if(result.power()>0){activity=2;status=5;}setChanged();return result.power();
  }
  private int lastState=-1;
  private void sync(){
@@ -75,11 +72,11 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
   if(t!=null){var s=new FluidStack(t==fuel?IndustrialContent.FUEL.get():IndustrialContent.LUBE.get(),1000);if(t.fill(s,SIMULATE)==1000){t.fill(s,EXECUTE);p.setItemInHand(hand,IndustrialContent.CAN.toStack());}}
   else if(held.is(IndustrialContent.CAN.get())){t=p.isShiftKeyDown()?oil:fuel;if(t.getFluidAmount()>=1000){t.drain(1000,EXECUTE);p.setItemInHand(hand,(t==fuel?IndustrialContent.FUEL_CAN:IndustrialContent.LUBE_CAN).toStack());}}
  }
- public final ContainerData data=new ContainerData(){public int get(int i){return switch(i){case 0->fuel.getFluidAmount();case 1->oil.getFluidAmount();case 2->status;case 3->warmup;case 4->(int)(condition*1000);case 5->enabled?1:0;case 6->testTicks;default->0;};}public void set(int i,int v){}public int getCount(){return 7;}};
+ public final ContainerData data=new ContainerData(){public int get(int i){return switch(i){case 0->fuel.getFluidAmount();case 1->oil.getFluidAmount();case 2->status;case 3->warmup;case 4->(int)(condition*1000);case 5->enabled?1:0;default->0;};}public void set(int i,int v){}public int getCount(){return 6;}};
  @Override public Component getDisplayName(){return Component.translatable("block.civilization.oil_engine");}
  @Override public AbstractContainerMenu createMenu(int id,Inventory inv,Player p){return new OilEngineMenu(id,inv,this,data);}
- @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);build.save(t,r);t.put("fuel",fuel.writeToNBT(r,new CompoundTag()));t.put("oil",oil.writeToNBT(r,new CompoundTag()));t.putDouble("fuelCredit",fuelCredit);t.putDouble("oilCredit",oilCredit);t.putDouble("condition",condition);t.putBoolean("enabled",enabled);t.putInt("warmup",warmup);t.putInt("status",status);t.putBoolean("caught",caught);}
- @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);fuel.readFromNBT(r,t.getCompound("fuel"));oil.readFromNBT(r,t.getCompound("oil"));fuelCredit=Math.clamp(t.getDouble("fuelCredit"),0,.999999);oilCredit=Math.clamp(t.getDouble("oilCredit"),0,.999999);condition=t.contains("condition")?Math.clamp(t.getDouble("condition"),.2,1):1;enabled=t.getBoolean("enabled");warmup=Math.clamp(t.getInt("warmup"),0,100);status=t.getInt("status");caught=t.getBoolean("caught");testTicks=0;}
+ @Override protected void saveAdditional(CompoundTag t,HolderLookup.Provider r){super.saveAdditional(t,r);build.save(t,r);t.put("fuel",fuel.writeToNBT(r,new CompoundTag()));t.put("oil",oil.writeToNBT(r,new CompoundTag()));t.putDouble("fuelCredit",fuelCredit);t.putDouble("oilCredit",oilCredit);t.putDouble("condition",condition);t.putBoolean("enabled",enabled);t.putInt("warmup",warmup);t.putInt("status",status);}
+ @Override protected void loadAdditional(CompoundTag t,HolderLookup.Provider r){super.loadAdditional(t,r);int before=build.sections;build.load(t,r,model());if(level!=null&&level.isClientSide&&build.sections!=before)ModeledMachine.redraw(this);fuel.readFromNBT(r,t.getCompound("fuel"));oil.readFromNBT(r,t.getCompound("oil"));fuelCredit=Math.clamp(t.getDouble("fuelCredit"),0,.999999);oilCredit=Math.clamp(t.getDouble("oilCredit"),0,.999999);condition=t.contains("condition")?Math.clamp(t.getDouble("condition"),.2,1):1;enabled=t.getBoolean("enabled");warmup=Math.clamp(t.getInt("warmup"),0,100);status=t.getInt("status");}
  @Override public CompoundTag getUpdateTag(HolderLookup.Provider r){return saveWithoutMetadata(r);}
  @Override public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket(){return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);}
 }

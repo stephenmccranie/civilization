@@ -14,7 +14,7 @@ import java.util.WeakHashMap;
 
 /**
  * The Hot-Bulb Engine heard: the blowlamp's roar at the lamp ports while they heat the bulbs and keep them hot, fading
- * as the engine catches, and under load the flywheel's {@link EngineRhythm} of exhaust knocks from the stack over a
+ * as the engine catches, and while it runs the flywheel's {@link EngineRhythm} of exhaust knocks from the stack over a
  * quiet mechanical bed that follows its speed.
  * One voice per engine, ticked by the engine on the client.
  */
