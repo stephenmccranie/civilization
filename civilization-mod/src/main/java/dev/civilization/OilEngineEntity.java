@@ -32,8 +32,8 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
  @Override public boolean stillValid(Player p){return valid(p);}
  /** The flywheel turns while the engine works under load. */
  @Override public boolean working(){return status==5;}
- /** The lamps burn at the bulbs while they heat them to start. */
- @Override public boolean lit(){return status==3;}
+ /** The lamps burn at the bulbs while they heat them and keep them hot until the engine runs. */
+ @Override public boolean lit(){return status==3||status==4;}
  @Override public void sectionsChanged(){complete=false;checked=false;}
  public boolean valid(Player p){return level!=null&&!isRemoved()&&level.getBlockEntity(worldPosition)==this&&p.distanceToSqr(CivicAccess.world(level,worldPosition))<=64&&CivicAccess.allowed(level,worldPosition,p);}
  public void control(int button){if(button==0){enabled=!enabled;if(!enabled){warmup=0;testTicks=0;}}else if(button==1&&enabled&&warmup>=100)testTicks=200;setChanged();}

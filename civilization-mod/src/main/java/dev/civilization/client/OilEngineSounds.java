@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * The Hot-Bulb Engine heard: the blowlamp's roar at the lamp ports while they heat the bulbs, and under load the
- * flywheel's {@link EngineRhythm} of exhaust knocks from the stack over a quiet mechanical bed that follows its speed.
+ * The Hot-Bulb Engine heard: the blowlamp's roar at the lamp ports while they heat the bulbs and keep them hot, fading
+ * as the engine catches, and under load the flywheel's {@link EngineRhythm} of exhaust knocks from the stack over a
+ * quiet mechanical bed that follows its speed.
  * One voice per engine, ticked by the engine on the client.
  */
 public final class OilEngineSounds {
@@ -57,7 +58,8 @@ public final class OilEngineSounds {
         }
     }
 
-    /** A steady bed at one point of the engine that eases toward its target level and ends once it falls silent. */
+    /** A steady bed at one point of the engine that eases toward its target level over about a second, so the blowlamp
+     *  overlaps the kick and catch, and ends once it falls silent. */
     private static final class Loop extends AbstractTickableSoundInstance {
         private final OilEngineEntity engine;
         float target;
@@ -72,7 +74,7 @@ public final class OilEngineSounds {
 
         @Override public void tick() {
             if (engine.isRemoved() || engine.getLevel() != Minecraft.getInstance().level) { stop(); return; }
-            volume += (target - volume) * .15f;
+            volume += (target - volume) * .05f;
             if (target == 0 && volume < .01f) stop();
         }
     }

@@ -3,8 +3,7 @@
 `python tools/audio/prepare.py <asset>` reads art/assets/<asset>/audio/sources.json. Each recording there names its
 original, the original's sha256, the runtime sound it becomes and its kind:
 - loop: a steady bed made seamless (trimmed ends, bounded level compensation, an equal-power cyclic seam);
-- shot: one sound, from just before its onset until it falls silent;
-- hits: `count` separate sounds in one recording, each exported as its own numbered shot.
+- shot: one sound, from just before its onset until it falls silent.
 Every export is a mono Vorbis file. The asset folder keeps the prepared WAV and OGG and a receipt of every hash; only
 the OGGs are copied into the mod's runtime sounds. `--check` verifies the receipt and the published files.
 
@@ -99,20 +98,6 @@ def shot(samples, rate):
     return samples * (SHOT_PEAK / np.max(np.abs(samples)))
 
 
-def hits(samples, rate, count):
-    """Split at each rise past 30% of the peak that comes at least 100 ms after the last; the recording must hold
-    exactly `count`."""
-    level = envelope(samples, rate)
-    onsets = []
-    for i in np.flatnonzero((level[1:] > .3 * level.max()) & (level[:-1] <= .3 * level.max())) + 1:
-        if not onsets or i - onsets[-1] >= .1 * rate:
-            onsets.append(i)
-    if len(onsets) != count:
-        raise ValueError(f"Expected {count} hits, found {len(onsets)} at {[round(o / rate, 3) for o in onsets]} s")
-    bounds = [max(0, o - int(.005 * rate)) for o in onsets] + [len(samples)]
-    return [shot(samples[a:b], rate) for a, b in zip(bounds, bounds[1:])]
-
-
 def check_loop(samples, rate):
     assert .095 < rms(samples) < .105, "Export level drift"
     seam = abs(samples[0] - samples[-1])
@@ -161,35 +146,29 @@ def main():
         return
     receipt = {"method": "Mono downmix. Loops: 0.5-second end trims, bounded one-second level compensation, 0.3-second "
                          f"equal-power cyclic seam, RMS {LOOP_RMS} under a 0.6 soft peak ceiling. Shots: 5 ms before onset "
-                         f"to 20 ms past -40 dB, 2 ms and 20 ms fades, peak {SHOT_PEAK}; hits split at rises past 30% of peak 100 ms "
-                         "after the last. Mono Vorbis export at compression level 0.1.",
+                         f"to 20 ms past -40 dB, 2 ms and 20 ms fades, peak {SHOT_PEAK}. Mono Vorbis export at compression level 0.1.",
                "builder_sha256": digest(Path(__file__)), "manifest_sha256": digest(manifest_path),
                "settings": {"numpy": np.__version__, "soundfile": sf.__version__}, "files": {}}
     for entry in manifest["files"].values():
         source = asset / "audio" / entry["original"]
         assert digest(source) == entry["sha256"], f"Original recording changed: {source}"
         samples, rate = mono(source)
-        kind = entry["kind"]
-        if kind == "loop":
-            outputs = {entry["runtime"]: loop(samples, rate)}
-        elif kind == "shot":
-            outputs = {entry["runtime"]: shot(samples, rate)}
-        else:
-            outputs = {f"{entry['runtime']}_{i + 1}": s for i, s in enumerate(hits(samples, rate, entry["count"]))}
-        for name, prepared in outputs.items():
-            wav, ogg = asset / f"{name}.wav", asset / f"{name}.ogg"
-            sf.write(wav, prepared, rate, subtype="PCM_16")
-            sf.write(ogg, prepared, rate, format="OGG", subtype="VORBIS", compression_level=.1)
-            stats = check(ogg, "loop" if kind == "loop" else "shot")
-            receipt["files"][name] = {"kind": "loop" if kind == "loop" else "shot", "original": entry["original"],
-                                      "original_sha256": entry["sha256"], "validation": stats,
-                                      "source_wav": {"path": wav.name, "sha256": digest(wav)},
-                                      "source_ogg": {"path": ogg.name, "sha256": digest(ogg)}}
-            print(name, json.dumps(stats))
-    # Publish only after every candidate passes decoding, level and seam checks.
+        name, kind = entry["runtime"], entry["kind"]
+        prepared = {"loop": loop, "shot": shot}[kind](samples, rate)
+        wav, ogg = asset / f"{name}.wav", asset / f"{name}.ogg"
+        sf.write(wav, prepared, rate, subtype="PCM_16")
+        sf.write(ogg, prepared, rate, format="OGG", subtype="VORBIS", compression_level=.1)
+        stats = check(ogg, kind)
+        receipt["files"][name] = {"kind": kind, "original": entry["original"], "original_sha256": entry["sha256"],
+                                  "validation": stats, "source_wav": {"path": wav.name, "sha256": digest(wav)},
+                                  "source_ogg": {"path": ogg.name, "sha256": digest(ogg)}}
+        print(name, json.dumps(stats))
+    # Publish only after every candidate passes decoding, level and seam checks. Vorbis streams carry a random serial,
+    # so a re-export that decodes to the published audio leaves the published file as it is.
     for name, record in receipt["files"].items():
-        target = RUNTIME / f"{name}.ogg"
-        shutil.copyfile(asset / f"{name}.ogg", target)
+        target, export = RUNTIME / f"{name}.ogg", asset / f"{name}.ogg"
+        if not (target.is_file() and np.array_equal(sf.read(target)[0], sf.read(export)[0])):
+            shutil.copyfile(export, target)
         record["runtime_ogg_sha256"] = digest(target)
     (asset / "audio-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
 

@@ -55,19 +55,7 @@
     "subtitle": "subtitles.civilization.engine_knock",
     "sounds": [
       {
-        "name": "civilization:engine_knock_1",
-        "attenuation_distance": 32
-      },
-      {
-        "name": "civilization:engine_knock_2",
-        "attenuation_distance": 32
-      },
-      {
-        "name": "civilization:engine_knock_3",
-        "attenuation_distance": 32
-      },
-      {
-        "name": "civilization:engine_knock_4",
+        "name": "civilization:engine_knock",
         "attenuation_distance": 32
       }
     ]
