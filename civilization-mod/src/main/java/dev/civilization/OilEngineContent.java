@@ -19,5 +19,5 @@ public final class OilEngineContent {
  public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<OilEngineEntity>> ENTITY=E.register("oil_engine",()->BlockEntityType.Builder.of(OilEngineEntity::new,ENGINE.get()).build(null));
  public static final DeferredHolder<MenuType<?>,MenuType<OilEngineMenu>> MENU=M.register("oil_engine",()->new MenuType<>(OilEngineMenu::new,net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS));
  public static void register(IEventBus bus){B.register(bus);I.register(bus);E.register(bus);M.register(bus);S.register(bus);bus.addListener(OilEngineContent::capabilities);}
- private static void capabilities(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent e){e.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,ENTITY.get(),(m,side)->side==m.front()?m.fuel:side==net.minecraft.core.Direction.DOWN?m.oil:null);}
+ private static void capabilities(net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent e){e.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,ENTITY.get(),(m,side)->side==m.front()?new FluidPort(m,side,m.fuel,true,false):side==net.minecraft.core.Direction.DOWN?new FluidPort(m,side,m.oil,true,false):null);}
 }
