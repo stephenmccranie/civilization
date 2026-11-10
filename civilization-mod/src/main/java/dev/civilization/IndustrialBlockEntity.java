@@ -26,8 +26,6 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     /** The Coal Engine's brick firebox and the Fired Heater's brick hearth. */
     public int masonry(){return kind==Kind.COAL_ENGINE?4:20;}
     public int[] coalFuelSlots(){return MachineInventory.INDUSTRIAL_INPUT;}
-    /** The Coal Engine's fire burns behind its firedoor. */
-    public boolean coalFireIgnoresRain(){return kind==Kind.COAL_ENGINE;}
     public boolean coalPowered(){return kind==Kind.COAL_ENGINE||kind==Kind.HEATER;}
     /** What a machine's input slots take: the derrick's casing, or Coal for a fire. */
     public static Item supply(Kind kind){return switch(kind){case DERRICK->ManufacturingContent.part("iron","plate");case HEATER,COAL_ENGINE->KilnContent.MINERAL_COAL.get();default->null;};}
@@ -86,7 +84,6 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(structure==MachineStructure.UNLOADED){formed=false;firePaused=true;pause(MachineStatus.Industry.UNLOADED);return;}
         if(structure!=MachineStructure.COMPLETE){formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
         formed=true;
-        if(kind==Kind.HEATER&&MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Industry.WET);return;}
         if(coalPowered()&&!fire.hot()){pause(fire.lit()?MachineStatus.Industry.WARMING:MachineStatus.Industry.FIRE_UNLIT);return;}
         if(kind==Kind.COAL_ENGINE){status=server.getGameTime()-workedTick<=IndustrialRates.STEP_TICKS?MachineStatus.Industry.WORKING:MachineStatus.Industry.READY;working(status==MachineStatus.Industry.WORKING);return;}
         MachineInventory.refill(this,MachineInventory.INDUSTRIAL_INPUT);

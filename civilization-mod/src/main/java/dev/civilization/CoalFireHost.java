@@ -9,5 +9,7 @@ public interface CoalFireHost extends Container {
     int masonry();
     /** Fraction of industrial waste heat emitted into the local thermal field. */
     default double coalWasteHeatFactor(){return 1;}
-    default boolean coalFireIgnoresRain(){return false;}
+    /** Whether the fire burns in the open, as the Smithy's forge does, so rain keeps it from lighting and working. A
+     *  fire behind a door ignores rain. */
+    default boolean openFire(){return false;}
 }

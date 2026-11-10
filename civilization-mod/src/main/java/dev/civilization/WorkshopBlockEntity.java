@@ -23,6 +23,8 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
     public int[] coalFuelSlots(){return MachineInventory.WORKSHOP_FUEL;}
     /** The Smithy's footing and brickwork store its fire's heat. */
     public int masonry(){return kind==2?24:0;}
+    /** The forge's coal bed lies open on its hearth. */
+    @Override public boolean openFire(){return fired(kind);}
     /** The Smithy burns Coal, the Tannery steeps, and the loom and Assembly Bench are worked by hand. */
     public static boolean fired(int kind){return kind==2;}
     public static boolean handWorked(int kind){return kind==1||kind==ManufacturingJobs.BENCH;}
@@ -129,7 +131,7 @@ public final class WorkshopBlockEntity extends BlockEntity implements WorldlyCon
         if(level==null||level.isClientSide)return;
         int structure=structure();
         if(structure!=MachineStructure.COMPLETE){firePaused=structure==MachineStructure.UNLOADED;if(structure==MachineStructure.INCOMPLETE)fire.extinguish();pause(MachineStatus.Workshop.INCOMPLETE,false);return;}
-        if(MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Workshop.WET,false);return;}
+        if(fire.rainedOut()){pause(MachineStatus.Workshop.WET,false);return;}
         if(!fire.hot()){pause(fire.lit()?MachineStatus.Workshop.WARMING:MachineStatus.Workshop.FIRE_UNLIT,false);return;}
         if(settleInputs()){pause(MachineStatus.Workshop.HOT_METAL,true);return;}
         var job=job();if(job==null){pause(MachineWork.matches(this,kind,selected).size()>1?MachineStatus.Workshop.AMBIGUOUS:MachineStatus.Workshop.NEEDS_MATERIALS,true);return;}

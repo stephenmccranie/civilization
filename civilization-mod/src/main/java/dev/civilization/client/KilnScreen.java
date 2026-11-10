@@ -45,7 +45,7 @@ public final class KilnScreen extends MachineScreen<KilnMenu> {
         for(int index:new int[]{1,3})if(menu.getSlot(index).getItem().isEmpty())MachineUi.ghost(g,KilnContent.MINERAL_COAL.toStack(),leftPos+menu.getSlot(index).x,topPos+88);
         MachineUi.fire(g,leftPos+66,topPos+85,44,23,menu.isLit());
         boolean incomplete=menu.requiresStructure()&&menu.structureStatus()!=1;
-        var state=!incomplete&&!menu.isLit()&&!menu.hot()&&menu.operatingStatus()!=7?Component.literal("Add Coal and strike to light"):Component.translatable(incomplete?"gui.civilization.structure_"+menu.structureStatus():"gui.civilization.operating_"+menu.operatingStatus());
+        var state=!incomplete&&!menu.isLit()&&!menu.hot()?Component.literal("Add Coal and strike to light"):Component.translatable(incomplete?"gui.civilization.structure_"+menu.structureStatus():"gui.civilization.operating_"+menu.operatingStatus());
         g.drawString(font,font.plainSubstrByWidth(state.getString(),158),leftPos+9,topPos+64,MachineUi.MUTED,false);
     }
     @Override public void render(GuiGraphics g,int x,int y,float dt){super.render(g,x,y,dt);

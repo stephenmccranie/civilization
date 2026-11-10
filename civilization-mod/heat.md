@@ -92,7 +92,7 @@ A two-second pass by a campfire moves a body about an eighth of the way; beside 
 
 A hot machine's masonry leaks at a temperature-adjusted rate: unchanged from 32°F through 78.8°F, so an unfed machine stays hot up to 10% longer when warmer and up to 30% less long below 32°F, with overhead shelter halving the cold penalty. This applies to every coal-fired machine; work draws, times and yields never change, and engines and claim upkeep are unaffected. Neighboring field temperatures are sampled around the controller once a second. `ThermalRules` owns the tuning.
 
-**Rain on the work face:** direct rain on the block in front of a heated controller blocks ignition and pauses productive work in Kilns, Foundries, Cooking Stoves, Fertilizer Furnaces, town workshops and the Fired Heater. The regional `isRainingAt` query includes sky exposure and biome precipitation, so a roof over the work face is enough and a chimney may stay outdoors. A lit fire keeps the masonry hot and work resumes when sheltered or dry; the screen names the obstruction. Oil Derricks, Coal Drills, the Distillation Column, Condenser and Hot-Bulb Engines are not rain-paused.
+**Rain on an open fire:** only a fire that burns in the open minds rain, and today that is the Smithy's forge. Direct rain on the block in front of its controller blocks ignition and pauses its work. The regional `isRainingAt` query includes sky exposure and biome precipitation, so a roof over that work face is enough and the chimney may stay outdoors. A lit fire keeps the masonry hot and work resumes when sheltered or dry; the screen names the obstruction. Every other machine works in the rain: its fire burns behind a door, or it has none.
 
 ## Player display
 

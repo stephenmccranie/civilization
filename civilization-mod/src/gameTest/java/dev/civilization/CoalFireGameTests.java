@@ -32,7 +32,7 @@ public final class CoalFireGameTests {
         h.runAfterDelay(21,()->{
             MachineFixture.spark(h.getLevel(),true);
             double secondCost=CalorieConfig.IGNITE.get()*ThermalRules.calorieFactor(ThermalSystem.comfort(player));
-            h.assertTrue(menu.clickMenuButton(player,CoalFire.BUTTON)&&w.fire.lit(),"Later accepted spark lights the fire: valid="+menu.stillValid(player)+", structure="+MachineFixture.status(h.getLevel(),w.getBlockPos())+", wet="+MachineWeather.wetWorkFace(w.getLevel(),w.getBlockPos(),w.getBlockState())+", fuel="+w.getItem(4).getCount()+", state="+w.fire.state());
+            h.assertTrue(menu.clickMenuButton(player,CoalFire.BUTTON)&&w.fire.lit(),"Later accepted spark lights the fire: valid="+menu.stillValid(player)+", structure="+MachineFixture.status(h.getLevel(),w.getBlockPos())+", wet="+w.fire.rainedOut()+", fuel="+w.getItem(4).getCount()+", state="+w.fire.state());
             h.assertTrue(Math.abs(data.reserve().calories()-(first-secondCost))<1e-8,
                     "Successful ignition costs one further strike");
             h.succeed();

@@ -77,13 +77,12 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
     public int operatingStatus() {
         if (requiresStructure() && structureStatus() != MachineStructure.COMPLETE) return 0;
         if (getBlockState().getValue(MachineFeedback.WORKING)) return 1;
-        if (MachineWeather.wetWorkFace(level, worldPosition, getBlockState())) return 7;
         if (!getItem(0).isEmpty() && !canPlaceItem(0, getItem(0))) return 5;
         if (getItem(0).isEmpty()) return MachineInventory.count(this,MachineInventory.KILN_OUTPUT)==0 ? 2 : 6;
         var result = product(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(0)));
         if (result.isEmpty()) return 5;
         if (!MachineInventory.room(this,MachineInventory.KILN_OUTPUT,result)) return 3;
-        return fire.hot() ? 2 : fire.lit() ? 8 : 4;
+        return fire.hot() ? 2 : fire.lit() ? 7 : 4;
     }
     private final net.minecraft.world.item.crafting.RecipeType<? extends net.minecraft.world.item.crafting.AbstractCookingRecipe> processType;
     public KilnBlockEntity(BlockPos pos, BlockState state) { this(KilnContent.ENTITY.get(), pos, state, KilnContent.RECIPE_TYPE.get()); }
@@ -160,7 +159,7 @@ public class KilnBlockEntity extends AbstractFurnaceBlockEntity implements CoalF
         kiln.fire.tick(1);
         if (MachineInventory.count(kiln,MachineInventory.KILN_FUEL) < fuel)
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, net.minecraft.sounds.SoundSource.BLOCKS, 0.2f, 0.9f);
-        if (!kiln.fire.hot() || MachineWeather.wetWorkFace(level, pos, state)) { feedback(level, pos, kiln.fire.lit(), false); return; }
+        if (!kiln.fire.hot()) { feedback(level, pos, kiln.fire.lit(), false); return; }
         var input=new net.minecraft.world.item.crafting.SingleRecipeInput(kiln.getItem(0));
         var result=kiln.product(input);
         boolean hot=result.has(HotMetal.HOT.get()),heat=hot&&result.is(kiln.getItem(0).getItem());

@@ -71,9 +71,17 @@ public final class CoalFire {
     private void release(double joules){
         if(joules>0)ThermalField.fuel(owner.getLevel(),owner.getBlockPos(),joules*ThermalRules.COAL_WASTE_HEAT/Energy.COAL*host.coalWasteHeatFactor());
     }
+    /** Whether rain reaches an open fire: it falls on the block in front of the controller, its work face. A roof over
+     *  that block shelters the fire, and its chimney may stand outdoors. */
+    public boolean rainedOut(){
+        var level=owner.getLevel();var state=owner.getBlockState();var facing=net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
+        if(level==null||!host.openFire()||!ThermalConfig.enabled()||!state.hasProperty(facing))return false;
+        var face=owner.getBlockPos().relative(state.getValue(facing));
+        return Chunks.loaded(level,face)&&level.isRainingAt(face);
+    }
     public boolean strike(boolean structureReady){
         var level=owner.getLevel();if(level==null||level.isClientSide||lit||!structureReady||!fuel()&&reserve<=0||level.getGameTime()<nextStrike)return false;
-        if(!host.coalFireIgnoresRain()&&MachineWeather.wetWorkFace(level,owner.getBlockPos(),owner.getBlockState()))return false;
+        if(rainedOut())return false;
         nextStrike=level.getGameTime()+20;owner.setChanged();
         level.playSound(null,owner.getBlockPos(),SoundEvents.FLINTANDSTEEL_USE,SoundSource.BLOCKS,.65f,.9f+level.random.nextFloat()*.2f);
         if(level.random.nextInt(3)==0){lit=true;level.playSound(null,owner.getBlockPos(),SoundEvents.FIRECHARGE_USE,SoundSource.BLOCKS,.5f,.85f);}
