@@ -89,7 +89,7 @@ public final class MachineStructure {
             if(part.material().startsWith("engine_")||part.material().equals("survey_section"))state=state.setValue(CivicBlock.FACING,front);
             if(state.getBlock() instanceof AnvilBlock)state=state.setValue(AnvilBlock.FACING,front.getClockWise());
             if(state.is(Blocks.LADDER))state=state.setValue(LadderBlock.FACING,side(part,front));return state;}
-        int corner=part.corner()>=0?part.corner():part.units()==1?2+(part.depth()==0?1:0):part.units()==3?(part.x()<0?1:0)+(part.depth()==0?2:0):0;
+        int corner=part.corner()>=0?part.corner():part.units()==1?2+(part.depth()==0?1:0):0;
         var local=CutGeometry.bounds(part.units(),part.side(),corner);
         var rotation=switch(front){case EAST->Rotation.CLOCKWISE_90;case SOUTH->Rotation.CLOCKWISE_180;case WEST->Rotation.COUNTERCLOCKWISE_90;default->Rotation.NONE;};
         return CutGeometry.state(CutGeometry.rotate(local,rotation));
@@ -126,7 +126,7 @@ public final class MachineStructure {
             var pos = position(controller, front, part);
             if (!Chunks.loaded(level, pos)) return new Result(UNLOADED, pos, "unloaded");
             if (missing==null && !matches(level, pos, part, front))
-                missing=new Result(INCOMPLETE, pos, part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : part.units()==3?"_eighth":"_quarter"));
+                missing=new Result(INCOMPLETE, pos, part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : "_quarter"));
         }
         return missing==null?new Result(COMPLETE, null, ""):missing;
     }

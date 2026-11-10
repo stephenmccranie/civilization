@@ -41,12 +41,12 @@ Coal extraction replaces the dense block with air and puts **16 Coal** into the 
 | --- | --- |
 | Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its right |
 | Fired Heater | Fully modeled coal-fired still: a riveted black still shell lying front to back in a red-brick furnace setting, with a firedoor under a round brick arch at the front, a manhole dome, safety valve and dial thermometer on its crown, and a stepped breeching carrying a tall stack at the back. 3×6 blocks and seven tall at the stack, with the ground-level controller, the firedoor, at the front middle; crude intake in the left wall and heated output in the right wall, both one block up and two blocks back |
-| Distillation Column | Five-wide, eleven-high clipped-corner vessel with tapered crown; intake low on the left, vapor outlet high on the right, lubricating-oil outlet low on the right |
+| Distillation Column | Fully modeled refinery tower: a slender sixteen-sided riveted black tower in four plate rings on a red-brick base, with a cleanout door under a brick arch at the front, a bolted manhole and a dial thermometer on the tower's front, and a domed head whose vapor line bends over and runs down the tower's right side into the base. 3×4 blocks and nine and a half tall, with the ground-level controller, the cleanout door, at the front middle; hot oil intake in the left wall and vapor outlet in the right wall, both one block up and two blocks back in line with the heater's ports, and the lubricating-oil outlet at ground level in the right wall, one block back |
 | Air-Cooled Condenser | Seven-wide horizontal vessel with rounded edges, cooling-grille faces and steel cradles; vapor intake left, fuel outlet right |
 | Coal Drill | Extraction frame; fuel intake at back, lubricant intake at left, coal hopper output below |
 | Liquid Tank | Single block holding 16,000 mB of one fluid; every side accepts or supplies it |
 
-Sides are as seen facing the controller's front. The column and condenser are built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
+Sides are as seen facing the controller's front. The condenser is built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
 
 ### Oil Derrick construction
 
@@ -59,6 +59,10 @@ Completed sections are solid immediately. **Breaking a frame section or the port
 ### Fired Heater construction
 
 The Fired Heater is built from its controller the same way: place the firedoor at ground level, where the heater will extend one block to either side and five behind, and right-click it with each section's material. The bill is **Footing** 4 stone or cobblestone, **Furnace walls** 6 brick blocks, **Furnace front** 4 brick blocks, **Still shell** 6 Industrial Casing, **Manhole and gauges** 2 Copper Plates, **Breeching** 4 brick blocks, **Stack** 3 Refinery Flues, and a Refinery Port for each of the crude intake and the hot oil outlet. Sections are solid as they are built, break and refund one at a time, and breaking the controller dismantles the heater, as for the derrick.
+
+### Distillation Column construction
+
+The Distillation Column is built the same way: place the cleanout door at ground level, where the column will extend one block to either side and three behind, and right-click it with each section's material. The bill is **Footing** 3 stone or cobblestone, **Base** 8 brick blocks, **Lower shell** and **Upper shell** 6 Industrial Casing each, **Head** 3 Industrial Casing, **Vapor line** 4 Refinery Flues, **Manhole and gauge** 2 Copper Plates, and a Refinery Port for each of the hot oil intake, the vapor outlet and the lubricating oil outlet. Sections and the controller break and refund as the heater's do.
 
 ### Oil well
 

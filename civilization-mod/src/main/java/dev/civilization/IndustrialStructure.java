@@ -8,28 +8,10 @@ public final class IndustrialStructure {
     private static MachineStructure.Part p(int x,int y,int z,String material,int units){return new MachineStructure.Part(x,y,z,material,units,Direction.DOWN);}
     /** A native model's structure is the ports its sections place. */
     private static List<MachineStructure.Part> ports(MachineModel model){return model.ports.stream().map(MachineModel.Port::part).toList();}
-    private static final List<MachineStructure.Part> DERRICK=ports(MachineModel.OIL_DERRICK),HEATER=ports(MachineModel.FIRED_HEATER);
+    private static final List<MachineStructure.Part> DERRICK=ports(MachineModel.OIL_DERRICK),HEATER=ports(MachineModel.FIRED_HEATER),COLUMN=ports(MachineModel.DISTILLATION_COLUMN);
     private static final List<MachineStructure.Part> DRILL=List.of(p(-1,0,0,"stone",4),p(1,0,0,"stone",4),p(-1,1,0,"casing",4),p(1,1,0,"casing",4),p(-1,2,0,"casing",2),p(0,2,0,"casing",2),p(1,2,0,"casing",2),p(0,1,0,"casing",4));
-    private static final List<MachineStructure.Part> COLUMN=column(),CONDENSER=condenser();
+    private static final List<MachineStructure.Part> CONDENSER=condenser();
     private static void replace(List<MachineStructure.Part> a,int x,int y,int z,String material,Direction side){a.removeIf(p->p.x()==x&&p.y()==y&&p.depth()==z);a.add(new MachineStructure.Part(x,y,z,material,4,side));}
-    private static List<MachineStructure.Part> column(){
-        var a=new ArrayList<MachineStructure.Part>();
-        // Five-block diameter with clipped corners, hollow cross-shaped core and a tapered crown.
-        for(int y=0;y<=10;y++)for(int z=0;z<=4;z++)for(int x=-2;x<=2;x++){
-            if(x==0&&y==0&&z==0)continue;
-            int dx=Math.abs(x),dz=Math.abs(z-2);
-            if(dx==2&&dz==2)continue;
-            if(y==0){a.add(p(x,y,z,"casing",4));continue;}
-            if(y==10){if(dx<2&&dz<2)a.add(new MachineStructure.Part(x,y,z,"casing",dx+dz==2?3:2,Direction.DOWN,(x<0?1:0)+(z<2?2:0)));continue;}
-            boolean core=dx+dz<2;
-            if(core){a.add(p(x,y,z,y==9?"casing":"air",4));continue;}
-            if(dx==2&&dz==1)a.add(new MachineStructure.Part(x,y,z,"casing",2,z<2?Direction.SOUTH:Direction.NORTH));
-            else if(dz==2&&dx==1)a.add(new MachineStructure.Part(x,y,z,"casing",2,x<0?Direction.EAST:Direction.WEST));
-            else a.add(p(x,y,z,"casing",4));
-        }
-        replace(a,-2,1,2,"input_port",Direction.WEST);replace(a,2,9,2,"output_port",Direction.EAST);replace(a,2,1,2,"aux_port",Direction.EAST);
-        return List.copyOf(a);
-    }
     private static List<MachineStructure.Part> condenser(){
         var a=new ArrayList<MachineStructure.Part>();
         // Long horizontal vessel, rounded half-grid ends and visible cooling grilles.

@@ -356,9 +356,9 @@ public final class IndustryGameTests {
         pipe(h,h.absolutePos(new BlockPos(21,68,2)));
         for(int z=3;z<=4;z++)pipe(h,h.absolutePos(new BlockPos(21,68,z)));
         pipe(h,h.absolutePos(new BlockPos(22,68,4)));
-        for(int x=26;x<=35;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
-        for(int x=41;x<=48;x++)pipe(h,h.absolutePos(new BlockPos(x,76,4)));
-        for(int y=69;y<76;y++)pipe(h,h.absolutePos(new BlockPos(48,y,4)));
+        for(int x=26;x<=36;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
+        for(int x=40;x<=48;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
+        pipe(h,h.absolutePos(new BlockPos(48,69,4)));
         pipe(h,h.absolutePos(new BlockPos(56,69,4)));
         var tankPos=h.absolutePos(new BlockPos(57,69,4));l.setBlockAndUpdate(tankPos,IndustrialContent.TANK.get().defaultBlockState());
         var tank=(IndustrialBlockEntity)l.getBlockEntity(tankPos);
