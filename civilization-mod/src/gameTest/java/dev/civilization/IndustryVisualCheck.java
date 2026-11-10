@@ -9,7 +9,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.DERRICK)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
+    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(m.model()!=null)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);
@@ -17,10 +17,10 @@ final class IndustryVisualCheck {
             server.execute(()->{try{
                 var l=server.overworld();var player=server.getPlayerList().getPlayers().getFirst();
                 for(int x=15;x<80;x++)for(int z=-30;z<12;z++){l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<140;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
-                var ref=machine(l,IndustrialContent.REFINERY.get(),REF);CoalFireFixture.light(ref);var col=machine(l,IndustrialContent.COLUMN.get(),COL);machine(l,IndustrialContent.CONDENSER.get(),new BlockPos(60,101,0));
+                var ref=machine(l,IndustrialContent.HEATER.get(),REF);CoalFireFixture.light(ref);var col=machine(l,IndustrialContent.COLUMN.get(),COL);machine(l,IndustrialContent.CONDENSER.get(),new BlockPos(60,101,0));
                 var crude=machine(l,IndustrialContent.TANK.get(),new BlockPos(28,102,1));machine(l,IndustrialContent.TANK.get(),new BlockPos(68,103,2));machine(l,IndustrialContent.TANK.get(),new BlockPos(54,102,5));
-                for(int x=29;x<=31;x++)pipe(l,x,102,1);
-                for(int x=37;x<=43;x++)pipe(l,x,102,2);
+                for(int x=29;x<=32;x++)pipe(l,x,102,1);pipe(l,32,102,2);
+                for(int x=36;x<=43;x++)pipe(l,x,102,2);
                 for(int x=49;x<=56;x++)pipe(l,x,110,2);for(int y=103;y<110;y++)pipe(l,56,y,2);
                 for(int z=2;z<=5;z++)pipe(l,49,102,z);for(int x=50;x<54;x++)pipe(l,x,102,5);
                 for(int x=64;x<68;x++)pipe(l,x,103,2);
@@ -30,7 +30,7 @@ final class IndustryVisualCheck {
             }catch(Throwable t){failure=t;}});
         }
         if(ticks>100&&!ready){ticks=101;return;}
-        if(ticks==150){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.kind()!=IndustrialBlock.Kind.REFINERY)throw new IllegalStateException("Heater menu did not synchronize");shot(mc,"heater");}
+        if(ticks==150){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.kind()!=IndustrialBlock.Kind.HEATER)throw new IllegalStateException("Heater menu did not synchronize");shot(mc,"heater");}
         if(ticks==155)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),46.5,101,-2,java.util.Set.of(),0,0);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(COL));});
         if(ticks==180){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.kind()!=IndustrialBlock.Kind.COLUMN)throw new IllegalStateException("Column menu did not synchronize");shot(mc,"column");}
         if(ticks==185)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),64,110,-18,java.util.Set.of(),35,10);});
@@ -74,14 +74,21 @@ final class IndustryVisualCheck {
         if(ticks==550)shot(mc,"pump-select");
         if(ticks==560)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),23.5,103,-17,java.util.Set.of(),0,0);});
         if(ticks==610)shot(mc,"pump-guide");
-        if(ticks==615){mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();int i=0;for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),IndustrialContent.TANK.get(),IndustrialContent.DRILL.get())){l.setBlockAndUpdate(new BlockPos(22+i*2,101,-22),block.defaultBlockState());p.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(block));}p.teleportTo(l,27.5,102,-32,java.util.Set.of(),0,4);});}
+        if(ticks==615){mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();int i=0;for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.HEATER.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),IndustrialContent.TANK.get(),IndustrialContent.DRILL.get())){l.setBlockAndUpdate(new BlockPos(22+i*2,101,-22),block.defaultBlockState());p.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(block));}p.teleportTo(l,27.5,102,-32,java.util.Set.of(),0,4);});}
         if(ticks==650)shot(mc,"controller-family");
         if(ticks==655){mc.options.hideGui=false;mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}
         if(ticks==670)shot(mc,"controller-items");
         // Brass and gauge fittings: a helm console with its panel and a guardrail run beside a casing block.
         if(ticks==675){mc.setScreen(null);mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();var at=new BlockPos(24,101,-27);l.setBlockAndUpdate(at,BoatContent.HELM.get().defaultBlockState());for(var part:BoatSystem.parts())MachineStructure.placePart(l,at,Direction.NORTH,part);for(int x=28;x<=31;x++)l.setBlockAndUpdate(new BlockPos(x,101,-27),IndustrialContent.GUARDRAIL.get().defaultBlockState());l.setBlockAndUpdate(new BlockPos(32,101,-27),IndustrialContent.CASING.get().defaultBlockState());p.teleportTo(l,28.5,102.5,-32,java.util.Set.of(),0,20);});}
         if(ticks==705)shot(mc,"fittings");
-        if(ticks>710)mc.stop();
+        // The Fired Heater with its fire burning: front and rear by day, then its firedoor and slit at night.
+        if(ticks==710)server.execute(()->{var l=server.overworld();var ref=(IndustrialBlockEntity)l.getBlockEntity(REF);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(8));CoalFireFixture.light(ref);server.getPlayerList().getPlayers().getFirst().teleportTo(l,28.5,105,-7,java.util.Set.of(),-31,15);});
+        if(ticks==740){if(!mc.level.getBlockState(REF).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT))throw new IllegalStateException("Heater fire is not lit");shot(mc,"heater-front");}
+        if(ticks==742)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),39.5,105,11,java.util.Set.of(),148,15));
+        if(ticks==770)shot(mc,"heater-rear");
+        if(ticks==772)server.execute(()->{var l=server.overworld();l.setDayTime(18000);server.getPlayerList().getPlayers().getFirst().teleportTo(l,32.5,101.5,-5,java.util.Set.of(),-22,2);});
+        if(ticks==800)shot(mc,"heater-night");
+        if(ticks>805)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"industry-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }

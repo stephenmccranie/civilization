@@ -6,30 +6,12 @@ import static dev.civilization.IndustrialBlock.Kind;
 /** Fixed hollow vessels, cut corners and accessible flanged connections. */
 public final class IndustrialStructure {
     private static MachineStructure.Part p(int x,int y,int z,String material,int units){return new MachineStructure.Part(x,y,z,material,units,Direction.DOWN);}
-    private static final List<MachineStructure.Part> DERRICK=MachineModel.OIL_DERRICK.ports.stream().map(MachineModel.Port::part).toList();
+    /** A native model's structure is the ports its sections place. */
+    private static List<MachineStructure.Part> ports(MachineModel model){return model.ports.stream().map(MachineModel.Port::part).toList();}
+    private static final List<MachineStructure.Part> DERRICK=ports(MachineModel.OIL_DERRICK),HEATER=ports(MachineModel.FIRED_HEATER);
     private static final List<MachineStructure.Part> DRILL=List.of(p(-1,0,0,"stone",4),p(1,0,0,"stone",4),p(-1,1,0,"casing",4),p(1,1,0,"casing",4),p(-1,2,0,"casing",2),p(0,2,0,"casing",2),p(1,2,0,"casing",2),p(0,1,0,"casing",4));
-    private static final List<MachineStructure.Part> HEATER=heater(),COLUMN=column(),CONDENSER=condenser();
+    private static final List<MachineStructure.Part> COLUMN=column(),CONDENSER=condenser();
     private static void replace(List<MachineStructure.Part> a,int x,int y,int z,String material,Direction side){a.removeIf(p->p.x()==x&&p.y()==y&&p.depth()==z);a.add(new MachineStructure.Part(x,y,z,material,4,side));}
-    private static List<MachineStructure.Part> heater(){
-        var a=new ArrayList<MachineStructure.Part>();
-        // Broad brick hearth, stepped jacket, recessed service door and a narrow rear flue.
-        for(int y=0;y<=3;y++)for(int z=0;z<=4;z++)for(int x=-2;x<=2;x++){
-            if(x==0&&y==0&&z==0)continue;
-            if(Math.abs(x)==2&&(z==0||z==4)){
-                if(y==0)a.add(p(x,y,z,"brick",2));
-                else if(y<3)a.add(new MachineStructure.Part(x,y,z,"casing",1,x<0?Direction.EAST:Direction.WEST,z==0?3:2));
-                continue;
-            }
-            boolean inside=Math.abs(x)<2&&z>0&&z<4;
-            a.add(p(x,y,z,inside&&y>0&&y<3?"air":y==0?"brick":"casing",y==3?2:4));
-        }
-        // A small raised crown gives the roof an arch rather than a flat box.
-        for(int z=1;z<=3;z++){replace(a,0,3,z,"casing",Direction.DOWN);a.add(p(0,4,z,"casing",2));}
-        replace(a,0,3,4,"casing",Direction.DOWN);
-        for(int y=4;y<=7;y++)a.add(p(0,y,4,"flue",4));
-        replace(a,-2,1,1,"input_port",Direction.WEST);replace(a,2,1,2,"output_port",Direction.EAST);
-        return List.copyOf(a);
-    }
     private static List<MachineStructure.Part> column(){
         var a=new ArrayList<MachineStructure.Part>();
         // Five-block diameter with clipped corners, hollow cross-shaped core and a tapered crown.
@@ -66,8 +48,8 @@ public final class IndustrialStructure {
         replace(a,-3,2,2,"input_port",Direction.WEST);replace(a,3,2,2,"output_port",Direction.EAST);
         return List.copyOf(a);
     }
-    public static boolean remote(Kind k){return k==Kind.DERRICK||k==Kind.REFINERY||k==Kind.COLUMN||k==Kind.CONDENSER;}
-    public static List<MachineStructure.Part> parts(Kind kind){return switch(kind){case DERRICK->DERRICK;case REFINERY->HEATER;case DRILL->DRILL;case COLUMN->COLUMN;case CONDENSER->CONDENSER;case TANK,COAL_ENGINE->List.of();};}
+    public static boolean remote(Kind k){return k==Kind.DERRICK||k==Kind.HEATER||k==Kind.COLUMN||k==Kind.CONDENSER;}
+    public static List<MachineStructure.Part> parts(Kind kind){return switch(kind){case DERRICK->DERRICK;case HEATER->HEATER;case DRILL->DRILL;case COLUMN->COLUMN;case CONDENSER->CONDENSER;case TANK,COAL_ENGINE->List.of();};}
     public static boolean complete(Level l,BlockPos at,Direction front,Kind kind){
         var modeled=ModeledMachine.of(l.getBlockEntity(at));
         return (modeled==null||ModeledMachine.status(modeled)==MachineStructure.COMPLETE)&&MachineStructure.checkParts(l,at,front,parts(kind)).status()==MachineStructure.COMPLETE;

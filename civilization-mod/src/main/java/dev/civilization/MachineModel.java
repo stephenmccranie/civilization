@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.*;
  * cubes fill and the ports it places, read once from the definition its Blockbench source exports.
  */
 public final class MachineModel {
-    public static final MachineModel OIL_DERRICK=load("oil_derrick"), KILN=load("kiln"), FOUNDRY=load("foundry"), FERTILIZER_FURNACE=load("fertilizer_furnace"), TANNERY=load("tannery"), TEXTILE=load("textile_workshop"), SMITHY=load("smithy"), OIL_ENGINE=load("oil_engine"), COAL_ENGINE=load("coal_engine");
+    public static final MachineModel OIL_DERRICK=load("oil_derrick"), KILN=load("kiln"), FOUNDRY=load("foundry"), FERTILIZER_FURNACE=load("fertilizer_furnace"), TANNERY=load("tannery"), TEXTILE=load("textile_workshop"), SMITHY=load("smithy"), OIL_ENGINE=load("oil_engine"), COAL_ENGINE=load("coal_engine"), FIRED_HEATER=load("fired_heater");
 
     /** Accepts any listed item or tag; `material` names them together on the guide. */
     public record Section(String name,List<String> items,String material,int count,int labor) {
@@ -133,7 +133,7 @@ public final class MachineModel {
             return new MachineModel(id,JsonParser.parseReader(new InputStreamReader(in,StandardCharsets.UTF_8)).getAsJsonObject());
         }catch(IOException e){throw new ExceptionInInitializerError(e);}
     }
-    public static List<MachineModel> all(){return List.of(OIL_DERRICK,KILN,FOUNDRY,FERTILIZER_FURNACE,TANNERY,TEXTILE,SMITHY,OIL_ENGINE,COAL_ENGINE);}
+    public static List<MachineModel> all(){return List.of(OIL_DERRICK,KILN,FOUNDRY,FERTILIZER_FURNACE,TANNERY,TEXTILE,SMITHY,OIL_ENGINE,COAL_ENGINE,FIRED_HEATER);}
     public Section section(int part){return sections.get(part);}
     /** Everything the model can occupy around a controller at `at`, in any facing. */
     public AABB area(net.minecraft.core.BlockPos at){return new AABB(at).inflate(reach,0,reach).setMinY(at.getY()+bottom).setMaxY(at.getY()+top);}

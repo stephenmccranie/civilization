@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "civilization:oil_refinery"
+          "name": "civilization:fired_heater"
         }
       ],
       "conditions": [

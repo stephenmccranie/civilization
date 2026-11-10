@@ -111,7 +111,7 @@ public final class CivilizationJei implements IModPlugin {
         category(r,"kiln",KilnContent.KILN.get());category(r,"foundry",KilnContent.FOUNDRY.get());
         category(r,"fertilizer",KilnContent.RETORT.get());category(r,"cooking",CookingContent.STATION.get());
         category(r,"tannery",WorkshopContent.TANNERY.get());category(r,"textile",WorkshopContent.TEXTILE.get());category(r,"smithy",WorkshopContent.SMITHY.get());category(r,"assembly",WorkshopContent.BENCH.get());
-        category(r,"oil_derrick",IndustrialContent.DERRICK.get());category(r,"heater",IndustrialContent.REFINERY.get());
+        category(r,"oil_derrick",IndustrialContent.DERRICK.get());category(r,"heater",IndustrialContent.HEATER.get());
         category(r,"column",IndustrialContent.COLUMN.get());category(r,"condenser",IndustrialContent.CONDENSER.get());category(r,"coal_drill",IndustrialContent.DRILL.get());
         category(r,"canisters",IndustrialContent.TANK.get(),"Canister filling / emptying");
         category(r,"anvil",KilnContent.STONE_ANVIL.get(),"Anvil and grindstone work");
@@ -175,12 +175,12 @@ public final class CivilizationJei implements IModPlugin {
         }).toList();add(r,name,recipes);
     }
     private void industry(IRecipeRegistration r){
-        for(var kind:List.of(IndustrialBlock.Kind.REFINERY,IndustrialBlock.Kind.COLUMN,IndustrialBlock.Kind.CONDENSER)){
+        for(var kind:List.of(IndustrialBlock.Kind.HEATER,IndustrialBlock.Kind.COLUMN,IndustrialBlock.Kind.CONDENSER)){
             var batch=IndustrialProcess.forKind(kind);var slots=new ArrayList<Slot>();
             slots.add(fluid(RecipeIngredientRole.INPUT,batch.input(),batch.inputMb()));slots.add(fluid(RecipeIngredientRole.OUTPUT,batch.output(),batch.outputMb()));
             if(batch.oilMb()>0)slots.add(fluid(RecipeIngredientRole.OUTPUT,IndustrialContent.LUBE.get(),batch.oilMb()));
             if(batch.sulfur()>0)slots.add(output(IndustrialContent.SULFUR.get(),batch.sulfur()));
-            boolean fired=kind==IndustrialBlock.Kind.REFINERY;if(fired)slots.add(coal());
+            boolean fired=kind==IndustrialBlock.Kind.HEATER;if(fired)slots.add(coal());
             String name=fired?"heater":kind==IndustrialBlock.Kind.COLUMN?"column":"condenser";
             add(r,name,List.of(process(name,slots,batch.ticks(),fired?"Draws one Coal per 250 mB from a hot machine; warming up and heat loss come on top.":"Connect the multiblock fluid ports with pipes. All output buffers need room.")));
         }

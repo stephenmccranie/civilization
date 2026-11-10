@@ -40,13 +40,13 @@ Coal extraction replaces the dense block with air and puts **16 Coal** into the 
 | Machine | Shape and connections |
 | --- | --- |
 | Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its right |
-| Fired Heater | Five-wide brick hearth, riveted steel jacket, stepped crown and narrow rear flue; eight blocks tall; crude intake left, heated output right |
+| Fired Heater | Fully modeled coal-fired still: a riveted black still shell lying front to back in a red-brick furnace setting, with a firedoor under a round brick arch at the front, a manhole dome, safety valve and dial thermometer on its crown, and a stepped breeching carrying a tall stack at the back. 3×6 blocks and seven tall at the stack, with the ground-level controller, the firedoor, at the front middle; crude intake in the left wall and heated output in the right wall, both one block up and two blocks back |
 | Distillation Column | Five-wide, eleven-high clipped-corner vessel with tapered crown; intake low on the left, vapor outlet high on the right, lubricating-oil outlet low on the right |
 | Air-Cooled Condenser | Seven-wide horizontal vessel with rounded edges, cooling-grille faces and steel cradles; vapor intake left, fuel outlet right |
 | Coal Drill | Extraction frame; fuel intake at back, lubricant intake at left, coal hopper output below |
 | Liquid Tank | Single block holding 16,000 mB of one fluid; every side accepts or supplies it |
 
-Sides are as seen facing the controller's front. The heater, column and condenser are built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, Refinery Flues, bricks, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
+Sides are as seen facing the controller's front. The column and condenser are built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
 
 ### Oil Derrick construction
 
@@ -55,6 +55,10 @@ Place the Oil Derrick controller at ground level (holding it previews the whole 
 The bill is **165 planks, 7 stone or cobblestone, 4 Iron Plates, 2 Machine Parts and 1 Refinery Port** across 31 sections: footings (7 stone), 20 frame panels (6 planks each), the middle gallery's two pairs of sides (8 planks each), the crown gallery's two pairs of sides (5 and 4 planks), floor (8 planks), walking beam (6 planks), bull wheel (6 planks), crown block and drill line (4 Iron Plates), band wheel (2 Machine Parts) and output port. Sections may use different plank species, each from one held stack, without changing the timber texture. Each section checks loaded space, build limits, claims, placement permission and entities; blocked sections consume nothing. Placement labor applies (356 kcal for the body before modifiers, plus the port). Creative construction is free.
 
 Completed sections are solid immediately. **Breaking a frame section or the port removes only that section**, refunds its paid materials once and stops the derrick until it is repaired with the same held-item interaction. Breaking the controller dismantles the derrick, refunding the remaining materials once and dropping its inventory and controller; the well and its casing stay in the ground and a new derrick drills afresh; Creative-built sections refund nothing. Partial progress and payments are saved. Drain the derrick's liquid before removing the controller.
+
+### Fired Heater construction
+
+The Fired Heater is built from its controller the same way: place the firedoor at ground level, where the heater will extend one block to either side and five behind, and right-click it with each section's material. The bill is **Footing** 4 stone or cobblestone, **Furnace walls** 6 brick blocks, **Furnace front** 4 brick blocks, **Still shell** 6 Industrial Casing, **Manhole and gauges** 2 Copper Plates, **Breeching** 4 brick blocks, **Stack** 3 Refinery Flues, and a Refinery Port for each of the crude intake and the hot oil outlet. Sections are solid as they are built, break and refund one at a time, and breaking the controller dismantles the heater, as for the derrick.
 
 ### Oil well
 
@@ -108,7 +112,7 @@ The products have distinct uses: **fuel powers machines, oil lubricates moving m
 
 ### Controls
 
-Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater shows a warm inspection slit while processing and smokes from its actual flue. Completed batches and coal use are logged in the energy journal.
+Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater's firedoor grate and inspection slit glow while its fire burns, and its stack smokes while the fire burns. Completed batches and coal use are logged in the energy journal.
 
 ## Liquids and pipes
 

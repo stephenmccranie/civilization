@@ -90,7 +90,7 @@ public final class IndustryGameTests {
         var pick=new ItemStack(Items.STONE_PICKAXE).get(net.minecraft.core.component.DataComponents.TOOL);
         for(var block:List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),CookingContent.STATION.get(),KilnContent.FOUNDRY.get(),
                 WorkshopContent.TANNERY.get(),WorkshopContent.SMITHY.get(),CivicContent.LAND.get(),
-                AirshipContent.CONTROLLER.get(),IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
+                AirshipContent.CONTROLLER.get(),IndustrialContent.DERRICK.get(),IndustrialContent.HEATER.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.TANK.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),OilEngineContent.ENGINE.get(),
                 BulkContent.BUNKER.get(),BulkContent.TANK.get()))
             h.assertTrue(pick.isCorrectForDrops(block.defaultBlockState()),"Stone pickaxe recovers "+block.getDescriptionId());
@@ -127,7 +127,7 @@ public final class IndustryGameTests {
         var copy=new IndustrialBlockEntity(col.getBlockPos(),col.getBlockState());copy.loadWithComponents(col.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());
         h.assertTrue(copy.input.isEmpty()&&copy.output.getFluidAmount()==3200&&copy.lubricant.getFluidAmount()==800,"Four coproduct batches conserve fluid");
         for(int slot:MachineInventory.INDUSTRIAL_OUTPUT)h.assertTrue(copy.getItem(slot).getCount()==32&&copy.canTakeItemThroughFace(slot,copy.getItem(slot),Direction.DOWN),"Every output is used, saved and hopper-accessible");
-        var heat=machine(h,IndustrialContent.REFINERY.get(),14);heat.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),250),EXECUTE);heat.setItem(2,KilnContent.MINERAL_COAL.toStack());run(heat,10);
+        var heat=machine(h,IndustrialContent.HEATER.get(),14);heat.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),250),EXECUTE);heat.setItem(2,KilnContent.MINERAL_COAL.toStack());run(heat,10);
         h.assertTrue(heat.output.getFluidAmount()==250&&heat.getItem(2).isEmpty()&&heat.getItem(0).isEmpty(),"Heater draws fuel from second slot without duplication");h.succeed();
     }
     @GameTest(template="empty") public static void competingDrillsConsumePhysicalBlocksOnce(GameTestHelper h){
@@ -140,7 +140,7 @@ public final class IndustryGameTests {
     @GameTest(template="empty") public static void coalBootstrapsOilAndIndustrialCoal(GameTestHelper h){
         var pump=machine(h,IndustrialContent.DERRICK.get(),2);var oil=site(pump,Deposits.Kind.OIL,1);bind(pump,oil);pump.struck=true;MachineFixture.coalEngine(h.getLevel(),pump);pumped(pump,8);
         h.assertTrue(pump.output.getFluidAmount()==1000&&stock(h,oil)==0,"Eight engine-driven steps pump one physical 1,000 mB block");
-        var ref=machine(h,IndustrialContent.REFINERY.get(),7);ref.input.fill(pump.output.drain(1000,EXECUTE),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(ref,50);
+        var ref=machine(h,IndustrialContent.HEATER.get(),7);ref.input.fill(pump.output.drain(1000,EXECUTE),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(ref,50);
         h.assertTrue(ref.input.isEmpty()&&ref.output.getFluidAmount()==1000&&ref.getItem(0).isEmpty()&&!ref.fire.lit()&&ref.fire.hot(),"Four Coal heat 1,000 crude; the fire burns out while the hearth stays hot");
         var column=machine(h,IndustrialContent.COLUMN.get(),24);column.input.fill(ref.output.drain(1000,EXECUTE),EXECUTE);run(column,40);
         h.assertTrue(column.output.getFluidAmount()==800&&column.lubricant.getFluidAmount()==200&&column.getItem(1).is(IndustrialContent.SULFUR.get()),"Column separates vapor, lubricating oil and sulfur");
@@ -327,15 +327,15 @@ public final class IndustryGameTests {
         try{h.assertTrue(port.drain(100,EXECUTE).isEmpty(),"Cached fluid capability respects a newly created claim");ref.transfer();h.assertTrue(ref.input.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Separate ownership blocks fluid transfer");}finally{d.claims.remove(claim.at);d.rebuildIndex();}h.succeed();
     }
     @GameTest(template="empty") public static void fuelGatesAndUnmineableClues(GameTestHelper h){
-        var ref=machine(h,IndustrialContent.REFINERY.get(),2);var drill=machine(h,IndustrialContent.DRILL.get(),7);
+        var ref=machine(h,IndustrialContent.HEATER.get(),2);var drill=machine(h,IndustrialContent.DRILL.get(),7);
         h.assertTrue(!ref.canPlaceItem(0,new ItemStack(Items.CHARCOAL))&&!drill.canPlaceItem(0,KilnContent.MINERAL_COAL.toStack()),"No biomass and no direct coal-powered drill");
         h.assertTrue(ref.input.fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE)==0&&drill.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),1000),EXECUTE)==0,"Crude cannot bypass refining");
         h.assertTrue(IndustrialContent.COAL_SEAM.get().defaultBlockState().getDestroySpeed(h.getLevel(),drill.getBlockPos())<0&&Blocks.COAL_ORE.defaultBlockState().getDestroySpeed(h.getLevel(),drill.getBlockPos())>0,"Large seams are machine-only while ordinary ore stays mineable");h.succeed();
     }
     @GameTest(template="empty") public static void industrialStructuresRotateWithCutSlabs(GameTestHelper h){
-        var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
-            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.DERRICK)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
-            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.kind==IndustrialBlock.Kind.DERRICK)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
+        var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.HEATER.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
+            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.model()!=null)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
+            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.model()!=null)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
         }h.succeed();
     }
 
@@ -348,14 +348,15 @@ public final class IndustryGameTests {
         h.runAfterDelay(20,()->{var pump=machine(h,IndustrialContent.DERRICK.get(),15);
         var oil=site(pump,Deposits.Kind.OIL,1000);bind(pump,oil);pump.struck=true;int[] initialStock={0};
         var engine=MachineFixture.hotBulbEngine(l,pump);engine.enabled=true;
-        var heater=machine(h,IndustrialContent.REFINERY.get(),24);
+        var heater=machine(h,IndustrialContent.HEATER.get(),24);
         var column=machine(h,IndustrialContent.COLUMN.get(),38);
         var condenser=machine(h,IndustrialContent.CONDENSER.get(),52);
         // The derrick's crude port is beside its ground-level controller.
         for(int x=17;x<=21;x++)pipe(h,h.absolutePos(new BlockPos(x,67,2)));
         pipe(h,h.absolutePos(new BlockPos(21,68,2)));
-        pipe(h,h.absolutePos(new BlockPos(21,68,3)));
-        for(int x=27;x<=35;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
+        for(int z=3;z<=4;z++)pipe(h,h.absolutePos(new BlockPos(21,68,z)));
+        pipe(h,h.absolutePos(new BlockPos(22,68,4)));
+        for(int x=26;x<=35;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
         for(int x=41;x<=48;x++)pipe(h,h.absolutePos(new BlockPos(x,76,4)));
         for(int y=69;y<76;y++)pipe(h,h.absolutePos(new BlockPos(48,y,4)));
         pipe(h,h.absolutePos(new BlockPos(56,69,4)));
@@ -406,7 +407,7 @@ public final class IndustryGameTests {
         });
     }
     @GameTest(template="empty") public static void refineryPipesConserveWithoutValves(GameTestHelper h){
-        var ref=machine(h,IndustrialContent.REFINERY.get(),3);IndustrialStructure.bind(ref);var at=port(ref,"input_port");var mid=at.west();var source=mid.west().south();
+        var ref=machine(h,IndustrialContent.HEATER.get(),3);IndustrialStructure.bind(ref);var at=port(ref,"input_port");var mid=at.west();var source=mid.west().south();
         pipe(h,mid);pipe(h,mid.west());pipe(h,mid.north());h.getLevel().setBlockAndUpdate(source,IndustrialContent.TANK.get().defaultBlockState());var tank=(IndustrialBlockEntity)h.getLevel().getBlockEntity(source);tank.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),1000),EXECUTE);
         ref.transfer();h.assertTrue(ref.input.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Bent pipes transfer exactly 25 mB per step");
         h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).setValue(FluidPipeBlock.OPEN,false));ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Changing legacy valve state cannot reset the shared pipe budget");
@@ -434,11 +435,11 @@ public final class IndustryGameTests {
         var copy=new IndustrialBlockEntity(drill.getBlockPos(),drill.getBlockState());copy.loadWithComponents(drill.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());h.assertTrue(copy.lubrication==drill.lubrication,"Lubrication persists");h.succeed();
     }
     @GameTest(template="empty") public static void remotePortRevokesAfterControllerRemoval(GameTestHelper h){
-        var ref=machine(h,IndustrialContent.REFINERY.get(),3);IndustrialStructure.bind(ref);var at=port(ref,"output_port");ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),1000),EXECUTE);
+        var ref=machine(h,IndustrialContent.HEATER.get(),3);IndustrialStructure.bind(ref);var at=port(ref,"output_port");ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),1000),EXECUTE);
         var cap=h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,at,Direction.EAST);h.assertTrue(cap.drain(100,SIMULATE).getAmount()==100,"Output port exposes heated stream");h.getLevel().removeBlock(ref.getBlockPos(),false);h.assertTrue(cap.drain(100,EXECUTE).isEmpty(),"Cached port cannot drain removed controller");h.succeed();
     }
     @GameTest(template="empty") public static void hotStreamsCannotBecomeFuelCanisters(GameTestHelper h){
-        var ref=machine(h,IndustrialContent.REFINERY.get(),3);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),1000),EXECUTE);var p=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"hot-test"));p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,IndustrialContent.CAN.toStack());ref.canister(p,net.minecraft.world.InteractionHand.MAIN_HAND);
+        var ref=machine(h,IndustrialContent.HEATER.get(),3);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),1000),EXECUTE);var p=new FakePlayer(h.getLevel(),new GameProfile(UUID.randomUUID(),"hot-test"));p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,IndustrialContent.CAN.toStack());ref.canister(p,net.minecraft.world.InteractionHand.MAIN_HAND);
         h.assertTrue(ref.output.getFluidAmount()==1000&&p.getMainHandItem().is(IndustrialContent.CAN.get()),"Hot stream cannot bypass condenser using canister");h.succeed();
     }
 

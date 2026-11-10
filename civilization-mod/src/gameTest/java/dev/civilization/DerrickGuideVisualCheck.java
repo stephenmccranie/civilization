@@ -79,7 +79,7 @@ final class DerrickGuideVisualCheck {
     private static void verifyCrownRenderer(Minecraft mc){
         var m=(IndustrialBlockEntity)mc.level.getBlockEntity(AT);var renderer=mc.getBlockEntityRenderDispatcher().getRenderer(m);
         if(renderer==null||!renderer.shouldRenderOffScreen(m)||!renderer.shouldRender(m,mc.gameRenderer.getMainCamera().getPosition()))throw new IllegalStateException("Derrick must remain eligible when its controller section leaves view");
-        if(renderer.shouldRenderOffScreen(new IndustrialBlockEntity(AT,IndustrialContent.REFINERY.get().defaultBlockState())))throw new IllegalStateException("Only derricks should bypass controller-section culling");
+        if(renderer.shouldRenderOffScreen(new IndustrialBlockEntity(AT,IndustrialContent.COLUMN.get().defaultBlockState())))throw new IllegalStateException("Only native models should bypass controller-section culling");
         // The crown's top rail stands 25.875 blocks above the controller.
         if(!renderer.getRenderBoundingBox(m).contains(.5,126.8,5))throw new IllegalStateException("Render bounds omit the crown");
         if(renderer.shouldRender(m,new net.minecraft.world.phys.Vec3(500,121,0)))throw new IllegalStateException("Global registration bypassed the view-distance limit");

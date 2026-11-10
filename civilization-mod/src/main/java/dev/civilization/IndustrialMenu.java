@@ -19,7 +19,7 @@ public final class IndustrialMenu extends AbstractContainerMenu implements CoalF
     }
     public int fireState(){return data.get(11);}
     public int heat(){return data.get(6);}
-    public boolean hasCoalFire(){return kind()==IndustrialBlock.Kind.COAL_ENGINE||kind()==IndustrialBlock.Kind.REFINERY;}
+    public boolean hasCoalFire(){return kind()==IndustrialBlock.Kind.COAL_ENGINE||kind()==IndustrialBlock.Kind.HEATER;}
     @Override public boolean clickMenuButton(Player p,int id){if(id!=CoalFire.BUTTON||!stillValid(p)||!(inventory instanceof IndustrialBlockEntity m)||!m.coalPowered())return false;boolean ok=m.fire.strike(p,IndustrialStructure.bind(m));broadcastChanges();return ok;}
     public IndustrialBlock.Kind kind(){return IndustrialBlock.Kind.values()[Math.clamp(data.get(0),0,IndustrialBlock.Kind.values().length-1)];}
     @Override public boolean stillValid(Player p){return inventory.stillValid(p);}

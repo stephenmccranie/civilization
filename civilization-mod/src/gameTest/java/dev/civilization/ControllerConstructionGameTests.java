@@ -30,7 +30,7 @@ public final class ControllerConstructionGameTests {
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
-        List<Block> controllers=List.of(IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
+        List<Block> controllers=List.of(IndustrialContent.DRILL.get(),
                 IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
                 BulkContent.TANK.get(),CivicContent.TABLE.get());
         for(var block:controllers) {
@@ -57,8 +57,8 @@ public final class ControllerConstructionGameTests {
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         for(int units=1;units<=3;units++) {
             int size=units;
-            // The Refinery's shell has beam and slab pieces; the Distillation Column's crown has the corner cubes.
-            var state=(units<3?IndustrialContent.REFINERY.get():IndustrialContent.COLUMN.get()).defaultBlockState().setValue(CivicBlock.FACING,front);
+            // The Condenser's vessel has beam and slab pieces; the Distillation Column's crown has the corner cubes.
+            var state=(units<3?IndustrialContent.CONDENSER.get():IndustrialContent.COLUMN.get()).defaultBlockState().setValue(CivicBlock.FACING,front);
             level.setBlockAndUpdate(at,state);
             var part=MachineStructure.guideParts(state).stream().filter(p->p.units()==size).findFirst().orElseThrow();
             var target=MachineStructure.position(at,front,part);
