@@ -9,7 +9,6 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(m.model()!=null)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);
@@ -17,8 +16,8 @@ final class IndustryVisualCheck {
             server.execute(()->{try{
                 var l=server.overworld();var player=server.getPlayerList().getPlayers().getFirst();
                 for(int x=15;x<80;x++)for(int z=-30;z<12;z++){l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<140;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
-                var ref=machine(l,IndustrialContent.HEATER.get(),REF);CoalFireFixture.light(ref);var col=machine(l,IndustrialContent.COLUMN.get(),COL);machine(l,IndustrialContent.CONDENSER.get(),new BlockPos(60,101,0));
-                var crude=machine(l,IndustrialContent.TANK.get(),new BlockPos(28,102,1));machine(l,IndustrialContent.TANK.get(),new BlockPos(68,102,2));machine(l,IndustrialContent.TANK.get(),new BlockPos(52,101,1));
+                var ref=MachineFixture.industrial(l,IndustrialContent.HEATER.get(),REF);CoalFireFixture.light(ref);var col=MachineFixture.industrial(l,IndustrialContent.COLUMN.get(),COL);MachineFixture.industrial(l,IndustrialContent.CONDENSER.get(),new BlockPos(60,101,0));
+                var crude=MachineFixture.industrial(l,IndustrialContent.TANK.get(),new BlockPos(28,102,1));MachineFixture.industrial(l,IndustrialContent.TANK.get(),new BlockPos(68,102,2));MachineFixture.industrial(l,IndustrialContent.TANK.get(),new BlockPos(52,101,1));
                 for(int x=29;x<=32;x++)pipe(l,x,102,1);pipe(l,32,102,2);
                 for(int x=36;x<=44;x++)pipe(l,x,102,2);
                 for(int x=48;x<=56;x++)pipe(l,x,102,2);
@@ -56,7 +55,7 @@ final class IndustryVisualCheck {
         if(ticks==350)server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,39,103,-1,java.util.Set.of(),0,23);var ref=(IndustrialBlockEntity)l.getBlockEntity(REF);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),4000),EXECUTE);MachineFixture.build(l,COL);var col=(IndustrialBlockEntity)l.getBlockEntity(COL);col.input.drain(4000,EXECUTE);col.output.drain(4000,EXECUTE);col.lubricant.drain(4000,EXECUTE);});
         if(ticks==375){var f=(PipeFlowEntity)mc.level.getBlockEntity(new BlockPos(39,102,2));if(f==null||f.fluids[Direction.EAST.ordinal()]!=3||f.until[Direction.EAST.ordinal()]<=mc.level.getGameTime())throw new IllegalStateException("Heated crude animation did not reach client");shot(mc,"pipe-glass");}
         if(ticks==379)shot(mc,"pipe-flow-next");
-        if(ticks==385)server.execute(()->{try{var l=server.overworld();var pump=machine(l,IndustrialContent.DERRICK.get(),new BlockPos(23,101,-12));
+        if(ticks==385)server.execute(()->{try{var l=server.overworld();var pump=MachineFixture.industrial(l,IndustrialContent.DERRICK.get(),new BlockPos(23,101,-12));
             var site=new Deposits.Site(23,101,-12,Deposits.Kind.OIL,2);l.setBlockAndUpdate(new BlockPos(site.x(),site.top(),site.z()),IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());
             var field=IndustrialBlockEntity.class.getDeclaredField("site");field.setAccessible(true);field.set(pump,site);field=IndustrialBlockEntity.class.getDeclaredField("surveyed");field.setAccessible(true);field.setBoolean(pump,true);
             pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),2000),EXECUTE);pump.struck=true;MachineFixture.coalEngine(l,pump);

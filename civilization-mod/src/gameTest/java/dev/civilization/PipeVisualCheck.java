@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.GameType;
 
-/** Pipe art fixture: long runs of each liquid both ways, every shape, a cluster of bends, the ports of a modeled and a block-built machine, night, and the items. */
+/** Pipe art fixture: long runs of each liquid both ways, every shape, a cluster of bends, a loose port and the ports of two machines, night, and the items. */
 final class PipeVisualCheck {
     private static int ticks;
     private static volatile boolean ready;
@@ -49,11 +49,6 @@ final class PipeVisualCheck {
     // Crude into the Fired Heater's intake, and hot oil from its outlet to the Distillation Column's port.
     private static final BlockPos HEATER=new BlockPos(122,101,-8),COLUMN=new BlockPos(130,101,-8);
     private static final List<Run> MACHINES=List.of(new Run(1,117,102,-6,121,102,-6),new Run(3,123,102,-6,129,102,-6));
-    private static void machine(ServerLevel l,IndustrialBlock b,BlockPos at){
-        l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);
-        if(m.model()!=null)MachineFixture.build(l,at);else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);
-        if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);
-    }
     private static void view(Minecraft mc,double x,double y,double z,float yaw,float pitch){
         var server=mc.getSingleplayerServer();server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),x,y,z,java.util.Set.of(),yaw,pitch));
     }
@@ -71,7 +66,7 @@ final class PipeVisualCheck {
                     l.setBlockAndUpdate(new BlockPos(x,y,z),y==100?Blocks.STONE_BRICKS.defaultBlockState():Blocks.AIR.defaultBlockState());
                 for(int x=58;x<=118;x++)for(int y=101;y<=108;y++)l.setBlockAndUpdate(new BlockPos(x,y,3),(x>=105&&x<=109?Blocks.BRICKS:Blocks.SMOOTH_STONE).defaultBlockState());
                 l.setBlockAndUpdate(PORT,IndustrialContent.PORT.get().defaultBlockState());
-                machine(l,IndustrialContent.HEATER.get(),HEATER);machine(l,IndustrialContent.COLUMN.get(),COLUMN);
+                MachineFixture.industrial(l,IndustrialContent.HEATER.get(),HEATER);MachineFixture.industrial(l,IndustrialContent.COLUMN.get(),COLUMN);
                 l.setBlockAndUpdate(LONE,IndustrialContent.PIPE.get().defaultBlockState());
                 for(var runs:List.of(LIQUIDS,SHAPES,MACHINES))for(var run:runs)for(var at:run.pipes())l.setBlockAndUpdate(at,IndustrialContent.PIPE.get().defaultBlockState());
                 for(int x:new int[]{63,69,75,81,93,99,105,113})l.setBlockAndUpdate(new BlockPos(x,101,-2),Blocks.LANTERN.defaultBlockState());
