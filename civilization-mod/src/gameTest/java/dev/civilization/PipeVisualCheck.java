@@ -48,7 +48,7 @@ final class PipeVisualCheck {
     private static final BlockPos LONE=new BlockPos(105,102,0),PORT=new BlockPos(107,104,3);
     // Crude into the Fired Heater's intake, and hot oil from its outlet to the Distillation Column's port.
     private static final BlockPos HEATER=new BlockPos(122,101,-8),COLUMN=new BlockPos(130,101,-8);
-    private static final List<Run> MACHINES=List.of(new Run(1,117,102,-6,121,102,-6),new Run(3,123,102,-6,128,102,-6));
+    private static final List<Run> MACHINES=List.of(new Run(1,117,102,-6,121,102,-6),new Run(3,123,102,-6,129,102,-6));
     private static void machine(ServerLevel l,IndustrialBlock b,BlockPos at){
         l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);
         if(m.model()!=null)MachineFixture.build(l,at);else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);

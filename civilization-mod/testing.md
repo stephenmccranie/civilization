@@ -89,6 +89,6 @@ The report is `runs/perf/report/report.md`, with `report.json` for comparing run
 
 A fixture runs its phases as separate server processes on one fresh flat world in `runs/fixture`.
 
-- `boat`: `seed` builds and fuels a loaded boat, then `reload` confirms its engine fuel, oil, condition and cargo after a restart.
+- `boat`: `seed` builds and fuels a loaded boat, then `reload` confirms its cargo and its engine's oil, condition and fuel after a restart, the fuel less only what the running engine has idled away since.
 - `airship`: `seed` assembles a loaded airship, then `reload` confirms its power and cargo after a restart.
 - `thermal`: the [thermal laboratory](heat.md). `check` records heating and cooling at reference stations into `measurements.csv`, and `reload` confirms the field survives a restart. `-Phase physics` runs the reference physics checks. `-Phase manual` opens the laboratory as an interactive server on `localhost:25567` with `/thermal_lab` commands.
