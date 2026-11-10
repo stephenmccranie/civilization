@@ -42,6 +42,8 @@
     "civilization:tannery_part",
     "civilization:oil_engine_part",
     "civilization:coal_engine_part",
-    "civilization:fired_heater_part"
+    "civilization:fired_heater_part",
+    "civilization:distillation_column_part",
+    "civilization:condenser_part"
   ]
 }

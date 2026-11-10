@@ -47,6 +47,29 @@ def block(m, group, name, face, phi, tilt, depth, length, height, material, fron
           material, angle=[tilt, wrap(-90 - math.degrees(phi)), roll], pivot=c, faces=faces, collide=False)
 
 
+def mass(m, group, name, lo, hi, material='mortar', holes=()):
+    """A solid mass lo..hi carrying the collision, less the boxes `holes` such as a port's cell or a door's recess, in
+    boxes no larger than its texture. The faces where its boxes meet are never drawn; those round a hole are."""
+    cuts = []
+    for d in range(3):
+        edges = sorted({lo[d], hi[d], *(e for a, b in holes for e in (a[d], b[d]) if lo[d] < e < hi[d])})
+        cuts.append([a + (b - a) * i / n for a, b in zip(edges, edges[1:]) for n in [max(1, math.ceil((b - a) / 32))] for i in range(n)] + [hi[d]])
+    counts = [len(c) - 1 for c in cuts]
+
+    def solid(index):
+        if any(not 0 <= i < n for i, n in zip(index, counts)): return False
+        centre = [(cuts[d][i] + cuts[d][i + 1]) / 2 for d, i in enumerate(index)]
+        return not any(all(a[d] < centre[d] < b[d] for d in range(3)) for a, b in holes)
+    for i in range(counts[0]):
+        for j in range(counts[1]):
+            for k in range(counts[2]):
+                if not solid((i, j, k)): continue
+                beside = {'west': (i - 1, j, k), 'east': (i + 1, j, k), 'down': (i, j - 1, k), 'up': (i, j + 1, k),
+                          'north': (i, j, k - 1), 'south': (i, j, k + 1)}
+                m.box(group, f'{name}_{i}_{j}_{k}', [cuts[0][i], cuts[1][j], cuts[2][k]], [cuts[0][i + 1], cuts[1][j + 1], cuts[2][k + 1]],
+                      material, faces={face: None for face, index in beside.items() if solid(index)})
+
+
 def minus(stretches, holes):
     """The parts of the (start, end) stretches no hole covers."""
     for h0, h1 in holes:
@@ -115,6 +138,27 @@ class Mason:
                 for s, e in bond(a, b, k % 2):
                     last = self.lay(m, group, f'{name}_{k}_{s:g}', point(origin, phi, tilt, (s + e) / 2, COURSE * k + .875), phi, tilt,
                                     e - s, last, stain((s + e) / 2, y))
+
+    def face(self, m, group, name, side, lo, hi, foot, ref=None, holes=lambda y: [], stain=plain):
+        """Bricks on one side of the mass lo..hi, on the grid of the box `ref` whose side lies in the same plane: courses
+        count from the footing's top `foot` and bonds from that box's corner, so masses built against and upon each
+        other read as one wall. `holes(y)` gives stretches along the side's axis, in model units, that take no brick."""
+        phi, corner, axis = SIDES[side]; ref = ref or (lo, hi); origin = corner(*ref); origin[1] = foot
+        left = {'front': lambda a, b: (a - ref[0][0], b - ref[0][0]), 'back': lambda a, b: (ref[1][0] - b, ref[1][0] - a),
+                'west': lambda a, b: (ref[1][2] - b, ref[1][2] - a), 'east': lambda a, b: (a - ref[0][2], b - ref[0][2])}[side]
+        self.wall(m, group, name, origin, phi, (round((lo[1] - foot) / COURSE), round((hi[1] - foot) / COURSE)),
+                  lambda y: minus([left(lo[axis], hi[axis])], [left(a, b) for a, b in holes(y)]), stain)
+
+    def stones(self, m, group, name, lo, hi, sides):
+        """A course of footing stones on each named side of the mass lo..hi, as many as fill it, cut to share it evenly."""
+        stone0 = self.pieces['stone'][0]
+        for side in sides:
+            phi, corner, axis = SIDES[side]; length = hi[axis] - lo[axis]
+            count = math.ceil(length / (stone0.width + .25)); place = length / count; last = None
+            for j in range(count):
+                stone = self.piece('stone', last); last = stone.tone; thick = self.rng.choice([.25, .5])
+                block(m, group, f'{name}_{side}_{j}', point(corner(lo, hi), phi, 0, (j + .5) * place, (hi[1] - lo[1] - .25) / 2, thick),
+                      phi, 0, thick, min(stone.width, place - .25), stone.height, stone.region, (0, 0))
 
     def brickwork(self, m, group, name, lo, hi, sides, holes=lambda side, y: [], stain=lambda side, u, y: None, top=True):
         """A solid mortar mass lo..hi carrying the collision, its named sides laid with brick, less each side's holes

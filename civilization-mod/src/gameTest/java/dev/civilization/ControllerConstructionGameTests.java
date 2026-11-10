@@ -31,7 +31,7 @@ public final class ControllerConstructionGameTests {
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
         List<Block> controllers=List.of(IndustrialContent.DRILL.get(),
-                IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
+                BulkContent.BUNKER.get(),
                 BulkContent.TANK.get(),CivicContent.TABLE.get());
         for(var block:controllers) {
             var state=block.defaultBlockState().setValue(CivicBlock.FACING,front);
@@ -55,10 +55,10 @@ public final class ControllerConstructionGameTests {
         var player=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"cut-check"));
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
-        for(int units=1;units<=3;units++) {
+        for(int units=1;units<=2;units++) {
             int size=units;
-            // The Condenser's vessel has beam and slab pieces; the Distillation Column's crown has the corner cubes.
-            var state=(units<3?IndustrialContent.CONDENSER.get():IndustrialContent.COLUMN.get()).defaultBlockState().setValue(CivicBlock.FACING,front);
+            // The Coal Bunker's roof has beam pieces and its walls and floor slab pieces.
+            var state=BulkContent.BUNKER.get().defaultBlockState().setValue(CivicBlock.FACING,front);
             level.setBlockAndUpdate(at,state);
             var part=MachineStructure.guideParts(state).stream().filter(p->p.units()==size).findFirst().orElseThrow();
             var target=MachineStructure.position(at,front,part);

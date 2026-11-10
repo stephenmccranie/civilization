@@ -24,7 +24,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 public final class MachinePreview {
     /** A structure requirement, or, without a part, a cell the held block's click fills. Its look is prepared outside rendering. */
     private record Ghost(BlockPos pos, AABB box, MachineStructure.Part part, BlockState shown, ModelData data, boolean wrong) {
-        String label() { return part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : part.units()==3?"_eighth":"_quarter"); }
+        String label() { return part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : "_quarter"); }
     }
     private record LayoutKey(Level level,BlockPos at,BlockState state) {}
     private record LayoutPart(BlockPos pos,MachineStructure.Part part,net.minecraft.core.Direction front,AABB box) {}

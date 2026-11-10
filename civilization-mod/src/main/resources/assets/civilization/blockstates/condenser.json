@@ -1,20 +1,5 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "civilization:block/condenser",
-      "y": 0
-    },
-    "facing=east": {
-      "model": "civilization:block/condenser",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "civilization:block/condenser",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "civilization:block/condenser",
-      "y": 270
-    }
+    "": {"model": "civilization:block/condenser"}
   }
 }

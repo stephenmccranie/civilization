@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 public final class IndustrialBlock extends Block implements EntityBlock, ModeledBlock {
     public enum Kind { DERRICK, HEATER, DRILL, TANK, COLUMN, CONDENSER, COAL_ENGINE }
     public final Kind kind;
-    public static MachineModel model(Kind kind){return switch(kind){case DERRICK->MachineModel.OIL_DERRICK;case HEATER->MachineModel.FIRED_HEATER;case COAL_ENGINE->MachineModel.COAL_ENGINE;default->null;};}
+    public static MachineModel model(Kind kind){return switch(kind){case DERRICK->MachineModel.OIL_DERRICK;case HEATER->MachineModel.FIRED_HEATER;case COLUMN->MachineModel.DISTILLATION_COLUMN;case CONDENSER->MachineModel.CONDENSER;case COAL_ENGINE->MachineModel.COAL_ENGINE;default->null;};}
     @Override public MachineModel model(){return model(kind);}
     /** A native model fills only part of its controller's cell, so the controller hides none of its neighbours' faces
      *  and, like the model's other cells, passes light through undimmed. */

@@ -56,6 +56,26 @@ class Model:
                      point(cx+length/2,cy+thickness/2,end-inset),material,-45 if sx*sy>0 else 45,
                      axis,point(cx,cy,(start+end)/2))
 
+    def pipe(self, group, name, axis, centre, r, lo, hi, material='steel', ends=None, collide=True):
+        """An octagonal pipe or drum of radius `r` along `axis` from lo to hi, round `centre` (its two other
+        coordinates, in x, y, z order), in lengths no longer than a 128px material: two boxes square to the axes and
+        two turned an eighth of a turn, each a little shorter so their end faces never lie in one plane. Only the flats
+        and, where `ends` names a material, the two end faces are drawn; the square boxes carry the collision."""
+        d = 'xyz'.index(axis); u, v = [i for i in range(3) if i != d]; a = r * math.tan(math.pi / 8)
+        sides = [[('west', 'east'), ('down', 'up'), ('north', 'south')][i] for i in (d, u, v)]
+        count = max(1, math.ceil((hi - lo) / 32))
+        for n in range(count):
+            for i, (du, dv, angle) in enumerate(((r, a, 0), (a, r, 0), (a, r, 45), (a, r, -45))):
+                start, end, pivot = [0, 0, 0], [0, 0, 0], [0, 0, 0]
+                start[d], end[d] = lo + (hi - lo) * n / count + .01 * i, lo + (hi - lo) * (n + 1) / count - .01 * i
+                start[u], end[u], start[v], end[v] = centre[0] - du, centre[0] + du, centre[1] - dv, centre[1] + dv
+                pivot[d], pivot[u], pivot[v] = (start[d] + end[d]) / 2, centre[0], centre[1]
+                faces = {side: None for side in sides[2 if du > dv else 1]}
+                faces[sides[0][0]] = ends if ends and n == 0 else None
+                faces[sides[0][1]] = ends if ends and n == count - 1 else None
+                self.box(group, f'{name}_{n}_{i}', start, end, material, angle=angle, axis=axis, pivot=pivot, faces=faces,
+                         collide=collide and not angle)
+
     def claim(self, group, start, end):
         """Give `group` the solid geometry inside the box start..end: every unrotated colliding part crossing it is split,
         the inside piece moving to `group`; surface detail stays whole with its section. A machine's controller claims

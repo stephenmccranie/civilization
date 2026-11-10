@@ -18,12 +18,12 @@ final class IndustryVisualCheck {
                 var l=server.overworld();var player=server.getPlayerList().getPlayers().getFirst();
                 for(int x=15;x<80;x++)for(int z=-30;z<12;z++){l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<140;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
                 var ref=machine(l,IndustrialContent.HEATER.get(),REF);CoalFireFixture.light(ref);var col=machine(l,IndustrialContent.COLUMN.get(),COL);machine(l,IndustrialContent.CONDENSER.get(),new BlockPos(60,101,0));
-                var crude=machine(l,IndustrialContent.TANK.get(),new BlockPos(28,102,1));machine(l,IndustrialContent.TANK.get(),new BlockPos(68,103,2));machine(l,IndustrialContent.TANK.get(),new BlockPos(54,102,5));
+                var crude=machine(l,IndustrialContent.TANK.get(),new BlockPos(28,102,1));machine(l,IndustrialContent.TANK.get(),new BlockPos(68,102,2));machine(l,IndustrialContent.TANK.get(),new BlockPos(52,101,1));
                 for(int x=29;x<=32;x++)pipe(l,x,102,1);pipe(l,32,102,2);
-                for(int x=36;x<=43;x++)pipe(l,x,102,2);
-                for(int x=49;x<=56;x++)pipe(l,x,110,2);for(int y=103;y<110;y++)pipe(l,56,y,2);
-                for(int z=2;z<=5;z++)pipe(l,49,102,z);for(int x=50;x<54;x++)pipe(l,x,102,5);
-                for(int x=64;x<68;x++)pipe(l,x,103,2);
+                for(int x=36;x<=44;x++)pipe(l,x,102,2);
+                for(int x=48;x<=56;x++)pipe(l,x,102,2);
+                for(int x=48;x<52;x++)pipe(l,x,101,1);
+                for(int x=64;x<68;x++)pipe(l,x,102,2);
                 crude.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),10000),EXECUTE);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),2000),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(8));col.input.fill(new FluidStack(IndustrialContent.HEATED.get(),1000),EXECUTE);col.progress=col.duration()-IndustrialRates.STEP_TICKS;var condenser=(IndustrialBlockEntity)l.getBlockEntity(new BlockPos(60,101,0));condenser.input.fill(new FluidStack(IndustrialContent.VAPOR.get(),200),EXECUTE);condenser.progress=condenser.duration()-IndustrialRates.STEP_TICKS;
                 player.getInventory().clearContent();int i=0;for(var item:java.util.List.of(IndustrialContent.PIPE.get().asItem(),IndustrialContent.PORT.get().asItem(),IndustrialContent.CRUDE_CAN.get(),IndustrialContent.FUEL_CAN.get(),IndustrialContent.LUBE_CAN.get(),IndustrialContent.SULFUR.get()))player.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(item));
                 player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);player.getAbilities().flying=true;player.onUpdateAbilities();player.teleportTo(l,34.5,101,-2,java.util.Set.of(),0,0);l.setDayTime(6000);l.setWeatherParameters(100000,0,false,false);player.openMenu(ref);ready=true;
@@ -33,10 +33,10 @@ final class IndustryVisualCheck {
         if(ticks==150){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.kind()!=IndustrialBlock.Kind.HEATER)throw new IllegalStateException("Heater menu did not synchronize");shot(mc,"heater");}
         if(ticks==155)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),46.5,101,-2,java.util.Set.of(),0,0);p.openMenu((IndustrialBlockEntity)server.overworld().getBlockEntity(COL));});
         if(ticks==180){if(!(mc.player.containerMenu instanceof IndustrialMenu m)||m.kind()!=IndustrialBlock.Kind.COLUMN)throw new IllegalStateException("Column menu did not synchronize");shot(mc,"column");}
-        if(ticks==185)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),64,110,-18,java.util.Set.of(),35,10);});
+        if(ticks==185)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),66,112,-24,java.util.Set.of(),26,14);});
         if(ticks==190)mc.options.hideGui=true;
         if(ticks==230)shot(mc,"machines");
-        if(ticks==235)server.execute(()->{var l=server.overworld();var output=(IndustrialBlockEntity)l.getBlockEntity(new BlockPos(68,103,2));if(output.input.getFluidAmount()==0){failure=new IllegalStateException("Connected refinery did not deliver engine fuel");return;}l.removeBlock(COL.offset(-1,0,0),false);var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,46.5,101,-3,java.util.Set.of(),0,20);});
+        if(ticks==235)server.execute(()->{var l=server.overworld();var output=(IndustrialBlockEntity)l.getBlockEntity(new BlockPos(68,102,2));if(output.input.getFluidAmount()==0){failure=new IllegalStateException("Connected refinery did not deliver engine fuel");return;}l.removeBlock(COL.offset(-1,0,0),false);var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,46.5,101,-3,java.util.Set.of(),0,20);});
         if(ticks==240)mc.options.hideGui=false;
         if(ticks==270){shot(mc,"guide");com.mojang.logging.LogUtils.getLogger().info("INDUSTRY VISUAL VERIFIED");}
         if(ticks==275)server.execute(()->{try {
@@ -53,7 +53,7 @@ final class IndustryVisualCheck {
         if(ticks==315)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),34,105,-7,java.util.Set.of(),35,15);});
         if(ticks==320)mc.options.hideGui=true;
         if(ticks==345){shot(mc,"foundry");com.mojang.logging.LogUtils.getLogger().info("FOUNDRY VISUAL VERIFIED");}
-        if(ticks==350)server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,39,103,-1,java.util.Set.of(),0,23);var ref=(IndustrialBlockEntity)l.getBlockEntity(REF);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),4000),EXECUTE);l.setBlockAndUpdate(COL.offset(-1,0,0),IndustrialContent.CASING.get().defaultBlockState());var col=(IndustrialBlockEntity)l.getBlockEntity(COL);col.input.drain(4000,EXECUTE);col.output.drain(4000,EXECUTE);col.lubricant.drain(4000,EXECUTE);});
+        if(ticks==350)server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,39,103,-1,java.util.Set.of(),0,23);var ref=(IndustrialBlockEntity)l.getBlockEntity(REF);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),4000),EXECUTE);MachineFixture.build(l,COL);var col=(IndustrialBlockEntity)l.getBlockEntity(COL);col.input.drain(4000,EXECUTE);col.output.drain(4000,EXECUTE);col.lubricant.drain(4000,EXECUTE);});
         if(ticks==375){var f=(PipeFlowEntity)mc.level.getBlockEntity(new BlockPos(39,102,2));if(f==null||f.fluids[Direction.EAST.ordinal()]!=3||f.until[Direction.EAST.ordinal()]<=mc.level.getGameTime())throw new IllegalStateException("Heated crude animation did not reach client");shot(mc,"pipe-glass");}
         if(ticks==379)shot(mc,"pipe-flow-next");
         if(ticks==385)server.execute(()->{try{var l=server.overworld();var pump=machine(l,IndustrialContent.DERRICK.get(),new BlockPos(23,101,-12));
@@ -86,9 +86,24 @@ final class IndustryVisualCheck {
         if(ticks==740){if(!mc.level.getBlockState(REF).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT))throw new IllegalStateException("Heater fire is not lit");shot(mc,"heater-front");}
         if(ticks==742)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),39.5,105,11,java.util.Set.of(),148,15));
         if(ticks==770)shot(mc,"heater-rear");
-        if(ticks==772)server.execute(()->{var l=server.overworld();l.setDayTime(18000);server.getPlayerList().getPlayers().getFirst().teleportTo(l,32.5,101.5,-5,java.util.Set.of(),-22,2);});
-        if(ticks==800)shot(mc,"heater-night");
-        if(ticks>805)mc.stop();
+        // The Distillation Column from its vapor line's side and from behind.
+        if(ticks==772)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),52,106,-9,java.util.Set.of(),27,2));
+        if(ticks==800)shot(mc,"column-front");
+        if(ticks==802)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),41,106,11,java.util.Set.of(),-149,2));
+        if(ticks==830)shot(mc,"column-rear");
+        // The Air-Cooled Condenser from its look box's side and from behind.
+        if(ticks==832)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),57,103.5,-4.5,java.util.Set.of(),-24,9));
+        if(ticks==860)shot(mc,"condenser-front");
+        if(ticks==862)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),67,105,11,java.util.Set.of(),143,13));
+        if(ticks==890)shot(mc,"condenser-rear");
+        // Night: the heater's firedoor and slit glow; the column and the condenser show nothing lit.
+        if(ticks==892)server.execute(()->{var l=server.overworld();l.setDayTime(18000);server.getPlayerList().getPlayers().getFirst().teleportTo(l,32.5,101.5,-5,java.util.Set.of(),-22,2);});
+        if(ticks==920)shot(mc,"heater-night");
+        if(ticks==922)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),49.5,102,-6,java.util.Set.of(),20,-14));
+        if(ticks==950)shot(mc,"column-night");
+        if(ticks==952)server.execute(()->server.getPlayerList().getPlayers().getFirst().teleportTo(server.overworld(),57.5,102,-4,java.util.Set.of(),-24,0));
+        if(ticks==980)shot(mc,"condenser-night");
+        if(ticks>985)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"industry-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }
