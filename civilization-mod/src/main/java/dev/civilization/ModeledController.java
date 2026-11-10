@@ -11,8 +11,10 @@ public interface ModeledController {
     ModeledBuild build();
     Direction front();
     boolean stillValid(Player player);
-    /** Whether the machine is running, which plays its work animation and shows its lit bones. */
+    /** Whether the machine is running, which plays its work animation. */
     boolean working();
+    /** Whether its `lit_` bones show: its fire, or an engine's lamps while they heat it to start. */
+    default boolean lit(){return working();}
     /** How many of the model's `float_<n>` pieces are afloat in its water, such as a Tannery's steeping hides. */
     default int afloat(){return 0;}
     /** Sections were added or removed: the machine stops until it next checks itself. */

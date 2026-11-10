@@ -17,7 +17,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==100){mc.options.pauseOnLostFocus=false;mc.options.renderDistance().set(8);mc.options.fov().set(40);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
             check(mc,()->{var l=server.overworld();l.setDayTime(6000);l.setWeatherParameters(100000,0,false,false);
                 for(int x=-10;x<=12;x++)for(int z=-4;z<=13;z++){l.getChunkAt(new BlockPos(x,101,z));l.setBlockAndUpdate(new BlockPos(x,100,z),Blocks.STONE_BRICKS.defaultBlockState());for(int y=101;y<=129;y++)l.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());}
-                l.setBlockAndUpdate(AT,IndustrialContent.PUMP.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.setHealth(p.getMaxHealth());p.fallDistance=0;p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.getAbilities().flying=false;p.onUpdateAbilities();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);ready=true;
+                l.setBlockAndUpdate(AT,IndustrialContent.DERRICK.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.setHealth(p.getMaxHealth());p.fallDistance=0;p.setGameMode(GameType.SURVIVAL);p.getInventory().clearContent();p.getAbilities().flying=false;p.onUpdateAbilities();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);ready=true;
             });}
         if(ticks>100&&!ready){ticks=101;return;}
         if(ticks==135)shot(mc,"construction-guide");
@@ -31,8 +31,8 @@ final class DerrickGuideVisualCheck {
         if(ticks==185)shot(mc,"partial-guide");
         if(ticks==200)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);var cell=MachineModel.OIL_DERRICK.cells.stream().filter(c->c.pieces().size()==1&&c.pieces().containsKey(1)).findFirst().orElseThrow();l.destroyBlock(ModeledMachine.position(AT,m.front(),cell),true);if(l.getBlockEntity(AT)!=m||Integer.bitCount(m.build().sections)!=10)throw new IllegalStateException("Panel damage collapsed tower");});
         if(ticks==220)shot(mc,"damaged-guide");
-        if(ticks==240)check(mc,()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);var m=(IndustrialBlockEntity)l.getBlockEntity(AT);for(var stock:java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,6),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,60),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,29),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))ModeledMachine.build(m,p,stock);});
-        if(ticks==260)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);if(m.build().sections==0||!IndustrialStructure.bind(m))throw new IllegalStateException("Progressive completed construction failed");
+        if(ticks==240)check(mc,()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,.5,102,-3,java.util.Set.of(),0,15);var m=(IndustrialBlockEntity)l.getBlockEntity(AT);for(var stock:java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,6),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,60),new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS,64),new net.minecraft.world.item.ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK),4),new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("civilization:machine_parts")),2),IndustrialContent.PORT.toStack()))ModeledMachine.build(m,p,stock);});
+        if(ticks==260)check(mc,()->{var l=server.overworld();var m=(IndustrialBlockEntity)l.getBlockEntity(AT);if(m.build().sections!=MachineModel.OIL_DERRICK.all||!IndustrialStructure.bind(m))throw new IllegalStateException("Progressive construction left sections unbuilt: "+Integer.toBinaryString(MachineModel.OIL_DERRICK.all&~m.build().sections));
             var samples=new StringBuilder();for(int y:new int[]{0,4,12,20,28}){
                 var center=AT.above(y);samples.append(" y=").append(y).append(':').append(l.getBrightness(net.minecraft.world.level.LightLayer.SKY,center));
                 for(var side:net.minecraft.core.Direction.Plane.HORIZONTAL)samples.append('/').append(l.getBrightness(net.minecraft.world.level.LightLayer.SKY,center.relative(side,5)));
@@ -40,7 +40,7 @@ final class DerrickGuideVisualCheck {
             System.out.println("DERRICK_SKY_SAMPLES controllerPacked="+net.minecraft.client.renderer.LevelRenderer.getLightColor(l,AT)+samples);
             var site=new Deposits.Site(0,101,0,Deposits.Kind.OIL,2);int stock=0;for(int i=0;i<site.cells()&&stock<20;i++){var pos=site.cell(i);if(site.body(pos)){l.setBlockAndUpdate(pos,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());stock++;}}
             try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,site);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}
-            m.setItem(0,KilnContent.MINERAL_COAL.toStack(16));CoalFireFixture.light(m);var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(l,8,114,-40,java.util.Set.of(),9.5f,0);
+            m.struck=true;MachineFixture.coalEngine(l,m);var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(l,8,114,-40,java.util.Set.of(),9.5f,0);
         });
         if(ticks==265){mc.options.fov().set(40);mc.options.hideGui=true;}
         if(ticks==310)shot(mc,"front");
@@ -49,7 +49,7 @@ final class DerrickGuideVisualCheck {
         if(ticks==360)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),13,119,-9,java.util.Set.of(),43,10);});
         if(ticks==395)shot(mc,"gallery-detail");
         if(ticks==400)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=false;p.onUpdateAbilities();p.teleportTo(server.overworld(),.5,116.5,1.9,java.util.Set.of(),0,5);});
-        if(ticks==425)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!p.onGround()||Math.abs(p.getY()-116.40625)>.04)throw new IllegalStateException("Gallery collision does not support the actual player: "+p.getY()+" ground="+p.onGround());profileCornerCollision(mc);galleryChecked=true;});
+        if(ticks==425)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();if(!p.onGround()||Math.abs(p.getY()-116.46875)>.04)throw new IllegalStateException("Gallery collision does not support the actual player: "+p.getY()+" ground="+p.onGround());profileCornerCollision(mc);galleryChecked=true;});
         if(ticks==430)shot(mc,"on-gallery");
         if(ticks==435)check(mc,()->{var p=server.getPlayerList().getPlayers().getFirst();p.getAbilities().flying=true;p.onUpdateAbilities();p.teleportTo(server.overworld(),7,104,-6,java.util.Set.of(),34,0);});
         if(ticks==465)shot(mc,"working-base");
@@ -116,10 +116,10 @@ final class DerrickGuideVisualCheck {
         // Exercise Minecraft's actual movement collision path at all four gallery corners.
         var player=mc.getSingleplayerServer().getPlayerList().getPlayers().getFirst();double max=0;
         for(double x:new double[]{-2.4,3.4})for(double z:new double[]{2.6,7.4}){
-            player.teleportTo(level,x,116.40625,z,java.util.Set.of(),0,0);
+            player.teleportTo(level,x,116.46875,z,java.util.Set.of(),0,0);
             for(int step=0;step<20;step++){start=System.nanoTime();player.move(net.minecraft.world.entity.MoverType.SELF,new net.minecraft.world.phys.Vec3(step%2==0?.06:-.06,-.01,0));max=Math.max(max,(System.nanoTime()-start)/1e6);}
         }
-        player.teleportTo(level,.5,116.40625,1.9,java.util.Set.of(),0,5);
+        player.teleportTo(level,.5,116.46875,1.9,java.util.Set.of(),0,5);
         com.mojang.logging.LogUtils.getLogger().info("DERRICK CORNER CPU: sections={}, old={} ms/query, cached={} ms/query; 1000 identical chunk collision shapes; max of 80 corner movement calls={} ms",corner.pieces().size(),old,cached,max);
     }
     private static void profileGuide(Minecraft mc){

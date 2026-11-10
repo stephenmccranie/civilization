@@ -73,6 +73,11 @@ final class MachineBlockModel extends BakedModelWrapper<BakedModel> {
         }
     }
 
+    @EventBusSubscriber(modid = "civilization", value = Dist.CLIENT)
+    static final class Levels {
+        @SubscribeEvent static void unload(net.neoforged.neoforge.event.level.LevelEvent.Unload event) { if (event.getLevel().isClientSide()) ModeledMachine.DRAWN.clear(); }
+    }
+
     /** Tint 0 is the biome's water colour, as a pool's. */
     @SubscribeEvent static void tint(RegisterColorHandlersEvent.Block event) {
         for (var block : BuiltInRegistries.BLOCK)
@@ -82,8 +87,8 @@ final class MachineBlockModel extends BakedModelWrapper<BakedModel> {
 
     @Override public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData data) {
         var at = state.getBlock() instanceof MachinePartBlock part ? part.controller(pos, state) : pos;
-        var c = ModeledMachine.of(level.getBlockEntity(at));
-        int sections = c != null && c.model() == mesh.model && c.front() == state.getValue(CivicBlock.FACING) ? c.build().sections : 0;
+        var c = ModeledMachine.DRAWN.get(at);
+        int sections = c != null && c.model() == mesh.model && c.front() == state.getValue(CivicBlock.FACING) ? c.sections() : 0;
         var controller = level.getBlockState(at);
         return data.derive().with(SECTIONS, sections).with(LIT, sections != 0 && controller.hasProperty(BlockStateProperties.LIT) && controller.getValue(BlockStateProperties.LIT)).build();
     }

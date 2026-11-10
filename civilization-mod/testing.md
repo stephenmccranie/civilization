@@ -17,7 +17,7 @@ Run the smallest check that covers the change, once. Repeat a passing check only
 
 Every run starts from a clean directory that `dev.ps1` rebuilds: `runs/gametest`, `runs/visual`, `runs/peer` and `runs/fixture`. Two directories persist: `runs/server` is the development server world, and `run/` is the development client. Visual runs copy that client's `saves/preview-compatibility` world, mods, shader and resource packs, `options.txt` and Iris settings, so install the optional client mods (Photon, Distant Horizons, JEI) there.
 
-GameTest and visual runs pass on a zero exit code; a check fails by throwing. Each fixture phase must also print `<NAME>_<PHASE>_PASS`. Fixtures copy the EULA acceptance from `runs/server`, so run `.\dev.ps1 Server` once first.
+GameTest and visual runs pass on a zero exit code; a check fails by throwing. A GameTest server that fails to start also exits cleanly, so `GameTest` passes only when the server reports its required tests passed. Each fixture phase must also print `<NAME>_<PHASE>_PASS`. Fixtures copy the EULA acceptance from `runs/server`, so run `.\dev.ps1 Server` once first.
 
 Visual clients are hidden, unfocused, silent, 1920x1080 and cannot grab the mouse; their sounds still play, so scenes can check them, but OpenAL output is muted (`VisualTestGuard` and `civilization.visual.mixins.json`). They never use the owner's Prism instance. Screenshots land in `runs/visual/screenshots` (and `runs/peer/screenshots`); look at them whenever appearance changes. `-Full` extends a scene with its optional night, outline or placement tour.
 
@@ -43,10 +43,9 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron; iron ingots through every glow colour in the hotbar, held white-hot and cherry red in first person and cherry red in third, lighting the floor around them, then the same night without shaders and dropped white-yellow, cherry red and dull red, by day and night |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
 | `pipes` | Empty and flowing glass pipes, connections and flanges |
-| `industry` | Refinery, Oil Derrick, construction cabinet, industrial icons, and a boat helm and guardrail run |
-| `derrick-guide` | Oil Derrick section guides placed by real clicks, day and night |
-| `engine` | Oil Engine states, cabinet and wheel animation |
-| `models` | GeckoLib model integration beside the Oil Engine |
+| `industry` | Refinery, an Oil Derrick pumping with a Coal Engine driving it, construction cabinet, industrial icons, and a boat helm and guardrail run |
+| `derrick-guide` | Oil Derrick section guides placed by real clicks, its beam working from a Coal Engine, day and night |
+| `engine` | Hot-Bulb Engine stopped, heating with lit lamp ports and the blowlamp sounding, kicked over and running with the flywheel turning and the stack knocking, its menu and its section guide |
 | `deposits` | Generated coal and oil bodies across chunk borders, before and after extraction |
 | `uranium` | Exposed ore, stocked chest and held Raw Uranium |
 | `coal-mining` | Manual coal workface, partial masks and standing inside a mined notch |

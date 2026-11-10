@@ -1,7 +1,8 @@
 package dev.civilization;
 /** Pure work accounting, shared by production and tests. Amounts are millibuckets. */
 public final class BoatEngine {
-    public static final double REFERENCE_MASS=33;
+    /** Sable mass of the reference 31-block hull carrying one engine, which this thrust drives at its documented speeds. */
+    public static final double REFERENCE_MASS=44;
     public record State(double fuel,double oil,double condition,double power) {}
     public static State step(double fuel,double oil,double condition,double demand,double dt) {
         demand=Math.clamp(demand,0,1);dt=Math.clamp(dt,0,1);condition=Math.clamp(condition,.2,1);

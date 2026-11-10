@@ -69,7 +69,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("airship")){AirshipVisualCheck.tick(mc);return;}
         if(CHECK.equals("boat")){BoatVisualCheck.tick(mc);return;}
         if(CHECK.equals("weather")){WeatherVisualCheck.tick(mc);return;}
-        if(CHECK.equals("engine") || CHECK.equals("models")){OilEngineVisualCheck.tick(mc);return;}
+        if(CHECK.equals("engine")){OilEngineVisualCheck.tick(mc);return;}
         if(CHECK.equals("crafting")){CraftingVisualCheck.tick(mc);return;}
         if(CHECK.equals("chests")){ChestVisualCheck.tick(mc);return;}
         if(CHECK.equals("inventory")){InventoryVisualCheck.tick(mc);return;}

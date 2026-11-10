@@ -111,7 +111,7 @@ public final class CivilizationJei implements IModPlugin {
         category(r,"kiln",KilnContent.KILN.get());category(r,"foundry",KilnContent.FOUNDRY.get());
         category(r,"fertilizer",KilnContent.RETORT.get());category(r,"cooking",CookingContent.STATION.get());
         category(r,"tannery",WorkshopContent.TANNERY.get());category(r,"textile",WorkshopContent.TEXTILE.get());category(r,"smithy",WorkshopContent.SMITHY.get());category(r,"assembly",WorkshopContent.BENCH.get());
-        category(r,"oil_pump",IndustrialContent.PUMP.get());category(r,"heater",IndustrialContent.REFINERY.get());
+        category(r,"oil_derrick",IndustrialContent.DERRICK.get());category(r,"heater",IndustrialContent.REFINERY.get());
         category(r,"column",IndustrialContent.COLUMN.get());category(r,"condenser",IndustrialContent.CONDENSER.get());category(r,"coal_drill",IndustrialContent.DRILL.get());
         category(r,"canisters",IndustrialContent.TANK.get(),"Canister filling / emptying");
         category(r,"anvil",KilnContent.STONE_ANVIL.get(),"Anvil and grindstone work");
@@ -184,7 +184,7 @@ public final class CivilizationJei implements IModPlugin {
             String name=fired?"heater":kind==IndustrialBlock.Kind.COLUMN?"column":"condenser";
             add(r,name,List.of(process(name,slots,batch.ticks(),fired?"Draws one Coal per 250 mB from a hot machine; warming up and heat loss come on top.":"Connect the multiblock fluid ports with pipes. All output buffers need room.")));
         }
-        add(r,"oil_pump",List.of(process("oil_extraction",List.of(fluid(RecipeIngredientRole.OUTPUT,IndustrialContent.CRUDE.get(),125),coal()),50,"Build above the physical oil deposit within its footprint. Drains 125 mB per step. One Coal extracts 250 mB before idle losses.")));
+        add(r,"oil_derrick",List.of(process("oil_extraction",List.of(fluid(RecipeIngredientRole.OUTPUT,IndustrialContent.CRUDE.get(),IndustrialRates.PUMP_MB),new Slot(RecipeIngredientRole.CATALYST,List.of(new ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK))),FluidStack.EMPTY,"Well casing: one Iron Plate lines four blocks of the well as it is drilled.")),IndustrialRates.PUMP_TICKS,"Build above the physical oil deposit with an engine within 8 blocks. The engine first drills the well, five full-power seconds a block, then pumps 125 mB per 2.5 full-power seconds. The Coal Engine gives half power.")));
         add(r,"coal_drill",List.of(process("coal_extraction",List.of(fluid(RecipeIngredientRole.INPUT,IndustrialContent.FUEL.get(),IndustrialRates.DRILL_FUEL_MB),
                 new Slot(RecipeIngredientRole.CATALYST,List.of(),new FluidStack(IndustrialContent.LUBE.get(),10),"Optional: consumed per batch to restore full speed; dry drilling slows to 20%."),output(KilnContent.MINERAL_COAL.get(),16)),100,"Breaks one physical coal-seam block below the drill. 5s lubricated; up to 25s dry. Oil is optional, fuel is required.")));
         var cans=new ArrayList<Process>();

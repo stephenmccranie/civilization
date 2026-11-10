@@ -6,7 +6,7 @@ import static dev.civilization.IndustrialBlock.Kind;
 /** Fixed hollow vessels, cut corners and accessible flanged connections. */
 public final class IndustrialStructure {
     private static MachineStructure.Part p(int x,int y,int z,String material,int units){return new MachineStructure.Part(x,y,z,material,units,Direction.DOWN);}
-    private static final List<MachineStructure.Part> PUMP=MachineModel.OIL_DERRICK.ports.stream().map(MachineModel.Port::part).toList();
+    private static final List<MachineStructure.Part> DERRICK=MachineModel.OIL_DERRICK.ports.stream().map(MachineModel.Port::part).toList();
     private static final List<MachineStructure.Part> DRILL=List.of(p(-1,0,0,"stone",4),p(1,0,0,"stone",4),p(-1,1,0,"casing",4),p(1,1,0,"casing",4),p(-1,2,0,"casing",2),p(0,2,0,"casing",2),p(1,2,0,"casing",2),p(0,1,0,"casing",4));
     private static final List<MachineStructure.Part> HEATER=heater(),COLUMN=column(),CONDENSER=condenser();
     private static void replace(List<MachineStructure.Part> a,int x,int y,int z,String material,Direction side){a.removeIf(p->p.x()==x&&p.y()==y&&p.depth()==z);a.add(new MachineStructure.Part(x,y,z,material,4,side));}
@@ -66,8 +66,8 @@ public final class IndustrialStructure {
         replace(a,-3,2,2,"input_port",Direction.WEST);replace(a,3,2,2,"output_port",Direction.EAST);
         return List.copyOf(a);
     }
-    public static boolean remote(Kind k){return k==Kind.PUMP||k==Kind.REFINERY||k==Kind.COLUMN||k==Kind.CONDENSER;}
-    public static List<MachineStructure.Part> parts(Kind kind){return switch(kind){case PUMP->PUMP;case REFINERY->HEATER;case DRILL->DRILL;case COLUMN->COLUMN;case CONDENSER->CONDENSER;case TANK->List.of();};}
+    public static boolean remote(Kind k){return k==Kind.DERRICK||k==Kind.REFINERY||k==Kind.COLUMN||k==Kind.CONDENSER;}
+    public static List<MachineStructure.Part> parts(Kind kind){return switch(kind){case DERRICK->DERRICK;case REFINERY->HEATER;case DRILL->DRILL;case COLUMN->COLUMN;case CONDENSER->CONDENSER;case TANK,COAL_ENGINE->List.of();};}
     public static boolean complete(Level l,BlockPos at,Direction front,Kind kind){
         var modeled=ModeledMachine.of(l.getBlockEntity(at));
         return (modeled==null||ModeledMachine.status(modeled)==MachineStructure.COMPLETE)&&MachineStructure.checkParts(l,at,front,parts(kind)).status()==MachineStructure.COMPLETE;

@@ -54,7 +54,7 @@ public final class BlockCarryGameTests {
     @GameTest(template="industrial") public static void reviewedCargoStillIncludesConstructionAndBulkyFixtures(GameTestHelper h){
         for(var item:new Item[]{Items.STONE,Items.DIRT,Items.OAK_LOG,Items.OAK_PLANKS,Items.STONE_SLAB,Items.STONE_STAIRS,Items.COBBLESTONE_WALL,
                 Items.OAK_FENCE,Items.OAK_DOOR,Items.OAK_TRAPDOOR,Items.GLASS,Items.WHITE_WOOL,Items.REDSTONE_BLOCK,Items.HAY_BLOCK,Items.CHEST,
-                Items.FURNACE,Items.RED_BED,Items.SHULKER_BOX,Items.TUBE_CORAL_BLOCK,Items.CHERRY_LEAVES,Items.FLOWERING_AZALEA_LEAVES,IndustrialContent.PUMP.get().asItem()})
+                Items.FURNACE,Items.RED_BED,Items.SHULKER_BOX,Items.TUBE_CORAL_BLOCK,Items.CHERRY_LEAVES,Items.FLOWERING_AZALEA_LEAVES,IndustrialContent.DERRICK.get().asItem()})
             h.assertTrue(BlockCarry.block(item.getDefaultInstance()),"Bulky construction/fixtures retain the hand allowance: "+item);
         h.assertTrue(BlockCarry.block(CuttingContent.stack(Blocks.STONE.defaultBlockState(),3,1)),"Cut pieces retain the hand allowance");
         // A complete registry receipt makes other unusual BlockItems reviewable without geometry heuristics.

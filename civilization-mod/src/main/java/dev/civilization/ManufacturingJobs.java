@@ -28,7 +28,7 @@ public final class ManufacturingJobs {
         if(output.is(ItemTags.RAILS))return Category.TRANSPORT;
         return switch(BuiltInRegistries.ITEM.getKey(output.getItem()).getPath()){
             case "builders_line","prospecting_rod","geiger_counter"->Category.TOOLS;
-            case "oil_engine","oil_pump","oil_refinery","coal_drill","distillation_column","condenser","fluid_pipe","coal_preparation_screen","land_controller","trade_counter","survey_table_section","gladiator_pit"->Category.MACHINES;
+            case "oil_engine","coal_engine","oil_derrick","oil_refinery","coal_drill","distillation_column","condenser","fluid_pipe","coal_preparation_screen","land_controller","trade_counter","survey_table_section","gladiator_pit"->Category.MACHINES;
             case "chest","barrel","backpack","empty_canister","fuel_tank","coal_bunker","cargo_tank"->Category.STORAGE;
             case "wheelbarrow","minecart","coal_minecart","boat_helm"->Category.TRANSPORT;
             case "iron_bars","industrial_guardrail"->Category.BUILDING;

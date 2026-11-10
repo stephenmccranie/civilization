@@ -88,7 +88,7 @@ public final class ManufacturingGameTests {
         var tabs=new EnumMap<ManufacturingJobs.Category,List<String>>(ManufacturingJobs.Category.class);
         for(var job:WorkshopJobs.jobs(3))if(!job.output().isEmpty())tabs.computeIfAbsent(ManufacturingJobs.category(job.output()),c->new ArrayList<>()).add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(job.output().getItem()).getPath());
         h.assertTrue(tabs.keySet().equals(EnumSet.allOf(ManufacturingJobs.Category.class)),"Every tab has recipes: "+tabs.keySet());
-        h.assertTrue(new HashSet<>(tabs.get(ManufacturingJobs.Category.COMPONENTS)).equals(Set.of("tool_handle","wooden_wheel","machine_parts","industrial_casing","engine_cylinder","engine_flywheel","cooling_grille","refinery_flue","refinery_port")),
+        h.assertTrue(new HashSet<>(tabs.get(ManufacturingJobs.Category.COMPONENTS)).equals(Set.of("tool_handle","wooden_wheel","machine_parts","industrial_casing","cooling_grille","refinery_flue","refinery_port")),
                 "Components holds only parts, so a new output must be given its tab: "+tabs.get(ManufacturingJobs.Category.COMPONENTS));
         for(var expected:Map.of("oak_door",ManufacturingJobs.Category.BUILDING,"iron_bars",ManufacturingJobs.Category.BUILDING,"rail",ManufacturingJobs.Category.TRANSPORT,"wheelbarrow",ManufacturingJobs.Category.TRANSPORT,
                 "chest",ManufacturingJobs.Category.STORAGE,"coal_bunker",ManufacturingJobs.Category.STORAGE,"oil_engine",ManufacturingJobs.Category.MACHINES,"builders_line",ManufacturingJobs.Category.TOOLS,"shield",ManufacturingJobs.Category.ARMOR,"netherite_sword",ManufacturingJobs.Category.WEAPONS).entrySet())
@@ -97,7 +97,7 @@ public final class ManufacturingGameTests {
     }
     @GameTest(template="industrial") public static void tableBypassesRetiredAndBootstrapRemains(GameTestHelper h){
         var manager=h.getLevel().getRecipeManager();
-        for(String id:List.of("civilization:machine_parts","civilization:empty_canister","civilization:oil_pump","civilization:engine_cylinder","civilization:coal_minecart","minecraft:oak_door","minecraft:minecart","minecraft:rail"))
+        for(String id:List.of("civilization:machine_parts","civilization:empty_canister","civilization:oil_derrick","civilization:coal_minecart","minecraft:oak_door","minecraft:minecart","minecraft:rail"))
             h.assertTrue(manager.byKey(net.minecraft.resources.ResourceLocation.parse(id)).isEmpty(),"Old direct crafting disabled: "+id);
         for(String id:List.of("civilization:assembly_bench","civilization:foundry","civilization:smithy","civilization:tannery","minecraft:chest"))
             h.assertTrue(manager.byKey(net.minecraft.resources.ResourceLocation.parse(id)).isPresent(),"Bootstrap available: "+id);
@@ -119,7 +119,8 @@ public final class ManufacturingGameTests {
         h.assertTrue(copy.selected==-1&&copy.progress==0&&copy.getItem(0).getCount()==3&&copy.getItem(1).is(Items.LEATHER)&&copy.getItem(5).is(Items.IRON_PICKAXE),"Legacy work resets, paid stock and existing output remain");h.succeed();
     }
     @GameTest(template="industrial") public static void eachForgedPartHasAnActualCustomer(GameTestHelper h){
-        for(var forged:WorkshopJobs.jobs(2))h.assertTrue(WorkshopJobs.jobs(3).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(forged.output()))),"Forged part earns a stock slot: "+forged.id());h.succeed();
+        for(var forged:WorkshopJobs.jobs(2))h.assertTrue(WorkshopJobs.jobs(3).stream().anyMatch(j->j.needs().stream().anyMatch(n->n.count()>0&&n.ingredient().test(forged.output())))
+                ||MachineModel.all().stream().anyMatch(m->m.sections.stream().anyMatch(s->s.accepts(forged.output()))),"Forged part earns a stock slot: "+forged.id());h.succeed();
     }
     /** A player's repair at the bench by real menu clicks: inputs shift-clicked from the inventory in `order`, Work pressed, the output shift-clicked back. */
     static ItemStack repairByMenu(GameTestHelper h,WorkshopBlockEntity w,int selection,ItemStack damaged,List<String> order){

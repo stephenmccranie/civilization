@@ -9,7 +9,7 @@ import static net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 final class IndustryVisualCheck {
     private static int ticks;private static volatile boolean ready;private static volatile Throwable failure;
     private static final BlockPos REF=new BlockPos(34,101,0),COL=new BlockPos(46,101,0);
-    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
+    private static IndustrialBlockEntity machine(ServerLevel l,IndustrialBlock b,BlockPos at){l.setBlockAndUpdate(at,b.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);if(b.kind==IndustrialBlock.Kind.DERRICK)MachineFixture.build((ServerLevel)m.getLevel(),m.getBlockPos());else for(var p:IndustrialStructure.parts(b.kind))MachineStructure.placePart(l,at,Direction.NORTH,p);if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+b.kind);return m;}
     private static void pipe(ServerLevel l,int x,int y,int z){l.setBlockAndUpdate(new BlockPos(x,y,z),IndustrialContent.PIPE.get().defaultBlockState());}
     static void tick(Minecraft mc){
         ticks++;var server=mc.getSingleplayerServer();if(failure!=null)throw new IllegalStateException("Industry fixture failed",failure);
@@ -56,21 +56,25 @@ final class IndustryVisualCheck {
         if(ticks==350)server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,39,103,-1,java.util.Set.of(),0,23);var ref=(IndustrialBlockEntity)l.getBlockEntity(REF);ref.output.fill(new FluidStack(IndustrialContent.HEATED.get(),4000),EXECUTE);l.setBlockAndUpdate(COL.offset(-1,0,0),IndustrialContent.CASING.get().defaultBlockState());var col=(IndustrialBlockEntity)l.getBlockEntity(COL);col.input.drain(4000,EXECUTE);col.output.drain(4000,EXECUTE);col.lubricant.drain(4000,EXECUTE);});
         if(ticks==375){var f=(PipeFlowEntity)mc.level.getBlockEntity(new BlockPos(39,102,2));if(f==null||f.fluids[Direction.EAST.ordinal()]!=3||f.until[Direction.EAST.ordinal()]<=mc.level.getGameTime())throw new IllegalStateException("Heated crude animation did not reach client");shot(mc,"pipe-glass");}
         if(ticks==379)shot(mc,"pipe-flow-next");
-        if(ticks==385)server.execute(()->{try{var l=server.overworld();var pump=machine(l,IndustrialContent.PUMP.get(),new BlockPos(23,101,-12));
+        if(ticks==385)server.execute(()->{try{var l=server.overworld();var pump=machine(l,IndustrialContent.DERRICK.get(),new BlockPos(23,101,-12));
             var site=new Deposits.Site(23,101,-12,Deposits.Kind.OIL,2);l.setBlockAndUpdate(new BlockPos(site.x(),site.top(),site.z()),IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());
             var field=IndustrialBlockEntity.class.getDeclaredField("site");field.setAccessible(true);field.set(pump,site);field=IndustrialBlockEntity.class.getDeclaredField("surveyed");field.setAccessible(true);field.setBoolean(pump,true);
-            pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),2000),EXECUTE);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(8));CoalFireFixture.light(pump);
+            pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),2000),EXECUTE);pump.struck=true;MachineFixture.coalEngine(l,pump);
             var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,35,117,-60,java.util.Set.of(),12,0);
         }catch(Throwable t){failure=t;}});
         if(ticks==390)mc.options.fov().set(65);
         if(ticks==420)shot(mc,"pump-front");
-        if(ticks==425)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),23,117,40,java.util.Set.of(),180,0);});
+        // Close on the floor: the Coal Engine in front, the band wheel and walking beam inside the door bay, two moments apart.
+        if(ticks==422)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),15.5,102,-21.5,java.util.Set.of(),-36,8);});
+        if(ticks==436)shot(mc,"pump-rig");
+        if(ticks==440)shot(mc,"pump-rig-later");
+        if(ticks==443)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(server.overworld(),23,117,40,java.util.Set.of(),180,0);});
         if(ticks==495)shot(mc,"pump-rear");
-        if(ticks==500){mc.options.hideGui=false;server.execute(()->{var l=server.overworld();var at=new BlockPos(23,101,-12);l.removeBlock(at,false);l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,23.5,102,-15,java.util.Set.of(),0,32);p.getInventory().setItem(0,IndustrialContent.PUMP.toStack());p.openMenu((IndustrialBlockEntity)l.getBlockEntity(at));});}
+        if(ticks==500){mc.options.hideGui=false;server.execute(()->{var l=server.overworld();var at=new BlockPos(23,101,-12);l.removeBlock(at,false);l.setBlockAndUpdate(at,IndustrialContent.DERRICK.get().defaultBlockState());var p=server.getPlayerList().getPlayers().getFirst();p.teleportTo(l,23.5,102,-15,java.util.Set.of(),0,32);p.getInventory().setItem(0,IndustrialContent.DERRICK.toStack());p.openMenu((IndustrialBlockEntity)l.getBlockEntity(at));});}
         if(ticks==550)shot(mc,"pump-select");
         if(ticks==560)server.execute(()->{var p=server.getPlayerList().getPlayers().getFirst();p.closeContainer();p.teleportTo(server.overworld(),23.5,103,-17,java.util.Set.of(),0,0);});
         if(ticks==610)shot(mc,"pump-guide");
-        if(ticks==615){mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();int i=0;for(var block:java.util.List.of(IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),IndustrialContent.TANK.get(),IndustrialContent.DRILL.get())){l.setBlockAndUpdate(new BlockPos(22+i*2,101,-22),block.defaultBlockState());p.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(block));}p.teleportTo(l,27.5,102,-32,java.util.Set.of(),0,4);});}
+        if(ticks==615){mc.options.hideGui=true;server.execute(()->{var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();int i=0;for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),IndustrialContent.TANK.get(),IndustrialContent.DRILL.get())){l.setBlockAndUpdate(new BlockPos(22+i*2,101,-22),block.defaultBlockState());p.getInventory().setItem(i++,new net.minecraft.world.item.ItemStack(block));}p.teleportTo(l,27.5,102,-32,java.util.Set.of(),0,4);});}
         if(ticks==650)shot(mc,"controller-family");
         if(ticks==655){mc.options.hideGui=false;mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));}
         if(ticks==670)shot(mc,"controller-items");

@@ -32,7 +32,7 @@ public final class ControllerConstructionGameTests {
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
         List<Block> controllers=List.of(IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
-                BulkContent.TANK.get(),OilEngineContent.ENGINE.get(),CivicContent.TABLE.get());
+                BulkContent.TANK.get(),CivicContent.TABLE.get());
         for(var block:controllers) {
             var state=block.defaultBlockState().setValue(CivicBlock.FACING,front);
             level.setBlockAndUpdate(at,state);

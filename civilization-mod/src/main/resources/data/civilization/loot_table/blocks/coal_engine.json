@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "civilization:engine_flywheel"
+          "name": "civilization:coal_engine"
         }
       ],
       "conditions": [

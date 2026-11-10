@@ -23,4 +23,19 @@ final class MachineFixture {
         for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if((r.nextInt(3)==0)==catches){l.random.setSeed(seed);return;}}
     }
     static int status(ServerLevel l,BlockPos at){return ModeledMachine.status(ModeledMachine.of(l.getBlockEntity(at)));}
+    /** A built Coal Engine six blocks in front of a derrick, its fire lit at working heat with Coal to keep it there. */
+    static IndustrialBlockEntity coalEngine(ServerLevel l,IndustrialBlockEntity derrick){
+        var at=derrick.getBlockPos().relative(derrick.front(),6);
+        l.setBlockAndUpdate(at,IndustrialContent.COAL_ENGINE.get().defaultBlockState().setValue(CivicBlock.FACING,derrick.front()));build(l,at);
+        var engine=(IndustrialBlockEntity)l.getBlockEntity(at);engine.setItem(0,KilnContent.MINERAL_COAL.toStack(16));CoalFireFixture.light(engine);return engine;
+    }
+    /** A built Hot-Bulb Engine six blocks in front of a derrick, fuelled and oiled, its bulbs already hot but stopped. */
+    static OilEngineEntity hotBulbEngine(ServerLevel l,IndustrialBlockEntity derrick){
+        var at=derrick.getBlockPos().relative(derrick.front(),6);
+        l.setBlockAndUpdate(at,OilEngineContent.ENGINE.get().defaultBlockState().setValue(CivicBlock.FACING,derrick.front()));build(l,at);
+        var engine=(OilEngineEntity)l.getBlockEntity(at);
+        engine.fuel.fill(new net.neoforged.neoforge.fluids.FluidStack(IndustrialContent.FUEL.get(),4000),net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        engine.oil.fill(new net.neoforged.neoforge.fluids.FluidStack(IndustrialContent.LUBE.get(),2000),net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+        engine.warmup=100;return engine;
+    }
 }

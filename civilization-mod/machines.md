@@ -44,7 +44,7 @@ Inventories live only in the controller. Breaking a shell block scatters nothing
 
 **Hoppers:** kiln-family machines take ingredients from above, coal from the sides or front and give output below. A modeled machine reaches its controller through every part: a hopper feeding into its top adds ingredients, one at a side adds coal and one underneath extracts output. No casing inventories or hidden transfers exist.
 
-**Removing controllers:** stone pickaxes recover stone and metal controllers (the Smithy, extraction and refinery machinery, Hot-Bulb Engine, Land Controller, bulk stores) and Industrial Casing, pipes and engine pieces. Stone axes recover wooden controllers such as the Trade Counter, Survey Table and Small Boat Helm. Stocked bulk stores must be emptied first; claim and vehicle protections still apply.
+**Removing controllers:** stone pickaxes recover stone and metal controllers (the Smithy, extraction and refinery machinery, Hot-Bulb Engine, Land Controller, bulk stores) and Industrial Casing and pipes. Stone axes recover wooden controllers such as the Trade Counter, Survey Table and Small Boat Helm. Stocked bulk stores must be emptied first; claim and vehicle protections still apply.
 
 ## Cabinet interface
 
@@ -59,7 +59,7 @@ Every machine and civic screen uses one cabinet: soft tan enamel, a dark metal f
 
 ## Coal fires
 
-Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototype Stove, Foundry, Smithy, Oil Derrick and Fired Heater — burns only Coal and shares one fire lifecycle:
+Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototype Stove, Foundry, Smithy, Coal Engine and Fired Heater — burns only Coal and shares one fire lifecycle:
 
 - **Lighting.** Add Coal, complete the structure and click the striker. Each accepted strike costs `machineIgnitionKcal` (1 kcal at neutral comfort) and lights with a one-in-three chance; the server accepts at most one strike per second. An unlucky strike costs labor but no coal. Rejected clicks (cooldown, already lit, wet, incomplete or no coal) are free. Sparks and the native flint sound acknowledge a strike; the button disables while lit. Direct rain on the work face blocks ignition and pauses work ([heat](heat.md#machines)).
 - **Warming up.** The fire heats the machine's masonry before anything can be made. Full masonry holds 0.7 Coal (175 MJ) of heat per block, and every machine holds at least one Coal; work needs 80% of full. Beyond replacing what work draws, a lit fire fills an empty store in two minutes, so a cold machine reaches working heat in about 100 seconds. Warming up is the large cost of a session:
@@ -71,7 +71,7 @@ Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototyp
   | Fertilizer Furnace | 21 | 14.7 Coal | 11.8 Coal |
   | Fired Heater | 20 | 14 Coal | 11.2 Coal |
   | Kiln | 17 | 11.9 Coal | 9.5 Coal |
-  | Oil Derrick | 7 | 4.9 Coal | 3.9 Coal |
+  | Coal Engine | 4 | 2.8 Coal | 2.2 Coal |
   | Cooking Stove, Prototype Stove | 0 | 1 Coal | 0.8 Coal |
 
 - **Working and cooling.** At working heat each job draws its [coal budget](#coal-budget) from the store, and a lit fire replaces what was drawn and tops the masonry up to full, feeding itself from both coal slots even without materials or with blocked output. Hot masonry leaks into the surrounding air: unfed at neutral temperature, a full store falls to working heat in about twenty minutes, sooner in the cold ([heat](heat.md#machines)). A hot idle machine therefore burns only what it leaks, and work stops when the store falls below working heat.
@@ -81,7 +81,7 @@ Firelight and a quiet crackle follow the lit fire; smoke (industrial machines) o
 
 ## Coal budget
 
-`ProductionEnergy` owns one budget: one Coal, a 10 kg scuttle of 250 MJ, is **400 work units** of 625 kJ. Kilns and standard workshop jobs draw one unit per work tick (20 seconds per Coal); pumping and heating draw eight units per 5 mB. Work per Coal drawn from a hot machine:
+`ProductionEnergy` owns one budget: one Coal, a 10 kg scuttle of 250 MJ, is **400 work units** of 625 kJ. Kilns and standard workshop jobs draw one unit per work tick (20 seconds per Coal); heating draws eight units per 5 mB, and a Coal Engine draws four units per full-power tick of the work it gives. Work per Coal drawn from a hot machine:
 
 | Machine | One Coal drawn makes |
 | --- | --- |
@@ -89,7 +89,7 @@ Firelight and a quiet crackle follow the lit fire; smoke (industrial machines) o
 | Foundry | 2 units of rough metal, or one heat of up to 8; blister steel takes 2 Coal per ingot |
 | Cooking Stove | 2 cooked items |
 | Fertilizer Furnace | 8 Mineral Fertilizer (one batch) |
-| Oil Derrick / Fired Heater | 250 mB pumped / 250 mB heated |
+| Coal Engine / Fired Heater | 250 mB pumped by the derrick it drives / 250 mB heated |
 
 Equipment forging takes longer by material, which scales its coal. [Warming up](#coal-fires) and leakage come on top: they are most of the Coal a short session spends and spread thin over a long one. [Temperature](heat.md#machines) changes only how fast a machine leaks; recipe times, yields and work draws do not change. Claim upkeep, crafting and refined-fuel consumption are separate.
 

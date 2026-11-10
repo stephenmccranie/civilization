@@ -17,7 +17,7 @@ final class JeiVisualCheck {
         var runtime=CivilizationJei.runtime();var manager=runtime.getRecipeManager();
         if(ticks==40){
             mc.options.hideGui=false;mc.options.guiScale().set(3);
-            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","assembly","oil_pump","heater","column","condenser","coal_drill","canisters","anvil","cutting","recombining");
+            var types=List.of("kiln","foundry","fertilizer","cooking","tannery","textile","smithy","assembly","oil_derrick","heater","column","condenser","coal_drill","canisters","anvil","cutting","recombining");
             for(var type:types){
                 var recipeType=CivilizationJei.type(type);var category=manager.getRecipeCategory(recipeType);
                 if(category==null||manager.createRecipeLookup(recipeType).get().findAny().isEmpty())throw new IllegalStateException("Missing JEI recipes: "+type);

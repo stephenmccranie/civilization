@@ -140,8 +140,11 @@ try {
             Invoke-Gradle runServer
         }
         'GameTest' {
-            Reset-Directory (Join-Path $root 'runs/gametest')
-            Invoke-Gradle runGameTestServer
+            $gametest = Join-Path $root 'runs/gametest'
+            Reset-Directory $gametest
+            Invoke-Gradle runGameTestServer (Join-Path $gametest 'gradle.log')
+            # A server that fails to start also exits cleanly, so only its own verdict counts as a pass.
+            if (-not (Select-String -LiteralPath (Join-Path $gametest 'gradle.log') -Pattern 'required tests passed' -Quiet)) { throw 'The GameTest server reported no passing run.' }
         }
         'Visual' {
             $visual = Join-Path $root 'runs/visual'

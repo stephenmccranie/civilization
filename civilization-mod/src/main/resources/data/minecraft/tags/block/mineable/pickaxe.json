@@ -14,13 +14,14 @@
     "civilization:smithy",
     "civilization:land_controller",
     "civilization:airship_controller",
-    "civilization:oil_pump",
+    "civilization:oil_derrick",
     "civilization:oil_refinery",
     "civilization:coal_drill",
     "civilization:fuel_tank",
     "civilization:distillation_column",
     "civilization:condenser",
     "civilization:oil_engine",
+    "civilization:coal_engine",
     "civilization:coal_bunker",
     "civilization:cargo_tank",
     "civilization:industrial_casing",
@@ -29,8 +30,6 @@
     "civilization:refinery_flue",
     "civilization:refinery_port",
     "civilization:fluid_pipe",
-    "civilization:engine_cylinder",
-    "civilization:engine_flywheel",
     "civilization:prototype_stove",
     "civilization:resting_skillet",
     "civilization:baking_oven",
@@ -40,6 +39,8 @@
     "civilization:foundry_part",
     "civilization:fertilizer_furnace_part",
     "civilization:smithy_part",
-    "civilization:tannery_part"
+    "civilization:tannery_part",
+    "civilization:oil_engine_part",
+    "civilization:coal_engine_part"
   ]
 }

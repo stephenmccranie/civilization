@@ -1,6 +1,6 @@
 # Industry
 
-Deposits, the oil refinery, industrial liquids, the Hot-Bulb Engine and bulk storage. Crude oil from an **Oil Derrick** passes through a **Fired Heater**, **Distillation Column** and **Air-Cooled Condenser** to become refined fuel, with lubricating oil and sulfur as coproducts. Refined fuel runs Coal Drills, Hot-Bulb Engines and the [boats](vehicle-physics.md#boats) they drive. Controllers need Machine Parts from [manufacturing](manufacturing.md); hand mining of huge coal veins is in [coal mining](coal-mining.md); shared machine rules are in [machines](machines.md).
+Deposits, the oil refinery, industrial liquids, engines and bulk storage. An engine drives the **Oil Derrick** that drills a well into an oil body and pumps it; the crude passes through a **Fired Heater**, **Distillation Column** and **Air-Cooled Condenser** to become refined fuel, with lubricating oil and sulfur as coproducts. The [Coal Engine](#coal-engine) burns Coal; refined fuel runs Coal Drills, [Hot-Bulb Engines](#hot-bulb-engine) and the [boats](vehicle-physics.md#boats) they drive. Controllers need Machine Parts from [manufacturing](manufacturing.md); hand mining of huge coal veins is in [coal mining](coal-mining.md); shared machine rules are in [machines](machines.md).
 
 ## Deposits
 
@@ -31,7 +31,7 @@ Dense seam, seep and reservoir blocks cannot be mined in Survival, drop nothing 
 
 ### Extraction reach
 
-An **Oil Derrick** may stand at any height above the oil body's top, horizontally inside its footprint. A **Coal Drill** stands over the seam within sixteen blocks of its center surface height. No shafts or pipes are needed and machines never quarry overburden: they remove only matching resource blocks in the body below, scanning from the field center outward and down each column, at most 1,024 cells per ten-tick work step. A loaded slice can be worked while distant chunks are unloaded; an unloaded slice never counts as depleted, and extraction never loads chunks.
+An **Oil Derrick** may stand at any height above the oil body's top with its well, under the walking beam's head five blocks behind the controller, horizontally inside the footprint, and [drills that well](#oil-well) down to the body. A **Coal Drill** stands over the seam within sixteen blocks of its center surface height and needs no shaft. Neither machine quarries overburden: they remove only matching resource blocks in the body below, scanning from the field center outward and down each column, at most 1,024 cells per ten-tick work step. A loaded slice can be worked while distant chunks are unloaded; an unloaded slice never counts as depleted, and extraction never loads chunks.
 
 Coal extraction replaces the dense block with air and puts **16 Coal** into the machine. Oil has eight height steps per block: the derrick drains **125 mB** steps from the top of the nearest column downward, then outward, and empty cells become air. Reservoir oil never spreads, equalizes or regenerates. All machines draw on the same blocks, so nothing pays twice, and breaking or rebuilding a controller restores nothing.
 
@@ -39,7 +39,7 @@ Coal extraction replaces the dense block with air and puts **16 Coal** into the 
 
 | Machine | Shape and connections |
 | --- | --- |
-| Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, stone feet, middle and crown galleries and an animated crosshead; about 8×10×26 blocks including the ground-level controller at the front. Crude Refinery Port immediately to its right |
+| Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its right |
 | Fired Heater | Five-wide brick hearth, riveted steel jacket, stepped crown and narrow rear flue; eight blocks tall; crude intake left, heated output right |
 | Distillation Column | Five-wide, eleven-high clipped-corner vessel with tapered crown; intake low on the left, vapor outlet high on the right, lubricating-oil outlet low on the right |
 | Air-Cooled Condenser | Seven-wide horizontal vessel with rounded edges, cooling-grille faces and steel cradles; vapor intake left, fuel outlet right |
@@ -50,11 +50,17 @@ Sides are as seen facing the controller's front. The heater, column and condense
 
 ### Oil Derrick construction
 
-Place the `oil_pump` controller at ground level (holding it previews the whole tower where a right-click would put it) and **right-click it with construction materials in hand**. Only the held stack is used; a click adds as many matching sections as it can afford, working upward, and leftovers stay in hand. The guide shows the missing model sections, remaining materials and progress, with red outlines on blocked cells; it follows the [guide performance contract](machines.md#guide-performance-contract).
+Place the Oil Derrick controller at ground level (holding it previews the whole tower where a right-click would put it) and **right-click it with construction materials in hand**. Only the held stack is used; a click adds as many matching sections as it can afford, working upward, and leftovers stay in hand. The guide shows the missing model sections, remaining materials and progress, with red outlines on blocked cells; it follows the [guide performance contract](machines.md#guide-performance-contract).
 
-The bill is **149 planks, 8 iron blocks, 7 stone or cobblestone and 1 Refinery Port** across 29 sections: footings (7 stone), 20 frame panels (6 planks each), the middle gallery's four sides (5 planks each), the crown gallery's two pairs of sides (5 and 4 planks), machinery (8 iron blocks) and output port. Sections may use different plank species, each from one held stack, without changing the timber texture. Each section checks loaded space, build limits, claims, placement permission and entities; blocked sections consume nothing. Placement labor applies (328 kcal for the body before modifiers, plus the port). Creative construction is free.
+The bill is **165 planks, 7 stone or cobblestone, 4 Iron Plates, 2 Machine Parts and 1 Refinery Port** across 31 sections: footings (7 stone), 20 frame panels (6 planks each), the middle gallery's two pairs of sides (8 planks each), the crown gallery's two pairs of sides (5 and 4 planks), floor (8 planks), walking beam (6 planks), bull wheel (6 planks), crown block and drill line (4 Iron Plates), band wheel (2 Machine Parts) and output port. Sections may use different plank species, each from one held stack, without changing the timber texture. Each section checks loaded space, build limits, claims, placement permission and entities; blocked sections consume nothing. Placement labor applies (356 kcal for the body before modifiers, plus the port). Creative construction is free.
 
-Completed sections are solid immediately. **Breaking a frame section or the port removes only that section**, refunds its paid materials once and stops extraction until it is repaired with the same held-item interaction. Breaking the controller dismantles the derrick, refunding the remaining materials once and dropping its inventory and controller; Creative-built sections refund nothing. Partial progress and payments are saved. Drain the derrick's liquid before removing the controller.
+Completed sections are solid immediately. **Breaking a frame section or the port removes only that section**, refunds its paid materials once and stops the derrick until it is repaired with the same held-item interaction. Breaking the controller dismantles the derrick, refunding the remaining materials once and dropping its inventory and controller; the well and its casing stay in the ground and a new derrick drills afresh; Creative-built sections refund nothing. Partial progress and payments are saved. Drain the derrick's liquid before removing the controller.
+
+### Oil well
+
+An [engine](#engines) within eight blocks of the controller drives the derrick through its band wheel, and the walking beam does all its work. First it **drills one well** straight down from under the beam's head: each block takes **5 full-power seconds**, and each new four blocks of well first take **one Iron Plate of casing** from the controller's two slots (screen or hopper). The bit passes caves, liquids and the oil seep, and stops at bedrock, the bottom of the world or ground claimed by another owner. The hole is not dug out: nothing is mined and nothing drops. When the bit reaches the oil body the derrick has **struck oil** and the same beam **pumps** it, one 125 mB oil step per **2.5 full-power seconds**, from the [physical oil](#extraction-reach) as before. A Coal Engine gives half power, so it drills a block in 10 seconds and pumps 25 mB/s; a Hot-Bulb Engine gives full power.
+
+The derrick asks only for the work its current block or step still needs and only while it can use it, so an engine idles while the casing, output or deposit stops the derrick. The beam rocks while work flows. The screen shows the bit's depth and cased depth, or the well's depth once it has struck oil, and the status names what is missing: casing, an engine in range, the engine's work, or the reason the bit stopped.
 
 The tower renderer stays drawn when the controller's chunk section leaves view (within a 128-block controller distance), samples ambient light around the tower so shaded timber stays readable under shaders, and uses cached collision shapes per section and orientation.
 
@@ -65,6 +71,7 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 | Item | Ingredients / yield |
 | --- | --- |
 | Oil Derrick | 4 Iron Plates, 3 Copper Plates, 2 Machine Parts |
+| Coal Engine | 3 Iron Plates, 2 Machine Parts |
 | Fired Heater | 2 Iron Plates, 3 Copper Plates, 3 bricks, 1 Machine Parts |
 | Distillation Column | 4 Iron Plates, 4 Copper Plates, 1 Machine Parts |
 | Air-Cooled Condenser | 4 Iron Plates, 2 Copper Plates, 2 iron bars, 1 Machine Parts |
@@ -78,8 +85,6 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 | Industrial Guardrail ×16 | 6 Copper Rods, 10 Iron Rods |
 | Empty Canister | 5 Iron Plates |
 | Hot-Bulb Engine | 4 Steel Plates, 2 Machine Parts, 2 Copper Plates, 4 Iron Plates |
-| Engine Cylinder | 6 Iron Plates, 2 Machine Parts |
-| Engine Flywheel | 8 Steel Rods, 1 Machine Parts |
 | Coal Bunker | 4 Steel Plates, 1 Machine Parts |
 | Cargo Tank | 4 Steel Plates, 1 Machine Parts, 2 Glass |
 
@@ -87,15 +92,15 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 
 | Machine | Completed batch | Time at 20 TPS |
 | --- | --- | --- |
-| Oil Derrick | One oil height step → 125 mB crude | 2.5 seconds |
+| Oil Derrick | One block of well drilled, or one oil height step → 125 mB crude | 5 or 2.5 seconds at full power |
 | Fired Heater | 250 mB crude → 250 mB heated crude | 5 seconds |
 | Distillation Column | 1,000 mB heated crude → 800 mB distillate vapor + 200 mB lubricating oil + 1 Sulfur | 20 seconds |
 | Air-Cooled Condenser | 200 mB vapor → 200 mB refined fuel | 5 seconds |
 | Coal Drill | 80 mB refined fuel → one dense coal block removed → 16 Coal | 5 seconds lubricated; up to 25 seconds dry |
 
-One Oil Derrick is the throughput unit: **50 mB/s crude** feeds one heater and one column, then one condenser at **40 mB/s refined fuel**, plus **10 mB/s lubricant and one Sulfur per 20 seconds**. Two lubricated Coal Drills use 32 mB/s together, leaving 8 mB/s for engines. These are loaded rates with coal supplied and outputs clear; startup fills batch buffers first and downstream flow pulses with completed batches. Crude lines reach the 50 mB/s pipe capacity. Empty search stretches, depleted or unloaded deposits, missing coal or backed-up coproducts interrupt supply, so keep lubricant and sulfur moving as well as fuel.
+One Oil Derrick driven at full power is the throughput unit: **50 mB/s crude** feeds one heater and one column, then one condenser at **40 mB/s refined fuel**, plus **10 mB/s lubricant and one Sulfur per 20 seconds**. Two lubricated Coal Drills use 32 mB/s together, leaving 8 mB/s for engines. These are loaded rates with coal supplied and outputs clear; a Coal Engine halves the derrick's rate; startup fills batch buffers first and downstream flow pulses with completed batches. Crude lines reach the 50 mB/s pipe capacity. Empty search stretches, depleted or unloaded deposits, missing coal or backed-up coproducts interrupt supply, so keep lubricant and sulfur moving as well as fuel.
 
-The Derrick and Heater burn Coal (250 mB each per Coal drawn; [coal budget](machines.md#coal-budget)), after [warming up](machines.md#coal-fires) on about 4 and 11 Coal. Eight Coal drawn plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
+The Coal Engine and Heater burn Coal (250 mB pumped or heated per Coal drawn; [coal budget](machines.md#coal-budget)), after [warming up](machines.md#coal-fires) on about 2 and 11 Coal. Eight Coal drawn plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
 
 The products have distinct uses: **fuel powers machines, oil lubricates moving machinery, sulfur makes [fertilizer](machines.md#fertilizer-furnace)**. Heated crude and vapor are internal streams. Condensation is air-cooled: no water, pressure or electrical network. This is deliberately simplified petroleum processing: sulfur recovery and lubricant finishing are folded into the column, and ratios are game tuning rather than a chemical mass balance.
 
@@ -103,7 +108,7 @@ The products have distinct uses: **fuel powers machines, oil lubricates moving m
 
 ### Controls
 
-Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Derrick and Heater through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater shows a warm inspection slit while processing and smokes from its actual flue. Completed batches and coal use are logged in the energy journal.
+Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater shows a warm inspection slit while processing and smokes from its actual flue. Completed batches and coal use are logged in the energy journal.
 
 ## Liquids and pipes
 
@@ -121,21 +126,33 @@ Remote ports expose only their assigned controller buffer, on the outward face, 
 
 ## Stops and limits
 
-A missing structure, wrong site, depleted or unloaded deposit, protected resource, missing input or coal, or full output pauses processing. Blocked batches consume no deposit stock, draw no heat and reset partial progress; a lit fire keeps the machine hot. Work heat is drawn on completion. A coal block always yields 16 Coal and an oil step 125 mB; nothing is produced once the physical resource is gone.
+A missing structure, wrong site, depleted or unloaded deposit, protected resource, missing input, coal, casing or engine, or full output pauses processing. Blocked batches consume no deposit stock, draw no heat and reset partial progress; a lit fire keeps the machine hot. Work heat is drawn on completion. A coal block always yields 16 Coal and an oil step 125 mB; nothing is produced once the physical resource is gone.
 
-Inventory, fluid buffers, lubrication, the fire and its stored heat, in-progress work and the search cursor are saved in the block entity; depletion is saved as removed blocks and changed oil heights in ordinary chunks. Rebuilding starts a bounded search through what remains. **Breaking a controller drops its items but discards its fluids and heat — drain it first.** A tank item never carries liquid. There is no offline production, forced chunk loading or crash-atomic saving across player and resource chunks.
+Inventory, fluid buffers, lubrication, the fire and its stored heat, in-progress work, the well's depth, casing and strike, and the search cursor are saved in the block entity; depletion is saved as removed blocks and changed oil heights in ordinary chunks. Rebuilding starts a bounded search through what remains. **Breaking a controller drops its items but discards its fluids and heat — drain it first.** A tank item never carries liquid. There is no offline production, forced chunk loading or crash-atomic saving across player and resource chunks.
+
+## Engines
+
+An engine drives one machine within **eight blocks** of its controller; today that is the [Oil Derrick](#oil-well), which uses the nearest engine on its side of every claim boundary. Every engine supplies work the same way: each game tick it gives the machine up to the share of its full power that machine asks for, and burns its own fuel for exactly the work it gave. Engines differ only in fuel and power. The server accepts one request per engine per tick and checks range, loaded ends, structure and claims at that moment. It is not an electric grid or shaft network.
+
+## Coal Engine
+
+A small oilfield steam engine, **2 blocks wide, 3 long and 4 tall**: a vertical boiler with brass bands, gauge glass and safety valve stands on its own red-brick firebox, and a brass steam pipe feeds a horizontal single cylinder on oak sills whose crosshead and rod turn a big flywheel. It is the lower tier, before refined fuel.
+
+**Construction.** The controller comes from the Assembly Bench ([recipes](#recipes)) and is the firebox at the engine's front corner; the engine extends one block to the controller's left as you face it and two behind. It is built in sections by right-clicking the controller with each section's material: **Firebox** 4 bricks, **Boiler** 6 Iron Plates, **Stack** 2 Iron Plates, **Engine bed** 6 planks, **Cylinder** 4 Iron Plates, **Running gear** 2 Machine Parts, **Flywheel** 6 Iron Rods and **Steam piping** 2 Copper Plates.
+
+**Operation.** Coal goes into the firebox's two slots through the screen or a hopper, and the fire is lit and kept like every [coal fire](machines.md#coal-fires); rain does not reach it behind the firedoor. Its four bricks of masonry warm up on about 2 Coal. At working heat it gives up to **half power**, drawing from the firebox's stored heat exactly the work it gives: one Coal for every five full-power seconds, ten seconds of its own half power. The firedoor glows and the stack smokes while the fire burns; while it drives a machine the flywheel turns and the stack puffs with every stroke. It does not drive boats.
 
 ## Hot-Bulb Engine
 
-A standalone hot-bulb oil engine: a stepped cast-iron bed, horizontal cylinder, enclosed crankcase and a rotating four-spoke flywheel, with a dial and lever on the control face. It powers [boats](vehicle-physics.md#boats) and its own commissioning test; it is not an electric grid or shaft network.
+A twin-cylinder vertical marine hot-bulb oil engine, **2 blocks wide, 4 long and 3 tall**, after period Bolinder-type engines: a two-rail bedplate, two cylinders on cast crankcase columns crowned by drum-shaped hot-bulb heads with lamp ports on cast bosses, a silencer drum and stack on a cast standard, a dished flywheel at the back and the clutch drum, handwheel, starting lever, sight-feed lubricator and gauge at the front. It drives [boats](vehicle-physics.md#boats) and, at full power, an [Oil Derrick](#oil-well).
 
-**Construction.** The controller, Engine Cylinder and Engine Flywheel come from the Assembly Bench ([recipes](#recipes)). The guide requires **8 Industrial Casing slabs, 1 Engine Cylinder and 1 Engine Flywheel**: the controller occupies the front center of a complete 3×3 half-height bed. Cylinder and flywheel match the controller's facing when placed in their positions, regardless of where you stand; elsewhere they face the player. Keep the marked space above and in front of the machinery and behind the cylinder clear.
+**Construction.** The controller comes from the Assembly Bench ([recipes](#recipes)) and is the engine's front corner on its control side; the engine extends one block to the controller's left as you face it and three behind. Like the [other modelled machines](machines.md#building-with-a-controller), it is built in sections by right-clicking the controller with each section's material, any amount at a time: **Bedplate** 8 Industrial Casing, **Crankcase** 8 Iron Plates, **Cylinders** 6 Steel Plates, **Running gear** 4 Machine Parts, **Flywheel** 8 Steel Rods, **Exhaust** 4 Iron Plates and **Controls** 2 Copper Plates. Breaking any part of a section removes that section and refunds what was paid for it.
 
-**Supply.** The controller front accepts refined fuel and its underside lubricating oil (route the lubricant pipe beneath the bed); capacities are **4,000 mB fuel / 2,000 mB oil**. A filled canister inserts 1,000 mB; an empty canister withdraws fuel, or oil when sneaking, and needs a whole 1,000 mB. Crude and wrong liquids are rejected. The screen has named gauges, **Start/Stop** and **Test Run**.
+**Supply.** The controller front accepts refined fuel and its underside lubricating oil (route the lubricant pipe beneath the bed); capacities are **4,000 mB fuel / 2,000 mB oil**. A filled canister inserts 1,000 mB; an empty canister withdraws fuel, or oil when sneaking, and needs a whole 1,000 mB. Crude and wrong liquids are rejected. The screen has named gauges and **Start/Stop**.
 
-**Operation.** Start spends **10 mB fuel once**, then heats for **5 loaded seconds**; with less than 10 mB it waits without spending. Ready or idle engines use no fuel. At full load an engine uses **2 mB fuel/s and 0.1 mB oil/s**; Test Run applies full load for **10 seconds** (20 mB fuel, 1 mB oil) and dissipates the work. Dry running gradually reduces delivered power to 20%; supplied lubricant restores it. Stop cancels startup, readiness and the test, and a later cold start costs fuel again. The startup flame goes out when ready; running turns the flywheel with bounded exhaust and quiet mechanical sound. Loose flywheels and guides use a static model.
+**Operation.** Start spends **10 mB fuel once** and heats the bulbs for **5 loaded seconds**; with less than 10 mB it waits without spending. While they heat, both lamp ports glow and a blowlamp roars at them. Then the engine kicks its flywheel over in a burst of black smoke and runs until it is stopped or runs dry: the lamps go dark and the roar fades as it catches, the flywheel turns, and the stack knocks twice a turn over the clatter of the running gear, each knock puffing smoke that rises in a drifting column. Running with nothing to drive it idles on **0.2 mB fuel/s** and no oil; at full load it uses **2 mB fuel/s and 0.1 mB oil/s**. Dry running gradually reduces delivered power to 20%; supplied lubricant restores it. Stop shuts it down, its knocks spreading apart as the flywheel coasts to rest, and a later cold start costs fuel again.
 
-**State and limits.** Tanks, fractional work credit, lubrication, enabled state and completed warm-up are saved; a test run does not restart after load. No offline work or forced chunks. A missing structure stops the engine and requires reheating. The server accepts at most one work request per engine per game tick and checks range, loaded endpoints, structure and claims; physics substeps never spend fuel independently. Breaking the controller returns it empty: **stored fluids and work credit are lost**, so drain it first.
+**State and limits.** Tanks, fractional work credit, lubrication, enabled state and completed warm-up are saved. No offline work or forced chunks. A missing section stops the engine and requires reheating. The server accepts at most one work request per engine per game tick and checks range, loaded endpoints, structure and claims; physics substeps never spend fuel independently. Breaking the controller returns it empty: **stored fluids and work credit are lost**, so drain it first.
 
 ## Bulk freight storage
 

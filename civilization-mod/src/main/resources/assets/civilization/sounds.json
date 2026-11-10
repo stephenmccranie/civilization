@@ -31,5 +31,43 @@
         "attenuation_distance": 48
       }
     ]
+  },
+  "engine_blowlamp": {
+    "subtitle": "subtitles.civilization.engine_blowlamp",
+    "sounds": [
+      {
+        "name": "civilization:engine_blowlamp",
+        "attenuation_distance": 16,
+        "volume": 0.7
+      }
+    ]
+  },
+  "engine_kick": {
+    "subtitle": "subtitles.civilization.engine_kick",
+    "sounds": [
+      {
+        "name": "civilization:engine_kick",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "engine_knock": {
+    "subtitle": "subtitles.civilization.engine_knock",
+    "sounds": [
+      {
+        "name": "civilization:engine_knock",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_bed": {
+    "subtitle": "subtitles.civilization.engine_bed",
+    "sounds": [
+      {
+        "name": "civilization:engine_bed",
+        "attenuation_distance": 12,
+        "volume": 0.4
+      }
+    ]
   }
 }

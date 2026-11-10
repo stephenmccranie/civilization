@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "civilization:oil_pump"
+          "name": "civilization:oil_derrick"
         }
       ],
       "conditions": [

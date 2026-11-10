@@ -138,7 +138,7 @@ Wood species are oak, spruce, birch, jungle, acacia, dark oak, mangrove, cherry,
 
 ## Other bench jobs
 
-Every other Assembly Bench job takes **ten seconds** and is listed with its feature: the refinery family, Hot-Bulb Engine parts and bulk stores in [industry](industry.md#recipes), the Small Boat Helm in [vehicles](vehicle-physics.md#boats), the Builder's Line in [cutting](cutting.md#builders-line), the Geiger Counter in [geography](geography.md#frontier-uranium), the Prospecting Rod in [industry](industry.md#prospecting), civic controllers in [ownership and trade](ownership-trade.md), and the Gladiator Pit controller in its [reference](gladiator-pit.md#build-and-materials). `ManufacturingJobs` and `AssemblyRecipes` are the authoritative catalog.
+Every other Assembly Bench job takes **ten seconds** and is listed with its feature: the refinery family, the Hot-Bulb Engine and bulk stores in [industry](industry.md#recipes), the Small Boat Helm in [vehicles](vehicle-physics.md#boats), the Builder's Line in [cutting](cutting.md#builders-line), the Geiger Counter in [geography](geography.md#frontier-uranium), the Prospecting Rod in [industry](industry.md#prospecting), civic controllers in [ownership and trade](ownership-trade.md), and the Gladiator Pit controller in its [reference](gladiator-pit.md#build-and-materials). `ManufacturingJobs` and `AssemblyRecipes` are the authoritative catalog.
 
 ## Save compatibility
 

@@ -42,7 +42,7 @@ public final class IndustryGameTests {
         var l=h.getLevel();var at=h.absolutePos(new BlockPos(8,67,8));
         var player=new FakePlayer(l,new GameProfile(UUID.randomUUID(),"derrick-builder"));player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);player.setPos(at.getX()+.5,at.getY()+1,at.getZ()-3);
         for(var front:Direction.Plane.HORIZONTAL){
-            l.setBlockAndUpdate(at,IndustrialContent.PUMP.get().defaultBlockState().setValue(CivicBlock.FACING,front));var m=(IndustrialBlockEntity)l.getBlockEntity(at);
+            l.setBlockAndUpdate(at,IndustrialContent.DERRICK.get().defaultBlockState().setValue(CivicBlock.FACING,front));var m=(IndustrialBlockEntity)l.getBlockEntity(at);
             for(var cell:MachineModel.OIL_DERRICK.cells){var p=ModeledMachine.position(at,front,cell);l.getChunkAt(p);l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());}
             var port=MachineStructure.position(at,front,MachineModel.OIL_DERRICK.ports.getFirst().part());l.setBlockAndUpdate(port,Blocks.AIR.defaultBlockState());
             player.getInventory().clearContent();player.getInventory().setItem(1,new ItemStack(Items.OAK_PLANKS,64));
@@ -53,7 +53,7 @@ public final class IndustryGameTests {
             double labor=CalorieFoodData.of(player).laborSpent;
             h.assertTrue(ModeledMachine.build(m,player,held)&&held.isEmpty()&&m.build().sections==1&&!IndustrialStructure.bind(m),"Footings are visible and solid before completion");
             var partial=new IndustrialBlockEntity(at,m.getBlockState());partial.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(partial.build().sections==1&&partial.build().paid.get(0).getFirst().is(Items.COBBLESTONE),"Partial construction and paid material identity survive save/load");
-            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,24),new ItemStack(Items.IRON_BLOCK,8),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledMachine.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
+            for(var stock:List.of(new ItemStack(Items.OAK_PLANKS,60),new ItemStack(Items.BIRCH_PLANKS,60),new ItemStack(Items.OAK_PLANKS,40),new ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK),4),new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("civilization:machine_parts")),2),IndustrialContent.PORT.toStack()))h.assertTrue(ModeledMachine.build(m,player,stock)&&stock.isEmpty(),"Consume only the supplied stack");
             h.assertTrue(m.build().sections==MachineModel.OIL_DERRICK.all&&IndustrialStructure.bind(m)&&player.getInventory().getItem(1).getCount()==64,"Complete all rotations without touching inventory reserves");
             h.assertTrue(CalorieFoodData.of(player).laborSpent-labor>0&&CalorieFoodData.of(player).laborSpent-labor<500,"Charge material labor, not hidden cells");
             int dropped=derrickDrops(l,at);l.destroyBlock(port,true);
@@ -63,14 +63,14 @@ public final class IndustryGameTests {
             h.assertTrue(l.getBlockEntity(at)==m&&Integer.bitCount(m.build().sections)==MachineModel.OIL_DERRICK.sections.size()-1&&derrickDrops(l,at)-dropped==6,"A broken panel leaves the other sections standing");
             m.process();h.assertTrue(!m.formed&&Integer.bitCount(m.build().sections)==MachineModel.OIL_DERRICK.sections.size()-1,"Incomplete pump stops without dismantling");
             h.assertTrue(ModeledMachine.build(m,player,new ItemStack(Items.OAK_PLANKS,6))&&IndustrialStructure.bind(m),"Repair the missing frame panel");
-            var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(copy.build().paid.values().stream().flatMap(List::stream).mapToInt(ItemStack::getCount).sum()==165,"Exact per-section refund ledger survives reload");
-            dropped=derrickDrops(l,at);l.removeBlock(at,false);h.assertTrue(derrickDrops(l,at)-dropped==165,"Controller removal refunds remaining materials exactly once");
+            var copy=new IndustrialBlockEntity(at,m.getBlockState());copy.loadWithComponents(m.saveWithFullMetadata(l.registryAccess()),l.registryAccess());h.assertTrue(copy.build().paid.values().stream().flatMap(List::stream).mapToInt(ItemStack::getCount).sum()==179,"Exact per-section refund ledger survives reload");
+            dropped=derrickDrops(l,at);l.removeBlock(at,false);h.assertTrue(derrickDrops(l,at)-dropped==179,"Controller removal refunds remaining materials exactly once");
             h.assertTrue(MachineModel.OIL_DERRICK.cells.stream().allMatch(c->l.getBlockState(ModeledMachine.position(at,front,c)).isAir())&&l.getBlockState(port).isAir(),"Controller removal clears owned physical cells");
         }h.succeed();
     }
-    private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.PUMP.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
+    private static int derrickDrops(net.minecraft.server.level.ServerLevel l,BlockPos at){return l.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,new net.minecraft.world.phys.AABB(at).inflate(3)).stream().filter(e->!e.getItem().is(IndustrialContent.DERRICK.asItem())).mapToInt(e->e.getItem().getCount()).sum();}
     @GameTest(template="empty",batch="derrick-construction") public static void derrickCollisionThroughChunkGetter(GameTestHelper h){
-        var m=machine(h,IndustrialContent.PUMP.get(),8);var l=h.getLevel();
+        var m=machine(h,IndustrialContent.DERRICK.get(),8);var l=h.getLevel();
         var cell=MachineModel.OIL_DERRICK.cells.stream().filter(c->c.y()==15&&c.pieces().containsKey(21)).findFirst().orElseThrow();var at=ModeledMachine.position(m.getBlockPos(),m.front(),cell);var state=l.getBlockState(at);
         h.assertTrue(!state.getCollisionShape(l.getChunkAt(at),at).isEmpty(),"Collision getter uses a chunk, and still resolves controller ownership");h.succeed();
     }
@@ -90,7 +90,7 @@ public final class IndustryGameTests {
         var pick=new ItemStack(Items.STONE_PICKAXE).get(net.minecraft.core.component.DataComponents.TOOL);
         for(var block:List.of(KilnContent.KILN.get(),KilnContent.RETORT.get(),CookingContent.STATION.get(),KilnContent.FOUNDRY.get(),
                 WorkshopContent.TANNERY.get(),WorkshopContent.SMITHY.get(),CivicContent.LAND.get(),
-                AirshipContent.CONTROLLER.get(),IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
+                AirshipContent.CONTROLLER.get(),IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),
                 IndustrialContent.TANK.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get(),OilEngineContent.ENGINE.get(),
                 BulkContent.BUNKER.get(),BulkContent.TANK.get()))
             h.assertTrue(pick.isCorrectForDrops(block.defaultBlockState()),"Stone pickaxe recovers "+block.getDescriptionId());
@@ -109,16 +109,18 @@ public final class IndustryGameTests {
     private static IndustrialBlockEntity machine(GameTestHelper h,IndustrialBlock block,int x){
         var at=h.absolutePos(new BlockPos(x,67,2));h.getLevel().removeBlock(at,false);h.getLevel().setBlockAndUpdate(at,block.defaultBlockState());
         var m=(IndustrialBlockEntity)h.getLevel().getBlockEntity(at);
-        if(m.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build((net.minecraft.server.level.ServerLevel)m.getLevel(),m.getBlockPos());else for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
+        if(m.model()!=null)MachineFixture.build((net.minecraft.server.level.ServerLevel)m.getLevel(),m.getBlockPos());else for(var part:IndustrialStructure.parts(m.kind))MachineStructure.placePart(h.getLevel(),at,m.front(),part);return m;
     }
     private static void bind(IndustrialBlockEntity m,Deposits.Site s){try{var f=IndustrialBlockEntity.class.getDeclaredField("site");f.setAccessible(true);f.set(m,s);f=IndustrialBlockEntity.class.getDeclaredField("surveyed");f.setAccessible(true);f.setBoolean(m,true);}catch(Exception e){throw new RuntimeException(e);}}
     private static Deposits.Site site(IndustrialBlockEntity m,Deposits.Kind k,int count){
-        var p=m.getBlockPos();var site=new Deposits.Site(p.getX(),p.getY(),p.getZ(),k,2);
+        var p=m.kind==IndustrialBlock.Kind.DERRICK?m.well():m.getBlockPos();var site=new Deposits.Site(p.getX(),p.getY(),p.getZ(),k,2);
         for(int i=0;i<site.cells();i++){var cell=site.cell(i);if(!site.body(cell))continue;m.getLevel().setBlockAndUpdate(cell,count-->0?(k==Deposits.Kind.OIL?IndustrialContent.RESERVOIR_OIL.get():IndustrialContent.COAL_SEAM.get()).defaultBlockState():Blocks.AIR.defaultBlockState());}
         return site;
     }
     private static int stock(GameTestHelper h,Deposits.Site s){int total=0;for(int i=0;i<s.cells();i++){var p=s.cell(i);if(!s.body(p))continue;var state=h.getLevel().getBlockState(p);if(state.is(IndustrialContent.COAL_SEAM.get()))total+=16;else if(state.is(IndustrialContent.RESERVOIR_OIL.get()))total+=(8-state.getValue(net.minecraft.world.level.block.LiquidBlock.LEVEL))*125;}return total;}
     private static void run(IndustrialBlockEntity m,int steps){CoalFireFixture.light(m);for(int i=0;i<steps;i++)m.process();}
+    /** Derrick steps whose engine has already given each its full work. */
+    private static void pumped(IndustrialBlockEntity m,int steps){for(int i=0;i<steps;i++){m.effort=m.duration();m.process();}}
     @GameTest(template="empty") public static void industrialBanksUseLastFuelAndAllOutputs(GameTestHelper h){
         var col=machine(h,IndustrialContent.COLUMN.get(),3);col.input.fill(new FluidStack(IndustrialContent.HEATED.get(),4000),EXECUTE);
         for(int slot:MachineInventory.INDUSTRIAL_OUTPUT)col.setItem(slot,IndustrialContent.SULFUR.toStack(31));run(col,160);
@@ -136,8 +138,8 @@ public final class IndustryGameTests {
         h.succeed();
     }
     @GameTest(template="empty") public static void coalBootstrapsOilAndIndustrialCoal(GameTestHelper h){
-        var pump=machine(h,IndustrialContent.PUMP.get(),2);var oil=site(pump,Deposits.Kind.OIL,1);bind(pump,oil);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(pump,100);
-        h.assertTrue(pump.output.getFluidAmount()==1000&&pump.getItem(0).isEmpty()&&!pump.fire.lit()&&pump.fire.hot()&&stock(h,oil)==0,"Four Coal pump one physical 1,000 mB block; the fire burns out while the footings stay hot");
+        var pump=machine(h,IndustrialContent.DERRICK.get(),2);var oil=site(pump,Deposits.Kind.OIL,1);bind(pump,oil);pump.struck=true;MachineFixture.coalEngine(h.getLevel(),pump);pumped(pump,8);
+        h.assertTrue(pump.output.getFluidAmount()==1000&&stock(h,oil)==0,"Eight engine-driven steps pump one physical 1,000 mB block");
         var ref=machine(h,IndustrialContent.REFINERY.get(),7);ref.input.fill(pump.output.drain(1000,EXECUTE),EXECUTE);ref.setItem(0,KilnContent.MINERAL_COAL.toStack(4));run(ref,50);
         h.assertTrue(ref.input.isEmpty()&&ref.output.getFluidAmount()==1000&&ref.getItem(0).isEmpty()&&!ref.fire.lit()&&ref.fire.hot(),"Four Coal heat 1,000 crude; the fire burns out while the hearth stays hot");
         var column=machine(h,IndustrialContent.COLUMN.get(),24);column.input.fill(ref.output.drain(1000,EXECUTE),EXECUTE);run(column,40);
@@ -149,26 +151,60 @@ public final class IndustryGameTests {
         h.assertTrue(produced==128&&drill.input.getFluidAmount()==160&&stock(h,seam)==0,"640 fuel removes eight blocks and produces 128 coal");h.succeed();
     }
     @GameTest(template="empty") public static void blockedOrBrokenMachineSpendsNothing(GameTestHelper h){
-        var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack(2));pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),4000),EXECUTE);run(pump,12);
-        h.assertTrue(pump.getItem(0).getCount()==1&&pump.fire.hot()&&stock(h,s)==1000&&pump.status==4,"Full output preserves oil; the hot fire only replaces leakage");
+        var pump=machine(h,IndustrialContent.DERRICK.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.struck=true;MachineFixture.coalEngine(h.getLevel(),pump);pump.setItem(0,new ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK),2));pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),4000),EXECUTE);pumped(pump,3);
+        h.assertTrue(pump.getItem(0).getCount()==2&&stock(h,s)==1000&&pump.status==4&&!pump.working(),"Full output preserves oil and casing and stops the beam");
         pump.output.drain(4000,EXECUTE);var frame=IndustrialStructure.parts(pump.kind).stream().filter(p->!p.material().equals("air")).findFirst().orElseThrow();
         var area=new net.minecraft.world.phys.AABB(pump.getBlockPos()).inflate(3);
-        int coal=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
+        int plates=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(pump.getItem(0).getItem())).mapToInt(e->e.getItem().getCount()).sum();
         h.getLevel().removeBlock(MachineStructure.position(pump.getBlockPos(),pump.front(),frame),false);
-        int dropped=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(KilnContent.MINERAL_COAL.get())).mapToInt(e->e.getItem().getCount()).sum();
-        run(pump,2);h.assertTrue(h.getLevel().getBlockEntity(pump.getBlockPos())==pump&&!pump.formed&&dropped==coal&&pump.getItem(0).getCount()==1&&stock(h,s)==1000,"Local damage stops production without consuming coal or oil or dropping inventory");h.succeed();
+        int dropped=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,area).stream().filter(e->e.getItem().is(pump.getItem(0).getItem())).mapToInt(e->e.getItem().getCount()).sum();
+        pumped(pump,2);h.assertTrue(h.getLevel().getBlockEntity(pump.getBlockPos())==pump&&!pump.formed&&dropped==plates&&pump.getItem(0).getCount()==2&&stock(h,s)==1000,"Local damage stops production without consuming casing or oil or dropping inventory");h.succeed();
     }
     @GameTest(template="empty") public static void machineSaveReloadAndRebuildDoNotRefillDeposit(GameTestHelper h){
-        var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.setItem(0,KilnContent.MINERAL_COAL.toStack());run(pump,5);
-        h.assertTrue(stock(h,s)==875,"First completed batch lowers actual fluid height");
+        var pump=machine(h,IndustrialContent.DERRICK.get(),2);var s=site(pump,Deposits.Kind.OIL,1);bind(pump,s);pump.struck=true;pump.depth=30;pump.cased=32;MachineFixture.coalEngine(h.getLevel(),pump);pumped(pump,1);pump.effort=17.5;
+        h.assertTrue(stock(h,s)==875,"First completed step lowers actual fluid height");
         var copy=new IndustrialBlockEntity(pump.getBlockPos(),pump.getBlockState());copy.loadWithComponents(pump.saveWithFullMetadata(h.getLevel().registryAccess()),h.getLevel().registryAccess());copy.setLevel(h.getLevel());h.getLevel().setBlockEntity(copy);bind(copy,s);
-        h.assertTrue(CoalFireFixture.stored(copy.fire)==CoalFireFixture.stored(pump.fire)&&copy.output.getFluidAmount()==125,"Stored heat and extracted liquid persist");
-        copy.setItem(0,KilnContent.MINERAL_COAL.toStack(3));run(copy,100);h.assertTrue(copy.output.getFluidAmount()==1000&&stock(h,s)==0,"Restored cursor extracts only remaining physical oil");
-        h.getLevel().removeBlock(pump.getBlockPos(),false);var rebuilt=machine(h,IndustrialContent.PUMP.get(),2);bind(rebuilt,s);rebuilt.setItem(0,KilnContent.MINERAL_COAL.toStack());run(rebuilt,100);
-        h.assertTrue(rebuilt.status==3&&rebuilt.getItem(0).isEmpty()&&rebuilt.output.isEmpty(),"Rebuilding cannot refresh an empty reservoir");h.succeed();
+        h.assertTrue(copy.struck&&copy.depth==30&&copy.cased==32&&copy.effort==17.5&&copy.output.getFluidAmount()==125,"The well, its work in progress and extracted liquid persist");
+        pumped(copy,7);h.assertTrue(copy.output.getFluidAmount()==1000&&stock(h,s)==0,"Restored cursor extracts only remaining physical oil");
+        h.getLevel().removeBlock(pump.getBlockPos(),false);var rebuilt=machine(h,IndustrialContent.DERRICK.get(),2);bind(rebuilt,s);rebuilt.struck=true;pumped(rebuilt,8);
+        h.assertTrue(rebuilt.status==3&&rebuilt.output.isEmpty(),"Rebuilding cannot refresh an empty reservoir");h.succeed();
+    }
+    @GameTest(template="empty") public static void derrickSaysWhatItsWellNeeds(GameTestHelper h){
+        var l=h.getLevel();var d=machine(h,IndustrialContent.DERRICK.get(),2);var w=d.well();
+        bind(d,new Deposits.Site(w.getX(),w.getY(),w.getZ(),Deposits.Kind.OIL,2,40));
+        for(int y=1;y<=3;y++)l.setBlockAndUpdate(w.below(y),Blocks.STONE.defaultBlockState());
+        d.process();h.assertTrue(d.status==MachineStatus.Industry.NEEDS_CASING&&d.cased==0,"An uncased well waits for casing");
+        d.setItem(0,new ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK),1));d.process();
+        h.assertTrue(d.status==MachineStatus.Industry.NO_ENGINE&&d.cased==4&&d.getItem(0).isEmpty(),"One Iron Plate cases four blocks of well");
+        MachineFixture.coalEngine(l,d);d.process();h.assertTrue(d.status==MachineStatus.Industry.NEEDS_POWER&&d.depth==0,"An engine in range that gives no work leaves the bit still");
+        d.effort=d.duration();d.process();h.assertTrue(d.depth==1&&d.effort==0&&!d.struck,"Five full-power seconds drill one block");
+        l.setBlockAndUpdate(w.below(2),Blocks.BEDROCK.defaultBlockState());d.process();h.assertTrue(d.status==MachineStatus.Industry.BLOCKED&&d.depth==1,"Bedrock stops the bit");
+        h.succeed();
+    }
+    @GameTest(template="empty") public static void coalEngineGivesHalfPowerOncePerTick(GameTestHelper h){
+        var d=machine(h,IndustrialContent.DERRICK.get(),2);var e=MachineFixture.coalEngine(h.getLevel(),d);e.process();double before=CoalFireFixture.stored(e.fire);
+        h.assertTrue(e.requestWork(d.getBlockPos(),1)==IndustrialRates.COAL_ENGINE_POWER&&e.requestWork(d.getBlockPos(),1)==0,"Half power, to one machine a tick");
+        double spent=before-CoalFireFixture.stored(e.fire),expected=IndustrialRates.COAL_ENGINE_POWER*IndustrialRates.COAL_WORK_UNITS*CoalFire.UNIT;
+        h.assertTrue(Math.abs(spent-expected)<expected*1e-9,"It burns exactly the heat of the work it gave: "+spent+" / "+expected);h.succeed();
+    }
+    @GameTest(template="empty",timeoutTicks=1400,batch="derrick-well") public static void coalEngineDrillsThenPumpsAWell(GameTestHelper h){
+        var l=h.getLevel();var d=machine(h,IndustrialContent.DERRICK.get(),2);var w=d.well();
+        // The oil body's crown lies three blocks under the floor: two blocks of stone to drill, then oil.
+        var s=new Deposits.Site(w.getX(),w.getY(),w.getZ(),Deposits.Kind.OIL,2,11);
+        for(int i=0;i<s.cells();i++){var c=s.cell(i);if(s.body(c))l.setBlockAndUpdate(c,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());}
+        for(int y=1;y<=2;y++)l.setBlockAndUpdate(w.below(y),Blocks.STONE.defaultBlockState());
+        bind(d,s);d.setItem(0,new ItemStack(IndustrialBlockEntity.supply(IndustrialBlock.Kind.DERRICK),2));var engine=MachineFixture.coalEngine(l,d);
+        var chunks=List.of(d.getBlockPos(),engine.getBlockPos(),w);for(var p:chunks)l.setChunkForced(p.getX()>>4,p.getZ()>>4,true);
+        h.startSequence().thenWaitUntil(()->h.assertTrue(d.output.getFluidAmount()>=250,"Waiting to pump: status="+d.status+", depth="+d.depth+", engine="+engine.status))
+            .thenExecute(()->{
+                h.assertTrue(d.struck&&d.depth==2&&d.cased==4&&d.getItem(0).getCount()==1,"Two drilled blocks take one plate of casing before the bit strikes oil");
+                h.assertTrue(engine.working()&&d.working(),"The engine's flywheel and the derrick's beam both run");
+                h.assertTrue(engine.getItem(0).getCount()+engine.getItem(2).getCount()<16,"The engine burned Coal for the work");
+                for(var p:chunks)l.setChunkForced(p.getX()>>4,p.getZ()>>4,false);
+            }).thenSucceed();
     }
     @GameTest(template="empty") public static void oilLowersAtTheWellBeforeMovingOutward(GameTestHelper h){
-        var pump=machine(h,IndustrialContent.PUMP.get(),2);var s=site(pump,Deposits.Kind.OIL,0);var center=new BlockPos(s.x(),s.centerY(),s.z());
+        var pump=machine(h,IndustrialContent.DERRICK.get(),2);var s=site(pump,Deposits.Kind.OIL,0);var center=new BlockPos(s.x(),s.centerY(),s.z());
         for(var p:java.util.List.of(center.above(),center.above().east(),center))h.getLevel().setBlockAndUpdate(p,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());
         var work=new DepositWork();for(int i=0;i<16;i++){DepositWork.Target t;do{t=work.find(h.getLevel(),s,pump.getBlockPos());}while(t.status()==10);h.assertTrue(t.status()==7&&t.pos().equals(i<8?center.above():center),"The well column drains from its top downward");h.assertTrue(work.extract(h.getLevel(),s,pump.getBlockPos(),t),"Physical drain commits");}
         h.assertTrue(h.getLevel().getBlockState(center.above()).isAir()&&h.getLevel().getBlockState(center).isAir()&&h.getLevel().getBlockState(center.above().east()).is(IndustrialContent.RESERVOIR_OIL.get()),"Nearby oil remains physical and unspent");h.succeed();
@@ -184,7 +220,7 @@ public final class IndustryGameTests {
         var drill=machine(h,IndustrialContent.DRILL.get(),3);var small=site(drill,Deposits.Kind.OIL,0);var scan=new DepositWork();scan.find(h.getLevel(),small,drill.getBlockPos());h.assertTrue(scan.cursor<=1024,"One scan has a fixed work budget");h.succeed();
     }
     @GameTest(template="empty") public static void wideDepositUsesNearbyLoadedStock(GameTestHelper h){
-        var pump=machine(h,IndustrialContent.PUMP.get(),2);
+        var pump=machine(h,IndustrialContent.DERRICK.get(),2);
         var site=new Deposits.Site(pump.getBlockPos().getX(),pump.getBlockPos().getY(),pump.getBlockPos().getZ(),Deposits.Kind.OIL,70);
         var oil=new BlockPos(site.x(),site.top(),site.z());
         h.getLevel().setBlockAndUpdate(oil,IndustrialContent.RESERVOIR_OIL.get().defaultBlockState());
@@ -297,9 +333,9 @@ public final class IndustryGameTests {
         h.assertTrue(IndustrialContent.COAL_SEAM.get().defaultBlockState().getDestroySpeed(h.getLevel(),drill.getBlockPos())<0&&Blocks.COAL_ORE.defaultBlockState().getDestroySpeed(h.getLevel(),drill.getBlockPos())>0,"Large seams are machine-only while ordinary ore stays mineable");h.succeed();
     }
     @GameTest(template="empty") public static void industrialStructuresRotateWithCutSlabs(GameTestHelper h){
-        var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.PUMP.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
-            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.PUMP)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
-            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.kind==IndustrialBlock.Kind.PUMP)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
+        var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.REFINERY.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
+            h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.kind==IndustrialBlock.Kind.DERRICK)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
+            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.kind==IndustrialBlock.Kind.DERRICK)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
         }h.succeed();
     }
 
@@ -307,10 +343,11 @@ public final class IndustryGameTests {
     private static void pipe(GameTestHelper h,BlockPos p){h.getLevel().setBlockAndUpdate(p,IndustrialContent.PIPE.get().defaultBlockState());}
     @GameTest(template="empty",timeoutTicks=1000,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
         var l=h.getLevel();var origin=h.absolutePos(new BlockPos(0,67,0));
-        // This 60-block pipeline extends beyond the tiny empty template's ticking area.
-        for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
-        h.runAfterDelay(20,()->{var pump=machine(h,IndustrialContent.PUMP.get(),15);
-        var oil=site(pump,Deposits.Kind.OIL,1000);bind(pump,oil);int initialStock=stock(h,oil);
+        // This 60-block pipeline, and the derrick's engine six blocks in front of it, extend beyond the tiny empty template's ticking area.
+        for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-8)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
+        h.runAfterDelay(20,()->{var pump=machine(h,IndustrialContent.DERRICK.get(),15);
+        var oil=site(pump,Deposits.Kind.OIL,1000);bind(pump,oil);pump.struck=true;int[] initialStock={0};
+        var engine=MachineFixture.hotBulbEngine(l,pump);engine.enabled=true;
         var heater=machine(h,IndustrialContent.REFINERY.get(),24);
         var column=machine(h,IndustrialContent.COLUMN.get(),38);
         var condenser=machine(h,IndustrialContent.CONDENSER.get(),52);
@@ -327,20 +364,20 @@ public final class IndustryGameTests {
         // Forced chunks reach entity-ticking on the chunk system's own clock, which catch-up ticks can outrun, so wait for that state;
         // then let newly placed block-entity tickers/ports settle before the fixed 400-tick measurement.
         var stages=java.util.List.of(pump,heater,column,condenser);
-        h.startSequence().thenWaitUntil(()->{for(var m:stages)h.assertTrue(l.isPositionEntityTicking(m.getBlockPos()),"Every stage's chunk becomes entity-ticking: "+m.kind);}).thenIdle(20).thenExecute(()->{
+        // The derrick pumps from the start, so by priming it has settled into its steady 50-tick step.
+        h.startSequence().thenWaitUntil(()->{for(var m:stages)h.assertTrue(l.isPositionEntityTicking(m.getBlockPos()),"Every stage's chunk becomes entity-ticking: "+m.kind);h.assertTrue(l.isPositionEntityTicking(engine.getBlockPos()),"The engine's chunk becomes entity-ticking");}).thenIdle(80).thenExecute(()->{
         for(var m:stages)
             h.assertTrue(l.isPositionEntityTicking(m.getBlockPos())&&m.formed&&m.progress==0,"Every stage is loaded and idle before priming: "+m.kind);
-        pump.setItem(0,KilnContent.MINERAL_COAL.toStack(32));heater.setItem(0,KilnContent.MINERAL_COAL.toStack(32));
-        CoalFireFixture.light(pump);CoalFireFixture.light(heater);
+        heater.setItem(0,KilnContent.MINERAL_COAL.toStack(32));CoalFireFixture.light(heater);initialStock[0]=stock(h,oil);
         // Startup inventory isolates sustained throughput from first-fill latency.
-        pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),125),EXECUTE);
-        heater.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),500),EXECUTE);
+        pump.output.drain(4000,EXECUTE);pump.output.fill(new FluidStack(IndustrialContent.CRUDE.get(),125),EXECUTE);
+        heater.input.drain(4000,EXECUTE);heater.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),500),EXECUTE);
         heater.output.fill(new FluidStack(IndustrialContent.HEATED.get(),250),EXECUTE);
         column.input.fill(new FluidStack(IndustrialContent.HEATED.get(),2000),EXECUTE);
         column.output.fill(new FluidStack(IndustrialContent.VAPOR.get(),800),EXECUTE);
         condenser.input.fill(new FluidStack(IndustrialContent.VAPOR.get(),400),EXECUTE);
         h.runAfterDelay(400,()->{
-            h.assertTrue(initialStock-stock(h,oil)==1000,"Twenty seconds removes precisely 1,000 mB physical crude");
+            h.assertTrue(initialStock[0]-stock(h,oil)==1000,"Twenty seconds at full power removes precisely 1,000 mB physical crude");
             h.assertTrue(heater.input.getFluidAmount()==500&&column.input.getFluidAmount()==2000,"Matched upstream stages hold stable input inventories: "+heater.input.getFluidAmount()+", "+column.input.getFluidAmount());
             h.assertTrue(column.lubricant.getFluidAmount()==200&&column.getItem(1).getCount()==1,"One column batch yields 200 mB oil and one sulfur: "+column.lubricant.getFluidAmount()+", sulfur="+column.getItem(1)+", progress="+column.progress);
             h.assertTrue(condenser.output.getFluidAmount()+tank.input.getFluidAmount()==800,"One condenser delivers 800 mB fuel per twenty seconds: "+condenser.output.getFluidAmount()+" + "+tank.input.getFluidAmount()+", status="+condenser.status+", progress="+condenser.progress);

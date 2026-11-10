@@ -157,7 +157,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
     private Look guide;
 
     public ModeledMachineRenderer(BlockEntityRendererProvider.Context context) {}
-    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.FOUNDRY_ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.RETORT_ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(WorkshopContent.ENTITY.get(),ModeledMachineRenderer::new);}
+    @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.FOUNDRY_ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(KilnContent.RETORT_ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(WorkshopContent.ENTITY.get(),ModeledMachineRenderer::new);e.registerBlockEntityRenderer(OilEngineContent.ENTITY.get(),ModeledMachineRenderer::new);}
     @Override public AABB getRenderBoundingBox(BlockEntity entity){var c=ModeledMachine.of(entity);return c==null?new AABB(entity.getBlockPos()):c.model().area(entity.getBlockPos());}
     // A tall model spans sections beyond its controller's; it must not vanish when that section leaves view.
     @Override public boolean shouldRenderOffScreen(BlockEntity entity){return ModeledMachine.of(entity)!=null;}
@@ -172,7 +172,7 @@ public final class ModeledMachineRenderer implements BlockEntityRenderer<BlockEn
         var c=ModeledMachine.of(entity);if(c==null||entity.getLevel()==null)return;
         var look=looks.computeIfAbsent(entity,e->new Look(e.getType(),e.getBlockPos(),e.getBlockState(),c.model()));
         look.setLevel(entity.getLevel());look.setBlockState(entity.getBlockState());
-        look.sections=c.build().sections;look.hideController=false;look.running=c.working();look.lit=c.working();look.guide=false;look.afloat=c.afloat();
+        look.sections=c.build().sections;look.hideController=false;look.running=c.working();look.lit=c.lit();look.guide=false;look.afloat=c.afloat();
         renderer(c.model()).render(look,partial,pose,buffers,light,overlay);
     }
     /** The sections of `model` not in `built`, for a controller at `at`; a controller not yet placed is drawn too. */
