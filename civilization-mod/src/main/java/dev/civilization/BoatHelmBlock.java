@@ -12,10 +12,24 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 public final class BoatHelmBlock extends HorizontalDirectionalBlock implements MultiCellBlock {
     public static final BooleanProperty PANEL=BooleanProperty.create("panel");
-    public static final IntegerProperty GEAR=IntegerProperty.create("gear",0,3);
-    public BoatHelmBlock(Properties p){super(p);registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(PANEL,false).setValue(GEAR,1));}
+    /** What the helm shows: the engine order on its telegraph, reverse to fast, and its wheel turned to port, amidships or to starboard. */
+    public static final IntegerProperty GEAR=IntegerProperty.create("gear",0,3),STEER=IntegerProperty.create("steer",0,2);
+    /** The wheel on its pedestal and the telegraph on its column, by facing. */
+    private static final VoxelShape[] WHEEL=turned(Shapes.or(Block.box(1,0,2.5,16,1.5,14.5),Block.box(4,1.5,3,12,25.25,11),Block.box(0,8,11,16,24.4,13.6)));
+    private static final VoxelShape[] TELEGRAPH=turned(Shapes.or(Block.box(0,0,2.5,15,1.5,14.5),Block.box(5,1.5,5,11,12.5,11),Block.box(5.25,12.5,3.4,10.75,24,12)));
+    /** A shape drawn facing north, the bow at -z, turned to each horizontal facing as the block state turns the model. */
+    private static VoxelShape[] turned(VoxelShape north){
+        var shapes=new VoxelShape[4];
+        for(var front:Direction.Plane.HORIZONTAL){
+            var shape=Shapes.empty();
+            for(var b:north.toAabbs())shape=Shapes.or(shape,switch(front){case EAST->Shapes.box(1-b.maxZ,b.minY,b.minX,1-b.minZ,b.maxY,b.maxX);case SOUTH->Shapes.box(1-b.maxX,b.minY,1-b.maxZ,1-b.minX,b.maxY,1-b.minZ);case WEST->Shapes.box(b.minZ,b.minY,1-b.maxX,b.maxZ,b.maxY,1-b.minX);default->Shapes.create(b);});
+            shapes[front.get2DDataValue()]=shape;
+        }
+        return shapes;
+    }
+    public BoatHelmBlock(Properties p){super(p);registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(PANEL,false).setValue(GEAR,1).setValue(STEER,1));}
     @Override protected com.mojang.serialization.MapCodec<BoatHelmBlock> codec(){return simpleCodec(BoatHelmBlock::new);}
-    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState>b){b.add(FACING,PANEL,GEAR);}
+    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState>b){b.add(FACING,PANEL,GEAR,STEER);}
     public static BlockPos other(BlockPos p,BlockState s){return p.relative(s.getValue(PANEL)?s.getValue(FACING).getCounterClockWise():s.getValue(FACING).getClockWise());}
     public static BlockPos root(BlockPos p,BlockState s){return s.getValue(PANEL)?other(p,s):p;}
     @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){
@@ -32,7 +46,7 @@ public final class BoatHelmBlock extends HorizontalDirectionalBlock implements M
         return super.playerWillDestroy(l,p,s,player);
     }
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){
-        return s.getValue(PANEL)?Block.box(0,0,0,16,22,16):Block.box(0,0,0,16,28,16);
+        return (s.getValue(PANEL)?TELEGRAPH:WHEEL)[s.getValue(FACING).get2DDataValue()];
     }
     @Override protected InteractionResult useWithoutItem(BlockState s,Level l,BlockPos p,Player player,BlockHitResult hit){
         if(l instanceof net.minecraft.server.level.ServerLevel server && player instanceof net.minecraft.server.level.ServerPlayer sp){
