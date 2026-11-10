@@ -14,13 +14,15 @@ import net.minecraft.world.phys.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
  * Coal custody across a server restart and a chunk unload. {@code seed} leaves every custodian holding stock in one
  * chunk and stops the server in the same tick, so a struck chunk is still falling and an undercut pile's fall is still
- * scheduled. {@code reload} counts the stock after the restart, lets the chunk unload and load again, and counts once more.
+ * scheduled. {@code reload} counts the stock after the restart, waits until the chunk and its entities have been saved
+ * and dropped from memory, loads them again and counts once more.
  */
 @EventBusSubscriber(modid = "civilization")
 public final class CoalPersistenceCheck {
@@ -39,10 +41,16 @@ public final class CoalPersistenceCheck {
      */
     private static final String EXPECTED = "faces=" + Long.toHexString(STRUCK) + "," + Long.toHexString(PILLAR) + " loose=60 blocked=7 floating=" + (PHASE.equals("seed") ? 1 : 0) + " cart=123 screen=135/1 shovel=9";
     private static int ticks, unforcedAt, reforcedAt;
+    /** The server has saved the unforced chunk and dropped it, so the next load reads what was saved. */
+    private static boolean dropped;
 
     @SubscribeEvent public static void start(ServerStartedEvent e) {
-        ticks = unforcedAt = reforcedAt = 0;
+        ticks = unforcedAt = reforcedAt = 0; dropped = false;
         if (!PHASE.isEmpty()) e.getServer().overworld().setChunkForced(CHUNK_X, CHUNK_Z, true);
+    }
+    @SubscribeEvent public static void unloaded(ChunkEvent.Unload e) {
+        var at = e.getChunk().getPos();
+        if (unforcedAt > 0 && at.x == CHUNK_X && at.z == CHUNK_Z && e.getLevel() instanceof ServerLevel l && l == l.getServer().overworld()) dropped = true;
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         if (PHASE.isEmpty()) return;
@@ -55,7 +63,7 @@ public final class CoalPersistenceCheck {
             verify(l, "across the restart");
             l.setChunkForced(CHUNK_X, CHUNK_Z, false); unforcedAt = ticks;
         } else if (unforcedAt > 0 && reforcedAt == 0) {
-            if (!Chunks.loaded(l, CHUNK_X, CHUNK_Z) && l.getEntitiesOfClass(CoalMinecart.class, AREA).isEmpty()) {
+            if (dropped && l.getEntitiesOfClass(CoalMinecart.class, AREA).isEmpty()) {
                 l.setChunkForced(CHUNK_X, CHUNK_Z, true); reforcedAt = ticks;
             } else if (ticks - unforcedAt > 1200) throw new IllegalStateException("The coal chunk did not unload within a minute");
         } else if (reforcedAt > 0 && ticks == reforcedAt + SETTLE) {
