@@ -159,6 +159,6 @@ public final class ChestArmfulGameTests {
         h.assertTrue(blocks(cart)==BlockCarry.LIMIT&&count(cart,Items.COBBLESTONE)==1&&hopper.getItem(0).getCount()==2,"A hopper fills a chest minecart to its armful and keeps the rest: cart "+blocks(cart)+", hopper "+hopper.getItem(0));
         hopper.setItem(0,new ItemStack(Items.APPLE,2));hopperTick(hopper);
         h.assertTrue(hopper.getItem(0).getCount()==1&&count(cart,Items.APPLE)==1,"A hopper still feeds a chest minecart ordinary goods");
-        cart.discard();h.succeed();
+        cart.clearContent();cart.discard();h.succeed();
     }
 }
