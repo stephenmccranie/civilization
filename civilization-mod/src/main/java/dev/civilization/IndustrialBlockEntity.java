@@ -24,13 +24,11 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     public int progress,status;
     public final CoalFire fire=new CoalFire(this);
     /** The Coal Engine's brick firebox and the Fired Heater's brick hearth. */
-    public int masonry(){return kind==Kind.COAL_ENGINE?4:20;}
+    public int masonry(){return kind==Kind.COAL_ENGINE?4:18;}
     public int[] coalFuelSlots(){return MachineInventory.INDUSTRIAL_INPUT;}
-    /** The Coal Engine's fire burns behind its firedoor. */
-    public boolean coalFireIgnoresRain(){return kind==Kind.COAL_ENGINE;}
-    public boolean coalPowered(){return kind==Kind.COAL_ENGINE||kind==Kind.REFINERY;}
+    public boolean coalPowered(){return kind==Kind.COAL_ENGINE||kind==Kind.HEATER;}
     /** What a machine's input slots take: the derrick's casing, or Coal for a fire. */
-    public static Item supply(Kind kind){return switch(kind){case DERRICK->ManufacturingContent.part("iron","plate");case REFINERY,COAL_ENGINE->KilnContent.MINERAL_COAL.get();default->null;};}
+    public static Item supply(Kind kind){return switch(kind){case DERRICK->ManufacturingContent.part("iron","plate");case HEATER,COAL_ENGINE->KilnContent.MINERAL_COAL.get();default->null;};}
     /** The derrick's well: blocks drilled below its floor, blocks of that cased, whether the bit has struck the oil body,
      *  and the engine work given towards the next block or pumped step. */
     public int depth,cased;
@@ -49,8 +47,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     private final ModeledBuild build=new ModeledBuild();
     private int lastPumpView = -1;
     public IndustrialBlockEntity(BlockPos p,BlockState s){super(IndustrialContent.ENTITY.get(),p,s);kind=((IndustrialBlock)s.getBlock()).kind;
-        input=tank(kind==Kind.TANK?16000:4000,stack->switch(kind){case TANK->IndustrialContent.industrial(stack);case REFINERY->stack.is(IndustrialContent.CRUDE.get());case COLUMN->stack.is(IndustrialContent.HEATED.get());case CONDENSER->stack.is(IndustrialContent.VAPOR.get());case DRILL->stack.is(IndustrialContent.FUEL.get());default->false;});
-        output=tank(4000,stack->stack.is(switch(kind){case DERRICK->IndustrialContent.CRUDE.get();case REFINERY->IndustrialContent.HEATED.get();case COLUMN->IndustrialContent.VAPOR.get();default->IndustrialContent.FUEL.get();}));
+        input=tank(kind==Kind.TANK?16000:4000,stack->switch(kind){case TANK->IndustrialContent.industrial(stack);case HEATER->stack.is(IndustrialContent.CRUDE.get());case COLUMN->stack.is(IndustrialContent.HEATED.get());case CONDENSER->stack.is(IndustrialContent.VAPOR.get());case DRILL->stack.is(IndustrialContent.FUEL.get());default->false;});
+        output=tank(4000,stack->stack.is(switch(kind){case DERRICK->IndustrialContent.CRUDE.get();case HEATER->IndustrialContent.HEATED.get();case COLUMN->IndustrialContent.VAPOR.get();default->IndustrialContent.FUEL.get();}));
         lubricant=tank(4000,stack->stack.is(IndustrialContent.LUBE.get()));
     }
     private FluidTank tank(int capacity,java.util.function.Predicate<FluidStack> validator){return new FluidTank(capacity,validator){@Override protected void onContentsChanged(){setChanged();}};}
@@ -61,7 +59,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     @Override public boolean working(){return formed&&getBlockState().getValue(MachineFeedback.WORKING);}
     @Override public boolean lit(){return formed&&getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT);}
     @Override public void sectionsChanged(){formed=false;}
-    public int duration(){return switch(kind){case DERRICK->struck?IndustrialRates.PUMP_TICKS:IndustrialRates.DRILL_TICKS;case DRILL->lubricant.getFluidAmount()>=10?100:100000/Math.max(200,lubrication);case REFINERY,COLUMN,CONDENSER->IndustrialProcess.forKind(kind).ticks();case TANK,COAL_ENGINE->1;};}
+    public int duration(){return switch(kind){case DERRICK->struck?IndustrialRates.PUMP_TICKS:IndustrialRates.DRILL_TICKS;case DRILL->lubricant.getFluidAmount()>=10?100:100000/Math.max(200,lubrication);case HEATER,COLUMN,CONDENSER->IndustrialProcess.forKind(kind).ticks();case TANK,COAL_ENGINE->1;};}
     /** The derrick's well column, under the walking beam's head. */
     public BlockPos well(){return worldPosition.relative(front().getOpposite(),IndustrialRates.WELL);}
 
@@ -86,7 +84,6 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         if(structure==MachineStructure.UNLOADED){formed=false;firePaused=true;pause(MachineStatus.Industry.UNLOADED);return;}
         if(structure!=MachineStructure.COMPLETE){formed=false;if(coalPowered())fire.extinguish();pause(MachineStatus.Industry.INCOMPLETE);return;}
         formed=true;
-        if(kind==Kind.REFINERY&&MachineWeather.wetWorkFace(level,worldPosition,getBlockState())){pause(MachineStatus.Industry.WET);return;}
         if(coalPowered()&&!fire.hot()){pause(fire.lit()?MachineStatus.Industry.WARMING:MachineStatus.Industry.FIRE_UNLIT);return;}
         if(kind==Kind.COAL_ENGINE){status=server.getGameTime()-workedTick<=IndustrialRates.STEP_TICKS?MachineStatus.Industry.WORKING:MachineStatus.Industry.READY;working(status==MachineStatus.Industry.WORKING);return;}
         MachineInventory.refill(this,MachineInventory.INDUSTRIAL_INPUT);

@@ -42,31 +42,41 @@ public final class WeatherGameTests {
   double after=restored.coolingFor(l,p);
   h.assertTrue(after>0&&after<wet*.4,"Cooling lingers after rain, then gradually recovers");h.succeed();
  }
- @GameTest(template="empty",timeoutTicks=200) public static void kilnNeedsAWeatherShelteredWorkFace(GameTestHelper h){
-  var l=river(h);var p=new BlockPos(400,90,450);l.getChunk(p);
-  var state=KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH);
+ @GameTest(template="empty",timeoutTicks=200) public static void onlyAnOpenFireNeedsAWeatherShelteredWorkFace(GameTestHelper h){
+  var l=river(h);var p=new BlockPos(400,90,450);var kilnAt=p.east(12);l.getChunk(p);l.getChunk(kilnAt);
   l.setBlockAndUpdate(p,Blocks.AIR.defaultBlockState());
-  l.setBlockAndUpdate(p,state);
+  l.setBlockAndUpdate(p,WorkshopContent.SMITHY.get().defaultBlockState().setValue(WorkshopBlock.FACING,Direction.NORTH));
   MachineFixture.build(l,p);
-  var kiln=(KilnBlockEntity)l.getBlockEntity(p);var face=p.north();var roof=face.above(3);
+  var forge=(WorkshopBlockEntity)l.getBlockEntity(p);var face=p.north();var roof=face.above(3);
   l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());
+  l.setBlockAndUpdate(kilnAt,Blocks.AIR.defaultBlockState());
+  l.setBlockAndUpdate(kilnAt,KilnContent.KILN.get().defaultBlockState().setValue(AbstractFurnaceBlock.FACING,Direction.NORTH));
+  MachineFixture.build(l,kilnAt);
+  var kiln=(KilnBlockEntity)l.getBlockEntity(kilnAt);
   float oldRain=l.getRainLevel(1);l.setRainLevel(1);
   try{
-   h.assertTrue(kiln.checkStructure().status()==MachineStructure.COMPLETE,"Kiln shell complete");
-   h.assertTrue(MachineWeather.wetWorkFace(l,p,state),"Rain reaches the open firing face: rain="+l.isRainingAt(face)+", sky="+l.canSeeSky(face)+", height="+l.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,face).getY()+", biome="+l.getBiome(face).value().getPrecipitationAt(face));
-   kiln.setItem(0,new ItemStack(Items.CLAY));kiln.setItem(1,KilnContent.MINERAL_COAL.toStack(2));
-   h.assertTrue(!kiln.fire.strike(true)&&kiln.getItem(1).getCount()==2,"Wet fire cannot be ignited");
+   h.assertTrue(MachineFixture.status(l,p)==MachineStructure.COMPLETE&&kiln.checkStructure().status()==MachineStructure.COMPLETE,"Forge and kiln complete");
+   h.assertTrue(forge.fire.rainedOut(),"Rain reaches the forge's open work face: rain="+l.isRainingAt(face)+", sky="+l.canSeeSky(face)+", height="+l.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING,face).getY()+", biome="+l.getBiome(face).value().getPrecipitationAt(face));
+   forge.select(WorkshopJobs.index(2,"civilization:iron_pickaxe_head"));forge.setItem(0,new ItemStack(Items.IRON_INGOT,3));forge.setItem(4,KilnContent.MINERAL_COAL.toStack(2));
+   h.assertTrue(!forge.fire.strike(true)&&forge.getItem(4).getCount()==2,"A wet forge cannot be lit");
    l.setBlockAndUpdate(roof,Blocks.BRICKS.defaultBlockState());
-   h.assertTrue(!MachineWeather.wetWorkFace(l,p,state),"A roof over the work face stops direct rain");
+   h.assertTrue(!forge.fire.rainedOut(),"A roof over the work face stops direct rain");
    MachineFixture.spark(l,true);
-   h.assertTrue(kiln.fire.strike(true)&&kiln.fire.lit(),"Sheltered kiln lights during district rain");
-   CoalFireFixture.light(kiln);
+   h.assertTrue(forge.fire.strike(true)&&forge.fire.lit(),"Sheltered forge lights during district rain");
+   CoalFireFixture.light(forge);
    l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());
-   for(int i=0;i<250;i++)KilnBlockEntity.tick(l,p,kiln.getBlockState(),kiln);
-   h.assertTrue(kiln.getItem(0).getCount()==1&&kiln.getItem(2).isEmpty(),"Exposed kiln retains ingredients without completing work");
+   forge.process();
+   h.assertTrue(forge.status==MachineStatus.Workshop.WET&&forge.getItem(0).getCount()==3,"Exposed forge keeps its materials without working: "+forge.status);
    l.setBlockAndUpdate(roof,Blocks.BRICKS.defaultBlockState());
-   for(int i=0;i<210;i++)KilnBlockEntity.tick(l,p,kiln.getBlockState(),kiln);
-   h.assertTrue(kiln.getItem(0).isEmpty()&&kiln.getItem(2).is(Items.BRICK),"Roofed kiln resumes and completes work with its existing fire");
+   forge.process();
+   h.assertTrue(forge.status==MachineStatus.Workshop.WORKING,"Roofed forge resumes with its existing fire: "+forge.status);
+   h.assertTrue(l.isRainingAt(kilnAt.north())&&!kiln.fire.rainedOut(),"Rain falls on the kiln's firedoor without reaching its fire");
+   kiln.setItem(0,new ItemStack(Items.CLAY));kiln.setItem(1,KilnContent.MINERAL_COAL.toStack(2));
+   MachineFixture.spark(l,true);
+   h.assertTrue(kiln.fire.strike(true)&&kiln.fire.lit(),"A fire behind a door lights in the rain");
+   CoalFireFixture.light(kiln);
+   for(int i=0;i<250;i++)KilnBlockEntity.tick(l,kilnAt,kiln.getBlockState(),kiln);
+   h.assertTrue(kiln.getItem(0).isEmpty()&&kiln.getItem(2).is(Items.BRICK),"The kiln fires its clay in the rain");
   }finally{l.setRainLevel(oldRain);l.setBlockAndUpdate(roof,Blocks.AIR.defaultBlockState());}
   h.succeed();
  }

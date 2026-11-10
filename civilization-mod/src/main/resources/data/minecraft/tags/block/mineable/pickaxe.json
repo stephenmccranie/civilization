@@ -15,7 +15,7 @@
     "civilization:land_controller",
     "civilization:airship_controller",
     "civilization:oil_derrick",
-    "civilization:oil_refinery",
+    "civilization:fired_heater",
     "civilization:coal_drill",
     "civilization:fuel_tank",
     "civilization:distillation_column",
@@ -41,6 +41,9 @@
     "civilization:smithy_part",
     "civilization:tannery_part",
     "civilization:oil_engine_part",
-    "civilization:coal_engine_part"
+    "civilization:coal_engine_part",
+    "civilization:fired_heater_part",
+    "civilization:distillation_column_part",
+    "civilization:condenser_part"
   ]
 }

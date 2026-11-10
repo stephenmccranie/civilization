@@ -33,7 +33,7 @@ final class AssemblyRecipes {
         add(jobs,"civilization:industrial_casing",8,item("civilization:steel_plate",4),item("civilization:copper_plate",4));
         add(jobs,"civilization:industrial_guardrail",16,item("civilization:copper_rod",6),item("civilization:iron_rod",10));
         add(jobs,"civilization:oil_derrick",1,item("civilization:iron_plate",4),item("civilization:copper_plate",3),item("civilization:machine_parts",2));
-        add(jobs,"civilization:oil_refinery",1,item("civilization:copper_plate",3),item("minecraft:brick",3),item("civilization:machine_parts",1),item("civilization:iron_plate",2));
+        add(jobs,"civilization:fired_heater",1,item("civilization:copper_plate",3),item("minecraft:brick",3),item("civilization:machine_parts",1),item("civilization:iron_plate",2));
         add(jobs,"civilization:prospecting_rod",1,item("civilization:iron_rod",1),item("minecraft:stick",2));
         add(jobs,"civilization:refinery_flue",4,item("civilization:industrial_casing",4));
         add(jobs,"civilization:refinery_port",2,item("civilization:iron_plate",4),item("civilization:copper_plate",1));

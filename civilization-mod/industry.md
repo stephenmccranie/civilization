@@ -39,14 +39,14 @@ Coal extraction replaces the dense block with air and puts **16 Coal** into the 
 
 | Machine | Shape and connections |
 | --- | --- |
-| Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its right |
-| Fired Heater | Five-wide brick hearth, riveted steel jacket, stepped crown and narrow rear flue; eight blocks tall; crude intake left, heated output right |
-| Distillation Column | Five-wide, eleven-high clipped-corner vessel with tapered crown; intake low on the left, vapor outlet high on the right, lubricating-oil outlet low on the right |
-| Air-Cooled Condenser | Seven-wide horizontal vessel with rounded edges, cooling-grille faces and steel cradles; vapor intake left, fuel outlet right |
+| Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its left |
+| Fired Heater | Fully modeled coal-fired still: a riveted black still shell lying front to back in a red-brick furnace setting, with a firedoor under a round brick arch at the front, a manhole dome, safety valve and dial thermometer on its crown, and a stepped breeching carrying a tall stack at the back. 3×6 blocks and seven tall at the stack, with the ground-level controller, the firedoor, at the front middle; crude intake in the right wall and heated output in the left wall, both one block up and two blocks back |
+| Distillation Column | Fully modeled refinery tower: a slender sixteen-sided riveted black tower in four plate rings on a red-brick base, with a cleanout door under a brick arch at the front, a bolted manhole and a dial thermometer on the tower's front, and a domed head whose vapor line bends over and runs down the tower's left side into the base. 3×4 blocks and nine and a half tall, with the ground-level controller, the cleanout door, at the front middle; hot oil intake in the right wall and vapor outlet in the left wall, both one block up and two blocks back in line with the heater's ports, and the lubricating-oil outlet at ground level in the left wall, one block back |
+| Air-Cooled Condenser | Fully modeled aerial condenser: an open rack of twelve gilled cooling pipes, three tiers of four, running between two riveted black header boxes that each stand on a red-brick plinth, with a steel trestle at mid-span and a look box with a brass sight glass on the ground in front, piped to the lowest tier. 7×3 blocks and three tall, standing one block behind the ground-level controller, the look box, at the front middle; vapor intake low in the right header's outer end and fuel outlet low in the left header's, both one block up and two blocks back in line with the column's ports |
 | Coal Drill | Extraction frame; fuel intake at back, lubricant intake at left, coal hopper output below |
 | Liquid Tank | Single block holding 16,000 mB of one fluid; every side accepts or supplies it |
 
-Sides are as seen facing the controller's front. The heater, column and condenser are built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, Refinery Flues, bricks, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
+Sides are as seen facing the controller's front. The Coal Drill is built with the ordinary [construction guide](machines.md#building-with-a-controller) from stone, Industrial Casing and its saw-cut halves. A machine's ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
 
 ### Oil Derrick construction
 
@@ -55,6 +55,18 @@ Place the Oil Derrick controller at ground level (holding it previews the whole 
 The bill is **165 planks, 7 stone or cobblestone, 4 Iron Plates, 2 Machine Parts and 1 Refinery Port** across 31 sections: footings (7 stone), 20 frame panels (6 planks each), the middle gallery's two pairs of sides (8 planks each), the crown gallery's two pairs of sides (5 and 4 planks), floor (8 planks), walking beam (6 planks), bull wheel (6 planks), crown block and drill line (4 Iron Plates), band wheel (2 Machine Parts) and output port. Sections may use different plank species, each from one held stack, without changing the timber texture. Each section checks loaded space, build limits, claims, placement permission and entities; blocked sections consume nothing. Placement labor applies (356 kcal for the body before modifiers, plus the port). Creative construction is free.
 
 Completed sections are solid immediately. **Breaking a frame section or the port removes only that section**, refunds its paid materials once and stops the derrick until it is repaired with the same held-item interaction. Breaking the controller dismantles the derrick, refunding the remaining materials once and dropping its inventory and controller; the well and its casing stay in the ground and a new derrick drills afresh; Creative-built sections refund nothing. Partial progress and payments are saved. Drain the derrick's liquid before removing the controller.
+
+### Fired Heater construction
+
+The Fired Heater is built from its controller the same way: place the firedoor at ground level, where the heater will extend one block to either side and five behind, and right-click it with each section's material. The bill is **Footing** 4 stone or cobblestone, **Furnace walls** 6 brick blocks, **Furnace front** 4 brick blocks, **Still shell** 6 Industrial Casing, **Manhole and gauges** 2 Copper Plates, **Breeching** 4 brick blocks, **Stack** 3 Refinery Flues, and a Refinery Port for each of the crude intake and the hot oil outlet. Sections are solid as they are built, break and refund one at a time, and breaking the controller dismantles the heater, as for the derrick.
+
+### Distillation Column construction
+
+The Distillation Column is built the same way: place the cleanout door at ground level, where the column will extend one block to either side and three behind, and right-click it with each section's material. The bill is **Footing** 3 stone or cobblestone, **Base** 8 brick blocks, **Lower shell** and **Upper shell** 6 Industrial Casing each, **Head** 3 Industrial Casing, **Vapor line** 4 Refinery Flues, **Manhole and gauge** 2 Copper Plates, and a Refinery Port for each of the hot oil intake, the vapor outlet and the lubricating oil outlet. Sections and the controller break and refund as the heater's do.
+
+### Air-Cooled Condenser construction
+
+The Air-Cooled Condenser is built the same way: place the look box at ground level, where the rack will stand one block behind it and extend three blocks to either side, and right-click it with each section's material. The bill is **Footings** 2 stone or cobblestone, **Plinths** 4 brick blocks, **Headers** 6 Industrial Casing, **Trestle** 4 Iron Plates, **Lower pipes**, **Middle pipes** and **Upper pipes** 5 Cooling Grilles each, and a Refinery Port for each of the vapor intake and the fuel outlet. Sections and the controller break and refund as the heater's do.
 
 ### Oil well
 
@@ -66,7 +78,7 @@ The tower renderer stays drawn when the controller's chunk section leaves view (
 
 ### Recipes
 
-All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Structural blocks are extra; controller tooltips and guides give each shell's bill.
+All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Structural blocks are extra; each machine's construction section below gives its bill, and its controller names the next section's materials.
 
 | Item | Ingredients / yield |
 | --- | --- |
@@ -100,7 +112,7 @@ All are ten-second [Assembly Bench](manufacturing.md#assembly-bench) jobs. Struc
 
 One Oil Derrick driven at full power is the throughput unit: **50 mB/s crude** feeds one heater and one column, then one condenser at **40 mB/s refined fuel**, plus **10 mB/s lubricant and one Sulfur per 20 seconds**. Two lubricated Coal Drills use 32 mB/s together, leaving 8 mB/s for engines. These are loaded rates with coal supplied and outputs clear; a Coal Engine halves the derrick's rate; startup fills batch buffers first and downstream flow pulses with completed batches. Crude lines reach the 50 mB/s pipe capacity. Empty search stretches, depleted or unloaded deposits, missing coal or backed-up coproducts interrupt supply, so keep lubricant and sulfur moving as well as fuel.
 
-The Coal Engine and Heater burn Coal (250 mB pumped or heated per Coal drawn; [coal budget](machines.md#coal-budget)), after [warming up](machines.md#coal-fires) on about 2 and 11 Coal. Eight Coal drawn plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
+The Coal Engine and Heater burn Coal (250 mB pumped or heated per Coal drawn; [coal budget](machines.md#coal-budget)), after [warming up](machines.md#coal-fires) on about 2 and 10 Coal. Eight Coal drawn plus crude stock yields 800 mB fuel, 200 mB lubricant and one Sulfur; eight lubricated drill batches spend 640 mB of that fuel and 80 mB lubricant to extract 128 Coal from a separate finite seam. This is a geological bootstrap, not renewable energy. Charcoal, biomass and raw crude cannot replace the required fuels.
 
 The products have distinct uses: **fuel powers machines, oil lubricates moving machinery, sulfur makes [fertilizer](machines.md#fertilizer-furnace)**. Heated crude and vapor are internal streams. Condensation is air-cooled: no water, pressure or electrical network. This is deliberately simplified petroleum processing: sulfur recovery and lubricant finishing are folded into the column, and ratios are game tuning rather than a chemical mass balance.
 
@@ -108,7 +120,7 @@ The products have distinct uses: **fuel powers machines, oil lubricates moving m
 
 ### Controls
 
-Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater shows a warm inspection slit while processing and smokes from its actual flue. Completed batches and coal use are logged in the energy journal.
+Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater's firedoor grate and inspection slit glow while its fire burns, and its stack smokes while the fire burns; the column and the condenser show their state only on their screens. Completed batches and coal use are logged in the energy journal.
 
 ## Liquids and pipes
 
@@ -116,7 +128,7 @@ Every process buffer holds **4,000 mB**; a Liquid Tank holds **16,000 mB** of on
 
 Connect pipes between flanged ports, tanks and extractor connections; they turn corners and run vertically. Pipes are always open, with no valves. Each pipe segment has a shared **25 mB per ten-tick step (50 mB/s)** budget spent only by fluid actually delivered and shared by every route through it, across pushing, pulling, branches and fluid types. Unused capacity does not accumulate and is not saved. Direct adjacent-port operations move at most 25 mB per call. Tanks are passive buffers and do not push to each other.
 
-Routing explores at most **128 pipes per network** and never loads chunks; an oversized network transfers nothing, so split long runs with buffer tanks. Loops cannot duplicate delivery. Endpoints are visited in deterministic order without fair branch scheduling. Pipes hold no fluid inventory; separate lines are recommended for legibility but not required. Clear inspection windows show confirmed transfers — brown crude, orange heated crude, pale vapor, amber refined fuel, olive lubricating oil — with moving highlights for direction, clearing 0.8 seconds after the last transfer; mixed traffic shows the latest fluid per arm.
+Routing explores at most **128 pipes per network** and never loads chunks; an oversized network transfers nothing, so split long runs with buffer tanks. Loops cannot duplicate delivery. Endpoints are visited in deterministic order without fair branch scheduling. Pipes hold no fluid inventory; separate lines are recommended for legibility but not required. Pipes are slim black iron and run unbroken from block to block. Flanges stand only on the arms of a bend, tee or cross, as the blank on a dead end, and against a port, tank or engine. Every fourth block of a straight run carries a short sight glass, counted from the pipe's position, so a straight link shorter than four blocks may have none; a pipe joined to nothing carries one too. The glass is dark when idle and shows confirmed transfers — brown crude, orange heated crude, pale vapor, amber refined fuel, olive lubricating oil — with moving highlights for direction, clearing 0.8 seconds after the last transfer; mixed traffic shows the latest fluid.
 
 Remote ports expose only their assigned controller buffer, on the outward face, while the controller and whole structure are present; a port cannot serve two vessels.
 
@@ -140,7 +152,7 @@ A small oilfield steam engine, **2 blocks wide, 3 long and 4 tall**: a vertical 
 
 **Construction.** The controller comes from the Assembly Bench ([recipes](#recipes)) and is the firebox at the engine's front corner; the engine extends one block to the controller's left as you face it and two behind. It is built in sections by right-clicking the controller with each section's material: **Firebox** 4 bricks, **Boiler** 6 Iron Plates, **Stack** 2 Iron Plates, **Engine bed** 6 planks, **Cylinder** 4 Iron Plates, **Running gear** 2 Machine Parts, **Flywheel** 6 Iron Rods and **Steam piping** 2 Copper Plates.
 
-**Operation.** Coal goes into the firebox's two slots through the screen or a hopper, and the fire is lit and kept like every [coal fire](machines.md#coal-fires); rain does not reach it behind the firedoor. Its four bricks of masonry warm up on about 2 Coal. At working heat it gives up to **half power**, drawing from the firebox's stored heat exactly the work it gives: one Coal for every five full-power seconds, ten seconds of its own half power. The firedoor glows and the stack smokes while the fire burns; while it drives a machine the flywheel turns and the stack puffs with every stroke. It does not drive boats.
+**Operation.** Coal goes into the firebox's two slots through the screen or a hopper, and the fire is lit and kept like every [coal fire](machines.md#coal-fires). Its four bricks of masonry warm up on about 2 Coal. At working heat it gives up to **half power**, drawing from the firebox's stored heat exactly the work it gives: one Coal for every five full-power seconds, ten seconds of its own half power. The firedoor glows and the stack smokes while the fire burns; while it drives a machine the flywheel turns and the stack puffs with every stroke. It does not drive boats.
 
 ## Hot-Bulb Engine
 
@@ -169,6 +181,7 @@ An incomplete or unloaded shell stops all transfers but keeps stock. Mining a st
 
 ## Save compatibility
 
+- **Rebuilt machines are not converted.** The Fired Heater replaced `civilization:oil_refinery`, whose blocks and items no longer load. A Distillation Column or Air-Cooled Condenser controller placed while they were block structures needs its sections built once its old shell is cleared. Pipes from older saves take their current shape when first loaded.
 - **Retrofit oil in New Surv.** A world-root `civilization-retrofit-oil.flag` opts a saved world's already generated chunks into a one-time oil backfill as they load. It uses the same deposit sites as new terrain, adds the seep and source at an unobstructed natural surface, and replaces only natural underground rock with oil or the reservoir cavity, leaving ores, tunnels and construction (player-placed plain stone may be replaced). Each processed chunk saves a completion marker, so later visits and extraction never refill it. Only the New Surv save carries the flag; other old worlds gain no physical oil.
 - **Generated sites.** Deposit placement belongs to the world generator, so terrain generated before a placement change keeps its old bodies while prospecting and extractor lookup follow the current rules. Keep generator and deposit rules fixed within a world; evaluate changes in a fresh world.
 - **Authored deposits.** A map may define deposit geometry in vanilla command storage `civilization:authored_deposits`: a list per dimension ID of up to 64 compounds with `x`, `y`, `z`, `kind` (0 coal, 1 oil) and `radius` (8–32). Authored sites take precedence where they contain a position; they define where machines search, never quantities — stock is still the actual blocks. Ordinary worlds have no entries.

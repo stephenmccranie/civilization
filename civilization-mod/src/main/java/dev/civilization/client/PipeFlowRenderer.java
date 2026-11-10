@@ -10,32 +10,31 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-/** Colored flow inside clear static pipe geometry; empty pipes render no backing. */
+/** The liquid behind the four windows of a pipe's sight glass, drawn while the pipe carries a transfer. */
 @EventBusSubscriber(modid="civilization",bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
 public final class PipeFlowRenderer implements BlockEntityRenderer<PipeFlowEntity> {
     private static final ResourceLocation WHITE=ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    /** From the glass model: half the glass's length, the liquid's distance from the pipe's axis and half a window's width. */
+    private static final float GLASS=2f/16,DEPTH=2.5f/16,HALF=1f/16;
+    /** Steps of the moving highlight along the glass. */
+    private static final int BANDS=8;
     public PipeFlowRenderer(BlockEntityRendererProvider.Context context){}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.PIPE_ENTITY.get(),PipeFlowRenderer::new);}
     @Override public int getViewDistance(){return 48;}
     @Override public void render(PipeFlowEntity pipe,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
-        if(pipe.getLevel()==null)return;
-        var state=pipe.getBlockState();var axes=java.util.EnumSet.noneOf(Direction.Axis.class);
-        for(var d:Direction.values())if(state.getValue(FluidPipeBlock.CONNECTIONS.get(d)))axes.add(d.getAxis());
+        if(pipe.getLevel()==null||!pipe.getBlockState().getValue(FluidPipeBlock.GLASS))return;
         double time=pipe.getLevel().getGameTime()+partial;
-        var v=buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE));
-        for(var d:Direction.values()){
-            if(!state.getValue(FluidPipeBlock.CONNECTIONS.get(d)))continue;
-            int i=d.ordinal();boolean active=pipe.until[i]>time;
-            if(!active)continue;
-            int color=PipeFlowEntity.color(pipe.fluids[i]);
+        // A glass lies on a straight pipe, so a transfer either way passes one of these sides.
+        for(var d:new Direction[]{Direction.UP,Direction.SOUTH,Direction.EAST}){
+            int i=d.ordinal();if(pipe.until[i]<=time)continue;
+            int color=PipeFlowEntity.color(pipe.fluids[i]);var v=buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE));
             pose.pushPose();pose.translate(.5,.5,.5);pose.mulPose(d.getRotation());
-            for(int face=0;face<8;face++){
-                pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(face*45));
-                float start=axes.size()>1?.251f:0;
-                for(int n=0;n<8;n++){
-                    float a=start+(.5f-start)*n/8,b=start+(.5f-start)*(n+1)/8;
+            for(int side=0;side<4;side++){
+                pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(side*90));
+                for(int n=0;n<BANDS;n++){
+                    float a=GLASS*(2f*n/BANDS-1),b=GLASS*(2f*(n+1)/BANDS-1);
                     double wave=.78+.22*Math.cos((a*4-pipe.signs[i]*time/14)*Math.PI*2);
-                    quad(v,pose.last(),-.0901f,.0901f,a,b,.2175f,tint(color,wave),light,overlay);
+                    quad(v,pose.last(),-HALF,HALF,a,b,DEPTH,tint(color,wave),light,overlay);
                 }
                 pose.popPose();
             }

@@ -24,7 +24,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 public final class MachinePreview {
     /** A structure requirement, or, without a part, a cell the held block's click fills. Its look is prepared outside rendering. */
     private record Ghost(BlockPos pos, AABB box, MachineStructure.Part part, BlockState shown, ModelData data, boolean wrong) {
-        String label() { return part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : part.units()==3?"_eighth":"_quarter"); }
+        String label() { return part.material() + (part.units() == 4 ? "" : part.units() == 2 ? "_half" : "_quarter"); }
     }
     private record LayoutKey(Level level,BlockPos at,BlockState state) {}
     private record LayoutPart(BlockPos pos,MachineStructure.Part part,net.minecraft.core.Direction front,AABB box) {}
@@ -95,10 +95,8 @@ public final class MachinePreview {
         ghosts = List.copyOf(next);
         blockers = ghosts.stream().map(ghost -> ghost.box().deflate(.0001)).distinct().toList();
         var counts = new java.util.LinkedHashMap<Need,Integer>();
-        for (var ghost : ghosts) if (ghost.part() != null && !ghost.part().material().equals("air")) {
-            String material = ghost.part().material().endsWith("_port") ? "port" : ghost.part().material();
-            counts.merge(new Need(material, ghost.part().units()), 1, Integer::sum);
-        }
+        for (var ghost : ghosts) if (ghost.part() != null && !ghost.part().material().equals("air"))
+            counts.merge(new Need(ghost.part().material(), ghost.part().units()), 1, Integer::sum);
         needs = java.util.Collections.unmodifiableMap(counts);
     }
 

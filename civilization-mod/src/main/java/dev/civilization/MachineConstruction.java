@@ -84,8 +84,7 @@ public final class MachineConstruction {
                 continue;
             }
             BlockState state = MachineStructure.shape(part, front);
-            if (part.units() == 4 && !part.material().endsWith("_port") && !part.material().equals("guardrail")
-                    && !part.material().startsWith("engine_") && !part.material().equals("arena_gate") && stack.getItem() instanceof BlockItem block)
+            if (part.units() == 4 && !part.material().equals("arena_gate") && stack.getItem() instanceof BlockItem block)
                 state = block.getBlock().defaultBlockState();
             var shape = part.units() == 4 ? state.getCollisionShape(level, pos)
                     : Shapes.create(CutBlock.bounds(MachineStructure.shape(part, front)));

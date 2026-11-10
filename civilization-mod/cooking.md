@@ -25,7 +25,7 @@ A lit campfire roasts raw meat, fish, potatoes and kelp as in vanilla: four at o
 
 ## Prototype Stove
 
-A cast-iron stovetop on an open steel stand with one removable skillet, a rotary heat dial and four ember vents. Get it from the Civilization creative tab or `/give @s civilization:prototype_stove`; there is no Survival recipe. Place it under cover so its fire can be lit.
+A cast-iron stovetop on an open steel stand with one removable skillet, a rotary heat dial and four ember vents. Get it from the Civilization creative tab or `/give @s civilization:prototype_stove`; there is no Survival recipe.
 
 1. Open the stove and add **2 raw potatoes, 2 carrots and 1 bread**, plus Coal.
 2. Click **Load batch**, then the striker to light the fire ([ignition rules](machines.md#coal-fires)).

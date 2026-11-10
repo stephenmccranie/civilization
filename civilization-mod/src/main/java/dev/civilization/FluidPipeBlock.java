@@ -9,26 +9,41 @@ import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.*;
 public final class FluidPipeBlock extends Block implements net.minecraft.world.level.block.EntityBlock {
-    public static final BooleanProperty OPEN=BooleanProperty.create("open");
-    public static final java.util.Map<Direction,BooleanProperty> CONNECTIONS=PipeBlock.PROPERTY_BY_DIRECTION;
-    public FluidPipeBlock(Properties p){super(p);var s=stateDefinition.any().setValue(OPEN,true);for(var prop:CONNECTIONS.values())s=s.setValue(prop,false);registerDefaultState(s);}
-    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(OPEN);for(var prop:CONNECTIONS.values())b.add(prop);}
-    private boolean connects(LevelAccessor l,BlockPos p,Direction d){var s=l.getBlockState(p.relative(d));return s.is(this)||(s.getBlock() instanceof BulkBlock bulk&&bulk.liquid)||(s.getBlock() instanceof OilEngineBlock&&d.getAxis()!=Direction.Axis.Y&&d.getAxis()!=s.getValue(CivicBlock.FACING).getAxis())||s.is(IndustrialContent.PORT.get())||s.getBlock() instanceof IndustrialBlock;}
-    @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){var s=defaultBlockState();for(var d:Direction.values())s=s.setValue(CONNECTIONS.get(d),connects(c.getLevel(),c.getClickedPos(),d));return s;}
-    @Override protected BlockState updateShape(BlockState s,Direction d,BlockState other,LevelAccessor l,BlockPos p,BlockPos n){return s.setValue(CONNECTIONS.get(d),connects(l,p,d));}
+    /** What a side joins: nothing, the next pipe of a straight run, or a flange: a machine, or any arm of a bend, tee or cross. */
+    public enum Side implements net.minecraft.util.StringRepresentable{NONE,PIPE,FLANGE;@Override public String getSerializedName(){return name().toLowerCase(java.util.Locale.ROOT);}}
+    public static final java.util.Map<Direction,EnumProperty<Side>> SIDES=new java.util.EnumMap<>(Direction.class);
+    static{for(var d:Direction.values())SIDES.put(d,EnumProperty.create(d.getName(),Side.class));}
+    /** A sight glass: on a straight pipe every fourth block along any axis, and on a pipe joined to nothing. */
+    public static final BooleanProperty GLASS=BooleanProperty.create("glass");
+    public FluidPipeBlock(Properties p){super(p);var s=stateDefinition.any().setValue(GLASS,true);for(var prop:SIDES.values())s=s.setValue(prop,Side.NONE);registerDefaultState(s);}
+    @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(GLASS);for(var prop:SIDES.values())b.add(prop);}
+    private Side joint(BlockState s,Direction d){
+        if(s.is(this))return Side.PIPE;
+        return (s.getBlock() instanceof BulkBlock bulk&&bulk.liquid)||(s.getBlock() instanceof OilEngineBlock&&d.getAxis()!=Direction.Axis.Y&&d.getAxis()!=s.getValue(CivicBlock.FACING).getAxis())||s.is(IndustrialContent.PORT.get())||s.getBlock() instanceof IndustrialBlock?Side.FLANGE:Side.NONE;
+    }
+    /** The whole state follows from the neighbours and the position. */
+    private BlockState shaped(LevelAccessor l,BlockPos p){
+        var joints=new java.util.EnumMap<Direction,Side>(Direction.class);var axes=java.util.EnumSet.noneOf(Direction.Axis.class);
+        for(var d:Direction.values()){var j=joint(l.getBlockState(p.relative(d)),d);if(j!=Side.NONE){joints.put(d,j);axes.add(d.getAxis());}}
+        var s=defaultBlockState().setValue(GLASS,joints.isEmpty()||joints.size()==2&&axes.size()==1&&Math.floorMod(p.getX()+p.getY()+p.getZ(),4)==0);
+        for(var d:Direction.values())s=s.setValue(SIDES.get(d),!joints.containsKey(d)?Side.NONE:axes.size()>1?Side.FLANGE:joints.get(d));
+        return s;
+    }
+    @Override public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext c){return shaped(c.getLevel(),c.getClickedPos());}
+    @Override protected BlockState updateShape(BlockState s,Direction d,BlockState other,LevelAccessor l,BlockPos p,BlockPos n){return shaped(l,p);}
     @Override protected void onPlace(BlockState s,Level l,BlockPos p,BlockState old,boolean moving){
         super.onPlace(s,l,p,old,moving);if(!l.isClientSide&&!old.is(this))l.scheduleTick(p,this,1);
     }
     @Override protected void tick(BlockState s,net.minecraft.server.level.ServerLevel l,BlockPos p,net.minecraft.util.RandomSource random){
-        var next=s.setValue(OPEN,true);for(var d:Direction.values())next=next.setValue(CONNECTIONS.get(d),connects(l,p,d));
+        var next=shaped(l,p);
         if(next!=s)l.setBlockAndUpdate(p,next);
     }
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){
         var axes=java.util.EnumSet.noneOf(Direction.Axis.class);
-        for(var d:Direction.values())if(s.getValue(CONNECTIONS.get(d)))axes.add(d.getAxis());
+        for(var d:Direction.values())if(s.getValue(SIDES.get(d))!=Side.NONE)axes.add(d.getAxis());
         if(axes.isEmpty())return Block.box(4,4,0,12,12,16);
         var shape=axes.size()>1?Block.box(4,4,4,12,12,12):Shapes.empty();
-        for(var d:Direction.values())if(s.getValue(CONNECTIONS.get(d)))shape=Shapes.or(shape,switch(d){
+        for(var d:Direction.values())if(s.getValue(SIDES.get(d))!=Side.NONE)shape=Shapes.or(shape,switch(d){
             case DOWN->Block.box(4,0,4,12,8,12);case UP->Block.box(4,8,4,12,16,12);
             case NORTH->Block.box(4,4,0,12,12,8);case SOUTH->Block.box(4,4,8,12,12,16);
             case WEST->Block.box(0,4,4,8,12,12);case EAST->Block.box(8,4,4,16,12,12);});

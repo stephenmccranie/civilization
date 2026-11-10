@@ -43,8 +43,8 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron; iron ingots through every glow colour in the hotbar, held white-hot and cherry red in first person and cherry red in third, lighting the floor around them, then the same night without shaders and dropped white-yellow, cherry red and dull red, by day and night |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
-| `pipes` | Empty and flowing glass pipes, connections and flanges |
-| `industry` | Refinery, an Oil Derrick pumping with a Coal Engine driving it, construction cabinet, industrial icons, and a boat helm and guardrail run |
+| `pipes` | A long run of each liquid with its sight glasses, flowing both ways and then empty; iron pipes as a length, bend, tee, six-armed cross, riser, blank ends, a lone pipe and a cluster of bends; a pipe at a Refinery Port in a brick wall, at the Fired Heater's ports and at a Distillation Column's port; the runs and machines at night; the pipe held and both icons |
+| `industry` | Refinery, an Oil Derrick pumping with a Coal Engine driving it, construction cabinet, industrial icons, the boat helm from its pilot's side and a guardrail run, the Fired Heater burning from the front and rear by day and its firedoor at night, and the Distillation Column and the Air-Cooled Condenser each from the front and rear by day and at night |
 | `derrick-guide` | Oil Derrick section guides placed by real clicks, its beam working from a Coal Engine, day and night |
 | `engine` | Hot-Bulb Engine stopped, heating with lit lamp ports and the blowlamp sounding, kicked over and running with the flywheel turning and the stack knocking, its menu and its section guide |
 | `deposits` | Generated coal and oil bodies across chunk borders, before and after extraction |
@@ -66,7 +66,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `canisters` | All four canisters in frames, inventory and hand |
 | `cloth`, `sulfur`, `parts`, `supplies`, `foods`, `manufactured`, `components`, `tools`, `minerals`, `buckets` | Item art in frames, inventory slots and hand |
 | `paterson` | Paterson revolver input, reload, hammer and recoil |
-| `boat` | Freeform boat placement, gears, steering and throttle |
+| `boat` | Freeform building onto a launched hull; the helm at rest, its wheel turned to port and starboard and its telegraph in each engine order by real keys; the boat under way from the pilot's view, steering, and its turned wheel from the deck; reverse and neutral; the helm carried in the Hand with its placement preview and icon, in the inventory, in third person and placed by a real click |
 | `airship` | Airship assembly, flight controls and rider retention |
 | `weather` | Two clients: local rain beside a dry neighbouring district |
 | `gladiator` | Two clients: arena menus, stakes, knockout and winnings |
@@ -90,7 +90,7 @@ The report is `runs/perf/report/report.md`, with `report.json` for comparing run
 
 A fixture runs its phases as separate server processes on one fresh flat world in `runs/fixture`.
 
-- `boat`: `seed` builds and fuels a loaded boat, then `reload` confirms its engine fuel, oil, condition and cargo after a restart.
+- `boat`: `seed` builds and fuels a loaded boat, then `reload` confirms its cargo and its engine's oil, condition and fuel after a restart, the fuel less only what the running engine has idled away since.
 - `airship`: `seed` assembles a loaded airship, then `reload` confirms its power and cargo after a restart.
 - `coal`: `seed` leaves raw coal in a struck face, piles, a falling and a blocked batch, a cart, a screen and a stored shovel, stopping the server while a chunk is still falling and an undercut pile's fall is still scheduled; `reload` counts every unit after the restart and again after the chunk has unloaded and loaded.
 - `thermal`: the [thermal laboratory](heat.md). `check` records heating and cooling at reference stations into `measurements.csv`, and `reload` confirms the field survives a restart. `-Phase physics` runs the reference physics checks. `-Phase manual` opens the laboratory as an interactive server on `localhost:25567` with `/thermal_lab` commands.

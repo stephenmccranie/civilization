@@ -12,7 +12,7 @@ public final class MachineStatus {
         private Industry(){}
         public static final int READY=0, INCOMPLETE=1, WRONG_SITE=2, DEPLETED=3,
                 OUTPUT_FULL=4, NEEDS_FUEL=5, NEEDS_INPUT=6, WORKING=7,
-                UNLOADED=8, CLAIM_BLOCKED=9, SEARCHING=10, FIRE_UNLIT=11, WET=12, WARMING=13,
-                NEEDS_CASING=14, BLOCKED=15, NO_ENGINE=16, NEEDS_POWER=17;
+                UNLOADED=8, CLAIM_BLOCKED=9, SEARCHING=10, FIRE_UNLIT=11, WARMING=12,
+                NEEDS_CASING=13, BLOCKED=14, NO_ENGINE=15, NEEDS_POWER=16;
     }
 }

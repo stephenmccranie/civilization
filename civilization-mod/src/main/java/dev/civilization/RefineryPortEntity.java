@@ -29,9 +29,9 @@ public final class RefineryPortEntity extends BlockEntity {
         for(var part:IndustrialStructure.parts(m.kind))if(part.material().equals(role)&&MachineStructure.position(controller,m.front(),part).equals(worldPosition))return m;
         return null;
     }
-    public net.minecraft.network.chat.Component description(){var m=owner();return net.minecraft.network.chat.Component.literal(m==null?"Unbound port - complete the multiblock":m.getDisplayName().getString()+" | "+(role.equals("aux_port")?"Lubricating oil output":role.equals("input_port")?"Intake":"Output"));}
+    public net.minecraft.network.chat.Component description(){var m=owner();return net.minecraft.network.chat.Component.literal(m==null?"Port without a machine · right-click a machine's controller with ports to fit them":m.getDisplayName().getString()+" | "+(role.equals("aux_port")?"Lubricating oil output":role.equals("input_port")?"Intake":"Output"));}
     public boolean boundTo(BlockPos at){return at.equals(controller);}
-    public boolean canBind(IndustrialBlockEntity m){var old=owner();return old==null||old==m||!IndustrialStructure.complete(level,old.getBlockPos(),old.front(),old.kind);}
+    public boolean canBind(IndustrialBlockEntity m){var old=owner();return old==null||old==m||!IndustrialStructure.complete(old);}
     public void bind(IndustrialBlockEntity m,String role,Direction side){
         if(m.model()!=null&&!assembly){assembly=true;setChanged();level.scheduleTick(worldPosition,getBlockState().getBlock(),100);}
         if(!m.getBlockPos().equals(controller)||!this.role.equals(role)){controller=m.getBlockPos();this.role=role;setChanged();level.updateNeighborsAt(worldPosition,getBlockState().getBlock());}
@@ -39,7 +39,7 @@ public final class RefineryPortEntity extends BlockEntity {
     }
     public IFluidHandler handler(Direction side){return new IFluidHandler(){
         private net.neoforged.neoforge.fluids.capability.templates.FluidTank tank(){
-            var m=owner();if(m==null||isRemoved()||side!=getBlockState().getValue(RefineryPortBlock.FACING)||!Chunks.loaded(level,worldPosition.relative(side))||!CivicAccess.boundary(level,controller,worldPosition)||!CivicAccess.boundary(level,worldPosition,worldPosition.relative(side))||!IndustrialStructure.complete(level,controller,m.front(),m.kind))return null;
+            var m=owner();if(m==null||isRemoved()||side!=getBlockState().getValue(RefineryPortBlock.FACING)||!Chunks.loaded(level,worldPosition.relative(side))||!CivicAccess.boundary(level,controller,worldPosition)||!CivicAccess.boundary(level,worldPosition,worldPosition.relative(side))||!IndustrialStructure.complete(m))return null;
             return role.equals("input_port")?m.input:role.equals("aux_port")?m.lubricant:m.output;
         }
         public int getTanks(){return 1;}

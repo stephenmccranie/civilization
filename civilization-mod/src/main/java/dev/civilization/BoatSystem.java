@@ -90,12 +90,12 @@ public final class BoatSystem {
     public static void input(ServerPlayer p,int throttle,int steer,boolean exit){for(var s:boats(p.serverLevel())){var d=drives.get(s.getUniqueId());if(d!=null&&p.getUUID().equals(d.pilot)){if(exit){release(d,p);return;}d.throttle=Math.clamp(d.throttle+Math.clamp(throttle,-1,1),-1,2);d.steer=Math.clamp(steer,-1,1);d.last=p.serverLevel().getGameTime();return;}}}
     private static Drive drive(ServerSubLevel s){return drives.computeIfAbsent(s.getUniqueId(),k->{var d=new Drive();d.throttle=s.getLevel().getBlockState(helm(s)).getOptionalValue(BoatHelmBlock.GEAR).orElse(1)-1;return d;});}
     private static String gear(int n){return switch(n){case -1->"REVERSE";case 1->"SLOW";case 2->"FAST";default->"NEUTRAL";};}
-    private static void console(ServerSubLevel s,int gear){
+    private static void console(ServerSubLevel s,Drive d){
         var l=s.getLevel();var pos=helm(s);var state=l.getBlockState(pos);if(!state.is(BoatContent.HELM.get()))return;
         var panel=BoatHelmBlock.other(pos,state);
         // Upgrade old single-block helms only into empty space; never replace cabin or cargo.
         if(l.getBlockState(panel).isAir())l.setBlockAndUpdate(panel,state.setValue(BoatHelmBlock.PANEL,true));
-        for(var p:List.of(pos,panel)){var b=l.getBlockState(p);if(b.is(BoatContent.HELM.get())&&b.getValue(BoatHelmBlock.GEAR)!=gear+1)l.setBlockAndUpdate(p,b.setValue(BoatHelmBlock.GEAR,gear+1));}
+        for(var p:List.of(pos,panel)){var b=l.getBlockState(p);if(!b.is(BoatContent.HELM.get()))continue;var shown=b.setValue(BoatHelmBlock.GEAR,d.throttle+1).setValue(BoatHelmBlock.STEER,d.steer+1);if(shown!=b)l.setBlockAndUpdate(p,shown);}
     }
     static void release(Drive d,ServerPlayer p){d.pilot=null;d.steer=0;if(p!=null)PacketDistributor.sendToPlayer(p,new BoatPayload.State(false));}
     private static void status(ServerSubLevel s,ServerPlayer p){var d=drive(s);p.displayClientMessage(Component.literal(String.format(Locale.ROOT,"%s | Engines %d | Output %.2f | Mass %.1f | W/S: gear · A/D: steer · Shift: leave helm",gear(d.throttle),d.engines,d.power,d.mass)),true);}
@@ -107,7 +107,7 @@ public final class BoatSystem {
             live.add(s.getUniqueId());var d=drive(s);var p=d.pilot==null?null:event.getServer().getPlayerList().getPlayer(d.pilot);
             var w=world(s,helm(s));
             if(p==null||!p.isAlive()||p.serverLevel()!=l||!owner(s,p)||p.position().distanceToSqr(w)>36||l.getGameTime()-d.last>15||!l.getBlockState(helm(s)).is(BoatContent.HELM.get()))release(d,p);
-            console(s,d.throttle);
+            console(s,d);
             d.surface=Double.NaN;
             var base=BlockPos.containing(w);
             boolean loaded=true;for(int x=-8;x<=8;x+=8)for(int z=-8;z<=8;z+=8)if(!Chunks.loaded(l,base.offset(x,0,z)))loaded=false;

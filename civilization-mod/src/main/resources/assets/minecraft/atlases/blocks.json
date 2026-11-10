@@ -8,6 +8,9 @@
     {"type": "single", "resource": "civilization:entity/textile_workshop"},
     {"type": "single", "resource": "civilization:entity/smithy"},
     {"type": "single", "resource": "civilization:entity/oil_engine"},
-    {"type": "single", "resource": "civilization:entity/coal_engine"}
+    {"type": "single", "resource": "civilization:entity/coal_engine"},
+    {"type": "single", "resource": "civilization:entity/fired_heater"},
+    {"type": "single", "resource": "civilization:entity/distillation_column"},
+    {"type": "single", "resource": "civilization:entity/condenser"}
   ]
 }

@@ -27,9 +27,11 @@ public final class BoatPersistenceCheck {
    Files.writeString(path,s.getUniqueId().toString());System.out.println("BOAT_SEED_PASS");
   }else{
    var id=java.util.UUID.fromString(Files.readString(path).trim());var s=BoatSystem.boats(l).stream().filter(b->b.getUniqueId().equals(id)).findFirst().orElseThrow();var engine=(OilEngineEntity)l.getBlockEntity(BoatSystem.helm(s).offset(0,0,1));
-   if(engine.fuel.getFluidAmount()!=1379||engine.oil.getFluidAmount()!=499||engine.condition!=.65||!engine.enabled||engine.warmup!=100){throw new IllegalStateException("Physical engine state changed across restart: fuel="+engine.fuel.getFluidAmount()+" oil="+engine.oil.getFluidAmount()+" condition="+engine.condition+" enabled="+engine.enabled+" warmup="+engine.warmup+" sections="+engine.build().sections+" status="+ModeledMachine.status(engine));}
+   // The seeded engine is left running, so since the restart it has idled for at most the ticks this check waited.
+   double fuel=engine.fuel.getFluidAmount()+engine.fuelCredit;
+   if(fuel>1379||fuel<1379-ticks*OilEngineEntity.IDLE_FUEL-1e-6||engine.oil.getFluidAmount()!=499||engine.condition!=.65||!engine.enabled||engine.warmup!=100){throw new IllegalStateException("Physical engine state changed across restart: fuel="+fuel+" oil="+engine.oil.getFluidAmount()+" condition="+engine.condition+" enabled="+engine.enabled+" warmup="+engine.warmup+" sections="+engine.build().sections+" status="+ModeledMachine.status(engine));}
    var chest=(ChestBlockEntity)l.getBlockEntity(BoatSystem.helm(s).offset(2,0,-2));if(!chest.getItem(0).is(KilnContent.STEEL.get())||chest.getItem(0).getCount()!=23)throw new IllegalStateException("Cargo lost across restart");
-   System.out.println("BOAT_RELOAD_PASS uuid="+id+" engine_fuel=1379 oil=499 condition=0.65 cargo=23");
+   System.out.println("BOAT_RELOAD_PASS uuid="+id+" engine_fuel="+fuel+" oil=499 condition=0.65 cargo=23");
   }server.halt(false);
  }catch(Exception ex){throw new IllegalStateException("Boat persistence check failed",ex);}}
 }
