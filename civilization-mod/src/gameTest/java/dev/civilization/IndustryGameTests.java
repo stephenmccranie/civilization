@@ -335,7 +335,7 @@ public final class IndustryGameTests {
     @GameTest(template="empty") public static void industrialStructuresRotateWithCutSlabs(GameTestHelper h){
         var at=h.absolutePos(new BlockPos(3,3,3));for(var block:java.util.List.of(IndustrialContent.DERRICK.get(),IndustrialContent.HEATER.get(),IndustrialContent.DRILL.get(),IndustrialContent.COLUMN.get(),IndustrialContent.CONDENSER.get()))for(var facing:Direction.Plane.HORIZONTAL){
             h.getLevel().setBlockAndUpdate(at,block.defaultBlockState().setValue(CivicBlock.FACING,facing));if(block.model()!=null)MachineFixture.build(h.getLevel(),at);else for(var part:IndustrialStructure.parts(block.kind))MachineStructure.placePart(h.getLevel(),at,facing,part);
-            h.assertTrue(IndustrialStructure.complete(h.getLevel(),at,facing,block.kind),"Shaped frame recognizes all rotations");if(block.model()!=null)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
+            h.assertTrue(IndustrialStructure.complete((IndustrialBlockEntity)h.getLevel().getBlockEntity(at)),"Shaped frame recognizes all rotations");if(block.model()!=null)h.getLevel().removeBlock(at,false);else for(var part:IndustrialStructure.parts(block.kind))h.getLevel().removeBlock(MachineStructure.position(at,facing,part),false);
         }h.succeed();
     }
 
@@ -410,14 +410,14 @@ public final class IndustryGameTests {
         pipe(h,mid);pipe(h,mid.west());pipe(h,mid.north());h.getLevel().setBlockAndUpdate(source,IndustrialContent.TANK.get().defaultBlockState());var tank=(IndustrialBlockEntity)h.getLevel().getBlockEntity(source);tank.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),1000),EXECUTE);
         ref.transfer();h.assertTrue(ref.input.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Bent pipes transfer exactly 25 mB per step");
         h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).cycle(FluidPipeBlock.GLASS));ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Changing a pipe's state cannot reset the shared pipe budget");
-        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).cycle(FluidPipeBlock.GLASS));h.getLevel().removeBlock(ref.getBlockPos().offset(0,3,3),false);ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Broken chimney prevents remote intake");
+        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).cycle(FluidPipeBlock.GLASS));h.getLevel().removeBlock(ref.getBlockPos().offset(0,3,3),false);
         var cap=h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,at,Direction.WEST);h.assertTrue(cap.fill(new FluidStack(IndustrialContent.CRUDE.get(),100),EXECUTE)==0,"Broken build also closes external capability");
         h.runAfterDelay(2,()->{
             var flow=(PipeFlowEntity)h.getLevel().getBlockEntity(mid);var dead=(PipeFlowEntity)h.getLevel().getBlockEntity(mid.north());
             h.assertTrue(flow.fluids[Direction.EAST.ordinal()]==1&&flow.signs[Direction.EAST.ordinal()]==1,"Crude flow points into heater");
             h.assertTrue(java.util.Arrays.stream(dead.until).allMatch(t->t==0),"Dead branch never displays flow");
             h.assertTrue(h.getLevel().getBlockState(mid).getValue(FluidPipeBlock.SIDES.get(Direction.EAST))==FluidPipeBlock.Side.FLANGE,"Authored pipe connects to flange after refresh");
-            h.runAfterDelay(18,()->{h.assertTrue(flow.until[Direction.EAST.ordinal()]<=h.getLevel().getGameTime(),"Stopped flow expires");h.succeed();});
+            h.runAfterDelay(18,()->{ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"A heater missing its still shell draws nothing once the pipes' budget renews");h.assertTrue(flow.until[Direction.EAST.ordinal()]<=h.getLevel().getGameTime(),"Stopped flow expires");h.succeed();});
         });
     }
     @GameTest(template="empty") public static void columnBlockedCoproductsAndSaveReload(GameTestHelper h){

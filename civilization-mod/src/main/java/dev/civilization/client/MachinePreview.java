@@ -95,10 +95,8 @@ public final class MachinePreview {
         ghosts = List.copyOf(next);
         blockers = ghosts.stream().map(ghost -> ghost.box().deflate(.0001)).distinct().toList();
         var counts = new java.util.LinkedHashMap<Need,Integer>();
-        for (var ghost : ghosts) if (ghost.part() != null && !ghost.part().material().equals("air")) {
-            String material = ghost.part().material().endsWith("_port") ? "port" : ghost.part().material();
-            counts.merge(new Need(material, ghost.part().units()), 1, Integer::sum);
-        }
+        for (var ghost : ghosts) if (ghost.part() != null && !ghost.part().material().equals("air"))
+            counts.merge(new Need(ghost.part().material(), ghost.part().units()), 1, Integer::sum);
         needs = java.util.Collections.unmodifiableMap(counts);
     }
 

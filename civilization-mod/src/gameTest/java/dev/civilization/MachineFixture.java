@@ -18,6 +18,13 @@ final class MachineFixture {
         var p=new FakePlayer(l,new GameProfile(UUID.randomUUID(),"machine-fixture"));p.setGameMode(GameType.CREATIVE);p.setPos(at.getX()+.5,at.getY()+1,at.getZ()+.5);
         if(!ModeledMachine.assemble(modeled,p))throw new IllegalStateException(model.id+" fixture could not assemble");
     }
+    /** An industrial machine facing north, built whole with its ports bound. */
+    static IndustrialBlockEntity industrial(ServerLevel l,IndustrialBlock block,BlockPos at){
+        l.setBlockAndUpdate(at,block.defaultBlockState());var m=(IndustrialBlockEntity)l.getBlockEntity(at);
+        if(m.model()!=null)build(l,at);
+        if(!IndustrialStructure.bind(m))throw new IllegalStateException("Incomplete fixture: "+block.kind);
+        return m;
+    }
     /** Chooses the level's next rolls so the next spark struck in it catches, or fails; the fire still pays and burns as it would. */
     static void spark(ServerLevel l,boolean catches){
         for(long seed=0;;seed++){var r=net.minecraft.util.RandomSource.create(seed);r.nextFloat();if((r.nextInt(3)==0)==catches){l.random.setSeed(seed);return;}}
