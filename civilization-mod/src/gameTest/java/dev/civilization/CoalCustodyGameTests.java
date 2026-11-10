@@ -264,6 +264,23 @@ public final class CoalCustodyGameTests {
         h.runAfterDelay(150, () -> { check.run(); h.succeed(); });
     }
 
+    @GameTest(template = "industrial", timeoutTicks = 100)
+    public static void flowingWaterCannotWashAwayPilesOrWorkedFaces(GameTestHelper h) {
+        var a = CoalMiningGameTests.face(h); var l = h.getLevel();
+        // A capped stone basin holding, in a row, a small pile, a water source and a worked face.
+        for (int x = -2; x <= 2; x++) for (int z = -1; z <= 1; z++) for (int y = -1; y <= 0; y++) l.setBlockAndUpdate(a.offset(x, y, z), STONE);
+        var source = a.below(); var pile = source.west(); var worked = source.east();
+        l.setBlockAndUpdate(pile, pile(8));
+        l.setBlockAndUpdate(worked, CoalMiningContent.FACE.get().defaultBlockState());
+        ((CoalWorkfaceEntity) l.getBlockEntity(worked)).mask(~FIRST_PATCH);
+        l.setBlockAndUpdate(source, Blocks.WATER.defaultBlockState());
+        h.runAfterDelay(40, () -> {
+            h.assertTrue(l.getBlockState(pile).equals(pile(8)), "Water flowing against a small pile leaves its eight units");
+            h.assertTrue(l.getBlockEntity(worked) instanceof CoalWorkfaceEntity face && face.mask() == ~FIRST_PATCH, "Water flowing against a worked face leaves its remaining coal");
+            h.succeed();
+        });
+    }
+
     @GameTest(template = "industrial")
     public static void pickBreakingOnContactStillReleasesItsChunkOnce(GameTestHelper h) {
         var a = CoalMiningGameTests.face(h); var p = CoalMiningGameTests.player(h, a); var pick = p.getMainHandItem();
