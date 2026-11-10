@@ -302,4 +302,24 @@ public class CivicGameTests {
             h.assertTrue(s.amount==65 && s.price==3,"Customers cannot edit quantities");
         } finally {d.shops.remove(at);} h.succeed();
     }
+
+    @GameTest(template = "empty") public static void whitelistRemovalStopsOpenChestVehicleMenus(GameTestHelper h) {
+        var level = h.getLevel(); var d = CivicData.get(level.getServer()); var leader = player(h); var member = player(h);
+        var pos = new BlockPos(200320, 64, 200000); var c = claim(d, leader.getUUID(), pos, System.currentTimeMillis());
+        try {
+            var cart = new net.minecraft.world.entity.vehicle.MinecartChest(level, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+            var boat = new net.minecraft.world.entity.vehicle.ChestBoat(net.minecraft.world.entity.EntityType.CHEST_BOAT, level); boat.setPos(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+            var funnel = new net.minecraft.world.entity.vehicle.MinecartHopper(level, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+            for (net.minecraft.world.Container vehicle : new net.minecraft.world.Container[]{cart, boat, funnel}) {
+                c.whitelist.put(member.getUUID(), "member"); vehicle.setItem(0, Items.DIAMOND.getDefaultInstance());
+                var menu = vehicle == funnel ? new net.minecraft.world.inventory.HopperMenu(5, member.getInventory(), vehicle) : net.minecraft.world.inventory.ChestMenu.threeRows(5, member.getInventory(), vehicle);
+                member.containerMenu = menu; menu.clicked(0, 0, ClickType.PICKUP, member);
+                h.assertTrue(vehicle.getItem(0).isEmpty() && menu.getCarried().is(Items.DIAMOND), "A member takes from a chest vehicle inside the claim: " + vehicle);
+                menu.clicked(0, 0, ClickType.PICKUP, member);
+                c.whitelist.remove(member.getUUID()); menu.clicked(0, 0, ClickType.PICKUP, member); menu.clicked(0, 0, ClickType.QUICK_MOVE, member);
+                h.assertTrue(vehicle.getItem(0).is(Items.DIAMOND) && vehicle.getItem(0).getCount() == 1 && menu.getCarried().isEmpty() && member.getInventory().countItem(Items.DIAMOND) == 0, "An already-open chest vehicle menu cannot bypass revocation: " + vehicle);
+            }
+        } finally { d.claims.remove(c.at); d.rebuildIndex(); }
+        h.succeed();
+    }
 }

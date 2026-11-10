@@ -163,7 +163,7 @@ Manual mining unlocks huge coal veins and replaces the Coal Drill: special tools
 
 **Open**
 - Per-block yield, extraction time, labour and route throughput, tuned together.
-- Further controls, fragment geometry, missed-swing costs; shovel custody and scoop size; cart capacity, uphill haulage and cross-claim access.
+- Further controls, fragment geometry, missed-swing costs; shovel custody (a loaded shovel destroyed as a dropped item loses its load) and scoop size; cart capacity, uphill haulage and cross-claim access.
 - Preparation power (coal or hand; never mandatory oil), throughput and waste.
 - Keeping Fortune, explosions, pistons, hoppers and Builder's Line from bypassing extraction; drill legacy IDs and saves.
 - Not agreed: cave-ins, gas, ventilation, mandatory supports, elevators, locomotives, conveyors.

@@ -192,6 +192,11 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
             }
         }else if(kind==Kind.DRILL){PipeRouting.transfer(level,worldPosition,front().getOpposite(),input,false);PipeRouting.transfer(level,worldPosition,front().getCounterClockWise(),lubricant,false);}
     }
+    /** The liquid connection on one side: a derrick gives crude at its front, a drill takes fuel at its back and lubricant at its left, and a tank takes and gives on every side. */
+    public FluidPort port(Direction side){
+        boolean gives=kind==Kind.DERRICK&&side==front(),lube=kind==Kind.DRILL&&side==front().getCounterClockWise();
+        return new FluidPort(this,side,lube?lubricant:gives?output:input,lube||kind==Kind.TANK||kind==Kind.DRILL&&side==front().getOpposite(),kind==Kind.TANK||gives);
+    }
     public void canister(Player p,InteractionHand hand){
         var held=p.getItemInHand(hand);Item result=null;
         if(held.is(IndustrialContent.CAN.get())){

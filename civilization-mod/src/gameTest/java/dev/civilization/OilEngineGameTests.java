@@ -53,7 +53,7 @@ public class OilEngineGameTests {
     var at=pipe.relative(side);l.setBlockAndUpdate(at,IndustrialContent.TANK.get().defaultBlockState());var tank=(IndustrialBlockEntity)l.getBlockEntity(at);
     var fluid=fuel?IndustrialContent.FUEL.get():IndustrialContent.LUBE.get();var target=fuel?e.fuel:e.oil;tank.input.fill(new FluidStack(fluid,1000),EXECUTE);
     var cap=l.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,e.getBlockPos(),side);
-    h.assertTrue(cap==target,"Correct sided capability");
+    h.assertTrue(cap!=null&&cap.getTankCapacity(0)==target.getCapacity(),"Correct sided capability");
     int n=PipeRouting.transfer(l,e.getBlockPos(),side,target,false);h.assertTrue(n==25&&target.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Pipe transfer conserves fluid "+facing+" "+side+" n="+n+" engine="+target.getFluidAmount()+" tank="+tank.input.getFluidAmount());
     h.assertTrue(ModeledMachine.status(e)==MachineStructure.COMPLETE,"Service pipes leave the engine complete");
     l.removeBlock(pipe,false);l.removeBlock(at,false);
@@ -65,5 +65,50 @@ public class OilEngineGameTests {
   e.fuel.fill(new FluidStack(IndustrialContent.FUEL.get(),9),EXECUTE);e.toggle();e.tick();h.assertTrue(e.warmup==0&&e.fuel.getFluidAmount()==9,"Insufficient starting fuel stays intact");
   e.fuel.fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE);for(int i=0;i<100;i++)e.tick();double power=e.requestWork(e.getBlockPos(),1);h.assertTrue(power>0&&e.condition<1,"Dry engine gradually loses efficiency");
   e.toggle();h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Stopped engine supplies no work");h.succeed();
+ }
+
+ @GameTest(template="industrial") public static void servicePortsTakeLiquidInAndGiveNoneBack(GameTestHelper h){
+  var e=build(h,Direction.NORTH);var l=h.getLevel();e.fuel.fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE);e.oil.fill(new FluidStack(IndustrialContent.LUBE.get(),500),EXECUTE);
+  for(var side:java.util.List.of(Direction.NORTH,Direction.DOWN)){
+   boolean fuel=side==Direction.NORTH;var held=fuel?e.fuel:e.oil;var liquid=fuel?IndustrialContent.FUEL.get():IndustrialContent.LUBE.get();int before=held.getFluidAmount();
+   var pipe=e.getBlockPos().relative(side);l.setBlockAndUpdate(pipe,IndustrialContent.PIPE.get().defaultBlockState());
+   var intake=new net.neoforged.neoforge.fluids.capability.templates.FluidTank(1000);int pulled=PipeRouting.transfer(l,pipe.relative(side),side.getOpposite(),intake,false);
+   h.assertTrue(pulled==0&&intake.isEmpty()&&held.getFluidAmount()==before,"A tank's intake piped to the engine's "+side+" port draws nothing back out: pulled "+pulled+", engine "+held.getFluidAmount());
+   var port=l.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,e.getBlockPos(),side);
+   h.assertTrue(port.drain(100,EXECUTE).isEmpty()&&port.drain(new FluidStack(liquid,100),EXECUTE).isEmpty()&&held.getFluidAmount()==before,"The "+side+" port gives nothing back");
+   h.assertTrue(port.fill(new FluidStack(liquid,100),EXECUTE)==100&&held.getFluidAmount()==before+100,"The "+side+" port takes its liquid");
+   l.removeBlock(pipe,false);
+  }
+  var port=l.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,e.getBlockPos(),Direction.NORTH);
+  var d=CivicData.get(l.getServer());var c=new CivicData.Claim();c.at=CivicService.address(l,e.getBlockPos().north());c.owner=new CivicData.Owner(java.util.UUID.randomUUID(),false);c.radius=1;c.height=32;c.upkeep=1;c.coalUnit=3600000;c.energy=7200000;c.lastUpdate=System.currentTimeMillis();
+  d.claims.put(c.at,c);d.rebuildIndex();
+  try{h.assertTrue(CivicAccess.claim(l,e.getBlockPos())==null&&port.fill(new FluidStack(IndustrialContent.FUEL.get(),100),EXECUTE)==0&&e.fuel.getFluidAmount()==1100,"A cached port takes nothing across a new claim boundary");}finally{d.claims.remove(c.at);d.rebuildIndex();}
+  h.succeed();
+ }
+
+ @GameTest(template="industrial") public static void canistersMoveWholeCansAndRespectClaims(GameTestHelper h){
+  var e=build(h,Direction.NORTH);var l=h.getLevel();var p=h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);p.setPos(e.getBlockPos().getCenter());
+  var hand=net.minecraft.world.InteractionHand.MAIN_HAND;var hit=new net.minecraft.world.phys.BlockHitResult(e.getBlockPos().getCenter(),Direction.UP,e.getBlockPos(),false);
+  java.util.function.Consumer<net.minecraft.world.item.ItemStack> use=can->{p.setItemInHand(hand,can);e.getBlockState().useItemOn(can,l,p,hand,hit);};
+  var empty=IndustrialContent.CAN.get();var fuel=IndustrialContent.FUEL_CAN.get();var lube=IndustrialContent.LUBE_CAN.get();
+  use.accept(new net.minecraft.world.item.ItemStack(fuel));
+  h.assertTrue(e.fuel.getFluidAmount()==1000&&e.oil.isEmpty()&&p.getMainHandItem().is(empty),"A fuel canister pours exactly 1,000 mB into the fuel tank and comes back empty");
+  use.accept(new net.minecraft.world.item.ItemStack(lube));use.accept(new net.minecraft.world.item.ItemStack(lube));
+  h.assertTrue(e.oil.getFluidAmount()==2000&&e.fuel.getFluidAmount()==1000&&p.getMainHandItem().is(empty),"Lubricant canisters fill the oil tank only");
+  use.accept(new net.minecraft.world.item.ItemStack(lube));
+  h.assertTrue(e.oil.getFluidAmount()==2000&&p.getMainHandItem().is(lube),"A full tank leaves the canister full");
+  use.accept(new net.minecraft.world.item.ItemStack(empty));
+  h.assertTrue(e.fuel.isEmpty()&&p.getMainHandItem().is(fuel),"An empty canister draws 1,000 mB of fuel");
+  use.accept(new net.minecraft.world.item.ItemStack(empty));
+  h.assertTrue(e.fuel.isEmpty()&&e.oil.getFluidAmount()==2000&&p.getMainHandItem().is(empty),"With under 1,000 mB of fuel the canister stays empty and the oil stays put");
+  p.setShiftKeyDown(true);use.accept(new net.minecraft.world.item.ItemStack(empty));p.setShiftKeyDown(false);
+  h.assertTrue(e.oil.getFluidAmount()==1000&&p.getMainHandItem().is(lube),"Sneaking draws oil instead");
+  var d=CivicData.get(l.getServer());var c=new CivicData.Claim();c.at=CivicService.address(l,e.getBlockPos());c.owner=new CivicData.Owner(java.util.UUID.randomUUID(),false);c.radius=1;c.height=32;c.upkeep=1;c.coalUnit=3600000;c.energy=7200000;c.lastUpdate=System.currentTimeMillis();
+  d.claims.put(c.at,c);d.rebuildIndex();
+  try{
+   use.accept(new net.minecraft.world.item.ItemStack(fuel));h.assertTrue(e.fuel.isEmpty()&&p.getMainHandItem().is(fuel),"An outsider's canister pours nothing into a claimed engine");
+   p.setShiftKeyDown(true);use.accept(new net.minecraft.world.item.ItemStack(empty));p.setShiftKeyDown(false);h.assertTrue(e.oil.getFluidAmount()==1000&&p.getMainHandItem().is(empty),"Nor does it draw the oil out");
+  }finally{d.claims.remove(c.at);d.rebuildIndex();}
+  h.succeed();
  }
 }

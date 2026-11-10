@@ -14,7 +14,7 @@ public final class RawCoalPileBlock extends Block {
     public static final IntegerProperty UNITS=IntegerProperty.create("units",1,64);
     private static final VoxelShape[] SHAPES=new VoxelShape[5];
     static {for(int i=1;i<=4;i++)SHAPES[i]=Shapes.or(box(1,0,1,15,i*2,15),box(3,0,3,13,i*2+1,13)).optimize();}
-    public RawCoalPileBlock(){super(BlockBehaviour.Properties.ofFullCopy(Blocks.COAL_BLOCK).strength(-1,3600000).noLootTable().noOcclusion().pushReaction(PushReaction.BLOCK));registerDefaultState(stateDefinition.any().setValue(UNITS,1));}
+    public RawCoalPileBlock(){super(BlockBehaviour.Properties.ofFullCopy(Blocks.COAL_BLOCK).strength(-1,3600000).noLootTable().noOcclusion().forceSolidOn().pushReaction(PushReaction.BLOCK));registerDefaultState(stateDefinition.any().setValue(UNITS,1));}
     public static int stage(int units){return Math.clamp((units+15)/16,1,4);}
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> b){b.add(UNITS);}
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){return SHAPES[stage(s.getValue(UNITS))];}

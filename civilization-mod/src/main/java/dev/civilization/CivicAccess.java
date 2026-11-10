@@ -35,6 +35,7 @@ public final class CivicAccess {
     }
     public static boolean container(net.minecraft.world.Container container, Player player) {
         if (container instanceof SharedTables.Grid grid) return grid.stillValid(player);
+        if (container instanceof net.minecraft.world.entity.Entity vehicle) return allowed(vehicle.level(), vehicle.blockPosition(), player);
         if (container instanceof net.minecraft.world.level.block.entity.BlockEntity entity && entity.getLevel() != null)
             return allowed(entity.getLevel(), entity.getBlockPos(), player);
         if (container instanceof dev.civilization.mixin.CompoundContainerAccess compound)
