@@ -53,6 +53,35 @@ public class BulkStorageGameTests {
         var target=new net.neoforged.neoforge.fluids.capability.templates.FluidTank(1000);b.fluids(Direction.NORTH).fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE);
         int n=PipeRouting.transfer(h.getLevel(),at.north(2),Direction.SOUTH,target,false);h.assertTrue(n==25&&target.getFluidAmount()==25&&b.amount()==975,"Local pipe 25mB budget");h.assertTrue(PipeRouting.transfer(h.getLevel(),at.north(2),Direction.SOUTH,target,false)==0,"Shared pipe budget prevents double transfer");h.succeed();
     }
+
+    @GameTest(template="industrial") public static void handAndShiftClickStoreCoalUntilFullOrShutOut(GameTestHelper h){
+        var b=build(h,false,Direction.NORTH);var l=h.getLevel();var coal=KilnContent.MINERAL_COAL;
+        var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"stoker");var p=new net.minecraft.server.level.ServerPlayer(l.getServer(),l,profile,net.minecraft.server.level.ClientInformation.createDefault());
+        p.connection=new net.neoforged.neoforge.common.util.FakePlayer(l,profile).connection;p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);p.setPos(b.getBlockPos().getCenter());
+        p.getData(Accessories.INVENTORY).setStackInSlot(0,Backpack.ITEM.toStack());Backpack.worn(p).setItem(0,coal.toStack(20));
+        p.getInventory().setItem(9,coal.toStack(32));p.getInventory().setItem(10,new ItemStack(Items.APPLE,5));
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,coal.toStack(10));b.useHeld(p,net.minecraft.world.InteractionHand.MAIN_HAND);
+        h.assertTrue(b.amount()==10&&p.getMainHandItem().isEmpty(),"A right-click stores the held coal: bunker "+b.amount());
+        // As the server's menu opening does: the Hand, then the pack.
+        var menu=b.createMenu(1,p.getInventory(),p);BlockCarry.attachMenu(menu,p.getInventory());Backpack.attachMenu(menu,p);p.containerMenu=menu;int packed=-1;var quick=net.minecraft.world.inventory.ClickType.QUICK_MOVE;
+        for(int i=0;i<menu.slots.size();i++)if(menu.slots.get(i) instanceof Backpack.PackSlot s&&s.getItem().is(coal.get())){packed=i;break;}
+        h.assertTrue(menu instanceof BulkMenu&&packed>=0,"The bunker's screen shows the worn pack");
+        menu.clicked(0,0,quick,p);menu.clicked(1,0,quick,p);
+        h.assertTrue(b.amount()==42&&p.getInventory().getItem(9).isEmpty()&&p.getInventory().getItem(10).getCount()==5,"Shift-click stores a pocket's coal and nothing else: bunker "+b.amount());
+        menu.clicked(packed,0,quick,p);
+        h.assertTrue(b.amount()==62&&Backpack.worn(p).isEmpty(),"Shift-click stores the pack's coal: bunker "+b.amount());
+        b.insertCoal(BulkEntity.COAL_CAPACITY-62-5,false);p.getInventory().setItem(9,coal.toStack(32));menu.clicked(0,0,quick,p);
+        h.assertTrue(b.amount()==BulkEntity.COAL_CAPACITY&&p.getInventory().getItem(9).getCount()==27,"A nearly full bunker takes what fits and the pocket keeps the rest: "+p.getInventory().getItem(9));
+        var beside=b.getBlockPos().north();var state=Blocks.HOPPER.defaultBlockState().setValue(net.minecraft.world.level.block.HopperBlock.FACING,Direction.SOUTH);l.setBlockAndUpdate(beside,state);
+        var hopper=(net.minecraft.world.level.block.entity.HopperBlockEntity)l.getBlockEntity(beside);hopper.setItem(0,coal.toStack(5));
+        net.minecraft.world.level.block.entity.HopperBlockEntity.pushItemsTick(l,beside,state,hopper);
+        h.assertTrue(b.amount()==BulkEntity.COAL_CAPACITY&&hopper.getItem(0).getCount()==5,"A hopper keeps the coal a full bunker cannot take");
+        l.removeBlock(beside,false);b.extractCoal(100,false);
+        var d=CivicData.get(l.getServer());var c=new CivicData.Claim();c.at=new CivicData.Address("minecraft:overworld",b.getBlockPos());c.owner=new CivicData.Owner(java.util.UUID.randomUUID(),false);c.radius=1;c.height=32;c.upkeep=1;c.coalUnit=3600000;c.energy=7200000;c.lastUpdate=System.currentTimeMillis();
+        d.claims.put(c.at,c);d.rebuildIndex();
+        try{menu.clicked(0,0,quick,p);h.assertTrue(b.amount()==BulkEntity.COAL_CAPACITY-100&&p.getInventory().getItem(9).getCount()==27,"A player shut out by a claim stores nothing through the open screen");}finally{d.claims.remove(c.at);d.rebuildIndex();}
+        h.succeed();
+    }
 }
 
 
