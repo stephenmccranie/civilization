@@ -10,17 +10,20 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-/** Colored flow inside clear static pipe geometry; empty pipes render no backing. */
+/** The liquid behind the four windows of each arm's sight glass, drawn while that arm carries a transfer. */
 @EventBusSubscriber(modid="civilization",bus=EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
 public final class PipeFlowRenderer implements BlockEntityRenderer<PipeFlowEntity> {
     private static final ResourceLocation WHITE=ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    /** From the arm model: the glass's reach in from the block's face, the liquid's distance from the pipe's axis and half a window's width. */
+    private static final float GLASS=2.5f/16,DEPTH=2.5f/16,HALF=1f/16;
+    /** Steps of the moving highlight along one arm's glass. */
+    private static final int BANDS=5;
     public PipeFlowRenderer(BlockEntityRendererProvider.Context context){}
     @SubscribeEvent public static void register(EntityRenderersEvent.RegisterRenderers e){e.registerBlockEntityRenderer(IndustrialContent.PIPE_ENTITY.get(),PipeFlowRenderer::new);}
     @Override public int getViewDistance(){return 48;}
     @Override public void render(PipeFlowEntity pipe,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay){
         if(pipe.getLevel()==null)return;
-        var state=pipe.getBlockState();var axes=java.util.EnumSet.noneOf(Direction.Axis.class);
-        for(var d:Direction.values())if(state.getValue(FluidPipeBlock.CONNECTIONS.get(d)))axes.add(d.getAxis());
+        var state=pipe.getBlockState();
         double time=pipe.getLevel().getGameTime()+partial;
         var v=buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE));
         for(var d:Direction.values()){
@@ -29,13 +32,12 @@ public final class PipeFlowRenderer implements BlockEntityRenderer<PipeFlowEntit
             if(!active)continue;
             int color=PipeFlowEntity.color(pipe.fluids[i]);
             pose.pushPose();pose.translate(.5,.5,.5);pose.mulPose(d.getRotation());
-            for(int face=0;face<8;face++){
-                pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(face*45));
-                float start=axes.size()>1?.251f:0;
-                for(int n=0;n<8;n++){
-                    float a=start+(.5f-start)*n/8,b=start+(.5f-start)*(n+1)/8;
+            for(int side=0;side<4;side++){
+                pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(side*90));
+                for(int n=0;n<BANDS;n++){
+                    float a=.5f-GLASS+GLASS*n/BANDS,b=.5f-GLASS+GLASS*(n+1)/BANDS;
                     double wave=.78+.22*Math.cos((a*4-pipe.signs[i]*time/14)*Math.PI*2);
-                    quad(v,pose.last(),-.0901f,.0901f,a,b,.2175f,tint(color,wave),light,overlay);
+                    quad(v,pose.last(),-HALF,HALF,a,b,DEPTH,tint(color,wave),light,overlay);
                 }
                 pose.popPose();
             }

@@ -10,7 +10,7 @@
         "down": "false"
       },
       "apply": {
-        "model": "civilization:block/fluid_pipe_open"
+        "model": "civilization:block/fluid_pipe_spool"
       }
     },
     {
