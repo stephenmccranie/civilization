@@ -4,7 +4,7 @@ param(
     [string]$Task = 'Build',
     [string]$Scene = 'machines',
     [switch]$Full,
-    [ValidateSet('boat', 'airship', 'thermal')]
+    [ValidateSet('boat', 'airship', 'coal', 'thermal')]
     [string]$Name = 'boat',
     [string]$Phase
 )
@@ -23,7 +23,7 @@ $sableJarName = "sable-neoforge-$($properties.minecraft_version)-$($properties.s
 $sableUrl = "https://cdn.modrinth.com/data/T9PomCSv/versions/U678xqle/$sableJarName"
 $sableSha512 = 'bf3d8c87bcc5efb99afffd50305fc978086ed48a63e106816e3a8a3901f8052f4480ea527dbd7d4003f7775ed4d020529098034f4e307aefac9cc42df2b4c19a'
 # Phases each fixture runs against one fresh world; -Phase runs a single phase instead (thermal: physics, manual).
-$fixturePhases = @{ boat = 'seed', 'reload'; airship = 'seed', 'reload'; thermal = 'check', 'reload' }
+$fixturePhases = @{ boat = 'seed', 'reload'; airship = 'seed', 'reload'; coal = 'seed', 'reload'; thermal = 'check', 'reload' }
 $peerScenes = 'gladiator', 'weather'
 
 function Invoke-Gradle([string[]]$Arguments, [string]$Log) {

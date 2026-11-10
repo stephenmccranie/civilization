@@ -9,7 +9,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.*;
 
 public final class CoalWorkfaceBlock extends Block implements EntityBlock {
-    public CoalWorkfaceBlock(){super(BlockBehaviour.Properties.ofFullCopy(Blocks.COAL_BLOCK).strength(-1,3600000).noLootTable().noOcclusion().dynamicShape().pushReaction(PushReaction.BLOCK));}
+    public CoalWorkfaceBlock(){super(BlockBehaviour.Properties.ofFullCopy(Blocks.COAL_BLOCK).strength(-1,3600000).noLootTable().noOcclusion().dynamicShape().forceSolidOn().pushReaction(PushReaction.BLOCK));}
     @Override public BlockEntity newBlockEntity(BlockPos p,BlockState s){return new CoalWorkfaceEntity(p,s);}
     @Override protected VoxelShape getShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){return l.getBlockEntity(p) instanceof CoalWorkfaceEntity e?e.shape():Shapes.block();}
     @Override protected VoxelShape getCollisionShape(BlockState s,BlockGetter l,BlockPos p,CollisionContext c){return getShape(s,l,p,c);}
