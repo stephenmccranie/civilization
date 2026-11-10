@@ -31,5 +31,5 @@ public final class OilEngineBlock extends Block implements EntityBlock, ModeledB
   return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
  }
  @Override protected void onRemove(BlockState s,Level l,BlockPos pos,BlockState next,boolean moving){if(!s.is(next.getBlock())&&!l.isClientSide&&l.getBlockEntity(pos) instanceof OilEngineEntity e)ModeledMachine.dismantle(e);super.onRemove(s,l,pos,next,moving);}
- @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Runs on refined fuel + lubricating oil"));lines.add(Component.literal("Place for the build guide"));lines.add(Component.literal("Drain liquids before breaking."));}
+ @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Runs on refined fuel + lubricating oil"));lines.add(Component.literal("Place for the build guide"));lines.add(Component.literal("Take full canisters out before breaking; the rest is lost."));}
 }
