@@ -24,7 +24,7 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
     public int progress,status;
     public final CoalFire fire=new CoalFire(this);
     /** The Coal Engine's brick firebox and the Fired Heater's brick hearth. */
-    public int masonry(){return kind==Kind.COAL_ENGINE?4:20;}
+    public int masonry(){return kind==Kind.COAL_ENGINE?4:18;}
     public int[] coalFuelSlots(){return MachineInventory.INDUSTRIAL_INPUT;}
     public boolean coalPowered(){return kind==Kind.COAL_ENGINE||kind==Kind.HEATER;}
     /** What a machine's input slots take: the derrick's casing, or Coal for a fire. */

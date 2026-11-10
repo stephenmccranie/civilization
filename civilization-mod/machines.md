@@ -69,7 +69,7 @@ Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototyp
   | Smithy | 24 | 16.8 Coal | 13.4 Coal |
   | Foundry | 23 | 16.1 Coal | 12.9 Coal |
   | Fertilizer Furnace | 21 | 14.7 Coal | 11.8 Coal |
-  | Fired Heater | 20 | 14 Coal | 11.2 Coal |
+  | Fired Heater | 18 | 12.6 Coal | 10.1 Coal |
   | Kiln | 17 | 11.9 Coal | 9.5 Coal |
   | Coal Engine | 4 | 2.8 Coal | 2.2 Coal |
   | Cooking Stove, Prototype Stove | 0 | 1 Coal | 0.8 Coal |
@@ -77,7 +77,7 @@ Every coal-burning machine — Kiln, Fertilizer Furnace, Cooking Stove, Prototyp
 - **Working and cooling.** At working heat each job draws its [coal budget](#coal-budget) from the store, and a lit fire replaces what was drawn and tops the masonry up to full, feeding itself from both coal slots even without materials or with blocked output. Hot masonry leaks into the surrounding air: unfed at neutral temperature, a full store falls to working heat in about twenty minutes, sooner in the cold ([heat](heat.md#machines)). A hot idle machine therefore burns only what it leaks, and work stops when the store falls below working heat.
 - **Going out.** When the burning Coal and all coal in the slots are spent the fire goes out; the machine keeps working on its stored heat until it cools below working heat, and added coal needs a new strike. There is no stop button: remove spare coal and let the fire burn out, or dismantle the structure. Breaking the structure puts out the fire and loses its burning Coal and stored heat; unloading pauses everything without catch-up. Lit state, burning Coal, stored heat and strike cooldown are saved. Each Coal the fire takes logs `coal_fire_fuel` in the [energy journal](survival.md#energy-journal).
 
-Firelight and a quiet crackle follow the lit fire; smoke (industrial machines) or steam (stoves) follows actual processing; ignition and completion play brief sounds. Particles are local and follow particle settings; sounds use the Blocks volume. Lit models keep normal ambient shading, and their fire textures and emitted light still light the surroundings.
+Firelight and a quiet crackle follow the lit fire, as does the smoke from a Fired Heater's or Coal Engine's stack; a Coal Drill's smoke and a stove's steam follow actual processing; ignition and completion play brief sounds. Particles are local and follow particle settings; sounds use the Blocks volume. Lit models keep normal ambient shading, and their fire textures and emitted light still light the surroundings.
 
 ## Coal budget
 
