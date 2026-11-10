@@ -9,6 +9,7 @@ Run the smallest check that covers the change, once. Repeat a passing check only
 | Recipes, inventory, placement, persistence, production, calories, networking | `.\dev.ps1 GameTest`: every server GameTest |
 | Rendering, shaders, HUD, textures, client input | `.\dev.ps1 Visual -Scene <scene>` |
 | Vehicle state across a server restart | `.\dev.ps1 Fixture -Name boat` or `-Name airship` |
+| Coal stock across a server restart or chunk unload | `.\dev.ps1 Fixture -Name coal` |
 | Heat solver | `.\dev.ps1 Fixture -Name thermal`, and `-Phase physics` for the reference physics checks |
 | Client and server together | `GameTest` plus the relevant scene |
 | Rendering cost or frame pacing | `.\dev.ps1 Perf`, before and after the change ([performance](#performance)) |
@@ -91,4 +92,5 @@ A fixture runs its phases as separate server processes on one fresh flat world i
 
 - `boat`: `seed` builds and fuels a loaded boat, then `reload` confirms its engine fuel, oil, condition and cargo after a restart.
 - `airship`: `seed` assembles a loaded airship, then `reload` confirms its power and cargo after a restart.
+- `coal`: `seed` leaves raw coal in a struck face, piles, a falling and a blocked batch, a cart, a screen and a stored shovel, stopping the server while a chunk is still falling and an undercut pile's fall is still scheduled; `reload` counts every unit after the restart and again after the chunk has unloaded and loaded.
 - `thermal`: the [thermal laboratory](heat.md). `check` records heating and cooling at reference stations into `measurements.csv`, and `reload` confirms the field survives a restart. `-Phase physics` runs the reference physics checks. `-Phase manual` opens the laboratory as an interactive server on `localhost:25567` with `/thermal_lab` commands.
