@@ -42,11 +42,11 @@ Coal extraction replaces the dense block with air and puts **16 Coal** into the 
 | Oil Derrick | Fully modeled tapered timber tower with five X-braced bays, cobblestone footings, middle and crown galleries and a crown sheave; inside the open front bay a band wheel on two bearings cranks the walking beam over the well, beside the cable drum of the bull wheel. 9×10×26 blocks with the ground-level controller, the band wheel, at the front middle and the well five blocks behind it. Crude Refinery Port immediately to its right |
 | Fired Heater | Fully modeled coal-fired still: a riveted black still shell lying front to back in a red-brick furnace setting, with a firedoor under a round brick arch at the front, a manhole dome, safety valve and dial thermometer on its crown, and a stepped breeching carrying a tall stack at the back. 3×6 blocks and seven tall at the stack, with the ground-level controller, the firedoor, at the front middle; crude intake in the left wall and heated output in the right wall, both one block up and two blocks back |
 | Distillation Column | Fully modeled refinery tower: a slender sixteen-sided riveted black tower in four plate rings on a red-brick base, with a cleanout door under a brick arch at the front, a bolted manhole and a dial thermometer on the tower's front, and a domed head whose vapor line bends over and runs down the tower's right side into the base. 3×4 blocks and nine and a half tall, with the ground-level controller, the cleanout door, at the front middle; hot oil intake in the left wall and vapor outlet in the right wall, both one block up and two blocks back in line with the heater's ports, and the lubricating-oil outlet at ground level in the right wall, one block back |
-| Air-Cooled Condenser | Seven-wide horizontal vessel with rounded edges, cooling-grille faces and steel cradles; vapor intake left, fuel outlet right |
+| Air-Cooled Condenser | Fully modeled aerial condenser: an open rack of twelve gilled cooling pipes, three tiers of four, running between two riveted black header boxes that each stand on a red-brick plinth, with a steel trestle at mid-span and a look box with a brass sight glass on the ground in front, piped to the lowest tier. 7×3 blocks and three tall, standing one block behind the ground-level controller, the look box, at the front middle; vapor intake low in the left header's outer end and fuel outlet low in the right header's, both one block up and two blocks back in line with the column's ports |
 | Coal Drill | Extraction frame; fuel intake at back, lubricant intake at left, coal hopper output below |
 | Liquid Tank | Single block holding 16,000 mB of one fluid; every side accepts or supplies it |
 
-Sides are as seen facing the controller's front. The condenser is built with the ordinary [construction guide](machines.md#building-with-a-controller) from Industrial Casing, Cooling Grilles, saw-cut pieces and Refinery Ports; automatically placed ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
+Sides are as seen facing the controller's front. The Coal Drill is built with the ordinary [construction guide](machines.md#building-with-a-controller) from stone, Industrial Casing and its saw-cut halves. A machine's ports face outward, and empty-hand right-click on a port names its machine and role. Required parts must stay intact for processing and remote fluid access. Industrial Guardrails are decorative only.
 
 ### Oil Derrick construction
 
@@ -63,6 +63,10 @@ The Fired Heater is built from its controller the same way: place the firedoor a
 ### Distillation Column construction
 
 The Distillation Column is built the same way: place the cleanout door at ground level, where the column will extend one block to either side and three behind, and right-click it with each section's material. The bill is **Footing** 3 stone or cobblestone, **Base** 8 brick blocks, **Lower shell** and **Upper shell** 6 Industrial Casing each, **Head** 3 Industrial Casing, **Vapor line** 4 Refinery Flues, **Manhole and gauge** 2 Copper Plates, and a Refinery Port for each of the hot oil intake, the vapor outlet and the lubricating oil outlet. Sections and the controller break and refund as the heater's do.
+
+### Air-Cooled Condenser construction
+
+The Air-Cooled Condenser is built the same way: place the look box at ground level, where the rack will stand one block behind it and extend three blocks to either side, and right-click it with each section's material. The bill is **Footings** 2 stone or cobblestone, **Plinths** 4 brick blocks, **Headers** 6 Industrial Casing, **Trestle** 4 Iron Plates, **Lower pipes**, **Middle pipes** and **Upper pipes** 5 Cooling Grilles each, and a Refinery Port for each of the vapor intake and the fuel outlet. Sections and the controller break and refund as the heater's do.
 
 ### Oil well
 
@@ -116,7 +120,7 @@ The products have distinct uses: **fuel powers machines, oil lubricates moving m
 
 ### Controls
 
-Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater's firedoor grate and inspection slit glow while its fire burns, and its stack smokes while the fire burns. Completed batches and coal use are logged in the energy journal.
+Controllers show liquid gauges, progress, status and their slots in the [cabinet interface](machines.md#cabinet-interface). Feed coal to the Coal Engine and Heater, and casing plates to the Derrick, through their screens or a hopper above or beside; drill coal and column sulfur leave through a hopper below. The heater's firedoor grate and inspection slit glow while its fire burns, and its stack smokes while the fire burns; the column and the condenser show their state only on their screens. Completed batches and coal use are logged in the energy journal.
 
 ## Liquids and pipes
 

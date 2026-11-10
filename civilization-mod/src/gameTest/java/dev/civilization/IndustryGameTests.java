@@ -358,9 +358,8 @@ public final class IndustryGameTests {
         pipe(h,h.absolutePos(new BlockPos(22,68,4)));
         for(int x=26;x<=36;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
         for(int x=40;x<=48;x++)pipe(h,h.absolutePos(new BlockPos(x,68,4)));
-        pipe(h,h.absolutePos(new BlockPos(48,69,4)));
-        pipe(h,h.absolutePos(new BlockPos(56,69,4)));
-        var tankPos=h.absolutePos(new BlockPos(57,69,4));l.setBlockAndUpdate(tankPos,IndustrialContent.TANK.get().defaultBlockState());
+        pipe(h,h.absolutePos(new BlockPos(56,68,4)));
+        var tankPos=h.absolutePos(new BlockPos(57,68,4));l.setBlockAndUpdate(tankPos,IndustrialContent.TANK.get().defaultBlockState());
         var tank=(IndustrialBlockEntity)l.getBlockEntity(tankPos);
         // Forced chunks reach entity-ticking on the chunk system's own clock, which catch-up ticks can outrun, so wait for that state;
         // then let newly placed block-entity tickers/ports settle before the fixed 400-tick measurement.

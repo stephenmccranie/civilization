@@ -39,7 +39,6 @@ public final class MachineStructure {
             case "glass" -> state.is(Blocks.GLASS);
             case "planks" -> state.is(net.minecraft.tags.BlockTags.PLANKS);
             case "guardrail" -> state.is(IndustrialContent.GUARDRAIL.get());
-            case "cooling" -> state.is(IndustrialContent.COOLING.get());
             case "flue" -> state.is(IndustrialContent.FLUE.get());
             case "casing" -> state.is(IndustrialContent.CASING.get());
             case "input_port", "output_port", "aux_port" -> state.is(IndustrialContent.PORT.get());
@@ -64,7 +63,6 @@ public final class MachineStructure {
             case "glass" -> Blocks.GLASS.defaultBlockState();
             case "planks" -> Blocks.OAK_PLANKS.defaultBlockState();
             case "guardrail" -> IndustrialContent.GUARDRAIL.get().defaultBlockState();
-            case "cooling" -> IndustrialContent.COOLING.get().defaultBlockState();
             case "flue" -> IndustrialContent.FLUE.get().defaultBlockState();
             case "casing" -> IndustrialContent.CASING.get().defaultBlockState();
             case "input_port", "output_port", "aux_port" -> IndustrialContent.PORT.get().defaultBlockState();

@@ -31,7 +31,7 @@ public final class ControllerConstructionGameTests {
         player.setPos(at.getX()+.5,at.getY()+2,at.getZ()-3);
         var hit=new BlockHitResult(Vec3.atCenterOf(at),Direction.NORTH,at,false);
         List<Block> controllers=List.of(IndustrialContent.DRILL.get(),
-                IndustrialContent.CONDENSER.get(),BulkContent.BUNKER.get(),
+                BulkContent.BUNKER.get(),
                 BulkContent.TANK.get(),CivicContent.TABLE.get());
         for(var block:controllers) {
             var state=block.defaultBlockState().setValue(CivicBlock.FACING,front);
