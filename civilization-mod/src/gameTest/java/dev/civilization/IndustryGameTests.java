@@ -409,14 +409,14 @@ public final class IndustryGameTests {
         var ref=machine(h,IndustrialContent.HEATER.get(),3);IndustrialStructure.bind(ref);var at=port(ref,"input_port");var mid=at.west();var source=mid.west().south();
         pipe(h,mid);pipe(h,mid.west());pipe(h,mid.north());h.getLevel().setBlockAndUpdate(source,IndustrialContent.TANK.get().defaultBlockState());var tank=(IndustrialBlockEntity)h.getLevel().getBlockEntity(source);tank.input.fill(new FluidStack(IndustrialContent.CRUDE.get(),1000),EXECUTE);
         ref.transfer();h.assertTrue(ref.input.getFluidAmount()==25&&tank.input.getFluidAmount()==975,"Bent pipes transfer exactly 25 mB per step");
-        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).setValue(FluidPipeBlock.OPEN,false));ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Changing legacy valve state cannot reset the shared pipe budget");
-        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).setValue(FluidPipeBlock.OPEN,true));h.getLevel().removeBlock(ref.getBlockPos().offset(0,3,3),false);ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Broken chimney prevents remote intake");
+        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).cycle(FluidPipeBlock.GLASS));ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Changing a pipe's state cannot reset the shared pipe budget");
+        h.getLevel().setBlockAndUpdate(mid,h.getLevel().getBlockState(mid).cycle(FluidPipeBlock.GLASS));h.getLevel().removeBlock(ref.getBlockPos().offset(0,3,3),false);ref.transfer();h.assertTrue(tank.input.getFluidAmount()==975,"Broken chimney prevents remote intake");
         var cap=h.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,at,Direction.WEST);h.assertTrue(cap.fill(new FluidStack(IndustrialContent.CRUDE.get(),100),EXECUTE)==0,"Broken build also closes external capability");
         h.runAfterDelay(2,()->{
             var flow=(PipeFlowEntity)h.getLevel().getBlockEntity(mid);var dead=(PipeFlowEntity)h.getLevel().getBlockEntity(mid.north());
             h.assertTrue(flow.fluids[Direction.EAST.ordinal()]==1&&flow.signs[Direction.EAST.ordinal()]==1,"Crude flow points into heater");
             h.assertTrue(java.util.Arrays.stream(dead.until).allMatch(t->t==0),"Dead branch never displays flow");
-            h.assertTrue(h.getLevel().getBlockState(mid).getValue(FluidPipeBlock.CONNECTIONS.get(Direction.EAST)),"Authored pipe connects to flange after refresh");
+            h.assertTrue(h.getLevel().getBlockState(mid).getValue(FluidPipeBlock.SIDES.get(Direction.EAST))==FluidPipeBlock.Side.FLANGE,"Authored pipe connects to flange after refresh");
             h.runAfterDelay(18,()->{h.assertTrue(flow.until[Direction.EAST.ordinal()]<=h.getLevel().getGameTime(),"Stopped flow expires");h.succeed();});
         });
     }
