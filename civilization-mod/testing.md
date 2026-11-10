@@ -42,7 +42,7 @@ GameTest templates must contain their whole fixture: the suite places tests in a
 | `assembly` | Assembly Bench forging and assembly through the real menu |
 | `storage` | Paired material, fuel and output banks in machine menus; rough metal glowing to cold in the hotbar beside the Stone Anvil, iron anvil and water cauldron; iron ingots through every glow colour in the hotbar, held white-hot and cherry red in first person and cherry red in third, lighting the floor around them, then the same night without shaders and dropped white-yellow, cherry red and dull red, by day and night |
 | `bulk` | Coal Bunker and Cargo Tank construction, fill states and menu withdrawal |
-| `pipes` | Empty and flowing glass pipes, connections and flanges |
+| `pipes` | Iron pipes as a length, bend, tee, six-armed cross, riser, blank ends and a lone pipe, flowing and then empty; each liquid flowing both ways; a pipe at a Refinery Port in a brick wall, at the Fired Heater's ports and at a Distillation Column's port, by day and at night; the pipe held and both icons |
 | `industry` | Refinery, an Oil Derrick pumping with a Coal Engine driving it, construction cabinet, industrial icons, a boat helm and guardrail run, and the Fired Heater burning from the front and rear by day and its firedoor at night |
 | `derrick-guide` | Oil Derrick section guides placed by real clicks, its beam working from a Coal Engine, day and night |
 | `engine` | Hot-Bulb Engine stopped, heating with lit lamp ports and the blowlamp sounding, kicked over and running with the flywheel turning and the stack knocking, its menu and its section guide |
