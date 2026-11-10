@@ -4,7 +4,7 @@ Everything the dedicated server runs besides the game and its mods: its services
 
 | Directory | What it runs |
 | --- | --- |
-| [`minecraft/`](minecraft) | The game server: its service, the start script that feeds the console pipe `/run/minecraft/console`, the JVM arguments, the world-generation CPU cap, the VM's swappiness and the world datapacks (the scale-4 world preset and the river and woodland biome tags). |
+| [`minecraft/`](minecraft) | The game server: its service, the start script that feeds the console pipe `/run/minecraft/console`, the JVM arguments, the world-generation CPU cap, the VM's swappiness and the world datapacks (the world preset, which sets the world to scale 4 and gives it its height curve, and the river and woodland biome tags). |
 | [`pregeneration/`](pregeneration) | The controller that pregenerates chunks and LODs outward from spawn while nobody is online ([details](pregeneration/README.md)). |
 | [`world-map/`](world-map) | The public read-only map and its nginx entry point ([details](world-map/README.md)). |
 
