@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "civilization:item/oil_pump"
+    "layer0": "civilization:item/oil_derrick"
   }
 }

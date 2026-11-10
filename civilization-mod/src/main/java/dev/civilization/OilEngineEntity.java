@@ -16,6 +16,8 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
  public final FluidTank fuel=tank(4000,true),oil=tank(2000,false);
  public boolean enabled,complete; public int warmup,status; public double condition=1,fuelCredit,oilCredit;
  private long workedTick=Long.MIN_VALUE; private int activity; private boolean checked;
+ /** Running with nothing to drive, the engine idles on a tenth of full load's fuel, 0.2 mB a second, and no oil. */
+ static final double IDLE_FUEL=.01;
  private final ModeledBuild build=new ModeledBuild();
  public OilEngineEntity(BlockPos p,BlockState s){super(OilEngineContent.ENTITY.get(),p,s);}
  private FluidTank tank(int capacity,boolean isFuel){return new FluidTank(capacity,s->s.is(isFuel?IndustrialContent.FUEL.get():IndustrialContent.LUBE.get())){ @Override public int fill(FluidStack stack,net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction action){int room=getSpace()-((isFuel?fuelCredit:oilCredit)>0?1:0);return room<=0?0:super.fill(stack.copyWithAmount(Math.min(stack.getAmount(),room)),action);}
@@ -47,19 +49,22 @@ public final class OilEngineEntity extends BlockEntity implements MenuProvider, 
   else if(warmup<100){
    if(warmup==0){if(fuel.getFluidAmount()<10){status=2;sync();return;}fuel.drain(10,EXECUTE);ThermalField.fuel(level,worldPosition,80);EnergyLog.machine(level,worldPosition,"engine_start","civilization:refined_fuel_mb",10,null,0);}
    warmup++;status=3;setChanged();
-  }else {if(activity>0)activity--;status=activity>0?5:4;}
+  }else {if(activity>0)activity--;else burnTo(Math.max(0,fuel.getFluidAmount()+fuelCredit-IDLE_FUEL));status=activity>0?5:4;}
   sync();
  }
  @Override public double requestWork(BlockPos consumer,double demand){
   if(level==null||level.isClientSide||!enabled||warmup<100||!Double.isFinite(demand)||demand<=0||workedTick==level.getGameTime())return 0;
   if(!consumer.equals(worldPosition)&&level.getBlockEntity(consumer)==null)return 0;
   if(!Chunks.loaded(level,consumer)||consumer.distSqr(worldPosition)>RANGE*RANGE||!CivicAccess.boundary(level,worldPosition,consumer)||ModeledMachine.status(this)!=MachineStructure.COMPLETE)return 0;
-  double beforeFuel=fuel.getFluidAmount()+fuelCredit;
   workedTick=level.getGameTime();var result=BoatEngine.step(fuel.getFluidAmount()+fuelCredit,oil.getFluidAmount()+oilCredit,condition,demand,.05);
-  // Whole mB remain transferable; sub-mB credit stays inside the engine and is persisted.
-  int f=(int)Math.floor(result.fuel()),o=(int)Math.floor(result.oil());fuelCredit=result.fuel()-f;oilCredit=result.oil()-o;
-  fuel.drain(fuel.getFluidAmount()-f,EXECUTE);oil.drain(oil.getFluidAmount()-o,EXECUTE);condition=result.condition();ThermalField.fuel(level,worldPosition,Math.max(0,beforeFuel-result.fuel())*8);
-  if(result.power()>0){activity=2;status=5;}setChanged();return result.power();
+  burnTo(result.fuel());int o=(int)Math.floor(result.oil());oilCredit=result.oil()-o;oil.drain(oil.getFluidAmount()-o,EXECUTE);condition=result.condition();
+  if(result.power()>0){activity=2;status=5;}return result.power();
+ }
+ /** Burns the fuel down to `left` mB, its heat warming the engine's surroundings. Whole mB remain transferable; the
+  *  sub-mB credit stays inside the engine and is persisted, as the oil's does. */
+ private void burnTo(double left){
+  double before=fuel.getFluidAmount()+fuelCredit;int f=(int)Math.floor(left);fuelCredit=left-f;fuel.drain(fuel.getFluidAmount()-f,EXECUTE);
+  ThermalField.fuel(level,worldPosition,(before-left)*8);setChanged();
  }
  private int lastState=-1;
  private void sync(){

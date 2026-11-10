@@ -107,7 +107,7 @@ public final class ThermalField extends SavedData {
     /** Registered structure only: never flood-fill into the player's house. */
     static Set<BlockPos> body(ServerLevel l,BlockPos p) {
         var state=l.getBlockState(p);var cells=new HashSet<BlockPos>();cells.add(p);
-        boolean heatedMachine=state.getBlock() instanceof IndustrialBlock || state.getBlock() instanceof OilEngineBlock
+        boolean heatedMachine=state.getBlock() instanceof IndustrialBlock
                 || state.getBlock() instanceof WorkshopBlock
                 || l.getBlockEntity(p) instanceof KilnBlockEntity kiln && kiln.requiresStructure();
         var modeled=ModeledMachine.of(l.getBlockEntity(p));

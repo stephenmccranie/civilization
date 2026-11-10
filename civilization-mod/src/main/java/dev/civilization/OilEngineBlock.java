@@ -28,10 +28,8 @@ public final class OilEngineBlock extends Block implements EntityBlock, ModeledB
   if(stack.is(IndustrialContent.CAN.get())||stack.is(IndustrialContent.FUEL_CAN.get())||stack.is(IndustrialContent.LUBE_CAN.get())){if(!l.isClientSide&&CivicAccess.allowed(l,pos,p)&&l.getBlockEntity(pos) instanceof OilEngineEntity e)e.canister(p,hand);return ItemInteractionResult.sidedSuccess(l.isClientSide);}
   var engine=ModeledMachine.of(l.getBlockEntity(pos));var held=engine==null?ItemStack.EMPTY:ModeledMachine.material(engine,p,stack);
   if(!held.isEmpty()){if(!l.isClientSide)ModeledMachine.build(engine,p,held);return ItemInteractionResult.sidedSuccess(l.isClientSide);}
-  return MachineConstruction.useOn(stack,s,l,pos,p);
+  return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
  }
  @Override protected void onRemove(BlockState s,Level l,BlockPos pos,BlockState next,boolean moving){if(!s.is(next.getBlock())&&!l.isClientSide&&l.getBlockEntity(pos) instanceof OilEngineEntity e)ModeledMachine.dismantle(e);super.onRemove(s,l,pos,next,moving);}
- /** While it runs, exhaust leaves the stack's top: half a block across the engine from the controller's centre, 2.875
-  *  blocks back and three up. */
  @Override public void appendHoverText(ItemStack s,Item.TooltipContext c,java.util.List<Component> lines,TooltipFlag f){lines.add(Component.literal("Runs on refined fuel + lubricating oil"));lines.add(Component.literal("Place for the build guide"));lines.add(Component.literal("Drain liquids before breaking."));}
 }

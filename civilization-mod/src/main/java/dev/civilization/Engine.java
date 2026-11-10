@@ -16,14 +16,15 @@ public interface Engine {
     static Engine of(BlockEntity entity){
         return entity instanceof OilEngineEntity oil?oil:entity instanceof IndustrialBlockEntity m&&m.kind==IndustrialBlock.Kind.COAL_ENGINE?m:null;
     }
-    /** The nearest engine within range of `at` in chunks that have finished loading, or null. */
+    /** The nearest engine within range of `at` and on its side of every claim boundary, in chunks that have finished
+     *  loading, or null. */
     static BlockPos near(Level level,BlockPos at){
         BlockPos best=null;
         for(int cx=(at.getX()-RANGE)>>4;cx<=(at.getX()+RANGE)>>4;cx++)for(int cz=(at.getZ()-RANGE)>>4;cz<=(at.getZ()+RANGE)>>4;cz++){
             var chunk=Chunks.chunk(level,cx,cz);if(chunk==null)continue;
             for(var entity:chunk.getBlockEntities().values()){
                 var p=entity.getBlockPos();
-                if(of(entity)!=null&&p.distSqr(at)<=RANGE*RANGE&&(best==null||p.distSqr(at)<best.distSqr(at)))best=p;
+                if(of(entity)!=null&&p.distSqr(at)<=RANGE*RANGE&&(best==null||p.distSqr(at)<best.distSqr(at))&&CivicAccess.boundary(level,p,at))best=p;
             }
         }
         return best;

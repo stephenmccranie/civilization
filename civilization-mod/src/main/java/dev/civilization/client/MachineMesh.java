@@ -125,11 +125,12 @@ final class MachineMesh {
         if (cell < 0 && water) throw new IllegalStateException(model.id + ": water needs a water cell in its definition");
         var offset = cell == CONTROLLER_CELL ? BlockPos.ZERO : ModeledMachine.position(BlockPos.ZERO, front, model.cells.get(cell));
         var into = quads.computeIfAbsent(key(front, cell, group), k -> new ArrayList<>());
-        // Sodium stores a chunk section's vertices at most eight blocks outside it, so a cube must lie that near its cell.
+        // Sodium stores a chunk section's vertices from eight blocks before it to just short of eight past it, so a
+        // cube must lie that near its cell.
         for (var quad : placed) {
             for (var point : quad.corners()) {
                 point.sub(offset.getX(), offset.getY(), offset.getZ());
-                if (Math.min(point.x(), Math.min(point.y(), point.z())) < -8 || Math.max(point.x(), Math.max(point.y(), point.z())) > 9)
+                if (Math.min(point.x(), Math.min(point.y(), point.z())) < -8 || Math.max(point.x(), Math.max(point.y(), point.z())) >= 9)
                     throw new IllegalStateException(model.id + ": section " + group + " draws a cube more than eight blocks from the nearest cell it fills");
             }
             into.add(quad);

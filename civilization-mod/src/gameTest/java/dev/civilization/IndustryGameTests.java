@@ -343,8 +343,8 @@ public final class IndustryGameTests {
     private static void pipe(GameTestHelper h,BlockPos p){h.getLevel().setBlockAndUpdate(p,IndustrialContent.PIPE.get().defaultBlockState());}
     @GameTest(template="empty",timeoutTicks=1000,batch="industry-pipeline") public static void onePumpSustainsOnePrimedRefineryLine(GameTestHelper h){
         var l=h.getLevel();var origin=h.absolutePos(new BlockPos(0,67,0));
-        // This 60-block pipeline extends beyond the tiny empty template's ticking area.
-        for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-1)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
+        // This 60-block pipeline, and the derrick's engine six blocks in front of it, extend beyond the tiny empty template's ticking area.
+        for(int cx=(origin.getX()-5)>>4;cx<=(origin.getX()+64)>>4;cx++)for(int cz=(origin.getZ()-8)>>4;cz<=(origin.getZ()+12)>>4;cz++)l.setChunkForced(cx,cz,true);
         h.runAfterDelay(20,()->{var pump=machine(h,IndustrialContent.DERRICK.get(),15);
         var oil=site(pump,Deposits.Kind.OIL,1000);bind(pump,oil);pump.struck=true;int[] initialStock={0};
         var engine=MachineFixture.hotBulbEngine(l,pump);engine.enabled=true;

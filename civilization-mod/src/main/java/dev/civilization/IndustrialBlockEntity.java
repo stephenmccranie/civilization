@@ -92,7 +92,8 @@ public final class IndustrialBlockEntity extends BlockEntity implements WorldlyC
         MachineInventory.refill(this,MachineInventory.INDUSTRIAL_INPUT);
         transfer(true);
         if(kind==Kind.COLUMN||kind==Kind.CONDENSER){refine();return;}
-        if(!surveyed&&(kind==Kind.DERRICK||kind==Kind.DRILL)){site=Deposits.at(server,worldPosition);surveyed=true;}
+        // The derrick's site is the one its well stands over, so a well always reaches the body it was sited on.
+        if(!surveyed&&(kind==Kind.DERRICK||kind==Kind.DRILL)){site=Deposits.at(server,kind==Kind.DERRICK?well():worldPosition);surveyed=true;}
         if(kind==Kind.DERRICK){derrick(server);return;}
         DepositWork.Target target=null;
         if(kind==Kind.DRILL){

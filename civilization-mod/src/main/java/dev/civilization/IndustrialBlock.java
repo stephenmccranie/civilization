@@ -60,6 +60,6 @@ public final class IndustrialBlock extends Block implements EntityBlock, Modeled
         if(kind!=Kind.TANK)lines.add(Component.literal(model()!=null?"Supply held materials to the controller.":"Place for the construction guide.").withStyle(net.minecraft.ChatFormatting.GRAY));
         if(kind==Kind.DERRICK)lines.add(Component.literal("Driven by an engine within 8 blocks.").withStyle(net.minecraft.ChatFormatting.GRAY));
         if(kind==Kind.COAL_ENGINE)lines.add(Component.literal("Drives a machine within 8 blocks.").withStyle(net.minecraft.ChatFormatting.GRAY));
-        lines.add(Component.literal("Drain liquids before breaking.").withStyle(net.minecraft.ChatFormatting.GRAY));
+        if(kind!=Kind.COAL_ENGINE)lines.add(Component.literal("Drain liquids before breaking.").withStyle(net.minecraft.ChatFormatting.GRAY));
     }
 }

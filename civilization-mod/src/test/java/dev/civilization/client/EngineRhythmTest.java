@@ -14,7 +14,7 @@ class EngineRhythmTest {
     }
 
     @Test void startFromRestKicksOnceThenKnocksTightenToTwoATurn() {
-        var rhythm = new EngineRhythm();
+        var rhythm = new EngineRhythm(false);
         assertEquals(EngineRhythm.Beat.KICK, rhythm.tick(true));
         var knocks = beats(rhythm, true, 200, EngineRhythm.Beat.KNOCK);
         assertTrue(knocks.getFirst() <= 10, "The engine catches within half a second of the kick");
@@ -24,7 +24,7 @@ class EngineRhythmTest {
     }
 
     @Test void coastingSpreadsTheKnocksThenStopsAndTheNextStartKicksAgain() {
-        var rhythm = new EngineRhythm();
+        var rhythm = new EngineRhythm(false);
         beats(rhythm, true, 200, EngineRhythm.Beat.KNOCK);
         var knocks = beats(rhythm, false, 100, EngineRhythm.Beat.KNOCK);
         assertFalse(knocks.isEmpty(), "The flywheel coasts on after the load stops");
@@ -33,10 +33,17 @@ class EngineRhythmTest {
         assertEquals(EngineRhythm.Beat.KICK, rhythm.tick(true), "A start from rest kicks the flywheel over again");
     }
 
-    @Test void loadReturningWhileCoastingResumesWithoutAKick() {
-        var rhythm = new EngineRhythm();
+    @Test void restartingWhileCoastingResumesWithoutAKick() {
+        var rhythm = new EngineRhythm(false);
         beats(rhythm, true, 200, EngineRhythm.Beat.KNOCK);
         for (int t = 0; t < 5; t++) rhythm.tick(false);
         assertTrue(beats(rhythm, true, 100, EngineRhythm.Beat.KICK).isEmpty(), "A turning flywheel needs no kick");
+    }
+
+    @Test void anEngineFirstMetRunningKnocksAtSpeedWithoutAKick() {
+        var rhythm = new EngineRhythm(true);
+        assertTrue(beats(rhythm, true, 100, EngineRhythm.Beat.KICK).isEmpty(), "A running engine coming into view was not just started");
+        var knocks = beats(rhythm, true, 100, EngineRhythm.Beat.KNOCK);
+        assertEquals(EngineRhythm.BEAT, knocks.get(1) - knocks.get(0), "It is already at speed");
     }
 }

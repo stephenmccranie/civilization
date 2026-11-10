@@ -3,7 +3,8 @@ package dev.civilization.client;
 /**
  * The Hot-Bulb Engine's flywheel heard as exhaust knocks, two a turn. While the engine runs it spins up to full speed,
  * a knock every {@link #BEAT} ticks (the run animation's 0.8-second turn); once it stops it coasts down, its knocks
- * spreading apart until it rests. A start from rest begins with the kick that throws the flywheel over.
+ * spreading apart until it rests. A start from rest begins with the kick that throws the flywheel over; an engine
+ * first met already running is at full speed, with no kick.
  */
 final class EngineRhythm {
     enum Beat { NONE, KICK, KNOCK }
@@ -12,6 +13,8 @@ final class EngineRhythm {
     /** The flywheel's speed as a fraction of full; 0 at rest. */
     double speed;
     private double phase;
+
+    EngineRhythm(boolean turning) { speed = turning ? 1 : 0; }
 
     Beat tick(boolean running) {
         if (running && speed == 0) { speed = KICKED; phase = .3; return Beat.KICK; }

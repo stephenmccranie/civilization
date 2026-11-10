@@ -36,10 +36,10 @@ public class OilEngineGameTests {
   var e=build(h,Direction.NORTH);e.fuel.fill(new FluidStack(IndustrialContent.FUEL.get(),1000),EXECUTE);e.oil.fill(new FluidStack(IndustrialContent.LUBE.get(),1000),EXECUTE);e.toggle();
   e.tick();h.assertTrue(e.lit()&&e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Lamps light the controller while the bulbs heat");
   for(int i=1;i<100;i++)e.tick();h.assertTrue(e.warmup==100&&e.fuel.getFluidAmount()==990,"One 10mB cold start");
-  for(int i=0;i<30;i++)e.tick();h.assertTrue(e.fuel.getFluidAmount()==990&&e.working()&&!e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Once the bulbs are hot the engine runs, its lamps out, using no fuel off load");
+  for(int i=0;i<30;i++)e.tick();h.assertTrue(Math.abs(e.fuel.getFluidAmount()+e.fuelCredit-989.7)<.00001&&e.working()&&!e.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT),"Once the bulbs are hot the engine runs, its lamps out, idling on a tenth of full load's fuel");
   double power=e.requestWork(e.getBlockPos(),1);h.assertTrue(power>.99,"Engine supplies work");h.assertTrue(e.requestWork(e.getBlockPos(),1)==0,"Repeated request cannot double-spend or double-output");
   for(int i=0;i<5;i++)e.tick();h.assertTrue(e.status==4&&e.working()&&!e.lit(),"Off load it keeps running with its lamps out");
-  h.assertTrue(Math.abs(e.fuel.getFluidAmount()+e.fuelCredit-989.9)<.00001,"Fractional fuel is conserved");
+  h.assertTrue(Math.abs(e.fuel.getFluidAmount()+e.fuelCredit-989.57)<.00001,"Fractional fuel is conserved: 0.1 mB for the tick of work, then three idle ticks once the load is gone");
   h.assertTrue(Math.abs(e.oil.getFluidAmount()+e.oilCredit-999.995)<.00001,"Fractional lubricant is conserved");
   var saved=e.saveWithoutMetadata(h.getLevel().registryAccess());var restored=new OilEngineEntity(e.getBlockPos(),e.getBlockState());restored.loadWithComponents(saved,h.getLevel().registryAccess());
   h.assertTrue(Math.abs(restored.fuelCredit-e.fuelCredit)<.00001&&restored.warmup==100&&restored.build().sections==e.build().sections,"Saved build, warmup and fractional stock");

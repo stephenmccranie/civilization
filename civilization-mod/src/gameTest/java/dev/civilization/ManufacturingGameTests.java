@@ -97,7 +97,7 @@ public final class ManufacturingGameTests {
     }
     @GameTest(template="industrial") public static void tableBypassesRetiredAndBootstrapRemains(GameTestHelper h){
         var manager=h.getLevel().getRecipeManager();
-        for(String id:List.of("civilization:machine_parts","civilization:empty_canister","civilization:oil_pump","civilization:coal_minecart","minecraft:oak_door","minecraft:minecart","minecraft:rail"))
+        for(String id:List.of("civilization:machine_parts","civilization:empty_canister","civilization:oil_derrick","civilization:coal_minecart","minecraft:oak_door","minecraft:minecart","minecraft:rail"))
             h.assertTrue(manager.byKey(net.minecraft.resources.ResourceLocation.parse(id)).isEmpty(),"Old direct crafting disabled: "+id);
         for(String id:List.of("civilization:assembly_bench","civilization:foundry","civilization:smithy","civilization:tannery","minecraft:chest"))
             h.assertTrue(manager.byKey(net.minecraft.resources.ResourceLocation.parse(id)).isPresent(),"Bootstrap available: "+id);
