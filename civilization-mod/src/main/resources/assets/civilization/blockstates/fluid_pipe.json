@@ -2,67 +2,86 @@
   "multipart": [
     {
       "when": {
-        "north": "false",
-        "east": "false",
-        "south": "false",
-        "west": "false",
-        "up": "false",
-        "down": "false"
+        "glass": "true",
+        "east": "none",
+        "west": "none",
+        "up": "none",
+        "down": "none"
       },
       "apply": {
-        "model": "civilization:block/fluid_pipe_spool"
+        "model": "civilization:block/fluid_pipe_glass"
+      }
+    },
+    {
+      "when": {
+        "glass": "true",
+        "east": "pipe|flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_glass",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "glass": "true",
+        "up": "pipe|flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_glass",
+        "x": 270
       }
     },
     {
       "when": {
         "OR": [
           {
-            "north": "true",
-            "east": "true"
+            "north": "pipe|flange",
+            "east": "pipe|flange"
           },
           {
-            "north": "true",
-            "west": "true"
+            "north": "pipe|flange",
+            "west": "pipe|flange"
           },
           {
-            "south": "true",
-            "east": "true"
+            "south": "pipe|flange",
+            "east": "pipe|flange"
           },
           {
-            "south": "true",
-            "west": "true"
+            "south": "pipe|flange",
+            "west": "pipe|flange"
           },
           {
-            "north": "true",
-            "up": "true"
+            "north": "pipe|flange",
+            "up": "pipe|flange"
           },
           {
-            "north": "true",
-            "down": "true"
+            "north": "pipe|flange",
+            "down": "pipe|flange"
           },
           {
-            "south": "true",
-            "up": "true"
+            "south": "pipe|flange",
+            "up": "pipe|flange"
           },
           {
-            "south": "true",
-            "down": "true"
+            "south": "pipe|flange",
+            "down": "pipe|flange"
           },
           {
-            "east": "true",
-            "up": "true"
+            "east": "pipe|flange",
+            "up": "pipe|flange"
           },
           {
-            "east": "true",
-            "down": "true"
+            "east": "pipe|flange",
+            "down": "pipe|flange"
           },
           {
-            "west": "true",
-            "up": "true"
+            "west": "pipe|flange",
+            "up": "pipe|flange"
           },
           {
-            "west": "true",
-            "down": "true"
+            "west": "pipe|flange",
+            "down": "pipe|flange"
           }
         ]
       },
@@ -72,7 +91,8 @@
     },
     {
       "when": {
-        "north": "true"
+        "glass": "false",
+        "north": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm"
@@ -80,7 +100,8 @@
     },
     {
       "when": {
-        "east": "true"
+        "glass": "false",
+        "east": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm",
@@ -89,7 +110,8 @@
     },
     {
       "when": {
-        "south": "true"
+        "glass": "false",
+        "south": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm",
@@ -98,7 +120,8 @@
     },
     {
       "when": {
-        "west": "true"
+        "glass": "false",
+        "west": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm",
@@ -107,7 +130,8 @@
     },
     {
       "when": {
-        "up": "true"
+        "glass": "false",
+        "up": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm",
@@ -116,7 +140,8 @@
     },
     {
       "when": {
-        "down": "true"
+        "glass": "false",
+        "down": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_arm",
@@ -125,12 +150,65 @@
     },
     {
       "when": {
-        "north": "true",
-        "east": "false",
-        "south": "false",
-        "west": "false",
-        "up": "false",
-        "down": "false"
+        "north": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange"
+      }
+    },
+    {
+      "when": {
+        "east": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "flange"
+      },
+      "apply": {
+        "model": "civilization:block/fluid_pipe_flange",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "pipe|flange",
+        "east": "none",
+        "south": "none",
+        "west": "none",
+        "up": "none",
+        "down": "none"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end"
@@ -138,12 +216,12 @@
     },
     {
       "when": {
-        "north": "false",
-        "east": "true",
-        "south": "false",
-        "west": "false",
-        "up": "false",
-        "down": "false"
+        "north": "none",
+        "east": "pipe|flange",
+        "south": "none",
+        "west": "none",
+        "up": "none",
+        "down": "none"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end",
@@ -152,12 +230,12 @@
     },
     {
       "when": {
-        "north": "false",
-        "east": "false",
-        "south": "true",
-        "west": "false",
-        "up": "false",
-        "down": "false"
+        "north": "none",
+        "east": "none",
+        "south": "pipe|flange",
+        "west": "none",
+        "up": "none",
+        "down": "none"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end",
@@ -166,12 +244,12 @@
     },
     {
       "when": {
-        "north": "false",
-        "east": "false",
-        "south": "false",
-        "west": "true",
-        "up": "false",
-        "down": "false"
+        "north": "none",
+        "east": "none",
+        "south": "none",
+        "west": "pipe|flange",
+        "up": "none",
+        "down": "none"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end",
@@ -180,12 +258,12 @@
     },
     {
       "when": {
-        "north": "false",
-        "east": "false",
-        "south": "false",
-        "west": "false",
-        "up": "true",
-        "down": "false"
+        "north": "none",
+        "east": "none",
+        "south": "none",
+        "west": "none",
+        "up": "pipe|flange",
+        "down": "none"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end",
@@ -194,12 +272,12 @@
     },
     {
       "when": {
-        "north": "false",
-        "east": "false",
-        "south": "false",
-        "west": "false",
-        "up": "false",
-        "down": "true"
+        "north": "none",
+        "east": "none",
+        "south": "none",
+        "west": "none",
+        "up": "none",
+        "down": "pipe|flange"
       },
       "apply": {
         "model": "civilization:block/fluid_pipe_end",
