@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.GameType;
 
-/** Pipe art fixture: every shape, each liquid both ways, the ports of a modeled and a block-built machine, night, and the items. */
+/** Pipe art fixture: long runs of each liquid both ways, every shape, a cluster of bends, the ports of a modeled and a block-built machine, night, and the items. */
 final class PipeVisualCheck {
     private static int ticks;
     private static volatile boolean ready;
@@ -35,15 +35,17 @@ final class PipeVisualCheck {
         }
         return path;
     }
-    // Shapes against the wall: a length with both ends blanked, a bend, a tee, a cross with six arms, a riser, a lone pipe and a run into a port.
+    // A long run for each liquid, alternate rows set back so they stay apart.
+    private static final List<Run> LIQUIDS=List.of(new Run(1,60,102,0,86,102,0),new Run(2,60,103,2,86,103,2),new Run(3,60,104,0,86,104,0),
+        new Run(4,60,105,2,86,105,2),new Run(5,60,106,0,86,106,0));
+    // Shapes against the wall: a length with both ends blanked, a bend, a tee, a cross with six arms, a riser, a lone pipe, a run into a port
+    // and a cluster of seven bends with short lengths between them.
     private static final List<Run> SHAPES=List.of(new Run(1,91,102,0,95,102,0),new Run(2,91,104,0,93,104,0,93,106,0),
         new Run(5,94,104,0,98,104,0),new Run(4,96,106,0,96,104,0,97,104,0),
         new Run(3,98,105,0,102,105,0),new Run(3,100,107,0,100,103,0),new Run(3,100,105,-2,100,105,2),
-        new Run(4,103,100,0,103,106,0),new Run(3,105,104,0,107,104,0,107,104,3));
+        new Run(4,103,100,0,103,106,0),new Run(3,105,104,0,107,104,0,107,104,3),
+        new Run(2,109,102,0,112,102,0,112,104,0,110,104,0,110,106,0,114,106,0,114,102,0,116,102,0,116,107,0));
     private static final BlockPos LONE=new BlockPos(105,102,0),PORT=new BlockPos(107,104,3);
-    // One run for each liquid, alternate rows set back so they stay apart.
-    private static final List<Run> LIQUIDS=List.of(new Run(1,110,102,0,116,102,0),new Run(2,110,103,2,116,103,2),new Run(3,110,104,0,116,104,0),
-        new Run(4,110,105,2,116,105,2),new Run(5,110,106,0,116,106,0));
     // Crude into the Fired Heater's intake, and hot oil from its outlet to the Distillation Column's port.
     private static final BlockPos HEATER=new BlockPos(122,101,-8),COLUMN=new BlockPos(130,101,-8);
     private static final List<Run> MACHINES=List.of(new Run(1,117,102,-6,121,102,-6),new Run(3,123,102,-6,128,102,-6));
@@ -65,14 +67,14 @@ final class PipeVisualCheck {
             mc.options.hideGui=true;mc.options.fov().set(45);mc.options.guiScale().set(3);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
             server.execute(()->{try{
                 var l=server.overworld();var p=server.getPlayerList().getPlayers().getFirst();
-                for(int x=86;x<=138;x++)for(int z=-24;z<=6;z++)for(int y=100;y<=114;y++)
+                for(int x=56;x<=138;x++)for(int z=-24;z<=6;z++)for(int y=100;y<=114;y++)
                     l.setBlockAndUpdate(new BlockPos(x,y,z),y==100?Blocks.STONE_BRICKS.defaultBlockState():Blocks.AIR.defaultBlockState());
-                for(int x=89;x<=118;x++)for(int y=101;y<=108;y++)l.setBlockAndUpdate(new BlockPos(x,y,3),(x>=105&&x<=109?Blocks.BRICKS:Blocks.SMOOTH_STONE).defaultBlockState());
+                for(int x=58;x<=118;x++)for(int y=101;y<=108;y++)l.setBlockAndUpdate(new BlockPos(x,y,3),(x>=105&&x<=109?Blocks.BRICKS:Blocks.SMOOTH_STONE).defaultBlockState());
                 l.setBlockAndUpdate(PORT,IndustrialContent.PORT.get().defaultBlockState());
                 machine(l,IndustrialContent.HEATER.get(),HEATER);machine(l,IndustrialContent.COLUMN.get(),COLUMN);
                 l.setBlockAndUpdate(LONE,IndustrialContent.PIPE.get().defaultBlockState());
-                for(var runs:List.of(SHAPES,LIQUIDS,MACHINES))for(var run:runs)for(var at:run.pipes())l.setBlockAndUpdate(at,IndustrialContent.PIPE.get().defaultBlockState());
-                for(int x:new int[]{93,99,105,113})l.setBlockAndUpdate(new BlockPos(x,101,-2),Blocks.LANTERN.defaultBlockState());
+                for(var runs:List.of(LIQUIDS,SHAPES,MACHINES))for(var run:runs)for(var at:run.pipes())l.setBlockAndUpdate(at,IndustrialContent.PIPE.get().defaultBlockState());
+                for(int x:new int[]{63,69,75,81,93,99,105,113})l.setBlockAndUpdate(new BlockPos(x,101,-2),Blocks.LANTERN.defaultBlockState());
                 for(int x:new int[]{119,126})l.setBlockAndUpdate(new BlockPos(x,101,-9),Blocks.LANTERN.defaultBlockState());
                 p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();
                 p.getInventory().clearContent();p.getInventory().setItem(0,IndustrialContent.PIPE.toStack());p.getInventory().setItem(1,IndustrialContent.PORT.toStack());
@@ -82,8 +84,8 @@ final class PipeVisualCheck {
         }
         if(ticks>100&&!ready){ticks=101;return;}
         // Transfers run except for the stretch that shows them clearing; the liquid runs turn round halfway.
-        boolean reversed=ticks>=290;
-        if(ticks>=140&&ticks%6==0&&(ticks<=430||ticks>=500))server.execute(()->{
+        boolean reversed=ticks>=350;
+        if(ticks>=140&&ticks%6==0&&(ticks<=486||ticks>=540))server.execute(()->{
             var l=server.overworld();
             for(var run:SHAPES)run.flow(l,false);
             for(var run:MACHINES)run.flow(l,false);
@@ -94,34 +96,40 @@ final class PipeVisualCheck {
             shot(mc,"shapes");
         }
         if(ticks==184)view(mc,97.5,105.5,-4.5,0,12);
-        if(ticks==214)shot(mc,"joints");
+        if(ticks==214)shot(mc,"fittings");
         if(ticks==216)view(mc,104.3,103.5,-2.2,-32,7);
         if(ticks==246)shot(mc,"port");
-        if(ticks==248)view(mc,113.5,102.9,-6.5,0,0);
-        if(ticks==278)shot(mc,"liquids-east");
-        if(ticks==282)shot(mc,"liquids-east-later");
-        if(ticks==320)shot(mc,"liquids-west");
-        if(ticks==324)shot(mc,"liquids-west-later");
-        if(ticks==326)view(mc,125.5,103.5,-14.5,0,14);
-        if(ticks==356)shot(mc,"machines");
-        if(ticks==358)view(mc,117.5,102.3,-10.5,-34,14);
-        if(ticks==388)shot(mc,"heater-intake");
-        if(ticks==390)view(mc,125.5,102.3,-10.5,-24,14);
-        if(ticks==420)shot(mc,"column-port");
-        if(ticks==432)view(mc,99.5,103,-13,0,0);
-        if(ticks==470){
+        if(ticks==248)view(mc,113.5,102.4,-9,0,0);
+        if(ticks==278)shot(mc,"cluster");
+        if(ticks==280)view(mc,73.5,102.4,-17.5,0,0);
+        if(ticks==310)shot(mc,"run");
+        if(ticks==312)view(mc,73.5,102.4,-6.5,0,0);
+        if(ticks==342)shot(mc,"liquids-east");
+        if(ticks==346)shot(mc,"liquids-east-later");
+        if(ticks==384)shot(mc,"liquids-west");
+        if(ticks==388)shot(mc,"liquids-west-later");
+        if(ticks==390)view(mc,125.5,103.5,-14.5,0,14);
+        if(ticks==420)shot(mc,"machines");
+        if(ticks==422)view(mc,117.5,102.3,-10.5,-34,14);
+        if(ticks==452)shot(mc,"heater-intake");
+        if(ticks==454)view(mc,125.5,102.3,-10.5,-24,14);
+        if(ticks==484)shot(mc,"column-port");
+        if(ticks==488)view(mc,73.5,102.4,-6.5,0,0);
+        if(ticks==530){
             if(flowing(mc,new BlockPos(93,102,0),Direction.EAST))throw new IllegalStateException("Pipe flow did not clear");
             shot(mc,"empty");
         }
-        if(ticks==472)server.execute(()->server.overworld().setDayTime(18000));
-        if(ticks==540)shot(mc,"night");
-        if(ticks==542)view(mc,125.5,103.5,-14.5,0,14);
-        if(ticks==572)shot(mc,"machines-night");
-        if(ticks==574){server.execute(()->server.overworld().setDayTime(6000));view(mc,104.5,102.5,-3.5,0,0);mc.options.hideGui=false;}
-        if(ticks==620)shot(mc,"held");
-        if(ticks==624)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
-        if(ticks==640)shot(mc,"item");
-        if(ticks>645)mc.stop();
+        if(ticks==532){server.execute(()->server.overworld().setDayTime(18000));view(mc,73.5,102.4,-17.5,0,0);}
+        if(ticks==600)shot(mc,"night");
+        if(ticks==602)view(mc,73.5,102.4,-6.5,0,0);
+        if(ticks==632)shot(mc,"night-close");
+        if(ticks==634)view(mc,125.5,103.5,-14.5,0,14);
+        if(ticks==664)shot(mc,"machines-night");
+        if(ticks==666){server.execute(()->server.overworld().setDayTime(6000));view(mc,104.5,102.5,-3.5,0,0);mc.options.hideGui=false;}
+        if(ticks==712)shot(mc,"held");
+        if(ticks==716)mc.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+        if(ticks==732)shot(mc,"item");
+        if(ticks>737)mc.stop();
     }
     private static void shot(Minecraft mc,String name){Screenshot.grab(mc.gameDirectory,"pipes-"+name+".png",mc.getMainRenderTarget(),m->com.mojang.logging.LogUtils.getLogger().info("{}",m.getString()));}
 }
