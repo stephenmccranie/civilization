@@ -143,4 +143,22 @@ public final class ChestArmfulGameTests {
         h.assertTrue(blocks(chest)==BlockCarry.LIMIT&&packed==20-BlockCarry.LIMIT&&p.said.size()==1,"Shift-clicking a pack stack fills the chest to its armful and the rest stays packed: chest "+blocks(chest)+", pack "+packed);
         h.succeed();
     }
+
+    @GameTest(template="industrial") public static void droppersAndHoppersOverChestMinecartsStopAtTheArmful(GameTestHelper h){
+        var level=h.getLevel();ChestBlockEntity chest=place(h,new BlockPos(3,1,3),Blocks.CHEST);chest.setItem(0,new ItemStack(Items.DIRT,BlockCarry.LIMIT-1));
+        var beside=chest.getBlockPos().west();level.setBlockAndUpdate(beside,Blocks.DROPPER.defaultBlockState().setValue(DispenserBlock.FACING,Direction.EAST));
+        var dropper=(DispenserBlockEntity)level.getBlockEntity(beside);dropper.setItem(0,new ItemStack(Items.COBBLESTONE,3));
+        for(int n=0;n<3;n++)level.getBlockState(beside).tick(level,beside,level.random);
+        h.assertTrue(blocks(chest)==BlockCarry.LIMIT&&count(chest,Items.COBBLESTONE)==1&&dropper.getItem(0).getCount()==2,"A dropper fills a chest to its armful and keeps the rest: chest "+blocks(chest)+", dropper "+dropper.getItem(0));
+        dropper.setItem(0,new ItemStack(Items.APPLE,2));level.getBlockState(beside).tick(level,beside,level.random);
+        h.assertTrue(dropper.getItem(0).getCount()==1&&count(chest,Items.APPLE)==1,"A dropper still feeds ordinary goods");
+
+        var under=new BlockPos(7,1,3);var at=h.absolutePos(under);var cart=new MinecartChest(level,at.getX()+.5,at.getY(),at.getZ()+.5);level.addFreshEntity(cart);
+        cart.setItem(0,new ItemStack(Items.STONE,BlockCarry.LIMIT-1));
+        var hopper=hopperOver(h,under,new ItemStack(Items.COBBLESTONE,3));hopperTick(hopper);hopperTick(hopper);
+        h.assertTrue(blocks(cart)==BlockCarry.LIMIT&&count(cart,Items.COBBLESTONE)==1&&hopper.getItem(0).getCount()==2,"A hopper fills a chest minecart to its armful and keeps the rest: cart "+blocks(cart)+", hopper "+hopper.getItem(0));
+        hopper.setItem(0,new ItemStack(Items.APPLE,2));hopperTick(hopper);
+        h.assertTrue(hopper.getItem(0).getCount()==1&&count(cart,Items.APPLE)==1,"A hopper still feeds a chest minecart ordinary goods");
+        cart.clearContent();cart.discard();h.succeed();
+    }
 }
