@@ -2,35 +2,44 @@ package dev.civilization.mixin.compat;
 
 import dev.civilization.CloudCover;
 import dev.civilization.client.LocalWeather;
+import dev.civilization.client.PhotonRivers;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL20C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Each Iris pass that draws the shared cloud field gets its uniforms when bound: Photon's prepare and deferred passes. */
+/**
+ * Every Iris program that draws the shared cloud field or river water gets those uniforms with its own. Iris keeps
+ * one of these per program and updates it while the program is bound, whatever kind of program it is: Photon's
+ * prepare and deferred passes, Sodium's terrain and water, entities and Distant Horizons.
+ */
 @Pseudo
-@Mixin(targets = "net.irisshaders.iris.gl.program.Program", remap = false)
-public abstract class IrisCloudUniformMixin {
+@Mixin(targets = "net.irisshaders.iris.gl.program.ProgramUniforms", remap = false)
+public abstract class IrisPhotonUniformMixin {
     @Unique private static final float[] civilization$clear = new float[9];
-    // Cloud shift, grid offset and cloudiness locations, -1 where this program lacks one.
-    @Unique private int[] civilization$cloudUniforms;
+    @Unique private static final String[] civilization$names = {"civilizationCloudShift", "civilizationCloudGrid",
+            "civilizationCloudiness", "civilizationRiverCount", "civilizationRiverLine", "civilizationRiverAlong"};
+    // Each name's location in this program, -1 where it lacks one; found on the first update, with the program bound.
+    @Unique private int[] civilization$uniforms;
 
-    @Shadow public abstract int getProgramId();
-
-    @Inject(method = "use()V", at = @At("TAIL"), require = 1)
-    private void civilization$clouds(CallbackInfo ci) {
-        int[] at = civilization$cloudUniforms;
+    @Inject(method = "update()V", at = @At("TAIL"), require = 1)
+    private void civilization$uniforms(CallbackInfo ci) {
+        int[] at = civilization$uniforms;
         if (at == null) {
-            int id = getProgramId();
-            at = civilization$cloudUniforms = new int[]{GL20C.glGetUniformLocation(id, "civilizationCloudShift"),
-                    GL20C.glGetUniformLocation(id, "civilizationCloudGrid"), GL20C.glGetUniformLocation(id, "civilizationCloudiness")};
+            int id = GL20C.glGetInteger(GL20C.GL_CURRENT_PROGRAM);
+            at = civilization$uniforms = new int[civilization$names.length];
+            for (int k = 0; k < at.length; k++) at[k] = GL20C.glGetUniformLocation(id, civilization$names[k]);
         }
-        if (at[0] < 0 && at[1] < 0 && at[2] < 0) return;
+        if (at[0] >= 0 || at[1] >= 0 || at[2] >= 0) civilization$clouds(at);
+        if (at[3] >= 0 || at[4] >= 0 || at[5] >= 0) PhotonRivers.upload(at[3], at[4], at[5]);
+    }
+
+    @Unique
+    private static void civilization$clouds(int[] at) {
         var mc = Minecraft.getInstance();
         if (mc.level == null) return;
         var camera = mc.gameRenderer.getMainCamera().getPosition();

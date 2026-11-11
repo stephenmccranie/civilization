@@ -82,6 +82,7 @@ public final class PreviewVisualCheck {
         if(CHECK.equals("bulk")){BulkVisualCheck.tick(mc);return;}
         if(CHECK.equals("thermal")){ThermalVisualCheck.tick(mc);return;}
         if(CHECK.equals("clouds")){CloudVisualCheck.tick(mc);return;}
+        if(CHECK.equals("rivers")){RiverVisualCheck.tick(mc);return;}
         if(CHECK.equals("cloth")||CHECK.equals("sulfur")||CHECK.equals("parts")||CHECK.equals("supplies")||CHECK.equals("foods")||CHECK.equals("manufactured")||CHECK.equals("components")||CHECK.equals("tools")||CHECK.equals("minerals")||CHECK.equals("buckets")){ItemArtVisualCheck.tick(mc,CHECK);return;}
         if(CHECK.equals("canisters")){CanisterVisualCheck.tick(mc);return;}
         if(CHECK.equals("paterson")){FirearmVisualCheck.tick(mc);return;}

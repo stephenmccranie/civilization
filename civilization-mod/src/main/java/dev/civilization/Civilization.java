@@ -24,6 +24,7 @@ public final class Civilization {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, TemperatureWashConfig.SPEC, "civilization-temperature-wash.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER,WeatherConfig.SPEC,"civilization-weather.toml");
         modBus.addListener(WeatherPayload::register);
+        modBus.addListener(RiverFlow.Lines::register);
         modBus.addListener(ThermalPayload::register);
         ThermalContent.register(modBus);
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON,ThermalConfig.SPEC,"civilization-heat.toml");
