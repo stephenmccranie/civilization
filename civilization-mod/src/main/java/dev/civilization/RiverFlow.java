@@ -54,6 +54,7 @@ public final class RiverFlow {
             SENT.put(id, centre);
             var server = level.getServer();
             FETCH.execute(() -> {
+                if (SENT.get(id) != centre) return;
                 float[][] lines;
                 try {
                     lines = TerrainDiffusion.riverLines(x, z, REACH);
