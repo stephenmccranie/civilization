@@ -7,22 +7,26 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 /**
  * Photon runs river waves downstream: a channel DEPTH blocks deep runs south down a straight reach, round a quarter
- * bend of radius BEND about the origin and out to the west, with its line handed to the client as the server would
- * send it. Each shot is a run of screenshots two ticks apart; looking straight down, screen up is south and screen
- * right is west, so the reach's waves run up the screen, the exit's run right and the bend's run up and right.
+ * bend of radius BEND about the origin and out to the west, where it drops a block at x DROP and its water runs over
+ * the edge in a sloping lip. Its line is handed to the client as the server would send it. Each shot is a run of
+ * screenshots two ticks apart; looking south, screen right is west, and looking straight down, screen up is south,
+ * so the reach's waves run up the screen, the bend's run up and right, and the exit's and the lip's run right.
  * The still shots repeat views with no line, where Photon's own waves run one way everywhere.
  */
 final class RiverVisualCheck {
-    private static final int BEND=40,REACH=36,HALF=7,DEPTH=5,Y=200,START=120,STEP=110,SETTLE=70;
-    private record Shot(String name,double x,double y,double z,float pitch,boolean lines,int frames){}
+    private static final int BEND=40,REACH=36,HALF=7,DEPTH=5,DROP=-11,Y=200,START=120,STEP=110,SETTLE=70;
+    private record Shot(String name,double x,double y,double z,float yaw,float pitch,boolean lines,int frames){}
     private static final Shot[] SHOTS={
-            new Shot("low",BEND+.5,Y+3,-REACH-3,20,true,16),
-            new Shot("reach",BEND+.5,Y+7,-18.5,90,true,3),
-            new Shot("bend",BEND*.71,Y+7,BEND*.71,90,true,3),
-            new Shot("exit",-18.5,Y+7,BEND+.5,90,true,3),
-            new Shot("reach-still",BEND+.5,Y+7,-18.5,90,false,3),
-            new Shot("exit-still",-18.5,Y+7,BEND+.5,90,false,3),
-            new Shot("low-still",BEND+.5,Y+3,-REACH-3,20,false,16)};
+            new Shot("low",BEND+.5,Y+3,-REACH-3,0,20,true,16),
+            new Shot("reach",BEND+.5,Y+7,-18.5,0,90,true,3),
+            new Shot("bend",BEND*.71,Y+7,BEND*.71,0,90,true,3),
+            new Shot("exit",-18.5,Y+7,BEND+.5,0,90,true,3),
+            new Shot("rapids",DROP+.5,Y+3,BEND-HALF-3,0,30,true,8),
+            new Shot("rapids-low",-2.5,Y+2,BEND+.5,90,25,true,16),
+            new Shot("reach-still",BEND+.5,Y+7,-18.5,0,90,false,3),
+            new Shot("exit-still",-18.5,Y+7,BEND+.5,0,90,false,3),
+            new Shot("rapids-still",DROP+.5,Y+3,BEND-HALF-3,0,30,false,8),
+            new Shot("low-still",BEND+.5,Y+3,-REACH-3,0,20,false,16)};
     private static int ticks;
     private static void require(boolean ok,String message){if(!ok)throw new IllegalStateException(message);}
     /** Distance across from the channel's centreline. */
@@ -54,7 +58,7 @@ final class RiverVisualCheck {
     }
     private static void view(Minecraft mc,Shot shot){var server=mc.getSingleplayerServer();server.execute(()->{
         var p=server.getPlayerList().getPlayers().getFirst();p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=true;p.onUpdateAbilities();
-        p.teleportTo(server.overworld(),shot.x,shot.y,shot.z,java.util.Set.of(),0,shot.pitch);});}
+        p.teleportTo(server.overworld(),shot.x,shot.y,shot.z,java.util.Set.of(),shot.yaw,shot.pitch);});}
     static void tick(Minecraft mc){ticks++;var server=mc.getSingleplayerServer();
         if(ticks==100){mc.options.hideGui=true;mc.options.fov().set(70);TemperatureWashConfig.ENABLED.set(false);mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);server.execute(()->{
             var l=server.overworld();
@@ -62,11 +66,14 @@ final class RiverVisualCheck {
             int lo=-REACH-HALF-6,hi=BEND+HALF+6;var pos=new BlockPos.MutableBlockPos();
             for(int x=lo;x<=hi;x++)for(int z=lo;z<=hi;z++){
                 boolean water=across(x+.5,z+.5)<=HALF;
+                int top=water&&x<=DROP?Y-1:Y;
                 for(int y=Y-DEPTH-2;y<=Y+16;y++){
-                    var block=y>Y?Blocks.AIR:y==Y&&!water?Blocks.GRASS_BLOCK:y>=Y-DEPTH+1?(water?Blocks.WATER:Blocks.DIRT):y==Y-DEPTH&&water?Blocks.MUD:Blocks.STONE;
+                    var block=y>Y?Blocks.AIR:y==Y&&!water?Blocks.GRASS_BLOCK:y>top?Blocks.AIR:y>=Y-DEPTH+1?(water?Blocks.WATER:Blocks.DIRT):y==Y-DEPTH&&water?Blocks.MUD:Blocks.STONE;
                     l.setBlock(pos.set(x,y,z),block.defaultBlockState(),2);
                 }
             }
+            // The water at the top of the drop runs over its edge as it would in a world
+            for(int z=lo;z<=hi;z++)if(across(DROP+1.5,z+.5)<=HALF)l.scheduleTick(new BlockPos(DROP+1,Y,z),net.minecraft.world.level.material.Fluids.WATER,1);
         });}
         int shot=(ticks-START)/STEP,at=(ticks-START)%STEP;
         if(ticks<START||shot>SHOTS.length)return;

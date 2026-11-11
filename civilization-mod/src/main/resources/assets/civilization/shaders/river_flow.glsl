@@ -25,7 +25,9 @@ void civilization_river_frame(int k, vec2 p, out vec2 dir, out float along, out 
 
 // On a river's surface, Photon's flowing water laid along the river: its waves run downstream, and its noise
 // scrolls with them. Where p lies near the bend between two chords of a line, both are blended, so distance
-// along the river and its direction carry on smoothly round the bend.
+// along the river and its direction carry on smoothly round the bend. Every face of the water that looks up takes
+// the river's frame, including those sloping down where a river drops a block; its sides keep Photon's waves,
+// which run down them.
 void civilization_river_flow(
     vec3 scene_pos,
     vec3 flat_normal,
@@ -34,7 +36,7 @@ void civilization_river_flow(
     inout bool flowing_water,
     inout mat3 tbn
 ) {
-    if (flat_normal.y < 0.99 || civilizationRiverCount <= 0) return;
+    if (flat_normal.y < 0.5 || civilizationRiverCount <= 0) return;
     vec2 p = scene_pos.xz;
 
     int k = 0;
@@ -73,5 +75,7 @@ void civilization_river_flow(
     coord = vec2(across, -along);
     flow_dir = vec2(0.0, -1.0);
     flowing_water = true;
-    tbn = mat3(vec3(dir.y, 0.0, -dir.x), vec3(dir.x, 0.0, dir.y), vec3(0.0, 1.0, 0.0));
+    // The frame lies on the face: downstream tilted into its slope, across the river square to that and the normal
+    vec3 downstream = normalize(vec3(dir.x, 0.0, dir.y) - flat_normal * dot(vec3(dir.x, 0.0, dir.y), flat_normal));
+    tbn = mat3(cross(flat_normal, downstream), downstream, flat_normal);
 }
